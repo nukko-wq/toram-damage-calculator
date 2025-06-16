@@ -101,6 +101,7 @@ export type EquipmentType = 'weapon' | 'armor' | 'accessory' | 'fashion'
 // 装備カテゴリ
 export type EquipmentCategory = 
 	| 'main' 
+	| 'mainWeapon'
 	| 'body' 
 	| 'additional' 
 	| 'special' 
