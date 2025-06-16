@@ -45,20 +45,27 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 
 	// 外部からのstats変更を反映
 	useEffect(() => {
-		reset(stats)
-	}, [stats, reset])
+		// フォームが初期化されていない場合のみリセット
+		const currentValues = watch()
+		const hasChanges = Object.keys(stats).some(
+			key => currentValues[key as keyof BaseStatsFormData] !== stats[key as keyof BaseStats]
+		)
+		
+		if (hasChanges && Object.keys(errors).length === 0) {
+			reset(stats)
+		}
+	}, [stats, reset, watch, errors])
 
 	// フォームの値変更を監視して親に通知
 	useEffect(() => {
 		const subscription = watch((value) => {
-			// 全ての値が揃っていて、バリデーションエラーがない場合のみonChangeを呼ぶ
-			if (Object.values(value).every((v) => v !== undefined && v !== null) && 
-				Object.keys(errors).length === 0) {
+			// 全ての値が揃っている場合は常にonChangeを呼ぶ（バリデーションエラーがあっても）
+			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
 				onChange(value as BaseStats)
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watch, onChange, errors])
+	}, [watch, onChange])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-6 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
