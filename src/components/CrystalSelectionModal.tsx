@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { useModalOverlay } from 'react-aria'
+import { useState, useEffect } from 'react'
 import type { CrystalType, PresetCrystal } from '@/types/calculator'
 import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
@@ -23,17 +22,26 @@ export default function CrystalSelectionModal({
 	allowedTypes,
 	title,
 }: CrystalSelectionModalProps) {
-	const overlayRef = useRef<HTMLDivElement>(null)
-	const { modalProps, underlayProps } = useModalOverlay(
-		{ isDismissable: true },
-		{ isOpen },
-		overlayRef,
-	)
-
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
 	const [availableCrystals, setAvailableCrystals] = useState<PresetCrystal[]>(
 		[],
 	)
+
+	// ESCキーでモーダルを閉じる
+	useEffect(() => {
+		if (!isOpen) return
+
+		const handleEscapeKey = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				onClose()
+			}
+		}
+
+		document.addEventListener('keydown', handleEscapeKey)
+		return () => {
+			document.removeEventListener('keydown', handleEscapeKey)
+		}
+	}, [isOpen, onClose])
 
 	useEffect(() => {
 		if (!isOpen) return
@@ -90,17 +98,10 @@ export default function CrystalSelectionModal({
 	if (!isOpen) return null
 
 	return (
-		<div
-			{...underlayProps}
-			ref={overlayRef}
-			className="fixed inset-0 z-50 overflow-y-auto bg-black/50 transition-opacity"
-		>
+		<div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 transition-opacity">
 			{/* モーダルコンテンツ */}
 			<div className="relative min-h-screen flex items-center justify-center p-4">
-				<div
-					{...modalProps}
-					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
-				>
+				<div className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b">
 						<h2 className="text-xl font-bold text-gray-900">{title}</h2>
