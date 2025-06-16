@@ -1,18 +1,196 @@
 import type { PresetEquipment, EquipmentType, EquipmentCategory } from '@/types/calculator'
 import equipmentsData from '@/data/equipments.json'
 
+// 新しいJSON構造の型定義
+interface EquipmentsJsonStructure {
+	equipments: {
+		mainWeapon?: Array<{
+			id: string
+			name: string
+			weaponStats?: {
+				ATK?: number
+				stability?: number
+				refinement?: number
+			}
+			properties?: Record<string, number>
+			source?: string
+		}>
+		body?: Array<{
+			id: string
+			name: string
+			properties?: Record<string, number>
+			source?: string
+		}>
+		additional?: Array<{
+			id: string
+			name: string
+			properties?: Record<string, number>
+			source?: string
+		}>
+		special?: Array<{
+			id: string
+			name: string
+			properties?: Record<string, number>
+			source?: string
+		}>
+		subWeapon?: Array<{
+			id: string
+			name: string
+			properties?: Record<string, number>
+			source?: string
+		}>
+		fashion1?: Array<{
+			id: string
+			name: string
+			properties?: Record<string, number>
+			source?: string
+		}>
+		fashion2?: Array<{
+			id: string
+			name: string
+			properties?: Record<string, number>
+			source?: string
+		}>
+		fashion3?: Array<{
+			id: string
+			name: string
+			properties?: Record<string, number>
+			source?: string
+		}>
+	}
+}
+
 // プリセット装備データを取得
 export function getAllEquipments(): PresetEquipment[] {
 	const allEquipments: PresetEquipment[] = []
 	
-	// 各カテゴリの装備を統合
-	const categories = ['weapons', 'armors', 'accessories', 'fashion', 'subWeapons'] as const
+	// 新しいJSON構造に対応
+	const equipmentsRoot = (equipmentsData as EquipmentsJsonStructure).equipments
 	
-	categories.forEach(category => {
-		if (equipmentsData[category]) {
-			allEquipments.push(...(equipmentsData[category] as PresetEquipment[]))
+	if (!equipmentsRoot) {
+		console.error('equipments.json構造が不正です')
+		return []
+	}
+	
+	// mainWeapon -> main カテゴリ、weapon タイプ
+	if (equipmentsRoot.mainWeapon) {
+		for (const item of equipmentsRoot.mainWeapon) {
+			allEquipments.push({
+				id: item.id,
+				name: item.name,
+				type: 'weapon' as EquipmentType,
+				category: ['main'] as EquipmentCategory[],
+				baseStats: item.weaponStats || {},
+				properties: item.properties || {},
+				source: item.source
+			})
 		}
-	})
+	}
+	
+	// body -> body カテゴリ、armor タイプ
+	if (equipmentsRoot.body) {
+		for (const item of equipmentsRoot.body) {
+			allEquipments.push({
+				id: item.id,
+				name: item.name,
+				type: 'armor' as EquipmentType,
+				category: ['body'] as EquipmentCategory[],
+				baseStats: {},
+				properties: item.properties || {},
+				source: item.source
+			})
+		}
+	}
+	
+	// additional -> additional カテゴリ、accessory タイプ
+	if (equipmentsRoot.additional) {
+		for (const item of equipmentsRoot.additional) {
+			allEquipments.push({
+				id: item.id,
+				name: item.name,
+				type: 'accessory' as EquipmentType,
+				category: ['additional'] as EquipmentCategory[],
+				baseStats: {},
+				properties: item.properties || {},
+				source: item.source
+			})
+		}
+	}
+	
+	// special -> special カテゴリ、accessory タイプ
+	if (equipmentsRoot.special) {
+		for (const item of equipmentsRoot.special) {
+			allEquipments.push({
+				id: item.id,
+				name: item.name,
+				type: 'accessory' as EquipmentType,
+				category: ['special'] as EquipmentCategory[],
+				baseStats: {},
+				properties: item.properties || {},
+				source: item.source
+			})
+		}
+	}
+	
+	// subWeapon -> subWeapon カテゴリ、weapon タイプ
+	if (equipmentsRoot.subWeapon) {
+		for (const item of equipmentsRoot.subWeapon) {
+			allEquipments.push({
+				id: item.id,
+				name: item.name,
+				type: 'weapon' as EquipmentType,
+				category: ['subWeapon'] as EquipmentCategory[],
+				baseStats: {},
+				properties: item.properties || {},
+				source: item.source
+			})
+		}
+	}
+	
+	// fashion1 -> fashion1 カテゴリ、fashion タイプ
+	if (equipmentsRoot.fashion1) {
+		for (const item of equipmentsRoot.fashion1) {
+			allEquipments.push({
+				id: item.id,
+				name: item.name,
+				type: 'fashion' as EquipmentType,
+				category: ['fashion1'] as EquipmentCategory[],
+				baseStats: {},
+				properties: item.properties || {},
+				source: item.source
+			})
+		}
+	}
+	
+	// fashion2 -> fashion2 カテゴリ、fashion タイプ
+	if (equipmentsRoot.fashion2) {
+		for (const item of equipmentsRoot.fashion2) {
+			allEquipments.push({
+				id: item.id,
+				name: item.name,
+				type: 'fashion' as EquipmentType,
+				category: ['fashion2'] as EquipmentCategory[],
+				baseStats: {},
+				properties: item.properties || {},
+				source: item.source
+			})
+		}
+	}
+	
+	// fashion3 -> fashion3 カテゴリ、fashion タイプ
+	if (equipmentsRoot.fashion3) {
+		for (const item of equipmentsRoot.fashion3) {
+			allEquipments.push({
+				id: item.id,
+				name: item.name,
+				type: 'fashion' as EquipmentType,
+				category: ['fashion3'] as EquipmentCategory[],
+				baseStats: {},
+				properties: item.properties || {},
+				source: item.source
+			})
+		}
+	}
 	
 	return allEquipments
 }
@@ -98,6 +276,7 @@ export function getEquipmentTypeLabel(type: EquipmentType): string {
 export function getEquipmentCategoryLabel(category: EquipmentCategory): string {
 	switch (category) {
 		case 'main': return 'メイン装備'
+		case 'mainWeapon': return 'メイン武器'
 		case 'body': return '体装備'
 		case 'additional': return '追加装備'
 		case 'special': return '特殊装備'

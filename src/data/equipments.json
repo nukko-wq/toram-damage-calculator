@@ -1,216 +1,160 @@
 {
-  "weapons": [
-    {
-      "id": "blade_master_sword",
-      "name": "ブレードマスターソード",
-      "type": "weapon",
-      "category": ["main"],
-      "baseStats": {
-        "ATK": 250,
-        "stability": 85,
-        "refinement": 10
-      },
-      "properties": {
-        "ATK%": 15,
-        "クリティカル率%": 10,
-        "クリティカルダメージ%": 8
-      },
-      "description": "熟練の剣士が使用する高性能な片手剣",
-      "source": "クエスト報酬"
-    },
-    {
-      "id": "crimson_destroyer",
-      "name": "クリムゾンデストロイヤー",
-      "type": "weapon",
-      "category": ["main"],
-      "baseStats": {
-        "ATK": 320,
-        "stability": 75,
-        "refinement": 10
-      },
-      "properties": {
-        "ATK%": 20,
-        "武器ATK%": 12,
-        "近距離威力%": 15
-      },
-      "description": "破壊力に特化した両手剣",
-      "source": "ボスドロップ"
-    },
-    {
-      "id": "mystic_staff_of_wisdom",
-      "name": "ミスティックスタッフ・オブ・ウィズダム",
-      "type": "weapon",
-      "category": ["main"],
-      "baseStats": {
-        "MATK": 280,
-        "stability": 90,
-        "refinement": 10
-      },
-      "properties": {
-        "MATK%": 18,
-        "詠唱速度%": 15,
-        "MP": 200
-      },
-      "description": "古の魔術師が愛用していた杖",
-      "source": "レア素材合成"
-    }
-  ],
-  "armors": [
-    {
-      "id": "dragon_scale_armor",
-      "name": "ドラゴンスケールアーマー",
-      "type": "armor",
-      "category": ["body"],
-      "baseStats": {
-        "DEF": 180,
-        "MDEF": 120
-      },
-      "properties": {
-        "HP%": 20,
-        "VIT%": 15,
-        "物理貫通%": -10
-      },
-      "description": "ドラゴンの鱗で作られた頑丈な鎧",
-      "source": "ドラゴン討伐"
-    },
-    {
-      "id": "sage_robe",
-      "name": "セージローブ",
-      "type": "armor",
-      "category": ["body"],
-      "baseStats": {
-        "DEF": 80,
-        "MDEF": 200
-      },
-      "properties": {
-        "MP": 300,
-        "INT%": 18,
-        "詠唱速度%": 12
-      },
-      "description": "賢者が着用する魔力を高めるローブ",
-      "source": "ギルドショップ"
-    }
-  ],
-  "accessories": [
-    {
-      "id": "berserker_ring",
-      "name": "バーサーカーリング",
-      "type": "accessory",
-      "category": ["additional"],
-      "baseStats": {},
-      "properties": {
-        "ATK%": 12,
-        "クリティカル率%": 15,
-        "HP%": -10
-      },
-      "description": "攻撃力を大幅に向上させるが体力を犠牲にする指輪",
-      "source": "PvPポイント交換"
-    },
-    {
-      "id": "scholars_pendant",
-      "name": "スカラーズペンダント",
-      "type": "accessory",
-      "category": ["additional"],
-      "baseStats": {},
-      "properties": {
-        "MATK%": 10,
-        "MP": 150,
-        "詠唱速度%": 8
-      },
-      "description": "学者の知識を宿したペンダント",
-      "source": "クエスト報酬"
-    },
-    {
-      "id": "speed_boots",
-      "name": "スピードブーツ",
-      "type": "accessory",
-      "category": ["special"],
-      "baseStats": {},
-      "properties": {
-        "AGI%": 20,
-        "攻撃速度%": 15,
-        "回避%": 10
-      },
-      "description": "俊敏性を大幅に向上させる軽量ブーツ",
-      "source": "イベント限定"
-    }
-  ],
-  "fashion": [
-    {
-      "id": "royal_crown",
-      "name": "ロイヤルクラウン",
-      "type": "fashion",
-      "category": ["fashion1"],
-      "baseStats": {},
-      "properties": {
-        "HP": 100,
-        "MP": 50,
-        "全ステータス%": 3
-      },
-      "description": "王族の証である豪華な王冠",
-      "source": "課金アイテム"
-    },
-    {
-      "id": "ninja_mask",
-      "name": "ニンジャマスク",
-      "type": "fashion",
-      "category": ["fashion2"],
-      "baseStats": {},
-      "properties": {
-        "回避%": 8,
-        "クリティカル率%": 5,
-        "AGI": 20
-      },
-      "description": "忍者が使用する軽量なマスク",
-      "source": "特別クエスト"
-    },
-    {
-      "id": "mage_cape",
-      "name": "メイジケープ",
-      "type": "fashion",
-      "category": ["fashion3"],
-      "baseStats": {},
-      "properties": {
-        "MATK%": 8,
-        "詠唱速度%": 10,
-        "INT": 25
-      },
-      "description": "魔法使いの象徴的なケープ",
-      "source": "ギルドイベント"
-    }
-  ],
-  "subWeapons": [
-    {
-      "id": "throwing_knife_set",
-      "name": "スローイングナイフセット",
-      "type": "weapon",
-      "category": ["subWeapon"],
-      "baseStats": {
-        "ATK": 80,
-        "refinement": 5
-      },
-      "properties": {
-        "クリティカル率%": 12,
-        "命中%": 10
-      },
-      "description": "投擲用の軽量ナイフセット",
-      "source": "商店購入"
-    },
-    {
-      "id": "enhanced_arrows",
-      "name": "エンハンスドアロー",
-      "type": "weapon",
-      "category": ["subWeapon"],
-      "baseStats": {
-        "ATK": 60,
-        "refinement": 8
-      },
-      "properties": {
-        "遠距離威力%": 18,
-        "命中%": 15
-      },
-      "description": "魔力で強化された矢",
-      "source": "錬金術合成"
-    }
-  ]
+	"equipments": {
+		"mainWeapon": [
+			{
+				"id": "blade_master_sword",
+				"name": "有利-ATK%-STR%-クリ率",
+				"properties": {
+					"ATK%": 15,
+					"属性有利%": 22,
+					"クリティカル率": 27,
+					"STR%": 4,
+					"HP自然回復": -27,
+					"回避": -14
+				},
+				"source": "スミス"
+			},
+			{
+				"id": "crimson_destroyer",
+				"name": "クリムゾンデストロイヤー",
+				"weaponStats": {
+					"ATK": 320,
+					"stability": 75,
+					"refinement": 10
+				},
+				"properties": {
+					"ATK%": 20,
+					"武器ATK%": 12,
+					"近距離威力%": 15
+				},
+				"source": "ボスドロップ"
+			},
+			{
+				"id": "mystic_staff_of_wisdom",
+				"name": "ミスティックスタッフ・オブ・ウィズダム",
+				"properties": {
+					"MATK%": 18,
+					"詠唱速度%": 15,
+					"MP": 200
+				},
+				"source": "レア素材合成"
+			}
+		],
+		"body": [
+			{
+				"id": "dragon_scale_armor",
+				"name": "ドラゴンスケールアーマー",
+				"properties": {
+					"HP%": 20,
+					"VIT%": 15,
+					"物理貫通%": -10
+				},
+				"source": "ドラゴン討伐"
+			},
+			{
+				"id": "sage_robe",
+				"name": "セージローブ",
+				"properties": {
+					"MP": 300,
+					"INT%": 18,
+					"詠唱速度%": 12
+				},
+				"source": "ギルドショップ"
+			}
+		],
+		"additional": [
+			{
+				"id": "berserker_ring",
+				"name": "バーサーカーリング",
+				"properties": {
+					"ATK%": 12,
+					"クリティカル率%": 15,
+					"HP%": -10
+				},
+				"source": "PvPポイント交換"
+			},
+			{
+				"id": "scholars_pendant",
+				"name": "スカラーズペンダント",
+				"properties": {
+					"MATK%": 10,
+					"MP": 150,
+					"詠唱速度%": 8
+				},
+				"source": "クエスト報酬"
+			}
+		],
+		"special": [
+			{
+				"id": "speed_boots",
+				"name": "スピードブーツ",
+				"properties": {
+					"AGI%": 20,
+					"攻撃速度%": 15,
+					"回避%": 10
+				},
+				"source": "イベント限定"
+			}
+		],
+		"subWeapon": [
+			{
+				"id": "throwing_knife_set",
+				"name": "スローイングナイフセット",
+				"properties": {
+					"クリティカル率%": 12,
+					"命中%": 10
+				},
+				"source": "商店購入"
+			},
+			{
+				"id": "enhanced_arrows",
+				"name": "エンハンスドアロー",
+				"properties": {
+					"遠距離威力%": 18,
+					"命中%": 15
+				},
+				"source": "錬金術合成"
+			}
+		],
+		"fashion1": [
+			{
+				"id": "royal_crown",
+				"name": "ロイヤルクラウン",
+				"properties": {
+					"HP": 100,
+					"MP": 50,
+					"STR%": 3,
+					"INT%": 3,
+					"VIT%": 3,
+					"AGI%": 3,
+					"DEX%": 3
+				},
+				"source": "課金アイテム"
+			}
+		],
+		"fashion2": [
+			{
+				"id": "ninja_mask",
+				"name": "ニンジャマスク",
+				"properties": {
+					"回避%": 8,
+					"クリティカル率%": 5,
+					"AGI": 20
+				},
+				"source": "特別クエスト"
+			}
+		],
+		"fashion3": [
+			{
+				"id": "mage_cape",
+				"name": "メイジケープ",
+				"properties": {
+					"MATK%": 8,
+					"詠唱速度%": 10,
+					"INT": 25
+				},
+				"source": "ギルドイベント"
+			}
+		]
+	}
 }
