@@ -151,7 +151,7 @@ export default function EquipmentForm({
 
 			{/* タブヘッダー */}
 			<div className="border-b border-gray-200 mb-6">
-				<nav className="flex flex-wrap gap-2">
+				<nav className="grid grid-cols-4 gap-2">
 					{equipmentSlots.map(({ key, label }) => (
 						<button
 							key={key}
