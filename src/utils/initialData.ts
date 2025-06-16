@@ -32,6 +32,8 @@ export const createInitialMainWeapon = (): MainWeapon => ({
 
 export const createInitialSubWeapon = (): SubWeapon => ({
 	weaponType: 'なし',
+	ATK: 0,
+	stability: 0,
 	refinement: 0,
 })
 

@@ -83,6 +83,8 @@ export interface MainWeapon {
 // サブ武器
 export interface SubWeapon {
 	weaponType: SubWeaponType
+	ATK: number
+	stability: number
 	refinement: number
 }
 
