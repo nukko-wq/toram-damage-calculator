@@ -155,7 +155,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 	}
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6">
+		<section className="bg-white rounded-lg shadow-md p-6 col-start-1 col-end-3 row-start-3 row-end-4">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">クリスタ選択</h2>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">

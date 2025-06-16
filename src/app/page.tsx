@@ -27,7 +27,7 @@ export default function Home() {
 					</p>
 				</div>
 
-				<div className="space-y-8">
+				<div className="space-y-8 grid lg:grid-cols-[350px_100px_minmax(500px,1fr)] lg:grid-rows-[400px_400px_auto_auto_250px_auto_auto] gap-4">
 					<BaseStatsForm
 						stats={data.baseStats}
 						onChange={(baseStats) => setData({ ...data, baseStats })}
@@ -56,9 +56,8 @@ export default function Home() {
 						enemy={data.enemy}
 						onChange={(enemy) => setData({ ...data, enemy })}
 					/>
-
-					<StatsSummary data={data} />
 				</div>
+				<StatsSummary data={data} />
 			</div>
 		</div>
 	)

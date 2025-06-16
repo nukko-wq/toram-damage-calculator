@@ -146,7 +146,7 @@ export default function EquipmentForm({
 	)
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6">
+		<section className="bg-white rounded-lg shadow-md p-6 col-start-3 col-end-4 row-start-1 row-end-4">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">装備</h2>
 
 			{/* タブヘッダー */}

@@ -29,7 +29,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	]
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6">
+		<section className="bg-white rounded-lg shadow-md p-6 col-start-1 col-end-3 row-start-1 row-end-2">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">基本ステータス</h2>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				{statFields.map(({ key, label }) => (
