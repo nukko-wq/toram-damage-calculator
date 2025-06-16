@@ -7,6 +7,7 @@ const presetCrystals: PresetCrystal[] = [
 	...crystalsData.armor.map(crystal => ({ ...crystal, type: 'armor' as CrystalType })),
 	...crystalsData.additional.map(crystal => ({ ...crystal, type: 'additional' as CrystalType })),
 	...crystalsData.special.map(crystal => ({ ...crystal, type: 'special' as CrystalType })),
+	...crystalsData.normal.map(crystal => ({ ...crystal, type: 'normal' as CrystalType })),
 ]
 
 // LocalStorage管理のキー

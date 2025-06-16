@@ -15,11 +15,13 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 		armor: any[]
 		additional: any[]
 		special: any[]
+		normal: any[]
 	}>({
 		weapon: [],
 		armor: [],
 		additional: [],
 		special: [],
+		normal: [],
 	})
 
 	// クリスタデータを読み込み
@@ -29,6 +31,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 			armor: getCrystalsByType('armor'),
 			additional: getCrystalsByType('additional'),
 			special: getCrystalsByType('special'),
+			normal: getCrystalsByType('normal'),
 		})
 	}, [])
 
@@ -86,22 +89,39 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 		const selectedCrystal = selectedCrystalId
 			? getCrystalById(selectedCrystalId)
 			: null
-		const crystalList = availableCrystals[crystalType] || []
+		
+		// 指定されたタイプのクリスタ + ノーマルクリスタを取得
+		const specificCrystals = availableCrystals[crystalType] || []
+		const normalCrystals = availableCrystals.normal || []
 
 		return (
 			<div key={slotKey} className="space-y-2">
-				<label className="text-sm font-medium text-gray-700">{label}</label>
+				<label htmlFor={`crystal-${slotKey}`} className="text-sm font-medium text-gray-700">{label}</label>
 				<select
+					id={`crystal-${slotKey}`}
 					value={selectedCrystalId || ''}
 					onChange={(e) => handleCrystalChange(slotKey, e.target.value)}
 					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 				>
 					<option value="">なし</option>
-					{crystalList.map((crystal) => (
-						<option key={crystal.id} value={crystal.id}>
-							{crystal.name}
-						</option>
-					))}
+					{specificCrystals.length > 0 && (
+						<optgroup label={`${crystalType === 'weapon' ? '武器' : crystalType === 'armor' ? '防具' : crystalType === 'additional' ? '追加' : '特殊'}専用`}>
+							{specificCrystals.map((crystal) => (
+								<option key={crystal.id} value={crystal.id}>
+									{crystal.name}
+								</option>
+							))}
+						</optgroup>
+					)}
+					{normalCrystals.length > 0 && (
+						<optgroup label="ノーマル">
+							{normalCrystals.map((crystal) => (
+								<option key={crystal.id} value={crystal.id}>
+									{crystal.name}
+								</option>
+							))}
+						</optgroup>
+					)}
 				</select>
 				
 				{selectedCrystal && (

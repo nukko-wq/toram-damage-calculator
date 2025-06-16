@@ -22,16 +22,16 @@ export default function WeaponForm({
 }: WeaponFormProps) {
 	const weaponTypes: WeaponType[] = [
 		'片手剣',
+		'双剣',
 		'両手剣',
+		'手甲',
+		'旋風槍',
+		'抜刀剣',
 		'弓',
-		'ボウガン',
+		'自動弓',
 		'杖',
 		'魔導具',
-		'抜刀剣',
-		'旋風槍',
-		'ナックル',
-		'カタナ',
-		'なし',
+		'素手',
 	]
 
 	const subWeaponTypes: SubWeaponType[] = ['ナイフ', '矢', 'なし']

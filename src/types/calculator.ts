@@ -92,7 +92,7 @@ export interface Equipment {
 }
 
 // クリスタル種別
-export type CrystalType = 'weapon' | 'armor' | 'additional' | 'special'
+export type CrystalType = 'weapon' | 'armor' | 'additional' | 'special' | 'normal'
 
 // プリセットクリスタル
 export interface PresetCrystal {

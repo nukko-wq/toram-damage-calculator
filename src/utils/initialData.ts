@@ -23,7 +23,7 @@ export const createInitialBaseStats = (): BaseStats => ({
 })
 
 export const createInitialMainWeapon = (): MainWeapon => ({
-	weaponType: 'なし',
+	weaponType: '素手',
 	ATK: 0,
 	stability: 0,
 	refinement: 0,

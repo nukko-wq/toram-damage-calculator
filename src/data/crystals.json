@@ -86,5 +86,41 @@
 			},
 			"description": "遠距離威力12%, 武器ATK8%, 安定率10%"
 		}
+	],
+	"normal": [
+		{
+			"id": "normal_beast_slaying",
+			"name": "獣種特攻",
+			"properties": {
+				"ATK": 25
+			},
+			"description": "ATK25 (対獣種特効)"
+		},
+		{
+			"id": "normal_hp_boost",
+			"name": "HPブースト",
+			"properties": {
+				"HP": 500,
+				"HP%": 5
+			},
+			"description": "HP500, HP5%"
+		},
+		{
+			"id": "normal_mp_boost",
+			"name": "MPブースト",
+			"properties": {
+				"MP": 300
+			},
+			"description": "MP300"
+		},
+		{
+			"id": "normal_accuracy",
+			"name": "命中強化",
+			"properties": {
+				"命中": 50,
+				"命中%": 3
+			},
+			"description": "命中50, 命中3%"
+		}
 	]
 }
