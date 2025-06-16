@@ -1,0 +1,147 @@
+// 武器種の定義
+export type WeaponType =
+	| '片手剣'
+	| '両手剣'
+	| '弓'
+	| 'ボウガン'
+	| '杖'
+	| '魔導具'
+	| '抜刀剣'
+	| '旋風槍'
+	| 'ナックル'
+	| 'カタナ'
+	| 'ナイフ'
+	| '矢'
+	| 'なし'
+
+// サブ武器種の定義
+export type SubWeaponType = 'ナイフ' | '矢' | 'なし'
+
+// 基本ステータス
+export interface BaseStats {
+	STR: number
+	INT: number
+	VIT: number
+	AGI: number
+	DEX: number
+	CRT: number
+	MEN: number
+	TEC: number
+	level: number
+}
+
+// 装備プロパティ
+export interface EquipmentProperties {
+	'ATK%': number
+	ATK: number
+	'MATK%': number
+	MATK: number
+	'武器ATK%': number
+	武器ATK: number
+	'物理貫通%': number
+	'魔法貫通%': number
+	'属性有利%': number
+	'抜刀威力%': number
+	抜刀威力: number
+	'近距離威力%': number
+	'遠距離威力%': number
+	'クリティカルダメージ%': number
+	クリティカルダメージ: number
+	'クリティカル率%': number
+	クリティカル率: number
+	'安定率%': number
+	'HP%': number
+	HP: number
+	MP: number
+	'STR%': number
+	STR: number
+	'INT%': number
+	INT: number
+	'VIT%': number
+	VIT: number
+	'AGI%': number
+	AGI: number
+	'DEX%': number
+	DEX: number
+	'命中%': number
+	命中: number
+	'回避%': number
+	回避: number
+	'攻撃速度%': number
+	攻撃速度: number
+	'詠唱速度%': number
+	詠唱速度: number
+}
+
+// メイン武器
+export interface MainWeapon {
+	weaponType: WeaponType
+	ATK: number
+	stability: number
+	refinement: number
+}
+
+// サブ武器
+export interface SubWeapon {
+	weaponType: SubWeaponType
+	refinement: number
+}
+
+// 装備アイテム
+export interface Equipment {
+	name: string
+	properties: Partial<EquipmentProperties>
+}
+
+// 装備スロット
+export interface EquipmentSlots {
+	main: Equipment
+	body: Equipment
+	additional: Equipment
+	special: Equipment
+	subWeapon: Equipment
+	fashion1: Equipment
+	fashion2: Equipment
+	fashion3: Equipment
+}
+
+// クリスタルスロット
+export interface CrystalSlots {
+	weapon1: Equipment
+	weapon2: Equipment
+	armor1: Equipment
+	armor2: Equipment
+	additional1: Equipment
+	additional2: Equipment
+	special1: Equipment
+	special2: Equipment
+}
+
+// 敵の情報
+export interface EnemyInfo {
+	DEF: number
+	MDEF: number
+	level: number
+	guaranteedCritical: number
+	freeValue: number
+}
+
+// 計算機の全データ
+export interface CalculatorData {
+	baseStats: BaseStats
+	mainWeapon: MainWeapon
+	subWeapon: SubWeapon
+	equipment: EquipmentSlots
+	crystals: CrystalSlots
+	enemy: EnemyInfo
+}
+
+// 計算結果
+export interface CalculationResult {
+	totalStats: BaseStats & Partial<EquipmentProperties>
+	damage: {
+		normal: number
+		skill: number
+		critical: number
+	}
+}
