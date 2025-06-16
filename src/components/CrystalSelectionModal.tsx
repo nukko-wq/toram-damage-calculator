@@ -96,16 +96,21 @@ export default function CrystalSelectionModal({
 	}
 
 	const handleBackgroundClick = (e: React.MouseEvent) => {
-		// モーダル外をクリックした場合のみ閉じる
-		if (e.target === e.currentTarget) {
+		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
+		const modalContent = document.querySelector('[data-modal-content="true"]')
+		const target = e.target as Element
+		
+		if (modalContent && !modalContent.contains(target)) {
 			onClose()
 		}
 	}
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
+	const handleDialogKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Escape') {
 			onClose()
 		}
+		// EnterキーやSpaceキーで背景クリックと同様の動作をする場合
+		// (実際にはEscapeで十分なので、この部分は省略可能)
 	}
 
 	const handleContentClick = (e: React.MouseEvent) => {
@@ -113,27 +118,30 @@ export default function CrystalSelectionModal({
 		e.stopPropagation()
 	}
 
+	const handleContentKeyDown = (e: React.KeyboardEvent) => {
+		// キーイベントの伝播を停止（必要に応じて）
+		e.stopPropagation()
+	}
+
 	if (!isOpen) return null
 
 	return (
 		<>
-			{/* 背景オーバーレイ */}
-			<div
-				className="fixed inset-0 z-50 bg-black/50 transition-opacity"
-				onClick={handleBackgroundClick}
-				aria-hidden="true"
-			/>
 			{/* モーダル */}
 			<dialog
 				open={isOpen}
-				className="fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-transparent"
-				onKeyDown={handleKeyDown}
+				className="fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-black/50 transition-opacity"
+				onKeyDown={handleDialogKeyDown}
+				onClick={handleBackgroundClick}
 				aria-labelledby="modal-title"
+				aria-modal="true"
 			>
 				<div className="min-h-screen flex items-center justify-center p-4">
 					<div
 						className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
 						onClick={handleContentClick}
+						onKeyDown={handleContentKeyDown}
+						data-modal-content="true"
 					>
 						{/* ヘッダー */}
 						<div className="flex items-center justify-between p-6 border-b">
