@@ -253,18 +253,9 @@ export default function EquipmentForm({
 				{/* 現在選択されている装備表示 */}
 				{equipment[activeTab].presetId && (
 					<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-						<div className="flex items-center justify-between">
-							<span className="text-sm font-medium text-blue-800">
-								プリセット: {equipment[activeTab].name}
-							</span>
-							<button
-								type="button"
-								onClick={() => handlePresetEquipmentSelect(null)}
-								className="text-xs text-blue-600 hover:text-blue-800"
-							>
-								プリセット解除
-							</button>
-						</div>
+						<span className="text-sm font-medium text-blue-800">
+							プリセット: {equipment[activeTab].name}
+						</span>
 						<div className="text-xs text-blue-600 mt-1">
 							※ 下記の値を変更するとプリセットが解除されます
 						</div>
