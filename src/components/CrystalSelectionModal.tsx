@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import type { CrystalType } from '@/types/calculator'
-import { getCrystalsByType, getAllCrystals } from '@/utils/crystalDatabase'
+import { useState, useEffect, useRef } from 'react'
+import { useModalOverlay } from 'react-aria'
+import type { CrystalType, PresetCrystal } from '@/types/calculator'
+import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
 
 interface CrystalSelectionModalProps {
@@ -22,24 +23,17 @@ export default function CrystalSelectionModal({
 	allowedTypes,
 	title,
 }: CrystalSelectionModalProps) {
+	const overlayRef = useRef<HTMLDivElement>(null)
+	const { modalProps, underlayProps } = useModalOverlay(
+		{ isDismissable: true },
+		{ isOpen },
+		overlayRef,
+	)
+
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
-	const [availableCrystals, setAvailableCrystals] = useState<any[]>([])
-
-	// ESCキーでモーダルを閉じる
-	useEffect(() => {
-		if (!isOpen) return
-
-		const handleEscapeKey = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				onClose()
-			}
-		}
-
-		document.addEventListener('keydown', handleEscapeKey)
-		return () => {
-			document.removeEventListener('keydown', handleEscapeKey)
-		}
-	}, [isOpen, onClose])
+	const [availableCrystals, setAvailableCrystals] = useState<PresetCrystal[]>(
+		[],
+	)
 
 	useEffect(() => {
 		if (!isOpen) return
@@ -93,33 +87,19 @@ export default function CrystalSelectionModal({
 		onClose()
 	}
 
-	const handleBackgroundClick = (e: React.MouseEvent) => {
-		// モーダル外をクリックした場合のみ閉じる
-		if (e.target === e.currentTarget) {
-			onClose()
-		}
-	}
-
-	const handleContentClick = (e: React.MouseEvent) => {
-		// モーダル内のクリックは伝播を停止
-		e.stopPropagation()
-	}
-
 	if (!isOpen) return null
 
 	return (
 		<div
-			className="fixed inset-0 z-50 overflow-y-auto"
-			onClick={handleBackgroundClick}
+			{...underlayProps}
+			ref={overlayRef}
+			className="fixed inset-0 z-50 overflow-y-auto bg-black/50 transition-opacity"
 		>
-			{/* オーバーレイ */}
-			<div className="fixed inset-0 bg-black/50 transition-opacity" />
-
 			{/* モーダルコンテンツ */}
 			<div className="relative min-h-screen flex items-center justify-center p-4">
 				<div
+					{...modalProps}
 					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
-					onClick={handleContentClick}
 				>
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b">
