@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { CrystalSlots, CrystalType } from '@/types/calculator'
-import { getCrystalsByType, getCrystalById } from '@/utils/crystalDatabase'
+import { getCrystalById } from '@/utils/crystalDatabase'
+import CrystalSelectionModal from './CrystalSelectionModal'
 
 interface CrystalFormProps {
 	crystals: CrystalSlots
@@ -10,38 +11,42 @@ interface CrystalFormProps {
 }
 
 export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
-	const [availableCrystals, setAvailableCrystals] = useState<{
-		weapon: any[]
-		armor: any[]
-		additional: any[]
-		special: any[]
-		normal: any[]
+	const [modalState, setModalState] = useState<{
+		isOpen: boolean
+		slotKey: keyof CrystalSlots | null
+		allowedTypes: CrystalType[]
+		title: string
 	}>({
-		weapon: [],
-		armor: [],
-		additional: [],
-		special: [],
-		normal: [],
+		isOpen: false,
+		slotKey: null,
+		allowedTypes: [],
+		title: '',
 	})
 
-	// クリスタデータを読み込み
-	useEffect(() => {
-		setAvailableCrystals({
-			weapon: getCrystalsByType('weapon'),
-			armor: getCrystalsByType('armor'),
-			additional: getCrystalsByType('additional'),
-			special: getCrystalsByType('special'),
-			normal: getCrystalsByType('normal'),
-		})
-	}, [])
-
-	const handleCrystalChange = (
-		slotKey: keyof CrystalSlots,
-		crystalId: string
-	) => {
+	const handleCrystalChange = (crystalId: string | null) => {
+		if (!modalState.slotKey) return
+		
 		onChange({
 			...crystals,
-			[slotKey]: crystalId === '' ? null : crystalId,
+			[modalState.slotKey]: crystalId,
+		})
+	}
+
+	const openModal = (slotKey: keyof CrystalSlots, allowedTypes: CrystalType[], title: string) => {
+		setModalState({
+			isOpen: true,
+			slotKey,
+			allowedTypes,
+			title,
+		})
+	}
+
+	const closeModal = () => {
+		setModalState({
+			isOpen: false,
+			slotKey: null,
+			allowedTypes: [],
+			title: '',
 		})
 	}
 
@@ -80,7 +85,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 		},
 	]
 
-	const renderCrystalSelect = (
+	const renderCrystalSlot = (
 		slotKey: keyof CrystalSlots,
 		label: string,
 		crystalType: CrystalType
@@ -89,46 +94,41 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 		const selectedCrystal = selectedCrystalId
 			? getCrystalById(selectedCrystalId)
 			: null
-		
-		// 指定されたタイプのクリスタ + ノーマルクリスタを取得
-		const specificCrystals = availableCrystals[crystalType] || []
-		const normalCrystals = availableCrystals.normal || []
 
 		return (
 			<div key={slotKey} className="space-y-2">
-				<label htmlFor={`crystal-${slotKey}`} className="text-sm font-medium text-gray-700">{label}</label>
-				<select
-					id={`crystal-${slotKey}`}
-					value={selectedCrystalId || ''}
-					onChange={(e) => handleCrystalChange(slotKey, e.target.value)}
-					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-				>
-					<option value="">なし</option>
-					{specificCrystals.length > 0 && (
-						<optgroup label={`${crystalType === 'weapon' ? '武器' : crystalType === 'armor' ? '防具' : crystalType === 'additional' ? '追加' : '特殊'}専用`}>
-							{specificCrystals.map((crystal) => (
-								<option key={crystal.id} value={crystal.id}>
-									{crystal.name}
-								</option>
-							))}
-						</optgroup>
-					)}
-					{normalCrystals.length > 0 && (
-						<optgroup label="ノーマル">
-							{normalCrystals.map((crystal) => (
-								<option key={crystal.id} value={crystal.id}>
-									{crystal.name}
-								</option>
-							))}
-						</optgroup>
-					)}
-				</select>
+				<label className="text-sm font-medium text-gray-700">{label}</label>
 				
-				{selectedCrystal && (
-					<div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
-						{selectedCrystal.description}
-					</div>
-				)}
+				<button
+					onClick={() => openModal(slotKey, [crystalType], `${label}を選択`)}
+					className="w-full p-3 text-left border border-gray-300 rounded-md hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+				>
+					{selectedCrystal ? (
+						<div className="space-y-1">
+							<div className="flex items-center justify-between">
+								<span className="font-medium text-gray-900">{selectedCrystal.name}</span>
+								<span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
+									{selectedCrystal.type === 'weapon' ? '武器' : 
+									 selectedCrystal.type === 'armor' ? '防具' : 
+									 selectedCrystal.type === 'additional' ? '追加' : 
+									 selectedCrystal.type === 'special' ? '特殊' : 'ノーマル'}
+								</span>
+							</div>
+							{selectedCrystal.description && (
+								<div className="text-xs text-gray-500 truncate">
+									{selectedCrystal.description}
+								</div>
+							)}
+						</div>
+					) : (
+						<div className="flex items-center justify-between">
+							<span className="text-gray-500">クリスタを選択...</span>
+							<svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+							</svg>
+						</div>
+					)}
+				</button>
 			</div>
 		)
 	}
@@ -143,12 +143,22 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 						<h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
 						<div className="space-y-4">
 							{slots.map(({ key, label }) =>
-								renderCrystalSelect(key, label, type)
+								renderCrystalSlot(key, label, type)
 							)}
 						</div>
 					</div>
 				))}
 			</div>
+
+			{/* クリスタ選択モーダル */}
+			<CrystalSelectionModal
+				isOpen={modalState.isOpen}
+				onClose={closeModal}
+				onSelect={handleCrystalChange}
+				selectedCrystalId={modalState.slotKey ? crystals[modalState.slotKey] : null}
+				allowedTypes={modalState.allowedTypes}
+				title={modalState.title}
+			/>
 		</div>
 	)
 }
