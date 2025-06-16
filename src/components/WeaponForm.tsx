@@ -1,11 +1,15 @@
 'use client'
 
-import {
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { mainWeaponSchema, subWeaponSchema, type MainWeaponFormData, type SubWeaponFormData } from '@/schemas/weapons'
+import type {
 	MainWeapon,
 	SubWeapon,
 	WeaponType,
 	SubWeaponType,
 } from '@/types/calculator'
+import { useEffect } from 'react'
 
 interface WeaponFormProps {
 	mainWeapon: MainWeapon
@@ -36,35 +40,106 @@ export default function WeaponForm({
 
 	const subWeaponTypes: SubWeaponType[] = ['ナイフ', '矢', 'なし']
 
-	const handleMainWeaponChange = (
-		field: keyof MainWeapon,
-		value: string | number,
-	) => {
-		let processedValue: string | number = value
-		if (field !== 'weaponType') {
-			processedValue = typeof value === 'string' ? parseInt(value) || 0 : value
+	// メイン武器フォーム
+	const {
+		register: registerMain,
+		watch: watchMain,
+		formState: { errors: errorsMain },
+		reset: resetMain,
+		setValue: setValueMain,
+		getValues: getValuesMain,
+	} = useForm<MainWeaponFormData>({
+		resolver: zodResolver(mainWeaponSchema),
+		defaultValues: mainWeapon,
+		mode: 'onChange',
+	})
+
+	// サブ武器フォーム
+	const {
+		register: registerSub,
+		watch: watchSub,
+		formState: { errors: errorsSub },
+		reset: resetSub,
+		setValue: setValueSub,
+		getValues: getValuesSub,
+	} = useForm<SubWeaponFormData>({
+		resolver: zodResolver(subWeaponSchema),
+		defaultValues: subWeapon,
+		mode: 'onChange',
+	})
+
+	// 入力値を範囲内に制限する関数（メイン武器）
+	const handleMainBlur = (fieldName: keyof MainWeaponFormData) => {
+		const value = getValuesMain(fieldName)
+		if (typeof value !== 'number') return
+
+		let min = 0
+		let max = 1500
+
+		if (fieldName === 'stability') {
+			max = 100
+		} else if (fieldName === 'refinement') {
+			max = 15
 		}
 
-		onMainWeaponChange({
-			...mainWeapon,
-			[field]: processedValue,
-		})
+		if (value < min) {
+			setValueMain(fieldName, min, { shouldValidate: true })
+		} else if (value > max) {
+			setValueMain(fieldName, max, { shouldValidate: true })
+		}
 	}
 
-	const handleSubWeaponChange = (
-		field: keyof SubWeapon,
-		value: string | number,
-	) => {
-		let processedValue: string | number = value
-		if (field !== 'weaponType') {
-			processedValue = typeof value === 'string' ? parseInt(value) || 0 : value
+	// 入力値を範囲内に制限する関数（サブ武器）
+	const handleSubBlur = (fieldName: keyof SubWeaponFormData) => {
+		const value = getValuesSub(fieldName)
+		if (typeof value !== 'number') return
+
+		let min = 0
+		let max = 1500
+
+		if (fieldName === 'stability') {
+			max = 100
+		} else if (fieldName === 'refinement') {
+			max = 15
 		}
 
-		onSubWeaponChange({
-			...subWeapon,
-			[field]: processedValue,
-		})
+		if (value < min) {
+			setValueSub(fieldName, min, { shouldValidate: true })
+		} else if (value > max) {
+			setValueSub(fieldName, max, { shouldValidate: true })
+		}
 	}
+
+	// 外部からの変更を反映
+	useEffect(() => {
+		resetMain(mainWeapon)
+	}, [mainWeapon, resetMain])
+
+	useEffect(() => {
+		resetSub(subWeapon)
+	}, [subWeapon, resetSub])
+
+	// フォーム値変更を監視して親に通知（メイン武器）
+	useEffect(() => {
+		const subscription = watchMain((value) => {
+			if (Object.values(value).every((v) => v !== undefined && v !== null) && 
+				Object.keys(errorsMain).length === 0) {
+				onMainWeaponChange(value as MainWeapon)
+			}
+		})
+		return () => subscription.unsubscribe()
+	}, [watchMain, onMainWeaponChange, errorsMain])
+
+	// フォーム値変更を監視して親に通知（サブ武器）
+	useEffect(() => {
+		const subscription = watchSub((value) => {
+			if (Object.values(value).every((v) => v !== undefined && v !== null) && 
+				Object.keys(errorsSub).length === 0) {
+				onSubWeaponChange(value as SubWeapon)
+			}
+		})
+		return () => subscription.unsubscribe()
+	}, [watchSub, onSubWeaponChange, errorsSub])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-6 lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
@@ -79,14 +154,8 @@ export default function WeaponForm({
 							武器種
 						</label>
 						<select
-							value={mainWeapon.weaponType}
-							onChange={(e) =>
-								handleMainWeaponChange(
-									'weaponType',
-									e.target.value as WeaponType,
-								)
-							}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							{...registerMain('weaponType')}
 						>
 							{weaponTypes.map((type) => (
 								<option key={type} value={type}>
@@ -94,6 +163,9 @@ export default function WeaponForm({
 								</option>
 							))}
 						</select>
+						{errorsMain.weaponType && (
+							<p className="text-red-500 text-xs mt-1">{errorsMain.weaponType.message}</p>
+						)}
 					</div>
 
 					<div className="flex flex-col">
@@ -102,11 +174,19 @@ export default function WeaponForm({
 						</label>
 						<input
 							type="number"
-							value={mainWeapon.ATK}
-							onChange={(e) => handleMainWeaponChange('ATK', e.target.value)}
-							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+								errorsMain.ATK ? 'border-red-500' : 'border-gray-300'
+							}`}
 							min="0"
+							max="1500"
+							{...registerMain('ATK', { 
+								valueAsNumber: true,
+								onBlur: () => handleMainBlur('ATK')
+							})}
 						/>
+						{errorsMain.ATK && (
+							<p className="text-red-500 text-xs mt-1">{errorsMain.ATK.message}</p>
+						)}
 					</div>
 
 					<div className="flex flex-col">
@@ -115,14 +195,19 @@ export default function WeaponForm({
 						</label>
 						<input
 							type="number"
-							value={mainWeapon.stability}
-							onChange={(e) =>
-								handleMainWeaponChange('stability', e.target.value)
-							}
-							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+								errorsMain.stability ? 'border-red-500' : 'border-gray-300'
+							}`}
 							min="0"
 							max="100"
+							{...registerMain('stability', { 
+								valueAsNumber: true,
+								onBlur: () => handleMainBlur('stability')
+							})}
 						/>
+						{errorsMain.stability && (
+							<p className="text-red-500 text-xs mt-1">{errorsMain.stability.message}</p>
+						)}
 					</div>
 
 					<div className="flex flex-col">
@@ -131,14 +216,19 @@ export default function WeaponForm({
 						</label>
 						<input
 							type="number"
-							value={mainWeapon.refinement}
-							onChange={(e) =>
-								handleMainWeaponChange('refinement', e.target.value)
-							}
-							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+								errorsMain.refinement ? 'border-red-500' : 'border-gray-300'
+							}`}
 							min="0"
 							max="15"
+							{...registerMain('refinement', { 
+								valueAsNumber: true,
+								onBlur: () => handleMainBlur('refinement')
+							})}
 						/>
+						{errorsMain.refinement && (
+							<p className="text-red-500 text-xs mt-1">{errorsMain.refinement.message}</p>
+						)}
 					</div>
 				</div>
 			</div>
@@ -146,20 +236,14 @@ export default function WeaponForm({
 			{/* サブ武器 */}
 			<div>
 				<h3 className="text-lg font-semibold text-gray-700 mb-3">サブ武器</h3>
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 					<div className="flex flex-col">
 						<label className="text-sm font-medium text-gray-700 mb-1">
 							武器種
 						</label>
 						<select
-							value={subWeapon.weaponType}
-							onChange={(e) =>
-								handleSubWeaponChange(
-									'weaponType',
-									e.target.value as SubWeaponType,
-								)
-							}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							{...registerSub('weaponType')}
 						>
 							{subWeaponTypes.map((type) => (
 								<option key={type} value={type}>
@@ -167,6 +251,51 @@ export default function WeaponForm({
 								</option>
 							))}
 						</select>
+						{errorsSub.weaponType && (
+							<p className="text-red-500 text-xs mt-1">{errorsSub.weaponType.message}</p>
+						)}
+					</div>
+
+					<div className="flex flex-col">
+						<label className="text-sm font-medium text-gray-700 mb-1">
+							武器ATK
+						</label>
+						<input
+							type="number"
+							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+								errorsSub.ATK ? 'border-red-500' : 'border-gray-300'
+							}`}
+							min="0"
+							max="1500"
+							{...registerSub('ATK', { 
+								valueAsNumber: true,
+								onBlur: () => handleSubBlur('ATK')
+							})}
+						/>
+						{errorsSub.ATK && (
+							<p className="text-red-500 text-xs mt-1">{errorsSub.ATK.message}</p>
+						)}
+					</div>
+
+					<div className="flex flex-col">
+						<label className="text-sm font-medium text-gray-700 mb-1">
+							安定率
+						</label>
+						<input
+							type="number"
+							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+								errorsSub.stability ? 'border-red-500' : 'border-gray-300'
+							}`}
+							min="0"
+							max="100"
+							{...registerSub('stability', { 
+								valueAsNumber: true,
+								onBlur: () => handleSubBlur('stability')
+							})}
+						/>
+						{errorsSub.stability && (
+							<p className="text-red-500 text-xs mt-1">{errorsSub.stability.message}</p>
+						)}
 					</div>
 
 					<div className="flex flex-col">
@@ -175,14 +304,19 @@ export default function WeaponForm({
 						</label>
 						<input
 							type="number"
-							value={subWeapon.refinement}
-							onChange={(e) =>
-								handleSubWeaponChange('refinement', e.target.value)
-							}
-							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+								errorsSub.refinement ? 'border-red-500' : 'border-gray-300'
+							}`}
 							min="0"
 							max="15"
+							{...registerSub('refinement', { 
+								valueAsNumber: true,
+								onBlur: () => handleSubBlur('refinement')
+							})}
 						/>
+						{errorsSub.refinement && (
+							<p className="text-red-500 text-xs mt-1">{errorsSub.refinement.message}</p>
+						)}
 					</div>
 				</div>
 			</div>
