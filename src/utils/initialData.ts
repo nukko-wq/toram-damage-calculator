@@ -94,14 +94,14 @@ export const createInitialEquipmentSlots = (): EquipmentSlots => ({
 })
 
 export const createInitialCrystalSlots = (): CrystalSlots => ({
-	weapon1: createInitialEquipment(),
-	weapon2: createInitialEquipment(),
-	armor1: createInitialEquipment(),
-	armor2: createInitialEquipment(),
-	additional1: createInitialEquipment(),
-	additional2: createInitialEquipment(),
-	special1: createInitialEquipment(),
-	special2: createInitialEquipment(),
+	weapon1: null,
+	weapon2: null,
+	armor1: null,
+	armor2: null,
+	additional1: null,
+	additional2: null,
+	special1: null,
+	special2: null,
 })
 
 export const createInitialEnemyInfo = (): EnemyInfo => ({

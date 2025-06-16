@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import BaseStatsForm from '@/components/BaseStatsForm'
 import WeaponForm from '@/components/WeaponForm'
+import CrystalForm from '@/components/CrystalForm'
 import EquipmentForm from '@/components/EquipmentForm'
 import EnemyForm from '@/components/EnemyForm'
 import StatsSummary from '@/components/StatsSummary'
@@ -41,11 +42,14 @@ export default function Home() {
 						onSubWeaponChange={(subWeapon) => setData({ ...data, subWeapon })}
 					/>
 
+					<CrystalForm
+						crystals={data.crystals}
+						onChange={(crystals) => setData({ ...data, crystals })}
+					/>
+
 					<EquipmentForm
 						equipment={data.equipment}
-						crystals={data.crystals}
 						onEquipmentChange={(equipment) => setData({ ...data, equipment })}
-						onCrystalsChange={(crystals) => setData({ ...data, crystals })}
 					/>
 
 					<EnemyForm

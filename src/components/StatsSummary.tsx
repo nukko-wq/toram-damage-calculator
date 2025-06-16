@@ -5,6 +5,7 @@ import type {
 	BaseStats,
 	EquipmentProperties,
 } from '@/types/calculator'
+import { getCrystalById } from '@/utils/crystalDatabase'
 
 interface StatsSummaryProps {
 	data: CalculatorData
@@ -51,10 +52,7 @@ export default function StatsSummary({ data }: StatsSummaryProps) {
 		}
 
 		// 装備からの補正値を合計
-		const allEquipment = [
-			...Object.values(data.equipment),
-			...Object.values(data.crystals),
-		]
+		const allEquipment = Object.values(data.equipment)
 
 		for (const equipment of allEquipment) {
 			for (const [key, value] of Object.entries(equipment.properties)) {
@@ -62,6 +60,23 @@ export default function StatsSummary({ data }: StatsSummaryProps) {
 					const currentValue = totalStats[key as keyof typeof totalStats]
 					if (typeof currentValue === 'number') {
 						;(totalStats as any)[key] = currentValue + value
+					}
+				}
+			}
+		}
+
+		// クリスタからの補正値を合計
+		for (const crystalId of Object.values(data.crystals)) {
+			if (crystalId) {
+				const crystal = getCrystalById(crystalId)
+				if (crystal) {
+					for (const [key, value] of Object.entries(crystal.properties)) {
+						if (typeof value === 'number' && key in totalStats) {
+							const currentValue = totalStats[key as keyof typeof totalStats]
+							if (typeof currentValue === 'number') {
+								;(totalStats as any)[key] = currentValue + value
+							}
+						}
 					}
 				}
 			}
