@@ -95,13 +95,31 @@ export default function CrystalSelectionModal({
 		onClose()
 	}
 
+	const handleBackgroundClick = (e: React.MouseEvent) => {
+		// モーダル外をクリックした場合のみ閉じる
+		if (e.target === e.currentTarget) {
+			onClose()
+		}
+	}
+
+	const handleContentClick = (e: React.MouseEvent) => {
+		// モーダル内のクリックは伝播を停止
+		e.stopPropagation()
+	}
+
 	if (!isOpen) return null
 
 	return (
-		<div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 transition-opacity">
+		<div 
+			className="fixed inset-0 z-50 overflow-y-auto bg-black/50 transition-opacity"
+			onClick={handleBackgroundClick}
+		>
 			{/* モーダルコンテンツ */}
 			<div className="relative min-h-screen flex items-center justify-center p-4">
-				<div className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+				<div 
+					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+					onClick={handleContentClick}
+				>
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b">
 						<h2 className="text-xl font-bold text-gray-900">{title}</h2>
