@@ -133,7 +133,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 						</div>
 					) : (
 						<div className="flex items-center justify-between">
-							<span className="text-gray-500">クリスタを選択...</span>
+							<span className="text-gray-500">なし</span>
 							<svg
 								className="w-5 h-5 text-gray-400"
 								fill="none"
@@ -155,7 +155,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 	}
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6 col-start-1 col-end-3 row-start-3 row-end-4">
+		<section className="bg-white rounded-lg shadow-md p-6 lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">クリスタ選択</h2>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -27,7 +27,7 @@ export default function Home() {
 					</p>
 				</div>
 
-				<div className="space-y-8 grid lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[400px_400px_auto_auto_250px_auto_auto] gap-4">
+				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[400px_400px_auto_auto_250px_auto_auto] gap-4">
 					<BaseStatsForm
 						stats={data.baseStats}
 						onChange={(baseStats) => setData({ ...data, baseStats })}
