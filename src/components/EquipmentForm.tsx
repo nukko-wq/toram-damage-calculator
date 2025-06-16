@@ -1,11 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import {
+import type {
 	Equipment,
 	EquipmentSlots,
 	EquipmentProperties,
+	EquipmentCategory,
 } from '@/types/calculator'
+import { getEquipmentById } from '@/utils/equipmentDatabase'
+import EquipmentSelectionModal from './EquipmentSelectionModal'
 
 interface EquipmentFormProps {
 	equipment: EquipmentSlots
@@ -17,6 +20,15 @@ export default function EquipmentForm({
 	onEquipmentChange,
 }: EquipmentFormProps) {
 	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots>('main')
+	const [modalState, setModalState] = useState<{
+		isOpen: boolean
+		category: EquipmentCategory | null
+		title: string
+	}>({
+		isOpen: false,
+		category: null,
+		title: '',
+	})
 
 	const equipmentSlots = [
 		{ key: 'main' as const, label: 'メイン装備' },
@@ -96,7 +108,7 @@ export default function EquipmentForm({
 		property: keyof EquipmentProperties,
 		value: string,
 	) => {
-		const numValue = parseInt(value) || 0
+		const numValue = Number.parseInt(value) || 0
 		const updatedEquipment = {
 			...equipment,
 			[slotKey]: {
@@ -105,9 +117,60 @@ export default function EquipmentForm({
 					...equipment[slotKey].properties,
 					[property]: numValue,
 				},
+				// プロパティを手動変更した場合はプリセットIDをクリア
+				presetId: null,
 			},
 		}
 		onEquipmentChange(updatedEquipment)
+	}
+
+	const handlePresetEquipmentSelect = (equipmentId: string | null) => {
+		if (!modalState.category) return
+
+		const slotKey = modalState.category as keyof EquipmentSlots
+		
+		if (equipmentId === null) {
+			// 装備なしを選択
+			const updatedEquipment = {
+				...equipment,
+				[slotKey]: {
+					name: '',
+					properties: {},
+					presetId: null,
+				},
+			}
+			onEquipmentChange(updatedEquipment)
+		} else {
+			// プリセット装備を選択
+			const presetEquipment = getEquipmentById(equipmentId)
+			if (presetEquipment) {
+				const updatedEquipment = {
+					...equipment,
+					[slotKey]: {
+						name: presetEquipment.name,
+						properties: { ...presetEquipment.properties },
+						presetId: equipmentId,
+					},
+				}
+				onEquipmentChange(updatedEquipment)
+			}
+		}
+	}
+
+	const openEquipmentModal = (category: EquipmentCategory, title: string) => {
+		setModalState({
+			isOpen: true,
+			category,
+			title,
+		})
+	}
+
+	const closeEquipmentModal = () => {
+		setModalState({
+			isOpen: false,
+			category: null,
+			title: '',
+		})
 	}
 
 	const renderPropertyInputs = (
@@ -171,13 +234,57 @@ export default function EquipmentForm({
 
 			{/* タブコンテンツ */}
 			<div className="space-y-4">
-				<h3 className="text-lg font-semibold text-gray-700">
-					{equipmentSlots.find((slot) => slot.key === activeTab)?.label}
-				</h3>
+				<div className="flex items-center justify-between">
+					<h3 className="text-lg font-semibold text-gray-700">
+						{equipmentSlots.find((slot) => slot.key === activeTab)?.label}
+					</h3>
+					<button
+						type="button"
+						onClick={() => openEquipmentModal(
+							activeTab as EquipmentCategory,
+							`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`
+						)}
+						className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+					>
+						プリセット選択
+					</button>
+				</div>
+
+				{/* 現在選択されている装備表示 */}
+				{equipment[activeTab].presetId && (
+					<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+						<div className="flex items-center justify-between">
+							<span className="text-sm font-medium text-blue-800">
+								プリセット: {equipment[activeTab].name}
+							</span>
+							<button
+								type="button"
+								onClick={() => handlePresetEquipmentSelect(null)}
+								className="text-xs text-blue-600 hover:text-blue-800"
+							>
+								プリセット解除
+							</button>
+						</div>
+						<div className="text-xs text-blue-600 mt-1">
+							※ 下記の値を変更するとプリセットが解除されます
+						</div>
+					</div>
+				)}
+
 				{renderPropertyInputs(equipment[activeTab], (property, value) =>
 					handleEquipmentPropertyChange(activeTab, property, value),
 				)}
 			</div>
+
+			{/* 装備選択モーダル */}
+			<EquipmentSelectionModal
+				isOpen={modalState.isOpen}
+				onClose={closeEquipmentModal}
+				onSelect={handlePresetEquipmentSelect}
+				selectedEquipmentId={equipment[activeTab].presetId || null}
+				category={modalState.category || 'main'}
+				title={modalState.title}
+			/>
 		</section>
 	)
 }

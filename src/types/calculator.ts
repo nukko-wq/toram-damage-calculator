@@ -89,6 +89,40 @@ export interface SubWeapon {
 export interface Equipment {
 	name: string
 	properties: Partial<EquipmentProperties>
+	presetId?: string | null // プリセット装備のID（プリセット選択時のみ）
+}
+
+// 装備タイプ
+export type EquipmentType = 'weapon' | 'armor' | 'accessory' | 'fashion'
+
+// 装備カテゴリ
+export type EquipmentCategory = 
+	| 'main' 
+	| 'body' 
+	| 'additional' 
+	| 'special' 
+	| 'subWeapon' 
+	| 'fashion1' 
+	| 'fashion2' 
+	| 'fashion3'
+
+// プリセット装備
+export interface PresetEquipment {
+	id: string
+	name: string
+	type: EquipmentType
+	category: EquipmentCategory[]
+	baseStats: {
+		ATK?: number
+		DEF?: number
+		MATK?: number
+		MDEF?: number
+		stability?: number
+		refinement?: number
+	}
+	properties: Partial<EquipmentProperties>
+	description?: string
+	source?: string // 入手方法
 }
 
 // クリスタル種別

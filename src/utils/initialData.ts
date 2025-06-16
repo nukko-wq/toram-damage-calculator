@@ -80,6 +80,7 @@ export const createInitialEquipmentProperties =
 export const createInitialEquipment = (): Equipment => ({
 	name: '',
 	properties: createInitialEquipmentProperties(),
+	presetId: null,
 })
 
 export const createInitialEquipmentSlots = (): EquipmentSlots => ({
