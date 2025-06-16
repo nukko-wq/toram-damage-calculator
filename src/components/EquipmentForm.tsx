@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import {
 	Equipment,
 	EquipmentSlots,
@@ -15,6 +16,7 @@ export default function EquipmentForm({
 	equipment,
 	onEquipmentChange,
 }: EquipmentFormProps) {
+	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots>('main')
 
 	const equipmentSlots = [
 		{ key: 'main' as const, label: 'メイン装備' },
@@ -122,7 +124,12 @@ export default function EquipmentForm({
 					<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
 						{group.properties.map((property) => (
 							<div key={property} className="flex flex-col">
-								<label htmlFor={`${item.name}-${property}`} className="text-xs text-gray-600 mb-1">{property}</label>
+								<label
+									htmlFor={`${item.name}-${property}`}
+									className="text-xs text-gray-600 mb-1"
+								>
+									{property}
+								</label>
 								<input
 									id={`${item.name}-${property}`}
 									type="number"
@@ -139,20 +146,38 @@ export default function EquipmentForm({
 	)
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-6">
+		<section className="bg-white rounded-lg shadow-md p-6">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">装備</h2>
-			
-			<div className="space-y-6">
-				{equipmentSlots.map(({ key, label }) => (
-					<div key={key} className="border rounded-lg p-4">
-						<h3 className="text-lg font-semibold text-gray-700 mb-4">{label}</h3>
-						{renderPropertyInputs(
-							equipment[key],
-							(property, value) => handleEquipmentPropertyChange(key, property, value)
-						)}
-					</div>
-				))}
+
+			{/* タブヘッダー */}
+			<div className="border-b border-gray-200 mb-6">
+				<nav className="flex flex-wrap gap-2">
+					{equipmentSlots.map(({ key, label }) => (
+						<button
+							key={key}
+							type="button"
+							onClick={() => setActiveTab(key)}
+							className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+								activeTab === key
+									? 'bg-blue-500 text-white border-b-2 border-blue-500'
+									: 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+							}`}
+						>
+							{label}
+						</button>
+					))}
+				</nav>
 			</div>
-		</div>
+
+			{/* タブコンテンツ */}
+			<div className="space-y-4">
+				<h3 className="text-lg font-semibold text-gray-700">
+					{equipmentSlots.find((slot) => slot.key === activeTab)?.label}
+				</h3>
+				{renderPropertyInputs(equipment[activeTab], (property, value) =>
+					handleEquipmentPropertyChange(activeTab, property, value),
+				)}
+			</div>
+		</section>
 	)
 }

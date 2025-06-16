@@ -18,7 +18,7 @@ export default function EnemyForm({ enemy, onChange }: EnemyFormProps) {
 	}
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-6">
+		<section className="bg-white rounded-lg shadow-md p-6">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">敵情報</h2>
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 				<div className="flex flex-col">
@@ -74,7 +74,10 @@ export default function EnemyForm({ enemy, onChange }: EnemyFormProps) {
 				</div>
 
 				<div className="flex flex-col">
-					<label htmlFor="guaranteedCritical" className="text-sm font-medium text-gray-700 mb-1">
+					<label
+						htmlFor="guaranteedCritical"
+						className="text-sm font-medium text-gray-700 mb-1"
+					>
 						確定クリティカル
 					</label>
 					<input
@@ -88,6 +91,6 @@ export default function EnemyForm({ enemy, onChange }: EnemyFormProps) {
 					/>
 				</div>
 			</div>
-		</div>
+		</section>
 	)
 }

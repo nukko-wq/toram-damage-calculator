@@ -29,7 +29,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	]
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-6">
+		<section className="bg-white rounded-lg shadow-md p-6">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">基本ステータス</h2>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				{statFields.map(({ key, label }) => (
@@ -47,6 +47,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 					</div>
 				))}
 			</div>
-		</div>
+		</section>
 	)
 }

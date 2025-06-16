@@ -67,7 +67,7 @@ export default function WeaponForm({
 	}
 
 	return (
-		<div className="bg-white rounded-lg shadow-md p-6">
+		<section className="bg-white rounded-lg shadow-md p-6">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">武器情報</h2>
 
 			{/* メイン武器 */}
@@ -186,6 +186,6 @@ export default function WeaponForm({
 					</div>
 				</div>
 			</div>
-		</div>
+		</section>
 	)
 }
