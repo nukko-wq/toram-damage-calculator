@@ -242,11 +242,11 @@ export default function EquipmentForm({
 						type="button"
 						onClick={() => openEquipmentModal(
 							activeTab as EquipmentCategory,
-							`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`
+							equipment[activeTab].name || `${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`
 						)}
 						className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
 					>
-						プリセット選択
+						{equipment[activeTab].name || 'プリセット選択'}
 					</button>
 				</div>
 
