@@ -93,6 +93,18 @@ export interface Equipment {
 	properties: Partial<EquipmentProperties>
 }
 
+// クリスタル種別
+export type CrystalType = 'weapon' | 'armor' | 'additional' | 'special'
+
+// プリセットクリスタル
+export interface PresetCrystal {
+	id: string
+	name: string
+	type: CrystalType
+	properties: Partial<EquipmentProperties>
+	description?: string
+}
+
 // 装備スロット
 export interface EquipmentSlots {
 	main: Equipment
@@ -105,16 +117,16 @@ export interface EquipmentSlots {
 	fashion3: Equipment
 }
 
-// クリスタルスロット
+// クリスタルスロット（選択されたクリスタルのIDを保存）
 export interface CrystalSlots {
-	weapon1: Equipment
-	weapon2: Equipment
-	armor1: Equipment
-	armor2: Equipment
-	additional1: Equipment
-	additional2: Equipment
-	special1: Equipment
-	special2: Equipment
+	weapon1: string | null
+	weapon2: string | null
+	armor1: string | null
+	armor2: string | null
+	additional1: string | null
+	additional2: string | null
+	special1: string | null
+	special2: string | null
 }
 
 // 敵の情報

@@ -1,0 +1,90 @@
+{
+  "weapon": [
+    {
+      "id": "weapon_don_profundo",
+      "name": "ドン・プロフンド",
+      "properties": {
+        "ATK%": 10,
+        "STR%": 7,
+        "クリティカル率%": 8
+      },
+      "description": "ATK10%, STR7%, クリティカル率8%, DEF -27%"
+    },
+    {
+      "id": "weapon_black_dress_princess",
+      "name": "黒衣の聖誕姫",
+      "properties": {
+        "MATK%": 12,
+        "INT%": 5,
+        "詠唱速度%": 10
+      },
+      "description": "MATK12%, INT5%, 詠唱速度10%"
+    }
+  ],
+  "armor": [
+    {
+      "id": "armor_ccc",
+      "name": "ccc",
+      "properties": {
+        "HP%": 15,
+        "VIT%": 8,
+        "物理貫通%": -5
+      },
+      "description": "HP15%, VIT8%, 物理貫通-5%"
+    },
+    {
+      "id": "armor_ddd",
+      "name": "ddd",
+      "properties": {
+        "MP": 200,
+        "MEN%": 10,
+        "魔法貫通%": 3
+      },
+      "description": "MP200, MEN10%, 魔法貫通3%"
+    }
+  ],
+  "additional": [
+    {
+      "id": "additional_aaa",
+      "name": "aaa",
+      "properties": {
+        "命中%": 12,
+        "AGI%": 6,
+        "攻撃速度%": 8
+      },
+      "description": "命中12%, AGI6%, 攻撃速度8%"
+    },
+    {
+      "id": "additional_bbb",
+      "name": "bbb",
+      "properties": {
+        "回避%": 10,
+        "DEX%": 7,
+        "近距離威力%": 5
+      },
+      "description": "回避10%, DEX7%, 近距離威力5%"
+    }
+  ],
+  "special": [
+    {
+      "id": "special_eee",
+      "name": "eee",
+      "properties": {
+        "クリティカルダメージ%": 15,
+        "抜刀威力%": 8,
+        "属性有利%": 6
+      },
+      "description": "クリティカルダメージ15%, 抜刀威力8%, 属性有利6%"
+    },
+    {
+      "id": "special_fff",
+      "name": "fff",
+      "properties": {
+        "遠距離威力%": 12,
+        "武器ATK%": 8,
+        "安定率%": 10
+      },
+      "description": "遠距離威力12%, 武器ATK8%, 安定率10%"
+    }
+  ]
+}
