@@ -102,6 +102,12 @@ export default function CrystalSelectionModal({
 		}
 	}
 
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === 'Escape') {
+			onClose()
+		}
+	}
+
 	const handleContentClick = (e: React.MouseEvent) => {
 		// モーダル内のクリックは伝播を停止
 		e.stopPropagation()
@@ -110,19 +116,28 @@ export default function CrystalSelectionModal({
 	if (!isOpen) return null
 
 	return (
-		<div 
+		<div
 			className="fixed inset-0 z-50 overflow-y-auto bg-black/50 transition-opacity"
 			onClick={handleBackgroundClick}
+			onKeyDown={handleKeyDown}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="modal-title"
+			tabIndex={-1}
 		>
 			{/* モーダルコンテンツ */}
 			<div className="relative min-h-screen flex items-center justify-center p-4">
-				<div 
+				<div
 					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
 					onClick={handleContentClick}
+					onKeyDown={handleKeyDown}
+					role="document"
 				>
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b">
-						<h2 className="text-xl font-bold text-gray-900">{title}</h2>
+						<h2 id="modal-title" className="text-xl font-bold text-gray-900">
+							{title}
+						</h2>
 						<button
 							type="button"
 							onClick={onClose}
