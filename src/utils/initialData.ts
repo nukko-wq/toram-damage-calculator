@@ -11,14 +11,15 @@ import {
 } from '@/types/calculator'
 
 export const createInitialBaseStats = (): BaseStats => ({
-	STR: 0,
-	INT: 0,
-	VIT: 0,
-	AGI: 0,
-	DEX: 0,
-	CRT: 0,
-	MEN: 0,
-	TEC: 0,
+	STR: 1,
+	INT: 1,
+	VIT: 1,
+	AGI: 1,
+	DEX: 1,
+	CRT: 1,
+	MEN: 1,
+	TEC: 1,
+	LUK: 1,
 	level: 1,
 })
 

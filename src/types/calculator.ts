@@ -25,6 +25,7 @@ export interface BaseStats {
 	CRT: number
 	MEN: number
 	TEC: number
+	LUK: number
 	level: number
 }
 

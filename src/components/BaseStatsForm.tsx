@@ -9,7 +9,17 @@ interface BaseStatsFormProps {
 
 export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	const handleStatChange = (stat: keyof BaseStats, value: string) => {
-		const numValue = Number.parseInt(value) || 0
+		let numValue = Number.parseInt(value) || 1
+		
+		// 入力範囲の制限
+		if (stat === 'level') {
+			numValue = Math.max(1, Math.min(300, numValue))
+		} else if (['STR', 'INT', 'VIT', 'AGI', 'DEX'].includes(stat)) {
+			numValue = Math.max(1, Math.min(510, numValue))
+		} else if (['CRT', 'MEN', 'TEC', 'LUK'].includes(stat)) {
+			numValue = Math.max(1, Math.min(255, numValue))
+		}
+		
 		onChange({
 			...stats,
 			[stat]: numValue,
@@ -36,6 +46,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							onChange={(e) => handleStatChange('level', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 							min="1"
+							max="300"
 						/>
 					</div>
 				</div>
@@ -54,7 +65,8 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							value={stats.STR}
 							onChange={(e) => handleStatChange('STR', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							min="0"
+							min="1"
+							max="510"
 						/>
 					</div>
 
@@ -72,7 +84,8 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							value={stats.INT}
 							onChange={(e) => handleStatChange('INT', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							min="0"
+							min="1"
+							max="510"
 						/>
 					</div>
 
@@ -90,7 +103,8 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							value={stats.VIT}
 							onChange={(e) => handleStatChange('VIT', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							min="0"
+							min="1"
+							max="510"
 						/>
 					</div>
 				</div>
@@ -110,7 +124,8 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							value={stats.AGI}
 							onChange={(e) => handleStatChange('AGI', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							min="0"
+							min="1"
+							max="510"
 						/>
 					</div>
 
@@ -128,7 +143,8 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							value={stats.DEX}
 							onChange={(e) => handleStatChange('DEX', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							min="0"
+							min="1"
+							max="510"
 						/>
 					</div>
 				</div>
@@ -148,7 +164,8 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							value={stats.CRT}
 							onChange={(e) => handleStatChange('CRT', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							min="0"
+							min="1"
+							max="255"
 						/>
 					</div>
 
@@ -166,7 +183,8 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							value={stats.MEN}
 							onChange={(e) => handleStatChange('MEN', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							min="0"
+							min="1"
+							max="255"
 						/>
 					</div>
 
@@ -184,7 +202,29 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							value={stats.TEC}
 							onChange={(e) => handleStatChange('TEC', e.target.value)}
 							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							min="0"
+							min="1"
+							max="255"
+						/>
+					</div>
+				</div>
+
+				<div className="grid grid-cols-3 gap-4">
+					{/* LUK（運） */}
+					<div className="flex flex-col">
+						<label
+							htmlFor="stat-luk"
+							className="text-sm font-medium text-gray-500"
+						>
+							LUK
+						</label>
+						<input
+							id="stat-luk"
+							type="number"
+							value={stats.LUK}
+							onChange={(e) => handleStatChange('LUK', e.target.value)}
+							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+							min="1"
+							max="255"
 						/>
 					</div>
 				</div>

@@ -10,7 +10,7 @@ export function getAllEquipments(): PresetEquipment[] {
 	
 	categories.forEach(category => {
 		if (equipmentsData[category]) {
-			allEquipments.push(...equipmentsData[category])
+			allEquipments.push(...(equipmentsData[category] as PresetEquipment[]))
 		}
 	})
 	
