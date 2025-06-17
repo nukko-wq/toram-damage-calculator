@@ -29,47 +29,152 @@ export interface BaseStats {
 	level: number
 }
 
-// 装備プロパティ
+// 装備プロパティ（技術仕様書 4.1.5 に基づく完全定義）
 export interface EquipmentProperties {
-	'ATK%': number
-	ATK: number
-	'MATK%': number
-	MATK: number
-	'武器ATK%': number
-	武器ATK: number
-	'物理貫通%': number
-	'魔法貫通%': number
-	'属性有利%': number
-	'抜刀威力%': number
-	抜刀威力: number
-	'近距離威力%': number
-	'遠距離威力%': number
-	'クリティカルダメージ%': number
-	クリティカルダメージ: number
-	'クリティカル率%': number
-	クリティカル率: number
-	'安定率%': number
-	'HP%': number
-	HP: number
-	MP: number
-	'STR%': number
-	STR: number
-	'INT%': number
-	INT: number
-	'VIT%': number
-	VIT: number
-	'AGI%': number
-	AGI: number
-	'DEX%': number
-	DEX: number
-	'命中%': number
-	命中: number
-	'回避%': number
-	回避: number
-	'攻撃速度%': number
-	攻撃速度: number
-	'詠唱速度%': number
-	詠唱速度: number
+	// 基本攻撃力系
+	ATK_Rate: number                     // ATK%
+	ATK: number                          // ATK
+	MATK_Rate: number                    // MATK%
+	MATK: number                         // MATK
+	WeaponATK_Rate: number               // 武器ATK%
+	WeaponATK: number                    // 武器ATK
+	
+	// 防御力系
+	DEF_Rate: number                     // DEF%
+	DEF: number                          // DEF
+	MDEF_Rate: number                    // MDEF%
+	MDEF: number                         // MDEF
+	
+	// 貫通系
+	PhysicalPenetration_Rate: number     // 物理貫通%
+	MagicalPenetration_Rate: number      // 魔法貫通%
+	ElementAdvantage_Rate: number        // 属性有利%
+	
+	// 威力系
+	UnsheatheAttack_Rate: number         // 抜刀威力%
+	UnsheatheAttack: number              // 抜刀威力
+	ShortRangeDamage_Rate: number        // 近距離威力%
+	LongRangeDamage_Rate: number         // 遠距離威力%
+	
+	// クリティカル系
+	CriticalDamage_Rate: number          // クリティカルダメージ%
+	CriticalDamage: number               // クリティカルダメージ
+	Critical_Rate: number                // クリティカル率%
+	Critical: number                     // クリティカル率
+	
+	// 安定率
+	Stability_Rate: number               // 安定率%
+	
+	// HP/MP系
+	HP_Rate: number                      // HP%
+	HP: number                           // HP
+	MP_Rate: number                      // MP%
+	MP: number                           // MP
+	
+	// ステータス系
+	STR_Rate: number                     // STR%
+	STR: number                          // STR
+	INT_Rate: number                     // INT%
+	INT: number                          // INT
+	VIT_Rate: number                     // VIT%
+	VIT: number                          // VIT
+	AGI_Rate: number                     // AGI%
+	AGI: number                          // AGI
+	DEX_Rate: number                     // DEX%
+	DEX: number                          // DEX
+	CRT_Rate: number                     // CRT%
+	CRT: number                          // CRT
+	MEN_Rate: number                     // MEN%
+	MEN: number                          // MEN
+	TEC_Rate: number                     // TEC%
+	TEC: number                          // TEC
+	LUK_Rate: number                     // LUK%
+	LUK: number                          // LUK
+	
+	// 命中・回避系
+	Accuracy_Rate: number                // 命中%
+	Accuracy: number                     // 命中
+	Dodge_Rate: number                   // 回避%
+	Dodge: number                        // 回避
+	
+	// 速度系
+	AttackSpeed_Rate: number             // 攻撃速度%
+	AttackSpeed: number                  // 攻撃速度
+	CastingSpeed_Rate: number            // 詠唱速度%
+	CastingSpeed: number                 // 詠唱速度
+	MotionSpeed_Rate: number             // 行動速度%
+	
+	// MP回復系
+	AttackMPRecovery_Rate: number        // 攻撃MP回復%
+	AttackMPRecovery: number             // 攻撃MP回復
+	
+	// 耐性系
+	PhysicalResistance_Rate: number      // 物理耐性%
+	MagicalResistance_Rate: number       // 魔法耐性%
+	AilmentResistance_Rate: number       // 異常耐性%
+	
+	// その他戦闘系
+	Aggro_Rate: number                   // ヘイト%
+	RevivalTime_Rate: number             // 復帰短縮%
+	
+	// 自然回復系
+	NaturalHPRecovery_Rate: number       // HP自然回復%
+	NaturalHPRecovery: number            // HP自然回復
+	NaturalMPRecovery_Rate: number       // MP自然回復%
+	NaturalMPRecovery: number            // MP自然回復
+	
+	// 特殊系
+	ArmorBreak_Rate: number              // 防御崩し%
+	Anticipate_Rate: number              // 先読み%
+	GuardPower_Rate: number              // Guard力%
+	GuardRecharge_Rate: number           // Guard回復%
+	AvoidRecharge_Rate: number           // Avoid回復%
+	ItemCooldown: number                 // 道具速度
+	AbsoluteAccuracy_Rate: number        // 絶対命中%
+	AbsoluteDodge_Rate: number           // 絶対回避%
+	
+	// ステータス連動攻撃力
+	ATK_STR_Rate: number                 // ATK+(STR)%
+	ATK_INT_Rate: number                 // ATK+(INT)%
+	ATK_VIT_Rate: number                 // ATK+(VIT)%
+	ATK_AGI_Rate: number                 // ATK+(AGI)%
+	ATK_DEX_Rate: number                 // ATK+(DEX)%
+	MATK_STR_Rate: number                // MATK+(STR)%
+	MATK_INT_Rate: number                // MATK+(INT)%
+	MATK_VIT_Rate: number                // MATK+(VIT)%
+	MATK_AGI_Rate: number                // MATK+(AGI)%
+	MATK_DEX_Rate: number                // MATK+(DEX)%
+	
+	// 属性耐性
+	FireResistance_Rate: number          // 火耐性%
+	WaterResistance_Rate: number         // 水耐性%
+	WindResistance_Rate: number          // 風耐性%
+	EarthResistance_Rate: number         // 地耐性%
+	LightResistance_Rate: number         // 光耐性%
+	DarkResistance_Rate: number          // 闇耐性%
+	NeutralResistance_Rate: number       // 無耐性%
+	
+	// ダメージ軽減系
+	LinearReduction_Rate: number         // 直線軽減%
+	RushReduction_Rate: number           // 突進軽減%
+	BulletReduction_Rate: number         // 弾丸軽減%
+	ProximityReduction_Rate: number      // 周囲軽減%
+	AreaReduction_Rate: number           // 範囲軽減%
+	FloorTrapReduction_Rate: number      // 痛床軽減%
+	MeteorReduction_Rate: number         // 隕石軽減%
+	BladeReduction_Rate: number          // 射刃軽減%
+	SuctionReduction_Rate: number        // 吸引軽減%
+	ExplosionReduction_Rate: number      // 爆発軽減%
+	
+	// バリア系
+	PhysicalBarrier: number              // 物理バリア
+	MagicalBarrier: number               // 魔法バリア
+	FractionalBarrier: number            // 割合バリア
+	BarrierCooldown_Rate: number         // バリア速度%
+	
+	// 追撃系
+	PhysicalFollowup_Rate: number        // 物理追撃%
+	MagicalFollowup_Rate: number         // 魔法追撃%
 }
 
 // メイン武器
@@ -192,4 +297,91 @@ export interface CalculationResult {
 		skill: number
 		critical: number
 	}
+}
+
+// セーブデータ管理用の型定義
+export interface SaveData {
+	id: string
+	name: string
+	isDefault: boolean
+	createdAt: string
+	updatedAt: string
+	order: number
+	data: CalculatorData
+}
+
+// デフォルトセーブデータ
+export interface DefaultSaveData extends SaveData {
+	id: 'default'
+	name: 'メインデータ'
+	isDefault: true
+}
+
+// データ検証結果
+export interface DataValidation {
+	isValid: boolean
+	errors: string[]
+	warnings: string[]
+	brokenReferences: { type: string; id: string }[]
+}
+
+// ストレージ使用量
+export interface StorageUsage {
+	totalSize: number
+	maxSize: number
+	usage: number
+	warning: boolean
+	critical: boolean
+}
+
+// ユーザーカスタム装備
+export interface UserEquipment {
+	id: string
+	name: string
+	category: EquipmentCategory
+	properties: Partial<EquipmentProperties>
+	weaponStats?: {
+		ATK?: number
+		stability?: number
+		refinement?: number
+	}
+	crystalSlots?: {
+		slot1?: string
+		slot2?: string
+	}
+	createdAt: string
+	updatedAt: string
+	isFavorite: boolean
+}
+
+// ユーザーカスタムクリスタル
+export interface UserCrystal {
+	id: string
+	name: string
+	type: CrystalType
+	properties: Partial<EquipmentProperties>
+	description?: string
+	isCustom: true
+	createdAt: string
+	updatedAt: string
+	isFavorite?: boolean
+}
+
+// ユーザーカスタム敵情報
+export interface UserEnemy {
+	id: string
+	name: string
+	level: number
+	stats: {
+		DEF: number
+		MDEF: number
+		physicalResistance: number
+		magicalResistance: number
+		resistCritical: number
+		requiredHIT: number
+	}
+	category: 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
+	createdAt: string
+	updatedAt: string
+	isFavorite: boolean
 }

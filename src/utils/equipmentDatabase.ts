@@ -1,63 +1,17 @@
-import type { PresetEquipment, EquipmentType, EquipmentCategory } from '@/types/calculator'
+import type { PresetEquipment, EquipmentType, EquipmentCategory, EquipmentProperties } from '@/types/calculator'
 import equipmentsData from '@/data/equipments.json'
 
-// 新しいJSON構造の型定義
-interface EquipmentsJsonStructure {
-	equipments: {
-		mainWeapon?: Array<{
-			id: string
-			name: string
-			weaponStats?: {
-				ATK?: number
-				stability?: number
-				refinement?: number
-			}
-			properties?: Record<string, number>
-			source?: string
-		}>
-		body?: Array<{
-			id: string
-			name: string
-			properties?: Record<string, number>
-			source?: string
-		}>
-		additional?: Array<{
-			id: string
-			name: string
-			properties?: Record<string, number>
-			source?: string
-		}>
-		special?: Array<{
-			id: string
-			name: string
-			properties?: Record<string, number>
-			source?: string
-		}>
-		subWeapon?: Array<{
-			id: string
-			name: string
-			properties?: Record<string, number>
-			source?: string
-		}>
-		fashion1?: Array<{
-			id: string
-			name: string
-			properties?: Record<string, number>
-			source?: string
-		}>
-		fashion2?: Array<{
-			id: string
-			name: string
-			properties?: Record<string, number>
-			source?: string
-		}>
-		fashion3?: Array<{
-			id: string
-			name: string
-			properties?: Record<string, number>
-			source?: string
-		}>
+// プロパティからundefinedの値を除外する関数
+function cleanProperties(properties: any): Partial<EquipmentProperties> {
+	if (!properties) return {}
+	
+	const cleaned: Partial<EquipmentProperties> = {}
+	for (const [key, value] of Object.entries(properties)) {
+		if (value !== undefined && typeof value === 'number') {
+			cleaned[key as keyof EquipmentProperties] = value
+		}
 	}
+	return cleaned
 }
 
 // プリセット装備データを取得
@@ -65,7 +19,7 @@ export function getAllEquipments(): PresetEquipment[] {
 	const allEquipments: PresetEquipment[] = []
 	
 	// 新しいJSON構造に対応
-	const equipmentsRoot = (equipmentsData as EquipmentsJsonStructure).equipments
+	const equipmentsRoot = (equipmentsData as any).equipments
 	
 	if (!equipmentsRoot) {
 		console.error('equipments.json構造が不正です')
@@ -81,7 +35,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				type: 'weapon' as EquipmentType,
 				category: ['main'] as EquipmentCategory[],
 				baseStats: item.weaponStats || {},
-				properties: item.properties || {},
+				properties: cleanProperties(item.properties),
 				source: item.source
 			})
 		}
@@ -96,7 +50,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				type: 'armor' as EquipmentType,
 				category: ['body'] as EquipmentCategory[],
 				baseStats: {},
-				properties: item.properties || {},
+				properties: cleanProperties(item.properties),
 				source: item.source
 			})
 		}
@@ -111,7 +65,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				type: 'accessory' as EquipmentType,
 				category: ['additional'] as EquipmentCategory[],
 				baseStats: {},
-				properties: item.properties || {},
+				properties: cleanProperties(item.properties),
 				source: item.source
 			})
 		}
@@ -126,7 +80,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				type: 'accessory' as EquipmentType,
 				category: ['special'] as EquipmentCategory[],
 				baseStats: {},
-				properties: item.properties || {},
+				properties: cleanProperties(item.properties),
 				source: item.source
 			})
 		}
@@ -141,7 +95,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				type: 'weapon' as EquipmentType,
 				category: ['subWeapon'] as EquipmentCategory[],
 				baseStats: {},
-				properties: item.properties || {},
+				properties: cleanProperties(item.properties),
 				source: item.source
 			})
 		}
@@ -156,7 +110,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				type: 'fashion' as EquipmentType,
 				category: ['fashion1'] as EquipmentCategory[],
 				baseStats: {},
-				properties: item.properties || {},
+				properties: cleanProperties(item.properties),
 				source: item.source
 			})
 		}
@@ -171,7 +125,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				type: 'fashion' as EquipmentType,
 				category: ['fashion2'] as EquipmentCategory[],
 				baseStats: {},
-				properties: item.properties || {},
+				properties: cleanProperties(item.properties),
 				source: item.source
 			})
 		}
@@ -186,7 +140,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				type: 'fashion' as EquipmentType,
 				category: ['fashion3'] as EquipmentCategory[],
 				baseStats: {},
-				properties: item.properties || {},
+				properties: cleanProperties(item.properties),
 				source: item.source
 			})
 		}

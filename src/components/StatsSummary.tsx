@@ -15,40 +15,40 @@ export default function StatsSummary({ data }: StatsSummaryProps) {
 	const calculateTotalStats = () => {
 		const totalStats: BaseStats & Partial<EquipmentProperties> = {
 			...data.baseStats,
-			'ATK%': 0,
+			ATK_Rate: 0,
 			ATK: 0,
-			'MATK%': 0,
+			MATK_Rate: 0,
 			MATK: 0,
-			'武器ATK%': 0,
-			武器ATK: 0,
-			'物理貫通%': 0,
-			'魔法貫通%': 0,
-			'属性有利%': 0,
-			'抜刀威力%': 0,
-			抜刀威力: 0,
-			'近距離威力%': 0,
-			'遠距離威力%': 0,
-			'クリティカルダメージ%': 0,
-			クリティカルダメージ: 0,
-			'クリティカル率%': 0,
-			クリティカル率: 0,
-			'安定率%': 0,
-			'HP%': 0,
+			WeaponATK_Rate: 0,
+			WeaponATK: 0,
+			PhysicalPenetration_Rate: 0,
+			MagicalPenetration_Rate: 0,
+			ElementAdvantage_Rate: 0,
+			UnsheatheAttack_Rate: 0,
+			UnsheatheAttack: 0,
+			ShortRangeDamage_Rate: 0,
+			LongRangeDamage_Rate: 0,
+			CriticalDamage_Rate: 0,
+			CriticalDamage: 0,
+			Critical_Rate: 0,
+			Critical: 0,
+			Stability_Rate: 0,
+			HP_Rate: 0,
 			HP: 0,
 			MP: 0,
-			'STR%': 0,
-			'INT%': 0,
-			'VIT%': 0,
-			'AGI%': 0,
-			'DEX%': 0,
-			'命中%': 0,
-			命中: 0,
-			'回避%': 0,
-			回避: 0,
-			'攻撃速度%': 0,
-			攻撃速度: 0,
-			'詠唱速度%': 0,
-			詠唱速度: 0,
+			STR_Rate: 0,
+			INT_Rate: 0,
+			VIT_Rate: 0,
+			AGI_Rate: 0,
+			DEX_Rate: 0,
+			Accuracy_Rate: 0,
+			Accuracy: 0,
+			Dodge_Rate: 0,
+			Dodge: 0,
+			AttackSpeed_Rate: 0,
+			AttackSpeed: 0,
+			CastingSpeed_Rate: 0,
+			CastingSpeed: 0,
 		}
 
 		// 装備からの補正値を合計
@@ -84,19 +84,19 @@ export default function StatsSummary({ data }: StatsSummaryProps) {
 
 		// ステータス%補正を適用
 		totalStats.STR += Math.floor(
-			(data.baseStats.STR * (totalStats['STR%'] || 0)) / 100,
+			(data.baseStats.STR * (totalStats.STR_Rate || 0)) / 100,
 		)
 		totalStats.INT += Math.floor(
-			(data.baseStats.INT * (totalStats['INT%'] || 0)) / 100,
+			(data.baseStats.INT * (totalStats.INT_Rate || 0)) / 100,
 		)
 		totalStats.VIT += Math.floor(
-			(data.baseStats.VIT * (totalStats['VIT%'] || 0)) / 100,
+			(data.baseStats.VIT * (totalStats.VIT_Rate || 0)) / 100,
 		)
 		totalStats.AGI += Math.floor(
-			(data.baseStats.AGI * (totalStats['AGI%'] || 0)) / 100,
+			(data.baseStats.AGI * (totalStats.AGI_Rate || 0)) / 100,
 		)
 		totalStats.DEX += Math.floor(
-			(data.baseStats.DEX * (totalStats['DEX%'] || 0)) / 100,
+			(data.baseStats.DEX * (totalStats.DEX_Rate || 0)) / 100,
 		)
 
 		return totalStats
@@ -121,47 +121,47 @@ export default function StatsSummary({ data }: StatsSummaryProps) {
 		{
 			title: '攻撃力',
 			stats: [
-				{ key: 'ATK%', label: 'ATK%', value: totalStats['ATK%'] },
+				{ key: 'ATK_Rate', label: 'ATK%', value: totalStats.ATK_Rate },
 				{ key: 'ATK', label: 'ATK', value: totalStats.ATK },
-				{ key: 'MATK%', label: 'MATK%', value: totalStats['MATK%'] },
+				{ key: 'MATK_Rate', label: 'MATK%', value: totalStats.MATK_Rate },
 				{ key: 'MATK', label: 'MATK', value: totalStats.MATK },
-				{ key: '武器ATK%', label: '武器ATK%', value: totalStats['武器ATK%'] },
-				{ key: '武器ATK', label: '武器ATK', value: totalStats['武器ATK'] },
+				{ key: 'WeaponATK_Rate', label: '武器ATK%', value: totalStats.WeaponATK_Rate },
+				{ key: 'WeaponATK', label: '武器ATK', value: totalStats.WeaponATK },
 			],
 		},
 		{
 			title: '貫通・威力',
 			stats: [
 				{
-					key: '物理貫通%',
+					key: 'PhysicalPenetration_Rate',
 					label: '物理貫通%',
-					value: totalStats['物理貫通%'],
+					value: totalStats.PhysicalPenetration_Rate,
 				},
 				{
-					key: '魔法貫通%',
+					key: 'MagicalPenetration_Rate',
 					label: '魔法貫通%',
-					value: totalStats['魔法貫通%'],
+					value: totalStats.MagicalPenetration_Rate,
 				},
 				{
-					key: '属性有利%',
+					key: 'ElementAdvantage_Rate',
 					label: '属性有利%',
-					value: totalStats['属性有利%'],
+					value: totalStats.ElementAdvantage_Rate,
 				},
 				{
-					key: '抜刀威力%',
+					key: 'UnsheatheAttack_Rate',
 					label: '抜刀威力%',
-					value: totalStats['抜刀威力%'],
+					value: totalStats.UnsheatheAttack_Rate,
 				},
-				{ key: '抜刀威力', label: '抜刀威力', value: totalStats['抜刀威力'] },
+				{ key: 'UnsheatheAttack', label: '抜刀威力', value: totalStats.UnsheatheAttack },
 				{
-					key: '近距離威力%',
+					key: 'ShortRangeDamage_Rate',
 					label: '近距離威力%',
-					value: totalStats['近距離威力%'],
+					value: totalStats.ShortRangeDamage_Rate,
 				},
 				{
-					key: '遠距離威力%',
+					key: 'LongRangeDamage_Rate',
 					label: '遠距離威力%',
-					value: totalStats['遠距離威力%'],
+					value: totalStats.LongRangeDamage_Rate,
 				},
 			],
 		},
@@ -169,24 +169,24 @@ export default function StatsSummary({ data }: StatsSummaryProps) {
 			title: 'クリティカル',
 			stats: [
 				{
-					key: 'クリティカルダメージ%',
+					key: 'CriticalDamage_Rate',
 					label: 'クリティカルダメージ%',
-					value: totalStats['クリティカルダメージ%'],
+					value: totalStats.CriticalDamage_Rate,
 				},
 				{
-					key: 'クリティカルダメージ',
+					key: 'CriticalDamage',
 					label: 'クリティカルダメージ',
-					value: totalStats['クリティカルダメージ'],
+					value: totalStats.CriticalDamage,
 				},
 				{
-					key: 'クリティカル率%',
+					key: 'Critical_Rate',
 					label: 'クリティカル率%',
-					value: totalStats['クリティカル率%'],
+					value: totalStats.Critical_Rate,
 				},
 				{
-					key: 'クリティカル率',
+					key: 'Critical',
 					label: 'クリティカル率',
-					value: totalStats['クリティカル率'],
+					value: totalStats.Critical,
 				},
 			],
 		},
