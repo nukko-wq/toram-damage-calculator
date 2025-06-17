@@ -1,126 +1,205 @@
 {
-	"weapon": [
-		{
-			"id": "weapon_don_profundo",
-			"name": "ドン・プロフンド",
-			"properties": {
-				"ATK%": 10,
-				"STR%": 7,
-				"クリティカル率%": 8
-			},
-			"description": "ATK10%, STR7%, クリティカル率8%, DEF -27%"
-		},
-		{
-			"id": "weapon_black_dress_princess",
-			"name": "黒衣の聖誕姫",
-			"properties": {
-				"MATK%": 12,
-				"INT%": 5,
-				"詠唱速度%": 10
-			},
-			"description": "MATK12%, INT5%, 詠唱速度10%"
-		}
-	],
-	"armor": [
-		{
-			"id": "armor_ccc",
-			"name": "アルタダール",
-			"properties": {
-				"HP%": 15,
-				"VIT%": 8,
-				"物理貫通%": -5
-			},
-			"description": "HP15%, VIT8%, 物理貫通-5%"
-		},
-		{
-			"id": "armor_ddd",
-			"name": "ddd",
-			"properties": {
-				"MP": 200,
-				"MEN%": 10,
-				"魔法貫通%": 3
-			},
-			"description": "MP200, MEN10%, 魔法貫通3%"
-		}
-	],
-	"additional": [
-		{
-			"id": "additional_aaa",
-			"name": "aaa",
-			"properties": {
-				"命中%": 12,
-				"AGI%": 6,
-				"攻撃速度%": 8
-			},
-			"description": "命中12%, AGI6%, 攻撃速度8%"
-		},
-		{
-			"id": "additional_bbb",
-			"name": "bbb",
-			"properties": {
-				"回避%": 10,
-				"DEX%": 7,
-				"近距離威力%": 5
-			},
-			"description": "回避10%, DEX7%, 近距離威力5%"
-		}
-	],
-	"special": [
-		{
-			"id": "special_eee",
-			"name": "eee",
-			"properties": {
-				"クリティカルダメージ%": 15,
-				"抜刀威力%": 8,
-				"属性有利%": 6
-			},
-			"description": "クリティカルダメージ15%, 抜刀威力8%, 属性有利6%"
-		},
-		{
-			"id": "special_fff",
-			"name": "fff",
-			"properties": {
-				"遠距離威力%": 12,
-				"武器ATK%": 8,
-				"安定率%": 10
-			},
-			"description": "遠距離威力12%, 武器ATK8%, 安定率10%"
-		}
-	],
-	"normal": [
-		{
-			"id": "normal_beast_slaying",
-			"name": "獣種特攻",
-			"properties": {
-				"ATK": 25
-			},
-			"description": "ATK25 (対獣種特効)"
-		},
-		{
-			"id": "normal_hp_boost",
-			"name": "HPブースト",
-			"properties": {
-				"HP": 500,
-				"HP%": 5
-			},
-			"description": "HP500, HP5%"
-		},
-		{
-			"id": "normal_mp_boost",
-			"name": "MPブースト",
-			"properties": {
-				"MP": 300
-			},
-			"description": "MP300"
-		},
-		{
-			"id": "normal_accuracy",
-			"name": "命中強化",
-			"properties": {
-				"命中": 50,
-				"命中%": 3
-			},
-			"description": "命中50, 命中3%"
-		}
-	]
+  "crystals": {
+    "weapon": [
+      {
+        "id": "weapon_don_profundo",
+        "name": "ドン・プロフンド",
+        "type": "weapon",
+        "properties": {
+          "ATK_Rate": 10,
+          "STR_Rate": 7,
+          "Critical_Rate": 8,
+          "DEF_Rate": -27
+        }
+      },
+      {
+        "id": "weapon_black_dress_princess",
+        "name": "黒衣の聖誕姫",
+        "type": "weapon",
+        "properties": {
+          "MATK_Rate": 12,
+          "INT_Rate": 5,
+          "CastingSpeed_Rate": 10
+        }
+      },
+      {
+        "id": "weapon_crimson_blade",
+        "name": "クリムゾンブレード",
+        "type": "weapon",
+        "properties": {
+          "ATK_Rate": 15,
+          "CriticalDamage_Rate": 12,
+          "PhysicalPenetration_Rate": 8
+        }
+      }
+    ],
+    "armor": [
+      {
+        "id": "armor_altadal",
+        "name": "アルタダール",
+        "type": "armor",
+        "properties": {
+          "HP_Rate": 15,
+          "VIT_Rate": 8,
+          "PhysicalResistance_Rate": 5
+        }
+      },
+      {
+        "id": "armor_mystic_robe",
+        "name": "ミスティックローブ",
+        "type": "armor",
+        "properties": {
+          "MP": 200,
+          "MEN_Rate": 10,
+          "MagicalResistance_Rate": 8
+        }
+      },
+      {
+        "id": "armor_iron_guardian",
+        "name": "アイアンガーディアン",
+        "type": "armor",
+        "properties": {
+          "DEF_Rate": 20,
+          "VIT_Rate": 12,
+          "PhysicalBarrier": 50
+        }
+      }
+    ],
+    "additional": [
+      {
+        "id": "additional_swift_wing",
+        "name": "スウィフトウィング",
+        "type": "additional",
+        "properties": {
+          "Accuracy_Rate": 12,
+          "AGI_Rate": 6,
+          "AttackSpeed_Rate": 8
+        }
+      },
+      {
+        "id": "additional_shadow_step",
+        "name": "シャドウステップ",
+        "type": "additional",
+        "properties": {
+          "Dodge_Rate": 10,
+          "DEX_Rate": 7,
+          "MotionSpeed_Rate": 5
+        }
+      },
+      {
+        "id": "additional_mana_flow",
+        "name": "マナフロー",
+        "type": "additional",
+        "properties": {
+          "AttackMPRecovery_Rate": 15,
+          "CastingSpeed_Rate": 8,
+          "NaturalMPRecovery_Rate": 12
+        }
+      }
+    ],
+    "special": [
+      {
+        "id": "special_berserker_rage",
+        "name": "バーサーカーレイジ",
+        "type": "special",
+        "properties": {
+          "CriticalDamage_Rate": 15,
+          "UnsheatheAttack_Rate": 8,
+          "ElementAdvantage_Rate": 6
+        }
+      },
+      {
+        "id": "special_sniper_focus",
+        "name": "スナイパーフォーカス",
+        "type": "special",
+        "properties": {
+          "LongRangeDamage_Rate": 12,
+          "WeaponATK_Rate": 8,
+          "Stability_Rate": 10
+        }
+      },
+      {
+        "id": "special_magic_mastery",
+        "name": "マジックマスタリー",
+        "type": "special",
+        "properties": {
+          "MATK_Rate": 18,
+          "MagicalPenetration_Rate": 10,
+          "MagicalBarrier": 80
+        }
+      }
+    ],
+    "normal": [
+      {
+        "id": "normal_beast_slaying",
+        "name": "獣種特攻",
+        "type": "normal",
+        "properties": {
+          "ATK": 25
+        }
+      },
+      {
+        "id": "normal_hp_boost",
+        "name": "HPブースト",
+        "type": "normal",
+        "properties": {
+          "HP": 500,
+          "HP_Rate": 5
+        }
+      },
+      {
+        "id": "normal_mp_boost",
+        "name": "MPブースト",
+        "type": "normal",
+        "properties": {
+          "MP": 300
+        }
+      },
+      {
+        "id": "normal_accuracy",
+        "name": "命中強化",
+        "type": "normal",
+        "properties": {
+          "Accuracy": 50,
+          "Accuracy_Rate": 3
+        }
+      },
+      {
+        "id": "normal_str_boost",
+        "name": "STRブースト",
+        "type": "normal",
+        "properties": {
+          "STR": 15,
+          "STR_Rate": 8
+        }
+      },
+      {
+        "id": "normal_int_boost",
+        "name": "INTブースト",
+        "type": "normal",
+        "properties": {
+          "INT": 12,
+          "INT_Rate": 6
+        }
+      },
+      {
+        "id": "normal_critical_boost",
+        "name": "クリティカル強化",
+        "type": "normal",
+        "properties": {
+          "Critical_Rate": 5,
+          "CriticalDamage_Rate": 8
+        }
+      },
+      {
+        "id": "normal_defense_boost",
+        "name": "防御強化",
+        "type": "normal",
+        "properties": {
+          "DEF": 100,
+          "PhysicalResistance_Rate": 3
+        }
+      }
+    ]
+  }
 }
