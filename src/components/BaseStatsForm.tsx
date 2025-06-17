@@ -315,9 +315,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						)}
 					</div>
 				</div>
-
+				{/* 
 				<div className="grid grid-cols-3 gap-4">
-					{/* LUK（運） */}
+					{/* LUK（運） *
 					<div className="flex flex-col">
 						<label
 							htmlFor="stat-luk"
@@ -343,6 +343,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						)}
 					</div>
 				</div>
+				*/}
 			</div>
 		</section>
 	)
