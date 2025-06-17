@@ -19,6 +19,7 @@ npm run build        # Production build
 npm start           # Start production server
 npm run lint        # Run Next.js ESLint
 npm run format      # Format code with Biome
+npx tsc --noEmit     # Type check without emitting files
 ```
 
 ## Architecture Overview
@@ -32,8 +33,11 @@ The application consists of interconnected forms that feed into a damage calcula
 - `EnemyForm`: Target/enemy configuration
 
 ### Data Management Strategy
-- **Preset Data**: Static JSON files (`src/data/crystals.json`, `equipments.json`)
-- **User Custom Data**: LocalStorage for user-defined items (Phase 2 feature)
+- **Hybrid Data System**: Combines static preset JSON with dynamic user LocalStorage data
+- **Preset Data**: Static JSON files (`src/data/crystals.json`, `equipments.json`) 
+- **User Custom Data**: LocalStorage with CRUD operations, timestamps, and export/import
+- **Data Access Layer**: Unified APIs in `*Database.ts` files merge preset and user data
+- **Type Safety**: Zod validation + TypeScript interfaces ensure data integrity
 - **Real-time Calculation**: State changes trigger immediate stat recalculation
 
 ### Equipment System Complexity
