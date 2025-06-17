@@ -1,0 +1,212 @@
+{
+  "enemies": [
+    {
+      "id": "slime_lv1",
+      "name": "スライム",
+      "level": 1,
+      "stats": {
+        "DEF": 5,
+        "MDEF": 5,
+        "physicalResistance": 0,
+        "magicalResistance": 0,
+        "criticalConfirmation": 0,
+        "requiredHIT": 10
+      },
+      "category": "mob",
+      "source": "ソフィア平原",
+      "description": "最も基本的なモンスター"
+    },
+    {
+      "id": "goblin_lv5",
+      "name": "ゴブリン",
+      "level": 5,
+      "stats": {
+        "DEF": 15,
+        "MDEF": 10,
+        "physicalResistance": 0,
+        "magicalResistance": 0,
+        "criticalConfirmation": 0,
+        "requiredHIT": 25
+      },
+      "category": "mob",
+      "source": "ニーシュフォレスト",
+      "description": "小柄だが凶暴な亜人"
+    },
+    {
+      "id": "orc_lv20",
+      "name": "オーク",
+      "level": 20,
+      "stats": {
+        "DEF": 80,
+        "MDEF": 40,
+        "physicalResistance": 5,
+        "magicalResistance": 0,
+        "criticalConfirmation": 5,
+        "requiredHIT": 100
+      },
+      "category": "mob",
+      "source": "アルカト峡谷",
+      "description": "高い物理防御力を持つ亜人"
+    },
+    {
+      "id": "skeleton_lv30",
+      "name": "スケルトン",
+      "level": 30,
+      "stats": {
+        "DEF": 120,
+        "MDEF": 80,
+        "physicalResistance": 10,
+        "magicalResistance": -10,
+        "criticalConfirmation": 10,
+        "requiredHIT": 150
+      },
+      "category": "mob",
+      "source": "ラクル洞窟",
+      "description": "魔法に弱いアンデッド"
+    },
+    {
+      "id": "giant_bear_lv25",
+      "name": "ジャイアントベア",
+      "level": 25,
+      "stats": {
+        "DEF": 150,
+        "MDEF": 80,
+        "physicalResistance": 15,
+        "magicalResistance": 5,
+        "criticalConfirmation": 20,
+        "requiredHIT": 180
+      },
+      "category": "fieldBoss",
+      "source": "ニーシュフォレスト深部",
+      "description": "巨大化した森の熊"
+    },
+    {
+      "id": "poison_spider_lv40",
+      "name": "ポイズンスパイダー",
+      "level": 40,
+      "stats": {
+        "DEF": 180,
+        "MDEF": 120,
+        "physicalResistance": 10,
+        "magicalResistance": 20,
+        "criticalConfirmation": 30,
+        "requiredHIT": 250
+      },
+      "category": "fieldBoss",
+      "source": "毒蜘蛛の巣窟",
+      "description": "猛毒を持つ巨大蜘蛛"
+    },
+    {
+      "id": "ice_golem_lv50",
+      "name": "アイスゴーレム",
+      "level": 50,
+      "stats": {
+        "DEF": 300,
+        "MDEF": 200,
+        "physicalResistance": 25,
+        "magicalResistance": 15,
+        "criticalConfirmation": 40,
+        "requiredHIT": 350
+      },
+      "category": "fieldBoss",
+      "source": "氷雪の洞窟",
+      "description": "氷の力を宿した人工生命体"
+    },
+    {
+      "id": "dragon_knight_lv60",
+      "name": "ドラゴンナイト",
+      "level": 60,
+      "stats": {
+        "DEF": 450,
+        "MDEF": 300,
+        "physicalResistance": 30,
+        "magicalResistance": 25,
+        "criticalConfirmation": 60,
+        "requiredHIT": 500
+      },
+      "category": "boss",
+      "source": "竜の巣窟",
+      "description": "竜の力を得た騎士"
+    },
+    {
+      "id": "dark_mage_lv70",
+      "name": "ダークメイジ",
+      "level": 70,
+      "stats": {
+        "DEF": 250,
+        "MDEF": 500,
+        "physicalResistance": 10,
+        "magicalResistance": 40,
+        "criticalConfirmation": 80,
+        "requiredHIT": 600
+      },
+      "category": "boss",
+      "source": "闇の塔",
+      "description": "強大な魔力を持つ闇魔導師"
+    },
+    {
+      "id": "flame_demon_lv80",
+      "name": "フレイムデーモン",
+      "level": 80,
+      "stats": {
+        "DEF": 400,
+        "MDEF": 350,
+        "physicalResistance": 35,
+        "magicalResistance": 30,
+        "criticalConfirmation": 100,
+        "requiredHIT": 750
+      },
+      "category": "boss",
+      "source": "炎の神殿",
+      "description": "地獄から来た炎の悪魔"
+    },
+    {
+      "id": "ancient_dragon_lv100",
+      "name": "エンシェントドラゴン",
+      "level": 100,
+      "stats": {
+        "DEF": 800,
+        "MDEF": 600,
+        "physicalResistance": 50,
+        "magicalResistance": 45,
+        "criticalConfirmation": 150,
+        "requiredHIT": 1200
+      },
+      "category": "raidBoss",
+      "source": "古竜の祭壇",
+      "description": "太古から生きる伝説の竜"
+    },
+    {
+      "id": "demon_lord_lv120",
+      "name": "魔王",
+      "level": 120,
+      "stats": {
+        "DEF": 600,
+        "MDEF": 800,
+        "physicalResistance": 40,
+        "magicalResistance": 55,
+        "criticalConfirmation": 200,
+        "requiredHIT": 1500
+      },
+      "category": "raidBoss",
+      "source": "魔王城",
+      "description": "世界を脅かす絶対的存在"
+    },
+    {
+      "id": "void_emperor_lv150",
+      "name": "ヴォイドエンペラー",
+      "level": 150,
+      "stats": {
+        "DEF": 1000,
+        "MDEF": 1000,
+        "physicalResistance": 60,
+        "magicalResistance": 60,
+        "criticalConfirmation": 300,
+        "requiredHIT": 2000
+      },
+      "category": "raidBoss",
+      "source": "虚無の次元",
+      "description": "虚無を司る最強の存在"
+    }
+  ]
+}

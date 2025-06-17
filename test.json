@@ -1,0 +1,93 @@
+{
+  "1": {
+    "Unit": {
+      "Name": "ドン・プロフンド",
+      "Base": {
+        "ATK_Rate": 10,
+        "STR_Rate": 7,
+        "Critical_Rate": 8
+      },
+      "FilterNo": 0
+    },
+    "Name": "1100"
+  },
+  "2": {
+    "Unit": {
+      "Name": "暴獣リグシー",
+      "Base": {
+        "HP_Rate": 15,
+        "ASPD_Rate": 20,
+        "ATK_Rate": 10,
+        "MP": -100
+      },
+      "FilterNo": 0
+    },
+    "Name": "N112"
+  },
+  "3": {
+    "Unit": {
+      "Name": "ビルロッシュ",
+      "Base": {
+        "HP_Rate": 60,
+        "Resist_Physical": -7,
+        "Resist_Magic": -7
+      },
+      "FilterNo": 0
+    },
+    "Name": "201"
+  },
+  "4": {
+    "Unit": {
+      "Name": "なし",
+      "Base": {},
+      "FilterNo": 0
+    },
+    "Name": "0"
+  },
+  "5": {
+    "Unit": {
+      "Name": "ゴード",
+      "Base": {
+        "ATK_Rate": 7,
+        "ASPD_Rate": 80,
+        "LongDistance": -15
+      },
+      "FilterNo": 0
+    },
+    "Name": "2"
+  },
+  "6": {
+    "Unit": {
+      "Name": "なし",
+      "Base": {},
+      "FilterNo": 0
+    },
+    "Name": "0"
+  },
+  "7": {
+    "Unit": {
+      "Name": "暴獣リグシー",
+      "Base": {
+        "HP_Rate": 15,
+        "ASPD_Rate": 20,
+        "ATK_Rate": 10,
+        "MP": -100
+      },
+      "FilterNo": 0
+    },
+    "Name": "N112"
+  },
+  "8": {
+    "Unit": {
+      "Name": "ルトセーザ",
+      "Base": {
+        "ATK_Rate": 10,
+        "MATK_Rate": 10,
+        "MPRecovery": 4,
+        "MP": -200
+      },
+      "FilterNo": 0
+    },
+    "Name": "N108"
+  }
+}
