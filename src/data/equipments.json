@@ -1,160 +1,294 @@
 {
-	"equipments": {
-		"mainWeapon": [
-			{
-				"id": "blade_master_sword",
-				"name": "有利-ATK%-STR%-クリ率",
-				"properties": {
-					"ATK%": 15,
-					"属性有利%": 22,
-					"クリティカル率": 27,
-					"STR%": 4,
-					"HP自然回復": -27,
-					"回避": -14
-				},
-				"source": "スミス"
-			},
-			{
-				"id": "crimson_destroyer",
-				"name": "クリムゾンデストロイヤー",
-				"weaponStats": {
-					"ATK": 320,
-					"stability": 75,
-					"refinement": 10
-				},
-				"properties": {
-					"ATK%": 20,
-					"武器ATK%": 12,
-					"近距離威力%": 15
-				},
-				"source": "ボスドロップ"
-			},
-			{
-				"id": "mystic_staff_of_wisdom",
-				"name": "ミスティックスタッフ・オブ・ウィズダム",
-				"properties": {
-					"MATK%": 18,
-					"詠唱速度%": 15,
-					"MP": 200
-				},
-				"source": "レア素材合成"
-			}
-		],
-		"body": [
-			{
-				"id": "dragon_scale_armor",
-				"name": "ドラゴンスケールアーマー",
-				"properties": {
-					"HP%": 20,
-					"VIT%": 15,
-					"物理貫通%": -10
-				},
-				"source": "ドラゴン討伐"
-			},
-			{
-				"id": "sage_robe",
-				"name": "セージローブ",
-				"properties": {
-					"MP": 300,
-					"INT%": 18,
-					"詠唱速度%": 12
-				},
-				"source": "ギルドショップ"
-			}
-		],
-		"additional": [
-			{
-				"id": "berserker_ring",
-				"name": "バーサーカーリング",
-				"properties": {
-					"ATK%": 12,
-					"クリティカル率%": 15,
-					"HP%": -10
-				},
-				"source": "PvPポイント交換"
-			},
-			{
-				"id": "scholars_pendant",
-				"name": "スカラーズペンダント",
-				"properties": {
-					"MATK%": 10,
-					"MP": 150,
-					"詠唱速度%": 8
-				},
-				"source": "クエスト報酬"
-			}
-		],
-		"special": [
-			{
-				"id": "speed_boots",
-				"name": "スピードブーツ",
-				"properties": {
-					"AGI%": 20,
-					"攻撃速度%": 15,
-					"回避%": 10
-				},
-				"source": "イベント限定"
-			}
-		],
-		"subWeapon": [
-			{
-				"id": "throwing_knife_set",
-				"name": "スローイングナイフセット",
-				"properties": {
-					"クリティカル率%": 12,
-					"命中%": 10
-				},
-				"source": "商店購入"
-			},
-			{
-				"id": "enhanced_arrows",
-				"name": "エンハンスドアロー",
-				"properties": {
-					"遠距離威力%": 18,
-					"命中%": 15
-				},
-				"source": "錬金術合成"
-			}
-		],
-		"fashion1": [
-			{
-				"id": "royal_crown",
-				"name": "ロイヤルクラウン",
-				"properties": {
-					"HP": 100,
-					"MP": 50,
-					"STR%": 3,
-					"INT%": 3,
-					"VIT%": 3,
-					"AGI%": 3,
-					"DEX%": 3
-				},
-				"source": "課金アイテム"
-			}
-		],
-		"fashion2": [
-			{
-				"id": "ninja_mask",
-				"name": "ニンジャマスク",
-				"properties": {
-					"回避%": 8,
-					"クリティカル率%": 5,
-					"AGI": 20
-				},
-				"source": "特別クエスト"
-			}
-		],
-		"fashion3": [
-			{
-				"id": "mage_cape",
-				"name": "メイジケープ",
-				"properties": {
-					"MATK%": 8,
-					"詠唱速度%": 10,
-					"INT": 25
-				},
-				"source": "ギルドイベント"
-			}
-		]
-	}
+  "equipments": {
+    "mainWeapon": [
+      {
+        "id": "blade_master_sword",
+        "name": "ブレードマスターソード",
+        "properties": {
+          "ATK_Rate": 15,
+          "ElementAdvantage_Rate": 22,
+          "Critical_Rate": 27,
+          "STR_Rate": 4,
+          "NaturalHPRecovery": -27,
+          "Dodge": -14
+        },
+        "crystalSlots": {
+          "slot1": null,
+          "slot2": null
+        }
+      },
+      {
+        "id": "crimson_destroyer",
+        "name": "クリムゾンデストロイヤー",
+        "weaponStats": {
+          "ATK": 320,
+          "stability": 75,
+          "refinement": 10
+        },
+        "properties": {
+          "ATK_Rate": 20,
+          "WeaponATK_Rate": 12,
+          "ShortRangeDamage_Rate": 15
+        },
+        "crystalSlots": {
+          "slot1": "weapon_crimson_blade"
+        }
+      },
+      {
+        "id": "mystic_staff_of_wisdom",
+        "name": "ミスティックスタッフ・オブ・ウィズダム",
+        "properties": {
+          "MATK_Rate": 18,
+          "CastingSpeed_Rate": 15,
+          "MP": 200
+        },
+        "crystalSlots": {
+          "slot1": "weapon_black_dress_princess",
+          "slot2": "normal_int_boost"
+        }
+      }
+    ],
+    "body": [
+      {
+        "id": "dragon_scale_armor",
+        "name": "ドラゴンスケールアーマー",
+        "properties": {
+          "HP_Rate": 20,
+          "VIT_Rate": 15,
+          "PhysicalResistance_Rate": 8
+        },
+        "crystalSlots": {
+          "slot1": "armor_altadal",
+          "slot2": "normal_hp_boost"
+        }
+      },
+      {
+        "id": "sage_robe",
+        "name": "セージローブ",
+        "properties": {
+          "MP": 300,
+          "INT_Rate": 18,
+          "CastingSpeed_Rate": 12
+        },
+        "crystalSlots": {
+          "slot1": "armor_mystic_robe",
+          "slot2": "normal_mp_boost"
+        }
+      },
+      {
+        "id": "iron_guardian_plate",
+        "name": "アイアンガーディアンプレート",
+        "properties": {
+          "DEF_Rate": 25,
+          "VIT_Rate": 20,
+          "PhysicalBarrier": 100
+        },
+        "crystalSlots": {
+          "slot1": "armor_iron_guardian",
+          "slot2": "normal_defense_boost"
+        }
+      }
+    ],
+    "additional": [
+      {
+        "id": "berserker_ring",
+        "name": "バーサーカーリング",
+        "properties": {
+          "ATK_Rate": 12,
+          "Critical_Rate": 15,
+          "HP_Rate": -10
+        },
+        "crystalSlots": {
+          "slot1": "additional_swift_wing",
+          "slot2": "normal_critical_boost"
+        }
+      },
+      {
+        "id": "scholars_pendant",
+        "name": "スカラーズペンダント",
+        "properties": {
+          "MATK_Rate": 10,
+          "MP": 150,
+          "CastingSpeed_Rate": 8
+        },
+        "crystalSlots": {
+          "slot1": "additional_mana_flow"
+        }
+      },
+      {
+        "id": "shadow_amulet",
+        "name": "シャドウアミュレット",
+        "properties": {
+          "Dodge_Rate": 18,
+          "MotionSpeed_Rate": 12,
+          "DEX_Rate": 8
+        },
+        "crystalSlots": {
+          "slot1": "additional_shadow_step",
+          "slot2": "normal_accuracy"
+        }
+      }
+    ],
+    "special": [
+      {
+        "id": "speed_boots",
+        "name": "スピードブーツ",
+        "properties": {
+          "AGI_Rate": 20,
+          "AttackSpeed_Rate": 15,
+          "Dodge_Rate": 10
+        },
+        "crystalSlots": {
+          "slot1": "special_sniper_focus"
+        }
+      },
+      {
+        "id": "berserker_gauntlets",
+        "name": "バーサーカーガントレット",
+        "properties": {
+          "CriticalDamage_Rate": 20,
+          "UnsheatheAttack_Rate": 15,
+          "STR_Rate": 12
+        },
+        "crystalSlots": {
+          "slot1": "special_berserker_rage",
+          "slot2": "normal_str_boost"
+        }
+      },
+      {
+        "id": "arcane_circlet",
+        "name": "アルケインサークレット",
+        "properties": {
+          "MATK_Rate": 22,
+          "MagicalPenetration_Rate": 15,
+          "INT_Rate": 10
+        },
+        "crystalSlots": {
+          "slot1": "special_magic_mastery",
+          "slot2": "normal_int_boost"
+        }
+      }
+    ],
+    "subWeapon": [
+      {
+        "id": "throwing_knife_set",
+        "name": "スローイングナイフセット",
+        "properties": {
+          "Critical_Rate": 12,
+          "Accuracy_Rate": 10
+        }
+      },
+      {
+        "id": "enhanced_arrows",
+        "name": "エンハンスドアロー",
+        "properties": {
+          "LongRangeDamage_Rate": 18,
+          "Accuracy_Rate": 15
+        }
+      },
+      {
+        "id": "magic_orb",
+        "name": "マジックオーブ",
+        "properties": {
+          "MATK_Rate": 12,
+          "MagicalPenetration_Rate": 8,
+          "CastingSpeed_Rate": 10
+        }
+      }
+    ],
+    "fashion1": [
+      {
+        "id": "royal_crown",
+        "name": "ロイヤルクラウン",
+        "properties": {
+          "HP": 100,
+          "MP": 50,
+          "STR_Rate": 3,
+          "INT_Rate": 3,
+          "VIT_Rate": 3,
+          "AGI_Rate": 3,
+          "DEX_Rate": 3
+        }
+      },
+      {
+        "id": "golden_tiara",
+        "name": "ゴールデンティアラ",
+        "properties": {
+          "MATK_Rate": 8,
+          "MP_Rate": 10,
+          "INT_Rate": 5
+        }
+      }
+    ],
+    "fashion2": [
+      {
+        "id": "ninja_mask",
+        "name": "ニンジャマスク",
+        "properties": {
+          "Dodge_Rate": 8,
+          "Critical_Rate": 5,
+          "AGI": 20
+        }
+      },
+      {
+        "id": "warrior_bandana",
+        "name": "ウォリアーバンダナ",
+        "properties": {
+          "ATK_Rate": 6,
+          "STR_Rate": 4,
+          "PhysicalPenetration_Rate": 3
+        }
+      }
+    ],
+    "fashion3": [
+      {
+        "id": "mage_cape",
+        "name": "メイジケープ",
+        "properties": {
+          "MATK_Rate": 8,
+          "CastingSpeed_Rate": 10,
+          "INT": 25
+        }
+      },
+      {
+        "id": "assassin_cloak",
+        "name": "アサシンクローク",
+        "properties": {
+          "Critical_Rate": 10,
+          "Dodge_Rate": 12,
+          "MotionSpeed_Rate": 8
+        }
+      }
+    ],
+    "freeInput1": [
+      {
+        "id": "custom_accessory_1",
+        "name": "カスタムアクセサリー1",
+        "properties": {
+          "ATK_Rate": 5,
+          "HP_Rate": 5
+        }
+      }
+    ],
+    "freeInput2": [
+      {
+        "id": "custom_accessory_2",
+        "name": "カスタムアクセサリー2",
+        "properties": {
+          "MATK_Rate": 5,
+          "MP_Rate": 5
+        }
+      }
+    ],
+    "freeInput3": [
+      {
+        "id": "custom_accessory_3",
+        "name": "カスタムアクセサリー3",
+        "properties": {
+          "Critical_Rate": 3,
+          "Accuracy_Rate": 3
+        }
+      }
+    ]
+  }
 }
