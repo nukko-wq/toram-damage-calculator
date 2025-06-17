@@ -9,12 +9,10 @@
         "MDEF": 5,
         "physicalResistance": 0,
         "magicalResistance": 0,
-        "criticalConfirmation": 0,
+        "resistCritical": 0,
         "requiredHIT": 10
       },
-      "category": "mob",
-      "source": "ソフィア平原",
-      "description": "最も基本的なモンスター"
+      "category": "mob"
     },
     {
       "id": "goblin_lv5",
@@ -25,12 +23,10 @@
         "MDEF": 10,
         "physicalResistance": 0,
         "magicalResistance": 0,
-        "criticalConfirmation": 0,
+        "resistCritical": 0,
         "requiredHIT": 25
       },
-      "category": "mob",
-      "source": "ニーシュフォレスト",
-      "description": "小柄だが凶暴な亜人"
+      "category": "mob"
     },
     {
       "id": "orc_lv20",
@@ -41,12 +37,10 @@
         "MDEF": 40,
         "physicalResistance": 5,
         "magicalResistance": 0,
-        "criticalConfirmation": 5,
+        "resistCritical": 5,
         "requiredHIT": 100
       },
-      "category": "mob",
-      "source": "アルカト峡谷",
-      "description": "高い物理防御力を持つ亜人"
+      "category": "mob"
     },
     {
       "id": "skeleton_lv30",
@@ -57,12 +51,10 @@
         "MDEF": 80,
         "physicalResistance": 10,
         "magicalResistance": -10,
-        "criticalConfirmation": 10,
+        "resistCritical": 10,
         "requiredHIT": 150
       },
-      "category": "mob",
-      "source": "ラクル洞窟",
-      "description": "魔法に弱いアンデッド"
+      "category": "mob"
     },
     {
       "id": "giant_bear_lv25",
@@ -73,12 +65,10 @@
         "MDEF": 80,
         "physicalResistance": 15,
         "magicalResistance": 5,
-        "criticalConfirmation": 20,
+        "resistCritical": 20,
         "requiredHIT": 180
       },
-      "category": "fieldBoss",
-      "source": "ニーシュフォレスト深部",
-      "description": "巨大化した森の熊"
+      "category": "fieldBoss"
     },
     {
       "id": "poison_spider_lv40",
@@ -89,12 +79,10 @@
         "MDEF": 120,
         "physicalResistance": 10,
         "magicalResistance": 20,
-        "criticalConfirmation": 30,
+        "resistCritical": 30,
         "requiredHIT": 250
       },
-      "category": "fieldBoss",
-      "source": "毒蜘蛛の巣窟",
-      "description": "猛毒を持つ巨大蜘蛛"
+      "category": "fieldBoss"
     },
     {
       "id": "ice_golem_lv50",
@@ -105,12 +93,10 @@
         "MDEF": 200,
         "physicalResistance": 25,
         "magicalResistance": 15,
-        "criticalConfirmation": 40,
+        "resistCritical": 40,
         "requiredHIT": 350
       },
-      "category": "fieldBoss",
-      "source": "氷雪の洞窟",
-      "description": "氷の力を宿した人工生命体"
+      "category": "fieldBoss"
     },
     {
       "id": "dragon_knight_lv60",
@@ -121,12 +107,10 @@
         "MDEF": 300,
         "physicalResistance": 30,
         "magicalResistance": 25,
-        "criticalConfirmation": 60,
+        "resistCritical": 60,
         "requiredHIT": 500
       },
-      "category": "boss",
-      "source": "竜の巣窟",
-      "description": "竜の力を得た騎士"
+      "category": "boss"
     },
     {
       "id": "dark_mage_lv70",
@@ -137,12 +121,10 @@
         "MDEF": 500,
         "physicalResistance": 10,
         "magicalResistance": 40,
-        "criticalConfirmation": 80,
+        "resistCritical": 80,
         "requiredHIT": 600
       },
-      "category": "boss",
-      "source": "闇の塔",
-      "description": "強大な魔力を持つ闇魔導師"
+      "category": "boss"
     },
     {
       "id": "flame_demon_lv80",
@@ -153,12 +135,10 @@
         "MDEF": 350,
         "physicalResistance": 35,
         "magicalResistance": 30,
-        "criticalConfirmation": 100,
+        "resistCritical": 100,
         "requiredHIT": 750
       },
-      "category": "boss",
-      "source": "炎の神殿",
-      "description": "地獄から来た炎の悪魔"
+      "category": "boss"
     },
     {
       "id": "ancient_dragon_lv100",
@@ -169,12 +149,10 @@
         "MDEF": 600,
         "physicalResistance": 50,
         "magicalResistance": 45,
-        "criticalConfirmation": 150,
+        "resistCritical": 150,
         "requiredHIT": 1200
       },
-      "category": "raidBoss",
-      "source": "古竜の祭壇",
-      "description": "太古から生きる伝説の竜"
+      "category": "raidBoss"
     },
     {
       "id": "demon_lord_lv120",
@@ -185,12 +163,10 @@
         "MDEF": 800,
         "physicalResistance": 40,
         "magicalResistance": 55,
-        "criticalConfirmation": 200,
+        "resistCritical": 200,
         "requiredHIT": 1500
       },
-      "category": "raidBoss",
-      "source": "魔王城",
-      "description": "世界を脅かす絶対的存在"
+      "category": "raidBoss"
     },
     {
       "id": "void_emperor_lv150",
@@ -201,12 +177,10 @@
         "MDEF": 1000,
         "physicalResistance": 60,
         "magicalResistance": 60,
-        "criticalConfirmation": 300,
+        "resistCritical": 300,
         "requiredHIT": 2000
       },
-      "category": "raidBoss",
-      "source": "虚無の次元",
-      "description": "虚無を司る最強の存在"
+      "category": "raidBoss"
     }
   ]
 }
