@@ -99,7 +99,12 @@ export default function EquipmentForm({
 		},
 		{
 			title: '速度',
-			properties: ['AttackSpeed_Rate', 'AttackSpeed', 'CastingSpeed_Rate', 'CastingSpeed'] as const,
+			properties: [
+				'AttackSpeed_Rate',
+				'AttackSpeed',
+				'CastingSpeed_Rate',
+				'CastingSpeed',
+			] as const,
 		},
 	]
 
@@ -128,7 +133,7 @@ export default function EquipmentForm({
 		if (!modalState.category) return
 
 		const slotKey = modalState.category as keyof EquipmentSlots
-		
+
 		if (equipmentId === null) {
 			// 装備なしを選択
 			const updatedEquipment = {
@@ -240,10 +245,13 @@ export default function EquipmentForm({
 					</h3>
 					<button
 						type="button"
-						onClick={() => openEquipmentModal(
-							activeTab as EquipmentCategory,
-							equipment[activeTab].name || `${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`
-						)}
+						onClick={() =>
+							openEquipmentModal(
+								activeTab as EquipmentCategory,
+								equipment[activeTab].name ||
+									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
+							)
+						}
 						className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
 					>
 						{equipment[activeTab].name || 'プリセット選択'}

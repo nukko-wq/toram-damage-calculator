@@ -14,26 +14,32 @@ export const getUserEquipments = (): UserEquipment[] => {
  * IDでユーザーカスタム装備を取得
  */
 export const getUserEquipmentById = (id: string): UserEquipment | undefined => {
-	return getUserEquipments().find(equipment => equipment.id === id)
+	return getUserEquipments().find((equipment) => equipment.id === id)
 }
 
 /**
  * カテゴリ別にユーザーカスタム装備を取得
  */
-export const getUserEquipmentsByCategory = (category: EquipmentCategory): UserEquipment[] => {
-	return getUserEquipments().filter(equipment => equipment.category === category)
+export const getUserEquipmentsByCategory = (
+	category: EquipmentCategory,
+): UserEquipment[] => {
+	return getUserEquipments().filter(
+		(equipment) => equipment.category === category,
+	)
 }
 
 /**
  * ユーザーカスタム装備を保存
  */
-export const saveUserEquipment = (equipment: Omit<UserEquipment, 'createdAt' | 'updatedAt'>): void => {
+export const saveUserEquipment = (
+	equipment: Omit<UserEquipment, 'createdAt' | 'updatedAt'>,
+): void => {
 	try {
 		const userEquipments = getUserEquipments()
 		const now = new Date().toISOString()
-		
-		const existingIndex = userEquipments.findIndex(e => e.id === equipment.id)
-		
+
+		const existingIndex = userEquipments.findIndex((e) => e.id === equipment.id)
+
 		if (existingIndex >= 0) {
 			// 既存の装備を更新
 			userEquipments[existingIndex] = {
@@ -49,7 +55,7 @@ export const saveUserEquipment = (equipment: Omit<UserEquipment, 'createdAt' | '
 				updatedAt: now,
 			})
 		}
-		
+
 		StorageHelper.set(STORAGE_KEYS.CUSTOM_EQUIPMENTS, userEquipments)
 	} catch (error) {
 		console.error('Error saving user equipment:', error)
@@ -59,16 +65,19 @@ export const saveUserEquipment = (equipment: Omit<UserEquipment, 'createdAt' | '
 /**
  * ユーザーカスタム装備を更新
  */
-export const updateUserEquipment = (id: string, updates: Partial<UserEquipment>): void => {
+export const updateUserEquipment = (
+	id: string,
+	updates: Partial<UserEquipment>,
+): void => {
 	try {
 		const userEquipments = getUserEquipments()
-		const index = userEquipments.findIndex(e => e.id === id)
-		
+		const index = userEquipments.findIndex((e) => e.id === id)
+
 		if (index >= 0) {
 			userEquipments[index] = {
 				...userEquipments[index],
 				...updates,
-				updatedAt: new Date().toISOString()
+				updatedAt: new Date().toISOString(),
 			}
 			StorageHelper.set(STORAGE_KEYS.CUSTOM_EQUIPMENTS, userEquipments)
 		}
@@ -83,7 +92,7 @@ export const updateUserEquipment = (id: string, updates: Partial<UserEquipment>)
 export const deleteUserEquipment = (id: string): void => {
 	try {
 		const userEquipments = getUserEquipments()
-		const filtered = userEquipments.filter(e => e.id !== id)
+		const filtered = userEquipments.filter((e) => e.id !== id)
 		StorageHelper.set(STORAGE_KEYS.CUSTOM_EQUIPMENTS, filtered)
 	} catch (error) {
 		console.error('Error deleting user equipment:', error)
@@ -110,20 +119,23 @@ export const toggleEquipmentFavorite = (id: string): void => {
 /**
  * ユーザーカスタム装備を複製
  */
-export const duplicateUserEquipment = (id: string, newName?: string): string => {
+export const duplicateUserEquipment = (
+	id: string,
+	newName?: string,
+): string => {
 	const equipment = getUserEquipmentById(id)
 	if (!equipment) {
 		throw new Error('Equipment not found')
 	}
-	
+
 	const newId = `${equipment.id}_copy_${Date.now()}`
 	const duplicatedEquipment: Omit<UserEquipment, 'createdAt' | 'updatedAt'> = {
 		...equipment,
 		id: newId,
 		name: newName || `${equipment.name} (コピー)`,
-		isFavorite: false
+		isFavorite: false,
 	}
-	
+
 	saveUserEquipment(duplicatedEquipment)
 	return newId
 }
@@ -131,20 +143,23 @@ export const duplicateUserEquipment = (id: string, newName?: string): string => 
 /**
  * カスタム装備を検索
  */
-export const searchUserEquipments = (query: string, category?: EquipmentCategory): UserEquipment[] => {
+export const searchUserEquipments = (
+	query: string,
+	category?: EquipmentCategory,
+): UserEquipment[] => {
 	let equipments = getUserEquipments()
-	
+
 	if (category) {
-		equipments = equipments.filter(e => e.category === category)
+		equipments = equipments.filter((e) => e.category === category)
 	}
-	
+
 	if (query.trim()) {
 		const searchTerm = query.trim().toLowerCase()
-		equipments = equipments.filter(e => 
-			e.name.toLowerCase().includes(searchTerm)
+		equipments = equipments.filter((e) =>
+			e.name.toLowerCase().includes(searchTerm),
 		)
 	}
-	
+
 	return equipments
 }
 
@@ -152,5 +167,5 @@ export const searchUserEquipments = (query: string, category?: EquipmentCategory
  * お気に入りカスタム装備を取得
  */
 export const getFavoriteUserEquipments = (): UserEquipment[] => {
-	return getUserEquipments().filter(e => e.isFavorite)
+	return getUserEquipments().filter((e) => e.isFavorite)
 }

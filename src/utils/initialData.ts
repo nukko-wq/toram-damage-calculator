@@ -37,80 +37,81 @@ export const createInitialSubWeapon = (): SubWeapon => ({
 	refinement: 0,
 })
 
-export const createInitialEquipmentProperties = (): Partial<EquipmentProperties> => ({
-	// 基本攻撃力系
-	ATK_Rate: 0,
-	ATK: 0,
-	MATK_Rate: 0,
-	MATK: 0,
-	WeaponATK_Rate: 0,
-	WeaponATK: 0,
-	
-	// 防御力系
-	DEF_Rate: 0,
-	DEF: 0,
-	MDEF_Rate: 0,
-	MDEF: 0,
-	
-	// 貫通系
-	PhysicalPenetration_Rate: 0,
-	MagicalPenetration_Rate: 0,
-	ElementAdvantage_Rate: 0,
-	
-	// 威力系
-	UnsheatheAttack_Rate: 0,
-	UnsheatheAttack: 0,
-	ShortRangeDamage_Rate: 0,
-	LongRangeDamage_Rate: 0,
-	
-	// クリティカル系
-	CriticalDamage_Rate: 0,
-	CriticalDamage: 0,
-	Critical_Rate: 0,
-	Critical: 0,
-	
-	// 安定率
-	Stability_Rate: 0,
-	
-	// HP/MP系
-	HP_Rate: 0,
-	HP: 0,
-	MP_Rate: 0,
-	MP: 0,
-	
-	// ステータス系
-	STR_Rate: 0,
-	STR: 0,
-	INT_Rate: 0,
-	INT: 0,
-	VIT_Rate: 0,
-	VIT: 0,
-	AGI_Rate: 0,
-	AGI: 0,
-	DEX_Rate: 0,
-	DEX: 0,
-	CRT_Rate: 0,
-	CRT: 0,
-	MEN_Rate: 0,
-	MEN: 0,
-	TEC_Rate: 0,
-	TEC: 0,
-	LUK_Rate: 0,
-	LUK: 0,
-	
-	// 命中・回避系
-	Accuracy_Rate: 0,
-	Accuracy: 0,
-	Dodge_Rate: 0,
-	Dodge: 0,
-	
-	// 速度系
-	AttackSpeed_Rate: 0,
-	AttackSpeed: 0,
-	CastingSpeed_Rate: 0,
-	CastingSpeed: 0,
-	MotionSpeed_Rate: 0,
-})
+export const createInitialEquipmentProperties =
+	(): Partial<EquipmentProperties> => ({
+		// 基本攻撃力系
+		ATK_Rate: 0,
+		ATK: 0,
+		MATK_Rate: 0,
+		MATK: 0,
+		WeaponATK_Rate: 0,
+		WeaponATK: 0,
+
+		// 防御力系
+		DEF_Rate: 0,
+		DEF: 0,
+		MDEF_Rate: 0,
+		MDEF: 0,
+
+		// 貫通系
+		PhysicalPenetration_Rate: 0,
+		MagicalPenetration_Rate: 0,
+		ElementAdvantage_Rate: 0,
+
+		// 威力系
+		UnsheatheAttack_Rate: 0,
+		UnsheatheAttack: 0,
+		ShortRangeDamage_Rate: 0,
+		LongRangeDamage_Rate: 0,
+
+		// クリティカル系
+		CriticalDamage_Rate: 0,
+		CriticalDamage: 0,
+		Critical_Rate: 0,
+		Critical: 0,
+
+		// 安定率
+		Stability_Rate: 0,
+
+		// HP/MP系
+		HP_Rate: 0,
+		HP: 0,
+		MP_Rate: 0,
+		MP: 0,
+
+		// ステータス系
+		STR_Rate: 0,
+		STR: 0,
+		INT_Rate: 0,
+		INT: 0,
+		VIT_Rate: 0,
+		VIT: 0,
+		AGI_Rate: 0,
+		AGI: 0,
+		DEX_Rate: 0,
+		DEX: 0,
+		CRT_Rate: 0,
+		CRT: 0,
+		MEN_Rate: 0,
+		MEN: 0,
+		TEC_Rate: 0,
+		TEC: 0,
+		LUK_Rate: 0,
+		LUK: 0,
+
+		// 命中・回避系
+		Accuracy_Rate: 0,
+		Accuracy: 0,
+		Dodge_Rate: 0,
+		Dodge: 0,
+
+		// 速度系
+		AttackSpeed_Rate: 0,
+		AttackSpeed: 0,
+		CastingSpeed_Rate: 0,
+		CastingSpeed: 0,
+		MotionSpeed_Rate: 0,
+	})
 
 export const createInitialEquipment = (): Equipment => ({
 	name: '',

@@ -48,9 +48,11 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		// フォームが初期化されていない場合のみリセット
 		const currentValues = watch()
 		const hasChanges = Object.keys(stats).some(
-			key => currentValues[key as keyof BaseStatsFormData] !== stats[key as keyof BaseStats]
+			(key) =>
+				currentValues[key as keyof BaseStatsFormData] !==
+				stats[key as keyof BaseStats],
 		)
-		
+
 		if (hasChanges && Object.keys(errors).length === 0) {
 			reset(stats)
 		}
@@ -88,9 +90,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="510"
-							{...register('level', { 
+							{...register('level', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('level')
+								onBlur: () => handleBlur('level'),
 							})}
 						/>
 						{errors.level && (
@@ -117,9 +119,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="510"
-							{...register('STR', { 
+							{...register('STR', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('STR')
+								onBlur: () => handleBlur('STR'),
 							})}
 						/>
 						{errors.STR && (
@@ -143,9 +145,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="510"
-							{...register('INT', { 
+							{...register('INT', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('INT')
+								onBlur: () => handleBlur('INT'),
 							})}
 						/>
 						{errors.INT && (
@@ -169,9 +171,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="510"
-							{...register('VIT', { 
+							{...register('VIT', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('VIT')
+								onBlur: () => handleBlur('VIT'),
 							})}
 						/>
 						{errors.VIT && (
@@ -197,9 +199,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="510"
-							{...register('AGI', { 
+							{...register('AGI', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('AGI')
+								onBlur: () => handleBlur('AGI'),
 							})}
 						/>
 						{errors.AGI && (
@@ -223,9 +225,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="510"
-							{...register('DEX', { 
+							{...register('DEX', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('DEX')
+								onBlur: () => handleBlur('DEX'),
 							})}
 						/>
 						{errors.DEX && (
@@ -251,9 +253,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="255"
-							{...register('CRT', { 
+							{...register('CRT', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('CRT')
+								onBlur: () => handleBlur('CRT'),
 							})}
 						/>
 						{errors.CRT && (
@@ -277,9 +279,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="255"
-							{...register('MEN', { 
+							{...register('MEN', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('MEN')
+								onBlur: () => handleBlur('MEN'),
 							})}
 						/>
 						{errors.MEN && (
@@ -303,9 +305,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="255"
-							{...register('TEC', { 
+							{...register('TEC', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('TEC')
+								onBlur: () => handleBlur('TEC'),
 							})}
 						/>
 						{errors.TEC && (
@@ -331,9 +333,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 							}`}
 							min="1"
 							max="255"
-							{...register('LUK', { 
+							{...register('LUK', {
 								valueAsNumber: true,
-								onBlur: () => handleBlur('LUK')
+								onBlur: () => handleBlur('LUK'),
 							})}
 						/>
 						{errors.LUK && (

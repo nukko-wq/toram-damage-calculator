@@ -99,7 +99,7 @@ export default function CrystalSelectionModal({
 		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
 		const modalContent = document.querySelector('[data-modal-content="true"]')
 		const target = e.target as Element
-		
+
 		if (modalContent && !modalContent.contains(target)) {
 			onClose()
 		}

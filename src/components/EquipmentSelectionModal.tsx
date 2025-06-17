@@ -1,7 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { EquipmentType, PresetEquipment, EquipmentCategory } from '@/types/calculator'
+import type {
+	EquipmentType,
+	PresetEquipment,
+	EquipmentCategory,
+} from '@/types/calculator'
 import { getAvailableEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import EquipmentCard from './EquipmentCard'
 
@@ -23,7 +27,9 @@ export default function EquipmentSelectionModal({
 	title,
 }: EquipmentSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | EquipmentType>('all')
-	const [availableEquipments, setAvailableEquipments] = useState<PresetEquipment[]>([])
+	const [availableEquipments, setAvailableEquipments] = useState<
+		PresetEquipment[]
+	>([])
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
@@ -49,19 +55,25 @@ export default function EquipmentSelectionModal({
 		setAvailableEquipments(equipments)
 	}, [isOpen, category])
 
-	const filteredEquipments = availableEquipments.filter(equipment => {
+	const filteredEquipments = availableEquipments.filter((equipment) => {
 		if (activeFilter === 'all') return true
 		return equipment.type === activeFilter
 	})
 
 	const getFilterLabel = (filter: string) => {
 		switch (filter) {
-			case 'all': return '全て'
-			case 'weapon': return '武器'
-			case 'armor': return '防具'
-			case 'accessory': return 'アクセサリ'
-			case 'fashion': return 'オシャレ'
-			default: return filter
+			case 'all':
+				return '全て'
+			case 'weapon':
+				return '武器'
+			case 'armor':
+				return '防具'
+			case 'accessory':
+				return 'アクセサリ'
+			case 'fashion':
+				return 'オシャレ'
+			default:
+				return filter
 		}
 	}
 
@@ -79,7 +91,7 @@ export default function EquipmentSelectionModal({
 		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
 		const modalContent = document.querySelector('[data-modal-content="true"]')
 		const target = e.target as Element
-		
+
 		if (modalContent && !modalContent.contains(target)) {
 			onClose()
 		}
@@ -93,7 +105,9 @@ export default function EquipmentSelectionModal({
 	if (!isOpen) return null
 
 	// 利用可能な装備タイプを取得
-	const availableTypes = Array.from(new Set(availableEquipments.map(eq => eq.type)))
+	const availableTypes = Array.from(
+		new Set(availableEquipments.map((eq) => eq.type)),
+	)
 
 	return (
 		<dialog
@@ -111,7 +125,9 @@ export default function EquipmentSelectionModal({
 				>
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b">
-						<h2 id="modal-title" className="text-xl font-bold text-gray-900">{title}</h2>
+						<h2 id="modal-title" className="text-xl font-bold text-gray-900">
+							{title}
+						</h2>
 						<button
 							type="button"
 							onClick={onClose}
@@ -190,9 +206,7 @@ export default function EquipmentSelectionModal({
 								`}
 							>
 								<div className="flex items-center justify-between">
-									<span className="font-medium text-gray-900">
-										装備なし
-									</span>
+									<span className="font-medium text-gray-900">装備なし</span>
 									{selectedEquipmentId === null && (
 										<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
 											<svg

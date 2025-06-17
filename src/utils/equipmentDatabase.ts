@@ -1,10 +1,15 @@
-import type { PresetEquipment, EquipmentType, EquipmentCategory, EquipmentProperties } from '@/types/calculator'
+import type {
+	PresetEquipment,
+	EquipmentType,
+	EquipmentCategory,
+	EquipmentProperties,
+} from '@/types/calculator'
 import equipmentsData from '@/data/equipments.json'
 
 // プロパティからundefinedの値を除外する関数
 function cleanProperties(properties: any): Partial<EquipmentProperties> {
 	if (!properties) return {}
-	
+
 	const cleaned: Partial<EquipmentProperties> = {}
 	for (const [key, value] of Object.entries(properties)) {
 		if (value !== undefined && typeof value === 'number') {
@@ -17,15 +22,15 @@ function cleanProperties(properties: any): Partial<EquipmentProperties> {
 // プリセット装備データを取得
 export function getAllEquipments(): PresetEquipment[] {
 	const allEquipments: PresetEquipment[] = []
-	
+
 	// 新しいJSON構造に対応
 	const equipmentsRoot = (equipmentsData as any).equipments
-	
+
 	if (!equipmentsRoot) {
 		console.error('equipments.json構造が不正です')
 		return []
 	}
-	
+
 	// mainWeapon -> main カテゴリ、weapon タイプ
 	if (equipmentsRoot.mainWeapon) {
 		for (const item of equipmentsRoot.mainWeapon) {
@@ -36,11 +41,11 @@ export function getAllEquipments(): PresetEquipment[] {
 				category: ['main'] as EquipmentCategory[],
 				baseStats: item.weaponStats || {},
 				properties: cleanProperties(item.properties),
-				source: item.source
+				source: item.source,
 			})
 		}
 	}
-	
+
 	// body -> body カテゴリ、armor タイプ
 	if (equipmentsRoot.body) {
 		for (const item of equipmentsRoot.body) {
@@ -51,11 +56,11 @@ export function getAllEquipments(): PresetEquipment[] {
 				category: ['body'] as EquipmentCategory[],
 				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source
+				source: item.source,
 			})
 		}
 	}
-	
+
 	// additional -> additional カテゴリ、accessory タイプ
 	if (equipmentsRoot.additional) {
 		for (const item of equipmentsRoot.additional) {
@@ -66,11 +71,11 @@ export function getAllEquipments(): PresetEquipment[] {
 				category: ['additional'] as EquipmentCategory[],
 				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source
+				source: item.source,
 			})
 		}
 	}
-	
+
 	// special -> special カテゴリ、accessory タイプ
 	if (equipmentsRoot.special) {
 		for (const item of equipmentsRoot.special) {
@@ -81,11 +86,11 @@ export function getAllEquipments(): PresetEquipment[] {
 				category: ['special'] as EquipmentCategory[],
 				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source
+				source: item.source,
 			})
 		}
 	}
-	
+
 	// subWeapon -> subWeapon カテゴリ、weapon タイプ
 	if (equipmentsRoot.subWeapon) {
 		for (const item of equipmentsRoot.subWeapon) {
@@ -96,11 +101,11 @@ export function getAllEquipments(): PresetEquipment[] {
 				category: ['subWeapon'] as EquipmentCategory[],
 				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source
+				source: item.source,
 			})
 		}
 	}
-	
+
 	// fashion1 -> fashion1 カテゴリ、fashion タイプ
 	if (equipmentsRoot.fashion1) {
 		for (const item of equipmentsRoot.fashion1) {
@@ -111,11 +116,11 @@ export function getAllEquipments(): PresetEquipment[] {
 				category: ['fashion1'] as EquipmentCategory[],
 				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source
+				source: item.source,
 			})
 		}
 	}
-	
+
 	// fashion2 -> fashion2 カテゴリ、fashion タイプ
 	if (equipmentsRoot.fashion2) {
 		for (const item of equipmentsRoot.fashion2) {
@@ -126,11 +131,11 @@ export function getAllEquipments(): PresetEquipment[] {
 				category: ['fashion2'] as EquipmentCategory[],
 				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source
+				source: item.source,
 			})
 		}
 	}
-	
+
 	// fashion3 -> fashion3 カテゴリ、fashion タイプ
 	if (equipmentsRoot.fashion3) {
 		for (const item of equipmentsRoot.fashion3) {
@@ -141,29 +146,31 @@ export function getAllEquipments(): PresetEquipment[] {
 				category: ['fashion3'] as EquipmentCategory[],
 				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source
+				source: item.source,
 			})
 		}
 	}
-	
+
 	return allEquipments
 }
 
 // 装備タイプでフィルタリング
 export function getEquipmentsByType(type: EquipmentType): PresetEquipment[] {
-	return getAllEquipments().filter(equipment => equipment.type === type)
+	return getAllEquipments().filter((equipment) => equipment.type === type)
 }
 
 // 装備カテゴリでフィルタリング
-export function getEquipmentsByCategory(category: EquipmentCategory): PresetEquipment[] {
-	return getAllEquipments().filter(equipment => 
-		equipment.category.includes(category)
+export function getEquipmentsByCategory(
+	category: EquipmentCategory,
+): PresetEquipment[] {
+	return getAllEquipments().filter((equipment) =>
+		equipment.category.includes(category),
 	)
 }
 
 // IDで装備を取得
 export function getEquipmentById(id: string): PresetEquipment | null {
-	return getAllEquipments().find(equipment => equipment.id === id) || null
+	return getAllEquipments().find((equipment) => equipment.id === id) || null
 }
 
 // LocalStorageからユーザーカスタム装備を取得
@@ -181,14 +188,16 @@ export function getUserCustomEquipments(): PresetEquipment[] {
 export function saveUserCustomEquipment(equipment: PresetEquipment): void {
 	try {
 		const customEquipments = getUserCustomEquipments()
-		const existingIndex = customEquipments.findIndex(item => item.id === equipment.id)
-		
+		const existingIndex = customEquipments.findIndex(
+			(item) => item.id === equipment.id,
+		)
+
 		if (existingIndex >= 0) {
 			customEquipments[existingIndex] = equipment
 		} else {
 			customEquipments.push(equipment)
 		}
-		
+
 		localStorage.setItem('custom_equipments', JSON.stringify(customEquipments))
 	} catch (error) {
 		console.error('Failed to save custom equipment:', error)
@@ -199,45 +208,66 @@ export function saveUserCustomEquipment(equipment: PresetEquipment): void {
 export function getAllAvailableEquipments(): PresetEquipment[] {
 	const presetEquipments = getAllEquipments()
 	const customEquipments = getUserCustomEquipments()
-	
+
 	return [...presetEquipments, ...customEquipments]
 }
 
 // カテゴリ別の統合装備リストを取得
-export function getAvailableEquipmentsByCategory(category: EquipmentCategory): PresetEquipment[] {
-	return getAllAvailableEquipments().filter(equipment => 
-		equipment.category.includes(category)
+export function getAvailableEquipmentsByCategory(
+	category: EquipmentCategory,
+): PresetEquipment[] {
+	return getAllAvailableEquipments().filter((equipment) =>
+		equipment.category.includes(category),
 	)
 }
 
 // 装備タイプ別の統合装備リストを取得
-export function getAvailableEquipmentsByType(type: EquipmentType): PresetEquipment[] {
-	return getAllAvailableEquipments().filter(equipment => equipment.type === type)
+export function getAvailableEquipmentsByType(
+	type: EquipmentType,
+): PresetEquipment[] {
+	return getAllAvailableEquipments().filter(
+		(equipment) => equipment.type === type,
+	)
 }
 
 // 装備の表示名を取得（装備タイプに応じたラベル）
 export function getEquipmentTypeLabel(type: EquipmentType): string {
 	switch (type) {
-		case 'weapon': return '武器'
-		case 'armor': return '防具'
-		case 'accessory': return 'アクセサリ'
-		case 'fashion': return 'オシャレ'
-		default: return type
+		case 'weapon':
+			return '武器'
+		case 'armor':
+			return '防具'
+		case 'accessory':
+			return 'アクセサリ'
+		case 'fashion':
+			return 'オシャレ'
+		default:
+			return type
 	}
 }
 
 // 装備カテゴリの表示名を取得
 export function getEquipmentCategoryLabel(category: EquipmentCategory): string {
 	switch (category) {
-		case 'main': return 'メイン装備'
-		case 'mainWeapon': return 'メイン武器'
-		case 'body': return '体装備'
-		case 'additional': return '追加装備'
-		case 'special': return '特殊装備'
-		case 'subWeapon': return 'サブ武器'
-		case 'fashion1': return 'オシャレ1'
-		case 'fashion2': return 'オシャレ2'
-		case 'fashion3': return 'オシャレ3'
-		default: return category
+		case 'main':
+			return 'メイン装備'
+		case 'mainWeapon':
+			return 'メイン武器'
+		case 'body':
+			return '体装備'
+		case 'additional':
+			return '追加装備'
+		case 'special':
+			return '特殊装備'
+		case 'subWeapon':
+			return 'サブ武器'
+		case 'fashion1':
+			return 'オシャレ1'
+		case 'fashion2':
+			return 'オシャレ2'
+		case 'fashion3':
+			return 'オシャレ3'
+		default:
+			return category
 	}
 }

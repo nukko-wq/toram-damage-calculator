@@ -1,166 +1,166 @@
 {
-  "enemies": {
-    "mob": [
-      {
-        "id": "000",
-        "name": "ラフィー",
-        "level": 1,
-        "stats": {
-          "DEF": 0,
-          "MDEF": 0,
-          "physicalResistance": 0,
-          "magicalResistance": 0,
-          "resistCritical": 0,
-          "requiredHIT": 0
-        },
-        "category": "mob"
-      },
-      {
-        "id": "001",
-        "name": "エンバブ",
-        "level": 143,
-        "stats": {
-          "DEF": 143,
-          "MDEF": 143,
-          "physicalResistance": 0,
-          "magicalResistance": 0,
-          "resistCritical": 0,
-          "requiredHIT": 0
-        },
-        "category": "mob"
-      },
-      {
-        "id": "skeleton_lv30",
-        "name": "スケルトン",
-        "level": 30,
-        "stats": {
-          "DEF": 120,
-          "MDEF": 80,
-          "physicalResistance": 10,
-          "magicalResistance": -10,
-          "resistCritical": 10,
-          "requiredHIT": 150
-        },
-        "category": "mob"
-      }
-    ],
-    "fieldBoss": [
-      {
-        "id": "giant_bear_lv25",
-        "name": "ジャイアントベア",
-        "level": 25,
-        "stats": {
-          "DEF": 150,
-          "MDEF": 80,
-          "physicalResistance": 15,
-          "magicalResistance": 5,
-          "resistCritical": 20,
-          "requiredHIT": 180
-        },
-        "category": "fieldBoss"
-      },
-      {
-        "id": "poison_spider_lv40",
-        "name": "ポイズンスパイダー",
-        "level": 40,
-        "stats": {
-          "DEF": 180,
-          "MDEF": 120,
-          "physicalResistance": 10,
-          "magicalResistance": 20,
-          "resistCritical": 30,
-          "requiredHIT": 250
-        },
-        "category": "fieldBoss"
-      },
-      {
-        "id": "ice_golem_lv50",
-        "name": "アイスゴーレム",
-        "level": 50,
-        "stats": {
-          "DEF": 300,
-          "MDEF": 200,
-          "physicalResistance": 25,
-          "magicalResistance": 15,
-          "resistCritical": 40,
-          "requiredHIT": 350
-        },
-        "category": "fieldBoss"
-      }
-    ],
-    "boss": [
-      {
-        "id": "002",
-        "name": "ピヌグールガ",
-        "level": 286,
-        "stats": {
-          "DEF": 1144,
-          "MDEF": 715,
-          "physicalResistance": 15,
-          "magicalResistance": 10,
-          "resistCritical": 0,
-          "requiredHIT": 0
-        },
-        "category": "boss"
-      },
-      {
-        "id": "003",
-        "name": "バクザン",
-        "level": 292,
-        "stats": {
-          "DEF": 1460,
-          "MDEF": 584,
-          "physicalResistance": 10,
-          "magicalResistance": 10,
-          "resistCritical": 0,
-          "requiredHIT": 0
-        },
-        "category": "boss"
-      }
-    ],
-    "raidBoss": [
-      {
-        "id": "ancient_dragon_lv100",
-        "name": "エンシェントドラゴン",
-        "level": 100,
-        "stats": {
-          "DEF": 800,
-          "MDEF": 600,
-          "physicalResistance": 50,
-          "magicalResistance": 45,
-          "resistCritical": 150,
-          "requiredHIT": 1200
-        },
-        "category": "raidBoss"
-      },
-      {
-        "id": "demon_lord_lv120",
-        "name": "魔王",
-        "level": 120,
-        "stats": {
-          "DEF": 600,
-          "MDEF": 800,
-          "physicalResistance": 40,
-          "magicalResistance": 55,
-          "resistCritical": 200,
-          "requiredHIT": 1500
-        },
-        "category": "raidBoss"
-      },
-      {
-        "id": "void_emperor_lv150",
-        "name": "ヴォイドエンペラー",
-        "level": 288,
-        "stats": {
-          "DEF": 1000,
-          "MDEF": 1000,
-          "physicalResistance": 60,
-          "magicalResistance": 60,
-          "resistCritical": 300,
-          "requiredHIT": 2000
-        },
-        "category": "raidBoss"
-      }
-    ]
-  }
+	"enemies": {
+		"mob": [
+			{
+				"id": "000",
+				"name": "ラフィー",
+				"level": 1,
+				"stats": {
+					"DEF": 0,
+					"MDEF": 0,
+					"physicalResistance": 0,
+					"magicalResistance": 0,
+					"resistCritical": 0,
+					"requiredHIT": 0
+				},
+				"category": "mob"
+			},
+			{
+				"id": "001",
+				"name": "エンバブ",
+				"level": 143,
+				"stats": {
+					"DEF": 143,
+					"MDEF": 143,
+					"physicalResistance": 0,
+					"magicalResistance": 0,
+					"resistCritical": 0,
+					"requiredHIT": 0
+				},
+				"category": "mob"
+			},
+			{
+				"id": "skeleton_lv30",
+				"name": "スケルトン",
+				"level": 30,
+				"stats": {
+					"DEF": 120,
+					"MDEF": 80,
+					"physicalResistance": 10,
+					"magicalResistance": -10,
+					"resistCritical": 10,
+					"requiredHIT": 150
+				},
+				"category": "mob"
+			}
+		],
+		"fieldBoss": [
+			{
+				"id": "giant_bear_lv25",
+				"name": "ジャイアントベア",
+				"level": 25,
+				"stats": {
+					"DEF": 150,
+					"MDEF": 80,
+					"physicalResistance": 15,
+					"magicalResistance": 5,
+					"resistCritical": 20,
+					"requiredHIT": 180
+				},
+				"category": "fieldBoss"
+			},
+			{
+				"id": "poison_spider_lv40",
+				"name": "ポイズンスパイダー",
+				"level": 40,
+				"stats": {
+					"DEF": 180,
+					"MDEF": 120,
+					"physicalResistance": 10,
+					"magicalResistance": 20,
+					"resistCritical": 30,
+					"requiredHIT": 250
+				},
+				"category": "fieldBoss"
+			},
+			{
+				"id": "ice_golem_lv50",
+				"name": "アイスゴーレム",
+				"level": 50,
+				"stats": {
+					"DEF": 300,
+					"MDEF": 200,
+					"physicalResistance": 25,
+					"magicalResistance": 15,
+					"resistCritical": 40,
+					"requiredHIT": 350
+				},
+				"category": "fieldBoss"
+			}
+		],
+		"boss": [
+			{
+				"id": "002",
+				"name": "ピヌグールガ",
+				"level": 286,
+				"stats": {
+					"DEF": 1144,
+					"MDEF": 715,
+					"physicalResistance": 15,
+					"magicalResistance": 10,
+					"resistCritical": 0,
+					"requiredHIT": 0
+				},
+				"category": "boss"
+			},
+			{
+				"id": "003",
+				"name": "バクザン",
+				"level": 292,
+				"stats": {
+					"DEF": 1460,
+					"MDEF": 584,
+					"physicalResistance": 10,
+					"magicalResistance": 10,
+					"resistCritical": 0,
+					"requiredHIT": 0
+				},
+				"category": "boss"
+			}
+		],
+		"raidBoss": [
+			{
+				"id": "ancient_dragon_lv100",
+				"name": "エンシェントドラゴン",
+				"level": 100,
+				"stats": {
+					"DEF": 800,
+					"MDEF": 600,
+					"physicalResistance": 50,
+					"magicalResistance": 45,
+					"resistCritical": 150,
+					"requiredHIT": 1200
+				},
+				"category": "raidBoss"
+			},
+			{
+				"id": "demon_lord_lv120",
+				"name": "魔王",
+				"level": 120,
+				"stats": {
+					"DEF": 600,
+					"MDEF": 800,
+					"physicalResistance": 40,
+					"magicalResistance": 55,
+					"resistCritical": 200,
+					"requiredHIT": 1500
+				},
+				"category": "raidBoss"
+			},
+			{
+				"id": "void_emperor_lv150",
+				"name": "ヴォイドエンペラー",
+				"level": 288,
+				"stats": {
+					"DEF": 1000,
+					"MDEF": 1000,
+					"physicalResistance": 60,
+					"magicalResistance": 60,
+					"resistCritical": 300,
+					"requiredHIT": 2000
+				},
+				"category": "raidBoss"
+			}
+		]
+	}
 }

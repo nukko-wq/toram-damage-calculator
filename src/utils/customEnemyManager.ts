@@ -14,26 +14,30 @@ export const getUserEnemies = (): UserEnemy[] => {
  * IDでユーザーカスタム敵を取得
  */
 export const getUserEnemyById = (id: string): UserEnemy | undefined => {
-	return getUserEnemies().find(enemy => enemy.id === id)
+	return getUserEnemies().find((enemy) => enemy.id === id)
 }
 
 /**
  * カテゴリ別にユーザーカスタム敵を取得
  */
-export const getUserEnemiesByCategory = (category: UserEnemy['category']): UserEnemy[] => {
-	return getUserEnemies().filter(enemy => enemy.category === category)
+export const getUserEnemiesByCategory = (
+	category: UserEnemy['category'],
+): UserEnemy[] => {
+	return getUserEnemies().filter((enemy) => enemy.category === category)
 }
 
 /**
  * ユーザーカスタム敵を保存
  */
-export const saveUserEnemy = (enemy: Omit<UserEnemy, 'createdAt' | 'updatedAt'>): void => {
+export const saveUserEnemy = (
+	enemy: Omit<UserEnemy, 'createdAt' | 'updatedAt'>,
+): void => {
 	try {
 		const userEnemies = getUserEnemies()
 		const now = new Date().toISOString()
-		
-		const existingIndex = userEnemies.findIndex(e => e.id === enemy.id)
-		
+
+		const existingIndex = userEnemies.findIndex((e) => e.id === enemy.id)
+
 		if (existingIndex >= 0) {
 			// 既存の敵を更新
 			userEnemies[existingIndex] = {
@@ -49,7 +53,7 @@ export const saveUserEnemy = (enemy: Omit<UserEnemy, 'createdAt' | 'updatedAt'>)
 				updatedAt: now,
 			})
 		}
-		
+
 		StorageHelper.set(STORAGE_KEYS.CUSTOM_ENEMIES, userEnemies)
 	} catch (error) {
 		console.error('Error saving user enemy:', error)
@@ -59,16 +63,19 @@ export const saveUserEnemy = (enemy: Omit<UserEnemy, 'createdAt' | 'updatedAt'>)
 /**
  * ユーザーカスタム敵を更新
  */
-export const updateUserEnemy = (id: string, updates: Partial<UserEnemy>): void => {
+export const updateUserEnemy = (
+	id: string,
+	updates: Partial<UserEnemy>,
+): void => {
 	try {
 		const userEnemies = getUserEnemies()
-		const index = userEnemies.findIndex(e => e.id === id)
-		
+		const index = userEnemies.findIndex((e) => e.id === id)
+
 		if (index >= 0) {
 			userEnemies[index] = {
 				...userEnemies[index],
 				...updates,
-				updatedAt: new Date().toISOString()
+				updatedAt: new Date().toISOString(),
 			}
 			StorageHelper.set(STORAGE_KEYS.CUSTOM_ENEMIES, userEnemies)
 		}
@@ -83,7 +90,7 @@ export const updateUserEnemy = (id: string, updates: Partial<UserEnemy>): void =
 export const deleteUserEnemy = (id: string): void => {
 	try {
 		const userEnemies = getUserEnemies()
-		const filtered = userEnemies.filter(e => e.id !== id)
+		const filtered = userEnemies.filter((e) => e.id !== id)
 		StorageHelper.set(STORAGE_KEYS.CUSTOM_ENEMIES, filtered)
 	} catch (error) {
 		console.error('Error deleting user enemy:', error)
@@ -115,15 +122,15 @@ export const duplicateUserEnemy = (id: string, newName?: string): string => {
 	if (!enemy) {
 		throw new Error('Enemy not found')
 	}
-	
+
 	const newId = `${enemy.id}_copy_${Date.now()}`
 	const duplicatedEnemy: Omit<UserEnemy, 'createdAt' | 'updatedAt'> = {
 		...enemy,
 		id: newId,
 		name: newName || `${enemy.name} (コピー)`,
-		isFavorite: false
+		isFavorite: false,
 	}
-	
+
 	saveUserEnemy(duplicatedEnemy)
 	return newId
 }
@@ -131,20 +138,21 @@ export const duplicateUserEnemy = (id: string, newName?: string): string => {
 /**
  * カスタム敵を検索
  */
-export const searchUserEnemies = (query: string, category?: UserEnemy['category']): UserEnemy[] => {
+export const searchUserEnemies = (
+	query: string,
+	category?: UserEnemy['category'],
+): UserEnemy[] => {
 	let enemies = getUserEnemies()
-	
+
 	if (category) {
-		enemies = enemies.filter(e => e.category === category)
+		enemies = enemies.filter((e) => e.category === category)
 	}
-	
+
 	if (query.trim()) {
 		const searchTerm = query.trim().toLowerCase()
-		enemies = enemies.filter(e => 
-			e.name.toLowerCase().includes(searchTerm)
-		)
+		enemies = enemies.filter((e) => e.name.toLowerCase().includes(searchTerm))
 	}
-	
+
 	return enemies
 }
 
@@ -152,14 +160,19 @@ export const searchUserEnemies = (query: string, category?: UserEnemy['category'
  * お気に入りカスタム敵を取得
  */
 export const getFavoriteUserEnemies = (): UserEnemy[] => {
-	return getUserEnemies().filter(e => e.isFavorite)
+	return getUserEnemies().filter((e) => e.isFavorite)
 }
 
 /**
  * レベル範囲でカスタム敵を取得
  */
-export const getUserEnemiesByLevelRange = (minLevel: number, maxLevel: number): UserEnemy[] => {
-	return getUserEnemies().filter(e => e.level >= minLevel && e.level <= maxLevel)
+export const getUserEnemiesByLevelRange = (
+	minLevel: number,
+	maxLevel: number,
+): UserEnemy[] => {
+	return getUserEnemies().filter(
+		(e) => e.level >= minLevel && e.level <= maxLevel,
+	)
 }
 
 /**
@@ -168,16 +181,17 @@ export const getUserEnemiesByLevelRange = (minLevel: number, maxLevel: number): 
 export const getUserEnemiesByResistance = (
 	type: 'physical' | 'magical',
 	minResistance?: number,
-	maxResistance?: number
+	maxResistance?: number,
 ): UserEnemy[] => {
-	return getUserEnemies().filter(e => {
-		const resistance = type === 'physical' 
-			? e.stats.physicalResistance 
-			: e.stats.magicalResistance
-		
+	return getUserEnemies().filter((e) => {
+		const resistance =
+			type === 'physical'
+				? e.stats.physicalResistance
+				: e.stats.magicalResistance
+
 		if (minResistance !== undefined && resistance < minResistance) return false
 		if (maxResistance !== undefined && resistance > maxResistance) return false
-		
+
 		return true
 	})
 }

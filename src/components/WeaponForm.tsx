@@ -2,7 +2,12 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { mainWeaponSchema, subWeaponSchema, type MainWeaponFormData, type SubWeaponFormData } from '@/schemas/weapons'
+import {
+	mainWeaponSchema,
+	subWeaponSchema,
+	type MainWeaponFormData,
+	type SubWeaponFormData,
+} from '@/schemas/weapons'
 import type {
 	MainWeapon,
 	SubWeapon,
@@ -114,9 +119,11 @@ export default function WeaponForm({
 	useEffect(() => {
 		const currentValues = watchMain()
 		const hasChanges = Object.keys(mainWeapon).some(
-			key => currentValues[key as keyof MainWeaponFormData] !== mainWeapon[key as keyof MainWeapon]
+			(key) =>
+				currentValues[key as keyof MainWeaponFormData] !==
+				mainWeapon[key as keyof MainWeapon],
 		)
-		
+
 		if (hasChanges && Object.keys(errorsMain).length === 0) {
 			resetMain(mainWeapon)
 		}
@@ -125,9 +132,11 @@ export default function WeaponForm({
 	useEffect(() => {
 		const currentValues = watchSub()
 		const hasChanges = Object.keys(subWeapon).some(
-			key => currentValues[key as keyof SubWeaponFormData] !== subWeapon[key as keyof SubWeapon]
+			(key) =>
+				currentValues[key as keyof SubWeaponFormData] !==
+				subWeapon[key as keyof SubWeapon],
 		)
-		
+
 		if (hasChanges && Object.keys(errorsSub).length === 0) {
 			resetSub(subWeapon)
 		}
@@ -176,7 +185,9 @@ export default function WeaponForm({
 							))}
 						</select>
 						{errorsMain.weaponType && (
-							<p className="text-red-500 text-xs mt-1">{errorsMain.weaponType.message}</p>
+							<p className="text-red-500 text-xs mt-1">
+								{errorsMain.weaponType.message}
+							</p>
 						)}
 					</div>
 
@@ -191,13 +202,15 @@ export default function WeaponForm({
 							}`}
 							min="0"
 							max="1500"
-							{...registerMain('ATK', { 
+							{...registerMain('ATK', {
 								valueAsNumber: true,
-								onBlur: () => handleMainBlur('ATK')
+								onBlur: () => handleMainBlur('ATK'),
 							})}
 						/>
 						{errorsMain.ATK && (
-							<p className="text-red-500 text-xs mt-1">{errorsMain.ATK.message}</p>
+							<p className="text-red-500 text-xs mt-1">
+								{errorsMain.ATK.message}
+							</p>
 						)}
 					</div>
 
@@ -212,13 +225,15 @@ export default function WeaponForm({
 							}`}
 							min="0"
 							max="100"
-							{...registerMain('stability', { 
+							{...registerMain('stability', {
 								valueAsNumber: true,
-								onBlur: () => handleMainBlur('stability')
+								onBlur: () => handleMainBlur('stability'),
 							})}
 						/>
 						{errorsMain.stability && (
-							<p className="text-red-500 text-xs mt-1">{errorsMain.stability.message}</p>
+							<p className="text-red-500 text-xs mt-1">
+								{errorsMain.stability.message}
+							</p>
 						)}
 					</div>
 
@@ -233,13 +248,15 @@ export default function WeaponForm({
 							}`}
 							min="0"
 							max="15"
-							{...registerMain('refinement', { 
+							{...registerMain('refinement', {
 								valueAsNumber: true,
-								onBlur: () => handleMainBlur('refinement')
+								onBlur: () => handleMainBlur('refinement'),
 							})}
 						/>
 						{errorsMain.refinement && (
-							<p className="text-red-500 text-xs mt-1">{errorsMain.refinement.message}</p>
+							<p className="text-red-500 text-xs mt-1">
+								{errorsMain.refinement.message}
+							</p>
 						)}
 					</div>
 				</div>
@@ -264,7 +281,9 @@ export default function WeaponForm({
 							))}
 						</select>
 						{errorsSub.weaponType && (
-							<p className="text-red-500 text-xs mt-1">{errorsSub.weaponType.message}</p>
+							<p className="text-red-500 text-xs mt-1">
+								{errorsSub.weaponType.message}
+							</p>
 						)}
 					</div>
 
@@ -279,13 +298,15 @@ export default function WeaponForm({
 							}`}
 							min="0"
 							max="1500"
-							{...registerSub('ATK', { 
+							{...registerSub('ATK', {
 								valueAsNumber: true,
-								onBlur: () => handleSubBlur('ATK')
+								onBlur: () => handleSubBlur('ATK'),
 							})}
 						/>
 						{errorsSub.ATK && (
-							<p className="text-red-500 text-xs mt-1">{errorsSub.ATK.message}</p>
+							<p className="text-red-500 text-xs mt-1">
+								{errorsSub.ATK.message}
+							</p>
 						)}
 					</div>
 
@@ -300,13 +321,15 @@ export default function WeaponForm({
 							}`}
 							min="0"
 							max="100"
-							{...registerSub('stability', { 
+							{...registerSub('stability', {
 								valueAsNumber: true,
-								onBlur: () => handleSubBlur('stability')
+								onBlur: () => handleSubBlur('stability'),
 							})}
 						/>
 						{errorsSub.stability && (
-							<p className="text-red-500 text-xs mt-1">{errorsSub.stability.message}</p>
+							<p className="text-red-500 text-xs mt-1">
+								{errorsSub.stability.message}
+							</p>
 						)}
 					</div>
 
@@ -321,13 +344,15 @@ export default function WeaponForm({
 							}`}
 							min="0"
 							max="15"
-							{...registerSub('refinement', { 
+							{...registerSub('refinement', {
 								valueAsNumber: true,
-								onBlur: () => handleSubBlur('refinement')
+								onBlur: () => handleSubBlur('refinement'),
 							})}
 						/>
 						{errorsSub.refinement && (
-							<p className="text-red-500 text-xs mt-1">{errorsSub.refinement.message}</p>
+							<p className="text-red-500 text-xs mt-1">
+								{errorsSub.refinement.message}
+							</p>
 						)}
 					</div>
 				</div>

@@ -7,15 +7,15 @@ export const STORAGE_KEYS = {
 	// セーブデータ（参照情報のみ）
 	SAVE_DATA_LIST: 'toram_save_data_list',
 	CURRENT_SAVE_ID: 'toram_current_save_id',
-	
+
 	// ユーザーカスタムデータ（全セーブデータで共有）
 	CUSTOM_EQUIPMENTS: 'toram_custom_equipments',
 	CUSTOM_CRYSTALS: 'toram_user_crystals', // 既存のcrystalDatabase.tsと整合性を保つ
 	CUSTOM_ENEMIES: 'toram_custom_enemies',
-	
+
 	// アプリケーション設定
 	APP_SETTINGS: 'toram_app_settings',
-	VERSION: 'toram_storage_version'
+	VERSION: 'toram_storage_version',
 } as const
 
 // 安全なLocalStorage操作のヘルパー関数
@@ -25,7 +25,7 @@ export class StorageHelper {
 	 */
 	static get<T>(key: string, defaultValue: T): T {
 		if (typeof window === 'undefined') return defaultValue
-		
+
 		try {
 			const item = localStorage.getItem(key)
 			if (item === null) return defaultValue
@@ -41,7 +41,7 @@ export class StorageHelper {
 	 */
 	static set<T>(key: string, value: T): boolean {
 		if (typeof window === 'undefined') return false
-		
+
 		try {
 			localStorage.setItem(key, JSON.stringify(value))
 			return true
@@ -56,7 +56,7 @@ export class StorageHelper {
 	 */
 	static remove(key: string): boolean {
 		if (typeof window === 'undefined') return false
-		
+
 		try {
 			localStorage.removeItem(key)
 			return true
@@ -71,7 +71,7 @@ export class StorageHelper {
 	 */
 	static clear(): boolean {
 		if (typeof window === 'undefined') return false
-		
+
 		try {
 			localStorage.clear()
 			return true
@@ -86,7 +86,7 @@ export class StorageHelper {
 	 */
 	static isAvailable(): boolean {
 		if (typeof window === 'undefined') return false
-		
+
 		try {
 			const testKey = '__storage_test__'
 			localStorage.setItem(testKey, 'test')
@@ -108,12 +108,12 @@ export function getStorageUsage(): StorageUsage {
 			maxSize: 0,
 			usage: 0,
 			warning: false,
-			critical: false
+			critical: false,
 		}
 	}
 
 	let totalSize = 0
-	
+
 	try {
 		// 全てのLocalStorageアイテムのサイズを計算
 		for (let i = 0; i < localStorage.length; i++) {
@@ -133,13 +133,13 @@ export function getStorageUsage(): StorageUsage {
 	// LocalStorageの一般的な制限（5MB）
 	const maxSize = 5 * 1024 * 1024 // 5MB in bytes
 	const usage = totalSize / maxSize
-	
+
 	return {
 		totalSize,
 		maxSize,
 		usage,
 		warning: usage >= 0.8, // 80%以上で警告
-		critical: usage >= 0.95 // 95%以上で危険
+		critical: usage >= 0.95, // 95%以上で危険
 	}
 }
 
@@ -160,18 +160,21 @@ export async function validateStorageIntegrity(): Promise<boolean> {
 		// 基本的なデータ整合性チェック
 		const saveDataList = StorageHelper.get(STORAGE_KEYS.SAVE_DATA_LIST, [])
 		const currentSaveId = StorageHelper.get(STORAGE_KEYS.CURRENT_SAVE_ID, null)
-		
+
 		// 現在のセーブIDが存在するかチェック
 		if (currentSaveId && !Array.isArray(saveDataList)) {
 			console.warn('Save data list is not an array')
 			return false
 		}
-		
-		if (currentSaveId && !saveDataList.find((save: any) => save.id === currentSaveId)) {
+
+		if (
+			currentSaveId &&
+			!saveDataList.find((save: any) => save.id === currentSaveId)
+		) {
 			console.warn('Current save ID not found in save data list')
 			return false
 		}
-		
+
 		return true
 	} catch (error) {
 		console.error('Error validating storage integrity:', error)
@@ -196,7 +199,10 @@ export function setStorageVersion(version: string): boolean {
 /**
  * データ移行処理
  */
-export async function migrateStorageVersion(fromVersion: string, toVersion: string): Promise<void> {
+export async function migrateStorageVersion(
+	fromVersion: string,
+	toVersion: string,
+): Promise<void> {
 	console.log(`Migrating storage from ${fromVersion} to ${toVersion}`)
 	// 将来的にバージョン間の移行処理を実装
 }

@@ -125,7 +125,11 @@ export default function StatsSummary({ data }: StatsSummaryProps) {
 				{ key: 'ATK', label: 'ATK', value: totalStats.ATK },
 				{ key: 'MATK_Rate', label: 'MATK%', value: totalStats.MATK_Rate },
 				{ key: 'MATK', label: 'MATK', value: totalStats.MATK },
-				{ key: 'WeaponATK_Rate', label: '武器ATK%', value: totalStats.WeaponATK_Rate },
+				{
+					key: 'WeaponATK_Rate',
+					label: '武器ATK%',
+					value: totalStats.WeaponATK_Rate,
+				},
 				{ key: 'WeaponATK', label: '武器ATK', value: totalStats.WeaponATK },
 			],
 		},
@@ -152,7 +156,11 @@ export default function StatsSummary({ data }: StatsSummaryProps) {
 					label: '抜刀威力%',
 					value: totalStats.UnsheatheAttack_Rate,
 				},
-				{ key: 'UnsheatheAttack', label: '抜刀威力', value: totalStats.UnsheatheAttack },
+				{
+					key: 'UnsheatheAttack',
+					label: '抜刀威力',
+					value: totalStats.UnsheatheAttack,
+				},
 				{
 					key: 'ShortRangeDamage_Rate',
 					label: '近距離威力%',
