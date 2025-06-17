@@ -28,7 +28,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	// 入力値を範囲内に制限する関数
 	const handleBlur = (fieldName: keyof BaseStatsFormData) => {
 		const value = getValues(fieldName)
-		let min = 1
+		const min = 1
 		let max = 510
 
 		// フィールドごとの最大値を設定
