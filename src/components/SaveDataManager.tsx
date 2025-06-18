@@ -59,11 +59,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 
 		try {
 			// Zustandストア経由でセーブデータを切り替え
-			const loadedData = await switchSaveData(saveId)
-			if (loadedData) {
-				// CalculatorStoreのloadSaveDataを使用してセーブデータ切り替えバグを根本解決
-				await loadSaveData(loadedData)
-			}
+			await switchSaveData(saveId)
 		} catch (err) {
 			console.error('セーブデータの切り替えに失敗しました:', err)
 		}
@@ -72,13 +68,8 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 	// 新しいセーブデータを作成
 	const handleCreateSaveData = async (name: string) => {
 		try {
-			const newSaveData = await createSaveData(name, currentData)
+			await createSaveData(name, currentData)
 			setIsNewSaveModalOpen(false)
-
-			if (newSaveData) {
-				// 新しく作成したセーブデータに切り替え
-				await handleSaveDataSelect(newSaveData.id)
-			}
 		} catch (err) {
 			console.error('セーブデータの作成に失敗しました:', err)
 		}
@@ -133,10 +124,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 
 			try {
 				// Zustandストア経由でセーブデータを切り替え
-				const loadedData = await switchSaveData(pendingSaveId)
-				if (loadedData) {
-					await loadSaveData(loadedData)
-				}
+				await switchSaveData(pendingSaveId)
 			} catch (err) {
 				console.error('セーブデータの切り替えに失敗しました:', err)
 			}
@@ -154,10 +142,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 				setShowUnsavedChangesModal(false)
 				setPendingSaveId(null)
 
-				const loadedData = await switchSaveData(pendingSaveId)
-				if (loadedData) {
-					await loadSaveData(loadedData)
-				}
+				await switchSaveData(pendingSaveId)
 			} catch (err) {
 				console.error('セーブデータの切り替えに失敗しました:', err)
 			}

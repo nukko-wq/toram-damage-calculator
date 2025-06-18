@@ -1,16 +1,24 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
-import { categoryNameMap } from '@/utils/buffSkillDefaults'
-import type { BuffSkill, BuffSkillCategory } from '@/types/calculator'
+import {
+	categoryNameMap,
+	weaponTypeToMasterySkills,
+	getDefaultParametersForSkill,
+} from '@/utils/buffSkillDefaults'
+import type { BuffSkill, BuffSkillCategory, WeaponType } from '@/types/calculator'
 
 export default function BuffSkillForm() {
 	const storeBuffSkills = useCalculatorStore((state) => state.data.buffSkills)
+	const mainWeaponType = useCalculatorStore(
+		(state) => state.data.mainWeapon.weaponType,
+	)
 	const updateBuffSkills = useCalculatorStore((state) => state.updateBuffSkills)
 	const isInitialized = useCalculatorStore((state) => state.isInitialized)
 
 	const [localInitialized, setLocalInitialized] = useState(false)
+	const prevWeaponType = useRef<WeaponType>(mainWeaponType)
 
 	// セーブデータ切り替え時のちらつき防止
 	useEffect(() => {
@@ -19,17 +27,61 @@ export default function BuffSkillForm() {
 		return () => clearTimeout(timer)
 	}, [storeBuffSkills])
 
-	// スキルをカテゴリ別にグループ化
+	// 武器種に応じたマスタリスキルフィルタリング
+	const getVisibleMasterySkills = useCallback((weaponType: WeaponType) => {
+		return weaponTypeToMasterySkills[weaponType] || []
+	}, [])
+
+	// 武器種変更時のマスタリスキルリセット処理
+	const resetMasterySkillsOnWeaponChange = useCallback(() => {
+		if (!isInitialized || !localInitialized) return
+
+		const updatedSkills = storeBuffSkills.skills.map((skill) => {
+			if (skill.category === 'mastery') {
+				return {
+					...skill,
+					isEnabled: false,
+					parameters: getDefaultParametersForSkill(skill.id),
+				}
+			}
+			return skill
+		})
+		updateBuffSkills({ skills: updatedSkills })
+	}, [storeBuffSkills.skills, updateBuffSkills, isInitialized, localInitialized])
+
+	// 武器種変更を検知してマスタリスキルをリセット
+	useEffect(() => {
+		if (prevWeaponType.current !== mainWeaponType) {
+			resetMasterySkillsOnWeaponChange()
+			prevWeaponType.current = mainWeaponType
+		}
+	}, [mainWeaponType, resetMasterySkillsOnWeaponChange])
+
+	// スキルをカテゴリ別にグループ化（マスタリスキルフィルタリング付き）
 	const skillsByCategory = useMemo(() => {
+		const visibleMasterySkills = getVisibleMasterySkills(mainWeaponType)
+
 		return storeBuffSkills.skills.reduce(
 			(acc, skill) => {
+				// マスタリスキルの場合は武器種に応じてフィルタリング
+				if (skill.category === 'mastery') {
+					if (visibleMasterySkills.length === 0) {
+						// 抜刀剣等：マスタリスキル系統全体を非表示
+						return acc
+					}
+					if (!visibleMasterySkills.includes(skill.id)) {
+						// 該当しないマスタリスキルは非表示
+						return acc
+					}
+				}
+
 				if (!acc[skill.category]) acc[skill.category] = []
 				acc[skill.category].push(skill)
 				return acc
 			},
 			{} as Record<BuffSkillCategory, BuffSkill[]>,
 		)
-	}, [storeBuffSkills.skills])
+	}, [storeBuffSkills.skills, mainWeaponType, getVisibleMasterySkills])
 
 	// スキルのオン/オフ切り替え
 	const handleSkillToggle = (skillId: string, enabled: boolean) => {

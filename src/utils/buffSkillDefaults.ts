@@ -438,6 +438,78 @@ export const getDefaultBuffSkillFormData = (): BuffSkillFormData => ({
 	skills: getDefaultBuffSkills(),
 })
 
+// 武器種からマスタリスキルIDを取得するマッピング
+export const weaponTypeToMasterySkills: Record<string, string[]> = {
+	素手: ['shield_mastery'],
+	片手剣: ['blade_mastery', 'shield_mastery'],
+	双剣: ['blade_mastery', 'dual_mastery'],
+	両手剣: ['blade_mastery'],
+	手甲: ['martial_mastery', 'shield_mastery'],
+	旋風槍: ['halberd_mastery'],
+	抜刀剣: [], // 該当するマスタリスキルなし
+	弓: ['shoot_mastery'],
+	自動弓: ['shoot_mastery', 'shield_mastery'],
+	杖: ['magic_mastery', 'shield_mastery'],
+	魔導具: ['magic_mastery'],
+}
+
+// スキルIDからデフォルトパラメータを取得
+export const getDefaultParametersForSkill = (skillId: string) => {
+	const masteryDefaults = { skillLevel: 1 }
+	const emptyDefaults = {}
+	const levelDefaults = { skillLevel: 1 }
+	const stackDefaults = { stackCount: 1 }
+	const knightDefaults = { skillLevel: 1, playerCount: 0, refinement: 1 }
+	const eternalDefaults = { skillLevel: 1, spUsed: 25 }
+	const braveDefaults = { isCaster: 0 }
+
+	const skillDefaults: Record<string, any> = {
+		// マスタリスキル
+		halberd_mastery: masteryDefaults,
+		blade_mastery: masteryDefaults,
+		shoot_mastery: masteryDefaults,
+		magic_mastery: masteryDefaults,
+		martial_mastery: masteryDefaults,
+		dual_mastery: masteryDefaults,
+		shield_mastery: masteryDefaults,
+
+		// レベルを持つスキル
+		long_range: levelDefaults,
+		quick_aura: levelDefaults,
+		bushido: levelDefaults,
+		clear_mind: levelDefaults,
+		superhuman_strength: levelDefaults,
+		godspeed_trajectory: levelDefaults,
+		filo_eclair: levelDefaults,
+		camouflage: levelDefaults,
+		nindo: levelDefaults,
+		ninjutsu: levelDefaults,
+		ninjutsu_training_1: levelDefaults,
+		ninjutsu_training_2: levelDefaults,
+		mp_boost: levelDefaults,
+		hp_boost: levelDefaults,
+		attack_up: levelDefaults,
+		threatening_power: levelDefaults,
+		magic_up: levelDefaults,
+		more_magic: levelDefaults,
+		accuracy_up: levelDefaults,
+		dodge_up: levelDefaults,
+		front_maintenance_2: levelDefaults,
+
+		// 重ねがけ数を持つスキル
+		tornado_lance: stackDefaults,
+		godspeed_parry: stackDefaults,
+		passion_song: stackDefaults,
+
+		// 特殊パラメータを持つスキル
+		knight_pledge: knightDefaults,
+		eternal_nightmare: eternalDefaults,
+		brave: braveDefaults,
+	}
+
+	return skillDefaults[skillId] || emptyDefaults
+}
+
 // スキルカテゴリの日本語名マッピング
 export const categoryNameMap = {
 	mastery: 'マスタリスキル',
