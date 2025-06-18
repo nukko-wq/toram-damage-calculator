@@ -55,11 +55,10 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		register,
 		watch,
 		setValue,
-		reset,
 		formState: { errors },
 	} = useForm<FoodFormData>({
 		resolver: zodResolver(foodFormSchema),
-		defaultValues: effectiveFood,
+		values: effectiveFood,
 		mode: 'onChange',
 	})
 
@@ -67,12 +66,11 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 	const [isInitialized, setIsInitialized] = React.useState(false)
 	
 	React.useEffect(() => {
-		// Zustandストアのデータが変更されたときにフォームをリセットして初期化フラグもリセット
+		// valuesプロパティを使用しているため、データ変更時の処理を軽量化
 		setIsInitialized(false)
-		reset(effectiveFood)
-		const timer = setTimeout(() => setIsInitialized(true), 0)
+		const timer = setTimeout(() => setIsInitialized(true), 30)
 		return () => clearTimeout(timer)
-	}, [effectiveFood, reset])
+	}, [effectiveFood])
 
 	React.useEffect(() => {
 		const subscription = watch((value, { name, type }) => {

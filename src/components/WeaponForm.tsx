@@ -64,12 +64,11 @@ export default function WeaponForm({
 		register: registerMain,
 		watch: watchMain,
 		formState: { errors: errorsMain },
-		reset: resetMain,
 		setValue: setValueMain,
 		getValues: getValuesMain,
 	} = useForm<MainWeaponFormData>({
 		resolver: zodResolver(mainWeaponSchema),
-		defaultValues: effectiveMainWeapon,
+		values: effectiveMainWeapon,
 		mode: 'onChange',
 	})
 
@@ -78,12 +77,11 @@ export default function WeaponForm({
 		register: registerSub,
 		watch: watchSub,
 		formState: { errors: errorsSub },
-		reset: resetSub,
 		setValue: setValueSub,
 		getValues: getValuesSub,
 	} = useForm<SubWeaponFormData>({
 		resolver: zodResolver(subWeaponSchema),
-		defaultValues: effectiveSubWeapon,
+		values: effectiveSubWeapon,
 		mode: 'onChange',
 	})
 
@@ -129,14 +127,13 @@ export default function WeaponForm({
 		}
 	}
 
-	// 外部からの変更を反映（初期化状態管理付き）
+	// 外部からの変更を反映（軽量化でちらつき防止）
 	useEffect(() => {
+		// valuesプロパティを使用しているため、変更検知を一時的に無効化のみ
 		setIsInitialized(false)
-		resetMain(effectiveMainWeapon)
-		resetSub(effectiveSubWeapon)
-		const timer = setTimeout(() => setIsInitialized(true), 0)
+		const timer = setTimeout(() => setIsInitialized(true), 30)
 		return () => clearTimeout(timer)
-	}, [effectiveMainWeapon, effectiveSubWeapon, resetMain, resetSub])
+	}, [effectiveMainWeapon, effectiveSubWeapon])
 
 	// フォーム値変更を監視してZustandストアに通知（メイン武器）
 	useEffect(() => {

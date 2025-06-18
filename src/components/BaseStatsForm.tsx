@@ -100,10 +100,12 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		}
 	}
 
-	// 外部データ変更時の初期化管理
+	// 外部データ変更時の初期化管理（軽量化でちらつき防止）
 	useEffect(() => {
+		// データが変更されたときは一時的に変更検知を無効化
 		setIsInitialized(false)
-		const timer = setTimeout(() => setIsInitialized(true), 0)
+		// 次のティックで再有効化（ちらつき最小化）
+		const timer = setTimeout(() => setIsInitialized(true), 30)
 		return () => clearTimeout(timer)
 	}, [effectiveStats])
 

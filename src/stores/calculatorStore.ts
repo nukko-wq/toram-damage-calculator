@@ -69,21 +69,16 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			// ===== セーブデータ管理 =====
 			loadSaveData: async (data) => {
-				set({ isLoading: true, hasUnsavedChanges: false })
-
-				// フレーム待機で確実な初期化（セーブデータ切り替えバグの根本解決）
-				await new Promise((resolve) => setTimeout(resolve, 0))
-
+				// isLoadingを使わずに直接データを更新（ちらつき防止）
 				set({
 					data,
 					hasUnsavedChanges: false,
-					isLoading: false,
 				})
 
-				// 短時間の遅延を置いてフォームの初期化を確実に完了させる
+				// 最小限の遅延でフォームの変更検知を無効化（ちらつき最小化）
 				setTimeout(() => {
 					set({ hasUnsavedChanges: false })
-				}, 200)
+				}, 30)
 			},
 
 			saveCurrentData: async () => {
