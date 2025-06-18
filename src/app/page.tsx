@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useCalculatorStore, useUIStore } from '@/stores'
 import BaseStatsForm from '@/components/BaseStatsForm'
 import WeaponForm from '@/components/WeaponForm'
@@ -11,29 +11,20 @@ import NewEnemyForm from '@/components/NewEnemyForm'
 import StatsSummary from '@/components/StatsSummary'
 import SaveDataManager from '@/components/SaveDataManager'
 import ZustandTest from '@/components/ZustandTest'
-import type { CalculatorData, UpdateNotification } from '@/types/calculator'
-import { createInitialCalculatorData } from '@/utils/initialData'
-import {
-	saveCurrentData,
-	initializeStorage,
-	getCurrentSaveData,
-} from '@/utils/saveDataManager'
+import type { UpdateNotification } from '@/types/calculator'
+import { initializeStorage } from '@/utils/saveDataManager'
 
 export default function Home() {
-	// Zustandストアからデータを取得（段階的移行）
+	// Zustandストアからデータを取得
 	const { showSaveManager, setShowSaveManager } = useUIStore()
 	const {
-		hasUnsavedChanges,
+		data,
 		isInitialized,
 		isLoading,
 		initialize,
 	} = useCalculatorStore()
 
-	// 従来のstate（今後段階的に削除予定）
-	const [legacyData, setLegacyData] = useState<CalculatorData>(
-		createInitialCalculatorData(),
-	)
-	const [legacyIsInitialized, setLegacyIsInitialized] = useState(false)
+	// アップデート通知（Zustand移行後も必要）
 	const [updateNotifications, setUpdateNotifications] = useState<
 		UpdateNotification[]
 	>([])
@@ -57,54 +48,11 @@ export default function Home() {
 		}
 
 		initializeApp()
-	}, [])
+	}, [initialize])
 
 
-	// 個別データ変更ハンドラー（段階的移行：従来版）
-	const handleBaseStatsChange = useCallback((baseStats: typeof legacyData.baseStats) => {
-		setLegacyData(prev => ({ ...prev, baseStats }))
-		// Zustandの未保存変更フラグも更新
-		const { setHasUnsavedChanges } = useCalculatorStore.getState()
-		setHasUnsavedChanges(true)
-	}, [])
-
-	const handleMainWeaponChange = useCallback((mainWeapon: typeof legacyData.mainWeapon) => {
-		setLegacyData(prev => ({ ...prev, mainWeapon }))
-		const { setHasUnsavedChanges } = useCalculatorStore.getState()
-		setHasUnsavedChanges(true)
-	}, [])
-
-	const handleSubWeaponChange = useCallback((subWeapon: typeof legacyData.subWeapon) => {
-		setLegacyData(prev => ({ ...prev, subWeapon }))
-		const { setHasUnsavedChanges } = useCalculatorStore.getState()
-		setHasUnsavedChanges(true)
-	}, [])
-
-	const handleCrystalsChange = useCallback((crystals: typeof legacyData.crystals) => {
-		setLegacyData(prev => ({ ...prev, crystals }))
-		const { setHasUnsavedChanges } = useCalculatorStore.getState()
-		setHasUnsavedChanges(true)
-	}, [])
-
-	const handleEquipmentChange = useCallback((equipment: typeof legacyData.equipment) => {
-		setLegacyData(prev => ({ ...prev, equipment }))
-		const { setHasUnsavedChanges } = useCalculatorStore.getState()
-		setHasUnsavedChanges(true)
-	}, [])
-
-	const handleFoodChange = useCallback((food: typeof legacyData.food) => {
-		setLegacyData(prev => ({ ...prev, food }))
-		const { setHasUnsavedChanges } = useCalculatorStore.getState()
-		setHasUnsavedChanges(true)
-	}, [])
-
-	const handleEnemyChange = useCallback((enemy: typeof legacyData.enemy) => {
-		setLegacyData(prev => ({ ...prev, enemy }))
-		const { setHasUnsavedChanges } = useCalculatorStore.getState()
-		setHasUnsavedChanges(true)
-	}, [])
-
-	// セーブデータ管理はZustandに移行済み
+	// 全てのデータ変更はZustandストア経由で管理（props不要）
+	// 各フォームコンポーネントは直接Zustandストアを参照・更新
 
 	// 初期化が完了するまで読み込み表示（Zustandベース）
 	if (!isInitialized || isLoading) {
@@ -141,7 +89,7 @@ export default function Home() {
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
-								aria-hidden="true"
+								aria-label="セーブデータ管理アイコン"
 							>
 								<path
 									strokeLinecap="round"
@@ -179,7 +127,7 @@ export default function Home() {
 									</h3>
 									<div className="mt-2 text-sm text-green-700">
 										{updateNotifications.map((notification, index) => (
-											<div key={index} className="mb-1">
+											<div key={`notification-${notification.type}-${index}`} className="mb-1">
 												{notification.type === 'equipments' && '新しい装備'}
 												{notification.type === 'crystals' && '新しいクリスタル'}
 												{notification.type === 'enemies' && '新しい敵情報'}が
@@ -210,39 +158,14 @@ export default function Home() {
 				)}
 
 				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto] gap-4">
-					<BaseStatsForm
-						stats={legacyData.baseStats}
-						onChange={handleBaseStatsChange}
-					/>
-
-					<WeaponForm
-						mainWeapon={legacyData.mainWeapon}
-						subWeapon={legacyData.subWeapon}
-						onMainWeaponChange={handleMainWeaponChange}
-						onSubWeaponChange={handleSubWeaponChange}
-					/>
-
-					<CrystalForm
-						crystals={legacyData.crystals}
-						onChange={handleCrystalsChange}
-					/>
-
-					<EquipmentForm
-						equipment={legacyData.equipment}
-						onEquipmentChange={handleEquipmentChange}
-					/>
-
-					<FoodForm
-						food={legacyData.food}
-						onFoodChange={handleFoodChange}
-					/>
-
-					<NewEnemyForm
-						enemyData={legacyData.enemy}
-						onChange={handleEnemyChange}
-					/>
+					<BaseStatsForm />
+					<WeaponForm />
+					<CrystalForm />
+					<EquipmentForm />
+					<FoodForm />
+					<NewEnemyForm />
 				</div>
-				<StatsSummary data={legacyData} />
+				<StatsSummary data={data} />
 				
 				{/* Zustand動作確認用（開発環境のみ） */}
 				{process.env.NODE_ENV === 'development' && <ZustandTest />}

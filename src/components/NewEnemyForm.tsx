@@ -76,7 +76,13 @@ export default function NewEnemyForm({
 		if (enemyId === '') {
 			// 未選択の場合
 			const newData = getDefaultEnemyFormData()
-			onChange(newData)
+			// Zustandストアを更新
+			updateEnemy(newData)
+			
+			// 後方互換性のため従来のonChangeも呼び出し
+			if (onChange) {
+				onChange(newData)
+			}
 			return
 		}
 
