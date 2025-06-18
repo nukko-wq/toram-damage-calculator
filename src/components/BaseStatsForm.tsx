@@ -69,281 +69,73 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		return () => subscription.unsubscribe()
 	}, [watch, onChange])
 
+	// ステータスフィールドコンポーネント
+	const StatField = ({
+		label,
+		name,
+		max,
+	}: {
+		label: string
+		name: keyof BaseStatsFormData
+		max: number
+	}) => (
+		<div className="flex items-center gap-2">
+			<label
+				htmlFor={`stat-${name}`}
+				className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+			>
+				{label}:
+			</label>
+			<div className="flex flex-col flex-1">
+				<input
+					id={`stat-${name}`}
+					type="number"
+					className={`px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full ${
+						errors[name] ? 'border-red-500' : 'border-gray-300'
+					}`}
+					min="1"
+					max={max}
+					{...register(name, {
+						valueAsNumber: true,
+						onBlur: () => handleBlur(name),
+					})}
+				/>
+				{errors[name] && (
+					<span className="text-red-500 text-xs mt-1">
+						{errors[name]?.message}
+					</span>
+				)}
+			</div>
+		</div>
+	)
+
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
-			<h2 className="text-xl font-bold text-gray-800 mb-4">基本ステータス</h2>
-			<div className="flex flex-col gap-3">
-				{/* レベル */}
-				<div className="grid grid-cols-3 gap-4">
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-level"
-							className="text-sm font-medium text-gray-500"
-						>
-							レベル
-						</label>
-						<input
-							id="stat-level"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.level ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="510"
-							{...register('level', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('level'),
-							})}
-						/>
-						{errors.level && (
-							<p className="text-red-500 text-xs mt-1">
-								{errors.level.message}
-							</p>
-						)}
-					</div>
+		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
+			<h2 className="text-lg font-bold text-gray-800 mb-3">基本ステータス</h2>
+			<div className="flex flex-col gap-2">
+				{/* レベル行 */}
+				<div className="grid grid-cols-3 gap-3">
+					<StatField label="レベル" name="level" max={510} />
 				</div>
-				<div className="grid grid-cols-3 gap-4">
-					{/* STR（力） */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-str"
-							className="text-sm font-medium text-gray-500"
-						>
-							STR
-						</label>
-						<input
-							id="stat-str"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.STR ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="510"
-							{...register('STR', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('STR'),
-							})}
-						/>
-						{errors.STR && (
-							<p className="text-red-500 text-xs mt-1">{errors.STR.message}</p>
-						)}
-					</div>
-
-					{/* INT（知力） */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-int"
-							className="text-sm font-medium text-gray-500"
-						>
-							INT
-						</label>
-						<input
-							id="stat-int"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.INT ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="510"
-							{...register('INT', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('INT'),
-							})}
-						/>
-						{errors.INT && (
-							<p className="text-red-500 text-xs mt-1">{errors.INT.message}</p>
-						)}
-					</div>
-
-					{/* VIT（体力） */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-vit"
-							className="text-sm font-medium text-gray-500"
-						>
-							VIT
-						</label>
-						<input
-							id="stat-vit"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.VIT ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="510"
-							{...register('VIT', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('VIT'),
-							})}
-						/>
-						{errors.VIT && (
-							<p className="text-red-500 text-xs mt-1">{errors.VIT.message}</p>
-						)}
-					</div>
+				{/* メインステータス第1行 */}
+				<div className="grid grid-cols-3 gap-3">
+					<StatField label="STR" name="STR" max={510} />
+					<StatField label="INT" name="INT" max={510} />
+					<StatField label="VIT" name="VIT" max={510} />
 				</div>
 
-				<div className="grid grid-cols-3 gap-4">
-					{/* AGI（俊敏性） */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-agi"
-							className="text-sm font-medium text-gray-500"
-						>
-							AGI
-						</label>
-						<input
-							id="stat-agi"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.AGI ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="510"
-							{...register('AGI', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('AGI'),
-							})}
-						/>
-						{errors.AGI && (
-							<p className="text-red-500 text-xs mt-1">{errors.AGI.message}</p>
-						)}
-					</div>
-
-					{/* DEX（器用さ） */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-dex"
-							className="text-sm font-medium text-gray-500"
-						>
-							DEX
-						</label>
-						<input
-							id="stat-dex"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.DEX ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="510"
-							{...register('DEX', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('DEX'),
-							})}
-						/>
-						{errors.DEX && (
-							<p className="text-red-500 text-xs mt-1">{errors.DEX.message}</p>
-						)}
-					</div>
+				{/* メインステータス第2行 */}
+				<div className="grid grid-cols-3 gap-3">
+					<StatField label="AGI" name="AGI" max={510} />
+					<StatField label="DEX" name="DEX" max={510} />
 				</div>
 
-				<div className="grid grid-cols-3 gap-4">
-					{/* CRT（クリティカル） */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-crt"
-							className="text-sm font-medium text-gray-500"
-						>
-							CRT
-						</label>
-						<input
-							id="stat-crt"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.CRT ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="255"
-							{...register('CRT', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('CRT'),
-							})}
-						/>
-						{errors.CRT && (
-							<p className="text-red-500 text-xs mt-1">{errors.CRT.message}</p>
-						)}
-					</div>
-
-					{/* MEN（精神力） */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-men"
-							className="text-sm font-medium text-gray-500"
-						>
-							MEN
-						</label>
-						<input
-							id="stat-men"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.MEN ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="255"
-							{...register('MEN', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('MEN'),
-							})}
-						/>
-						{errors.MEN && (
-							<p className="text-red-500 text-xs mt-1">{errors.MEN.message}</p>
-						)}
-					</div>
-
-					{/* TEC（技術力） */}
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-tec"
-							className="text-sm font-medium text-gray-500"
-						>
-							TEC
-						</label>
-						<input
-							id="stat-tec"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.TEC ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="255"
-							{...register('TEC', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('TEC'),
-							})}
-						/>
-						{errors.TEC && (
-							<p className="text-red-500 text-xs mt-1">{errors.TEC.message}</p>
-						)}
-					</div>
+				{/* 特殊ステータス行 */}
+				<div className="grid grid-cols-3 gap-3">
+					<StatField label="CRT" name="CRT" max={255} />
+					<StatField label="MEN" name="MEN" max={255} />
+					<StatField label="TEC" name="TEC" max={255} />
 				</div>
-				{/* 
-				<div className="grid grid-cols-3 gap-4">
-					{/* LUK（運） *
-					<div className="flex flex-col">
-						<label
-							htmlFor="stat-luk"
-							className="text-sm font-medium text-gray-500"
-						>
-							LUK
-						</label>
-						<input
-							id="stat-luk"
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errors.LUK ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="1"
-							max="255"
-							{...register('LUK', {
-								valueAsNumber: true,
-								onBlur: () => handleBlur('LUK'),
-							})}
-						/>
-						{errors.LUK && (
-							<p className="text-red-500 text-xs mt-1">{errors.LUK.message}</p>
-						)}
-					</div>
-				</div>
-				*/}
 			</div>
 		</section>
 	)
