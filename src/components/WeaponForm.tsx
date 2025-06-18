@@ -169,14 +169,16 @@ export default function WeaponForm({
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 				{/* メイン武器 */}
 				<div className="space-y-3">
-					<h3 className="text-base font-semibold text-gray-700 mb-2">メイン武器</h3>
+					<h3 className="text-base font-semibold text-gray-700 mb-2">
+						メイン武器
+					</h3>
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
 							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
 								武器種:
 							</label>
 							<select
-								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								{...registerMain('weaponType')}
 							>
 								{weaponTypes.map((type) => (
@@ -193,7 +195,7 @@ export default function WeaponForm({
 							</label>
 							<input
 								type="number"
-								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="1500"
 								{...registerMain('ATK', {
@@ -215,7 +217,7 @@ export default function WeaponForm({
 							</label>
 							<input
 								type="number"
-								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="100"
 								{...registerMain('stability', {
@@ -237,7 +239,7 @@ export default function WeaponForm({
 							</label>
 							<input
 								type="number"
-								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="15"
 								{...registerMain('refinement', {
@@ -257,14 +259,16 @@ export default function WeaponForm({
 
 				{/* サブ武器 */}
 				<div className="space-y-3">
-					<h3 className="text-base font-semibold text-gray-700 mb-2">サブ武器</h3>
+					<h3 className="text-base font-semibold text-gray-700 mb-2">
+						サブ武器
+					</h3>
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
 							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
 								武器種:
 							</label>
 							<select
-								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								{...registerSub('weaponType')}
 							>
 								{subWeaponTypes.map((type) => (
@@ -281,7 +285,7 @@ export default function WeaponForm({
 							</label>
 							<input
 								type="number"
-								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="1500"
 								{...registerSub('ATK', {
@@ -303,7 +307,7 @@ export default function WeaponForm({
 							</label>
 							<input
 								type="number"
-								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="100"
 								{...registerSub('stability', {
@@ -325,7 +329,7 @@ export default function WeaponForm({
 							</label>
 							<input
 								type="number"
-								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="15"
 								{...registerSub('refinement', {
