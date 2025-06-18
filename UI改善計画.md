@@ -71,35 +71,38 @@
 
 ### 3. 視覚的改善
 
-#### タブデザイン
-- **優先度インジケータ:** ★（高）、○（中）、無印（低）
-- **色分けボーダー:** 
-  - 高頻度: 青色ボーダー（`border-blue-300`）
-  - 中頻度: 黄色ボーダー（`border-yellow-300`）
-  - 低頻度: グレーボーダー（`border-gray-300`）
-- **アクティブタブ:** 青色背景（`bg-blue-500`）
+#### 8カラムグリッドレイアウト
+- **グリッド構成:** 8カラムの固定グリッド（`grid-cols-8`）
+- **横スクロール:** 全体を`overflow-x-auto`で水平スクロール可能
+- **タブ廃止:** プロパティタブシステムを廃止し、全カテゴリを同時表示
+- **コンパクト設計:** 各カテゴリを縦長のカラムとして配置
+
+#### カテゴリ表示
+- **カテゴリヘッダー:** 各カラムの上部にカテゴリ名を表示
+- **シンプルデザイン:** 装飾的な優先度表示は廃止
+- **統一ボーダー:** 全カテゴリで統一されたグレーボーダー（`border-gray-300`）
 
 #### スクロール機能
-- 水平スクロール対応
-- スクロールバー非表示（`scrollbar-hide`クラス）
+- 水平スクロール対応（`overflow-x-auto`）
+- スクロールバー表示（ユーザビリティのため）
 - タッチデバイス対応
+- 左端に重要カテゴリ、右端に低頻度カテゴリを配置
 
 ### 4. 技術実装
 
-#### 状態管理
+#### グリッドレイアウト
 ```typescript
-const [activePropertyTab, setActivePropertyTab] = useState<
-  Record<keyof EquipmentSlots, number>
->({
-  main: 0,
-  body: 0,
-  additional: 0,
-  special: 0,
-  subWeapon: 0,
-  fashion1: 0,
-  fashion2: 0,
-  fashion3: 0,
-})
+// 8カラムグリッドでカテゴリを配置
+<div className="grid grid-cols-8 gap-4 overflow-x-auto">
+  {propertyGroups.map((group) => (
+    <div key={group.title} className="min-w-0 border border-gray-300 rounded-lg p-3">
+      <h4 className="font-medium text-gray-700 mb-3 sticky top-0 bg-white">
+        {group.title}
+      </h4>
+      {/* プロパティ入力フィールド */}
+    </div>
+  ))}
+</div>
 ```
 
 #### データ構造
@@ -107,40 +110,49 @@ const [activePropertyTab, setActivePropertyTab] = useState<
 const propertyGroups = [
   {
     title: '攻撃・威力',
-    priority: 'high' as const,
-    properties: ['ATK_Rate', 'ATK', ...] as const,
+    properties: ['ATK_Rate', 'ATK', 'MATK_Rate', 'MATK', ...] as const,
   },
-  // ...
+  {
+    title: 'ステータス',
+    properties: ['STR_Rate', 'STR', 'HP_Rate', 'HP', ...] as const,
+  },
+  {
+    title: '継戦補助',
+    properties: ['AttackMPRecovery_Rate', 'PhysicalResistance_Rate', ...] as const,
+  },
+  // ... 計8カテゴリ
 ] as const
 ```
 
-#### CSS改善
+#### レスポンシブ対応
 ```css
-/* グローバルスタイル追加 */
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* モバイル対応 */
+.property-grid {
+  min-width: 800px; /* 最小幅を設定 */
+  grid-template-columns: repeat(8, minmax(120px, 1fr));
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+/* スクロールバー表示 */
+.overflow-x-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
 }
 ```
 
 ## 実装結果
 
 ### 達成された改善点
-1. **縦スクロール大幅削減:** 17カテゴリ → 1カテゴリ表示
-2. **アクセス効率向上:** よく使う項目が最初に表示
-3. **視覚的わかりやすさ:** 優先度が一目でわかる
-4. **レスポンシブ対応:** モバイルでも使いやすい
-5. **装備スロット独立:** 各スロットで独立したタブ状態
+1. **一覧性向上:** 8カテゴリを同時表示、タブ切り替え不要
+2. **横スクロール設計:** 縦長レイアウトから横長レイアウトに変更
+3. **論理的配置:** 重要カテゴリを左側、低頻度カテゴリを右側に配置
+4. **シンプルデザイン:** 統一されたボーダーでスッキリとした見た目
+5. **コンパクト化:** 8カテゴリに統合し、関連項目をグループ化
 
 ### ユーザーエクスペリエンス向上
-- **初期表示:** 「攻撃・威力」タブが選択された状態
-- **効率的ナビゲーション:** 横スクロールで素早くカテゴリ移動
-- **直感的な優先度:** ★印でよく使う項目を識別
-- **状態保持:** 装備スロットを切り替えても各タブ状態を記憶
+- **一目で把握:** 全カテゴリが一覧できるため、どこに何があるかすぐわかる
+- **効率的編集:** タブ切り替えなしで複数カテゴリの値を連続編集可能
+- **直感的配置:** 左から右へ使用頻度順に配置
+- **スムーズなスクロール:** 横スクロールで自然なナビゲーション
 
 ## 今後の拡張可能性
 
@@ -153,11 +165,6 @@ const propertyGroups = [
 - プロパティ名での検索
 - 値が設定されているプロパティのハイライト
 - ゼロ以外の値のみ表示するフィルタ
-
-### その他の改善案
-- プロパティ入力時のバリデーション強化
-- 一括設定機能（同じ値を複数プロパティに設定）
-- プリセット値の提案機能
 
 ---
 
