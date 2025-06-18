@@ -17,11 +17,10 @@ interface StatFieldProps {
 	name: keyof BaseStatsFormData
 	max: number
 	register: any
-	errors: any
 	handleBlur: (name: keyof BaseStatsFormData) => void
 }
 
-const StatField = ({ label, name, max, register, errors, handleBlur }: StatFieldProps) => (
+const StatField = ({ label, name, max, register, handleBlur }: StatFieldProps) => (
 	<div className="flex items-center gap-2">
 		<label
 			htmlFor={`stat-${name}`}
@@ -29,32 +28,25 @@ const StatField = ({ label, name, max, register, errors, handleBlur }: StatField
 		>
 			{label}:
 		</label>
-		<div className="flex flex-col flex-1">
+		<div className="flex-1">
 			<input
 				id={`stat-${name}`}
 				type="number"
-				className={`px-1 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full ${
-					errors[name] ? 'border-red-500' : 'border-gray-300'
-				}`}
+				className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 				min="1"
 				max={max}
 				{...register(name, {
-					setValueAs: (value) => {
+					setValueAs: (value: string | number) => {
 						// 空文字やNaNの場合は1を返す
 						if (value === '' || value === null || value === undefined) {
 							return 1
 						}
 						const numValue = Number(value)
-						return isNaN(numValue) ? 1 : numValue
+						return Number.isNaN(numValue) ? 1 : numValue
 					},
 					onBlur: () => handleBlur(name),
 				})}
 			/>
-			{errors[name] && (
-				<span className="text-red-500 text-xs mt-1">
-					{errors[name]?.message}
-				</span>
-			)}
 		</div>
 	</div>
 )
@@ -100,7 +92,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		const subscription = watch((value) => {
 			// 全ての値が有効な数値の場合のみonChangeを呼ぶ
 			const isAllValid = Object.values(value).every((v) => 
-				typeof v === 'number' && !isNaN(v) && v >= 1
+				typeof v === 'number' && !Number.isNaN(v) && v >= 1
 			)
 			
 			if (isAllValid) {
@@ -122,7 +114,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="level" 
 						max={510} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 				</div>
@@ -133,7 +124,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="STR" 
 						max={510} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 					<StatField 
@@ -141,7 +131,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="INT" 
 						max={510} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 					<StatField 
@@ -149,7 +138,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="VIT" 
 						max={510} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 				</div>
@@ -161,7 +149,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="AGI" 
 						max={510} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 					<StatField 
@@ -169,7 +156,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="DEX" 
 						max={510} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 				</div>
@@ -181,7 +167,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="CRT" 
 						max={255} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 					<StatField 
@@ -189,7 +174,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="MEN" 
 						max={255} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 					<StatField 
@@ -197,7 +181,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						name="TEC" 
 						max={255} 
 						register={register}
-						errors={errors}
 						handleBlur={handleBlur}
 					/>
 				</div>
