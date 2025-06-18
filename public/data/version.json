@@ -1,0 +1,17 @@
+{
+	"version": "1.0.0",
+	"releaseDate": "2025-01-17",
+	"equipments": {
+		"version": "1.0.0",
+		"checksum": "initial_equipments_checksum"
+	},
+	"crystals": {
+		"version": "1.0.0",
+		"checksum": "initial_crystals_checksum"
+	},
+	"enemies": {
+		"version": "1.0.0",
+		"checksum": "initial_enemies_checksum"
+	},
+	"lastUpdated": "2025-01-17T00:00:00.000Z"
+}

@@ -543,7 +543,7 @@ export default function EquipmentForm({
 				</div>
 
 				{/* 現在選択されている装備表示 */}
-				{equipment[activeTab].presetId && (
+				{equipment[activeTab].isPreset && (
 					<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
 						<span className="text-sm font-medium text-blue-800">
 							プリセット: {equipment[activeTab].name}
@@ -564,7 +564,9 @@ export default function EquipmentForm({
 				isOpen={modalState.isOpen}
 				onClose={closeEquipmentModal}
 				onSelect={handlePresetEquipmentSelect}
-				selectedEquipmentId={equipment[activeTab].presetId || null}
+				selectedEquipmentId={
+					equipment[activeTab].isPreset ? equipment[activeTab].id : null
+				}
 				category={modalState.category || 'main'}
 				title={modalState.title}
 			/>

@@ -6,19 +6,24 @@ import type {
 	DefaultSaveData,
 	CalculatorData,
 	DataValidation,
+	UpdateNotification,
 } from '@/types/calculator'
 import { StorageHelper, STORAGE_KEYS } from './storage'
 import { createInitialCalculatorData } from './initialData'
+import { checkAndUpdatePresetData } from './presetVersionManager'
 
 /**
- * 初期化・セットアップ
+ * 初期化・セットアップ（バージョン管理システム統合版）
  */
-export async function initializeStorage(): Promise<void> {
+export async function initializeStorage(): Promise<UpdateNotification[]> {
 	try {
 		// ストレージが利用可能かチェック
 		if (!StorageHelper.isAvailable()) {
 			throw new Error('LocalStorage is not available')
 		}
+
+		// プリセットデータのバージョンチェック・更新
+		const updateNotifications = await checkAndUpdatePresetData()
 
 		// バージョンチェック・マイグレーション（将来実装）
 		await checkStorageVersion()
@@ -38,10 +43,13 @@ export async function initializeStorage(): Promise<void> {
 			console.warn('Storage integrity validation failed, resetting to default')
 			await resetToDefault()
 		}
+
+		return updateNotifications
 	} catch (error) {
 		console.error('ストレージ初期化エラー:', error)
 		// フォールバック処理
 		await resetToDefault()
+		return []
 	}
 }
 

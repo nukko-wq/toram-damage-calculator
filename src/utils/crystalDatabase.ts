@@ -1,12 +1,20 @@
 import type {
 	PresetCrystal,
+	LocalStorageCrystal,
+	Crystal,
 	CrystalType,
 	UserCrystal,
 } from '@/types/calculator'
 import { StorageHelper, STORAGE_KEYS } from './storage'
 import crystalsData from '@/data/crystals.json'
 
-// プリセットクリスタデータを正規化（JSONデータをそのまま使用）
+// ストレージキー
+const NEW_STORAGE_KEYS = {
+	PRESET_CRYSTALS: 'toram_preset_crystals',
+	CUSTOM_CRYSTALS: 'toram_custom_crystals',
+} as const
+
+// プリセットクリスタデータを正規化（JSONデータをそのまま使用）- 後方互換性のため保持
 const presetCrystals: PresetCrystal[] = [
 	...crystalsData.crystals.weapon.map((crystal) => ({
 		...crystal,
@@ -30,9 +38,70 @@ const presetCrystals: PresetCrystal[] = [
 	})),
 ]
 
+// ローカルストレージからプリセットクリスタルを取得（新システム）
+export function getLocalStorageCrystals(): LocalStorageCrystal[] {
+	try {
+		const stored = localStorage.getItem(NEW_STORAGE_KEYS.PRESET_CRYSTALS)
+		return stored ? JSON.parse(stored) : []
+	} catch (error) {
+		console.error('Failed to load preset crystals from localStorage:', error)
+		return []
+	}
+}
+
 // ユーザーカスタムクリスタをLocalStorageから取得
 export const getUserCrystals = (): UserCrystal[] => {
 	return StorageHelper.get<UserCrystal[]>(STORAGE_KEYS.CUSTOM_CRYSTALS, [])
+}
+
+// プリセットクリスタルのお気に入り状態を更新（新システム）
+export function togglePresetCrystalFavorite(id: string): void {
+	try {
+		const presetCrystals = getLocalStorageCrystals()
+		const index = presetCrystals.findIndex((item) => item.id === id)
+
+		if (index >= 0) {
+			presetCrystals[index].isFavorite = !presetCrystals[index].isFavorite
+			presetCrystals[index].isModified = true
+			presetCrystals[index].modifiedAt = new Date().toISOString()
+			presetCrystals[index].updatedAt = new Date().toISOString()
+
+			localStorage.setItem(
+				NEW_STORAGE_KEYS.PRESET_CRYSTALS,
+				JSON.stringify(presetCrystals),
+			)
+		}
+	} catch (error) {
+		console.error('Failed to toggle preset crystal favorite:', error)
+	}
+}
+
+// プリセットクリスタルのプロパティを更新（新システム）
+export function updatePresetCrystal(
+	id: string,
+	updates: Partial<LocalStorageCrystal>,
+): void {
+	try {
+		const presetCrystals = getLocalStorageCrystals()
+		const index = presetCrystals.findIndex((item) => item.id === id)
+
+		if (index >= 0) {
+			presetCrystals[index] = {
+				...presetCrystals[index],
+				...updates,
+				isModified: true,
+				modifiedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+			}
+
+			localStorage.setItem(
+				NEW_STORAGE_KEYS.PRESET_CRYSTALS,
+				JSON.stringify(presetCrystals),
+			)
+		}
+	} catch (error) {
+		console.error('Failed to update preset crystal:', error)
+	}
 }
 
 // IDでユーザーカスタムクリスタルを取得
@@ -147,31 +216,51 @@ export const deleteUserCrystal = (id: string): void => {
 	}
 }
 
-// すべてのクリスタ（プリセット + ユーザーカスタム）を取得
-export const getAllCrystals = (): (PresetCrystal | UserCrystal)[] => {
+// すべてのクリスタ（プリセット + ユーザーカスタム）を取得（新システム）
+export const getAllCrystals = (): Crystal[] => {
+	const presetCrystals = getLocalStorageCrystals()
+	const customCrystals = getUserCrystals()
+
+	// カスタムクリスタルをCustomCrystal形式に変換
+	const formattedCustomCrystals: Crystal[] = customCrystals.map((crystal) => ({
+		...crystal,
+		isPreset: false as const,
+		isCustom: true as const,
+		isFavorite: crystal.isFavorite || false,
+		isModified: false,
+		createdAt: crystal.createdAt || new Date().toISOString(),
+		updatedAt: crystal.updatedAt || new Date().toISOString(),
+	}))
+
+	return [...presetCrystals, ...formattedCustomCrystals]
+}
+
+// すべてのクリスタ（プリセット + ユーザーカスタム）を取得（後方互換性）
+export const getAllCrystalsLegacy = (): (PresetCrystal | UserCrystal)[] => {
 	return [...presetCrystals, ...getUserCrystals()]
 }
 
-// タイプ別にクリスタを取得
-export const getCrystalsByType = (
-	type: CrystalType,
-): (PresetCrystal | UserCrystal)[] => {
+// タイプ別にクリスタを取得（新システム）
+export const getCrystalsByType = (type: CrystalType): Crystal[] => {
 	return getAllCrystals().filter((crystal) => crystal.type === type)
 }
 
-// IDでクリスタを取得
-export const getCrystalById = (
-	id: string,
-): (PresetCrystal | UserCrystal) | undefined => {
+// IDでクリスタを取得（新システム）
+export const getCrystalById = (id: string): Crystal | undefined => {
 	return getAllCrystals().find((crystal) => crystal.id === id)
 }
 
-// プリセットクリスタのみを取得
-export const getPresetCrystals = (): PresetCrystal[] => {
+// プリセットクリスタのみを取得（新システム）
+export const getPresetCrystals = (): LocalStorageCrystal[] => {
+	return getLocalStorageCrystals()
+}
+
+// プリセットクリスタのみを取得（後方互換性）
+export const getPresetCrystalsLegacy = (): PresetCrystal[] => {
 	return presetCrystals
 }
 
-// クリスタが存在するかチェック
+// クリスタが存在するかチェック（新システム）
 export const crystalExists = (id: string): boolean => {
 	return getAllCrystals().some((crystal) => crystal.id === id)
 }

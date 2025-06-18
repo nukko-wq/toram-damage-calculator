@@ -115,9 +115,18 @@ export const createInitialEquipmentProperties =
 	})
 
 export const createInitialEquipment = (): Equipment => ({
+	id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
 	name: '',
+	type: 'weapon',
+	category: ['main'],
+	baseStats: {},
 	properties: createInitialEquipmentProperties(),
-	presetId: null,
+	isPreset: false,
+	isCustom: true,
+	isFavorite: false,
+	isModified: false,
+	createdAt: new Date().toISOString(),
+	updatedAt: new Date().toISOString(),
 })
 
 export const createInitialEquipmentSlots = (): EquipmentSlots => ({
@@ -157,7 +166,7 @@ export const createInitialEnemyFormData = (): EnemyFormData => ({
 	manualOverrides: {
 		resistCritical: 0,
 		requiredHIT: 0,
-	}
+	},
 })
 
 export const createInitialCalculatorData = (): CalculatorData => ({
@@ -166,6 +175,6 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	subWeapon: createInitialSubWeapon(),
 	equipment: createInitialEquipmentSlots(),
 	crystals: createInitialCrystalSlots(),
-	enemy: createInitialEnemyFormData(),  // 新しい敵情報システム
+	enemy: createInitialEnemyFormData(), // 新しい敵情報システム
 	legacyEnemy: createInitialEnemyInfo(), // 後方互換性
 })

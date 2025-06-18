@@ -4,22 +4,28 @@ import { z } from 'zod'
 
 // 敵基本ステータス用スキーマ
 export const enemyStatsSchema = z.object({
-	DEF: z.number()
+	DEF: z
+		.number()
 		.min(0, 'DEFは0以上である必要があります')
 		.max(9999, 'DEFは9999以下である必要があります'),
-	MDEF: z.number()
+	MDEF: z
+		.number()
 		.min(0, 'MDEFは0以上である必要があります')
 		.max(9999, 'MDEFは9999以下である必要があります'),
-	physicalResistance: z.number()
+	physicalResistance: z
+		.number()
 		.min(-100, '物理耐性は-100以上である必要があります')
 		.max(100, '物理耐性は100以下である必要があります'),
-	magicalResistance: z.number()
+	magicalResistance: z
+		.number()
 		.min(-100, '魔法耐性は-100以上である必要があります')
 		.max(100, '魔法耐性は100以下である必要があります'),
-	resistCritical: z.number()
+	resistCritical: z
+		.number()
 		.min(0, 'クリティカル耐性は0以上である必要があります')
 		.max(999, 'クリティカル耐性は999以下である必要があります'),
-	requiredHIT: z.number()
+	requiredHIT: z
+		.number()
 		.min(0, '必要HITは0以上である必要があります')
 		.max(9999, '必要HITは9999以下である必要があります'),
 })
@@ -28,12 +34,13 @@ export const enemyStatsSchema = z.object({
 export const presetEnemySchema = z.object({
 	id: z.string().min(1, 'IDは必須です'),
 	name: z.string().min(1, '敵名は必須です'),
-	level: z.number()
+	level: z
+		.number()
 		.min(1, 'レベルは1以上である必要があります')
 		.max(999, 'レベルは999以下である必要があります'),
 	stats: enemyStatsSchema,
 	category: z.enum(['mob', 'fieldBoss', 'boss', 'raidBoss'], {
-		errorMap: () => ({ message: '有効なカテゴリを選択してください' })
+		errorMap: () => ({ message: '有効なカテゴリを選択してください' }),
 	}),
 })
 
@@ -48,16 +55,20 @@ export const userEnemySchema = presetEnemySchema.extend({
 export const enemyFormDataSchema = z.object({
 	selectedId: z.string().nullable(),
 	type: z.enum(['preset', 'custom']).nullable(),
-	manualOverrides: z.object({
-		resistCritical: z.number()
-			.min(0, 'クリティカル耐性は0以上である必要があります')
-			.max(999, 'クリティカル耐性は999以下である必要があります')
-			.optional(),
-		requiredHIT: z.number()
-			.min(0, '必要HITは0以上である必要があります')
-			.max(9999, '必要HITは9999以下である必要があります')
-			.optional(),
-	}).optional(),
+	manualOverrides: z
+		.object({
+			resistCritical: z
+				.number()
+				.min(0, 'クリティカル耐性は0以上である必要があります')
+				.max(999, 'クリティカル耐性は999以下である必要があります')
+				.optional(),
+			requiredHIT: z
+				.number()
+				.min(0, '必要HITは0以上である必要があります')
+				.max(9999, '必要HITは9999以下である必要があります')
+				.optional(),
+		})
+		.optional(),
 })
 
 // 敵情報検索用スキーマ

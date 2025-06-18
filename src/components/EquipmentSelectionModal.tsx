@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import type {
 	EquipmentType,
-	PresetEquipment,
+	Equipment,
 	EquipmentCategory,
 } from '@/types/calculator'
 import { getAvailableEquipmentsByCategory } from '@/utils/equipmentDatabase'
@@ -27,9 +27,9 @@ export default function EquipmentSelectionModal({
 	title,
 }: EquipmentSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | EquipmentType>('all')
-	const [availableEquipments, setAvailableEquipments] = useState<
-		PresetEquipment[]
-	>([])
+	const [availableEquipments, setAvailableEquipments] = useState<Equipment[]>(
+		[],
+	)
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {

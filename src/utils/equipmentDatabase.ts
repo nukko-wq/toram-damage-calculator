@@ -1,5 +1,8 @@
 import type {
 	PresetEquipment,
+	LocalStorageEquipment,
+	Equipment,
+	UserEquipment,
 	EquipmentType,
 	EquipmentCategory,
 	EquipmentProperties,
@@ -173,10 +176,27 @@ export function getEquipmentById(id: string): PresetEquipment | null {
 	return getAllEquipments().find((equipment) => equipment.id === id) || null
 }
 
-// LocalStorageからユーザーカスタム装備を取得
-export function getUserCustomEquipments(): PresetEquipment[] {
+// ストレージキー
+const STORAGE_KEYS = {
+	PRESET_EQUIPMENTS: 'toram_preset_equipments',
+	CUSTOM_EQUIPMENTS: 'toram_custom_equipments',
+} as const
+
+// ローカルストレージからプリセット装備を取得（新システム）
+export function getLocalStorageEquipments(): LocalStorageEquipment[] {
 	try {
-		const customData = localStorage.getItem('custom_equipments')
+		const stored = localStorage.getItem(STORAGE_KEYS.PRESET_EQUIPMENTS)
+		return stored ? JSON.parse(stored) : []
+	} catch (error) {
+		console.error('Failed to load preset equipments from localStorage:', error)
+		return []
+	}
+}
+
+// ローカルストレージからユーザーカスタム装備を取得
+export function getUserCustomEquipments(): UserEquipment[] {
+	try {
+		const customData = localStorage.getItem(STORAGE_KEYS.CUSTOM_EQUIPMENTS)
 		return customData ? JSON.parse(customData) : []
 	} catch (error) {
 		console.error('Failed to load custom equipments:', error)
@@ -184,8 +204,8 @@ export function getUserCustomEquipments(): PresetEquipment[] {
 	}
 }
 
-// LocalStorageにユーザーカスタム装備を保存
-export function saveUserCustomEquipment(equipment: PresetEquipment): void {
+// ローカルストレージにユーザーカスタム装備を保存
+export function saveUserCustomEquipment(equipment: UserEquipment): void {
 	try {
 		const customEquipments = getUserCustomEquipments()
 		const existingIndex = customEquipments.findIndex(
@@ -198,33 +218,109 @@ export function saveUserCustomEquipment(equipment: PresetEquipment): void {
 			customEquipments.push(equipment)
 		}
 
-		localStorage.setItem('custom_equipments', JSON.stringify(customEquipments))
+		localStorage.setItem(
+			STORAGE_KEYS.CUSTOM_EQUIPMENTS,
+			JSON.stringify(customEquipments),
+		)
 	} catch (error) {
 		console.error('Failed to save custom equipment:', error)
 	}
 }
 
-// プリセット + ユーザーカスタム装備を統合して取得
-export function getAllAvailableEquipments(): PresetEquipment[] {
-	const presetEquipments = getAllEquipments()
+// プリセット装備のお気に入り状態を更新
+export function toggleEquipmentFavorite(id: string): void {
+	try {
+		const presetEquipments = getLocalStorageEquipments()
+		const index = presetEquipments.findIndex((item) => item.id === id)
+
+		if (index >= 0) {
+			presetEquipments[index].isFavorite = !presetEquipments[index].isFavorite
+			presetEquipments[index].isModified = true
+			presetEquipments[index].modifiedAt = new Date().toISOString()
+			presetEquipments[index].updatedAt = new Date().toISOString()
+
+			localStorage.setItem(
+				STORAGE_KEYS.PRESET_EQUIPMENTS,
+				JSON.stringify(presetEquipments),
+			)
+		}
+	} catch (error) {
+		console.error('Failed to toggle equipment favorite:', error)
+	}
+}
+
+// プリセット装備のプロパティを更新
+export function updatePresetEquipment(
+	id: string,
+	updates: Partial<LocalStorageEquipment>,
+): void {
+	try {
+		const presetEquipments = getLocalStorageEquipments()
+		const index = presetEquipments.findIndex((item) => item.id === id)
+
+		if (index >= 0) {
+			presetEquipments[index] = {
+				...presetEquipments[index],
+				...updates,
+				isModified: true,
+				modifiedAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+			}
+
+			localStorage.setItem(
+				STORAGE_KEYS.PRESET_EQUIPMENTS,
+				JSON.stringify(presetEquipments),
+			)
+		}
+	} catch (error) {
+		console.error('Failed to update preset equipment:', error)
+	}
+}
+
+// プリセット + ユーザーカスタム装備を統合して取得（新システム）
+export function getAllAvailableEquipments(): Equipment[] {
+	const presetEquipments = getLocalStorageEquipments()
 	const customEquipments = getUserCustomEquipments()
 
-	return [...presetEquipments, ...customEquipments]
+	// カスタム装備をCustomEquipment形式に変換
+	const formattedCustomEquipments: Equipment[] = customEquipments.map(
+		(equipment) => ({
+			id: equipment.id,
+			name: equipment.name,
+			type: 'weapon' as const, // UserEquipmentにtypeがないのでデフォルト値
+			category: [equipment.category] as EquipmentCategory[], // 単一カテゴリを配列に変換
+			baseStats: equipment.weaponStats || {}, // weaponStatsをbaseStatsにマップ
+			properties: equipment.properties,
+			isPreset: false as const,
+			isCustom: true as const,
+			isFavorite: equipment.isFavorite,
+			isModified: false,
+			createdAt: equipment.createdAt,
+			updatedAt: equipment.updatedAt,
+		}),
+	)
+
+	return [...presetEquipments, ...formattedCustomEquipments]
+}
+
+// 統合装備からIDで取得
+export function getAvailableEquipmentById(id: string): Equipment | null {
+	return (
+		getAllAvailableEquipments().find((equipment) => equipment.id === id) || null
+	)
 }
 
 // カテゴリ別の統合装備リストを取得
 export function getAvailableEquipmentsByCategory(
 	category: EquipmentCategory,
-): PresetEquipment[] {
+): Equipment[] {
 	return getAllAvailableEquipments().filter((equipment) =>
 		equipment.category.includes(category),
 	)
 }
 
 // 装備タイプ別の統合装備リストを取得
-export function getAvailableEquipmentsByType(
-	type: EquipmentType,
-): PresetEquipment[] {
+export function getAvailableEquipmentsByType(type: EquipmentType): Equipment[] {
 	return getAllAvailableEquipments().filter(
 		(equipment) => equipment.type === type,
 	)

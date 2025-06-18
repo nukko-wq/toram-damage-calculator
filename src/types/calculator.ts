@@ -193,8 +193,8 @@ export interface SubWeapon {
 	refinement: number
 }
 
-// 装備アイテム
-export interface Equipment {
+// 装備アイテム（レガシー - 統合型を使用することを推奨）
+export interface LegacyEquipment {
 	name: string
 	properties: Partial<EquipmentProperties>
 	presetId?: string | null // プリセット装備のID（プリセット選択時のみ）
@@ -282,31 +282,31 @@ export type EnemyCategory = 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
 
 // 敵の基本ステータス
 export interface EnemyStats {
-	DEF: number                  // 物理防御力 (0-9999)
-	MDEF: number                 // 魔法防御力 (0-9999)
-	physicalResistance: number   // 物理耐性% (-100-100)
-	magicalResistance: number    // 魔法耐性% (-100-100)
-	resistCritical: number       // クリティカル耐性 (0-999) ※プリセットでは0、ユーザーが調整可能
-	requiredHIT: number          // 必要HIT (0-9999) ※プリセットでは0、ユーザーが調整可能
+	DEF: number // 物理防御力 (0-9999)
+	MDEF: number // 魔法防御力 (0-9999)
+	physicalResistance: number // 物理耐性% (-100-100)
+	magicalResistance: number // 魔法耐性% (-100-100)
+	resistCritical: number // クリティカル耐性 (0-999) ※プリセットでは0、ユーザーが調整可能
+	requiredHIT: number // 必要HIT (0-9999) ※プリセットでは0、ユーザーが調整可能
 }
 
 // プリセット敵情報
 export interface PresetEnemy {
-	id: string                   // 一意識別子
-	name: string                 // 敵名
-	level: number                // レベル (1-999)
-	stats: EnemyStats           // 基本ステータス
-	category: EnemyCategory     // 敵カテゴリ
+	id: string // 一意識別子
+	name: string // 敵名
+	level: number // レベル (1-999)
+	stats: EnemyStats // 基本ステータス
+	category: EnemyCategory // 敵カテゴリ
 }
 
 // 敵フォームデータ（セーブデータ用）
 export interface EnemyFormData {
-	selectedId: string | null            // プリセット敵情報ID or カスタム敵情報ID
-	type: 'preset' | 'custom' | null    // データソースの識別
+	selectedId: string | null // プリセット敵情報ID or カスタム敵情報ID
+	type: 'preset' | 'custom' | null // データソースの識別
 	// 手動入力値（プリセット・カスタム選択後のresistCriticalとrequiredHIT調整用）
 	manualOverrides?: {
-		resistCritical?: number          // プリセット値(0)からの調整値
-		requiredHIT?: number             // プリセット値(0)からの調整値
+		resistCritical?: number // プリセット値(0)からの調整値
+		requiredHIT?: number // プリセット値(0)からの調整値
 	}
 }
 
@@ -326,7 +326,7 @@ export interface CalculatorData {
 	subWeapon: SubWeapon
 	equipment: EquipmentSlots
 	crystals: CrystalSlots
-	enemy: EnemyFormData  // 新しい敵情報システム
+	enemy: EnemyFormData // 新しい敵情報システム
 	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
 	legacyEnemy?: EnemyInfo
 }
@@ -426,4 +426,105 @@ export interface UserEnemy {
 	createdAt: string
 	updatedAt: string
 	isFavorite: boolean
+}
+
+// バージョン管理システム用の型定義
+
+// プリセットデータバージョン情報
+export interface PresetVersionInfo {
+	version: string
+	releaseDate: string
+	equipments: {
+		version: string
+		checksum: string
+	}
+	crystals: {
+		version: string
+		checksum: string
+	}
+	enemies: {
+		version: string
+		checksum: string
+	}
+	lastUpdated: string // ISO date
+}
+
+// 更新チェック結果
+export interface UpdateCheckResult {
+	needsUpdate: boolean
+	equipmentsUpdate: boolean
+	crystalsUpdate: boolean
+	enemiesUpdate: boolean
+	oldVersion: string
+	newVersion: string
+}
+
+// ローカルストレージ用のプリセットアイテム（共通フィールド）
+interface LocalStoragePresetItemBase {
+	isPreset: true
+	isFavorite: boolean
+	isModified: boolean
+	modifiedAt?: string
+	originalChecksum?: string
+	createdAt: string
+	updatedAt: string
+}
+
+// ローカルストレージ用のユーザーカスタムアイテム（共通フィールド）
+interface LocalStorageCustomItemBase {
+	isPreset: false
+	isFavorite: boolean
+	isModified: boolean
+	createdAt: string
+	updatedAt: string
+}
+
+// ローカルストレージ装備（プリセット由来）
+export interface LocalStorageEquipment
+	extends PresetEquipment,
+		LocalStoragePresetItemBase {}
+
+// ローカルストレージクリスタル（プリセット由来）
+export interface LocalStorageCrystal
+	extends PresetCrystal,
+		LocalStoragePresetItemBase {
+	description?: string
+}
+
+// ローカルストレージ敵情報（プリセット由来）
+export interface LocalStorageEnemy
+	extends PresetEnemy,
+		LocalStoragePresetItemBase {}
+
+// ユーザーカスタムアイテム
+export interface CustomEquipment
+	extends PresetEquipment,
+		LocalStorageCustomItemBase {
+	isCustom: true
+}
+
+export interface CustomCrystal
+	extends PresetCrystal,
+		LocalStorageCustomItemBase {
+	isCustom: true
+	description?: string
+}
+
+export interface CustomEnemy extends PresetEnemy, LocalStorageCustomItemBase {
+	isCustom: true
+}
+
+// 統合型（アプリ内で使用する型）
+export type Equipment = LocalStorageEquipment | CustomEquipment
+export type Crystal = LocalStorageCrystal | CustomCrystal
+export type Enemy = LocalStorageEnemy | CustomEnemy
+
+// 更新通知の種類
+export type UpdateNotificationType = 'equipments' | 'crystals' | 'enemies'
+
+// 更新通知データ
+export interface UpdateNotification {
+	type: UpdateNotificationType
+	count: number
+	items: string[] // 追加されたアイテム名のリスト
 }

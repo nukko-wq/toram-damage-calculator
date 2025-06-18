@@ -20,7 +20,13 @@ interface StatFieldProps {
 	handleBlur: (name: keyof BaseStatsFormData) => void
 }
 
-const StatField = ({ label, name, max, register, handleBlur }: StatFieldProps) => (
+const StatField = ({
+	label,
+	name,
+	max,
+	register,
+	handleBlur,
+}: StatFieldProps) => (
 	<div className="flex items-center gap-2">
 		<label
 			htmlFor={`stat-${name}`}
@@ -91,10 +97,10 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	useEffect(() => {
 		const subscription = watch((value) => {
 			// 全ての値が有効な数値の場合のみonChangeを呼ぶ
-			const isAllValid = Object.values(value).every((v) => 
-				typeof v === 'number' && !Number.isNaN(v) && v >= 1
+			const isAllValid = Object.values(value).every(
+				(v) => typeof v === 'number' && !Number.isNaN(v) && v >= 1,
 			)
-			
+
 			if (isAllValid) {
 				stableOnChange(value as BaseStats)
 			}
@@ -102,41 +108,40 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		return () => subscription.unsubscribe()
 	}, [watch, stableOnChange])
 
-
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">基本ステータス</h2>
 			<div className="flex flex-col gap-2">
 				{/* レベル行 */}
 				<div className="grid grid-cols-3 gap-3">
-					<StatField 
-						label="レベル" 
-						name="level" 
-						max={510} 
+					<StatField
+						label="レベル"
+						name="level"
+						max={510}
 						register={register}
 						handleBlur={handleBlur}
 					/>
 				</div>
 				{/* メインステータス第1行 */}
 				<div className="grid grid-cols-3 gap-3">
-					<StatField 
-						label="STR" 
-						name="STR" 
-						max={510} 
+					<StatField
+						label="STR"
+						name="STR"
+						max={510}
 						register={register}
 						handleBlur={handleBlur}
 					/>
-					<StatField 
-						label="INT" 
-						name="INT" 
-						max={510} 
+					<StatField
+						label="INT"
+						name="INT"
+						max={510}
 						register={register}
 						handleBlur={handleBlur}
 					/>
-					<StatField 
-						label="VIT" 
-						name="VIT" 
-						max={510} 
+					<StatField
+						label="VIT"
+						name="VIT"
+						max={510}
 						register={register}
 						handleBlur={handleBlur}
 					/>
@@ -144,17 +149,17 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 
 				{/* メインステータス第2行 */}
 				<div className="grid grid-cols-3 gap-3">
-					<StatField 
-						label="AGI" 
-						name="AGI" 
-						max={510} 
+					<StatField
+						label="AGI"
+						name="AGI"
+						max={510}
 						register={register}
 						handleBlur={handleBlur}
 					/>
-					<StatField 
-						label="DEX" 
-						name="DEX" 
-						max={510} 
+					<StatField
+						label="DEX"
+						name="DEX"
+						max={510}
 						register={register}
 						handleBlur={handleBlur}
 					/>
@@ -162,24 +167,24 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 
 				{/* 特殊ステータス行 */}
 				<div className="grid grid-cols-3 gap-3">
-					<StatField 
-						label="CRT" 
-						name="CRT" 
-						max={255} 
+					<StatField
+						label="CRT"
+						name="CRT"
+						max={255}
 						register={register}
 						handleBlur={handleBlur}
 					/>
-					<StatField 
-						label="MEN" 
-						name="MEN" 
-						max={255} 
+					<StatField
+						label="MEN"
+						name="MEN"
+						max={255}
 						register={register}
 						handleBlur={handleBlur}
 					/>
-					<StatField 
-						label="TEC" 
-						name="TEC" 
-						max={255} 
+					<StatField
+						label="TEC"
+						name="TEC"
+						max={255}
 						register={register}
 						handleBlur={handleBlur}
 					/>
