@@ -52,7 +52,10 @@ export default function EquipmentForm({
 				{ properties: ['PhysicalPenetration_Rate'], type: 'percent' },
 				{ properties: ['MagicalPenetration_Rate'], type: 'percent' },
 				{ properties: ['ElementAdvantage_Rate'], type: 'percent' },
-				{ properties: ['UnsheatheAttack_Rate', 'UnsheatheAttack'], type: 'pair' },
+				{
+					properties: ['UnsheatheAttack_Rate', 'UnsheatheAttack'],
+					type: 'pair',
+				},
 				{ properties: ['ShortRangeDamage_Rate'], type: 'percent' },
 				{ properties: ['LongRangeDamage_Rate'], type: 'percent' },
 				{ properties: ['CriticalDamage_Rate', 'CriticalDamage'], type: 'pair' },
@@ -80,14 +83,23 @@ export default function EquipmentForm({
 		{
 			title: '継戦補助',
 			propertyPairs: [
-				{ properties: ['AttackMPRecovery_Rate', 'AttackMPRecovery'], type: 'pair' },
+				{
+					properties: ['AttackMPRecovery_Rate', 'AttackMPRecovery'],
+					type: 'pair',
+				},
 				{ properties: ['PhysicalResistance_Rate'], type: 'percent' },
 				{ properties: ['MagicalResistance_Rate'], type: 'percent' },
 				{ properties: ['AilmentResistance_Rate'], type: 'percent' },
 				{ properties: ['Aggro_Rate'], type: 'percent' },
 				{ properties: ['RevivalTime_Rate'], type: 'percent' },
-				{ properties: ['NaturalHPRecovery_Rate', 'NaturalHPRecovery'], type: 'pair' },
-				{ properties: ['NaturalMPRecovery_Rate', 'NaturalMPRecovery'], type: 'pair' },
+				{
+					properties: ['NaturalHPRecovery_Rate', 'NaturalHPRecovery'],
+					type: 'pair',
+				},
+				{
+					properties: ['NaturalMPRecovery_Rate', 'NaturalMPRecovery'],
+					type: 'pair',
+				},
 			] as const,
 		},
 		{
@@ -160,7 +172,9 @@ export default function EquipmentForm({
 	] as const
 
 	// プロパティのベース名を取得する関数
-	const getBasePropertyLabel = (property: keyof EquipmentProperties): string => {
+	const getBasePropertyLabel = (
+		property: keyof EquipmentProperties,
+	): string => {
 		const baseLabels: Record<string, string> = {
 			// 基本攻撃力系
 			ATK_Rate: 'ATK',
@@ -188,10 +202,10 @@ export default function EquipmentForm({
 			LongRangeDamage_Rate: '遠距離威力',
 
 			// クリティカル系
-			CriticalDamage_Rate: 'クリティカルダメージ',
-			CriticalDamage: 'クリティカルダメージ',
-			Critical_Rate: 'クリティカル率',
-			Critical: 'クリティカル率',
+			CriticalDamage_Rate: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+			CriticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+			Critical_Rate: 'ｸﾘﾃｨｶﾙ率',
+			Critical: 'ｸﾘﾃｨｶﾙ率',
 
 			// 安定率
 			Stability_Rate: '安定率',
@@ -399,22 +413,28 @@ export default function EquipmentForm({
 				{propertyGroups.map((group) => (
 					<div
 						key={group.title}
-						className="w-56 flex-shrink-0 border border-gray-300 rounded-lg p-3"
+						className="w-[230px] flex-shrink-0 border-gray-300 rounded-lg p-3"
 					>
 						<h4 className="font-medium text-gray-700 mb-3 text-sm sticky top-0 bg-white">
 							{group.title}
 						</h4>
 						{/* 列見出し */}
-						<div className="grid grid-cols-3 gap-1 mb-2 text-xs text-gray-500 font-medium">
-							<div>プロパティ</div>
-							<div className="text-center">%</div>
-							<div className="text-center">+</div>
+						<div className="grid grid-cols-[100px_58px_58px] gap-1 mb-2">
+							<div className="text-gray-700 text-sm">プロパティ</div>
+							<div className="text-center text-gray-700 text-sm">%</div>
+							<div className="text-center text-gray-700 text-sm">+</div>
 						</div>
 						{/* プロパティ行 */}
 						<div className="space-y-1">
 							{group.propertyPairs.map((pair) => (
-								<div key={pair.properties[0]} className="grid grid-cols-3 gap-1 items-center">
-									<div className="text-xs text-gray-700 font-medium truncate" title={getBasePropertyLabel(pair.properties[0])}>
+								<div
+									key={pair.properties[0]}
+									className="grid grid-cols-[100px_1fr_1fr] gap-1 items-center"
+								>
+									<div
+										className="text-xs text-gray-700 font-medium truncate"
+										title={getBasePropertyLabel(pair.properties[0])}
+									>
 										{getBasePropertyLabel(pair.properties[0])}
 									</div>
 									{pair.type === 'pair' ? (
@@ -427,7 +447,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<input
 												id={`${item.name}-${pair.properties[1]}`}
@@ -436,7 +456,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[1], e.target.value)
 												}
-												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 										</>
 									) : pair.type === 'percent' ? (
@@ -449,7 +469,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<div /> {/* 空白の固定値列 */}
 										</>
