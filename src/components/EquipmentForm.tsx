@@ -46,115 +46,115 @@ export default function EquipmentForm({
 		{
 			title: '攻撃・威力',
 			propertyPairs: [
-				['ATK_Rate', 'ATK'],
-				['MATK_Rate', 'MATK'],
-				['WeaponATK_Rate', 'WeaponATK'],
-				['PhysicalPenetration_Rate'],
-				['MagicalPenetration_Rate'],
-				['ElementAdvantage_Rate'],
-				['UnsheatheAttack_Rate', 'UnsheatheAttack'],
-				['ShortRangeDamage_Rate'],
-				['LongRangeDamage_Rate'],
-				['CriticalDamage_Rate', 'CriticalDamage'],
-				['Critical_Rate', 'Critical'],
-				['Stability_Rate'],
+				{ properties: ['ATK_Rate', 'ATK'], type: 'pair' },
+				{ properties: ['MATK_Rate', 'MATK'], type: 'pair' },
+				{ properties: ['WeaponATK_Rate', 'WeaponATK'], type: 'pair' },
+				{ properties: ['PhysicalPenetration_Rate'], type: 'percent' },
+				{ properties: ['MagicalPenetration_Rate'], type: 'percent' },
+				{ properties: ['ElementAdvantage_Rate'], type: 'percent' },
+				{ properties: ['UnsheatheAttack_Rate', 'UnsheatheAttack'], type: 'pair' },
+				{ properties: ['ShortRangeDamage_Rate'], type: 'percent' },
+				{ properties: ['LongRangeDamage_Rate'], type: 'percent' },
+				{ properties: ['CriticalDamage_Rate', 'CriticalDamage'], type: 'pair' },
+				{ properties: ['Critical_Rate', 'Critical'], type: 'pair' },
+				{ properties: ['Stability_Rate'], type: 'percent' },
 			] as const,
 		},
 		{
 			title: 'ステータス',
 			propertyPairs: [
-				['HP_Rate', 'HP'],
-				['MP_Rate', 'MP'],
-				['STR_Rate', 'STR'],
-				['INT_Rate', 'INT'],
-				['VIT_Rate', 'VIT'],
-				['AGI_Rate', 'AGI'],
-				['DEX_Rate', 'DEX'],
-				['Accuracy_Rate', 'Accuracy'],
-				['Dodge_Rate', 'Dodge'],
-				['AttackSpeed_Rate', 'AttackSpeed'],
-				['CastingSpeed_Rate', 'CastingSpeed'],
-				['MotionSpeed_Rate'],
+				{ properties: ['HP_Rate', 'HP'], type: 'pair' },
+				{ properties: ['MP_Rate', 'MP'], type: 'pair' },
+				{ properties: ['STR_Rate', 'STR'], type: 'pair' },
+				{ properties: ['INT_Rate', 'INT'], type: 'pair' },
+				{ properties: ['VIT_Rate', 'VIT'], type: 'pair' },
+				{ properties: ['AGI_Rate', 'AGI'], type: 'pair' },
+				{ properties: ['DEX_Rate', 'DEX'], type: 'pair' },
+				{ properties: ['Accuracy_Rate', 'Accuracy'], type: 'pair' },
+				{ properties: ['Dodge_Rate', 'Dodge'], type: 'pair' },
+				{ properties: ['AttackSpeed_Rate', 'AttackSpeed'], type: 'pair' },
+				{ properties: ['CastingSpeed_Rate', 'CastingSpeed'], type: 'pair' },
+				{ properties: ['MotionSpeed_Rate'], type: 'percent' },
 			] as const,
 		},
 		{
 			title: '継戦補助',
 			propertyPairs: [
-				['AttackMPRecovery_Rate', 'AttackMPRecovery'],
-				['PhysicalResistance_Rate'],
-				['MagicalResistance_Rate'],
-				['AilmentResistance_Rate'],
-				['Aggro_Rate'],
-				['RevivalTime_Rate'],
-				['NaturalHPRecovery_Rate', 'NaturalHPRecovery'],
-				['NaturalMPRecovery_Rate', 'NaturalMPRecovery'],
+				{ properties: ['AttackMPRecovery_Rate', 'AttackMPRecovery'], type: 'pair' },
+				{ properties: ['PhysicalResistance_Rate'], type: 'percent' },
+				{ properties: ['MagicalResistance_Rate'], type: 'percent' },
+				{ properties: ['AilmentResistance_Rate'], type: 'percent' },
+				{ properties: ['Aggro_Rate'], type: 'percent' },
+				{ properties: ['RevivalTime_Rate'], type: 'percent' },
+				{ properties: ['NaturalHPRecovery_Rate', 'NaturalHPRecovery'], type: 'pair' },
+				{ properties: ['NaturalMPRecovery_Rate', 'NaturalMPRecovery'], type: 'pair' },
 			] as const,
 		},
 		{
 			title: '戦闘補助',
 			propertyPairs: [
-				['ArmorBreak_Rate'],
-				['Anticipate_Rate'],
-				['GuardPower_Rate'],
-				['GuardRecharge_Rate'],
-				['AvoidRecharge_Rate'],
-				['AbsoluteAccuracy_Rate'],
-				['AbsoluteDodge_Rate'],
-				['ItemCooldown'],
+				{ properties: ['ArmorBreak_Rate'], type: 'percent' },
+				{ properties: ['Anticipate_Rate'], type: 'percent' },
+				{ properties: ['GuardPower_Rate'], type: 'percent' },
+				{ properties: ['GuardRecharge_Rate'], type: 'percent' },
+				{ properties: ['AvoidRecharge_Rate'], type: 'percent' },
+				{ properties: ['AbsoluteAccuracy_Rate'], type: 'percent' },
+				{ properties: ['AbsoluteDodge_Rate'], type: 'percent' },
+				{ properties: ['ItemCooldown'], type: 'fixed' },
 			] as const,
 		},
 		// 低頻度（使用頻度低）
 		{
 			title: 'ステータス連動攻撃力',
 			propertyPairs: [
-				['ATK_STR_Rate'],
-				['ATK_INT_Rate'],
-				['ATK_VIT_Rate'],
-				['ATK_AGI_Rate'],
-				['ATK_DEX_Rate'],
-				['MATK_STR_Rate'],
-				['MATK_INT_Rate'],
-				['MATK_VIT_Rate'],
-				['MATK_AGI_Rate'],
-				['MATK_DEX_Rate'],
+				{ properties: ['ATK_STR_Rate'], type: 'percent' },
+				{ properties: ['ATK_INT_Rate'], type: 'percent' },
+				{ properties: ['ATK_VIT_Rate'], type: 'percent' },
+				{ properties: ['ATK_AGI_Rate'], type: 'percent' },
+				{ properties: ['ATK_DEX_Rate'], type: 'percent' },
+				{ properties: ['MATK_STR_Rate'], type: 'percent' },
+				{ properties: ['MATK_INT_Rate'], type: 'percent' },
+				{ properties: ['MATK_VIT_Rate'], type: 'percent' },
+				{ properties: ['MATK_AGI_Rate'], type: 'percent' },
+				{ properties: ['MATK_DEX_Rate'], type: 'percent' },
 			] as const,
 		},
 		{
 			title: '属性耐性',
 			propertyPairs: [
-				['FireResistance_Rate'],
-				['WaterResistance_Rate'],
-				['WindResistance_Rate'],
-				['EarthResistance_Rate'],
-				['LightResistance_Rate'],
-				['DarkResistance_Rate'],
-				['NeutralResistance_Rate'],
+				{ properties: ['FireResistance_Rate'], type: 'percent' },
+				{ properties: ['WaterResistance_Rate'], type: 'percent' },
+				{ properties: ['WindResistance_Rate'], type: 'percent' },
+				{ properties: ['EarthResistance_Rate'], type: 'percent' },
+				{ properties: ['LightResistance_Rate'], type: 'percent' },
+				{ properties: ['DarkResistance_Rate'], type: 'percent' },
+				{ properties: ['NeutralResistance_Rate'], type: 'percent' },
 			] as const,
 		},
 		{
 			title: 'ダメージ軽減',
 			propertyPairs: [
-				['LinearReduction_Rate'],
-				['RushReduction_Rate'],
-				['BulletReduction_Rate'],
-				['ProximityReduction_Rate'],
-				['AreaReduction_Rate'],
-				['FloorTrapReduction_Rate'],
-				['MeteorReduction_Rate'],
-				['BladeReduction_Rate'],
-				['SuctionReduction_Rate'],
-				['ExplosionReduction_Rate'],
+				{ properties: ['LinearReduction_Rate'], type: 'percent' },
+				{ properties: ['RushReduction_Rate'], type: 'percent' },
+				{ properties: ['BulletReduction_Rate'], type: 'percent' },
+				{ properties: ['ProximityReduction_Rate'], type: 'percent' },
+				{ properties: ['AreaReduction_Rate'], type: 'percent' },
+				{ properties: ['FloorTrapReduction_Rate'], type: 'percent' },
+				{ properties: ['MeteorReduction_Rate'], type: 'percent' },
+				{ properties: ['BladeReduction_Rate'], type: 'percent' },
+				{ properties: ['SuctionReduction_Rate'], type: 'percent' },
+				{ properties: ['ExplosionReduction_Rate'], type: 'percent' },
 			] as const,
 		},
 		{
 			title: 'バリア/追撃',
 			propertyPairs: [
-				['PhysicalBarrier'],
-				['MagicalBarrier'],
-				['FractionalBarrier'],
-				['BarrierCooldown_Rate'],
-				['PhysicalFollowup_Rate'],
-				['MagicalFollowup_Rate'],
+				{ properties: ['PhysicalBarrier'], type: 'fixed' },
+				{ properties: ['MagicalBarrier'], type: 'fixed' },
+				{ properties: ['FractionalBarrier'], type: 'fixed' },
+				{ properties: ['BarrierCooldown_Rate'], type: 'percent' },
+				{ properties: ['PhysicalFollowup_Rate'], type: 'percent' },
+				{ properties: ['MagicalFollowup_Rate'], type: 'percent' },
 			] as const,
 		},
 	] as const
@@ -400,64 +400,89 @@ export default function EquipmentForm({
 						{/* 関連ペア配置 */}
 						<div className="space-y-2">
 							{group.propertyPairs.map((pair) => (
-								<div key={pair[0]}>
-									{pair.length === 2 ? (
+								<div key={pair.properties[0]} className="grid grid-cols-2 gap-1">
+									{pair.type === 'pair' ? (
 										// ペア項目: %系と固定値系
-										<div className="grid grid-cols-2 gap-1">
+										<>
 											<div className="flex flex-col">
 												<label
-													htmlFor={`${item.name}-${pair[0]}`}
+													htmlFor={`${item.name}-${pair.properties[0]}`}
 													className="text-xs text-gray-600 mb-1"
 												>
-													{getPropertyLabel(pair[0])}
+													{getPropertyLabel(pair.properties[0])}
 												</label>
 												<input
-													id={`${item.name}-${pair[0]}`}
+													id={`${item.name}-${pair.properties[0]}`}
 													type="number"
-													value={item.properties[pair[0]] || 0}
+													value={item.properties[pair.properties[0]] || 0}
 													onChange={(e) =>
-														onPropertyChange(pair[0], e.target.value)
+														onPropertyChange(pair.properties[0], e.target.value)
 													}
 													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 												/>
 											</div>
 											<div className="flex flex-col">
 												<label
-													htmlFor={`${item.name}-${pair[1]}`}
+													htmlFor={`${item.name}-${pair.properties[1]}`}
 													className="text-xs text-gray-600 mb-1"
 												>
-													{getPropertyLabel(pair[1])}
+													{getPropertyLabel(pair.properties[1])}
 												</label>
 												<input
-													id={`${item.name}-${pair[1]}`}
+													id={`${item.name}-${pair.properties[1]}`}
 													type="number"
-													value={item.properties[pair[1]] || 0}
+													value={item.properties[pair.properties[1]] || 0}
 													onChange={(e) =>
-														onPropertyChange(pair[1], e.target.value)
+														onPropertyChange(pair.properties[1], e.target.value)
 													}
 													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 												/>
 											</div>
-										</div>
+										</>
+									) : pair.type === 'percent' ? (
+										// %系単独項目: 左カラムに配置
+										<>
+											<div className="flex flex-col">
+												<label
+													htmlFor={`${item.name}-${pair.properties[0]}`}
+													className="text-xs text-gray-600 mb-1"
+												>
+													{getPropertyLabel(pair.properties[0])}
+												</label>
+												<input
+													id={`${item.name}-${pair.properties[0]}`}
+													type="number"
+													value={item.properties[pair.properties[0]] || 0}
+													onChange={(e) =>
+														onPropertyChange(pair.properties[0], e.target.value)
+													}
+													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												/>
+											</div>
+											<div /> {/* 空白の右カラム */}
+										</>
 									) : (
-										// 単独項目: %系のみ
-										<div className="flex flex-col">
-											<label
-												htmlFor={`${item.name}-${pair[0]}`}
-												className="text-xs text-gray-600 mb-1"
-											>
-												{getPropertyLabel(pair[0])}
-											</label>
-											<input
-												id={`${item.name}-${pair[0]}`}
-												type="number"
-												value={item.properties[pair[0]] || 0}
-												onChange={(e) =>
-													onPropertyChange(pair[0], e.target.value)
-												}
-												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-											/>
-										</div>
+										// 固定値単独項目: 右カラムに配置
+										<>
+											<div /> {/* 空白の左カラム */}
+											<div className="flex flex-col">
+												<label
+													htmlFor={`${item.name}-${pair.properties[0]}`}
+													className="text-xs text-gray-600 mb-1"
+												>
+													{getPropertyLabel(pair.properties[0])}
+												</label>
+												<input
+													id={`${item.name}-${pair.properties[0]}`}
+													type="number"
+													value={item.properties[pair.properties[0]] || 0}
+													onChange={(e) =>
+														onPropertyChange(pair.properties[0], e.target.value)
+													}
+													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												/>
+											</div>
+										</>
 									)}
 								</div>
 							))}
