@@ -418,12 +418,12 @@ export default function EquipmentForm({
 			value: string,
 		) => void,
 	) => (
-		<div className="flex overflow-x-scroll w-full max-w-[95vw]">
-			<div className="grid grid-cols-8 gap-4 min-w-fit">
+		<div className="overflow-x-auto w-full">
+			<div className="flex gap-4 min-w-max">
 				{propertyGroups.map((group) => (
 					<div
 						key={group.title}
-						className="min-w-40 border border-gray-300 rounded-lg p-3"
+						className="w-48 flex-shrink-0 border border-gray-300 rounded-lg p-3"
 					>
 						<h4 className="font-medium text-gray-700 mb-3 text-sm sticky top-0 bg-white">
 							{group.title}

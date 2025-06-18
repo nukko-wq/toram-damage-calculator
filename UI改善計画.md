@@ -78,10 +78,11 @@
 - **コンパクト設計:** 各カテゴリを縦長のカラムとして配置
 
 #### カテゴリ内レイアウト
-- **2カラム配置:** 各カテゴリ内でプロパティを2カラムに分割
-- **左カラム（%系）:** ATK%, MATK%, STR%など割合系プロパティ
-- **右カラム（固定値）:** ATK, MATK, STRなど固定値系プロパティ
-- **論理的グループ化:** 関連するプロパティを隣接配置
+- **関連ペア配置:** 各カテゴリ内でプロパティを関連ペア（%系+固定値）でグループ化
+- **ペア配置:** ATK% + ATK、MATK% + MATKなど関連する項目を横並び
+- **単独項目:** 固定値がない項目（物理貫通%など）は単独で1行に配置
+- **論理的グループ化:** 機能的に関連するプロパティペアを隣接配置
+- **2カラムグリッド:** ペア単位で配置し、空きセルは自動調整
 
 #### カテゴリ表示
 - **カテゴリヘッダー:** 各カラムの上部にカテゴリ名を表示
@@ -96,32 +97,36 @@
 
 ### 4. 技術実装
 
-#### グリッドレイアウト
+#### フレックスレイアウト
 ```typescript
-// 8カラムグリッドでカテゴリを配置
-<div className="grid grid-cols-8 gap-4 overflow-x-auto">
-  {propertyGroups.map((group) => (
-    <div key={group.title} className="min-w-32 border border-gray-300 rounded-lg p-3">
-      <h4 className="font-medium text-gray-700 mb-3 sticky top-0 bg-white">
-        {group.title}
-      </h4>
-      {/* カテゴリ内2カラムレイアウト */}
-      <div className="grid grid-cols-2 gap-2">
+// フレックスレイアウトでカテゴリを横並び配置
+<div className="overflow-x-auto w-full">
+  <div className="flex gap-4 min-w-max">
+    {propertyGroups.map((group) => (
+      <div key={group.title} className="w-48 flex-shrink-0 border border-gray-300 rounded-lg p-3">
+        <h4 className="font-medium text-gray-700 mb-3 text-sm sticky top-0 bg-white">
+          {group.title}
+        </h4>
+        {/* 関連ペア配置 */}
         <div className="space-y-2">
-          {/* 左カラム: %系プロパティ */}
-          {group.percentProperties.map((property) => (
-            <PropertyInput key={property} property={property} />
-          ))}
-        </div>
-        <div className="space-y-2">
-          {/* 右カラム: 固定値系プロパティ */}
-          {group.fixedProperties.map((property) => (
-            <PropertyInput key={property} property={property} />
+          {group.propertyPairs.map((pair, index) => (
+            <div key={index}>
+              {pair.length === 2 ? (
+                // ペア項目: %系と固定値系
+                <div className="grid grid-cols-2 gap-1">
+                  <PropertyInput property={pair[0]} /> {/* %系 */}
+                  <PropertyInput property={pair[1]} /> {/* 固定値 */}
+                </div>
+              ) : (
+                // 単独項目: %系のみ
+                <PropertyInput property={pair[0]} />
+              )}
+            </div>
           ))}
         </div>
       </div>
-    </div>
-  ))}
+    ))}
+  </div>
 </div>
 ```
 
@@ -130,31 +135,36 @@
 const propertyGroups = [
   {
     title: '攻撃・威力',
-    percentProperties: [
-      'ATK_Rate', 'MATK_Rate', 'WeaponATK_Rate',
-      'PhysicalPenetration_Rate', 'MagicalPenetration_Rate',
-      'ElementAdvantage_Rate', 'UnsheatheAttack_Rate',
-      'ShortRangeDamage_Rate', 'LongRangeDamage_Rate',
-      'CriticalDamage_Rate', 'Critical_Rate', 'Stability_Rate'
-    ] as const,
-    fixedProperties: [
-      'ATK', 'MATK', 'WeaponATK',
-      'UnsheatheAttack', 'CriticalDamage', 'Critical'
+    propertyPairs: [
+      ['ATK_Rate', 'ATK'],                    // ATK%とATKのペア
+      ['MATK_Rate', 'MATK'],                  // MATK%とMATKのペア
+      ['WeaponATK_Rate', 'WeaponATK'],        // 武器ATK%と武器ATKのペア
+      ['PhysicalPenetration_Rate'],           // 物理貫通%（単独）
+      ['MagicalPenetration_Rate'],            // 魔法貫通%（単独）
+      ['ElementAdvantage_Rate'],              // 属性有利%（単独）
+      ['UnsheatheAttack_Rate', 'UnsheatheAttack'], // 抜刀威力%と抜刀威力のペア
+      ['ShortRangeDamage_Rate'],              // 近距離威力%（単独）
+      ['LongRangeDamage_Rate'],               // 遠距離威力%（単独）
+      ['CriticalDamage_Rate', 'CriticalDamage'], // クリティカルダメージ%とクリティカルダメージのペア
+      ['Critical_Rate', 'Critical'],          // クリティカル率%とクリティカル率のペア
+      ['Stability_Rate'],                     // 安定率%（単独）
     ] as const,
   },
   {
     title: 'ステータス',
-    percentProperties: [
-      'HP_Rate', 'MP_Rate', 'STR_Rate', 'INT_Rate',
-      'VIT_Rate', 'AGI_Rate', 'DEX_Rate',
-      'Accuracy_Rate', 'Dodge_Rate', 'AttackSpeed_Rate',
-      'CastingSpeed_Rate', 'MotionSpeed_Rate'
-    ] as const,
-    fixedProperties: [
-      'HP', 'MP', 'STR', 'INT',
-      'VIT', 'AGI', 'DEX',
-      'Accuracy', 'Dodge', 'AttackSpeed',
-      'CastingSpeed'
+    propertyPairs: [
+      ['HP_Rate', 'HP'],                      // HP%とHPのペア
+      ['MP_Rate', 'MP'],                      // MP%とMPのペア
+      ['STR_Rate', 'STR'],                    // STR%とSTRのペア
+      ['INT_Rate', 'INT'],                    // INT%とINTのペア
+      ['VIT_Rate', 'VIT'],                    // VIT%とVITのペア
+      ['AGI_Rate', 'AGI'],                    // AGI%とAGIのペア
+      ['DEX_Rate', 'DEX'],                    // DEX%とDEXのペア
+      ['Accuracy_Rate', 'Accuracy'],          // 命中%と命中のペア
+      ['Dodge_Rate', 'Dodge'],                // 回避%と回避のペア
+      ['AttackSpeed_Rate', 'AttackSpeed'],    // 攻撃速度%と攻撃速度のペア
+      ['CastingSpeed_Rate', 'CastingSpeed'],  // 詠唱速度%と詠唱速度のペア
+      ['MotionSpeed_Rate'],                   // 行動速度%（単独）
     ] as const,
   },
   // ... 計8カテゴリ
@@ -190,8 +200,10 @@ const propertyGroups = [
 - **効率的編集:** タブ切り替えなしで複数カテゴリの値を連続編集可能
 - **直感的配置:** 左から右へ使用頻度順に配置
 - **スムーズなスクロール:** 横スクロールで自然なナビゲーション
-- **論理的配置:** %系と固定値系が隣接配置され、関連性が明確
+- **関連ペア配置:** ATK%とATKなど関連項目が隣接配置され、関連性が明確
 - **入力効率:** 同じステータスの%と固定値を連続して設定可能
+- **柔軟なレイアウト:** ペア項目は横並び、単独項目は1列で最適配置
+- **視覚的整理:** 関連性に基づく論理的なグループ化でズレを防止
 
 ## 今後の拡張可能性
 
