@@ -10,11 +10,13 @@
 - 数値入力フィールドによる操作性の悪さ
 - レベル入力時の入力ミス（範囲外値の入力）
 - 視覚的な階層が不明確
+- **他のフォーム（基本ステータス、武器情報等）と比較してサイズが大きく、統一感に欠ける**
 
 ### 2.2 UX上の問題
 - キーボード入力が必要で操作が煩雑
 - レベル選択時の即座性に欠ける
 - 「なし」選択時の空白エリアが視覚的に不自然
+- **他コンポーネントとの視覚的バランスが取れていない**
 
 ## 3. 改善要求
 
@@ -22,11 +24,14 @@
 - **レベルラベルの削除**: 「レベル」ラベルを表示しない
 - **selectによるレベル選択**: input[type="number"]からselectに変更
 - **コンパクトなレイアウト**: 画面領域の効率的な使用
+- **他コンポーネントとのサイズ統一**: 基本ステータスや武器フォームと同等のコンパクトさ
+- **余白とパディングの最適化**: gap、margin、paddingの見直し
 
 ### 3.2 UX改善要求
 - **直感的な操作**: クリック操作のみでレベル選択完了
 - **視覚的な一貫性**: 料理選択とレベル選択の統一感
 - **即座性**: 選択操作の即座反映
+- **全体的な統一感**: 他のフォームコンポーネントとの視覚的バランス調整
 
 ## 4. 具体的な改善案
 
@@ -58,60 +63,88 @@ const levelOptions = Array.from({ length: 10 }, (_, i) => ({
 
 ### 4.3 レイアウト改善
 
-**コンパクト配置**:
+**コンパクト配置**（他コンポーネントとのサイズ統一）:
 ```
 ┌─────────────────────────────────────────┐
-│ 1つ目: [料理選択▼] [レベル▼]            │
-│ 2つ目: [料理選択▼] [レベル▼]            │
-│ 3つ目: [料理選択▼] [レベル▼]            │
-│ 4つ目: [料理選択▼] [レベル▼]            │
-│ 5つ目: [料理選択▼] [レベル▼]            │
+│ 1つ目: [料理選択▼] [Lv▼]                │
+│ 2つ目: [料理選択▼] [Lv▼]                │
+│ 3つ目: [料理選択▼] [Lv▼]                │
+│ 4つ目: [料理選択▼] [Lv▼]                │
+│ 5つ目: [料理選択▼] [Lv▼]                │
 └─────────────────────────────────────────┘
 ```
+
+**サイズ最適化**:
+- スロット間のgapを`space-y-4`から`space-y-2`に縮小
+- スロットラベルのフォントサイズ調整
+- レベル選択の幅をさらに縮小（`w-16`→`w-12`）
+- 全体的なpaddingの調整（`p-6`→`p-4`）
 
 ## 5. 実装仕様
 
 ### 5.1 コンポーネント変更点
 
-**FoodSlotコンポーネント**:
+**FoodSlotコンポーネント**（サイズ最適化版）:
 ```tsx
 // 変更前
-{showLevelInput ? (
-  <div className="w-20">
-    <div className="block text-xs text-gray-600">レベル</div>
-    <input type="number" min="1" max="10" ... />
+<div className="flex flex-col gap-2">
+  <div className="text-sm font-medium text-gray-700">{slotLabel}</div>
+  <div className="flex items-center gap-4">
+    {/* 冗長なレベルラベルとinput */}
   </div>
-) : (
-  <div className="w-20">
-    <div className="block text-xs text-gray-400">レベル</div>
-    <div className="...">-</div>
-  </div>
-)}
+</div>
 
-// 変更後
-{showLevelSelect && (
-  <div className="w-16">
-    <select className="...">
-      {levelOptions.map(option => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
+// 変更後（コンパクト版）
+<div className="flex flex-col gap-1">
+  <div className="text-xs font-medium text-gray-700">{slotLabel}</div>
+  <div className="flex items-center gap-2">
+    <div className="flex-1">
+      <select className="w-full px-2 py-1 text-sm ...">
+        {/* 料理選択 */}
+      </select>
+    </div>
+    {showLevelSelect && (
+      <div className="w-12">
+        <select className="w-full px-1 py-1 text-sm ...">
+          {/* レベル選択 */}
+        </select>
+      </div>
+    )}
   </div>
-)}
+</div>
 ```
 
-### 5.2 スタイリング改善
+**全体コンテナの調整**:
+```tsx
+// 変更前
+<div className="rounded-lg border border-gray-200 bg-white p-6">
+  <h3 className="mb-4 text-lg font-semibold text-gray-900">料理設定</h3>
+  <div className="space-y-4">
+
+// 変更後（コンパクト版）
+<div className="rounded-lg border border-gray-200 bg-white p-4">
+  <h3 className="mb-3 text-base font-semibold text-gray-900">料理設定</h3>
+  <div className="space-y-2">
+```
+
+### 5.2 スタイリング改善（コンパクト化）
 
 **selectボックスの統一**:
-- 料理選択とレベル選択で同一のスタイル適用
-- ボーダー、パディング、フォントサイズの統一
+- 料理選択：`px-2 py-1 text-sm`（基本ステータスと同等）
+- レベル選択：`px-1 py-1 text-sm`（最小限のパディング）
+- ボーダー、フォントサイズの他コンポーネントとの統一
 - hover/focusステートの統一
 
+**サイズ調整の詳細**:
+- スロットラベル：`text-sm`→`text-xs`（基本ステータスと同等）
+- タイトル：`text-lg`→`text-base`（武器フォームと同等）
+- 全体パディング：`p-6`→`p-4`（基本ステータスと同等）
+- スロット間隔：`space-y-4`→`space-y-2`（密度向上）
+- 要素間gap：`gap-4`→`gap-2`（コンパクト化）
+
 **レスポンシブ対応**:
-- 小画面では縦並びレイアウト
-- 大画面では横並びでコンパクト表示
+- 小画面でも横並びを維持（レベル選択が小さいため）
+- 大画面では他コンポーネントと同等の高さを目標
 
 ### 5.3 アクセシビリティ改善
 
@@ -166,10 +199,13 @@ const levelOptions = Array.from({ length: 10 }, (_, i) => ({
 - **操作時間短縮**: クリック操作のみでレベル選択完了
 - **入力ミス削減**: select選択による範囲外値入力の防止
 - **視認性向上**: コンパクトで見やすいレイアウト
+- **全体統一感**: 他のフォームコンポーネントとの視覚的バランス向上
+- **画面効率**: 限られた画面領域の有効活用
 
 ### 8.2 開発効率向上
 - **保守性向上**: 統一されたselect要素による管理簡素化
 - **バグ削減**: 数値入力に関する検証処理の簡素化
+- **デザイン一貫性**: 他コンポーネントと同等のスタイリング規則
 
 ## 9. 実装スケジュール
 

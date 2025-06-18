@@ -103,62 +103,64 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		const showLevelSelect = currentFood !== 'none'
 
 		return (
-			<div className="flex flex-col gap-2">
-				<div className="text-sm font-medium text-gray-700">{slotLabel}</div>
-				<div className="flex items-center gap-4">
-					{/* 料理選択 */}
-					<div className="flex-1">
+			<div className="flex items-center gap-2">
+				{/* スロットラベル */}
+				<div className="text-xs font-medium text-gray-700 w-10 flex-shrink-0">
+					{slotLabel}:
+				</div>
+
+				{/* 料理選択 */}
+				<div className="flex-1">
+					<select
+						{...register(`${slotName}.selectedFood`)}
+						onChange={(e) =>
+							handleFoodChange(slotName, e.target.value as FoodType)
+						}
+						className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+						aria-label={`${slotLabel}の料理選択`}
+					>
+						{FOOD_OPTIONS.map((option) => (
+							<option key={option.value} value={option.value}>
+								{option.label}
+							</option>
+						))}
+					</select>
+					{errors[slotName]?.selectedFood && (
+						<p className="mt-1 text-xs text-red-600">
+							{errors[slotName]?.selectedFood?.message}
+						</p>
+					)}
+				</div>
+
+				{/* レベル選択 */}
+				{showLevelSelect && (
+					<div className="w-12">
 						<select
-							{...register(`${slotName}.selectedFood`)}
-							onChange={(e) =>
-								handleFoodChange(slotName, e.target.value as FoodType)
-							}
-							className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-							aria-label={`${slotLabel}の料理選択`}
+							{...register(`${slotName}.level`, { valueAsNumber: true })}
+							className="w-full rounded-md border border-gray-300 px-1 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+							aria-label={`${slotLabel}のレベル選択`}
 						>
-							{FOOD_OPTIONS.map((option) => (
+							{levelOptions.map((option) => (
 								<option key={option.value} value={option.value}>
 									{option.label}
 								</option>
 							))}
 						</select>
-						{errors[slotName]?.selectedFood && (
+						{errors[slotName]?.level && (
 							<p className="mt-1 text-xs text-red-600">
-								{errors[slotName]?.selectedFood?.message}
+								{errors[slotName]?.level?.message}
 							</p>
 						)}
 					</div>
-
-					{/* レベル選択 */}
-					{showLevelSelect && (
-						<div className="w-16">
-							<select
-								{...register(`${slotName}.level`, { valueAsNumber: true })}
-								className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-								aria-label={`${slotLabel}のレベル選択`}
-							>
-								{levelOptions.map((option) => (
-									<option key={option.value} value={option.value}>
-										{option.label}
-									</option>
-								))}
-							</select>
-							{errors[slotName]?.level && (
-								<p className="mt-1 text-xs text-red-600">
-									{errors[slotName]?.level?.message}
-								</p>
-							)}
-						</div>
-					)}
-				</div>
+				)}
 			</div>
 		)
 	}
 
 	return (
-		<div className="rounded-lg border border-gray-200 bg-white p-6 col-start-1 col-end-2 row-start-5 row-end-6">
-			<h3 className="mb-4 text-lg font-semibold text-gray-900">料理設定</h3>
-			<div className="space-y-4">
+		<div className="rounded-lg border border-gray-200 bg-white p-4 col-start-1 col-end-2 row-start-5 row-end-6">
+			<h3 className="mb-3 text-base font-semibold text-gray-900">料理設定</h3>
+			<div className="space-y-2">
 				<FoodSlot slotName="slot1" slotLabel="1つ目" />
 				<FoodSlot slotName="slot2" slotLabel="2つ目" />
 				<FoodSlot slotName="slot3" slotLabel="3つ目" />
