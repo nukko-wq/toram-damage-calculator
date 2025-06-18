@@ -77,6 +77,12 @@
 - **タブ廃止:** プロパティタブシステムを廃止し、全カテゴリを同時表示
 - **コンパクト設計:** 各カテゴリを縦長のカラムとして配置
 
+#### カテゴリ内レイアウト
+- **2カラム配置:** 各カテゴリ内でプロパティを2カラムに分割
+- **左カラム（%系）:** ATK%, MATK%, STR%など割合系プロパティ
+- **右カラム（固定値）:** ATK, MATK, STRなど固定値系プロパティ
+- **論理的グループ化:** 関連するプロパティを隣接配置
+
 #### カテゴリ表示
 - **カテゴリヘッダー:** 各カラムの上部にカテゴリ名を表示
 - **シンプルデザイン:** 装飾的な優先度表示は廃止
@@ -95,11 +101,25 @@
 // 8カラムグリッドでカテゴリを配置
 <div className="grid grid-cols-8 gap-4 overflow-x-auto">
   {propertyGroups.map((group) => (
-    <div key={group.title} className="min-w-0 border border-gray-300 rounded-lg p-3">
+    <div key={group.title} className="min-w-32 border border-gray-300 rounded-lg p-3">
       <h4 className="font-medium text-gray-700 mb-3 sticky top-0 bg-white">
         {group.title}
       </h4>
-      {/* プロパティ入力フィールド */}
+      {/* カテゴリ内2カラムレイアウト */}
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-2">
+          {/* 左カラム: %系プロパティ */}
+          {group.percentProperties.map((property) => (
+            <PropertyInput key={property} property={property} />
+          ))}
+        </div>
+        <div className="space-y-2">
+          {/* 右カラム: 固定値系プロパティ */}
+          {group.fixedProperties.map((property) => (
+            <PropertyInput key={property} property={property} />
+          ))}
+        </div>
+      </div>
     </div>
   ))}
 </div>
@@ -110,15 +130,32 @@
 const propertyGroups = [
   {
     title: '攻撃・威力',
-    properties: ['ATK_Rate', 'ATK', 'MATK_Rate', 'MATK', ...] as const,
+    percentProperties: [
+      'ATK_Rate', 'MATK_Rate', 'WeaponATK_Rate',
+      'PhysicalPenetration_Rate', 'MagicalPenetration_Rate',
+      'ElementAdvantage_Rate', 'UnsheatheAttack_Rate',
+      'ShortRangeDamage_Rate', 'LongRangeDamage_Rate',
+      'CriticalDamage_Rate', 'Critical_Rate', 'Stability_Rate'
+    ] as const,
+    fixedProperties: [
+      'ATK', 'MATK', 'WeaponATK',
+      'UnsheatheAttack', 'CriticalDamage', 'Critical'
+    ] as const,
   },
   {
     title: 'ステータス',
-    properties: ['STR_Rate', 'STR', 'HP_Rate', 'HP', ...] as const,
-  },
-  {
-    title: '継戦補助',
-    properties: ['AttackMPRecovery_Rate', 'PhysicalResistance_Rate', ...] as const,
+    percentProperties: [
+      'HP_Rate', 'MP_Rate', 'STR_Rate', 'INT_Rate',
+      'VIT_Rate', 'AGI_Rate', 'DEX_Rate',
+      'Accuracy_Rate', 'Dodge_Rate', 'AttackSpeed_Rate',
+      'CastingSpeed_Rate', 'MotionSpeed_Rate'
+    ] as const,
+    fixedProperties: [
+      'HP', 'MP', 'STR', 'INT',
+      'VIT', 'AGI', 'DEX',
+      'Accuracy', 'Dodge', 'AttackSpeed',
+      'CastingSpeed'
+    ] as const,
   },
   // ... 計8カテゴリ
 ] as const
@@ -153,6 +190,8 @@ const propertyGroups = [
 - **効率的編集:** タブ切り替えなしで複数カテゴリの値を連続編集可能
 - **直感的配置:** 左から右へ使用頻度順に配置
 - **スムーズなスクロール:** 横スクロールで自然なナビゲーション
+- **論理的配置:** %系と固定値系が隣接配置され、関連性が明確
+- **入力効率:** 同じステータスの%と固定値を連続して設定可能
 
 ## 今後の拡張可能性
 
