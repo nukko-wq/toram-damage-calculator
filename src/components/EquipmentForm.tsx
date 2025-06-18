@@ -159,155 +159,162 @@ export default function EquipmentForm({
 		},
 	] as const
 
-	// プロパティの日本語ラベル
-	const getPropertyLabel = (property: keyof EquipmentProperties): string => {
-		const labels: Record<keyof EquipmentProperties, string> = {
+	// プロパティのベース名を取得する関数
+	const getBasePropertyLabel = (property: keyof EquipmentProperties): string => {
+		const baseLabels: Record<string, string> = {
 			// 基本攻撃力系
-			ATK_Rate: 'ATK%',
+			ATK_Rate: 'ATK',
 			ATK: 'ATK',
-			MATK_Rate: 'MATK%',
+			MATK_Rate: 'MATK',
 			MATK: 'MATK',
-			WeaponATK_Rate: '武器ATK%',
+			WeaponATK_Rate: '武器ATK',
 			WeaponATK: '武器ATK',
 
 			// 防御力系
-			DEF_Rate: 'DEF%',
+			DEF_Rate: 'DEF',
 			DEF: 'DEF',
-			MDEF_Rate: 'MDEF%',
+			MDEF_Rate: 'MDEF',
 			MDEF: 'MDEF',
 
 			// 貫通系
-			PhysicalPenetration_Rate: '物理貫通%',
-			MagicalPenetration_Rate: '魔法貫通%',
-			ElementAdvantage_Rate: '属性有利%',
+			PhysicalPenetration_Rate: '物理貫通',
+			MagicalPenetration_Rate: '魔法貫通',
+			ElementAdvantage_Rate: '属性有利',
 
 			// 威力系
-			UnsheatheAttack_Rate: '抜刀威力%',
+			UnsheatheAttack_Rate: '抜刀威力',
 			UnsheatheAttack: '抜刀威力',
-			ShortRangeDamage_Rate: '近距離威力%',
-			LongRangeDamage_Rate: '遠距離威力%',
+			ShortRangeDamage_Rate: '近距離威力',
+			LongRangeDamage_Rate: '遠距離威力',
 
 			// クリティカル系
-			CriticalDamage_Rate: 'クリティカルダメージ%',
+			CriticalDamage_Rate: 'クリティカルダメージ',
 			CriticalDamage: 'クリティカルダメージ',
-			Critical_Rate: 'クリティカル率%',
+			Critical_Rate: 'クリティカル率',
 			Critical: 'クリティカル率',
 
 			// 安定率
-			Stability_Rate: '安定率%',
+			Stability_Rate: '安定率',
 
 			// HP/MP系
-			HP_Rate: 'HP%',
+			HP_Rate: 'HP',
 			HP: 'HP',
-			MP_Rate: 'MP%',
+			MP_Rate: 'MP',
 			MP: 'MP',
 
 			// ステータス系
-			STR_Rate: 'STR%',
+			STR_Rate: 'STR',
 			STR: 'STR',
-			INT_Rate: 'INT%',
+			INT_Rate: 'INT',
 			INT: 'INT',
-			VIT_Rate: 'VIT%',
+			VIT_Rate: 'VIT',
 			VIT: 'VIT',
-			AGI_Rate: 'AGI%',
+			AGI_Rate: 'AGI',
 			AGI: 'AGI',
-			DEX_Rate: 'DEX%',
+			DEX_Rate: 'DEX',
 			DEX: 'DEX',
-			CRT_Rate: 'CRT%',
+			CRT_Rate: 'CRT',
 			CRT: 'CRT',
-			MEN_Rate: 'MEN%',
+			MEN_Rate: 'MEN',
 			MEN: 'MEN',
-			TEC_Rate: 'TEC%',
+			TEC_Rate: 'TEC',
 			TEC: 'TEC',
-			LUK_Rate: 'LUK%',
+			LUK_Rate: 'LUK',
 			LUK: 'LUK',
 
 			// 命中・回避系
-			Accuracy_Rate: '命中%',
+			Accuracy_Rate: '命中',
 			Accuracy: '命中',
-			Dodge_Rate: '回避%',
+			Dodge_Rate: '回避',
 			Dodge: '回避',
-			AbsoluteAccuracy_Rate: '絶対命中%',
-			AbsoluteDodge_Rate: '絶対回避%',
+			AbsoluteAccuracy_Rate: '絶対命中',
+			AbsoluteDodge_Rate: '絶対回避',
 
 			// 速度系
-			AttackSpeed_Rate: '攻撃速度%',
+			AttackSpeed_Rate: '攻撃速度',
 			AttackSpeed: '攻撃速度',
-			CastingSpeed_Rate: '詠唱速度%',
+			CastingSpeed_Rate: '詠唱速度',
 			CastingSpeed: '詠唱速度',
-			MotionSpeed_Rate: '行動速度%',
+			MotionSpeed_Rate: '行動速度',
 
 			// MP回復系
-			AttackMPRecovery_Rate: '攻撃MP回復%',
+			AttackMPRecovery_Rate: '攻撃MP回復',
 			AttackMPRecovery: '攻撃MP回復',
 
 			// 耐性系
-			PhysicalResistance_Rate: '物理耐性%',
-			MagicalResistance_Rate: '魔法耐性%',
-			AilmentResistance_Rate: '異常耐性%',
+			PhysicalResistance_Rate: '物理耐性',
+			MagicalResistance_Rate: '魔法耐性',
+			AilmentResistance_Rate: '異常耐性',
 
 			// その他戦闘系
-			Aggro_Rate: 'ヘイト%',
-			RevivalTime_Rate: '復帰短縮%',
+			Aggro_Rate: 'ヘイト',
+			RevivalTime_Rate: '復帰短縮',
 			ItemCooldown: '道具速度',
 
 			// 自然回復系
-			NaturalHPRecovery_Rate: 'HP自然回復%',
+			NaturalHPRecovery_Rate: 'HP自然回復',
 			NaturalHPRecovery: 'HP自然回復',
-			NaturalMPRecovery_Rate: 'MP自然回復%',
+			NaturalMPRecovery_Rate: 'MP自然回復',
 			NaturalMPRecovery: 'MP自然回復',
 
 			// 特殊系
-			ArmorBreak_Rate: '防御崩し%',
-			Anticipate_Rate: '先読み%',
-			GuardPower_Rate: 'Guard力%',
-			GuardRecharge_Rate: 'Guard回復%',
-			AvoidRecharge_Rate: 'Avoid回復%',
+			ArmorBreak_Rate: '防御崩し',
+			Anticipate_Rate: '先読み',
+			GuardPower_Rate: 'Guard力',
+			GuardRecharge_Rate: 'Guard回復',
+			AvoidRecharge_Rate: 'Avoid回復',
 
 			// ステータス連動攻撃力
-			ATK_STR_Rate: 'ATK+(STR)%',
-			ATK_INT_Rate: 'ATK+(INT)%',
-			ATK_VIT_Rate: 'ATK+(VIT)%',
-			ATK_AGI_Rate: 'ATK+(AGI)%',
-			ATK_DEX_Rate: 'ATK+(DEX)%',
-			MATK_STR_Rate: 'MATK+(STR)%',
-			MATK_INT_Rate: 'MATK+(INT)%',
-			MATK_VIT_Rate: 'MATK+(VIT)%',
-			MATK_AGI_Rate: 'MATK+(AGI)%',
-			MATK_DEX_Rate: 'MATK+(DEX)%',
+			ATK_STR_Rate: 'ATK+(STR)',
+			ATK_INT_Rate: 'ATK+(INT)',
+			ATK_VIT_Rate: 'ATK+(VIT)',
+			ATK_AGI_Rate: 'ATK+(AGI)',
+			ATK_DEX_Rate: 'ATK+(DEX)',
+			MATK_STR_Rate: 'MATK+(STR)',
+			MATK_INT_Rate: 'MATK+(INT)',
+			MATK_VIT_Rate: 'MATK+(VIT)',
+			MATK_AGI_Rate: 'MATK+(AGI)',
+			MATK_DEX_Rate: 'MATK+(DEX)',
 
 			// 属性耐性
-			FireResistance_Rate: '火耐性%',
-			WaterResistance_Rate: '水耐性%',
-			WindResistance_Rate: '風耐性%',
-			EarthResistance_Rate: '地耐性%',
-			LightResistance_Rate: '光耐性%',
-			DarkResistance_Rate: '闇耐性%',
-			NeutralResistance_Rate: '無耐性%',
+			FireResistance_Rate: '火耐性',
+			WaterResistance_Rate: '水耐性',
+			WindResistance_Rate: '風耐性',
+			EarthResistance_Rate: '地耐性',
+			LightResistance_Rate: '光耐性',
+			DarkResistance_Rate: '闇耐性',
+			NeutralResistance_Rate: '無耐性',
 
 			// ダメージ軽減系
-			LinearReduction_Rate: '直線軽減%',
-			RushReduction_Rate: '突進軽減%',
-			BulletReduction_Rate: '弾丸軽減%',
-			ProximityReduction_Rate: '周囲軽減%',
-			AreaReduction_Rate: '範囲軽減%',
-			FloorTrapReduction_Rate: '痛床軽減%',
-			MeteorReduction_Rate: '隕石軽減%',
-			BladeReduction_Rate: '射刃軽減%',
-			SuctionReduction_Rate: '吸引軽減%',
-			ExplosionReduction_Rate: '爆発軽減%',
+			LinearReduction_Rate: '直線軽減',
+			RushReduction_Rate: '突進軽減',
+			BulletReduction_Rate: '弾丸軽減',
+			ProximityReduction_Rate: '周囲軽減',
+			AreaReduction_Rate: '範囲軽減',
+			FloorTrapReduction_Rate: '痛床軽減',
+			MeteorReduction_Rate: '隕石軽減',
+			BladeReduction_Rate: '射刃軽減',
+			SuctionReduction_Rate: '吸引軽減',
+			ExplosionReduction_Rate: '爆発軽減',
 
 			// バリア系
 			PhysicalBarrier: '物理バリア',
 			MagicalBarrier: '魔法バリア',
 			FractionalBarrier: '割合バリア',
-			BarrierCooldown_Rate: 'バリア速度%',
+			BarrierCooldown_Rate: 'バリア速度',
 
 			// 追撃系
-			PhysicalFollowup_Rate: '物理追撃%',
-			MagicalFollowup_Rate: '魔法追撃%',
+			PhysicalFollowup_Rate: '物理追撃',
+			MagicalFollowup_Rate: '魔法追撃',
 		}
-		return labels[property] || property
+
+		// プロパティ名から対応するベース名を返す
+		for (const [key, label] of Object.entries(baseLabels)) {
+			if (property === key) return label
+		}
+
+		// フォールバック: _Rateを除去してベース名を生成
+		return property.replace(/_Rate$/, '').replace(/_/g, '')
 	}
 
 	const handleEquipmentPropertyChange = (
@@ -392,96 +399,73 @@ export default function EquipmentForm({
 				{propertyGroups.map((group) => (
 					<div
 						key={group.title}
-						className="w-48 flex-shrink-0 border border-gray-300 rounded-lg p-3"
+						className="w-56 flex-shrink-0 border border-gray-300 rounded-lg p-3"
 					>
 						<h4 className="font-medium text-gray-700 mb-3 text-sm sticky top-0 bg-white">
 							{group.title}
 						</h4>
-						{/* 関連ペア配置 */}
-						<div className="space-y-2">
+						{/* 列見出し */}
+						<div className="grid grid-cols-3 gap-1 mb-2 text-xs text-gray-500 font-medium">
+							<div>プロパティ</div>
+							<div className="text-center">%</div>
+							<div className="text-center">+</div>
+						</div>
+						{/* プロパティ行 */}
+						<div className="space-y-1">
 							{group.propertyPairs.map((pair) => (
-								<div key={pair.properties[0]} className="grid grid-cols-2 gap-1">
+								<div key={pair.properties[0]} className="grid grid-cols-3 gap-1 items-center">
+									<div className="text-xs text-gray-700 font-medium truncate" title={getBasePropertyLabel(pair.properties[0])}>
+										{getBasePropertyLabel(pair.properties[0])}
+									</div>
 									{pair.type === 'pair' ? (
 										// ペア項目: %系と固定値系
 										<>
-											<div className="flex flex-col">
-												<label
-													htmlFor={`${item.name}-${pair.properties[0]}`}
-													className="text-xs text-gray-600 mb-1"
-												>
-													{getPropertyLabel(pair.properties[0])}
-												</label>
-												<input
-													id={`${item.name}-${pair.properties[0]}`}
-													type="number"
-													value={item.properties[pair.properties[0]] || 0}
-													onChange={(e) =>
-														onPropertyChange(pair.properties[0], e.target.value)
-													}
-													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-												/>
-											</div>
-											<div className="flex flex-col">
-												<label
-													htmlFor={`${item.name}-${pair.properties[1]}`}
-													className="text-xs text-gray-600 mb-1"
-												>
-													{getPropertyLabel(pair.properties[1])}
-												</label>
-												<input
-													id={`${item.name}-${pair.properties[1]}`}
-													type="number"
-													value={item.properties[pair.properties[1]] || 0}
-													onChange={(e) =>
-														onPropertyChange(pair.properties[1], e.target.value)
-													}
-													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-												/>
-											</div>
+											<input
+												id={`${item.name}-${pair.properties[0]}`}
+												type="number"
+												value={item.properties[pair.properties[0]] || 0}
+												onChange={(e) =>
+													onPropertyChange(pair.properties[0], e.target.value)
+												}
+												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
+											<input
+												id={`${item.name}-${pair.properties[1]}`}
+												type="number"
+												value={item.properties[pair.properties[1]] || 0}
+												onChange={(e) =>
+													onPropertyChange(pair.properties[1], e.target.value)
+												}
+												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
 										</>
 									) : pair.type === 'percent' ? (
-										// %系単独項目: 左カラムに配置
+										// %系単独項目: %列に配置
 										<>
-											<div className="flex flex-col">
-												<label
-													htmlFor={`${item.name}-${pair.properties[0]}`}
-													className="text-xs text-gray-600 mb-1"
-												>
-													{getPropertyLabel(pair.properties[0])}
-												</label>
-												<input
-													id={`${item.name}-${pair.properties[0]}`}
-													type="number"
-													value={item.properties[pair.properties[0]] || 0}
-													onChange={(e) =>
-														onPropertyChange(pair.properties[0], e.target.value)
-													}
-													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-												/>
-											</div>
-											<div /> {/* 空白の右カラム */}
+											<input
+												id={`${item.name}-${pair.properties[0]}`}
+												type="number"
+												value={item.properties[pair.properties[0]] || 0}
+												onChange={(e) =>
+													onPropertyChange(pair.properties[0], e.target.value)
+												}
+												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
+											<div /> {/* 空白の固定値列 */}
 										</>
 									) : (
-										// 固定値単独項目: 右カラムに配置
+										// 固定値単独項目: 固定値列に配置
 										<>
-											<div /> {/* 空白の左カラム */}
-											<div className="flex flex-col">
-												<label
-													htmlFor={`${item.name}-${pair.properties[0]}`}
-													className="text-xs text-gray-600 mb-1"
-												>
-													{getPropertyLabel(pair.properties[0])}
-												</label>
-												<input
-													id={`${item.name}-${pair.properties[0]}`}
-													type="number"
-													value={item.properties[pair.properties[0]] || 0}
-													onChange={(e) =>
-														onPropertyChange(pair.properties[0], e.target.value)
-													}
-													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-												/>
-											</div>
+											<div /> {/* 空白の%列 */}
+											<input
+												id={`${item.name}-${pair.properties[0]}`}
+												type="number"
+												value={item.properties[pair.properties[0]] || 0}
+												onChange={(e) =>
+													onPropertyChange(pair.properties[0], e.target.value)
+												}
+												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
 										</>
 									)}
 								</div>
