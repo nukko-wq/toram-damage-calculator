@@ -9,16 +9,24 @@ import type {
 } from '@/types/calculator'
 import { getEquipmentById } from '@/utils/equipmentDatabase'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
+import { useCalculatorStore } from '@/stores'
 
 interface EquipmentFormProps {
-	equipment: EquipmentSlots
-	onEquipmentChange: (equipment: EquipmentSlots) => void
+	// Zustand移行後は不要（後方互換性のため残存）
+	equipment?: EquipmentSlots
+	onEquipmentChange?: (equipment: EquipmentSlots) => void
 }
 
 export default function EquipmentForm({
 	equipment,
 	onEquipmentChange,
 }: EquipmentFormProps) {
+	// Zustandストアから装備データを取得
+	const storeEquipment = useCalculatorStore(state => state.data.equipment)
+	const updateEquipment = useCalculatorStore(state => state.updateEquipment)
+	
+	// Zustandストアの値を使用（完全移行）
+	const effectiveEquipment = storeEquipment
 	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots>('main')
 	const [modalState, setModalState] = useState<{
 		isOpen: boolean
@@ -338,18 +346,25 @@ export default function EquipmentForm({
 	) => {
 		const numValue = Number.parseInt(value) || 0
 		const updatedEquipment = {
-			...equipment,
+			...effectiveEquipment,
 			[slotKey]: {
-				...equipment[slotKey],
+				...effectiveEquipment[slotKey],
 				properties: {
-					...equipment[slotKey].properties,
+					...effectiveEquipment[slotKey].properties,
 					[property]: numValue,
 				},
 				// プロパティを手動変更した場合はプリセットIDをクリア
 				presetId: null,
 			},
 		}
-		onEquipmentChange(updatedEquipment)
+		
+		// Zustandストアを更新
+		updateEquipment(updatedEquipment)
+		
+		// 後方互換性のため従来のonChangeも呼び出し
+		if (onEquipmentChange) {
+			onEquipmentChange(updatedEquipment)
+		}
 	}
 
 	const handlePresetEquipmentSelect = (equipmentId: string | null) => {
@@ -360,27 +375,41 @@ export default function EquipmentForm({
 		if (equipmentId === null) {
 			// 装備なしを選択
 			const updatedEquipment = {
-				...equipment,
+				...effectiveEquipment,
 				[slotKey]: {
 					name: '',
 					properties: {},
 					presetId: null,
 				},
 			}
-			onEquipmentChange(updatedEquipment)
+			
+			// Zustandストアを更新
+			updateEquipment(updatedEquipment)
+			
+			// 後方互換性のため従来のonChangeも呼び出し
+			if (onEquipmentChange) {
+				onEquipmentChange(updatedEquipment)
+			}
 		} else {
 			// プリセット装備を選択
 			const presetEquipment = getEquipmentById(equipmentId)
 			if (presetEquipment) {
 				const updatedEquipment = {
-					...equipment,
+					...effectiveEquipment,
 					[slotKey]: {
 						name: presetEquipment.name,
 						properties: { ...presetEquipment.properties },
 						presetId: equipmentId,
 					},
 				}
-				onEquipmentChange(updatedEquipment)
+				
+				// Zustandストアを更新
+				updateEquipment(updatedEquipment)
+				
+				// 後方互換性のため従来のonChangeも呼び出し
+				if (onEquipmentChange) {
+					onEquipmentChange(updatedEquipment)
+				}
 			}
 		}
 	}
@@ -532,21 +561,21 @@ export default function EquipmentForm({
 						onClick={() =>
 							openEquipmentModal(
 								activeTab as EquipmentCategory,
-								equipment[activeTab].name ||
+								effectiveEquipment[activeTab].name ||
 									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
 							)
 						}
 						className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
 					>
-						{equipment[activeTab].name || 'プリセット選択'}
+						{effectiveEquipment[activeTab].name || 'プリセット選択'}
 					</button>
 				</div>
 
 				{/* 現在選択されている装備表示 */}
-				{equipment[activeTab].isPreset && (
+				{effectiveEquipment[activeTab].isPreset && (
 					<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
 						<span className="text-sm font-medium text-blue-800">
-							プリセット: {equipment[activeTab].name}
+							プリセット: {effectiveEquipment[activeTab].name}
 						</span>
 						<div className="text-xs text-blue-600 mt-1">
 							※ 下記の値を変更するとプリセットが解除されます
@@ -554,7 +583,7 @@ export default function EquipmentForm({
 					</div>
 				)}
 
-				{renderPropertyInputs(equipment[activeTab], (property, value) =>
+				{renderPropertyInputs(effectiveEquipment[activeTab], (property, value) =>
 					handleEquipmentPropertyChange(activeTab, property, value),
 				)}
 			</div>
@@ -565,7 +594,7 @@ export default function EquipmentForm({
 				onClose={closeEquipmentModal}
 				onSelect={handlePresetEquipmentSelect}
 				selectedEquipmentId={
-					equipment[activeTab].isPreset ? equipment[activeTab].id : null
+					effectiveEquipment[activeTab].isPreset ? effectiveEquipment[activeTab].id : null
 				}
 				category={modalState.category || 'main'}
 				title={modalState.title}

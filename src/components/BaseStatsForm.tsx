@@ -5,10 +5,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { baseStatsSchema, type BaseStatsFormData } from '@/schemas/baseStats'
 import type { BaseStats } from '@/types/calculator'
 import { useEffect, useCallback, useState } from 'react'
+import { useCalculatorStore } from '@/stores'
 
 interface BaseStatsFormProps {
-	stats: BaseStats
-	onChange: (stats: BaseStats) => void
+	// Zustand移行後は不要（後方互換性のため残存）
+	stats?: BaseStats
+	onChange?: (stats: BaseStats) => void
 }
 
 // ステータスフィールドコンポーネント（コンポーネント外に定義して再作成を防ぐ）
@@ -60,6 +62,13 @@ const StatField = ({
 export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	// 初期化状態管理
 	const [isInitialized, setIsInitialized] = useState(false)
+	
+	// Zustandストアから基本ステータスを取得
+	const storeStats = useCalculatorStore(state => state.data.baseStats)
+	const updateBaseStats = useCalculatorStore(state => state.updateBaseStats)
+	
+	// Zustandストアの値を使用（完全移行）
+	const effectiveStats = storeStats
 
 	const {
 		register,
@@ -69,7 +78,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		getValues,
 	} = useForm<BaseStatsFormData>({
 		resolver: zodResolver(baseStatsSchema),
-		values: stats,
+		values: effectiveStats,
 		mode: 'onChange',
 	})
 
@@ -96,10 +105,10 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		setIsInitialized(false)
 		const timer = setTimeout(() => setIsInitialized(true), 0)
 		return () => clearTimeout(timer)
-	}, [stats])
+	}, [effectiveStats])
 
-	// onChangeをuseCallbackでメモ化して安定化
-	const stableOnChange = useCallback(onChange, [])
+	// 後方互換性のためのonChange（省略可能）
+	const stableOnChange = useCallback(onChange || (() => {}), [onChange])
 
 	// フォームの値変更を監視して親に通知
 	useEffect(() => {
@@ -115,11 +124,17 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 			)
 
 			if (isAllValid) {
-				stableOnChange(value as BaseStats)
+				// Zustandストアを更新（完全移行）
+				updateBaseStats(value as BaseStats)
+				
+				// 後方互換性のため従来のonChangeも呼び出し
+				if (onChange) {
+					stableOnChange(value as BaseStats)
+				}
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watch, stableOnChange, isInitialized])
+	}, [watch, stableOnChange, isInitialized, updateBaseStats])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">

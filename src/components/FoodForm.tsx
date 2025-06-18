@@ -5,10 +5,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { foodFormSchema } from '@/schemas/food'
 import type { FoodFormData, FoodType } from '@/types/calculator'
+import { useCalculatorStore } from '@/stores'
 
 interface FoodFormProps {
-	food: FoodFormData
-	onFoodChange: (food: FoodFormData) => void
+	// Zustand移行後は不要（後方互換性のため残存）
+	food?: FoodFormData
+	onFoodChange?: (food: FoodFormData) => void
 }
 
 // 料理の表示名マッピング
@@ -43,6 +45,12 @@ const FOOD_OPTIONS: { value: FoodType; label: string }[] = Object.entries(
 }))
 
 export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
+	// Zustandストアから料理データを取得
+	const storeFood = useCalculatorStore(state => state.data.food)
+	const updateFood = useCalculatorStore(state => state.updateFood)
+	
+	// Zustandストアの値を使用（完全移行）
+	const effectiveFood = storeFood
 	const {
 		register,
 		watch,
@@ -51,7 +59,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		formState: { errors },
 	} = useForm<FoodFormData>({
 		resolver: zodResolver(foodFormSchema),
-		defaultValues: food,
+		defaultValues: effectiveFood,
 		mode: 'onChange',
 	})
 
@@ -59,12 +67,12 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 	const [isInitialized, setIsInitialized] = React.useState(false)
 	
 	React.useEffect(() => {
-		// propsが変更されたときにフォームをリセットして初期化フラグもリセット
+		// Zustandストアのデータが変更されたときにフォームをリセットして初期化フラグもリセット
 		setIsInitialized(false)
-		reset(food)
+		reset(effectiveFood)
 		const timer = setTimeout(() => setIsInitialized(true), 0)
 		return () => clearTimeout(timer)
-	}, [food, reset])
+	}, [effectiveFood, reset])
 
 	React.useEffect(() => {
 		const subscription = watch((value, { name, type }) => {
@@ -72,10 +80,17 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 			if (!isInitialized || !name || !value || type !== 'change') {
 				return
 			}
-			onFoodChange(value as FoodFormData)
+			
+			// Zustandストアを更新
+			updateFood(value as FoodFormData)
+			
+			// 後方互換性のため従来のonChangeも呼び出し
+			if (onFoodChange) {
+				onFoodChange(value as FoodFormData)
+			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watch, onFoodChange, isInitialized])
+	}, [watch, onFoodChange, isInitialized, updateFood])
 
 	// 現在の値を取得（UI表示用）
 	const watchedValues = watch()

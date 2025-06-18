@@ -4,13 +4,21 @@ import { useState } from 'react'
 import type { CrystalSlots, CrystalType } from '@/types/calculator'
 import { getCrystalById } from '@/utils/crystalDatabase'
 import CrystalSelectionModal from './CrystalSelectionModal'
+import { useCalculatorStore } from '@/stores'
 
 interface CrystalFormProps {
-	crystals: CrystalSlots
-	onChange: (crystals: CrystalSlots) => void
+	// Zustand移行後は不要（後方互換性のため残存）
+	crystals?: CrystalSlots
+	onChange?: (crystals: CrystalSlots) => void
 }
 
 export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
+	// Zustandストアからクリスタルデータを取得
+	const storeCrystals = useCalculatorStore(state => state.data.crystals)
+	const updateCrystals = useCalculatorStore(state => state.updateCrystals)
+	
+	// Zustandストアの値を使用（完全移行）
+	const effectiveCrystals = storeCrystals
 	const [modalState, setModalState] = useState<{
 		isOpen: boolean
 		slotKey: keyof CrystalSlots | null
@@ -26,10 +34,18 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 	const handleCrystalChange = (crystalId: string | null) => {
 		if (!modalState.slotKey) return
 
-		onChange({
-			...crystals,
+		const newCrystals = {
+			...effectiveCrystals,
 			[modalState.slotKey]: crystalId,
-		})
+		}
+
+		// Zustandストアを更新
+		updateCrystals(newCrystals)
+		
+		// 後方互換性のため従来のonChangeも呼び出し
+		if (onChange) {
+			onChange(newCrystals)
+		}
 	}
 
 	const openModal = (
@@ -58,7 +74,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 		slotKey: keyof CrystalSlots,
 		crystalType: CrystalType,
 	) => {
-		const selectedCrystalId = crystals[slotKey]
+		const selectedCrystalId = effectiveCrystals[slotKey]
 		const selectedCrystal = selectedCrystalId
 			? getCrystalById(selectedCrystalId)
 			: null
@@ -158,7 +174,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 				onClose={closeModal}
 				onSelect={handleCrystalChange}
 				selectedCrystalId={
-					modalState.slotKey ? crystals[modalState.slotKey] : null
+					modalState.slotKey ? effectiveCrystals[modalState.slotKey] : null
 				}
 				allowedTypes={modalState.allowedTypes}
 				title={modalState.title}

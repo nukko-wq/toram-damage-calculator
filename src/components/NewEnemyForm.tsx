@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useCalculatorStore } from '@/stores'
 import type {
 	PresetEnemy,
 	UserEnemy,
@@ -18,8 +19,9 @@ import {
 } from '@/utils/enemyDatabase'
 
 interface NewEnemyFormProps {
-	enemyData: EnemyFormData
-	onChange: (enemyData: EnemyFormData) => void
+	// Zustand移行後は不要（後方互換性のため残存）
+	enemyData?: EnemyFormData
+	onChange?: (enemyData: EnemyFormData) => void
 }
 
 // デフォルト値の定義
@@ -36,6 +38,12 @@ export default function NewEnemyForm({
 	enemyData,
 	onChange,
 }: NewEnemyFormProps) {
+	// Zustandストアから敵データを取得
+	const storeEnemyData = useCalculatorStore(state => state.data.enemy)
+	const updateEnemy = useCalculatorStore(state => state.updateEnemy)
+	
+	// Zustandストアの値を使用（完全移行）
+	const effectiveEnemyData = storeEnemyData
 	const [selectedCategory, setSelectedCategory] = useState<
 		EnemyCategory | 'all'
 	>('all')
@@ -53,8 +61,8 @@ export default function NewEnemyForm({
 
 	// 現在選択されている敵情報を取得
 	const selectedEnemy =
-		enemyData.selectedId && enemyData.type
-			? getEnemyById(enemyData.selectedId)
+		effectiveEnemyData.selectedId && effectiveEnemyData.type
+			? getEnemyById(effectiveEnemyData.selectedId)
 			: null
 
 	// カテゴリ別の敵情報を取得
@@ -84,7 +92,14 @@ export default function NewEnemyForm({
 				requiredHIT: 0, // プリセットは0から開始
 			},
 		}
-		onChange(newData)
+		
+		// Zustandストアを更新
+		updateEnemy(newData)
+		
+		// 後方互換性のため従来のonChangeも呼び出し
+		if (onChange) {
+			onChange(newData)
+		}
 	}
 
 	// 手動調整値の変更処理
@@ -94,13 +109,20 @@ export default function NewEnemyForm({
 	) => {
 		const numValue = value === '' ? 0 : Number(value)
 		const newData: EnemyFormData = {
-			...enemyData,
+			...effectiveEnemyData,
 			manualOverrides: {
-				...enemyData.manualOverrides,
+				...effectiveEnemyData.manualOverrides,
 				[field]: numValue,
 			},
 		}
-		onChange(newData)
+		
+		// Zustandストアを更新
+		updateEnemy(newData)
+		
+		// 後方互換性のため従来のonChangeも呼び出し
+		if (onChange) {
+			onChange(newData)
+		}
 	}
 
 	// 最終的な計算値を取得（プリセット値 + 調整値）
@@ -139,7 +161,7 @@ export default function NewEnemyForm({
 						敵選択:
 					</label>
 					<select
-						value={enemyData.selectedId || ''}
+						value={effectiveEnemyData.selectedId || ''}
 						onChange={(e) => handleEnemySelect(e.target.value)}
 						className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
 					>
@@ -188,7 +210,7 @@ export default function NewEnemyForm({
 									<span className="text-gray-500">+</span>
 									<input
 										type="number"
-										value={enemyData.manualOverrides?.resistCritical || 0}
+										value={effectiveEnemyData.manualOverrides?.resistCritical || 0}
 										onChange={(e) =>
 											handleManualOverrideChange(
 												'resistCritical',
@@ -203,7 +225,7 @@ export default function NewEnemyForm({
 									<span className="font-medium">
 										{getFinalValue(
 											selectedEnemy.stats.resistCritical,
-											enemyData.manualOverrides?.resistCritical,
+											effectiveEnemyData.manualOverrides?.resistCritical,
 										)}
 									</span>
 								</div>
@@ -220,7 +242,7 @@ export default function NewEnemyForm({
 									<span className="text-gray-500">+</span>
 									<input
 										type="number"
-										value={enemyData.manualOverrides?.requiredHIT || 0}
+										value={effectiveEnemyData.manualOverrides?.requiredHIT || 0}
 										onChange={(e) =>
 											handleManualOverrideChange('requiredHIT', e.target.value)
 										}
@@ -232,7 +254,7 @@ export default function NewEnemyForm({
 									<span className="font-medium">
 										{getFinalValue(
 											selectedEnemy.stats.requiredHIT,
-											enemyData.manualOverrides?.requiredHIT,
+											effectiveEnemyData.manualOverrides?.requiredHIT,
 										)}
 									</span>
 								</div>

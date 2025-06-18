@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useCalculatorStore, useUIStore } from '@/stores'
 import BaseStatsForm from '@/components/BaseStatsForm'
 import WeaponForm from '@/components/WeaponForm'
 import CrystalForm from '@/components/CrystalForm'
@@ -9,6 +10,7 @@ import FoodForm from '@/components/FoodForm'
 import NewEnemyForm from '@/components/NewEnemyForm'
 import StatsSummary from '@/components/StatsSummary'
 import SaveDataManager from '@/components/SaveDataManager'
+import ZustandTest from '@/components/ZustandTest'
 import type { CalculatorData, UpdateNotification } from '@/types/calculator'
 import { createInitialCalculatorData } from '@/utils/initialData'
 import {
@@ -18,32 +20,39 @@ import {
 } from '@/utils/saveDataManager'
 
 export default function Home() {
-	const [data, setData] = useState<CalculatorData>(
+	// Zustandストアからデータを取得（段階的移行）
+	const { showSaveManager, setShowSaveManager } = useUIStore()
+	const {
+		hasUnsavedChanges,
+		isInitialized,
+		isLoading,
+		initialize,
+	} = useCalculatorStore()
+
+	// 従来のstate（今後段階的に削除予定）
+	const [legacyData, setLegacyData] = useState<CalculatorData>(
 		createInitialCalculatorData(),
 	)
-	const [showSaveManager, setShowSaveManager] = useState(false)
-	const [isInitialized, setIsInitialized] = useState(false)
-	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+	const [legacyIsInitialized, setLegacyIsInitialized] = useState(false)
 	const [updateNotifications, setUpdateNotifications] = useState<
 		UpdateNotification[]
 	>([])
 	const [showUpdateNotifications, setShowUpdateNotifications] = useState(false)
 
-	// アプリケーション初期化
+	// アプリケーション初期化（Zustandベース）
 	useEffect(() => {
 		const initializeApp = async () => {
 			try {
 				const notifications = await initializeStorage()
-				const currentSave = getCurrentSaveData()
-				setData(currentSave.data)
 				setUpdateNotifications(notifications)
 				if (notifications.length > 0) {
 					setShowUpdateNotifications(true)
 				}
-				setIsInitialized(true)
+				
+				// Zustandストアで初期化
+				await initialize()
 			} catch (error) {
 				console.error('アプリケーション初期化エラー:', error)
-				setIsInitialized(true) // エラーでも初期化完了とする
 			}
 		}
 
@@ -51,66 +60,54 @@ export default function Home() {
 	}, [])
 
 
-	// 個別データ変更ハンドラー
-	const handleBaseStatsChange = useCallback((baseStats: typeof data.baseStats) => {
-		setData(prev => ({ ...prev, baseStats }))
+	// 個別データ変更ハンドラー（段階的移行：従来版）
+	const handleBaseStatsChange = useCallback((baseStats: typeof legacyData.baseStats) => {
+		setLegacyData(prev => ({ ...prev, baseStats }))
+		// Zustandの未保存変更フラグも更新
+		const { setHasUnsavedChanges } = useCalculatorStore.getState()
 		setHasUnsavedChanges(true)
 	}, [])
 
-	const handleMainWeaponChange = useCallback((mainWeapon: typeof data.mainWeapon) => {
-		setData(prev => ({ ...prev, mainWeapon }))
+	const handleMainWeaponChange = useCallback((mainWeapon: typeof legacyData.mainWeapon) => {
+		setLegacyData(prev => ({ ...prev, mainWeapon }))
+		const { setHasUnsavedChanges } = useCalculatorStore.getState()
 		setHasUnsavedChanges(true)
 	}, [])
 
-	const handleSubWeaponChange = useCallback((subWeapon: typeof data.subWeapon) => {
-		setData(prev => ({ ...prev, subWeapon }))
+	const handleSubWeaponChange = useCallback((subWeapon: typeof legacyData.subWeapon) => {
+		setLegacyData(prev => ({ ...prev, subWeapon }))
+		const { setHasUnsavedChanges } = useCalculatorStore.getState()
 		setHasUnsavedChanges(true)
 	}, [])
 
-	const handleCrystalsChange = useCallback((crystals: typeof data.crystals) => {
-		setData(prev => ({ ...prev, crystals }))
+	const handleCrystalsChange = useCallback((crystals: typeof legacyData.crystals) => {
+		setLegacyData(prev => ({ ...prev, crystals }))
+		const { setHasUnsavedChanges } = useCalculatorStore.getState()
 		setHasUnsavedChanges(true)
 	}, [])
 
-	const handleEquipmentChange = useCallback((equipment: typeof data.equipment) => {
-		setData(prev => ({ ...prev, equipment }))
+	const handleEquipmentChange = useCallback((equipment: typeof legacyData.equipment) => {
+		setLegacyData(prev => ({ ...prev, equipment }))
+		const { setHasUnsavedChanges } = useCalculatorStore.getState()
 		setHasUnsavedChanges(true)
 	}, [])
 
-	const handleFoodChange = useCallback((food: typeof data.food) => {
-		setData(prev => ({ ...prev, food }))
+	const handleFoodChange = useCallback((food: typeof legacyData.food) => {
+		setLegacyData(prev => ({ ...prev, food }))
+		const { setHasUnsavedChanges } = useCalculatorStore.getState()
 		setHasUnsavedChanges(true)
 	}, [])
 
-	const handleEnemyChange = useCallback((enemy: typeof data.enemy) => {
-		setData(prev => ({ ...prev, enemy }))
+	const handleEnemyChange = useCallback((enemy: typeof legacyData.enemy) => {
+		setLegacyData(prev => ({ ...prev, enemy }))
+		const { setHasUnsavedChanges } = useCalculatorStore.getState()
 		setHasUnsavedChanges(true)
 	}, [])
 
-	// セーブデータの読み込み
-	const handleDataLoad = (loadedData: CalculatorData) => {
-		// データ読み込み中は変更検知を無効化
-		setHasUnsavedChanges(false)
-		setData(loadedData)
-		
-		// フォームの初期化完了を待つ（より長い遅延）
-		setTimeout(() => {
-			setHasUnsavedChanges(false)
-		}, 200)
-	}
+	// セーブデータ管理はZustandに移行済み
 
-	// 現在のデータを手動保存
-	const handleManualSave = async () => {
-		try {
-			await saveCurrentData(data)
-			setHasUnsavedChanges(false) // 保存後は未保存状態をリセット
-		} catch (error) {
-			console.error('データ保存エラー:', error)
-		}
-	}
-
-	// 初期化が完了するまで読み込み表示
-	if (!isInitialized) {
+	// 初期化が完了するまで読み込み表示（Zustandベース）
+	if (!isInitialized || isLoading) {
 		return (
 			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
 				<div className="text-center">
@@ -208,51 +205,47 @@ export default function Home() {
 				{/* セーブデータ管理パネル */}
 				{showSaveManager && (
 					<div className="mb-8">
-						<SaveDataManager
-							currentData={data}
-							onDataLoad={handleDataLoad}
-							onDataSave={handleManualSave}
-							hasUnsavedChanges={hasUnsavedChanges}
-							isFirstLoad={false} // セーブデータ管理開閉時の初期化を防ぐ
-							key="save-manager" // 一意キーでコンポーネントの再作成を防ぐ
-						/>
+						<SaveDataManager key="save-manager" />
 					</div>
 				)}
 
 				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto] gap-4">
 					<BaseStatsForm
-						stats={data.baseStats}
+						stats={legacyData.baseStats}
 						onChange={handleBaseStatsChange}
 					/>
 
 					<WeaponForm
-						mainWeapon={data.mainWeapon}
-						subWeapon={data.subWeapon}
+						mainWeapon={legacyData.mainWeapon}
+						subWeapon={legacyData.subWeapon}
 						onMainWeaponChange={handleMainWeaponChange}
 						onSubWeaponChange={handleSubWeaponChange}
 					/>
 
 					<CrystalForm
-						crystals={data.crystals}
+						crystals={legacyData.crystals}
 						onChange={handleCrystalsChange}
 					/>
 
 					<EquipmentForm
-						equipment={data.equipment}
+						equipment={legacyData.equipment}
 						onEquipmentChange={handleEquipmentChange}
 					/>
 
 					<FoodForm
-						food={data.food}
+						food={legacyData.food}
 						onFoodChange={handleFoodChange}
 					/>
 
 					<NewEnemyForm
-						enemyData={data.enemy}
+						enemyData={legacyData.enemy}
 						onChange={handleEnemyChange}
 					/>
 				</div>
-				<StatsSummary data={data} />
+				<StatsSummary data={legacyData} />
+				
+				{/* Zustand動作確認用（開発環境のみ） */}
+				{process.env.NODE_ENV === 'development' && <ZustandTest />}
 			</div>
 		</div>
 	)

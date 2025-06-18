@@ -1,73 +1,47 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { SaveData, CalculatorData } from '@/types/calculator'
-import {
-	getAllSaveData,
-	getCurrentSaveData,
-	setCurrentSaveData,
-	createSaveData,
-	deleteSaveData,
-	renameSaveData,
-	reorderSaveData,
-	initializeStorage,
-	loadSaveData,
-} from '@/utils/saveDataManager'
+import { useCalculatorStore, useSaveDataStore } from '@/stores'
 import SaveDataListItem from './SaveDataListItem'
 import NewSaveDataModal from './NewSaveDataModal'
 
 interface SaveDataManagerProps {
-	currentData: CalculatorData
-	onDataLoad: (data: CalculatorData) => void
-	onDataSave?: () => void
+	// 将来的に削除予定（Zustand移行後は不要）
+	currentData?: any
+	onDataLoad?: any
+	onDataSave?: any
 	hasUnsavedChanges?: boolean
-	isFirstLoad?: boolean // 初回読み込みかどうかの判定
+	isFirstLoad?: boolean
 }
 
-export default function SaveDataManager({
-	currentData,
-	onDataLoad,
-	onDataSave,
-	hasUnsavedChanges = false,
-	isFirstLoad = false,
-}: SaveDataManagerProps) {
-	const [saveDataList, setSaveDataList] = useState<SaveData[]>([])
-	const [currentSaveId, setCurrentSaveId] = useState<string>('default')
+export default function SaveDataManager({}: SaveDataManagerProps) {
+	// Zustandストアからデータを取得
+	const {
+		data: currentData,
+		hasUnsavedChanges,
+		loadSaveData,
+		saveCurrentData,
+	} = useCalculatorStore()
+
+	const {
+		saveDataList,
+		currentSaveId,
+		isLoading,
+		error,
+		pendingSaveId,
+		showUnsavedChangesModal,
+		loadSaveDataList,
+		switchSaveData,
+		createSaveData,
+		deleteSaveData,
+		renameSaveData,
+		reorderSaveData,
+		setPendingSaveId,
+		setShowUnsavedChangesModal,
+		setError,
+	} = useSaveDataStore()
+
 	const [isNewSaveModalOpen, setIsNewSaveModalOpen] = useState(false)
-	const [isLoading, setIsLoading] = useState(true)
-	const [error, setError] = useState<string | null>(null)
-	const [pendingSaveId, setPendingSaveId] = useState<string | null>(null)
-	const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false)
-
-	// セーブデータリストを読み込み
-	const loadSaveDataList = async () => {
-		try {
-			setIsLoading(true)
-			setError(null)
-
-			// ストレージを初期化
-			await initializeStorage()
-
-			// セーブデータリストを取得
-			const saveData = getAllSaveData()
-			setSaveDataList(saveData)
-
-			// 現在のセーブデータを取得
-			const current = getCurrentSaveData()
-			setCurrentSaveId(current.id)
-
-			// 初回読み込み時のみデータを親コンポーネントに通知
-			// （SaveDataManagerが開かれるたびにフォームがリセットされるのを防ぐ）
-			if (isFirstLoad) {
-				onDataLoad(current.data)
-			}
-		} catch (err) {
-			console.error('セーブデータの読み込みに失敗しました:', err)
-			setError('セーブデータの読み込みに失敗しました')
-		} finally {
-			setIsLoading(false)
-		}
-	}
 
 	// 初期化（一度だけ実行）
 	useEffect(() => {
@@ -84,15 +58,14 @@ export default function SaveDataManager({
 		}
 
 		try {
-			await setCurrentSaveData(saveId)
-			setCurrentSaveId(saveId)
-
-			// 最新のデータを直接ストレージから読み込み
-			const loadedSaveData = await loadSaveData(saveId)
-			onDataLoad(loadedSaveData.data)
+			// Zustandストア経由でセーブデータを切り替え
+			const loadedData = await switchSaveData(saveId)
+			if (loadedData) {
+				// CalculatorStoreのloadSaveDataを使用してセーブデータ切り替えバグを根本解決
+				await loadSaveData(loadedData)
+			}
 		} catch (err) {
 			console.error('セーブデータの切り替えに失敗しました:', err)
-			setError('セーブデータの切り替えに失敗しました')
 		}
 	}
 
@@ -100,30 +73,28 @@ export default function SaveDataManager({
 	const handleCreateSaveData = async (name: string) => {
 		try {
 			const newSaveData = await createSaveData(name, currentData)
-			await loadSaveDataList() // リストを再読み込み
 			setIsNewSaveModalOpen(false)
 
-			// 新しく作成したセーブデータに切り替え
-			await handleSaveDataSelect(newSaveData.id)
+			if (newSaveData) {
+				// 新しく作成したセーブデータに切り替え
+				await handleSaveDataSelect(newSaveData.id)
+			}
 		} catch (err) {
 			console.error('セーブデータの作成に失敗しました:', err)
-			setError('セーブデータの作成に失敗しました')
 		}
 	}
 
 	// セーブデータを削除
 	const handleDeleteSaveData = async (saveId: string) => {
 		try {
-			await deleteSaveData(saveId)
-			await loadSaveDataList() // リストを再読み込み
-
-			// 削除したセーブデータが現在選択中だった場合、デフォルトに切り替え
-			if (currentSaveId === saveId) {
-				await handleSaveDataSelect('default')
+			const defaultData = await deleteSaveData(saveId)
+			
+			// 削除したセーブデータが現在選択中だった場合、デフォルトデータを読み込み
+			if (currentSaveId === saveId && defaultData) {
+				await loadSaveData(defaultData)
 			}
 		} catch (err) {
 			console.error('セーブデータの削除に失敗しました:', err)
-			setError('セーブデータの削除に失敗しました')
 		}
 	}
 
@@ -131,10 +102,8 @@ export default function SaveDataManager({
 	const handleRenameSaveData = async (saveId: string, newName: string) => {
 		try {
 			await renameSaveData(saveId, newName)
-			await loadSaveDataList() // リストを再読み込み
 		} catch (err) {
 			console.error('セーブデータの名前変更に失敗しました:', err)
-			setError('セーブデータの名前変更に失敗しました')
 		}
 	}
 
@@ -142,17 +111,17 @@ export default function SaveDataManager({
 	const handleReorderSaveData = async (newOrder: string[]) => {
 		try {
 			await reorderSaveData(newOrder)
-			await loadSaveDataList() // リストを再読み込み
 		} catch (err) {
 			console.error('セーブデータの並び替えに失敗しました:', err)
-			setError('セーブデータの並び替えに失敗しました')
 		}
 	}
 
 	// 現在のデータを保存
-	const handleSaveCurrentData = () => {
-		if (onDataSave) {
-			onDataSave()
+	const handleSaveCurrentData = async () => {
+		try {
+			await saveCurrentData()
+		} catch (err) {
+			console.error('データ保存エラー:', err)
 		}
 	}
 
@@ -163,39 +132,34 @@ export default function SaveDataManager({
 			setPendingSaveId(null)
 
 			try {
-				await setCurrentSaveData(pendingSaveId)
-				setCurrentSaveId(pendingSaveId)
-
-				// 最新のデータを直接ストレージから読み込み
-				const loadedSaveData = await loadSaveData(pendingSaveId)
-				onDataLoad(loadedSaveData.data)
+				// Zustandストア経由でセーブデータを切り替え
+				const loadedData = await switchSaveData(pendingSaveId)
+				if (loadedData) {
+					await loadSaveData(loadedData)
+				}
 			} catch (err) {
 				console.error('セーブデータの切り替えに失敗しました:', err)
-				setError('セーブデータの切り替えに失敗しました')
 			}
 		}
 	}
 
 	// 未保存変更の確認ダイアログで「保存してから切り替え」を選択
 	const handleSaveAndSwitch = async () => {
-		if (onDataSave && pendingSaveId) {
+		if (pendingSaveId) {
 			try {
 				// 現在のデータを保存
-				await onDataSave()
+				await saveCurrentData()
 
 				// 保存後にセーブデータを切り替え
 				setShowUnsavedChangesModal(false)
 				setPendingSaveId(null)
 
-				await setCurrentSaveData(pendingSaveId)
-				setCurrentSaveId(pendingSaveId)
-
-				// 最新のデータを直接ストレージから読み込み
-				const loadedSaveData = await loadSaveData(pendingSaveId)
-				onDataLoad(loadedSaveData.data)
+				const loadedData = await switchSaveData(pendingSaveId)
+				if (loadedData) {
+					await loadSaveData(loadedData)
+				}
 			} catch (err) {
 				console.error('セーブデータの切り替えに失敗しました:', err)
-				setError('セーブデータの切り替えに失敗しました')
 			}
 		}
 	}
@@ -418,15 +382,13 @@ export default function SaveDataManager({
 							>
 								変更を破棄して切り替え
 							</button>
-							{onDataSave && (
-								<button
-									type="button"
-									onClick={handleSaveAndSwitch}
-									className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-								>
-									保存してから切り替え
-								</button>
-							)}
+							<button
+								type="button"
+								onClick={handleSaveAndSwitch}
+								className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+							>
+								保存してから切り替え
+							</button>
 						</div>
 					</div>
 				</div>

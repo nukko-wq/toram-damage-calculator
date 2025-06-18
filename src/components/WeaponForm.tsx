@@ -15,12 +15,14 @@ import type {
 	SubWeaponType,
 } from '@/types/calculator'
 import { useEffect, useState } from 'react'
+import { useCalculatorStore } from '@/stores'
 
 interface WeaponFormProps {
-	mainWeapon: MainWeapon
-	subWeapon: SubWeapon
-	onMainWeaponChange: (weapon: MainWeapon) => void
-	onSubWeaponChange: (weapon: SubWeapon) => void
+	// Zustand移行後は不要（後方互換性のため残存）
+	mainWeapon?: MainWeapon
+	subWeapon?: SubWeapon
+	onMainWeaponChange?: (weapon: MainWeapon) => void
+	onSubWeaponChange?: (weapon: SubWeapon) => void
 }
 
 export default function WeaponForm({
@@ -29,6 +31,15 @@ export default function WeaponForm({
 	onMainWeaponChange,
 	onSubWeaponChange,
 }: WeaponFormProps) {
+	// Zustandストアから武器データを取得
+	const storeMainWeapon = useCalculatorStore(state => state.data.mainWeapon)
+	const storeSubWeapon = useCalculatorStore(state => state.data.subWeapon)
+	const updateMainWeapon = useCalculatorStore(state => state.updateMainWeapon)
+	const updateSubWeapon = useCalculatorStore(state => state.updateSubWeapon)
+	
+	// Zustandストアの値を使用（完全移行）
+	const effectiveMainWeapon = storeMainWeapon
+	const effectiveSubWeapon = storeSubWeapon
 	const weaponTypes: WeaponType[] = [
 		'片手剣',
 		'双剣',
@@ -58,7 +69,7 @@ export default function WeaponForm({
 		getValues: getValuesMain,
 	} = useForm<MainWeaponFormData>({
 		resolver: zodResolver(mainWeaponSchema),
-		defaultValues: mainWeapon,
+		defaultValues: effectiveMainWeapon,
 		mode: 'onChange',
 	})
 
@@ -72,7 +83,7 @@ export default function WeaponForm({
 		getValues: getValuesSub,
 	} = useForm<SubWeaponFormData>({
 		resolver: zodResolver(subWeaponSchema),
-		defaultValues: subWeapon,
+		defaultValues: effectiveSubWeapon,
 		mode: 'onChange',
 	})
 
@@ -121,13 +132,13 @@ export default function WeaponForm({
 	// 外部からの変更を反映（初期化状態管理付き）
 	useEffect(() => {
 		setIsInitialized(false)
-		resetMain(mainWeapon)
-		resetSub(subWeapon)
+		resetMain(effectiveMainWeapon)
+		resetSub(effectiveSubWeapon)
 		const timer = setTimeout(() => setIsInitialized(true), 0)
 		return () => clearTimeout(timer)
-	}, [mainWeapon, subWeapon, resetMain, resetSub])
+	}, [effectiveMainWeapon, effectiveSubWeapon, resetMain, resetSub])
 
-	// フォーム値変更を監視して親に通知（メイン武器）
+	// フォーム値変更を監視してZustandストアに通知（メイン武器）
 	useEffect(() => {
 		const subscription = watchMain((value, { name, type }) => {
 			// 初期化中やプログラム的な変更は無視
@@ -135,13 +146,19 @@ export default function WeaponForm({
 				return
 			}
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
-				onMainWeaponChange(value as MainWeapon)
+				// Zustandストアを更新
+				updateMainWeapon(value as MainWeapon)
+				
+				// 後方互換性のため従来のonChangeも呼び出し
+				if (onMainWeaponChange) {
+					onMainWeaponChange(value as MainWeapon)
+				}
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watchMain, onMainWeaponChange, isInitialized])
+	}, [watchMain, onMainWeaponChange, isInitialized, updateMainWeapon])
 
-	// フォーム値変更を監視して親に通知（サブ武器）
+	// フォーム値変更を監視してZustandストアに通知（サブ武器）
 	useEffect(() => {
 		const subscription = watchSub((value, { name, type }) => {
 			// 初期化中やプログラム的な変更は無視
@@ -149,11 +166,17 @@ export default function WeaponForm({
 				return
 			}
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
-				onSubWeaponChange(value as SubWeapon)
+				// Zustandストアを更新
+				updateSubWeapon(value as SubWeapon)
+				
+				// 後方互換性のため従来のonChangeも呼び出し
+				if (onSubWeaponChange) {
+					onSubWeaponChange(value as SubWeapon)
+				}
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watchSub, onSubWeaponChange, isInitialized])
+	}, [watchSub, onSubWeaponChange, isInitialized, updateSubWeapon])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
