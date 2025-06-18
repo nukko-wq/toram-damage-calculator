@@ -149,6 +149,7 @@ useEffect(() => {
 // バフスキルフォームの例
 const BuffSkillForm = () => {
   const storeBuffSkills = useCalculatorStore(state => state.data.buffSkills)
+  const mainWeaponType = useCalculatorStore(state => state.data.mainWeapon.weaponType)
   const updateBuffSkills = useCalculatorStore(state => state.updateBuffSkills)
   
   // 個別スキルの更新処理
@@ -168,14 +169,70 @@ const BuffSkillForm = () => {
     updateBuffSkills({ skills: updatedSkills })
   }
   
-  // スキル系統別の表示・管理
+  // 武器種に応じたマスタリスキルフィルタリング
+  const getVisibleMasterySkills = (weaponType: WeaponType) => {
+    const weaponTypeToMasterySkills = {
+      '素手': ['shield_mastery'],
+      '片手剣': ['blade_mastery', 'shield_mastery'],
+      '双剣': ['blade_mastery', 'dual_mastery'],
+      '両手剣': ['blade_mastery'],
+      '手甲': ['martial_mastery', 'shield_mastery'],
+      '旋風槍': ['halberd_mastery'],
+      '抜刀剣': [], // 該当するマスタリスキルなし
+      '弓': ['shoot_mastery'],
+      '自動弓': ['shoot_mastery', 'shield_mastery'],
+      '杖': ['magic_mastery', 'shield_mastery'],
+      '魔導具': ['magic_mastery'],
+    }
+    return weaponTypeToMasterySkills[weaponType] || []
+  }
+  
+  // 武器種変更時のマスタリスキルリセット処理
+  const resetMasterySkillsOnWeaponChange = useCallback((newWeaponType: WeaponType) => {
+    const updatedSkills = storeBuffSkills.skills.map(skill => {
+      if (skill.category === 'mastery') {
+        return {
+          ...skill,
+          isEnabled: false,
+          parameters: getDefaultParametersForSkill(skill.id)
+        }
+      }
+      return skill
+    })
+    updateBuffSkills({ skills: updatedSkills })
+  }, [storeBuffSkills.skills, updateBuffSkills])
+  
+  // 前の武器種を追跡して変更検知
+  const prevWeaponType = useRef(mainWeaponType)
+  useEffect(() => {
+    if (prevWeaponType.current !== mainWeaponType) {
+      resetMasterySkillsOnWeaponChange(mainWeaponType)
+      prevWeaponType.current = mainWeaponType
+    }
+  }, [mainWeaponType, resetMasterySkillsOnWeaponChange])
+  
+  // スキル系統別の表示・管理（マスタリスキルフィルタリング付き）
   const skillsByCategory = useMemo(() => {
+    const visibleMasterySkills = getVisibleMasterySkills(mainWeaponType)
+    
     return storeBuffSkills.skills.reduce((acc, skill) => {
+      // マスタリスキルの場合は武器種に応じてフィルタリング
+      if (skill.category === 'mastery') {
+        if (visibleMasterySkills.length === 0) {
+          // 抜刀剣等：マスタリスキル系統全体を非表示
+          return acc
+        }
+        if (!visibleMasterySkills.includes(skill.id)) {
+          // 該当しないマスタリスキルは非表示
+          return acc
+        }
+      }
+      
       if (!acc[skill.category]) acc[skill.category] = []
       acc[skill.category].push(skill)
       return acc
     }, {} as Record<BuffSkillCategory, BuffSkill[]>)
-  }, [storeBuffSkills.skills])
+  }, [storeBuffSkills.skills, mainWeaponType])
   
   return (
     // UI実装...
