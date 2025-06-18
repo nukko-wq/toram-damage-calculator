@@ -316,12 +316,15 @@ export function getAvailableEquipmentsByCategory(
 ): Equipment[] {
 	return getAllAvailableEquipments().filter((equipment) => {
 		if (!equipment.category) return false
-		
+
 		// mainカテゴリを検索する時はmainWeaponカテゴリも含める
 		if (category === 'main') {
-			return equipment.category.includes('main') || equipment.category.includes('mainWeapon')
+			return (
+				equipment.category.includes('main') ||
+				equipment.category.includes('mainWeapon')
+			)
 		}
-		
+
 		return equipment.category.includes(category)
 	})
 }

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import BaseStatsForm from '@/components/BaseStatsForm'
 import WeaponForm from '@/components/WeaponForm'
 import CrystalForm from '@/components/CrystalForm'
 import EquipmentForm from '@/components/EquipmentForm'
+import FoodForm from '@/components/FoodForm'
 import NewEnemyForm from '@/components/NewEnemyForm'
 import StatsSummary from '@/components/StatsSummary'
 import SaveDataManager from '@/components/SaveDataManager'
@@ -50,10 +51,39 @@ export default function Home() {
 	}, [])
 
 	// データが変更されたとき（自動保存なし）
-	const handleDataChange = (newData: CalculatorData) => {
+	const handleDataChange = useCallback((newData: CalculatorData) => {
 		setData(newData)
 		setHasUnsavedChanges(true)
-	}
+	}, [])
+
+	// 個別データ変更ハンドラー
+	const handleBaseStatsChange = useCallback((baseStats: typeof data.baseStats) => {
+		handleDataChange({ ...data, baseStats })
+	}, [data, handleDataChange])
+
+	const handleMainWeaponChange = useCallback((mainWeapon: typeof data.mainWeapon) => {
+		handleDataChange({ ...data, mainWeapon })
+	}, [data, handleDataChange])
+
+	const handleSubWeaponChange = useCallback((subWeapon: typeof data.subWeapon) => {
+		handleDataChange({ ...data, subWeapon })
+	}, [data, handleDataChange])
+
+	const handleCrystalsChange = useCallback((crystals: typeof data.crystals) => {
+		handleDataChange({ ...data, crystals })
+	}, [data, handleDataChange])
+
+	const handleEquipmentChange = useCallback((equipment: typeof data.equipment) => {
+		handleDataChange({ ...data, equipment })
+	}, [data, handleDataChange])
+
+	const handleFoodChange = useCallback((food: typeof data.food) => {
+		handleDataChange({ ...data, food })
+	}, [data, handleDataChange])
+
+	const handleEnemyChange = useCallback((enemy: typeof data.enemy) => {
+		handleDataChange({ ...data, enemy })
+	}, [data, handleDataChange])
 
 	// セーブデータの読み込み
 	const handleDataLoad = (loadedData: CalculatorData) => {
@@ -179,38 +209,37 @@ export default function Home() {
 					</div>
 				)}
 
-				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_250px_auto_auto] gap-4">
+				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto] gap-4">
 					<BaseStatsForm
 						stats={data.baseStats}
-						onChange={(baseStats) => handleDataChange({ ...data, baseStats })}
+						onChange={handleBaseStatsChange}
 					/>
 
 					<WeaponForm
 						mainWeapon={data.mainWeapon}
 						subWeapon={data.subWeapon}
-						onMainWeaponChange={(mainWeapon) =>
-							handleDataChange({ ...data, mainWeapon })
-						}
-						onSubWeaponChange={(subWeapon) =>
-							handleDataChange({ ...data, subWeapon })
-						}
+						onMainWeaponChange={handleMainWeaponChange}
+						onSubWeaponChange={handleSubWeaponChange}
 					/>
 
 					<CrystalForm
 						crystals={data.crystals}
-						onChange={(crystals) => handleDataChange({ ...data, crystals })}
+						onChange={handleCrystalsChange}
 					/>
 
 					<EquipmentForm
 						equipment={data.equipment}
-						onEquipmentChange={(equipment) =>
-							handleDataChange({ ...data, equipment })
-						}
+						onEquipmentChange={handleEquipmentChange}
+					/>
+
+					<FoodForm
+						food={data.food}
+						onFoodChange={handleFoodChange}
 					/>
 
 					<NewEnemyForm
 						enemyData={data.enemy}
-						onChange={(enemy) => handleDataChange({ ...data, enemy })}
+						onChange={handleEnemyChange}
 					/>
 				</div>
 				<StatsSummary data={data} />

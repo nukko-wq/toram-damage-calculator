@@ -326,6 +326,7 @@ export interface CalculatorData {
 	subWeapon: SubWeapon
 	equipment: EquipmentSlots
 	crystals: CrystalSlots
+	food: FoodFormData // 料理データ
 	enemy: EnemyFormData // 新しい敵情報システム
 	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
 	legacyEnemy?: EnemyInfo
@@ -527,4 +528,43 @@ export interface UpdateNotification {
 	type: UpdateNotificationType
 	count: number
 	items: string[] // 追加されたアイテム名のリスト
+}
+
+// 料理システム
+
+// 料理タイプ
+export type FoodType =
+	| 'none' // なし
+	| 'okaka_onigiri' // おかかおにぎり(STR)
+	| 'sake_onigiri' // 鮭おにぎり(DEX)
+	| 'umeboshi_onigiri' // 梅干しおにぎり(INT)
+	| 'mentaiko_onigiri' // 明太子おにぎり(AGI)
+	| 'tuna_mayo_onigiri' // ツナマヨおにぎり(VIT)
+	| 'shoyu_ramen' // しょうゆラーメン(命中)
+	| 'zokusei_pasta' // 属性パスタ(属性有利共通)
+	| 'takoyaki' // たこ焼き(クリ率)
+	| 'yakisoba' // 焼きそば(攻撃MP回復)
+	| 'golden_fried_rice' // 黄金チャーハン(HP)
+	| 'ankake_fried_rice' // あんかけチャーハン(MP)
+	| 'margherita_pizza' // マルゲリータピザ(武器ATK+)
+	| 'diabola_pizza' // ディアボラピザ(ATK+)
+	| 'seafood_pizza' // シーフードピザ(MATK+)
+	| 'beef_stew' // ビーフシチュー(ヘイト+)
+	| 'white_stew' // ホワイトシチュー(ヘイト-)
+	| 'beef_burger' // ビーフバーガー(物理耐性)
+	| 'fish_burger' // フィッシュバーガー(魔法耐性)
+
+// 料理スロットデータ
+export interface FoodSlotData {
+	selectedFood: FoodType // 選択された料理タイプ
+	level: number // 料理レベル (1-10、「なし」の場合は0)
+}
+
+// 料理フォームデータ
+export interface FoodFormData {
+	slot1: FoodSlotData
+	slot2: FoodSlotData
+	slot3: FoodSlotData
+	slot4: FoodSlotData
+	slot5: FoodSlotData
 }

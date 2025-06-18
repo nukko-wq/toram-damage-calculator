@@ -5,6 +5,7 @@ import type {
 	Equipment,
 	EquipmentSlots,
 	CrystalSlots,
+	FoodFormData,
 	EnemyInfo,
 	EnemyFormData,
 	CalculatorData,
@@ -159,6 +160,15 @@ export const createInitialEnemyInfo = (): EnemyInfo => ({
 	freeValue: 0,
 })
 
+// 料理システムの初期値
+export const createInitialFoodFormData = (): FoodFormData => ({
+	slot1: { selectedFood: 'none', level: 0 },
+	slot2: { selectedFood: 'none', level: 0 },
+	slot3: { selectedFood: 'none', level: 0 },
+	slot4: { selectedFood: 'none', level: 0 },
+	slot5: { selectedFood: 'none', level: 0 },
+})
+
 // 新しい敵情報システムの初期値
 export const createInitialEnemyFormData = (): EnemyFormData => ({
 	selectedId: null,
@@ -175,6 +185,7 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	subWeapon: createInitialSubWeapon(),
 	equipment: createInitialEquipmentSlots(),
 	crystals: createInitialCrystalSlots(),
+	food: createInitialFoodFormData(), // 料理システム
 	enemy: createInitialEnemyFormData(), // 新しい敵情報システム
 	legacyEnemy: createInitialEnemyInfo(), // 後方互換性
 })

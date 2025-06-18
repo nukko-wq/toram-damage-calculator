@@ -153,10 +153,20 @@ export async function copyPresetEquipmentsToLocalStorage(): Promise<void> {
 				const localEquipment: LocalStorageEquipment = {
 					...equipment,
 					// JSONデータに不足している必須フィールドを追加
-					type: (category === 'mainWeapon' || category === 'subWeapon') ? 'weapon' : 
-						  (category === 'body') ? 'armor' : 
-						  (category === 'fashion1' || category === 'fashion2' || category === 'fashion3') ? 'fashion' : 'accessory',
-					category: category === 'mainWeapon' ? ['main', 'mainWeapon'] : [category as EquipmentCategory],
+					type:
+						category === 'mainWeapon' || category === 'subWeapon'
+							? 'weapon'
+							: category === 'body'
+								? 'armor'
+								: category === 'fashion1' ||
+										category === 'fashion2' ||
+										category === 'fashion3'
+									? 'fashion'
+									: 'accessory',
+					category:
+						category === 'mainWeapon'
+							? ['main', 'mainWeapon']
+							: [category as EquipmentCategory],
 					baseStats: equipment.weaponStats || equipment.baseStats || {},
 					isPreset: true,
 					isFavorite: false,
@@ -313,10 +323,20 @@ async function updatePresetEquipments(): Promise<UpdateNotification | null> {
 			for (const equipment of equipments as any[]) {
 				latestEquipments.push({
 					...equipment,
-					type: (category === 'mainWeapon' || category === 'subWeapon') ? 'weapon' : 
-						  (category === 'body') ? 'armor' : 
-						  (category === 'fashion1' || category === 'fashion2' || category === 'fashion3') ? 'fashion' : 'accessory',
-					category: category === 'mainWeapon' ? ['main', 'mainWeapon'] : [category as EquipmentCategory],
+					type:
+						category === 'mainWeapon' || category === 'subWeapon'
+							? 'weapon'
+							: category === 'body'
+								? 'armor'
+								: category === 'fashion1' ||
+										category === 'fashion2' ||
+										category === 'fashion3'
+									? 'fashion'
+									: 'accessory',
+					category:
+						category === 'mainWeapon'
+							? ['main', 'mainWeapon']
+							: [category as EquipmentCategory],
 					baseStats: equipment.weaponStats || equipment.baseStats || {},
 				} as PresetEquipment)
 			}

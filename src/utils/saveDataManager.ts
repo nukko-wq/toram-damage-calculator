@@ -10,7 +10,10 @@ import type {
 } from '@/types/calculator'
 import { StorageHelper, STORAGE_KEYS } from './storage'
 import { createInitialCalculatorData } from './initialData'
-import { checkAndUpdatePresetData, forceResetPresetData } from './presetVersionManager'
+import {
+	checkAndUpdatePresetData,
+	forceResetPresetData,
+} from './presetVersionManager'
 
 /**
  * 初期化・セットアップ（バージョン管理システム統合版）
