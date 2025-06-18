@@ -28,34 +28,34 @@
 					"requiredHIT": 0
 				},
 				"category": "mob"
-			},
-			{
-				"id": "skeleton_lv30",
-				"name": "スケルトン",
-				"level": 30,
-				"stats": {
-					"DEF": 120,
-					"MDEF": 80,
-					"physicalResistance": 10,
-					"magicalResistance": -10,
-					"resistCritical": 10,
-					"requiredHIT": 150
-				},
-				"category": "mob"
 			}
 		],
 		"fieldBoss": [
 			{
-				"id": "giant_bear_lv25",
-				"name": "ジャイアントベア",
-				"level": 25,
+				"id": "002",
+				"name": "リリカロラ",
+				"level": 278,
 				"stats": {
-					"DEF": 150,
-					"MDEF": 80,
-					"physicalResistance": 15,
-					"magicalResistance": 5,
-					"resistCritical": 20,
-					"requiredHIT": 180
+					"DEF": 1251,
+					"MDEF": 1251,
+					"physicalResistance": 11,
+					"magicalResistance": 11,
+					"resistCritical": 0,
+					"requiredHIT": 0
+				},
+				"category": "fieldBoss"
+			},
+			{
+				"id": "003",
+				"name": "カレリーフ",
+				"level": 305,
+				"stats": {
+					"DEF": 915,
+					"MDEF": 1526,
+					"physicalResistance": 14,
+					"magicalResistance": 14,
+					"resistCritical": 0,
+					"requiredHIT": 0
 				},
 				"category": "fieldBoss"
 			},
@@ -68,8 +68,8 @@
 					"MDEF": 120,
 					"physicalResistance": 10,
 					"magicalResistance": 20,
-					"resistCritical": 30,
-					"requiredHIT": 250
+					"resistCritical": 0,
+					"requiredHIT": 0
 				},
 				"category": "fieldBoss"
 			},
@@ -82,15 +82,15 @@
 					"MDEF": 200,
 					"physicalResistance": 25,
 					"magicalResistance": 15,
-					"resistCritical": 40,
-					"requiredHIT": 350
+					"resistCritical": 0,
+					"requiredHIT": 0
 				},
 				"category": "fieldBoss"
 			}
 		],
 		"boss": [
 			{
-				"id": "002",
+				"id": "004",
 				"name": "ピヌグールガ",
 				"level": 286,
 				"stats": {
@@ -104,7 +104,7 @@
 				"category": "boss"
 			},
 			{
-				"id": "003",
+				"id": "005",
 				"name": "バクザン",
 				"level": 292,
 				"stats": {
