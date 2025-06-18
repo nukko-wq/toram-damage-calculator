@@ -5,7 +5,7 @@ import BaseStatsForm from '@/components/BaseStatsForm'
 import WeaponForm from '@/components/WeaponForm'
 import CrystalForm from '@/components/CrystalForm'
 import EquipmentForm from '@/components/EquipmentForm'
-import EnemyForm from '@/components/EnemyForm'
+import NewEnemyForm from '@/components/NewEnemyForm'
 import StatsSummary from '@/components/StatsSummary'
 import SaveDataManager from '@/components/SaveDataManager'
 import type { CalculatorData } from '@/types/calculator'
@@ -153,8 +153,8 @@ export default function Home() {
 						}
 					/>
 
-					<EnemyForm
-						enemy={data.enemy}
+					<NewEnemyForm
+						enemyData={data.enemy}
 						onChange={(enemy) => handleDataChange({ ...data, enemy })}
 					/>
 				</div>

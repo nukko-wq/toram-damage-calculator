@@ -6,6 +6,7 @@ import type {
 	EquipmentSlots,
 	CrystalSlots,
 	EnemyInfo,
+	EnemyFormData,
 	CalculatorData,
 	EquipmentProperties,
 } from '@/types/calculator'
@@ -149,11 +150,22 @@ export const createInitialEnemyInfo = (): EnemyInfo => ({
 	freeValue: 0,
 })
 
+// 新しい敵情報システムの初期値
+export const createInitialEnemyFormData = (): EnemyFormData => ({
+	selectedId: null,
+	type: null,
+	manualOverrides: {
+		resistCritical: 0,
+		requiredHIT: 0,
+	}
+})
+
 export const createInitialCalculatorData = (): CalculatorData => ({
 	baseStats: createInitialBaseStats(),
 	mainWeapon: createInitialMainWeapon(),
 	subWeapon: createInitialSubWeapon(),
 	equipment: createInitialEquipmentSlots(),
 	crystals: createInitialCrystalSlots(),
-	enemy: createInitialEnemyInfo(),
+	enemy: createInitialEnemyFormData(),  // 新しい敵情報システム
+	legacyEnemy: createInitialEnemyInfo(), // 後方互換性
 })

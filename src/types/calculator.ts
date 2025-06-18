@@ -275,7 +275,42 @@ export interface CrystalSlots {
 	special2: string | null
 }
 
-// 敵の情報
+// 新しい敵情報システム
+
+// 敵のカテゴリ
+export type EnemyCategory = 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
+
+// 敵の基本ステータス
+export interface EnemyStats {
+	DEF: number                  // 物理防御力 (0-9999)
+	MDEF: number                 // 魔法防御力 (0-9999)
+	physicalResistance: number   // 物理耐性% (-100-100)
+	magicalResistance: number    // 魔法耐性% (-100-100)
+	resistCritical: number       // クリティカル耐性 (0-999) ※プリセットでは0、ユーザーが調整可能
+	requiredHIT: number          // 必要HIT (0-9999) ※プリセットでは0、ユーザーが調整可能
+}
+
+// プリセット敵情報
+export interface PresetEnemy {
+	id: string                   // 一意識別子
+	name: string                 // 敵名
+	level: number                // レベル (1-999)
+	stats: EnemyStats           // 基本ステータス
+	category: EnemyCategory     // 敵カテゴリ
+}
+
+// 敵フォームデータ（セーブデータ用）
+export interface EnemyFormData {
+	selectedId: string | null            // プリセット敵情報ID or カスタム敵情報ID
+	type: 'preset' | 'custom' | null    // データソースの識別
+	// 手動入力値（プリセット・カスタム選択後のresistCriticalとrequiredHIT調整用）
+	manualOverrides?: {
+		resistCritical?: number          // プリセット値(0)からの調整値
+		requiredHIT?: number             // プリセット値(0)からの調整値
+	}
+}
+
+// 従来のEnemyInfo（後方互換性のため残す、将来的に削除予定）
 export interface EnemyInfo {
 	DEF: number
 	MDEF: number
@@ -284,14 +319,16 @@ export interface EnemyInfo {
 	freeValue: number
 }
 
-// 計算機の全データ
+// 計算機の全データ（新しい敵情報システム対応）
 export interface CalculatorData {
 	baseStats: BaseStats
 	mainWeapon: MainWeapon
 	subWeapon: SubWeapon
 	equipment: EquipmentSlots
 	crystals: CrystalSlots
-	enemy: EnemyInfo
+	enemy: EnemyFormData  // 新しい敵情報システム
+	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
+	legacyEnemy?: EnemyInfo
 }
 
 // 計算結果
