@@ -413,13 +413,13 @@ export default function EquipmentForm({
 				{propertyGroups.map((group) => (
 					<div
 						key={group.title}
-						className="w-[230px] flex-shrink-0 border-gray-300 rounded-lg p-3"
+						className="w-[240px] flex-shrink-0 border-gray-300 rounded-lg p-3"
 					>
 						<h4 className="font-medium text-gray-700 mb-3 text-sm sticky top-0 bg-white">
 							{group.title}
 						</h4>
 						{/* 列見出し */}
-						<div className="grid grid-cols-[100px_58px_58px] gap-1 mb-2">
+						<div className="grid grid-cols-[100px_60px_60px] gap-1 mb-2">
 							<div className="text-gray-700 text-sm">プロパティ</div>
 							<div className="text-center text-gray-700 text-sm">%</div>
 							<div className="text-center text-gray-700 text-sm">+</div>
@@ -429,7 +429,7 @@ export default function EquipmentForm({
 							{group.propertyPairs.map((pair) => (
 								<div
 									key={pair.properties[0]}
-									className="grid grid-cols-[100px_1fr_1fr] gap-1 items-center"
+									className="grid grid-cols-[100px_60px_60px] gap-1 items-center"
 								>
 									<div
 										className="text-xs text-gray-700 font-medium truncate"
@@ -447,7 +447,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<input
 												id={`${item.name}-${pair.properties[1]}`}
@@ -456,7 +456,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[1], e.target.value)
 												}
-												className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 										</>
 									) : pair.type === 'percent' ? (
@@ -469,7 +469,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<div /> {/* 空白の固定値列 */}
 										</>

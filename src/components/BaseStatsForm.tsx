@@ -90,7 +90,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 				<input
 					id={`stat-${name}`}
 					type="number"
-					className={`px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full ${
+					className={`px-1 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full ${
 						errors[name] ? 'border-red-500' : 'border-gray-300'
 					}`}
 					min="1"
