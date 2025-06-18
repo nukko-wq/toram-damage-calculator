@@ -45,147 +45,116 @@ export default function EquipmentForm({
 		// 高頻度（よく使う）
 		{
 			title: '攻撃・威力',
-			percentProperties: [
-				'ATK_Rate',
-				'MATK_Rate',
-				'WeaponATK_Rate',
-				'PhysicalPenetration_Rate',
-				'MagicalPenetration_Rate',
-				'ElementAdvantage_Rate',
-				'UnsheatheAttack_Rate',
-				'ShortRangeDamage_Rate',
-				'LongRangeDamage_Rate',
-				'CriticalDamage_Rate',
-				'Critical_Rate',
-				'Stability_Rate',
-			] as const,
-			fixedProperties: [
-				'ATK',
-				'MATK',
-				'WeaponATK',
-				'UnsheatheAttack',
-				'CriticalDamage',
-				'Critical',
+			propertyPairs: [
+				['ATK_Rate', 'ATK'],
+				['MATK_Rate', 'MATK'],
+				['WeaponATK_Rate', 'WeaponATK'],
+				['PhysicalPenetration_Rate'],
+				['MagicalPenetration_Rate'],
+				['ElementAdvantage_Rate'],
+				['UnsheatheAttack_Rate', 'UnsheatheAttack'],
+				['ShortRangeDamage_Rate'],
+				['LongRangeDamage_Rate'],
+				['CriticalDamage_Rate', 'CriticalDamage'],
+				['Critical_Rate', 'Critical'],
+				['Stability_Rate'],
 			] as const,
 		},
 		{
 			title: 'ステータス',
-			percentProperties: [
-				'HP_Rate',
-				'MP_Rate',
-				'STR_Rate',
-				'INT_Rate',
-				'VIT_Rate',
-				'AGI_Rate',
-				'DEX_Rate',
-				'Accuracy_Rate',
-				'Dodge_Rate',
-				'AttackSpeed_Rate',
-				'CastingSpeed_Rate',
-				'MotionSpeed_Rate',
-			] as const,
-			fixedProperties: [
-				'HP',
-				'MP',
-				'STR',
-				'INT',
-				'VIT',
-				'AGI',
-				'DEX',
-				'Accuracy',
-				'Dodge',
-				'AttackSpeed',
-				'CastingSpeed',
+			propertyPairs: [
+				['HP_Rate', 'HP'],
+				['MP_Rate', 'MP'],
+				['STR_Rate', 'STR'],
+				['INT_Rate', 'INT'],
+				['VIT_Rate', 'VIT'],
+				['AGI_Rate', 'AGI'],
+				['DEX_Rate', 'DEX'],
+				['Accuracy_Rate', 'Accuracy'],
+				['Dodge_Rate', 'Dodge'],
+				['AttackSpeed_Rate', 'AttackSpeed'],
+				['CastingSpeed_Rate', 'CastingSpeed'],
+				['MotionSpeed_Rate'],
 			] as const,
 		},
 		{
 			title: '継戦補助',
-			percentProperties: [
-				'AttackMPRecovery_Rate',
-				'PhysicalResistance_Rate',
-				'MagicalResistance_Rate',
-				'AilmentResistance_Rate',
-				'Aggro_Rate',
-				'RevivalTime_Rate',
-				'NaturalHPRecovery_Rate',
-				'NaturalMPRecovery_Rate',
-			] as const,
-			fixedProperties: [
-				'AttackMPRecovery',
-				'NaturalHPRecovery',
-				'NaturalMPRecovery',
+			propertyPairs: [
+				['AttackMPRecovery_Rate', 'AttackMPRecovery'],
+				['PhysicalResistance_Rate'],
+				['MagicalResistance_Rate'],
+				['AilmentResistance_Rate'],
+				['Aggro_Rate'],
+				['RevivalTime_Rate'],
+				['NaturalHPRecovery_Rate', 'NaturalHPRecovery'],
+				['NaturalMPRecovery_Rate', 'NaturalMPRecovery'],
 			] as const,
 		},
 		{
 			title: '戦闘補助',
-			percentProperties: [
-				'ArmorBreak_Rate',
-				'Anticipate_Rate',
-				'GuardPower_Rate',
-				'GuardRecharge_Rate',
-				'AvoidRecharge_Rate',
-				'AbsoluteAccuracy_Rate',
-				'AbsoluteDodge_Rate',
+			propertyPairs: [
+				['ArmorBreak_Rate'],
+				['Anticipate_Rate'],
+				['GuardPower_Rate'],
+				['GuardRecharge_Rate'],
+				['AvoidRecharge_Rate'],
+				['AbsoluteAccuracy_Rate'],
+				['AbsoluteDodge_Rate'],
+				['ItemCooldown'],
 			] as const,
-			fixedProperties: ['ItemCooldown'] as const,
 		},
 		// 低頻度（使用頻度低）
 		{
 			title: 'ステータス連動攻撃力',
-			percentProperties: [
-				'ATK_STR_Rate',
-				'ATK_INT_Rate',
-				'ATK_VIT_Rate',
-				'ATK_AGI_Rate',
-				'ATK_DEX_Rate',
-				'MATK_STR_Rate',
-				'MATK_INT_Rate',
-				'MATK_VIT_Rate',
-				'MATK_AGI_Rate',
-				'MATK_DEX_Rate',
+			propertyPairs: [
+				['ATK_STR_Rate'],
+				['ATK_INT_Rate'],
+				['ATK_VIT_Rate'],
+				['ATK_AGI_Rate'],
+				['ATK_DEX_Rate'],
+				['MATK_STR_Rate'],
+				['MATK_INT_Rate'],
+				['MATK_VIT_Rate'],
+				['MATK_AGI_Rate'],
+				['MATK_DEX_Rate'],
 			] as const,
-			fixedProperties: [] as const,
 		},
 		{
 			title: '属性耐性',
-			percentProperties: [
-				'FireResistance_Rate',
-				'WaterResistance_Rate',
-				'WindResistance_Rate',
-				'EarthResistance_Rate',
-				'LightResistance_Rate',
-				'DarkResistance_Rate',
-				'NeutralResistance_Rate',
+			propertyPairs: [
+				['FireResistance_Rate'],
+				['WaterResistance_Rate'],
+				['WindResistance_Rate'],
+				['EarthResistance_Rate'],
+				['LightResistance_Rate'],
+				['DarkResistance_Rate'],
+				['NeutralResistance_Rate'],
 			] as const,
-			fixedProperties: [] as const,
 		},
 		{
 			title: 'ダメージ軽減',
-			percentProperties: [
-				'LinearReduction_Rate',
-				'RushReduction_Rate',
-				'BulletReduction_Rate',
-				'ProximityReduction_Rate',
-				'AreaReduction_Rate',
-				'FloorTrapReduction_Rate',
-				'MeteorReduction_Rate',
-				'BladeReduction_Rate',
-				'SuctionReduction_Rate',
-				'ExplosionReduction_Rate',
+			propertyPairs: [
+				['LinearReduction_Rate'],
+				['RushReduction_Rate'],
+				['BulletReduction_Rate'],
+				['ProximityReduction_Rate'],
+				['AreaReduction_Rate'],
+				['FloorTrapReduction_Rate'],
+				['MeteorReduction_Rate'],
+				['BladeReduction_Rate'],
+				['SuctionReduction_Rate'],
+				['ExplosionReduction_Rate'],
 			] as const,
-			fixedProperties: [] as const,
 		},
 		{
 			title: 'バリア/追撃',
-			percentProperties: [
-				'BarrierCooldown_Rate',
-				'PhysicalFollowup_Rate',
-				'MagicalFollowup_Rate',
-			] as const,
-			fixedProperties: [
-				'PhysicalBarrier',
-				'MagicalBarrier',
-				'FractionalBarrier',
+			propertyPairs: [
+				['PhysicalBarrier'],
+				['MagicalBarrier'],
+				['FractionalBarrier'],
+				['BarrierCooldown_Rate'],
+				['PhysicalFollowup_Rate'],
+				['MagicalFollowup_Rate'],
 			] as const,
 		},
 	] as const
@@ -428,51 +397,70 @@ export default function EquipmentForm({
 						<h4 className="font-medium text-gray-700 mb-3 text-sm sticky top-0 bg-white">
 							{group.title}
 						</h4>
-						<div className="grid grid-cols-2 gap-2">
-							{/* 左カラム: %系プロパティ */}
-							<div className="space-y-2">
-								{group.percentProperties.map((property) => (
-									<div key={property} className="flex flex-col">
-										<label
-											htmlFor={`${item.name}-${property}`}
-											className="text-xs text-gray-600 mb-1"
-										>
-											{getPropertyLabel(property)}
-										</label>
-										<input
-											id={`${item.name}-${property}`}
-											type="number"
-											value={item.properties[property] || 0}
-											onChange={(e) =>
-												onPropertyChange(property, e.target.value)
-											}
-											className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-										/>
-									</div>
-								))}
-							</div>
-							{/* 右カラム: 固定値系プロパティ */}
-							<div className="space-y-2">
-								{group.fixedProperties.map((property) => (
-									<div key={property} className="flex flex-col">
-										<label
-											htmlFor={`${item.name}-${property}`}
-											className="text-xs text-gray-600 mb-1"
-										>
-											{getPropertyLabel(property)}
-										</label>
-										<input
-											id={`${item.name}-${property}`}
-											type="number"
-											value={item.properties[property] || 0}
-											onChange={(e) =>
-												onPropertyChange(property, e.target.value)
-											}
-											className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-										/>
-									</div>
-								))}
-							</div>
+						{/* 関連ペア配置 */}
+						<div className="space-y-2">
+							{group.propertyPairs.map((pair) => (
+								<div key={pair[0]}>
+									{pair.length === 2 ? (
+										// ペア項目: %系と固定値系
+										<div className="grid grid-cols-2 gap-1">
+											<div className="flex flex-col">
+												<label
+													htmlFor={`${item.name}-${pair[0]}`}
+													className="text-xs text-gray-600 mb-1"
+												>
+													{getPropertyLabel(pair[0])}
+												</label>
+												<input
+													id={`${item.name}-${pair[0]}`}
+													type="number"
+													value={item.properties[pair[0]] || 0}
+													onChange={(e) =>
+														onPropertyChange(pair[0], e.target.value)
+													}
+													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												/>
+											</div>
+											<div className="flex flex-col">
+												<label
+													htmlFor={`${item.name}-${pair[1]}`}
+													className="text-xs text-gray-600 mb-1"
+												>
+													{getPropertyLabel(pair[1])}
+												</label>
+												<input
+													id={`${item.name}-${pair[1]}`}
+													type="number"
+													value={item.properties[pair[1]] || 0}
+													onChange={(e) =>
+														onPropertyChange(pair[1], e.target.value)
+													}
+													className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												/>
+											</div>
+										</div>
+									) : (
+										// 単独項目: %系のみ
+										<div className="flex flex-col">
+											<label
+												htmlFor={`${item.name}-${pair[0]}`}
+												className="text-xs text-gray-600 mb-1"
+											>
+												{getPropertyLabel(pair[0])}
+											</label>
+											<input
+												id={`${item.name}-${pair[0]}`}
+												type="number"
+												value={item.properties[pair[0]] || 0}
+												onChange={(e) =>
+													onPropertyChange(pair[0], e.target.value)
+												}
+												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
+										</div>
+									)}
+								</div>
+							))}
 						</div>
 					</div>
 				))}
