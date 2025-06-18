@@ -85,6 +85,12 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		}
 	}
 
+	// レベル選択オプション生成
+	const levelOptions = Array.from({ length: 10 }, (_, i) => ({
+		value: i + 1,
+		label: `${i + 1}`,
+	}))
+
 	// 料理スロットコンポーネント
 	const FoodSlot = ({
 		slotName,
@@ -94,7 +100,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		slotLabel: string
 	}) => {
 		const currentFood = watchedValues[slotName].selectedFood
-		const showLevelInput = currentFood !== 'none'
+		const showLevelSelect = currentFood !== 'none'
 
 		return (
 			<div className="flex flex-col gap-2">
@@ -108,6 +114,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 								handleFoodChange(slotName, e.target.value as FoodType)
 							}
 							className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+							aria-label={`${slotLabel}の料理選択`}
 						>
 							{FOOD_OPTIONS.map((option) => (
 								<option key={option.value} value={option.value}>
@@ -122,29 +129,25 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 						)}
 					</div>
 
-					{/* レベル入力 */}
-					{showLevelInput ? (
-						<div className="w-20">
-							<div className="block text-xs text-gray-600">レベル</div>
-							<input
-								type="number"
-								min="1"
-								max="10"
+					{/* レベル選択 */}
+					{showLevelSelect && (
+						<div className="w-16">
+							<select
 								{...register(`${slotName}.level`, { valueAsNumber: true })}
-								className="w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-							/>
+								className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+								aria-label={`${slotLabel}のレベル選択`}
+							>
+								{levelOptions.map((option) => (
+									<option key={option.value} value={option.value}>
+										{option.label}
+									</option>
+								))}
+							</select>
 							{errors[slotName]?.level && (
 								<p className="mt-1 text-xs text-red-600">
 									{errors[slotName]?.level?.message}
 								</p>
 							)}
-						</div>
-					) : (
-						<div className="w-20">
-							<div className="block text-xs text-gray-400">レベル</div>
-							<div className="rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-center text-sm text-gray-400">
-								-
-							</div>
 						</div>
 					)}
 				</div>
@@ -156,11 +159,11 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		<div className="rounded-lg border border-gray-200 bg-white p-6">
 			<h3 className="mb-4 text-lg font-semibold text-gray-900">料理設定</h3>
 			<div className="space-y-4">
-				<FoodSlot slotName="slot1" slotLabel="スロット1" />
-				<FoodSlot slotName="slot2" slotLabel="スロット2" />
-				<FoodSlot slotName="slot3" slotLabel="スロット3" />
-				<FoodSlot slotName="slot4" slotLabel="スロット4" />
-				<FoodSlot slotName="slot5" slotLabel="スロット5" />
+				<FoodSlot slotName="slot1" slotLabel="1つ目" />
+				<FoodSlot slotName="slot2" slotLabel="2つ目" />
+				<FoodSlot slotName="slot3" slotLabel="3つ目" />
+				<FoodSlot slotName="slot4" slotLabel="4つ目" />
+				<FoodSlot slotName="slot5" slotLabel="5つ目" />
 			</div>
 		</div>
 	)
