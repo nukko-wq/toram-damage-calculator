@@ -163,197 +163,183 @@ export default function WeaponForm({
 	}, [watchSub, onSubWeaponChange])
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6 lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
-			<h2 className="text-xl font-bold text-gray-800 mb-4">武器情報</h2>
+		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
+			<h2 className="text-lg font-bold text-gray-800 mb-3">武器情報</h2>
 
-			{/* メイン武器 */}
-			<div className="mb-6">
-				<h3 className="text-lg font-semibold text-gray-700 mb-3">メイン武器</h3>
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-					<div className="flex flex-col">
-						<label className="text-sm font-medium text-gray-700 mb-1">
-							武器種
-						</label>
-						<select
-							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							{...registerMain('weaponType')}
-						>
-							{weaponTypes.map((type) => (
-								<option key={type} value={type}>
-									{type}
-								</option>
-							))}
-						</select>
-						{errorsMain.weaponType && (
-							<p className="text-red-500 text-xs mt-1">
-								{errorsMain.weaponType.message}
-							</p>
-						)}
-					</div>
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+				{/* メイン武器 */}
+				<div className="space-y-3">
+					<h3 className="text-base font-semibold text-gray-700 mb-2">メイン武器</h3>
+					<div className="space-y-2">
+						<div className="flex items-center gap-2">
+							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+								武器種:
+							</label>
+							<select
+								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								{...registerMain('weaponType')}
+							>
+								{weaponTypes.map((type) => (
+									<option key={type} value={type}>
+										{type}
+									</option>
+								))}
+							</select>
+						</div>
 
-					<div className="flex flex-col">
-						<label className="text-sm font-medium text-gray-700 mb-1">
-							武器ATK
-						</label>
-						<input
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errorsMain.ATK ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="0"
-							max="1500"
-							{...registerMain('ATK', {
-								valueAsNumber: true,
-								onBlur: () => handleMainBlur('ATK'),
-							})}
-						/>
-						{errorsMain.ATK && (
-							<p className="text-red-500 text-xs mt-1">
-								{errorsMain.ATK.message}
-							</p>
-						)}
-					</div>
+						<div className="flex items-center gap-2">
+							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+								武器ATK:
+							</label>
+							<input
+								type="number"
+								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								min="0"
+								max="1500"
+								{...registerMain('ATK', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 0
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 0 : numValue
+									},
+									onBlur: () => handleMainBlur('ATK'),
+								})}
+							/>
+						</div>
 
-					<div className="flex flex-col">
-						<label className="text-sm font-medium text-gray-700 mb-1">
-							安定率
-						</label>
-						<input
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errorsMain.stability ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="0"
-							max="100"
-							{...registerMain('stability', {
-								valueAsNumber: true,
-								onBlur: () => handleMainBlur('stability'),
-							})}
-						/>
-						{errorsMain.stability && (
-							<p className="text-red-500 text-xs mt-1">
-								{errorsMain.stability.message}
-							</p>
-						)}
-					</div>
+						<div className="flex items-center gap-2">
+							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+								安定率:
+							</label>
+							<input
+								type="number"
+								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								min="0"
+								max="100"
+								{...registerMain('stability', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 0
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 0 : numValue
+									},
+									onBlur: () => handleMainBlur('stability'),
+								})}
+							/>
+						</div>
 
-					<div className="flex flex-col">
-						<label className="text-sm font-medium text-gray-700 mb-1">
-							精錬値
-						</label>
-						<input
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errorsMain.refinement ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="0"
-							max="15"
-							{...registerMain('refinement', {
-								valueAsNumber: true,
-								onBlur: () => handleMainBlur('refinement'),
-							})}
-						/>
-						{errorsMain.refinement && (
-							<p className="text-red-500 text-xs mt-1">
-								{errorsMain.refinement.message}
-							</p>
-						)}
+						<div className="flex items-center gap-2">
+							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+								精錬値:
+							</label>
+							<input
+								type="number"
+								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								min="0"
+								max="15"
+								{...registerMain('refinement', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 0
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 0 : numValue
+									},
+									onBlur: () => handleMainBlur('refinement'),
+								})}
+							/>
+						</div>
 					</div>
 				</div>
-			</div>
 
-			{/* サブ武器 */}
-			<div>
-				<h3 className="text-lg font-semibold text-gray-700 mb-3">サブ武器</h3>
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-					<div className="flex flex-col">
-						<label className="text-sm font-medium text-gray-700 mb-1">
-							武器種
-						</label>
-						<select
-							className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-							{...registerSub('weaponType')}
-						>
-							{subWeaponTypes.map((type) => (
-								<option key={type} value={type}>
-									{type}
-								</option>
-							))}
-						</select>
-						{errorsSub.weaponType && (
-							<p className="text-red-500 text-xs mt-1">
-								{errorsSub.weaponType.message}
-							</p>
-						)}
-					</div>
+				{/* サブ武器 */}
+				<div className="space-y-3">
+					<h3 className="text-base font-semibold text-gray-700 mb-2">サブ武器</h3>
+					<div className="space-y-2">
+						<div className="flex items-center gap-2">
+							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+								武器種:
+							</label>
+							<select
+								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								{...registerSub('weaponType')}
+							>
+								{subWeaponTypes.map((type) => (
+									<option key={type} value={type}>
+										{type}
+									</option>
+								))}
+							</select>
+						</div>
 
-					<div className="flex flex-col">
-						<label className="text-sm font-medium text-gray-700 mb-1">
-							武器ATK
-						</label>
-						<input
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errorsSub.ATK ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="0"
-							max="1500"
-							{...registerSub('ATK', {
-								valueAsNumber: true,
-								onBlur: () => handleSubBlur('ATK'),
-							})}
-						/>
-						{errorsSub.ATK && (
-							<p className="text-red-500 text-xs mt-1">
-								{errorsSub.ATK.message}
-							</p>
-						)}
-					</div>
+						<div className="flex items-center gap-2">
+							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+								武器ATK:
+							</label>
+							<input
+								type="number"
+								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								min="0"
+								max="1500"
+								{...registerSub('ATK', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 0
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 0 : numValue
+									},
+									onBlur: () => handleSubBlur('ATK'),
+								})}
+							/>
+						</div>
 
-					<div className="flex flex-col">
-						<label className="text-sm font-medium text-gray-700 mb-1">
-							安定率
-						</label>
-						<input
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errorsSub.stability ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="0"
-							max="100"
-							{...registerSub('stability', {
-								valueAsNumber: true,
-								onBlur: () => handleSubBlur('stability'),
-							})}
-						/>
-						{errorsSub.stability && (
-							<p className="text-red-500 text-xs mt-1">
-								{errorsSub.stability.message}
-							</p>
-						)}
-					</div>
+						<div className="flex items-center gap-2">
+							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+								安定率:
+							</label>
+							<input
+								type="number"
+								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								min="0"
+								max="100"
+								{...registerSub('stability', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 0
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 0 : numValue
+									},
+									onBlur: () => handleSubBlur('stability'),
+								})}
+							/>
+						</div>
 
-					<div className="flex flex-col">
-						<label className="text-sm font-medium text-gray-700 mb-1">
-							精錬値
-						</label>
-						<input
-							type="number"
-							className={`px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-								errorsSub.refinement ? 'border-red-500' : 'border-gray-300'
-							}`}
-							min="0"
-							max="15"
-							{...registerSub('refinement', {
-								valueAsNumber: true,
-								onBlur: () => handleSubBlur('refinement'),
-							})}
-						/>
-						{errorsSub.refinement && (
-							<p className="text-red-500 text-xs mt-1">
-								{errorsSub.refinement.message}
-							</p>
-						)}
+						<div className="flex items-center gap-2">
+							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+								精錬値:
+							</label>
+							<input
+								type="number"
+								className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								min="0"
+								max="15"
+								{...registerSub('refinement', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 0
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 0 : numValue
+									},
+									onBlur: () => handleSubBlur('refinement'),
+								})}
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
