@@ -78,14 +78,18 @@
 - **コンパクト設計:** 各カテゴリを縦長のカラムとして配置
 
 #### カテゴリ内レイアウト
+- **ラベル統一配置:** 各プロパティのラベルを行の左端に配置し、Inputフィールドを右側に配置
+  - **ペア項目例:** 「ATK」ラベル + ATK%入力 + ATK入力（ATK%、ATKの個別ラベルなし）
+  - **単独項目例:** 「物理貫通」ラベル + 物理貫通%入力（物理貫通%の個別ラベルなし）
+- **カテゴリヘッダー:** 各カテゴリの最上部に「%」「+」の列見出しを表示
+  - **3列レイアウト:** [プロパティ名] [%系] [固定値系] の構成
+  - **見出し表示:** 1行目のみに「%」「+」を表示、以降の行は入力フィールドのみ
 - **関連ペア配置:** 各カテゴリ内でプロパティを関連ペア（%系+固定値）でグループ化
-- **ペア配置:** ATK% + ATK、MATK% + MATKなど関連する項目を横並び
 - **単独項目配置:** 
-  - **%系単独項目（物理貫通%など）:** 左カラムに配置、右カラムは空白
-  - **固定値単独項目（道具速度など）:** 右カラムに配置、左カラムは空白
-  - **横幅統一:** ペア項目と同じ2カラムグリッド内で配置し、横幅を統一
+  - **%系単独項目（物理貫通%など）:** %系列に配置、固定値列は空白
+  - **固定値単独項目（道具速度など）:** 固定値列に配置、%系列は空白
 - **論理的グループ化:** 機能的に関連するプロパティペアを隣接配置
-- **一貫性:** 全ての行で2カラムグリッドを維持し、視覚的な整合性を保つ
+- **一貫性:** 全ての行で3列グリッドを維持し、視覚的な整合性を保つ
 
 #### カテゴリ表示
 - **カテゴリヘッダー:** 各カラムの上部にカテゴリ名を表示
@@ -110,27 +114,36 @@
         <h4 className="font-medium text-gray-700 mb-3 text-sm sticky top-0 bg-white">
           {group.title}
         </h4>
-        {/* 関連ペア配置 */}
-        <div className="space-y-2">
-          {group.propertyPairs.map((pair, index) => (
-            <div key={index} className="grid grid-cols-2 gap-1">
-              {pair.length === 2 ? (
+        {/* 列見出し */}
+        <div className="grid grid-cols-3 gap-1 mb-2 text-xs text-gray-500 font-medium">
+          <div>プロパティ</div>
+          <div className="text-center">%</div>
+          <div className="text-center">+</div>
+        </div>
+        {/* プロパティ行 */}
+        <div className="space-y-1">
+          {group.propertyPairs.map((pair) => (
+            <div key={pair.properties[0]} className="grid grid-cols-3 gap-1 items-center">
+              <div className="text-xs text-gray-700 font-medium">
+                {getBasePropertyLabel(pair.properties[0])} {/* プロパティ名のみ */}
+              </div>
+              {pair.type === 'pair' ? (
                 // ペア項目: %系と固定値系
                 <>
-                  <PropertyInput property={pair[0]} /> {/* %系 */}
-                  <PropertyInput property={pair[1]} /> {/* 固定値 */}
+                  <PropertyInput property={pair.properties[0]} hideLabel /> {/* %系 */}
+                  <PropertyInput property={pair.properties[1]} hideLabel /> {/* 固定値 */}
                 </>
               ) : pair.type === 'percent' ? (
-                // %系単独項目: 左カラムに配置
+                // %系単独項目: %列に配置
                 <>
-                  <PropertyInput property={pair[0]} />
-                  <div /> {/* 空白の右カラム */}
+                  <PropertyInput property={pair.properties[0]} hideLabel />
+                  <div /> {/* 空白の固定値列 */}
                 </>
               ) : (
-                // 固定値単独項目: 右カラムに配置
+                // 固定値単独項目: 固定値列に配置
                 <>
-                  <div /> {/* 空白の左カラム */}
-                  <PropertyInput property={pair[0]} />
+                  <div /> {/* 空白の%列 */}
+                  <PropertyInput property={pair.properties[0]} hideLabel />
                 </>
               )}
             </div>
@@ -148,39 +161,67 @@ const propertyGroups = [
   {
     title: '攻撃・威力',
     propertyPairs: [
-      ['ATK_Rate', 'ATK'],                    // ATK%とATKのペア
-      ['MATK_Rate', 'MATK'],                  // MATK%とMATKのペア
-      ['WeaponATK_Rate', 'WeaponATK'],        // 武器ATK%と武器ATKのペア
-      ['PhysicalPenetration_Rate'],           // 物理貫通%（単独）
-      ['MagicalPenetration_Rate'],            // 魔法貫通%（単独）
-      ['ElementAdvantage_Rate'],              // 属性有利%（単独）
-      ['UnsheatheAttack_Rate', 'UnsheatheAttack'], // 抜刀威力%と抜刀威力のペア
-      ['ShortRangeDamage_Rate'],              // 近距離威力%（単独）
-      ['LongRangeDamage_Rate'],               // 遠距離威力%（単独）
-      ['CriticalDamage_Rate', 'CriticalDamage'], // クリティカルダメージ%とクリティカルダメージのペア
-      ['Critical_Rate', 'Critical'],          // クリティカル率%とクリティカル率のペア
-      ['Stability_Rate'],                     // 安定率%（単独）
+      { properties: ['ATK_Rate', 'ATK'], type: 'pair' },              // ATK%とATKのペア
+      { properties: ['MATK_Rate', 'MATK'], type: 'pair' },            // MATK%とMATKのペア
+      { properties: ['WeaponATK_Rate', 'WeaponATK'], type: 'pair' },  // 武器ATK%と武器ATKのペア
+      { properties: ['PhysicalPenetration_Rate'], type: 'percent' },  // 物理貫通%（単独）
+      { properties: ['MagicalPenetration_Rate'], type: 'percent' },   // 魔法貫通%（単独）
+      { properties: ['ElementAdvantage_Rate'], type: 'percent' },     // 属性有利%（単独）
+      { properties: ['UnsheatheAttack_Rate', 'UnsheatheAttack'], type: 'pair' }, // 抜刀威力%と抜刀威力のペア
+      { properties: ['ShortRangeDamage_Rate'], type: 'percent' },     // 近距離威力%（単独）
+      { properties: ['LongRangeDamage_Rate'], type: 'percent' },      // 遠距離威力%（単独）
+      { properties: ['CriticalDamage_Rate', 'CriticalDamage'], type: 'pair' }, // クリティカルダメージ%とクリティカルダメージのペア
+      { properties: ['Critical_Rate', 'Critical'], type: 'pair' },    // クリティカル率%とクリティカル率のペア
+      { properties: ['Stability_Rate'], type: 'percent' },            // 安定率%（単独）
     ] as const,
   },
   {
     title: 'ステータス',
     propertyPairs: [
-      ['HP_Rate', 'HP'],                      // HP%とHPのペア
-      ['MP_Rate', 'MP'],                      // MP%とMPのペア
-      ['STR_Rate', 'STR'],                    // STR%とSTRのペア
-      ['INT_Rate', 'INT'],                    // INT%とINTのペア
-      ['VIT_Rate', 'VIT'],                    // VIT%とVITのペア
-      ['AGI_Rate', 'AGI'],                    // AGI%とAGIのペア
-      ['DEX_Rate', 'DEX'],                    // DEX%とDEXのペア
-      ['Accuracy_Rate', 'Accuracy'],          // 命中%と命中のペア
-      ['Dodge_Rate', 'Dodge'],                // 回避%と回避のペア
-      ['AttackSpeed_Rate', 'AttackSpeed'],    // 攻撃速度%と攻撃速度のペア
-      ['CastingSpeed_Rate', 'CastingSpeed'],  // 詠唱速度%と詠唱速度のペア
-      ['MotionSpeed_Rate'],                   // 行動速度%（単独）
+      { properties: ['HP_Rate', 'HP'], type: 'pair' },               // HP%とHPのペア
+      { properties: ['MP_Rate', 'MP'], type: 'pair' },               // MP%とMPのペア
+      { properties: ['STR_Rate', 'STR'], type: 'pair' },             // STR%とSTRのペア
+      { properties: ['INT_Rate', 'INT'], type: 'pair' },             // INT%とINTのペア
+      { properties: ['VIT_Rate', 'VIT'], type: 'pair' },             // VIT%とVITのペア
+      { properties: ['AGI_Rate', 'AGI'], type: 'pair' },             // AGI%とAGIのペア
+      { properties: ['DEX_Rate', 'DEX'], type: 'pair' },             // DEX%とDEXのペア
+      { properties: ['Accuracy_Rate', 'Accuracy'], type: 'pair' },   // 命中%と命中のペア
+      { properties: ['Dodge_Rate', 'Dodge'], type: 'pair' },         // 回避%と回避のペア
+      { properties: ['AttackSpeed_Rate', 'AttackSpeed'], type: 'pair' }, // 攻撃速度%と攻撃速度のペア
+      { properties: ['CastingSpeed_Rate', 'CastingSpeed'], type: 'pair' }, // 詠唱速度%と詠唱速度のペア
+      { properties: ['MotionSpeed_Rate'], type: 'percent' },         // 行動速度%（単独）
     ] as const,
   },
   // ... 計8カテゴリ
 ] as const
+
+// プロパティのベース名を取得する関数
+const getBasePropertyLabel = (property: keyof EquipmentProperties): string => {
+  const baseLabels: Record<string, string> = {
+    'ATK_Rate': 'ATK',      'ATK': 'ATK',
+    'MATK_Rate': 'MATK',    'MATK': 'MATK',
+    'WeaponATK_Rate': '武器ATK', 'WeaponATK': '武器ATK',
+    'PhysicalPenetration_Rate': '物理貫通',
+    'MagicalPenetration_Rate': '魔法貫通',
+    'ElementAdvantage_Rate': '属性有利',
+    'UnsheatheAttack_Rate': '抜刀威力', 'UnsheatheAttack': '抜刀威力',
+    'ShortRangeDamage_Rate': '近距離威力',
+    'LongRangeDamage_Rate': '遠距離威力',
+    'CriticalDamage_Rate': 'クリティカルダメージ', 'CriticalDamage': 'クリティカルダメージ',
+    'Critical_Rate': 'クリティカル率', 'Critical': 'クリティカル率',
+    'Stability_Rate': '安定率',
+    'ItemCooldown': '道具速度',
+    // ... その他のプロパティ
+  }
+  
+  // プロパティ名から_Rate, _などの接尾辞を除去してベース名を返す
+  for (const [key, label] of Object.entries(baseLabels)) {
+    if (property === key) return label
+  }
+  
+  // フォールバック: _Rateを除去してベース名を生成
+  return property.replace(/_Rate$/, '').replace(/_/g, '')
+}
 ```
 
 #### レスポンシブ対応
@@ -212,9 +253,11 @@ const propertyGroups = [
 - **効率的編集:** タブ切り替えなしで複数カテゴリの値を連続編集可能
 - **直感的配置:** 左から右へ使用頻度順に配置
 - **スムーズなスクロール:** 横スクロールで自然なナビゲーション
-- **関連ペア配置:** ATK%とATKなど関連項目が隣接配置され、関連性が明確
-- **入力効率:** 同じステータスの%と固定値を連続して設定可能
-- **柔軟なレイアウト:** ペア項目は横並び、単独項目は1列で最適配置
+- **統一ラベル:** プロパティ名を行の左端に統一配置し、視覚的整理を実現
+- **列見出し:** 各カテゴリ上部の「%」「+」見出しで入力内容が一目で分かる
+- **入力効率:** 同じプロパティの%と固定値を横並びで連続設定可能
+- **ラベル簡略化:** 「ATK%」「ATK」→「ATK」として冗長性を排除
+- **3列レイアウト:** [プロパティ名][%系][固定値系]の論理的な列構成
 - **視覚的整理:** 関連性に基づく論理的なグループ化でズレを防止
 
 ## 今後の拡張可能性
