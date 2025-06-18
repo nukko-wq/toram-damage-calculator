@@ -50,45 +50,53 @@ export default function Home() {
 		initializeApp()
 	}, [])
 
-	// データが変更されたとき（自動保存なし）
-	const handleDataChange = useCallback((newData: CalculatorData) => {
-		setData(newData)
-		setHasUnsavedChanges(true)
-	}, [])
 
 	// 個別データ変更ハンドラー
 	const handleBaseStatsChange = useCallback((baseStats: typeof data.baseStats) => {
-		handleDataChange({ ...data, baseStats })
-	}, [data, handleDataChange])
+		setData(prev => ({ ...prev, baseStats }))
+		setHasUnsavedChanges(true)
+	}, [])
 
 	const handleMainWeaponChange = useCallback((mainWeapon: typeof data.mainWeapon) => {
-		handleDataChange({ ...data, mainWeapon })
-	}, [data, handleDataChange])
+		setData(prev => ({ ...prev, mainWeapon }))
+		setHasUnsavedChanges(true)
+	}, [])
 
 	const handleSubWeaponChange = useCallback((subWeapon: typeof data.subWeapon) => {
-		handleDataChange({ ...data, subWeapon })
-	}, [data, handleDataChange])
+		setData(prev => ({ ...prev, subWeapon }))
+		setHasUnsavedChanges(true)
+	}, [])
 
 	const handleCrystalsChange = useCallback((crystals: typeof data.crystals) => {
-		handleDataChange({ ...data, crystals })
-	}, [data, handleDataChange])
+		setData(prev => ({ ...prev, crystals }))
+		setHasUnsavedChanges(true)
+	}, [])
 
 	const handleEquipmentChange = useCallback((equipment: typeof data.equipment) => {
-		handleDataChange({ ...data, equipment })
-	}, [data, handleDataChange])
+		setData(prev => ({ ...prev, equipment }))
+		setHasUnsavedChanges(true)
+	}, [])
 
 	const handleFoodChange = useCallback((food: typeof data.food) => {
-		handleDataChange({ ...data, food })
-	}, [data, handleDataChange])
+		setData(prev => ({ ...prev, food }))
+		setHasUnsavedChanges(true)
+	}, [])
 
 	const handleEnemyChange = useCallback((enemy: typeof data.enemy) => {
-		handleDataChange({ ...data, enemy })
-	}, [data, handleDataChange])
+		setData(prev => ({ ...prev, enemy }))
+		setHasUnsavedChanges(true)
+	}, [])
 
 	// セーブデータの読み込み
 	const handleDataLoad = (loadedData: CalculatorData) => {
+		// データ読み込み中は変更検知を無効化
+		setHasUnsavedChanges(false)
 		setData(loadedData)
-		setHasUnsavedChanges(false) // 読み込み時は未保存状態をリセット
+		
+		// フォームの初期化完了を待つ（より長い遅延）
+		setTimeout(() => {
+			setHasUnsavedChanges(false)
+		}, 200)
 	}
 
 	// 現在のデータを手動保存
@@ -205,6 +213,8 @@ export default function Home() {
 							onDataLoad={handleDataLoad}
 							onDataSave={handleManualSave}
 							hasUnsavedChanges={hasUnsavedChanges}
+							isFirstLoad={false} // セーブデータ管理開閉時の初期化を防ぐ
+							key="save-manager" // 一意キーでコンポーネントの再作成を防ぐ
 						/>
 					</div>
 				)}

@@ -14,7 +14,7 @@ import type {
 	WeaponType,
 	SubWeaponType,
 } from '@/types/calculator'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface WeaponFormProps {
 	mainWeapon: MainWeapon
@@ -44,6 +44,9 @@ export default function WeaponForm({
 	]
 
 	const subWeaponTypes: SubWeaponType[] = ['ナイフ', '矢', 'なし']
+
+	// 初期化状態管理
+	const [isInitialized, setIsInitialized] = useState(false)
 
 	// メイン武器フォーム
 	const {
@@ -115,52 +118,42 @@ export default function WeaponForm({
 		}
 	}
 
-	// 外部からの変更を反映
+	// 外部からの変更を反映（初期化状態管理付き）
 	useEffect(() => {
-		const currentValues = watchMain()
-		const hasChanges = Object.keys(mainWeapon).some(
-			(key) =>
-				currentValues[key as keyof MainWeaponFormData] !==
-				mainWeapon[key as keyof MainWeapon],
-		)
-
-		if (hasChanges && Object.keys(errorsMain).length === 0) {
-			resetMain(mainWeapon)
-		}
-	}, [mainWeapon, resetMain, watchMain, errorsMain])
-
-	useEffect(() => {
-		const currentValues = watchSub()
-		const hasChanges = Object.keys(subWeapon).some(
-			(key) =>
-				currentValues[key as keyof SubWeaponFormData] !==
-				subWeapon[key as keyof SubWeapon],
-		)
-
-		if (hasChanges && Object.keys(errorsSub).length === 0) {
-			resetSub(subWeapon)
-		}
-	}, [subWeapon, resetSub, watchSub, errorsSub])
+		setIsInitialized(false)
+		resetMain(mainWeapon)
+		resetSub(subWeapon)
+		const timer = setTimeout(() => setIsInitialized(true), 0)
+		return () => clearTimeout(timer)
+	}, [mainWeapon, subWeapon, resetMain, resetSub])
 
 	// フォーム値変更を監視して親に通知（メイン武器）
 	useEffect(() => {
-		const subscription = watchMain((value) => {
+		const subscription = watchMain((value, { name, type }) => {
+			// 初期化中やプログラム的な変更は無視
+			if (!isInitialized || !name || !value || type !== 'change') {
+				return
+			}
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
 				onMainWeaponChange(value as MainWeapon)
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watchMain, onMainWeaponChange])
+	}, [watchMain, onMainWeaponChange, isInitialized])
 
 	// フォーム値変更を監視して親に通知（サブ武器）
 	useEffect(() => {
-		const subscription = watchSub((value) => {
+		const subscription = watchSub((value, { name, type }) => {
+			// 初期化中やプログラム的な変更は無視
+			if (!isInitialized || !name || !value || type !== 'change') {
+				return
+			}
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
 				onSubWeaponChange(value as SubWeapon)
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watchSub, onSubWeaponChange])
+	}, [watchSub, onSubWeaponChange, isInitialized])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">

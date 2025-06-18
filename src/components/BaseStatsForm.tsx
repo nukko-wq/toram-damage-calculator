@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { baseStatsSchema, type BaseStatsFormData } from '@/schemas/baseStats'
 import type { BaseStats } from '@/types/calculator'
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 
 interface BaseStatsFormProps {
 	stats: BaseStats
@@ -58,6 +58,9 @@ const StatField = ({
 )
 
 export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
+	// 初期化状態管理
+	const [isInitialized, setIsInitialized] = useState(false)
+
 	const {
 		register,
 		watch,
@@ -88,14 +91,24 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		}
 	}
 
-	// valuesを使用するため、外部からの変更検知は不要
+	// 外部データ変更時の初期化管理
+	useEffect(() => {
+		setIsInitialized(false)
+		const timer = setTimeout(() => setIsInitialized(true), 0)
+		return () => clearTimeout(timer)
+	}, [stats])
 
 	// onChangeをuseCallbackでメモ化して安定化
 	const stableOnChange = useCallback(onChange, [])
 
 	// フォームの値変更を監視して親に通知
 	useEffect(() => {
-		const subscription = watch((value) => {
+		const subscription = watch((value, { name, type }) => {
+			// 初期化中やプログラム的な変更は無視
+			if (!isInitialized || !name || !value || type !== 'change') {
+				return
+			}
+
 			// 全ての値が有効な数値の場合のみonChangeを呼ぶ
 			const isAllValid = Object.values(value).every(
 				(v) => typeof v === 'number' && !Number.isNaN(v) && v >= 1,
@@ -106,7 +119,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watch, stableOnChange])
+	}, [watch, stableOnChange, isInitialized])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">

@@ -21,6 +21,7 @@ interface SaveDataManagerProps {
 	onDataLoad: (data: CalculatorData) => void
 	onDataSave?: () => void
 	hasUnsavedChanges?: boolean
+	isFirstLoad?: boolean // 初回読み込みかどうかの判定
 }
 
 export default function SaveDataManager({
@@ -28,6 +29,7 @@ export default function SaveDataManager({
 	onDataLoad,
 	onDataSave,
 	hasUnsavedChanges = false,
+	isFirstLoad = false,
 }: SaveDataManagerProps) {
 	const [saveDataList, setSaveDataList] = useState<SaveData[]>([])
 	const [currentSaveId, setCurrentSaveId] = useState<string>('default')
@@ -54,8 +56,11 @@ export default function SaveDataManager({
 			const current = getCurrentSaveData()
 			setCurrentSaveId(current.id)
 
-			// データを親コンポーネントに通知
-			onDataLoad(current.data)
+			// 初回読み込み時のみデータを親コンポーネントに通知
+			// （SaveDataManagerが開かれるたびにフォームがリセットされるのを防ぐ）
+			if (isFirstLoad) {
+				onDataLoad(current.data)
+			}
 		} catch (err) {
 			console.error('セーブデータの読み込みに失敗しました:', err)
 			setError('セーブデータの読み込みに失敗しました')
@@ -64,7 +69,7 @@ export default function SaveDataManager({
 		}
 	}
 
-	// 初期化
+	// 初期化（一度だけ実行）
 	useEffect(() => {
 		loadSaveDataList()
 	}, [])

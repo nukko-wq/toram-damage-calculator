@@ -47,6 +47,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		register,
 		watch,
 		setValue,
+		reset,
 		formState: { errors },
 	} = useForm<FoodFormData>({
 		resolver: zodResolver(foodFormSchema),
@@ -55,14 +56,26 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 	})
 
 	// フォームの値を監視し、変更時にコールバックを呼び出す
+	const [isInitialized, setIsInitialized] = React.useState(false)
+	
 	React.useEffect(() => {
-		const subscription = watch((value, { name }) => {
-			if (name && value) {
-				onFoodChange(value as FoodFormData)
+		// propsが変更されたときにフォームをリセットして初期化フラグもリセット
+		setIsInitialized(false)
+		reset(food)
+		const timer = setTimeout(() => setIsInitialized(true), 0)
+		return () => clearTimeout(timer)
+	}, [food, reset])
+
+	React.useEffect(() => {
+		const subscription = watch((value, { name, type }) => {
+			// 初期化中やプログラム的な変更は無視
+			if (!isInitialized || !name || !value || type !== 'change') {
+				return
 			}
+			onFoodChange(value as FoodFormData)
 		})
 		return () => subscription.unsubscribe()
-	}, [watch, onFoodChange])
+	}, [watch, onFoodChange, isInitialized])
 
 	// 現在の値を取得（UI表示用）
 	const watchedValues = watch()
