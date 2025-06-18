@@ -10,7 +10,7 @@ import type {
 } from '@/types/calculator'
 import { StorageHelper, STORAGE_KEYS } from './storage'
 import { createInitialCalculatorData } from './initialData'
-import { checkAndUpdatePresetData } from './presetVersionManager'
+import { checkAndUpdatePresetData, forceResetPresetData } from './presetVersionManager'
 
 /**
  * 初期化・セットアップ（バージョン管理システム統合版）
@@ -20,6 +20,13 @@ export async function initializeStorage(): Promise<UpdateNotification[]> {
 		// ストレージが利用可能かチェック
 		if (!StorageHelper.isAvailable()) {
 			throw new Error('LocalStorage is not available')
+		}
+
+		// TEMPORARY: プリセットデータを一度リセット（カテゴリ修正のため）
+		const hasResetFlag = localStorage.getItem('toram_preset_data_reset_v2')
+		if (!hasResetFlag) {
+			forceResetPresetData()
+			localStorage.setItem('toram_preset_data_reset_v2', 'true')
 		}
 
 		// プリセットデータのバージョンチェック・更新

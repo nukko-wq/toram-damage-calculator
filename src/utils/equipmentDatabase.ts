@@ -314,9 +314,16 @@ export function getAvailableEquipmentById(id: string): Equipment | null {
 export function getAvailableEquipmentsByCategory(
 	category: EquipmentCategory,
 ): Equipment[] {
-	return getAllAvailableEquipments().filter((equipment) =>
-		equipment.category.includes(category),
-	)
+	return getAllAvailableEquipments().filter((equipment) => {
+		if (!equipment.category) return false
+		
+		// mainカテゴリを検索する時はmainWeaponカテゴリも含める
+		if (category === 'main') {
+			return equipment.category.includes('main') || equipment.category.includes('mainWeapon')
+		}
+		
+		return equipment.category.includes(category)
+	})
 }
 
 // 装備タイプ別の統合装備リストを取得

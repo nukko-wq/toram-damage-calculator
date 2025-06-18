@@ -8,6 +8,7 @@ import type {
 	PresetCrystal,
 	PresetEnemy,
 	UpdateNotification,
+	EquipmentCategory,
 } from '@/types/calculator'
 
 // フォールバック用の静的インポート
@@ -23,6 +24,22 @@ const STORAGE_KEYS = {
 	PRESET_CRYSTALS: 'toram_preset_crystals',
 	PRESET_ENEMIES: 'toram_preset_enemies',
 } as const
+
+/**
+ * プリセットデータを強制的にリセットして再初期化
+ */
+export function forceResetPresetData(): void {
+	try {
+		// プリセットデータを削除
+		localStorage.removeItem(STORAGE_KEYS.PRESET_VERSION)
+		localStorage.removeItem(STORAGE_KEYS.PRESET_EQUIPMENTS)
+		localStorage.removeItem(STORAGE_KEYS.PRESET_CRYSTALS)
+		localStorage.removeItem(STORAGE_KEYS.PRESET_ENEMIES)
+		console.log('Preset data reset successfully')
+	} catch (error) {
+		console.error('Failed to reset preset data:', error)
+	}
+}
 
 /**
  * ローカルストレージからプリセットバージョン情報を取得
@@ -132,9 +149,15 @@ export async function copyPresetEquipmentsToLocalStorage(): Promise<void> {
 
 		// 各カテゴリの装備を処理
 		for (const [category, equipments] of Object.entries(data.equipments)) {
-			for (const equipment of equipments as PresetEquipment[]) {
+			for (const equipment of equipments as any[]) {
 				const localEquipment: LocalStorageEquipment = {
 					...equipment,
+					// JSONデータに不足している必須フィールドを追加
+					type: (category === 'mainWeapon' || category === 'subWeapon') ? 'weapon' : 
+						  (category === 'body') ? 'armor' : 
+						  (category === 'fashion1' || category === 'fashion2' || category === 'fashion3') ? 'fashion' : 'accessory',
+					category: category === 'mainWeapon' ? ['main', 'mainWeapon'] : [category as EquipmentCategory],
+					baseStats: equipment.weaponStats || equipment.baseStats || {},
 					isPreset: true,
 					isFavorite: false,
 					isModified: false,
@@ -286,8 +309,17 @@ async function updatePresetEquipments(): Promise<UpdateNotification | null> {
 		const latestEquipments: PresetEquipment[] = []
 
 		// 各カテゴリの装備を統合
-		for (const equipments of Object.values(data.equipments)) {
-			latestEquipments.push(...(equipments as PresetEquipment[]))
+		for (const [category, equipments] of Object.entries(data.equipments)) {
+			for (const equipment of equipments as any[]) {
+				latestEquipments.push({
+					...equipment,
+					type: (category === 'mainWeapon' || category === 'subWeapon') ? 'weapon' : 
+						  (category === 'body') ? 'armor' : 
+						  (category === 'fashion1' || category === 'fashion2' || category === 'fashion3') ? 'fashion' : 'accessory',
+					category: category === 'mainWeapon' ? ['main', 'mainWeapon'] : [category as EquipmentCategory],
+					baseStats: equipment.weaponStats || equipment.baseStats || {},
+				} as PresetEquipment)
+			}
 		}
 
 		const newEquipments = extractNewItems(currentEquipments, latestEquipments)
