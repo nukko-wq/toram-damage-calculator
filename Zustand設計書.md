@@ -21,7 +21,7 @@ src/stores/
 
 | ストア | 責任範囲 | 主要データ |
 |--------|----------|------------|
-| CalculatorStore | 計算機の全データ管理 | 基本ステータス、武器、装備、クリスタ、料理、敵情報 |
+| CalculatorStore | 計算機の全データ管理 | 基本ステータス、武器、装備、クリスタ、料理、敵情報、バフスキル |
 | SaveDataStore | セーブデータ操作 | セーブデータリスト、現在のセーブID |
 | UIStore | UI状態管理 | モーダル表示状態、管理画面表示状態 |
 
@@ -58,6 +58,7 @@ interface CalculatorStore {
   updateEquipment: (equipment: EquipmentSlots) => void
   updateFood: (food: FoodFormData) => void
   updateEnemy: (enemy: EnemyFormData) => void
+  updateBuffSkills: (buffSkills: BuffSkillFormData) => void
 }
 ```
 
@@ -140,7 +141,49 @@ useEffect(() => {
 }, [watch, isInitialized, updateStore])
 ```
 
-### 4.2 初期化管理
+### 4.3 バフスキル統合の特殊パターン
+
+バフスキルフォームでは複数のスキルを管理するため、より複雑な統合パターンを使用:
+
+```typescript
+// バフスキルフォームの例
+const BuffSkillForm = () => {
+  const storeBuffSkills = useCalculatorStore(state => state.data.buffSkills)
+  const updateBuffSkills = useCalculatorStore(state => state.updateBuffSkills)
+  
+  // 個別スキルの更新処理
+  const handleSkillToggle = (skillId: string, enabled: boolean) => {
+    const updatedSkills = storeBuffSkills.skills.map(skill =>
+      skill.id === skillId ? { ...skill, isEnabled: enabled } : skill
+    )
+    updateBuffSkills({ skills: updatedSkills })
+  }
+  
+  const handleParameterChange = (skillId: string, paramName: string, value: number) => {
+    const updatedSkills = storeBuffSkills.skills.map(skill =>
+      skill.id === skillId 
+        ? { ...skill, parameters: { ...skill.parameters, [paramName]: value } }
+        : skill
+    )
+    updateBuffSkills({ skills: updatedSkills })
+  }
+  
+  // スキル系統別の表示・管理
+  const skillsByCategory = useMemo(() => {
+    return storeBuffSkills.skills.reduce((acc, skill) => {
+      if (!acc[skill.category]) acc[skill.category] = []
+      acc[skill.category].push(skill)
+      return acc
+    }, {} as Record<BuffSkillCategory, BuffSkill[]>)
+  }, [storeBuffSkills.skills])
+  
+  return (
+    // UI実装...
+  )
+}
+```
+
+### 4.4 初期化管理
 
 セーブデータ切り替え時のちらつき防止機能:
 
