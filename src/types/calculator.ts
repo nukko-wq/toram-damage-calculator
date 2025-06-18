@@ -328,6 +328,7 @@ export interface CalculatorData {
 	crystals: CrystalSlots
 	food: FoodFormData // 料理データ
 	enemy: EnemyFormData // 新しい敵情報システム
+	buffSkills: BuffSkillFormData // バフスキルデータ
 	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
 	legacyEnemy?: EnemyInfo
 }
@@ -567,4 +568,52 @@ export interface FoodFormData {
 	slot3: FoodSlotData
 	slot4: FoodSlotData
 	slot5: FoodSlotData
+}
+
+// バフスキルシステム
+
+// バフスキルカテゴリ
+export type BuffSkillCategory =
+	| 'mastery'
+	| 'blade'
+	| 'shoot'
+	| 'halberd'
+	| 'mononofu'
+	| 'dualSword'
+	| 'sprite'
+	| 'darkPower'
+	| 'shield'
+	| 'knight'
+	| 'hunter'
+	| 'assassin'
+	| 'ninja'
+	| 'support'
+	| 'survival'
+	| 'battle'
+	| 'pet'
+	| 'minstrel'
+	| 'partisan'
+
+// バフスキルパラメータ
+export interface BuffSkillParameters {
+	skillLevel?: number // 1-10
+	stackCount?: number // 重ねがけ数
+	playerCount?: number // プレイヤー数
+	refinement?: number // 精錬値
+	spUsed?: number // 使用SP
+	isCaster?: number // 使用者フラグ (0:他者使用, 1:自己使用)
+}
+
+// バフスキルデータ
+export interface BuffSkill {
+	id: string
+	name: string
+	category: BuffSkillCategory
+	isEnabled: boolean
+	parameters: BuffSkillParameters
+}
+
+// バフスキルフォームデータ
+export interface BuffSkillFormData {
+	skills: BuffSkill[]
 }

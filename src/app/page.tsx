@@ -8,6 +8,7 @@ import CrystalForm from '@/components/CrystalForm'
 import EquipmentForm from '@/components/EquipmentForm'
 import FoodForm from '@/components/FoodForm'
 import NewEnemyForm from '@/components/NewEnemyForm'
+import BuffSkillForm from '@/components/BuffSkillForm'
 import StatsSummary from '@/components/StatsSummary'
 import SaveDataManager from '@/components/SaveDataManager'
 import ZustandTest from '@/components/ZustandTest'
@@ -157,13 +158,14 @@ export default function Home() {
 					</div>
 				)}
 
-				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto] gap-4">
+				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto_auto] gap-4">
 					<BaseStatsForm />
 					<WeaponForm />
 					<CrystalForm />
 					<EquipmentForm />
 					<FoodForm />
 					<NewEnemyForm />
+					<BuffSkillForm />
 				</div>
 				<StatsSummary data={data} />
 				

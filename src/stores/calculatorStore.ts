@@ -170,6 +170,17 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				)
 			},
 
+			updateBuffSkills: (buffSkills) => {
+				set(
+					(state) => ({
+						data: { ...state.data, buffSkills },
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'updateBuffSkills',
+				)
+			},
+
 			// ===== 将来の計算機能 =====
 			calculateDamage: async () => {
 				const { data } = get()

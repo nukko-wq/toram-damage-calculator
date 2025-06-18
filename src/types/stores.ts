@@ -7,6 +7,7 @@ import type {
 	EquipmentSlots,
 	FoodFormData,
 	EnemyFormData,
+	BuffSkillFormData,
 	SaveData,
 } from './calculator'
 
@@ -68,6 +69,7 @@ export interface CalculatorStore {
 	updateEquipment: (equipment: EquipmentSlots) => void
 	updateFood: (food: FoodFormData) => void
 	updateEnemy: (enemy: EnemyFormData) => void
+	updateBuffSkills: (buffSkills: BuffSkillFormData) => void
 
 	// ===== 将来の計算機能 =====
 	calculateDamage: () => Promise<void>
