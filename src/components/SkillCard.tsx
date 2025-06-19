@@ -96,8 +96,8 @@ export default function SkillCard({
 			case 'zensen_iji_2':
 			// 重ねがけ系
 			case 'tornado_lance':
-			case 'netsujo_no_uta':
-			case 'shinsoku_no_sabaki':
+			case 'passion_song':
+			case 'godspeed_parry':
 			// 特殊パラメータスキル
 			case 'brave':
 				return true

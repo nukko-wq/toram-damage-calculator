@@ -78,11 +78,11 @@ export function SkillParameterForm({
 
 			// 重ねがけ系
 			case 'tornado_lance':
-			case 'netsujo_no_uta':
+			case 'passion_song':
 				return ['stackCount']
 
 			// 特殊パラメータ
-			case 'shinsoku_no_sabaki':
+			case 'godspeed_parry':
 				return ['stackCount'] // 重ねがけ数 (1-3)
 
 			case 'knight_pledge':
@@ -149,18 +149,18 @@ export function SkillParameterForm({
 				{requiredParameters.includes('stackCount') && (
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-1">
-							{skill.id === 'shinsoku_no_sabaki' ? '重ねがけ数' : 'カウント数'}
+							{skill.id === 'godspeed_parry' ? '重ねがけ数' : 'カウント数'}
 						</label>
 						<input
 							{...register('stackCount', { valueAsNumber: true })}
 							type="number"
-							min={skill.id === 'shinsoku_no_sabaki' ? '1' : '1'}
-							max={skill.id === 'shinsoku_no_sabaki' ? '3' : '10'}
+							min={skill.id === 'godspeed_parry' ? '1' : '1'}
+							max={skill.id === 'godspeed_parry' ? '3' : '10'}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 						/>
 						{errors.stackCount && (
 							<p className="text-xs text-red-600 mt-1">
-								{skill.id === 'shinsoku_no_sabaki'
+								{skill.id === 'godspeed_parry'
 									? '1〜3の値を入力してください'
 									: '1〜10の値を入力してください'}
 							</p>
