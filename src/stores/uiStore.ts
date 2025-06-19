@@ -11,11 +11,7 @@ export const useUIStore = create<UIStore>()(
 
 			// ===== アクション =====
 			setShowSaveManager: (value) => {
-				set(
-					{ showSaveManager: value },
-					false,
-					'setShowSaveManager',
-				)
+				set({ showSaveManager: value }, false, 'setShowSaveManager')
 			},
 
 			setShowUpdateNotifications: (value) => {

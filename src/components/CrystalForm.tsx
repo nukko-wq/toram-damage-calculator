@@ -14,9 +14,9 @@ interface CrystalFormProps {
 
 export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 	// Zustandストアからクリスタルデータを取得
-	const storeCrystals = useCalculatorStore(state => state.data.crystals)
-	const updateCrystals = useCalculatorStore(state => state.updateCrystals)
-	
+	const storeCrystals = useCalculatorStore((state) => state.data.crystals)
+	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)
+
 	// Zustandストアの値を使用（完全移行）
 	const effectiveCrystals = storeCrystals
 	const [modalState, setModalState] = useState<{
@@ -41,7 +41,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 
 		// Zustandストアを更新
 		updateCrystals(newCrystals)
-		
+
 		// 後方互換性のため従来のonChangeも呼び出し
 		if (onChange) {
 			onChange(newCrystals)

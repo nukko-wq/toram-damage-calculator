@@ -46,9 +46,9 @@ const FOOD_OPTIONS: { value: FoodType; label: string }[] = Object.entries(
 
 export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 	// Zustandストアから料理データを取得
-	const storeFood = useCalculatorStore(state => state.data.food)
-	const updateFood = useCalculatorStore(state => state.updateFood)
-	
+	const storeFood = useCalculatorStore((state) => state.data.food)
+	const updateFood = useCalculatorStore((state) => state.updateFood)
+
 	// Zustandストアの値を使用（完全移行）
 	const effectiveFood = storeFood
 	const {
@@ -64,7 +64,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 
 	// フォームの値を監視し、変更時にコールバックを呼び出す
 	const [isInitialized, setIsInitialized] = React.useState(false)
-	
+
 	React.useEffect(() => {
 		// valuesプロパティを使用しているため、データ変更時の処理を軽量化
 		setIsInitialized(false)
@@ -78,10 +78,10 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 			if (!isInitialized || !name || !value || type !== 'change') {
 				return
 			}
-			
+
 			// Zustandストアを更新
 			updateFood(value as FoodFormData)
-			
+
 			// 後方互換性のため従来のonChangeも呼び出し
 			if (onFoodChange) {
 				onFoodChange(value as FoodFormData)

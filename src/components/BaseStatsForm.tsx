@@ -62,11 +62,11 @@ const StatField = ({
 export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	// 初期化状態管理
 	const [isInitialized, setIsInitialized] = useState(false)
-	
+
 	// Zustandストアから基本ステータスを取得
-	const storeStats = useCalculatorStore(state => state.data.baseStats)
-	const updateBaseStats = useCalculatorStore(state => state.updateBaseStats)
-	
+	const storeStats = useCalculatorStore((state) => state.data.baseStats)
+	const updateBaseStats = useCalculatorStore((state) => state.updateBaseStats)
+
 	// Zustandストアの値を使用（完全移行）
 	const effectiveStats = storeStats
 
@@ -128,7 +128,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 			if (isAllValid) {
 				// Zustandストアを更新（完全移行）
 				updateBaseStats(value as BaseStats)
-				
+
 				// 後方互換性のため従来のonChangeも呼び出し
 				if (onChange) {
 					stableOnChange(value as BaseStats)

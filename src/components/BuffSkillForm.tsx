@@ -1,18 +1,14 @@
 'use client'
 
-import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import {
 	categoryNameMap,
-	weaponTypeToMasterySkills,
 	getDefaultParametersForSkill,
+	weaponTypeToMasterySkills,
 } from '@/utils/buffSkillDefaults'
 import SkillCard from './SkillCard'
-import type {
-	BuffSkill,
-	BuffSkillCategory,
-	WeaponType,
-} from '@/types/calculator'
+import type { WeaponType } from '@/types/calculator'
 
 export default function BuffSkillForm() {
 	const storeBuffSkills = useCalculatorStore((state) => state.data.buffSkills)
@@ -30,7 +26,7 @@ export default function BuffSkillForm() {
 		setLocalInitialized(false)
 		const timer = setTimeout(() => setLocalInitialized(true), 30)
 		return () => clearTimeout(timer)
-	}, [storeBuffSkills.skills])
+	}, [storeBuffSkills.skills.length])
 
 	// 武器種に応じたマスタリスキルフィルタリング
 	const getVisibleMasterySkills = useCallback((weaponType: WeaponType) => {
@@ -102,11 +98,10 @@ export default function BuffSkillForm() {
 		updateBuffSkills({ skills: updatedSkills })
 	}
 
-	// スキルパラメータの更新
+	// スキルパラメータの更新（ポップオーバー用）
 	const handleParameterChange = (
 		skillId: string,
-		paramName: string,
-		value: number,
+		parameters: import('@/types/calculator').BuffSkillParameters,
 	) => {
 		if (!isInitialized || !localInitialized) return
 
@@ -114,51 +109,11 @@ export default function BuffSkillForm() {
 			skill.id === skillId
 				? {
 						...skill,
-						parameters: { ...skill.parameters, [paramName]: value },
+						parameters,
 					}
 				: skill,
 		)
 		updateBuffSkills({ skills: updatedSkills })
-	}
-
-	// パラメータの範囲制限を取得
-	const getParameterRange = (paramName: string) => {
-		switch (paramName) {
-			case 'skillLevel':
-				return { min: 1, max: 10 }
-			case 'stackCount':
-				return { min: 1, max: 10 }
-			case 'playerCount':
-				return { min: 0, max: 4 }
-			case 'refinement':
-				return { min: 1, max: 15 }
-			case 'spUsed':
-				return { min: 25, max: 80 }
-			case 'isCaster':
-				return { min: 0, max: 1 }
-			default:
-				return { min: 0, max: 100 }
-		}
-	}
-
-	// パラメータの表示名を取得
-	const getParameterLabel = (paramName: string) => {
-		switch (paramName) {
-			case 'skillLevel':
-				return 'スキルレベル'
-			case 'stackCount':
-				return '重ねがけ数'
-			case 'playerCount':
-				return 'プレイヤー数'
-			case 'refinement':
-				return '精錬値'
-			case 'spUsed':
-				return '使用SP'
-			case 'isCaster':
-				return '使用者か？'
-			default:
-				return paramName
-		}
 	}
 
 	return (
@@ -173,8 +128,6 @@ export default function BuffSkillForm() {
 						categoryLabel={skill.categoryLabel}
 						onToggle={handleSkillToggle}
 						onParameterChange={handleParameterChange}
-						getParameterRange={getParameterRange}
-						getParameterLabel={getParameterLabel}
 					/>
 				))}
 			</div>

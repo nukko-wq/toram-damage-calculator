@@ -18,12 +18,7 @@ import { initializeStorage } from '@/utils/saveDataManager'
 export default function Home() {
 	// Zustandストアからデータを取得
 	const { showSaveManager, setShowSaveManager } = useUIStore()
-	const {
-		data,
-		isInitialized,
-		isLoading,
-		initialize,
-	} = useCalculatorStore()
+	const { data, isInitialized, isLoading, initialize } = useCalculatorStore()
 
 	// アップデート通知（Zustand移行後も必要）
 	const [updateNotifications, setUpdateNotifications] = useState<
@@ -40,7 +35,7 @@ export default function Home() {
 				if (notifications.length > 0) {
 					setShowUpdateNotifications(true)
 				}
-				
+
 				// Zustandストアで初期化
 				await initialize()
 			} catch (error) {
@@ -50,7 +45,6 @@ export default function Home() {
 
 		initializeApp()
 	}, [initialize])
-
 
 	// 全てのデータ変更はZustandストア経由で管理（props不要）
 	// 各フォームコンポーネントは直接Zustandストアを参照・更新
@@ -128,7 +122,10 @@ export default function Home() {
 									</h3>
 									<div className="mt-2 text-sm text-green-700">
 										{updateNotifications.map((notification, index) => (
-											<div key={`notification-${notification.type}-${index}`} className="mb-1">
+											<div
+												key={`notification-${notification.type}-${index}`}
+												className="mb-1"
+											>
 												{notification.type === 'equipments' && '新しい装備'}
 												{notification.type === 'crystals' && '新しいクリスタル'}
 												{notification.type === 'enemies' && '新しい敵情報'}が
@@ -168,7 +165,7 @@ export default function Home() {
 					<BuffSkillForm />
 				</div>
 				<StatsSummary data={data} />
-				
+
 				{/* Zustand動作確認用（開発環境のみ） */}
 				{process.env.NODE_ENV === 'development' && <ZustandTest />}
 			</div>

@@ -1,8 +1,16 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import type { CalculatorStore, DamageCalculationResult, CalculationSettings } from '@/types/stores'
+import type {
+	CalculatorStore,
+	DamageCalculationResult,
+	CalculationSettings,
+} from '@/types/stores'
 import { createInitialCalculatorData } from '@/utils/initialData'
-import { saveCurrentData, getCurrentSaveData, initializeStorage } from '@/utils/saveDataManager'
+import {
+	saveCurrentData,
+	getCurrentSaveData,
+	initializeStorage,
+} from '@/utils/saveDataManager'
 
 // 初期計算設定
 const initialCalculationSettings: CalculationSettings = {
@@ -36,35 +44,19 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			setData: (data) => {
-				set(
-					{ data },
-					false,
-					'setData',
-				)
+				set({ data }, false, 'setData')
 			},
 
 			resetUnsavedChanges: () => {
-				set(
-					{ hasUnsavedChanges: false },
-					false,
-					'resetUnsavedChanges',
-				)
+				set({ hasUnsavedChanges: false }, false, 'resetUnsavedChanges')
 			},
 
 			setHasUnsavedChanges: (value) => {
-				set(
-					{ hasUnsavedChanges: value },
-					false,
-					'setHasUnsavedChanges',
-				)
+				set({ hasUnsavedChanges: value }, false, 'setHasUnsavedChanges')
 			},
 
 			setIsLoading: (value) => {
-				set(
-					{ isLoading: value },
-					false,
-					'setIsLoading',
-				)
+				set({ isLoading: value }, false, 'setIsLoading')
 			},
 
 			// ===== セーブデータ管理 =====

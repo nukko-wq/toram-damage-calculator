@@ -40,7 +40,7 @@ export default function ZustandTest() {
 			<h3 className="text-sm font-bold text-yellow-800 mb-2">
 				🧪 Zustand Test Panel
 			</h3>
-			
+
 			<div className="space-y-2 text-xs">
 				<div>
 					<strong>状態:</strong>
@@ -60,21 +60,21 @@ export default function ZustandTest() {
 					>
 						初期化テスト
 					</button>
-					
+
 					<button
 						onClick={handleTestBaseStatsUpdate}
 						className="w-full px-2 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600"
 					>
 						STR +10 (変更テスト)
 					</button>
-					
+
 					<button
 						onClick={() => resetUnsavedChanges()}
 						className="w-full px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600"
 					>
 						未保存変更リセット
 					</button>
-					
+
 					<button
 						onClick={() => setShowSaveManager(!showSaveManager)}
 						className="w-full px-2 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600"

@@ -32,11 +32,11 @@ export default function WeaponForm({
 	onSubWeaponChange,
 }: WeaponFormProps) {
 	// Zustandストアから武器データを取得
-	const storeMainWeapon = useCalculatorStore(state => state.data.mainWeapon)
-	const storeSubWeapon = useCalculatorStore(state => state.data.subWeapon)
-	const updateMainWeapon = useCalculatorStore(state => state.updateMainWeapon)
-	const updateSubWeapon = useCalculatorStore(state => state.updateSubWeapon)
-	
+	const storeMainWeapon = useCalculatorStore((state) => state.data.mainWeapon)
+	const storeSubWeapon = useCalculatorStore((state) => state.data.subWeapon)
+	const updateMainWeapon = useCalculatorStore((state) => state.updateMainWeapon)
+	const updateSubWeapon = useCalculatorStore((state) => state.updateSubWeapon)
+
 	// Zustandストアの値を使用（完全移行）
 	const effectiveMainWeapon = storeMainWeapon
 	const effectiveSubWeapon = storeSubWeapon
@@ -145,7 +145,7 @@ export default function WeaponForm({
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
 				// Zustandストアを更新
 				updateMainWeapon(value as MainWeapon)
-				
+
 				// 後方互換性のため従来のonChangeも呼び出し
 				if (onMainWeaponChange) {
 					onMainWeaponChange(value as MainWeapon)
@@ -165,7 +165,7 @@ export default function WeaponForm({
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
 				// Zustandストアを更新
 				updateSubWeapon(value as SubWeapon)
-				
+
 				// 後方互換性のため従来のonChangeも呼び出し
 				if (onSubWeaponChange) {
 					onSubWeaponChange(value as SubWeapon)

@@ -39,9 +39,9 @@ export default function NewEnemyForm({
 	onChange,
 }: NewEnemyFormProps) {
 	// Zustandストアから敵データを取得
-	const storeEnemyData = useCalculatorStore(state => state.data.enemy)
-	const updateEnemy = useCalculatorStore(state => state.updateEnemy)
-	
+	const storeEnemyData = useCalculatorStore((state) => state.data.enemy)
+	const updateEnemy = useCalculatorStore((state) => state.updateEnemy)
+
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEnemyData = storeEnemyData
 	const [selectedCategory, setSelectedCategory] = useState<
@@ -78,7 +78,7 @@ export default function NewEnemyForm({
 			const newData = getDefaultEnemyFormData()
 			// Zustandストアを更新
 			updateEnemy(newData)
-			
+
 			// 後方互換性のため従来のonChangeも呼び出し
 			if (onChange) {
 				onChange(newData)
@@ -98,10 +98,10 @@ export default function NewEnemyForm({
 				requiredHIT: 0, // プリセットは0から開始
 			},
 		}
-		
+
 		// Zustandストアを更新
 		updateEnemy(newData)
-		
+
 		// 後方互換性のため従来のonChangeも呼び出し
 		if (onChange) {
 			onChange(newData)
@@ -121,10 +121,10 @@ export default function NewEnemyForm({
 				[field]: numValue,
 			},
 		}
-		
+
 		// Zustandストアを更新
 		updateEnemy(newData)
-		
+
 		// 後方互換性のため従来のonChangeも呼び出し
 		if (onChange) {
 			onChange(newData)
@@ -216,7 +216,9 @@ export default function NewEnemyForm({
 									<span className="text-gray-500">+</span>
 									<input
 										type="number"
-										value={effectiveEnemyData.manualOverrides?.resistCritical || 0}
+										value={
+											effectiveEnemyData.manualOverrides?.resistCritical || 0
+										}
 										onChange={(e) =>
 											handleManualOverrideChange(
 												'resistCritical',

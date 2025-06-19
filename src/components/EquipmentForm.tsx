@@ -22,9 +22,9 @@ export default function EquipmentForm({
 	onEquipmentChange,
 }: EquipmentFormProps) {
 	// Zustandストアから装備データを取得
-	const storeEquipment = useCalculatorStore(state => state.data.equipment)
-	const updateEquipment = useCalculatorStore(state => state.updateEquipment)
-	
+	const storeEquipment = useCalculatorStore((state) => state.data.equipment)
+	const updateEquipment = useCalculatorStore((state) => state.updateEquipment)
+
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
 	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots>('main')
@@ -357,10 +357,10 @@ export default function EquipmentForm({
 				presetId: null,
 			},
 		}
-		
+
 		// Zustandストアを更新
 		updateEquipment(updatedEquipment)
-		
+
 		// 後方互換性のため従来のonChangeも呼び出し
 		if (onEquipmentChange) {
 			onEquipmentChange(updatedEquipment)
@@ -382,10 +382,10 @@ export default function EquipmentForm({
 					presetId: null,
 				},
 			}
-			
+
 			// Zustandストアを更新
 			updateEquipment(updatedEquipment)
-			
+
 			// 後方互換性のため従来のonChangeも呼び出し
 			if (onEquipmentChange) {
 				onEquipmentChange(updatedEquipment)
@@ -402,10 +402,10 @@ export default function EquipmentForm({
 						presetId: equipmentId,
 					},
 				}
-				
+
 				// Zustandストアを更新
 				updateEquipment(updatedEquipment)
-				
+
 				// 後方互換性のため従来のonChangeも呼び出し
 				if (onEquipmentChange) {
 					onEquipmentChange(updatedEquipment)
@@ -583,8 +583,10 @@ export default function EquipmentForm({
 					</div>
 				)}
 
-				{renderPropertyInputs(effectiveEquipment[activeTab], (property, value) =>
-					handleEquipmentPropertyChange(activeTab, property, value),
+				{renderPropertyInputs(
+					effectiveEquipment[activeTab],
+					(property, value) =>
+						handleEquipmentPropertyChange(activeTab, property, value),
 				)}
 			</div>
 
@@ -594,7 +596,9 @@ export default function EquipmentForm({
 				onClose={closeEquipmentModal}
 				onSelect={handlePresetEquipmentSelect}
 				selectedEquipmentId={
-					effectiveEquipment[activeTab].isPreset ? effectiveEquipment[activeTab].id : null
+					effectiveEquipment[activeTab].isPreset
+						? effectiveEquipment[activeTab].id
+						: null
 				}
 				category={modalState.category || 'main'}
 				title={modalState.title}

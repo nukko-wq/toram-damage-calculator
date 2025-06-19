@@ -79,7 +79,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 	const handleDeleteSaveData = async (saveId: string) => {
 		try {
 			const defaultData = await deleteSaveData(saveId)
-			
+
 			// 削除したセーブデータが現在選択中だった場合、デフォルトデータを読み込み
 			if (currentSaveId === saveId && defaultData) {
 				await loadSaveData(defaultData)
