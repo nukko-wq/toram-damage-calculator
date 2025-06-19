@@ -7,7 +7,12 @@ import {
 	weaponTypeToMasterySkills,
 	getDefaultParametersForSkill,
 } from '@/utils/buffSkillDefaults'
-import type { BuffSkill, BuffSkillCategory, WeaponType } from '@/types/calculator'
+import SkillCard from './SkillCard'
+import type {
+	BuffSkill,
+	BuffSkillCategory,
+	WeaponType,
+} from '@/types/calculator'
 
 export default function BuffSkillForm() {
 	const storeBuffSkills = useCalculatorStore((state) => state.data.buffSkills)
@@ -25,7 +30,7 @@ export default function BuffSkillForm() {
 		setLocalInitialized(false)
 		const timer = setTimeout(() => setLocalInitialized(true), 30)
 		return () => clearTimeout(timer)
-	}, [storeBuffSkills])
+	}, [storeBuffSkills.skills])
 
 	// 武器種に応じたマスタリスキルフィルタリング
 	const getVisibleMasterySkills = useCallback((weaponType: WeaponType) => {
@@ -47,7 +52,12 @@ export default function BuffSkillForm() {
 			return skill
 		})
 		updateBuffSkills({ skills: updatedSkills })
-	}, [storeBuffSkills.skills, updateBuffSkills, isInitialized, localInitialized])
+	}, [
+		storeBuffSkills.skills,
+		updateBuffSkills,
+		isInitialized,
+		localInitialized,
+	])
 
 	// 武器種変更を検知してマスタリスキルをリセット
 	useEffect(() => {
@@ -57,30 +67,29 @@ export default function BuffSkillForm() {
 		}
 	}, [mainWeaponType, resetMasterySkillsOnWeaponChange])
 
-	// スキルをカテゴリ別にグループ化（マスタリスキルフィルタリング付き）
-	const skillsByCategory = useMemo(() => {
+	// スキルを平坦なリストに変換（マスタリスキルフィルタリング付き）
+	const flatSkillsList = useMemo(() => {
 		const visibleMasterySkills = getVisibleMasterySkills(mainWeaponType)
 
-		return storeBuffSkills.skills.reduce(
-			(acc, skill) => {
+		return storeBuffSkills.skills
+			.filter((skill) => {
 				// マスタリスキルの場合は武器種に応じてフィルタリング
 				if (skill.category === 'mastery') {
 					if (visibleMasterySkills.length === 0) {
 						// 抜刀剣等：マスタリスキル系統全体を非表示
-						return acc
+						return false
 					}
 					if (!visibleMasterySkills.includes(skill.id)) {
 						// 該当しないマスタリスキルは非表示
-						return acc
+						return false
 					}
 				}
-
-				if (!acc[skill.category]) acc[skill.category] = []
-				acc[skill.category].push(skill)
-				return acc
-			},
-			{} as Record<BuffSkillCategory, BuffSkill[]>,
-		)
+				return true
+			})
+			.map((skill) => ({
+				...skill,
+				categoryLabel: categoryNameMap[skill.category],
+			}))
 	}, [storeBuffSkills.skills, mainWeaponType, getVisibleMasterySkills])
 
 	// スキルのオン/オフ切り替え
@@ -153,144 +162,22 @@ export default function BuffSkillForm() {
 	}
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-4 lg:col-start-1 lg:col-end-4 lg:row-start-4 lg:row-end-5">
 			<h2 className="text-xl font-bold text-gray-800">バフスキル設定</h2>
 
-			<div className="space-y-6">
-				{Object.entries(skillsByCategory).map(([category, skills]) => (
-					<SkillCategorySection
-						key={category}
-						category={category as BuffSkillCategory}
-						skills={skills}
-						onSkillToggle={handleSkillToggle}
+			<div className="grid grid-cols-5 gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2">
+				{flatSkillsList.map((skill) => (
+					<SkillCard
+						key={skill.id}
+						skill={skill}
+						categoryLabel={skill.categoryLabel}
+						onToggle={handleSkillToggle}
 						onParameterChange={handleParameterChange}
 						getParameterRange={getParameterRange}
 						getParameterLabel={getParameterLabel}
 					/>
 				))}
 			</div>
-		</div>
-	)
-}
-
-interface SkillCategorySectionProps {
-	category: BuffSkillCategory
-	skills: BuffSkill[]
-	onSkillToggle: (skillId: string, enabled: boolean) => void
-	onParameterChange: (
-		skillId: string,
-		paramName: string,
-		value: number,
-	) => void
-	getParameterRange: (paramName: string) => { min: number; max: number }
-	getParameterLabel: (paramName: string) => string
-}
-
-function SkillCategorySection({
-	category,
-	skills,
-	onSkillToggle,
-	onParameterChange,
-	getParameterRange,
-	getParameterLabel,
-}: SkillCategorySectionProps) {
-	const [isExpanded, setIsExpanded] = useState(true)
-
-	return (
-		<div className="border border-gray-200 rounded-lg p-4">
-			<button
-				type="button"
-				onClick={() => setIsExpanded(!isExpanded)}
-				className="flex items-center justify-between w-full text-left"
-			>
-				<h3 className="text-lg font-semibold text-gray-700">
-					{categoryNameMap[category]}
-				</h3>
-				<span className="text-gray-500">
-					{isExpanded ? '▼' : '▶'}
-				</span>
-			</button>
-
-			{isExpanded && (
-				<div className="mt-4 space-y-3">
-					{skills.map((skill) => (
-						<SkillItem
-							key={skill.id}
-							skill={skill}
-							onToggle={onSkillToggle}
-							onParameterChange={onParameterChange}
-							getParameterRange={getParameterRange}
-							getParameterLabel={getParameterLabel}
-						/>
-					))}
-				</div>
-			)}
-		</div>
-	)
-}
-
-interface SkillItemProps {
-	skill: BuffSkill
-	onToggle: (skillId: string, enabled: boolean) => void
-	onParameterChange: (
-		skillId: string,
-		paramName: string,
-		value: number,
-	) => void
-	getParameterRange: (paramName: string) => { min: number; max: number }
-	getParameterLabel: (paramName: string) => string
-}
-
-function SkillItem({
-	skill,
-	onToggle,
-	onParameterChange,
-	getParameterRange,
-	getParameterLabel,
-}: SkillItemProps) {
-	return (
-		<div className="bg-gray-50 p-3 rounded-md">
-			<div className="flex items-center justify-between mb-2">
-				<label className="flex items-center space-x-2">
-					<input
-						type="checkbox"
-						checked={skill.isEnabled}
-						onChange={(e) => onToggle(skill.id, e.target.checked)}
-						className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-					/>
-					<span className="font-medium text-gray-700">
-						{skill.name}
-					</span>
-				</label>
-			</div>
-
-			{skill.isEnabled &&
-				Object.keys(skill.parameters).length > 0 && (
-					<div className="grid grid-cols-2 gap-3">
-						{Object.entries(skill.parameters).map(
-							([paramName, value]) => (
-								<div key={paramName} className="space-y-1">
-									<label className="block text-sm font-medium text-gray-600">
-										{getParameterLabel(paramName)}
-									</label>
-									<input
-										type="number"
-										value={value ?? 0}
-										onChange={(e) =>
-											onParameterChange(
-												skill.id,
-												paramName,
-												Number(e.target.value),
-											)
-										}
-										{...getParameterRange(paramName)}
-										className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-									/>
-								</div>
-							),
-						)}
-					</div>
-				)}
 		</div>
 	)
 }
