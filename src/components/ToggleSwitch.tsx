@@ -40,8 +40,7 @@ export default function ToggleSwitch({
 			onClick={() => onChange(!checked)}
 			className={`
         relative inline-flex ${sizeClasses[size]} rounded-full border-2 border-transparent
-        transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 
-        focus:ring-blue-500 focus:ring-offset-2
+        transition-colors duration-100 ease-in-out focus:outline-none
         ${checked ? 'bg-blue-600' : 'bg-gray-200'}
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
       `}
@@ -49,7 +48,7 @@ export default function ToggleSwitch({
 			<span
 				className={`
           ${thumbSizeClasses[size]} inline-block rounded-full bg-white shadow transform 
-          transition duration-200 ease-in-out ${translateClasses[size]}
+          transition duration-100 ease-in-out ${translateClasses[size]}
         `}
 			/>
 		</button>
