@@ -8,49 +8,49 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: 'ハルバードマスタリ',
 		category: 'mastery',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'blade_mastery',
 		name: 'ブレードマスタリ',
 		category: 'mastery',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'shoot_mastery',
 		name: 'シュートマスタリ',
 		category: 'mastery',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'magic_mastery',
 		name: 'マジックマスタリ',
 		category: 'mastery',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'martial_mastery',
 		name: 'マーシャルマスタリ',
 		category: 'mastery',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'dual_mastery',
 		name: 'デュアルマスタリ',
 		category: 'mastery',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'shield_mastery',
 		name: 'シールドマスタリ',
 		category: 'mastery',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 
 	// ブレードスキル
@@ -82,7 +82,7 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: 'ロングレンジ',
 		category: 'shoot',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 
 	// ハルバードスキル
@@ -91,7 +91,7 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: 'クイックオーラ',
 		category: 'halberd',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'critical_parry',
@@ -128,14 +128,14 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: '武士道',
 		category: 'mononofu',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'clear_mind',
 		name: '明鏡止水',
 		category: 'mononofu',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'two_handed',
@@ -149,7 +149,7 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: '怪力乱神',
 		category: 'mononofu',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 
 	// デュアルソードスキル
@@ -158,14 +158,14 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: '神速の軌跡',
 		category: 'dualSword',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'filo_eclair',
 		name: 'フィロエクレール',
 		category: 'dualSword',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 
 	// スプライトスキル
@@ -197,7 +197,7 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: 'エターナルナイトメア',
 		category: 'darkPower',
 		isEnabled: false,
-		parameters: { skillLevel: 1, spUsed: 25 },
+		parameters: { skillLevel: 10, spUsed: 25 },
 	},
 
 	// シールドスキル
@@ -222,7 +222,7 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: 'ナイトプレッジ',
 		category: 'knight',
 		isEnabled: false,
-		parameters: { skillLevel: 1, playerCount: 0, refinement: 1 },
+		parameters: { skillLevel: 10, playerCount: 0, refinement: 1 },
 	},
 
 	// ハンタースキル
@@ -231,7 +231,7 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: 'カムフラージュ',
 		category: 'hunter',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 
 	// アサシンスキル
@@ -256,28 +256,28 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: '忍道',
 		category: 'ninja',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'ninjutsu',
 		name: '忍術',
 		category: 'ninja',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'ninjutsu_training_1',
 		name: '忍術鍛錬Ⅰ',
 		category: 'ninja',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'ninjutsu_training_2',
 		name: '忍術鍛錬Ⅱ',
 		category: 'ninja',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 
 	// サポートスキル
@@ -316,7 +316,7 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: 'MPブースト',
 		category: 'survival',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 
 	// バトルスキル
@@ -339,49 +339,49 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: 'HPブースト',
 		category: 'battle',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'attack_up',
 		name: '攻撃力UP',
 		category: 'battle',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'threatening_power',
 		name: '脅威の威力',
 		category: 'battle',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'magic_up',
 		name: '魔法力UP',
 		category: 'battle',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'more_magic',
 		name: '更なるまりょく',
 		category: 'battle',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'accuracy_up',
 		name: '命中UP',
 		category: 'battle',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 	{
 		id: 'dodge_up',
 		name: '回避UP',
 		category: 'battle',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 
 	// ペット使用スキル（赤バフ）
@@ -429,7 +429,7 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 		name: '前線維持Ⅱ',
 		category: 'partisan',
 		isEnabled: false,
-		parameters: { skillLevel: 1 },
+		parameters: { skillLevel: 10 },
 	},
 ]
 
@@ -455,12 +455,12 @@ export const weaponTypeToMasterySkills: Record<string, string[]> = {
 
 // スキルIDからデフォルトパラメータを取得
 export const getDefaultParametersForSkill = (skillId: string) => {
-	const masteryDefaults = { skillLevel: 1 }
+	const masteryDefaults = { skillLevel: 10 }
 	const emptyDefaults = {}
-	const levelDefaults = { skillLevel: 1 }
+	const levelDefaults = { skillLevel: 10 }
 	const stackDefaults = { stackCount: 1 }
-	const knightDefaults = { skillLevel: 1, playerCount: 0, refinement: 1 }
-	const eternalDefaults = { skillLevel: 1, spUsed: 25 }
+	const knightDefaults = { skillLevel: 10, playerCount: 0, refinement: 1 }
+	const eternalDefaults = { skillLevel: 10, spUsed: 25 }
 	const braveDefaults = { isCaster: 0 }
 
 	const skillDefaults: Record<string, any> = {

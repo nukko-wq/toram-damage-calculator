@@ -23,14 +23,12 @@ export default function SkillCard({
 
 	// スキル名の表示形式を決定（パラメータ値付き）
 	const getDisplayName = (): string => {
-		if (!skill.isEnabled) return skill.name
-
-		// スキルレベルがある場合は「スキル名/レベル」形式
+		// スキルレベルがある場合は「スキル名/レベル」形式（有効・無効問わず）
 		if (skill.parameters.skillLevel) {
 			return `${skill.name}/${skill.parameters.skillLevel}`
 		}
 
-		// スタックカウントがある場合
+		// スタックカウントがある場合（有効・無効問わず）
 		if (skill.parameters.stackCount) {
 			return `${skill.name}(${skill.parameters.stackCount})`
 		}
@@ -117,7 +115,7 @@ export default function SkillCard({
 						}
 						isOpen={isPopoverOpen}
 						onOpenChange={setIsPopoverOpen}
-						placement="bottom"
+						placement="center"
 					>
 						<SkillParameterForm
 							skill={skill}
