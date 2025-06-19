@@ -160,6 +160,7 @@ const BuffSkillForm = () => {
     updateBuffSkills({ skills: updatedSkills })
   }
   
+  // ポップオーバー用のパラメータ更新処理
   const handleParameterChange = (skillId: string, paramName: string, value: number) => {
     const updatedSkills = storeBuffSkills.skills.map(skill =>
       skill.id === skillId 
@@ -212,30 +213,53 @@ const BuffSkillForm = () => {
   }, [mainWeaponType, resetMasterySkillsOnWeaponChange])
   
   // スキル系統別の表示・管理（マスタリスキルフィルタリング付き）
-  const skillsByCategory = useMemo(() => {
+  const flatSkillsList = useMemo(() => {
     const visibleMasterySkills = getVisibleMasterySkills(mainWeaponType)
     
-    return storeBuffSkills.skills.reduce((acc, skill) => {
-      // マスタリスキルの場合は武器種に応じてフィルタリング
-      if (skill.category === 'mastery') {
-        if (visibleMasterySkills.length === 0) {
-          // 抜刀剣等：マスタリスキル系統全体を非表示
-          return acc
+    return storeBuffSkills.skills
+      .filter(skill => {
+        // マスタリスキルの場合は武器種に応じてフィルタリング
+        if (skill.category === 'mastery') {
+          if (visibleMasterySkills.length === 0) {
+            // 抜刀剣等：マスタリスキル系統全体を非表示
+            return false
+          }
+          if (!visibleMasterySkills.includes(skill.id)) {
+            // 該当しないマスタリスキルは非表示
+            return false
+          }
         }
-        if (!visibleMasterySkills.includes(skill.id)) {
-          // 該当しないマスタリスキルは非表示
-          return acc
-        }
-      }
-      
-      if (!acc[skill.category]) acc[skill.category] = []
-      acc[skill.category].push(skill)
-      return acc
-    }, {} as Record<BuffSkillCategory, BuffSkill[]>)
+        return true
+      })
+      .map(skill => ({
+        ...skill,
+        categoryLabel: categoryNameMap[skill.category],
+        // スキル名に現在のパラメータ値を表示
+        displayName: skill.isEnabled && skill.parameters.skillLevel 
+          ? `${skill.name}/${skill.parameters.skillLevel}`
+          : skill.name
+      }))
   }, [storeBuffSkills.skills, mainWeaponType])
   
   return (
-    // UI実装...
+    <div className="space-y-4">
+      <h2 className="text-xl font-bold text-gray-800">バフスキル設定</h2>
+      
+      {/* 5カラムグリッドレイアウト */}
+      <div className="grid grid-cols-5 gap-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2">
+        {flatSkillsList.map(skill => (
+          <SkillCard
+            key={skill.id}
+            skill={skill}
+            displayName={skill.displayName}
+            categoryLabel={skill.categoryLabel}
+            onToggle={handleSkillToggle}
+            onParameterChange={handleParameterChange}
+            showPopover={true} // ポップオーバー機能を有効化
+          />
+        ))}
+      </div>
+    </div>
   )
 }
 ```
