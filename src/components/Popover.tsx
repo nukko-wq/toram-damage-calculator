@@ -73,7 +73,7 @@ export function Popover({
 		};
 
 		updatePosition();
-		
+
 		// 中央表示の場合はリサイズイベントのみ監視
 		if (placement === "center") {
 			window.addEventListener("resize", updatePosition);
@@ -81,7 +81,7 @@ export function Popover({
 				window.removeEventListener("resize", updatePosition);
 			};
 		}
-		
+
 		// その他の配置の場合はスクロール・リサイズ両方を監視
 		window.addEventListener("scroll", updatePosition);
 		window.addEventListener("resize", updatePosition);
@@ -181,7 +181,7 @@ export function Popover({
 				ref={triggerRef}
 				onClick={handleTriggerClick}
 				onKeyDown={handleTriggerKeyDown}
-				className="cursor-pointer border-0 bg-transparent p-0 w-full text-left"
+				className="cursor-pointer border-0 bg-transparent p-0 w-36 text-left"
 				type="button"
 				aria-expanded={isOpen}
 			>

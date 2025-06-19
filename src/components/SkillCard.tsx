@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { BuffSkill, BuffSkillParameters } from "@/types/calculator";
 import { Popover } from "./Popover";
 import { SkillParameterForm } from "./SkillParameterForm";
-import ToggleSwitch from "./ToggleSwitch";
-import type { BuffSkill, BuffSkillParameters } from "@/types/calculator";
+import SkillToggleButtons from "./SkillToggleButton";
 
 interface SkillCardProps {
 	skill: BuffSkill;
@@ -129,9 +129,7 @@ export default function SkillCard({
 	return (
 		<div className="border-b-2 border-blue-200">
 			{/* カテゴリラベル */}
-			<div className="text-xs text-gray-500 font-medium mb-1">
-				{categoryLabel}
-			</div>
+			<div className="text-[10px] text-gray-500">{categoryLabel}</div>
 
 			{/* スキル名とトグルスイッチ */}
 			<div className="skill-header flex items-center justify-between mb-1">
@@ -157,10 +155,9 @@ export default function SkillCard({
 						{getDisplayName()}
 					</span>
 				)}
-				<ToggleSwitch
-					checked={skill.isEnabled}
-					onChange={(checked) => onToggle(skill.id, checked)}
-					size="sm"
+				<SkillToggleButtons
+					isEnabled={skill.isEnabled}
+					onToggle={(enabled) => onToggle(skill.id, enabled)}
 				/>
 			</div>
 		</div>

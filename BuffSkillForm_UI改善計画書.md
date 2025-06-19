@@ -102,7 +102,7 @@ export default function BuffSkillForm() {
     <div className="space-y-4">
       <h2 className="text-xl font-bold text-gray-800">バフスキル設定</h2>
       
-      <div className="grid grid-cols-5 gap-4 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2">
+      <div className="grid sm:grid-cols-2 grid-cols-5 gap-4 lg:grid-cols-4 md:grid-cols-3">
         {flatSkillsList.map(skill => (
           <SkillCard
             key={skill.id}
