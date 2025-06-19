@@ -155,7 +155,7 @@ function SkillCard({ skill, categoryLabel, onToggle, onParameterChange }: SkillC
   return (
     <div className="skill-card border rounded-lg p-3 bg-white shadow-sm">
       {/* カテゴリラベル */}
-      <div className="category-label text-xs text-gray-500 font-medium mb-2 pb-1 border-b border-gray-200">
+      <div className="text-xs text-gray-500 font-medium mb-2 pb-1 border-b border-gray-200">
         {categoryLabel}
       </div>
       
