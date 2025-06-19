@@ -98,7 +98,7 @@ export interface SaveDataStore {
 	showUnsavedChangesModal: boolean
 
 	loadSaveDataList: () => Promise<void>
-	switchSaveData: (saveId: string) => Promise<void>
+	switchSaveData: (saveId: string) => Promise<CalculatorData>
 	createSaveData: (name: string, data: CalculatorData) => Promise<void>
 	deleteSaveData: (saveId: string) => Promise<void>
 	renameSaveData: (saveId: string, newName: string) => Promise<void>

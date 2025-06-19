@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useCalculatorStore, useSaveDataStore } from '@/stores'
-import SaveDataListItem from './SaveDataListItem'
-import NewSaveDataModal from './NewSaveDataModal'
+import { useState, useEffect } from "react";
+import { useCalculatorStore, useSaveDataStore } from "@/stores";
+import SaveDataListItem from "./SaveDataListItem";
+import NewSaveDataModal from "./NewSaveDataModal";
 
 interface SaveDataManagerProps {
 	// 将来的に削除予定（Zustand移行後は不要）
-	currentData?: any
-	onDataLoad?: any
-	onDataSave?: any
-	hasUnsavedChanges?: boolean
-	isFirstLoad?: boolean
+	currentData?: any;
+	onDataLoad?: any;
+	onDataSave?: any;
+	hasUnsavedChanges?: boolean;
+	isFirstLoad?: boolean;
 }
 
 export default function SaveDataManager({}: SaveDataManagerProps) {
@@ -21,7 +21,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 		hasUnsavedChanges,
 		loadSaveData,
 		saveCurrentData,
-	} = useCalculatorStore()
+	} = useCalculatorStore();
 
 	const {
 		saveDataList,
@@ -39,121 +39,127 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 		setPendingSaveId,
 		setShowUnsavedChangesModal,
 		setError,
-	} = useSaveDataStore()
+	} = useSaveDataStore();
 
-	const [isNewSaveModalOpen, setIsNewSaveModalOpen] = useState(false)
+	const [isNewSaveModalOpen, setIsNewSaveModalOpen] = useState(false);
 
 	// 初期化（一度だけ実行）
 	useEffect(() => {
-		loadSaveDataList()
-	}, [])
+		loadSaveDataList();
+	}, []);
 
 	// セーブデータの切り替え
 	const handleSaveDataSelect = async (saveId: string) => {
 		// 未保存の変更がある場合は確認ダイアログを表示
 		if (hasUnsavedChanges && saveId !== currentSaveId) {
-			setPendingSaveId(saveId)
-			setShowUnsavedChangesModal(true)
-			return
+			setPendingSaveId(saveId);
+			setShowUnsavedChangesModal(true);
+			return;
 		}
 
 		try {
 			// Zustandストア経由でセーブデータを切り替え
-			await switchSaveData(saveId)
+			const loadedData = await switchSaveData(saveId);
+			// calculatorStoreにデータを読み込んで未保存変更フラグをリセット
+			await loadSaveData(loadedData);
 		} catch (err) {
-			console.error('セーブデータの切り替えに失敗しました:', err)
+			console.error("セーブデータの切り替えに失敗しました:", err);
 		}
-	}
+	};
 
 	// 新しいセーブデータを作成
 	const handleCreateSaveData = async (name: string) => {
 		try {
-			await createSaveData(name, currentData)
-			setIsNewSaveModalOpen(false)
+			await createSaveData(name, currentData);
+			setIsNewSaveModalOpen(false);
 		} catch (err) {
-			console.error('セーブデータの作成に失敗しました:', err)
+			console.error("セーブデータの作成に失敗しました:", err);
 		}
-	}
+	};
 
 	// セーブデータを削除
 	const handleDeleteSaveData = async (saveId: string) => {
 		try {
-			const defaultData = await deleteSaveData(saveId)
+			const defaultData = await deleteSaveData(saveId);
 
 			// 削除したセーブデータが現在選択中だった場合、デフォルトデータを読み込み
 			if (currentSaveId === saveId && defaultData) {
-				await loadSaveData(defaultData)
+				await loadSaveData(defaultData);
 			}
 		} catch (err) {
-			console.error('セーブデータの削除に失敗しました:', err)
+			console.error("セーブデータの削除に失敗しました:", err);
 		}
-	}
+	};
 
 	// セーブデータ名を変更
 	const handleRenameSaveData = async (saveId: string, newName: string) => {
 		try {
-			await renameSaveData(saveId, newName)
+			await renameSaveData(saveId, newName);
 		} catch (err) {
-			console.error('セーブデータの名前変更に失敗しました:', err)
+			console.error("セーブデータの名前変更に失敗しました:", err);
 		}
-	}
+	};
 
 	// セーブデータの並び順を変更
 	const handleReorderSaveData = async (newOrder: string[]) => {
 		try {
-			await reorderSaveData(newOrder)
+			await reorderSaveData(newOrder);
 		} catch (err) {
-			console.error('セーブデータの並び替えに失敗しました:', err)
+			console.error("セーブデータの並び替えに失敗しました:", err);
 		}
-	}
+	};
 
 	// 現在のデータを保存
 	const handleSaveCurrentData = async () => {
 		try {
-			await saveCurrentData()
+			await saveCurrentData();
 		} catch (err) {
-			console.error('データ保存エラー:', err)
+			console.error("データ保存エラー:", err);
 		}
-	}
+	};
 
 	// 未保存変更の確認ダイアログで「保存せずに切り替え」を選択
 	const handleDiscardChanges = async () => {
 		if (pendingSaveId) {
-			setShowUnsavedChangesModal(false)
-			setPendingSaveId(null)
+			setShowUnsavedChangesModal(false);
+			setPendingSaveId(null);
 
 			try {
 				// Zustandストア経由でセーブデータを切り替え
-				await switchSaveData(pendingSaveId)
+				const loadedData = await switchSaveData(pendingSaveId);
+				// calculatorStoreにデータを読み込んで未保存変更フラグをリセット
+				await loadSaveData(loadedData);
 			} catch (err) {
-				console.error('セーブデータの切り替えに失敗しました:', err)
+				console.error("セーブデータの切り替えに失敗しました:", err);
 			}
 		}
-	}
+	};
 
 	// 未保存変更の確認ダイアログで「保存してから切り替え」を選択
 	const handleSaveAndSwitch = async () => {
 		if (pendingSaveId) {
 			try {
 				// 現在のデータを保存
-				await saveCurrentData()
+				await saveCurrentData();
 
 				// 保存後にセーブデータを切り替え
-				setShowUnsavedChangesModal(false)
-				setPendingSaveId(null)
+				setShowUnsavedChangesModal(false);
+				setPendingSaveId(null);
 
-				await switchSaveData(pendingSaveId)
+				const loadedData = await switchSaveData(pendingSaveId);
+				// calculatorStoreにデータを読み込んで未保存変更フラグをリセット
+				await loadSaveData(loadedData);
 			} catch (err) {
-				console.error('セーブデータの切り替えに失敗しました:', err)
+				console.error("セーブデータの切り替えに失敗しました:", err);
 			}
 		}
-	}
+	};
 
 	// 未保存変更の確認ダイアログをキャンセル
 	const handleCancelSwitch = () => {
-		setShowUnsavedChangesModal(false)
-		setPendingSaveId(null)
-	}
+		setShowUnsavedChangesModal(false);
+		setPendingSaveId(null);
+	};
 
 	if (isLoading) {
 		return (
@@ -163,7 +169,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 					<span className="ml-3 text-gray-600">読み込み中...</span>
 				</div>
 			</div>
-		)
+		);
 	}
 
 	return (
@@ -175,8 +181,8 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 						onClick={handleSaveCurrentData}
 						className={`px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center ${
 							hasUnsavedChanges
-								? 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500'
-								: 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+								? "bg-green-600 hover:bg-green-700 cursor-pointer"
+								: "bg-gray-600"
 						}`}
 					>
 						{hasUnsavedChanges && (
@@ -194,12 +200,12 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 								/>
 							</svg>
 						)}
-						{hasUnsavedChanges ? '未保存の変更を保存' : '現在のデータを保存'}
+						現在のデータを保存
 					</button>
 					<button
 						type="button"
 						onClick={() => setIsNewSaveModalOpen(true)}
-						className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+						className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
 					>
 						新規セーブ作成
 					</button>
@@ -379,5 +385,5 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 				</div>
 			)}
 		</div>
-	)
+	);
 }

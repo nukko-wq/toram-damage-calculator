@@ -181,7 +181,7 @@ export function Popover({
 				ref={triggerRef}
 				onClick={handleTriggerClick}
 				onKeyDown={handleTriggerKeyDown}
-				className="cursor-pointer border-0 bg-transparent p-0 w-36 text-left"
+				className="cursor-pointer border-0 bg-transparent text-left"
 				type="button"
 				aria-expanded={isOpen}
 			>
