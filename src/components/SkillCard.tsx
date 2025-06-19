@@ -26,8 +26,8 @@ export default function SkillCard({
 		// 特殊パラメータスキルの表示形式
 		switch (skill.id) {
 			case 'eternal_nightmare':
-				if (skill.parameters.skillLevel && skill.parameters.spUsed) {
-					return `${skill.name}/${skill.parameters.skillLevel}(SP:${skill.parameters.spUsed})`
+				if (skill.parameters.skillLevel) {
+					return `${skill.name}/${skill.parameters.skillLevel}`
 				}
 				return skill.name
 
@@ -39,6 +39,15 @@ export default function SkillCard({
 
 			case 'brave':
 				// ブレイブは基本名のみ（isCasterは内部パラメータとして扱う）
+				return skill.name
+
+			case 'godspeed_parry':
+			case 'passion_song':
+			case 'tornado_lance':
+				// 重ねがけスキルは×記号で重ねがけ数を表示
+				if (skill.parameters.stackCount) {
+					return `${skill.name}×${skill.parameters.stackCount}`
+				}
 				return skill.name
 
 			default:
