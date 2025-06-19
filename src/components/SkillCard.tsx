@@ -23,18 +23,38 @@ export default function SkillCard({
 
 	// スキル名の表示形式を決定（パラメータ値付き）
 	const getDisplayName = (): string => {
-		// スキルレベルがある場合は「スキル名/レベル」形式（有効・無効問わず）
-		if (skill.parameters.skillLevel) {
-			return `${skill.name}/${skill.parameters.skillLevel}`
-		}
+		// 特殊パラメータスキルの表示形式
+		switch (skill.id) {
+			case 'eternal_nightmare':
+				if (skill.parameters.skillLevel && skill.parameters.spUsed) {
+					return `${skill.name}/${skill.parameters.skillLevel}(SP:${skill.parameters.spUsed})`
+				}
+				return skill.name
 
-		// スタックカウントがある場合（有効・無効問わず）
-		if (skill.parameters.stackCount) {
-			return `${skill.name}(${skill.parameters.stackCount})`
-		}
+			case 'knight_pledge':
+				if (skill.parameters.skillLevel) {
+					return `${skill.name}/${skill.parameters.skillLevel}`
+				}
+				return skill.name
 
-		// その他のパラメータがある場合は基本名のみ
-		return skill.name
+			case 'brave':
+				// ブレイブは基本名のみ（isCasterは内部パラメータとして扱う）
+				return skill.name
+
+			default:
+				// 通常のスキルレベル表示
+				if (skill.parameters.skillLevel) {
+					return `${skill.name}/${skill.parameters.skillLevel}`
+				}
+
+				// スタックカウント表示
+				if (skill.parameters.stackCount) {
+					return `${skill.name}(${skill.parameters.stackCount})`
+				}
+
+				// その他は基本名のみ
+				return skill.name
+		}
 	}
 
 	// パラメータが必要かどうかを判定
@@ -78,7 +98,7 @@ export default function SkillCard({
 			case 'tornado_lance':
 			case 'netsujo_no_uta':
 			case 'shinsoku_no_sabaki':
-			// 特殊パラメータ
+			// 特殊パラメータスキル
 			case 'brave':
 				return true
 

@@ -60,8 +60,6 @@ export function SkillParameterForm({
 			case 'kairiki_ranshin':
 			case 'shinsoku_no_kiseki':
 			case 'philo_eclaire':
-			case 'eternal_nightmare':
-			case 'knight_pledge':
 			case 'camouflage':
 			case 'nindo':
 			case 'ninjutsu':
