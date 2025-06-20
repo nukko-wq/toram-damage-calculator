@@ -193,10 +193,30 @@ const BuffSkillForm = () => {
     return weaponTypeToMasterySkills[weaponType] || []
   }
   
-  // 武器種変更時のマスタリスキルリセット処理
-  const resetMasterySkillsOnWeaponChange = useCallback((newWeaponType: WeaponType) => {
+  // 武器種から専用スキルIDを取得
+  const getWeaponSpecificSkills = (weaponType: WeaponType) => {
+    const weaponTypeToSpecialSkills = {
+      '素手': [],
+      '片手剣': [],
+      '双剣': [],
+      '両手剣': [],
+      '手甲': [],
+      '旋風槍': ['thor_hammer'], // トールハンマー
+      '抜刀剣': [],
+      '弓': [],
+      '自動弓': [],
+      '杖': [],
+      '魔導具': [],
+    }
+    return weaponTypeToSpecialSkills[weaponType] || []
+  }
+  
+  // 武器種変更時のマスタリスキル・専用スキルリセット処理
+  const resetWeaponDependentSkillsOnWeaponChange = useCallback((newWeaponType: WeaponType) => {
+    const weaponSpecificSkillIds = ['thor_hammer'] // 拡張可能
+    
     const updatedSkills = storeBuffSkills.skills.map(skill => {
-      if (skill.category === 'mastery') {
+      if (skill.category === 'mastery' || weaponSpecificSkillIds.includes(skill.id)) {
         return {
           ...skill,
           isEnabled: false,
@@ -212,14 +232,15 @@ const BuffSkillForm = () => {
   const prevWeaponType = useRef(mainWeaponType)
   useEffect(() => {
     if (prevWeaponType.current !== mainWeaponType) {
-      resetMasterySkillsOnWeaponChange(mainWeaponType)
+      resetWeaponDependentSkillsOnWeaponChange(mainWeaponType)
       prevWeaponType.current = mainWeaponType
     }
-  }, [mainWeaponType, resetMasterySkillsOnWeaponChange])
+  }, [mainWeaponType, resetWeaponDependentSkillsOnWeaponChange])
   
-  // スキル系統別の表示・管理（マスタリスキルフィルタリング付き）
+  // スキル系統別の表示・管理（マスタリ・専用スキルフィルタリング付き）
   const flatSkillsList = useMemo(() => {
     const visibleMasterySkills = getVisibleMasterySkills(mainWeaponType)
+    const visibleSpecialSkills = getWeaponSpecificSkills(mainWeaponType)
     
     return storeBuffSkills.skills
       .filter(skill => {
@@ -234,6 +255,15 @@ const BuffSkillForm = () => {
             return false
           }
         }
+        
+        // 武器種専用スキルの場合は武器種に応じてフィルタリング
+        if (['thor_hammer'].includes(skill.id)) { // 拡張可能
+          if (!visibleSpecialSkills.includes(skill.id)) {
+            // 該当しない専用スキルは非表示
+            return false
+          }
+        }
+        
         return true
       })
       .map(skill => ({

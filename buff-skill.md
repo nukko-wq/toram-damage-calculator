@@ -190,6 +190,18 @@
 - **マスタリスキル設定のリセット**: 武器種変更時に全てのマスタリスキルがデフォルト状態にリセット
 - **新規表示スキルの初期化**: 新しい武器種に対応するマスタリスキルは無効状態・初期パラメータで表示
 
+### 3.2.2 武器種専用スキル自動表示システム
+- **武器種連動表示**: メイン武器の武器種に応じて該当する専用スキルのみを表示
+- **武器種と専用スキルの対応関係**:
+
+| 武器種 | 表示される専用スキル |
+|--------|-------------------|
+| 旋風槍 | トールハンマー（ハルバードスキル） |
+
+- **動的表示切り替え**: 武器種変更時に即座に専用スキル表示を更新
+- **専用スキル設定のリセット**: 武器種変更時に専用スキルがデフォルト状態にリセット
+- **新規表示スキルの初期化**: 新しい武器種に対応する専用スキルは無効状態・初期パラメータで表示
+
 ### 3.3 スキル設定UI
 - **トグルスイッチ**: 各スキルの有効/無効を切り替え（チェックボックスからトグルスイッチに変更）
 - **スキル名クリック**: スキル名をクリックでポップオーバーを表示
@@ -230,7 +242,9 @@ type BuffSkillCategory =
   | 'battle' | 'pet' | 'minstrel' | 'partisan'
 ```
 
-### 4.2 武器種とマスタリスキルの対応関係
+### 4.2 武器種とスキルの対応関係
+
+#### 4.2.1 武器種とマスタリスキルの対応関係
 ```typescript
 // 武器種からマスタリスキルIDを取得するマッピング
 const weaponTypeToMasterySkills: Record<WeaponType, string[]> = {
@@ -246,11 +260,45 @@ const weaponTypeToMasterySkills: Record<WeaponType, string[]> = {
   '杖': ['magic_mastery', 'shield_mastery'],
   '魔導具': ['magic_mastery'],
 }
+```
+
+#### 4.2.2 武器種と専用スキルの対応関係
+```typescript
+// 武器種から専用スキルIDを取得するマッピング
+const weaponTypeToSpecialSkills: Record<WeaponType, string[]> = {
+  '素手': [],
+  '片手剣': [],
+  '双剣': [],
+  '両手剣': [],
+  '手甲': [],
+  '旋風槍': ['thor_hammer'], // トールハンマー
+  '抜刀剣': [],
+  '弓': [],
+  '自動弓': [],
+  '杖': [],
+  '魔導具': [],
+}
 
 // マスタリスキルリセット処理
 const resetMasterySkills = (skills: BuffSkill[]): BuffSkill[] => {
   return skills.map(skill => {
     if (skill.category === 'mastery') {
+      return {
+        ...skill,
+        isEnabled: false,
+        parameters: getDefaultParametersForSkill(skill.id)
+      }
+    }
+    return skill
+  })
+}
+
+// 武器種専用スキルリセット処理
+const resetWeaponSpecificSkills = (skills: BuffSkill[]): BuffSkill[] => {
+  const weaponSpecificSkillIds = ['thor_hammer'] // 現在はトールハンマーのみ
+  
+  return skills.map(skill => {
+    if (weaponSpecificSkillIds.includes(skill.id)) {
       return {
         ...skill,
         isEnabled: false,

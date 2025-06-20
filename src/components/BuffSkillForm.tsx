@@ -6,6 +6,8 @@ import {
 	categoryNameMap,
 	getDefaultParametersForSkill,
 	weaponTypeToMasterySkills,
+	weaponTypeToSpecialSkills,
+	weaponSpecificSkillIds,
 } from '@/utils/buffSkillDefaults'
 import SkillCard from './SkillCard'
 import type { WeaponType } from '@/types/calculator'
@@ -33,12 +35,17 @@ export default function BuffSkillForm() {
 		return weaponTypeToMasterySkills[weaponType] || []
 	}, [])
 
-	// 武器種変更時のマスタリスキルリセット処理
-	const resetMasterySkillsOnWeaponChange = useCallback(() => {
+	// 武器種に応じた専用スキルフィルタリング
+	const getVisibleSpecialSkills = useCallback((weaponType: WeaponType) => {
+		return weaponTypeToSpecialSkills[weaponType] || []
+	}, [])
+
+	// 武器種変更時のマスタリスキル・専用スキルリセット処理
+	const resetWeaponDependentSkillsOnWeaponChange = useCallback(() => {
 		if (!isInitialized || !localInitialized) return
 
 		const updatedSkills = storeBuffSkills.skills.map((skill) => {
-			if (skill.category === 'mastery') {
+			if (skill.category === 'mastery' || weaponSpecificSkillIds.includes(skill.id)) {
 				return {
 					...skill,
 					isEnabled: false,
@@ -55,17 +62,18 @@ export default function BuffSkillForm() {
 		localInitialized,
 	])
 
-	// 武器種変更を検知してマスタリスキルをリセット
+	// 武器種変更を検知してマスタリスキル・専用スキルをリセット
 	useEffect(() => {
 		if (prevWeaponType.current !== mainWeaponType) {
-			resetMasterySkillsOnWeaponChange()
+			resetWeaponDependentSkillsOnWeaponChange()
 			prevWeaponType.current = mainWeaponType
 		}
-	}, [mainWeaponType, resetMasterySkillsOnWeaponChange])
+	}, [mainWeaponType, resetWeaponDependentSkillsOnWeaponChange])
 
-	// スキルを平坦なリストに変換（マスタリスキルフィルタリング付き）
+	// スキルを平坦なリストに変換（マスタリ・専用スキルフィルタリング付き）
 	const flatSkillsList = useMemo(() => {
 		const visibleMasterySkills = getVisibleMasterySkills(mainWeaponType)
+		const visibleSpecialSkills = getVisibleSpecialSkills(mainWeaponType)
 
 		return storeBuffSkills.skills
 			.filter((skill) => {
@@ -80,13 +88,22 @@ export default function BuffSkillForm() {
 						return false
 					}
 				}
+
+				// 武器種専用スキルの場合は武器種に応じてフィルタリング
+				if (weaponSpecificSkillIds.includes(skill.id)) {
+					if (!visibleSpecialSkills.includes(skill.id)) {
+						// 該当しない専用スキルは非表示
+						return false
+					}
+				}
+
 				return true
 			})
 			.map((skill) => ({
 				...skill,
 				categoryLabel: categoryNameMap[skill.category],
 			}))
-	}, [storeBuffSkills.skills, mainWeaponType, getVisibleMasterySkills])
+	}, [storeBuffSkills.skills, mainWeaponType, getVisibleMasterySkills, getVisibleSpecialSkills])
 
 	// スキルのオン/オフ切り替え
 	const handleSkillToggle = (skillId: string, enabled: boolean) => {

@@ -453,6 +453,24 @@ export const weaponTypeToMasterySkills: Record<string, string[]> = {
 	魔導具: ['magic_mastery'],
 }
 
+// 武器種から専用スキルIDを取得するマッピング
+export const weaponTypeToSpecialSkills: Record<string, string[]> = {
+	素手: [],
+	片手剣: [],
+	双剣: [],
+	両手剣: [],
+	手甲: [],
+	旋風槍: ['thor_hammer'], // トールハンマー
+	抜刀剣: [],
+	弓: [],
+	自動弓: [],
+	杖: [],
+	魔導具: [],
+}
+
+// 武器種専用スキルIDのリスト（フィルタリング用）
+export const weaponSpecificSkillIds = ['thor_hammer']
+
 // スキルIDからデフォルトパラメータを取得
 export const getDefaultParametersForSkill = (skillId: string) => {
 	const masteryDefaults = { skillLevel: 10 }
