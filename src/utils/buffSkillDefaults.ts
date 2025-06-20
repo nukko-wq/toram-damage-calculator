@@ -469,7 +469,11 @@ export const weaponTypeToSpecialSkills: Record<string, string[]> = {
 }
 
 // 武器種専用スキルIDのリスト（フィルタリング用）
-export const weaponSpecificSkillIds = ['thor_hammer', 'tornado_lance', 'critical_parry']
+export const weaponSpecificSkillIds = [
+	'thor_hammer',
+	'tornado_lance',
+	'critical_parry',
+]
 
 // スキルIDからデフォルトパラメータを取得
 export const getDefaultParametersForSkill = (skillId: string) => {

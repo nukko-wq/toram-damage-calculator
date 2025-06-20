@@ -45,7 +45,10 @@ export default function BuffSkillForm() {
 		if (!isInitialized || !localInitialized) return
 
 		const updatedSkills = storeBuffSkills.skills.map((skill) => {
-			if (skill.category === 'mastery' || weaponSpecificSkillIds.includes(skill.id)) {
+			if (
+				skill.category === 'mastery' ||
+				weaponSpecificSkillIds.includes(skill.id)
+			) {
 				return {
 					...skill,
 					isEnabled: false,
@@ -103,7 +106,12 @@ export default function BuffSkillForm() {
 				...skill,
 				categoryLabel: categoryNameMap[skill.category],
 			}))
-	}, [storeBuffSkills.skills, mainWeaponType, getVisibleMasterySkills, getVisibleSpecialSkills])
+	}, [
+		storeBuffSkills.skills,
+		mainWeaponType,
+		getVisibleMasterySkills,
+		getVisibleSpecialSkills,
+	])
 
 	// スキルのオン/オフ切り替え
 	const handleSkillToggle = (skillId: string, enabled: boolean) => {

@@ -21,7 +21,7 @@ src/stores/
 
 | ストア | 責任範囲 | 主要データ |
 |--------|----------|------------|
-| CalculatorStore | 計算機の全データ管理 | 基本ステータス、武器、装備、クリスタ、料理、敵情報、バフスキル |
+| CalculatorStore | 計算機の全データ管理 | 基本ステータス、武器、装備、クリスタ、料理、敵情報、バフスキル、バフアイテム |
 | SaveDataStore | セーブデータ操作 | セーブデータリスト、現在のセーブID |
 | UIStore | UI状態管理 | モーダル表示状態、管理画面表示状態 |
 
@@ -59,6 +59,7 @@ interface CalculatorStore {
   updateFood: (food: FoodFormData) => void
   updateEnemy: (enemy: EnemyFormData) => void
   updateBuffSkills: (buffSkills: BuffSkillFormData) => void
+  updateBuffItems: (buffItems: BuffItemFormData) => void
 }
 ```
 
@@ -84,18 +85,20 @@ interface SaveDataStore {
   currentSaveId: string | null
 
   // === 操作 ===
-  loadSaveDataList: () => Promise<void>
+  loadSaveDataList: () => Promise<void>                    // ユーザーデータのみロード
   switchSaveData: (saveId: string) => Promise<void>
-  createSaveData: (name: string) => Promise<void>
-  deleteSaveData: (saveId: string) => Promise<void>
+  createSaveData: (name: string) => Promise<void>          // 作成後自動切り替え
+  deleteSaveData: (saveId: string) => Promise<void>        // 全削除時メインデータ切り替え
+  switchToMainData: () => Promise<void>                    // メインデータ切り替え専用
 }
 ```
 
 **主要機能**:
-- セーブデータリストの管理
+- ユーザー作成セーブデータリストの管理（メインデータ除外）
 - セーブデータの切り替え
-- 新規セーブデータの作成
-- セーブデータの削除
+- 新規セーブデータの作成（作成後自動切り替え）
+- セーブデータの削除（全削除時メインデータ自動復帰）
+- メインデータ切り替え機能
 
 ### 3.3 UIStore
 
@@ -299,7 +302,95 @@ const BuffSkillForm = () => {
 }
 ```
 
-### 4.4 初期化管理
+### 4.4 バフアイテム統合の特殊パターン
+
+バフアイテムフォームでは12カテゴリのアイテム選択を管理するため、シンプルな統合パターンを使用:
+
+```typescript
+// バフアイテムフォームの例
+const BuffItemForm = () => {
+  const storeBuffItems = useCalculatorStore(state => state.data.buffItems)
+  const updateBuffItems = useCalculatorStore(state => state.updateBuffItems)
+  const [isInitialized, setIsInitialized] = useState(false)
+  
+  // フォーム設定
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<BuffItemFormData>({
+    resolver: zodResolver(buffItemFormDataSchema),
+    values: storeBuffItems, // Zustandからのデータ
+    mode: 'onChange',
+  })
+  
+  // 変更検知とストア更新
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (!isInitialized || !name || !value || type !== 'change') {
+        return
+      }
+      updateBuffItems(value as BuffItemFormData)
+    })
+    return () => subscription.unsubscribe()
+  }, [watch, isInitialized, updateBuffItems])
+  
+  // 初期化管理
+  useEffect(() => {
+    setIsInitialized(false)
+    const timer = setTimeout(() => setIsInitialized(true), 30)
+    return () => clearTimeout(timer)
+  }, [storeBuffItems])
+  
+  return (
+    <div className="space-y-6">
+      <h2 className="text-xl font-bold text-gray-800">バフアイテム設定</h2>
+      
+      {/* カテゴリ別セレクトボックス */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            物理威力
+          </label>
+          <select
+            {...register('physicalPower')}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="">なし</option>
+            {getBuffItemsByCategory('physicalPower').map(item => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            魔法威力
+          </label>
+          <select
+            {...register('magicalPower')}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="">なし</option>
+            {getBuffItemsByCategory('magicalPower').map(item => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        {/* 他の10カテゴリも同様に実装 */}
+      </div>
+    </div>
+  )
+}
+```
+
+### 4.5 初期化管理
 
 セーブデータ切り替え時のちらつき防止機能:
 
@@ -333,6 +424,24 @@ SaveDataManager → SaveDataStore.switchSaveData → CalculatorStore.loadSaveDat
 
 ```
 アプリ起動 → initializeStorage → CalculatorStore.initialize → デフォルトセーブデータ読み込み
+```
+
+### 5.4 新規セーブデータ作成フロー
+
+```
+[新規作成] → 名前入力 → SaveDataStore.createSaveData → 新規データ作成 → 自動切り替え → CalculatorStore.loadSaveData
+```
+
+### 5.5 全ユーザーデータ削除フロー
+
+```
+[最後のユーザーデータ削除] → SaveDataStore.deleteSaveData → SaveDataStore.switchToMainData → CalculatorStore.loadSaveData(メインデータ)
+```
+
+### 5.6 セーブデータリスト表示フロー
+
+```
+SaveDataManager表示 → SaveDataStore.loadSaveDataList → ユーザー作成データのみフィルタリング → リスト表示
 ```
 
 ## 6. 型安全性

@@ -25,7 +25,7 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			pendingSaveId: null,
 			showUnsavedChangesModal: false,
 
-			// ===== セーブデータ一覧読み込み =====
+			// ===== セーブデータ一覧読み込み（ユーザー作成データのみ） =====
 			loadSaveDataList: async () => {
 				try {
 					set({ isLoading: true, error: null })
@@ -33,12 +33,15 @@ export const useSaveDataStore = create<SaveDataStore>()(
 					// ストレージを初期化
 					await initializeStorage()
 
-					// セーブデータリストを取得
-					const saveData = getAllSaveData()
+					// セーブデータリストを取得（メインデータ「default」を除外）
+					const allSaveData = getAllSaveData()
+					const userSaveData = allSaveData.filter(
+						(data) => data.id !== 'default',
+					)
 					const current = getCurrentSaveData()
 
 					set({
-						saveDataList: saveData,
+						saveDataList: userSaveData,
 						currentSaveId: current.id,
 						isLoading: false,
 					})
@@ -67,12 +70,16 @@ export const useSaveDataStore = create<SaveDataStore>()(
 				}
 			},
 
-			// ===== 新規セーブデータ作成 =====
+			// ===== 新規セーブデータ作成（作成後自動切り替え） =====
 			createSaveData: async (name, data) => {
 				try {
 					const newSaveData = await createSaveDataUtil(name, data)
 					await get().loadSaveDataList() // リストを再読み込み
-					return newSaveData
+
+					// 作成したセーブデータに自動切り替え
+					const loadedData = await get().switchSaveData(newSaveData.id)
+
+					return { saveData: newSaveData, loadedData }
 				} catch (err) {
 					console.error('セーブデータの作成に失敗しました:', err)
 					set({ error: 'セーブデータの作成に失敗しました' })
@@ -80,16 +87,22 @@ export const useSaveDataStore = create<SaveDataStore>()(
 				}
 			},
 
-			// ===== セーブデータ削除 =====
+			// ===== セーブデータ削除（全削除時メインデータ自動切り替え） =====
 			deleteSaveData: async (saveId) => {
 				try {
 					await deleteSaveDataUtil(saveId)
 					await get().loadSaveDataList() // リストを再読み込み
 
-					// 削除したセーブデータが現在選択中だった場合、デフォルトに切り替え
+					// 全ユーザーデータが削除された場合、メインデータに自動切り替え
+					if (get().saveDataList.length === 0) {
+						const mainData = await get().switchToMainData()
+						return mainData
+					}
+
+					// 削除したセーブデータが現在選択中だった場合、メインデータに切り替え
 					if (get().currentSaveId === saveId) {
-						const defaultData = await get().switchSaveData('default')
-						return defaultData
+						const mainData = await get().switchToMainData()
+						return mainData
 					}
 				} catch (err) {
 					console.error('セーブデータの削除に失敗しました:', err)
@@ -133,6 +146,18 @@ export const useSaveDataStore = create<SaveDataStore>()(
 
 			setError: (error) => {
 				set({ error })
+			},
+
+			// ===== メインデータ切り替え専用 =====
+			switchToMainData: async () => {
+				try {
+					const mainData = await get().switchSaveData('default')
+					return mainData
+				} catch (err) {
+					console.error('メインデータへの切り替えに失敗しました:', err)
+					set({ error: 'メインデータへの切り替えに失敗しました' })
+					throw err
+				}
 			},
 		}),
 		{

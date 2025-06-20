@@ -329,6 +329,7 @@ export interface CalculatorData {
 	food: FoodFormData // 料理データ
 	enemy: EnemyFormData // 新しい敵情報システム
 	buffSkills: BuffSkillFormData // バフスキルデータ
+	buffItems: BuffItemFormData // バフアイテムデータ
 	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
 	legacyEnemy?: EnemyInfo
 }
@@ -616,4 +617,54 @@ export interface BuffSkill {
 // バフスキルフォームデータ
 export interface BuffSkillFormData {
 	skills: BuffSkill[]
+}
+
+// バフアイテムカテゴリ
+export type BuffItemCategory =
+	| 'physicalPower' // 物理威力
+	| 'magicalPower' // 魔法威力
+	| 'physicalDefense' // 物理防御
+	| 'magicalDefense' // 魔法防御
+	| 'elementalAttack' // 属性攻撃
+	| 'elementalDefense' // 属性防御
+	| 'speed' // 速度
+	| 'casting' // 詠唱
+	| 'mp' // MP
+	| 'hp' // HP
+	| 'accuracy' // 命中
+	| 'evasion' // 回避
+
+// プリセットバフアイテム（JSON用）
+export interface PresetBuffItem {
+	id: string
+	name: string
+	category: BuffItemCategory
+	properties: Partial<EquipmentProperties>
+}
+
+// ローカルストレージバフアイテム（プリセット拡張版）
+export interface LocalStorageBuffItem extends PresetBuffItem {
+	isPreset: boolean // 常にtrue（プリセットのみ）
+	isFavorite: boolean // お気に入り設定
+	createdAt: string // 作成日時
+	updatedAt: string // 更新日時
+}
+
+// 統合バフアイテム型
+export type BuffItem = LocalStorageBuffItem
+
+// バフアイテムフォームデータ
+export interface BuffItemFormData {
+	physicalPower: string | null // 選択されたアイテムID（null = なし）
+	magicalPower: string | null
+	physicalDefense: string | null
+	magicalDefense: string | null
+	elementalAttack: string | null
+	elementalDefense: string | null
+	speed: string | null
+	casting: string | null
+	mp: string | null
+	hp: string | null
+	accuracy: string | null
+	evasion: string | null
 }

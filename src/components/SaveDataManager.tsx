@@ -36,6 +36,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 		deleteSaveData,
 		renameSaveData,
 		reorderSaveData,
+		switchToMainData,
 		setPendingSaveId,
 		setShowUnsavedChangesModal,
 		setError,
@@ -67,24 +68,26 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 		}
 	}
 
-	// 新しいセーブデータを作成
+	// 新しいセーブデータを作成（自動切り替え）
 	const handleCreateSaveData = async (name: string) => {
 		try {
-			await createSaveData(name, currentData)
+			const result = await createSaveData(name, currentData)
+			// 作成されたセーブデータに自動切り替えされるため、calculatorStoreにデータを読み込み
+			await loadSaveData(result.loadedData)
 			setIsNewSaveModalOpen(false)
 		} catch (err) {
 			console.error('セーブデータの作成に失敗しました:', err)
 		}
 	}
 
-	// セーブデータを削除
+	// セーブデータを削除（全削除時メインデータ自動切り替え）
 	const handleDeleteSaveData = async (saveId: string) => {
 		try {
-			const defaultData = await deleteSaveData(saveId)
+			const mainData = await deleteSaveData(saveId)
 
-			// 削除したセーブデータが現在選択中だった場合、デフォルトデータを読み込み
-			if (currentSaveId === saveId && defaultData) {
-				await loadSaveData(defaultData)
+			// 削除したセーブデータが現在選択中だった場合、または全ユーザーデータが削除された場合、メインデータを読み込み
+			if ((currentSaveId === saveId || saveDataList.length === 1) && mainData) {
+				await loadSaveData(mainData)
 			}
 		} catch (err) {
 			console.error('セーブデータの削除に失敗しました:', err)
@@ -283,10 +286,10 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 						/>
 					</svg>
 					<h3 className="mt-2 text-sm font-medium text-gray-900">
-						セーブデータがありません
+						ユーザー作成データがありません
 					</h3>
 					<p className="mt-1 text-sm text-gray-500">
-						新規セーブを作成して始めましょう
+						新規セーブを作成してカスタムデータを保存しましょう
 					</p>
 				</div>
 			)}
@@ -299,7 +302,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 
 			{/* 未保存変更の確認モーダル */}
 			{showUnsavedChangesModal && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+				<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 					<div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
 						{/* ヘッダー */}
 						<div className="flex items-center justify-between p-6 border-b border-gray-200">

@@ -99,10 +99,14 @@ export interface SaveDataStore {
 
 	loadSaveDataList: () => Promise<void>
 	switchSaveData: (saveId: string) => Promise<CalculatorData>
-	createSaveData: (name: string, data: CalculatorData) => Promise<void>
-	deleteSaveData: (saveId: string) => Promise<void>
+	createSaveData: (
+		name: string,
+		data: CalculatorData,
+	) => Promise<{ saveData: SaveData; loadedData: CalculatorData }>
+	deleteSaveData: (saveId: string) => Promise<CalculatorData | void>
 	renameSaveData: (saveId: string, newName: string) => Promise<void>
 	reorderSaveData: (newOrder: string[]) => Promise<void>
+	switchToMainData: () => Promise<CalculatorData>
 
 	setPendingSaveId: (saveId: string | null) => void
 	setShowUnsavedChangesModal: (value: boolean) => void
