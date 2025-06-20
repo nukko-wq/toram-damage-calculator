@@ -8,6 +8,7 @@ import type {
 	FoodFormData,
 	EnemyFormData,
 	BuffSkillFormData,
+	BuffItemFormData,
 	SaveData,
 } from './calculator'
 
@@ -70,6 +71,7 @@ export interface CalculatorStore {
 	updateFood: (food: FoodFormData) => void
 	updateEnemy: (enemy: EnemyFormData) => void
 	updateBuffSkills: (buffSkills: BuffSkillFormData) => void
+	updateBuffItems: (buffItems: BuffItemFormData) => void
 
 	// ===== 将来の計算機能 =====
 	calculateDamage: () => Promise<void>

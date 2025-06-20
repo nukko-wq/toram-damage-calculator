@@ -173,6 +173,17 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				)
 			},
 
+			updateBuffItems: (buffItems) => {
+				set(
+					(state) => ({
+						data: { ...state.data, buffItems },
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'updateBuffItems',
+				)
+			},
+
 			// ===== 将来の計算機能 =====
 			calculateDamage: async () => {
 				const { data } = get()

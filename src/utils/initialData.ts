@@ -9,10 +9,12 @@ import type {
 	EnemyInfo,
 	EnemyFormData,
 	BuffSkillFormData,
+	BuffItemFormData,
 	CalculatorData,
 	EquipmentProperties,
 } from '@/types/calculator'
 import { getDefaultBuffSkillFormData } from './buffSkillDefaults'
+import { getDefaultBuffItems } from './buffItemDefaults'
 
 export const createInitialBaseStats = (): BaseStats => ({
 	STR: 1,
@@ -190,5 +192,6 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	food: createInitialFoodFormData(), // 料理システム
 	enemy: createInitialEnemyFormData(), // 新しい敵情報システム
 	buffSkills: getDefaultBuffSkillFormData(), // バフスキルシステム
+	buffItems: getDefaultBuffItems(), // バフアイテムシステム
 	legacyEnemy: createInitialEnemyInfo(), // 後方互換性
 })

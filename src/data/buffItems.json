@@ -1,232 +1,232 @@
 {
-  "buffItems": {
-    "physicalPower": [
-      {
-        "id": "penetrate_oil",
-        "name": "ペネトレイトオイル",
-        "category": "physicalPower",
-        "properties": {
-          "Physical_Penetration": 15
-        }
-      },
-      {
-        "id": "minagiru_pill",
-        "name": "みなぎる丸薬",
-        "category": "physicalPower",
-        "properties": {
-          "ATK_Rate": 15
-        }
-      },
-      {
-        "id": "lantern_cake",
-        "name": "ランタンケーキ",
-        "category": "physicalPower",
-        "properties": {
-          "ATK": 100
-        }
-      }
-    ],
-    "magicalPower": [
-      {
-        "id": "magic_barrier_tablet",
-        "name": "魔法障壁の石板",
-        "category": "magicalPower",
-        "properties": {
-          "Magical_Penetration": 15
-        }
-      },
-      {
-        "id": "mage_secret_potion",
-        "name": "魔道士の秘薬",
-        "category": "magicalPower",
-        "properties": {
-          "MATK_Rate": 15
-        }
-      },
-      {
-        "id": "bitter_purupuru",
-        "name": "苦いプルプル",
-        "category": "magicalPower",
-        "properties": {
-          "MATK": 100
-        }
-      }
-    ],
-    "physicalDefense": [
-      {
-        "id": "mystery_potion_y",
-        "name": "謎のポーション(Y)",
-        "category": "physicalDefense",
-        "properties": {
-          "Physical_Resistance": 15
-        }
-      },
-      {
-        "id": "ginkgo_takikomi_gohan",
-        "name": "銀杏の炊き込みご飯",
-        "category": "physicalDefense",
-        "properties": {
-          "DEF_Rate": 20
-        }
-      }
-    ],
-    "magicalDefense": [
-      {
-        "id": "mystery_potion_p",
-        "name": "謎のポーション(P)",
-        "category": "magicalDefense",
-        "properties": {
-          "Magical_Resistance": 15
-        }
-      }
-    ],
-    "elementalAttack": [
-      {
-        "id": "zombie_cake",
-        "name": "ゾンビケーキ(有利共通)",
-        "category": "elementalAttack",
-        "properties": {
-          "Elemental_Advantage": 15
-        }
-      },
-      {
-        "id": "pumpkin_candy",
-        "name": "かぼちゃの飴玉(有利共通)",
-        "category": "elementalAttack",
-        "properties": {
-          "Elemental_Advantage": 10
-        }
-      }
-    ],
-    "elementalDefense": [
-      {
-        "id": "elemental_cake_common",
-        "name": "属性ケーキ類(共通)",
-        "category": "elementalDefense",
-        "properties": {
-          "Fire_Resistance": 10,
-          "Water_Resistance": 10,
-          "Earth_Resistance": 10,
-          "Wind_Resistance": 10,
-          "Light_Resistance": 10,
-          "Dark_Resistance": 10,
-          "Neutral_Resistance": 10
-        }
-      },
-      {
-        "id": "takoken_yaki",
-        "name": "たこけん焼き(共通)",
-        "category": "elementalDefense",
-        "properties": {
-          "Fire_Resistance": 8,
-          "Water_Resistance": 8,
-          "Earth_Resistance": 8,
-          "Wind_Resistance": 8,
-          "Light_Resistance": 8,
-          "Dark_Resistance": 8,
-          "Neutral_Resistance": 8
-        }
-      }
-    ],
-    "speed": [
-      {
-        "id": "tera_speed_pod",
-        "name": "テラスピードポッド",
-        "category": "speed",
-        "properties": {
-          "Attack_Speed": 1000
-        }
-      },
-      {
-        "id": "giga_speed_pod",
-        "name": "ギガスピードポッド",
-        "category": "speed",
-        "properties": {
-          "Attack_Speed": 500
-        }
-      }
-    ],
-    "casting": [
-      {
-        "id": "listening_horn",
-        "name": "リスニングホン",
-        "category": "casting",
-        "properties": {
-          "Cast_Speed": 1000
-        }
-      },
-      {
-        "id": "grape_jelly",
-        "name": "ぶどうゼリー",
-        "category": "casting",
-        "properties": {
-          "Cast_Speed": 500
-        }
-      }
-    ],
-    "mp": [
-      {
-        "id": "ad_magic_3",
-        "name": "アドマジクルⅢ",
-        "category": "mp",
-        "properties": {
-          "MP_Rate": 30
-        }
-      },
-      {
-        "id": "ronogo_shrimp_saute",
-        "name": "ロノーゴ海老ソテー",
-        "category": "mp",
-        "properties": {
-          "MP": 500
-        }
-      }
-    ],
-    "hp": [
-      {
-        "id": "dragon_steak",
-        "name": "ドラゴンステーキ",
-        "category": "hp",
-        "properties": {
-          "HP": 2000
-        }
-      },
-      {
-        "id": "plus_vita_6",
-        "name": "プラスバイタⅥ",
-        "category": "hp",
-        "properties": {
-          "HP_Rate": 30
-        }
-      }
-    ],
-    "accuracy": [
-      {
-        "id": "spirit_ring",
-        "name": "戦霊の輪",
-        "category": "accuracy",
-        "properties": {
-          "Accuracy": 30
-        }
-      },
-      {
-        "id": "leaf_cherry_tea",
-        "name": "葉桜茶",
-        "category": "accuracy",
-        "properties": {
-          "Accuracy_Rate": 15
-        }
-      }
-    ],
-    "evasion": [
-      {
-        "id": "golden_pom_salmon",
-        "name": "黄金ポム鮭",
-        "category": "evasion",
-        "properties": {
-          "Dodge": 30
-        }
-      }
-    ]
-  }
+	"buffItems": {
+		"physicalPower": [
+			{
+				"id": "penetrate_oil",
+				"name": "ペネトレイトオイル",
+				"category": "physicalPower",
+				"properties": {
+					"PhysicalPenetration_Rate": 15
+				}
+			},
+			{
+				"id": "minagiru_pill",
+				"name": "みなぎる丸薬",
+				"category": "physicalPower",
+				"properties": {
+					"ATK_Rate": 15
+				}
+			},
+			{
+				"id": "lantern_cake",
+				"name": "ランタンケーキ",
+				"category": "physicalPower",
+				"properties": {
+					"ATK": 100
+				}
+			}
+		],
+		"magicalPower": [
+			{
+				"id": "magic_barrier_tablet",
+				"name": "魔法障壁の石板",
+				"category": "magicalPower",
+				"properties": {
+					"MagicalPenetration_Rate": 15
+				}
+			},
+			{
+				"id": "mage_secret_potion",
+				"name": "魔道士の秘薬",
+				"category": "magicalPower",
+				"properties": {
+					"MATK_Rate": 15
+				}
+			},
+			{
+				"id": "bitter_purupuru",
+				"name": "苦いプルプル",
+				"category": "magicalPower",
+				"properties": {
+					"MATK": 100
+				}
+			}
+		],
+		"physicalDefense": [
+			{
+				"id": "mystery_potion_y",
+				"name": "謎のポーション(Y)",
+				"category": "physicalDefense",
+				"properties": {
+					"PhysicalResistance_Rate": 15
+				}
+			},
+			{
+				"id": "ginkgo_takikomi_gohan",
+				"name": "銀杏の炊き込みご飯",
+				"category": "physicalDefense",
+				"properties": {
+					"DEF_Rate": 20
+				}
+			}
+		],
+		"magicalDefense": [
+			{
+				"id": "mystery_potion_p",
+				"name": "謎のポーション(P)",
+				"category": "magicalDefense",
+				"properties": {
+					"MagicalResistance_Rate": 15
+				}
+			}
+		],
+		"elementalAttack": [
+			{
+				"id": "zombie_cake",
+				"name": "ゾンビケーキ(有利共通)",
+				"category": "elementalAttack",
+				"properties": {
+					"ElementAdvantage_Rate": 15
+				}
+			},
+			{
+				"id": "pumpkin_candy",
+				"name": "かぼちゃの飴玉(有利共通)",
+				"category": "elementalAttack",
+				"properties": {
+					"ElementAdvantage_Rate": 10
+				}
+			}
+		],
+		"elementalDefense": [
+			{
+				"id": "elemental_cake_common",
+				"name": "属性ケーキ類(共通)",
+				"category": "elementalDefense",
+				"properties": {
+					"FireResistance_Rate": 10,
+					"WaterResistance_Rate": 10,
+					"EarthResistance_Rate": 10,
+					"WindResistance_Rate": 10,
+					"LightResistance_Rate": 10,
+					"DarkResistance_Rate": 10,
+					"NeutralResistance_Rate": 10
+				}
+			},
+			{
+				"id": "takoken_yaki",
+				"name": "たこけん焼き(共通)",
+				"category": "elementalDefense",
+				"properties": {
+					"FireResistance_Rate": 8,
+					"WaterResistance_Rate": 8,
+					"EarthResistance_Rate": 8,
+					"WindResistance_Rate": 8,
+					"LightResistance_Rate": 8,
+					"DarkResistance_Rate": 8,
+					"NeutralResistance_Rate": 8
+				}
+			}
+		],
+		"speed": [
+			{
+				"id": "tera_speed_pod",
+				"name": "テラスピードポッド",
+				"category": "speed",
+				"properties": {
+					"AttackSpeed": 1000
+				}
+			},
+			{
+				"id": "giga_speed_pod",
+				"name": "ギガスピードポッド",
+				"category": "speed",
+				"properties": {
+					"AttackSpeed": 500
+				}
+			}
+		],
+		"casting": [
+			{
+				"id": "listening_horn",
+				"name": "リスニングホン",
+				"category": "casting",
+				"properties": {
+					"CastingSpeed": 1000
+				}
+			},
+			{
+				"id": "grape_jelly",
+				"name": "ぶどうゼリー",
+				"category": "casting",
+				"properties": {
+					"CastingSpeed": 500
+				}
+			}
+		],
+		"mp": [
+			{
+				"id": "ad_magic_3",
+				"name": "アドマジクルⅢ",
+				"category": "mp",
+				"properties": {
+					"MP_Rate": 30
+				}
+			},
+			{
+				"id": "ronogo_shrimp_saute",
+				"name": "ロノーゴ海老ソテー",
+				"category": "mp",
+				"properties": {
+					"MP": 500
+				}
+			}
+		],
+		"hp": [
+			{
+				"id": "dragon_steak",
+				"name": "ドラゴンステーキ",
+				"category": "hp",
+				"properties": {
+					"HP": 2000
+				}
+			},
+			{
+				"id": "plus_vita_6",
+				"name": "プラスバイタⅥ",
+				"category": "hp",
+				"properties": {
+					"HP_Rate": 30
+				}
+			}
+		],
+		"accuracy": [
+			{
+				"id": "spirit_ring",
+				"name": "戦霊の輪",
+				"category": "accuracy",
+				"properties": {
+					"Accuracy": 30
+				}
+			},
+			{
+				"id": "leaf_cherry_tea",
+				"name": "葉桜茶",
+				"category": "accuracy",
+				"properties": {
+					"Accuracy_Rate": 15
+				}
+			}
+		],
+		"evasion": [
+			{
+				"id": "golden_pom_salmon",
+				"name": "黄金ポム鮭",
+				"category": "evasion",
+				"properties": {
+					"Dodge": 30
+				}
+			}
+		]
+	}
 }
