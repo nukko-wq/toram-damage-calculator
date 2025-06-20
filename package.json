@@ -7,7 +7,7 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-		"format": "biome format --write"
+		"format": "npx @biomejs/biome format --write"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.1.1",
