@@ -196,7 +196,7 @@
 
 | 武器種 | 表示される専用スキル |
 |--------|-------------------|
-| 旋風槍 | トールハンマー（ハルバードスキル） |
+| 旋風槍 | トールハンマー、トルネードランス、会心の捌き（ハルバードスキル） |
 
 - **動的表示切り替え**: 武器種変更時に即座に専用スキル表示を更新
 - **専用スキル設定のリセット**: 武器種変更時に専用スキルがデフォルト状態にリセット
@@ -271,7 +271,7 @@ const weaponTypeToSpecialSkills: Record<WeaponType, string[]> = {
   '双剣': [],
   '両手剣': [],
   '手甲': [],
-  '旋風槍': ['thor_hammer'], // トールハンマー
+  '旋風槍': ['thor_hammer', 'tornado_lance', 'critical_parry'], // トールハンマー、トルネードランス、会心の捌き
   '抜刀剣': [],
   '弓': [],
   '自動弓': [],
@@ -295,7 +295,7 @@ const resetMasterySkills = (skills: BuffSkill[]): BuffSkill[] => {
 
 // 武器種専用スキルリセット処理
 const resetWeaponSpecificSkills = (skills: BuffSkill[]): BuffSkill[] => {
-  const weaponSpecificSkillIds = ['thor_hammer'] // 現在はトールハンマーのみ
+  const weaponSpecificSkillIds = ['thor_hammer', 'tornado_lance', 'critical_parry'] // 旋風槍専用スキル
   
   return skills.map(skill => {
     if (weaponSpecificSkillIds.includes(skill.id)) {

@@ -201,7 +201,7 @@ const BuffSkillForm = () => {
       '双剣': [],
       '両手剣': [],
       '手甲': [],
-      '旋風槍': ['thor_hammer'], // トールハンマー
+      '旋風槍': ['thor_hammer', 'tornado_lance', 'critical_parry'], // トールハンマー、トルネードランス、会心の捌き
       '抜刀剣': [],
       '弓': [],
       '自動弓': [],
@@ -213,7 +213,7 @@ const BuffSkillForm = () => {
   
   // 武器種変更時のマスタリスキル・専用スキルリセット処理
   const resetWeaponDependentSkillsOnWeaponChange = useCallback((newWeaponType: WeaponType) => {
-    const weaponSpecificSkillIds = ['thor_hammer'] // 拡張可能
+    const weaponSpecificSkillIds = ['thor_hammer', 'tornado_lance', 'critical_parry'] // 旋風槍専用スキル
     
     const updatedSkills = storeBuffSkills.skills.map(skill => {
       if (skill.category === 'mastery' || weaponSpecificSkillIds.includes(skill.id)) {
@@ -257,7 +257,7 @@ const BuffSkillForm = () => {
         }
         
         // 武器種専用スキルの場合は武器種に応じてフィルタリング
-        if (['thor_hammer'].includes(skill.id)) { // 拡張可能
+        if (['thor_hammer', 'tornado_lance', 'critical_parry'].includes(skill.id)) { // 旋風槍専用スキル
           if (!visibleSpecialSkills.includes(skill.id)) {
             // 該当しない専用スキルは非表示
             return false

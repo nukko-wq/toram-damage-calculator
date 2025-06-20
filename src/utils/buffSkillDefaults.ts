@@ -460,7 +460,7 @@ export const weaponTypeToSpecialSkills: Record<string, string[]> = {
 	双剣: [],
 	両手剣: [],
 	手甲: [],
-	旋風槍: ['thor_hammer'], // トールハンマー
+	旋風槍: ['thor_hammer', 'tornado_lance', 'critical_parry'], // トールハンマー、トルネードランス、会心の捌き
 	抜刀剣: [],
 	弓: [],
 	自動弓: [],
@@ -469,7 +469,7 @@ export const weaponTypeToSpecialSkills: Record<string, string[]> = {
 }
 
 // 武器種専用スキルIDのリスト（フィルタリング用）
-export const weaponSpecificSkillIds = ['thor_hammer']
+export const weaponSpecificSkillIds = ['thor_hammer', 'tornado_lance', 'critical_parry']
 
 // スキルIDからデフォルトパラメータを取得
 export const getDefaultParametersForSkill = (skillId: string) => {
