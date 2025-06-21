@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-
 import { useCalculatorStore } from '@/stores'
 import type {
 	Equipment,
@@ -13,7 +12,6 @@ import {
 	getCombinedEquipmentById,
 	getEquipmentCategoryLabel,
 } from '@/utils/equipmentDatabase'
-
 import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
@@ -698,6 +696,7 @@ export default function EquipmentForm({
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
+									aria-label="選択メニューを開く"
 								>
 									<path
 										strokeLinecap="round"
@@ -715,6 +714,7 @@ export default function EquipmentForm({
 									fill="none"
 									stroke="currentColor"
 									viewBox="0 0 24 24"
+									aria-label="選択メニューを開く"
 								>
 									<path
 										strokeLinecap="round"

@@ -12,7 +12,6 @@ import BuffSkillForm from '@/components/buff-skill/BuffSkillForm'
 import BuffItemForm from '@/components/buff-item/BuffItemForm'
 import StatsSummary from '@/components/summary/StatsSummary'
 import SaveDataManager from '@/components/save-data/SaveDataManager'
-import ZustandTest from '@/components/__tests__/ZustandTest'
 import type { UpdateNotification } from '@/types/calculator'
 import { initializeStorage } from '@/utils/saveDataManager'
 
@@ -168,8 +167,6 @@ export default function Home() {
 				</div>
 				<StatsSummary data={data} />
 
-				{/* Zustand動作確認用（開発環境のみ） */}
-				{process.env.NODE_ENV === 'development' && <ZustandTest />}
 			</div>
 		</div>
 	)
