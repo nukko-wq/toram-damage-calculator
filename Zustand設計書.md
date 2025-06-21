@@ -516,6 +516,8 @@ const EquipmentForm = () => {
 - リアルタイム反映：プロパティフォーム変更時の装備データ自動更新
 - 双方向同期：装備選択とプロパティ編集の整合性維持
 - 仮データ対応：永続・仮データ問わずプロパティ連動機能が動作
+- 編集セッション管理：既存カスタム装備の編集時は編集セッションで管理
+- 保存まで仮反映：永続データは「現在のデータを保存」実行時のみ更新
 
 ### 4.6 初期化管理
 
@@ -571,16 +573,34 @@ SaveDataManager → SaveDataStore.switchSaveData → CalculatorStore.loadSaveDat
 SaveDataManager表示 → SaveDataStore.loadSaveDataList → ユーザー作成データのみフィルタリング → リスト表示
 ```
 
-### 5.7 カスタム装備作成フロー
+### 5.7 カスタム装備作成フロー（仮データ）
 
 ```
-[新規作成] → 装備名入力モーダル → CalculatorStore.createCustomEquipment → LocalStorage保存 → プロパティリセット → 未保存変更フラグ設定
+[新規作成] → 装備名入力モーダル → CalculatorStore.createTemporaryCustomEquipment → メモリ上仮データ作成 → 自動装備セット → 未保存変更フラグ設定
 ```
 
 ### 5.8 カスタム装備削除フロー
 
 ```
 [削除] → 削除確認モーダル → CalculatorStore.deleteCustomEquipment → LocalStorage除去 → 未保存変更フラグ設定
+```
+
+### 5.9 既存カスタム装備編集フロー
+
+```
+カスタム装備選択 → 編集セッション開始 → プロパティ変更 → メモリ上編集データ更新 → 装備選択UI反映 → 未保存変更フラグ設定
+```
+
+### 5.10 カスタム装備保存フロー
+
+```
+[現在のデータを保存] → CalculatorStore.saveTemporaryCustomEquipments → 仮データ永続化 → 編集セッション永続化 → LocalStorage保存 → 仮データクリーンアップ
+```
+
+### 5.11 データ破棄フロー（リロード/切り替え）
+
+```
+セーブデータ切り替え/リロード → CalculatorStore.cleanupTemporaryData → 仮データ削除 → 編集セッション削除 → 永続データ復元
 ```
 
 ## 6. 型安全性

@@ -31,11 +31,14 @@ export default function EquipmentForm({
 	// Zustandストアから装備データを取得
 	const storeEquipment = useCalculatorStore((state) => state.data.equipment)
 	const updateEquipment = useCalculatorStore((state) => state.updateEquipment)
-	const createCustomEquipment = useCalculatorStore(
-		(state) => state.createCustomEquipment,
+	const createTemporaryCustomEquipment = useCalculatorStore(
+		(state) => state.createTemporaryCustomEquipment,
 	)
 	const deleteCustomEquipment = useCalculatorStore(
 		(state) => state.deleteCustomEquipment,
+	)
+	const updateCustomEquipmentProperties = useCalculatorStore(
+		(state) => state.updateCustomEquipmentProperties,
 	)
 
 	// Zustandストアの値を使用（完全移行）
@@ -377,6 +380,19 @@ export default function EquipmentForm({
 		value: string,
 	) => {
 		const numValue = Number.parseInt(value) || 0
+		const currentEquipment = effectiveEquipment[slotKey]
+
+		// カスタム装備の場合、プロパティ連動更新を実行
+		if (
+			currentEquipment.id &&
+			'isCustom' in currentEquipment &&
+			currentEquipment.isCustom
+		) {
+			updateCustomEquipmentProperties(currentEquipment.id, {
+				[property]: numValue,
+			})
+		}
+
 		const updatedEquipment = {
 			...effectiveEquipment,
 			[slotKey]: {
@@ -479,7 +495,7 @@ export default function EquipmentForm({
 		if (!createModalState.equipmentType) return
 
 		try {
-			await createCustomEquipment(
+			await createTemporaryCustomEquipment(
 				createModalState.equipmentType as EquipmentCategory,
 				equipmentName,
 			)

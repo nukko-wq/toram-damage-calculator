@@ -16,7 +16,22 @@ import {
 	createCustomEquipment,
 	saveCustomEquipment,
 	deleteCustomEquipment,
+	updateCustomEquipmentProperties,
+	hasTemporaryEquipments,
+	hasEditSessions,
 } from '@/utils/equipmentDatabase'
+import {
+	createTemporaryCustomEquipment,
+	cleanupAllTemporaryEquipments,
+	getAllTemporaryEquipments,
+	convertTemporaryEquipmentToPersistent,
+	isTemporaryEquipment,
+} from '@/utils/temporaryEquipmentManager'
+import {
+	cleanupAllEditSessions,
+	getAllEditSessionEquipments,
+	convertAllEditSessionsToPersistent,
+} from '@/utils/editSessionManager'
 import { createInitialEquipment } from '@/utils/initialData'
 
 // 初期計算設定
@@ -68,6 +83,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			// ===== セーブデータ管理 =====
 			loadSaveData: async (data) => {
+				// セーブデータ切り替え時に仮データと編集セッションをクリーンアップ
+				get().cleanupTemporaryData()
+
 				// isLoadingを使わずに直接データを更新（ちらつき防止）
 				set({
 					data,
@@ -82,6 +100,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			saveCurrentData: async () => {
 				try {
+					// 仮データと編集セッションを永続化
+					await get().saveTemporaryCustomEquipments()
+					await get().saveEditSessions()
+
 					const { data } = get()
 					await saveCurrentData(data)
 					set({ hasUnsavedChanges: false })
@@ -192,15 +214,15 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			// ===== カスタム装備管理 =====
-			createCustomEquipment: async (equipmentCategory, name) => {
+			createTemporaryCustomEquipment: async (equipmentCategory, name) => {
 				try {
-					// カスタム装備を作成
-					const customEquipment = createCustomEquipment(equipmentCategory, name)
+					// 仮データとしてカスタム装備を作成（LocalStorageには保存しない）
+					const temporaryEquipment = createTemporaryCustomEquipment(
+						name,
+						equipmentCategory,
+					)
 
-					// LocalStorageに保存
-					saveCustomEquipment(customEquipment)
-
-					// 作成したカスタム装備を自動的に装備スロットにセット
+					// 作成した仮データ装備を自動的に装備スロットにセット
 					const equipmentCategoryToSlotMap: Record<
 						string,
 						keyof EquipmentSlots
@@ -224,8 +246,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
 									equipment: {
 										...state.data.equipment,
 										[slotKey]: {
-											id: customEquipment.id,
-											name: customEquipment.name,
+											id: temporaryEquipment.id,
+											name: temporaryEquipment.name,
 											properties: {},
 											isPreset: false,
 											isCustom: true,
@@ -235,12 +257,90 @@ export const useCalculatorStore = create<CalculatorStore>()(
 								hasUnsavedChanges: true,
 							}),
 							false,
-							'createCustomEquipment',
+							'createTemporaryCustomEquipment',
 						)
 					}
 				} catch (error) {
-					console.error('カスタム装備作成エラー:', error)
+					console.error('仮データ装備作成エラー:', error)
 					throw error
+				}
+			},
+
+			// 仮データを永続化（「現在のデータを保存」時に呼び出し）
+			saveTemporaryCustomEquipments: async () => {
+				try {
+					const temporaryEquipments = getAllTemporaryEquipments()
+
+					for (const tempEquipment of temporaryEquipments) {
+						// 仮データを永続データに変換
+						const persistentEquipment = convertTemporaryEquipmentToPersistent(
+							tempEquipment.id,
+						)
+						if (persistentEquipment) {
+							// LocalStorageに保存
+							saveCustomEquipment(persistentEquipment)
+						}
+					}
+
+					// 仮データをクリーンアップ
+					cleanupAllTemporaryEquipments()
+				} catch (error) {
+					console.error('仮データ永続化エラー:', error)
+					throw error
+				}
+			},
+
+			// 編集セッションを永続化（「現在のデータを保存」時に呼び出し）
+			saveEditSessions: async () => {
+				try {
+					const editSessionEquipments = getAllEditSessionEquipments()
+
+					for (const editedEquipment of editSessionEquipments) {
+						// 編集セッション内容を永続データに反映
+						saveCustomEquipment(editedEquipment)
+					}
+
+					// 編集セッションをクリーンアップ
+					cleanupAllEditSessions()
+				} catch (error) {
+					console.error('編集セッション永続化エラー:', error)
+					throw error
+				}
+			},
+
+			// プロパティ連動更新
+			updateCustomEquipmentProperties: async (equipmentId, properties) => {
+				try {
+					const success = updateCustomEquipmentProperties(
+						equipmentId,
+						properties,
+					)
+					if (success) {
+						set(
+							(state) => ({ ...state, hasUnsavedChanges: true }),
+							false,
+							'updateCustomEquipmentProperties',
+						)
+					}
+					return success
+				} catch (error) {
+					console.error('カスタム装備プロパティ更新エラー:', error)
+					throw error
+				}
+			},
+
+			// 仮データと編集セッションのクリーンアップ
+			cleanupTemporaryData: () => {
+				cleanupAllTemporaryEquipments()
+				cleanupAllEditSessions()
+			},
+
+			// 未保存データの状態を取得
+			getUnsavedDataStatus: () => {
+				return {
+					hasUnsavedChanges: get().hasUnsavedChanges,
+					hasTemporaryEquipments: hasTemporaryEquipments(),
+					hasEditSessions: hasEditSessions(),
 				}
 			},
 

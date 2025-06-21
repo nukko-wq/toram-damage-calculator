@@ -21,6 +21,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 		hasUnsavedChanges,
 		loadSaveData,
 		saveCurrentData,
+		getUnsavedDataStatus,
 	} = useCalculatorStore()
 
 	const {
@@ -175,6 +176,11 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 		)
 	}
 
+	// 未保存状態の詳細を取得
+	const unsavedStatus = getUnsavedDataStatus()
+	const hasAnyUnsavedData =
+		unsavedStatus.hasUnsavedChanges || unsavedStatus.hasTemporaryEquipments || unsavedStatus.hasEditSessions
+
 	return (
 		<div className="bg-white rounded-lg shadow-md p-6">
 			<div className="flex items-center justify-between mb-6">
@@ -183,12 +189,21 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 					<button
 						onClick={handleSaveCurrentData}
 						className={`px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center ${
-							hasUnsavedChanges
-								? 'bg-green-600 hover:bg-green-700 cursor-pointer'
+							hasAnyUnsavedData
+								? (unsavedStatus.hasTemporaryEquipments || unsavedStatus.hasEditSessions)
+									? 'bg-orange-600 hover:bg-orange-700 cursor-pointer'
+									: 'bg-green-600 hover:bg-green-700 cursor-pointer'
 								: 'bg-gray-600'
 						}`}
+						title={
+							unsavedStatus.hasTemporaryEquipments
+								? '未保存のカスタム装備があります'
+								: unsavedStatus.hasEditSessions
+								? '編集中のカスタム装備があります'
+								: undefined
+						}
 					>
-						{hasUnsavedChanges && (
+						{hasAnyUnsavedData && (
 							<svg
 								className="mr-2 h-4 w-4"
 								fill="none"
@@ -199,11 +214,21 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 									strokeLinecap="round"
 									strokeLinejoin="round"
 									strokeWidth={2}
-									d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z"
+									d={
+										(unsavedStatus.hasTemporaryEquipments || unsavedStatus.hasEditSessions)
+											? 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z'
+											: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z'
+									}
 								/>
 							</svg>
 						)}
 						現在のデータを保存
+						{unsavedStatus.hasTemporaryEquipments && (
+							<span className="ml-1 text-xs">(仮データあり)</span>
+						)}
+						{unsavedStatus.hasEditSessions && (
+							<span className="ml-1 text-xs">(編集中)</span>
+						)}
 					</button>
 					<button
 						type="button"

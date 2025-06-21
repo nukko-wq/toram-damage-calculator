@@ -41,7 +41,7 @@ export function getLocalStorageEnemies(): LocalStorageEnemy[] {
  * プリセット敵情報を全て取得（後方互換性）
  */
 export function getPresetEnemies(): PresetEnemy[] {
-	const data = enemiesData as EnemiesData
+	const data = enemiesData as unknown as EnemiesData
 	return [
 		...data.enemies.mob,
 		...data.enemies.fieldBoss,
@@ -106,7 +106,7 @@ export function updatePresetEnemy(
 export function getPresetEnemiesByCategory(
 	category: EnemyCategory,
 ): PresetEnemy[] {
-	const data = enemiesData as EnemiesData
+	const data = enemiesData as unknown as EnemiesData
 	return data.enemies[category] || []
 }
 

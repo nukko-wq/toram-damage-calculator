@@ -8,6 +8,19 @@ import type {
 	EquipmentProperties,
 } from '@/types/calculator'
 import equipmentsData from '@/data/equipments.json'
+import {
+	getAllTemporaryEquipments,
+	getTemporaryEquipmentsByCategory,
+	getTemporaryEquipmentById,
+	isTemporaryEquipment,
+} from './temporaryEquipmentManager'
+import {
+	getAllEditSessionEquipments,
+	getEditSessionEquipment,
+	isInEditSession,
+	startEditSession,
+	updateEditSessionProperties,
+} from './editSessionManager'
 
 // プロパティからundefinedの値を除外する関数
 function cleanProperties(properties: any): Partial<EquipmentProperties> {
@@ -462,6 +475,8 @@ export function getCombinedEquipmentsByCategory(
 ): Equipment[] {
 	const presetEquipments = getEquipmentsByCategory(equipmentCategory)
 	const customEquipments = getUserCustomEquipments()
+	const temporaryEquipments =
+		getTemporaryEquipmentsByCategory(equipmentCategory)
 
 	// カスタム装備を該当カテゴリでフィルタリング
 	const filteredCustomEquipments = customEquipments.filter(
@@ -499,7 +514,25 @@ export function getCombinedEquipmentsByCategory(
 		}),
 	)
 
-	// プリセット装備とカスタム装備を結合
+	// 仮データ装備をEquipment形式に変換
+	const formattedTemporaryEquipments: Equipment[] = temporaryEquipments.map(
+		(equipment) => ({
+			id: equipment.id,
+			name: `${equipment.name} (未保存)`,
+			type: categoryToTypeMap[equipment.category],
+			category: [equipment.category] as EquipmentCategory[],
+			baseStats: equipment.weaponStats || {},
+			properties: equipment.properties,
+			isPreset: false,
+			isCustom: true,
+			isFavorite: equipment.isFavorite,
+			isModified: false,
+			createdAt: equipment.createdAt,
+			updatedAt: equipment.updatedAt,
+		}),
+	)
+
+	// プリセット装備とカスタム装備、仮データを結合
 	const convertedPresetEquipments = presetEquipments.map((preset) => ({
 		...preset,
 		isPreset: true as const,
@@ -509,11 +542,65 @@ export function getCombinedEquipmentsByCategory(
 		updatedAt: new Date().toISOString(),
 	}))
 
-	return [...convertedPresetEquipments, ...formattedCustomEquipments]
+	return [
+		...convertedPresetEquipments,
+		...formattedCustomEquipments,
+		...formattedTemporaryEquipments,
+	]
 }
 
-// 統合装備をIDで取得（プリセット・カスタム両対応）
+// 統合装備をIDで取得（プリセット・カスタム・編集セッション対応）
 export function getCombinedEquipmentById(id: string): Equipment | null {
+	const categoryToTypeMap: Record<EquipmentCategory, EquipmentType> = {
+		main: 'weapon',
+		mainWeapon: 'weapon',
+		body: 'armor',
+		additional: 'accessory',
+		special: 'accessory',
+		subWeapon: 'weapon',
+		fashion1: 'fashion',
+		fashion2: 'fashion',
+		fashion3: 'fashion',
+	}
+
+	// 編集セッション中のデータから検索（最優先）
+	const editSessionEquipment = getEditSessionEquipment(id)
+	if (editSessionEquipment) {
+		return {
+			id: editSessionEquipment.id,
+			name: `${editSessionEquipment.name} (編集中)`,
+			type: categoryToTypeMap[editSessionEquipment.category],
+			category: [editSessionEquipment.category],
+			baseStats: editSessionEquipment.weaponStats || {},
+			properties: editSessionEquipment.properties,
+			isPreset: false,
+			isCustom: true,
+			isFavorite: editSessionEquipment.isFavorite,
+			isModified: true,
+			createdAt: editSessionEquipment.createdAt,
+			updatedAt: editSessionEquipment.updatedAt,
+		}
+	}
+
+	// 仮データから検索（第二優先）
+	const temporaryEquipment = getTemporaryEquipmentById(id)
+	if (temporaryEquipment) {
+		return {
+			id: temporaryEquipment.id,
+			name: `${temporaryEquipment.name} (未保存)`,
+			type: categoryToTypeMap[temporaryEquipment.category],
+			category: [temporaryEquipment.category],
+			baseStats: temporaryEquipment.weaponStats || {},
+			properties: temporaryEquipment.properties,
+			isPreset: false,
+			isCustom: true,
+			isFavorite: temporaryEquipment.isFavorite,
+			isModified: false,
+			createdAt: temporaryEquipment.createdAt,
+			updatedAt: temporaryEquipment.updatedAt,
+		}
+	}
+
 	// プリセット装備から検索
 	const presetEquipment = getEquipmentById(id)
 	if (presetEquipment) {
@@ -530,19 +617,6 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 	// カスタム装備から検索
 	const customEquipment = getCustomEquipmentById(id)
 	if (customEquipment) {
-		// カスタム装備をEquipment形式に変換
-		const categoryToTypeMap: Record<EquipmentCategory, EquipmentType> = {
-			main: 'weapon',
-			mainWeapon: 'weapon',
-			body: 'armor',
-			additional: 'accessory',
-			special: 'accessory',
-			subWeapon: 'weapon',
-			fashion1: 'fashion',
-			fashion2: 'fashion',
-			fashion3: 'fashion',
-		}
-
 		return {
 			id: customEquipment.id,
 			name: customEquipment.name,
@@ -560,4 +634,49 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 	}
 
 	return null
+}
+
+// カスタム装備のプロパティを更新（編集セッション・仮データ・永続データ対応）
+export function updateCustomEquipmentProperties(
+	id: string,
+	properties: Partial<EquipmentProperties>,
+): boolean {
+	// 編集セッション中のデータ更新を試行（最優先）
+	if (isInEditSession(id)) {
+		return updateEditSessionProperties(id, properties)
+	}
+
+	// 仮データから更新を試行
+	if (isTemporaryEquipment(id)) {
+		try {
+			const {
+				updateTemporaryEquipmentProperties,
+			} = require('./temporaryEquipmentManager')
+			return updateTemporaryEquipmentProperties(id, properties)
+		} catch (error) {
+			console.error('Failed to update temporary equipment properties:', error)
+			return false
+		}
+	}
+
+	// カスタム装備の場合は編集セッションを開始してから更新
+	const customEquipment = getCustomEquipmentById(id)
+	if (customEquipment) {
+		// 編集セッションを開始
+		const editableEquipment = startEditSession(customEquipment)
+		// 編集セッション内でプロパティを更新
+		return updateEditSessionProperties(editableEquipment.id, properties)
+	}
+
+	return false
+}
+
+// 仮データが存在するかチェック
+export function hasTemporaryEquipments(): boolean {
+	return getAllTemporaryEquipments().length > 0
+}
+
+// 編集セッション中のデータが存在するかチェック
+export function hasEditSessions(): boolean {
+	return getAllEditSessionEquipments().length > 0
 }
