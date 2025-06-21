@@ -208,9 +208,16 @@ export default function CrystalCard({
 
 				return `${propName}${value > 0 ? '+' : ''}${value}${suffix}`
 			})
-			.slice(0, 3) // 最大3つまで表示
+			.slice(0, 4) // 最大4つまで表示
 
-		return props.join(', ')
+		// 2つずつのグループに分ける
+		const rows: string[] = []
+		for (let i = 0; i < props.length; i += 2) {
+			const row = props.slice(i, i + 2).join(', ')
+			rows.push(row)
+		}
+
+		return rows
 	}
 
 	return (
@@ -257,9 +264,15 @@ export default function CrystalCard({
 			<h3 className="font-semibold text-gray-900 mb-2 pr-8">{crystal.name}</h3>
 
 			{/* プロパティ */}
-			<div className="text-sm text-gray-600 mb-2 min-h-[1.25rem]">
-				{formatProperties()}
-			</div>
+			{formatProperties().length > 0 && (
+				<div className="text-sm text-gray-600 mb-2 min-h-[1.25rem]">
+					{formatProperties().map((row) => (
+						<div key={row} className="flex flex-wrap gap-x-3">
+							{row}
+						</div>
+					))}
+				</div>
+			)}
 
 			{/* 説明 */}
 			{crystal.description && (
