@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { Equipment, EquipmentCategory } from '@/types/calculator'
+import type { Equipment, EquipmentCategory, EquipmentProperties } from '@/types/calculator'
 import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import EquipmentCard from './EquipmentCard'
 
@@ -12,6 +12,7 @@ interface EquipmentSelectionModalProps {
 	selectedEquipmentId: string | null
 	category: EquipmentCategory
 	title: string
+	currentFormProperties?: Partial<EquipmentProperties> // 現在のフォーム値
 }
 
 export default function EquipmentSelectionModal({
@@ -21,6 +22,7 @@ export default function EquipmentSelectionModal({
 	selectedEquipmentId,
 	category,
 	title,
+	currentFormProperties,
 }: EquipmentSelectionModalProps) {
 	const [availableEquipments, setAvailableEquipments] = useState<Equipment[]>(
 		[],
@@ -46,9 +48,26 @@ export default function EquipmentSelectionModal({
 		if (!isOpen) return
 
 		// カテゴリに対応するプリセット + カスタム装備を統合して取得
-		const equipments = getCombinedEquipmentsByCategory(category)
+		let equipments = getCombinedEquipmentsByCategory(category)
+		
+		// 現在選択中の装備にフォーム値を反映
+		if (selectedEquipmentId && currentFormProperties) {
+			equipments = equipments.map(equipment => {
+				if (equipment.id === selectedEquipmentId) {
+					return {
+						...equipment,
+						properties: {
+							...equipment.properties,
+							...currentFormProperties
+						}
+					}
+				}
+				return equipment
+			})
+		}
+		
 		setAvailableEquipments(equipments)
-	}, [isOpen, category])
+	}, [isOpen, category, selectedEquipmentId, currentFormProperties])
 
 	const filteredEquipments = availableEquipments
 

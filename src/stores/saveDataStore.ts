@@ -13,6 +13,7 @@ import {
 	initializeStorage,
 	loadSaveData,
 } from '@/utils/saveDataManager'
+import { setCurrentSaveDataId } from '@/utils/editSessionManager'
 
 export const useSaveDataStore = create<SaveDataStore>()(
 	devtools(
@@ -40,6 +41,9 @@ export const useSaveDataStore = create<SaveDataStore>()(
 					)
 					const current = getCurrentSaveData()
 
+					// 編集セッション管理にセーブデータIDを設定
+					setCurrentSaveDataId(current.id)
+
 					set({
 						saveDataList: userSaveData,
 						currentSaveId: current.id,
@@ -57,6 +61,9 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			// ===== セーブデータ切り替え =====
 			switchSaveData: async (saveId) => {
 				try {
+					// 編集セッション管理にセーブデータIDを設定
+					setCurrentSaveDataId(saveId)
+					
 					await setCurrentSaveData(saveId)
 					set({ currentSaveId: saveId })
 

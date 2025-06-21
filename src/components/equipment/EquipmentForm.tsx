@@ -739,13 +739,10 @@ export default function EquipmentForm({
 				isOpen={modalState.isOpen}
 				onClose={closeEquipmentModal}
 				onSelect={handlePresetEquipmentSelect}
-				selectedEquipmentId={
-					effectiveEquipment[activeTab].isPreset
-						? effectiveEquipment[activeTab].id
-						: null
-				}
+				selectedEquipmentId={effectiveEquipment[activeTab].id}
 				category={modalState.category || 'main'}
 				title={modalState.title}
+				currentFormProperties={effectiveEquipment[activeTab].properties} // 現在のフォーム値を渡す
 			/>
 
 			{/* カスタム装備作成モーダル */}

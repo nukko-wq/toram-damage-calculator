@@ -29,8 +29,10 @@ import {
 } from '@/utils/temporaryEquipmentManager'
 import {
 	cleanupAllEditSessions,
+	cleanupCurrentEditSessions,
 	getAllEditSessionEquipments,
 	convertAllEditSessionsToPersistent,
+	setCurrentSaveDataId,
 } from '@/utils/editSessionManager'
 import { createInitialEquipment } from '@/utils/initialData'
 
@@ -332,7 +334,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			// 仮データと編集セッションのクリーンアップ
 			cleanupTemporaryData: () => {
 				cleanupAllTemporaryEquipments()
-				cleanupAllEditSessions()
+				cleanupCurrentEditSessions() // 現在のセーブデータに関連する編集セッションのみをクリーンアップ
 			},
 
 			// 未保存データの状態を取得

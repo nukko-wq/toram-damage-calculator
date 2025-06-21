@@ -6,9 +6,25 @@ import type {
 	UserEquipment,
 } from '@/types/calculator'
 
-// 編集セッションを格納するメモリストレージ
+// 編集セッションを格納するメモリストレージ（セーブデータID + 装備IDの組み合わせをキーとする）
 const editSessions: Map<string, UserEquipment> = new Map()
 let lastCleanup: Date = new Date()
+let currentSaveDataId: string | null = null
+
+/**
+ * 現在のセーブデータIDを設定
+ */
+export function setCurrentSaveDataId(saveDataId: string | null): void {
+	currentSaveDataId = saveDataId
+}
+
+/**
+ * セーブデータと装備の組み合わせキーを生成
+ */
+function createSessionKey(equipmentId: string, saveDataId?: string): string {
+	const effectiveSaveDataId = saveDataId || currentSaveDataId || 'default'
+	return `${effectiveSaveDataId}:${equipmentId}`
+}
 
 /**
  * 既存カスタム装備の編集セッションを開始
@@ -26,8 +42,9 @@ export function startEditSession(
 		updatedAt: new Date().toISOString(),
 	}
 
-	// 編集セッションに保存
-	editSessions.set(equipment.id, editableEquipment)
+	// セーブデータ固有のキーで編集セッションに保存
+	const sessionKey = createSessionKey(equipment.id)
+	editSessions.set(sessionKey, editableEquipment)
 
 	return editableEquipment
 }
@@ -39,7 +56,8 @@ export function updateEditSessionProperties(
 	id: string,
 	properties: Partial<EquipmentProperties>,
 ): boolean {
-	const sessionEquipment = editSessions.get(id)
+	const sessionKey = createSessionKey(id)
+	const sessionEquipment = editSessions.get(sessionKey)
 	if (!sessionEquipment) {
 		return false
 	}
@@ -51,7 +69,7 @@ export function updateEditSessionProperties(
 	}
 	sessionEquipment.updatedAt = new Date().toISOString()
 
-	editSessions.set(id, sessionEquipment)
+	editSessions.set(sessionKey, sessionEquipment)
 	return true
 }
 
@@ -59,7 +77,8 @@ export function updateEditSessionProperties(
  * 編集セッション中かどうかを判定
  */
 export function isInEditSession(id: string): boolean {
-	return editSessions.has(id)
+	const sessionKey = createSessionKey(id)
+	return editSessions.has(sessionKey)
 }
 
 /**
@@ -68,26 +87,67 @@ export function isInEditSession(id: string): boolean {
 export function getEditSessionEquipment(
 	id: string,
 ): UserEquipment | undefined {
-	return editSessions.get(id)
+	const sessionKey = createSessionKey(id)
+	return editSessions.get(sessionKey)
 }
 
 /**
- * すべての編集セッション装備を取得
+ * 現在のセーブデータに関連する編集セッション装備を取得
  */
 export function getAllEditSessionEquipments(): UserEquipment[] {
-	return Array.from(editSessions.values())
+	if (!currentSaveDataId) {
+		return []
+	}
+	
+	const currentSavePrefix = `${currentSaveDataId}:`
+	const results: UserEquipment[] = []
+	
+	for (const [sessionKey, equipment] of editSessions) {
+		if (sessionKey.startsWith(currentSavePrefix)) {
+			results.push(equipment)
+		}
+	}
+	
+	return results
 }
 
 /**
  * 編集セッションを終了（破棄）
  */
 export function endEditSession(id: string): boolean {
-	return editSessions.delete(id)
+	const sessionKey = createSessionKey(id)
+	return editSessions.delete(sessionKey)
+}
+
+/**
+ * 特定のセーブデータに関連する編集セッションをクリーンアップ
+ */
+export function cleanupEditSessionsForSaveData(saveDataId: string): void {
+	const keysToDelete: string[] = []
+	
+	for (const [sessionKey] of editSessions) {
+		if (sessionKey.startsWith(`${saveDataId}:`)) {
+			keysToDelete.push(sessionKey)
+		}
+	}
+	
+	for (const key of keysToDelete) {
+		editSessions.delete(key)
+	}
+}
+
+/**
+ * 現在のセーブデータに関連する編集セッションをクリーンアップ
+ */
+export function cleanupCurrentEditSessions(): void {
+	if (currentSaveDataId) {
+		cleanupEditSessionsForSaveData(currentSaveDataId)
+	}
 }
 
 /**
  * すべての編集セッションをクリーンアップ
- * セーブデータ切り替えやブラウザリロード時に呼び出し
+ * ブラウザリロード時などに呼び出し
  */
 export function cleanupAllEditSessions(): void {
 	editSessions.clear()
@@ -123,7 +183,8 @@ export function getEditSessionIds(): string[] {
 export function convertEditSessionToPersistent(
 	id: string,
 ): UserEquipment | null {
-	const editSessionEquipment = editSessions.get(id)
+	const sessionKey = createSessionKey(id)
+	const editSessionEquipment = editSessions.get(sessionKey)
 	if (!editSessionEquipment) {
 		return null
 	}
@@ -144,7 +205,10 @@ export function convertEditSessionToPersistent(
 export function convertAllEditSessionsToPersistent(): UserEquipment[] {
 	const persistentEquipments: UserEquipment[] = []
 
-	for (const [id, sessionEquipment] of editSessions) {
+	// 現在のセーブデータに関連する編集セッションのみを永続化
+	const currentEditSessions = getAllEditSessionEquipments()
+	
+	for (const sessionEquipment of currentEditSessions) {
 		persistentEquipments.push({
 			...sessionEquipment,
 			updatedAt: new Date().toISOString(),
@@ -161,7 +225,8 @@ export function updateEditSessionWeaponStats(
 	id: string,
 	weaponStats: { ATK?: number; stability?: number; refinement?: number },
 ): boolean {
-	const sessionEquipment = editSessions.get(id)
+	const sessionKey = createSessionKey(id)
+	const sessionEquipment = editSessions.get(sessionKey)
 	if (!sessionEquipment || !sessionEquipment.weaponStats) {
 		return false
 	}
@@ -172,7 +237,7 @@ export function updateEditSessionWeaponStats(
 	}
 	sessionEquipment.updatedAt = new Date().toISOString()
 
-	editSessions.set(id, sessionEquipment)
+	editSessions.set(sessionKey, sessionEquipment)
 	return true
 }
 
@@ -183,7 +248,8 @@ export function updateEditSessionCrystalSlots(
 	id: string,
 	crystalSlots: { slot1?: string; slot2?: string },
 ): boolean {
-	const sessionEquipment = editSessions.get(id)
+	const sessionKey = createSessionKey(id)
+	const sessionEquipment = editSessions.get(sessionKey)
 	if (!sessionEquipment || !sessionEquipment.crystalSlots) {
 		return false
 	}
@@ -194,6 +260,6 @@ export function updateEditSessionCrystalSlots(
 	}
 	sessionEquipment.updatedAt = new Date().toISOString()
 
-	editSessions.set(id, sessionEquipment)
+	editSessions.set(sessionKey, sessionEquipment)
 	return true
 }
