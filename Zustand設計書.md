@@ -302,93 +302,134 @@ const BuffSkillForm = () => {
 }
 ```
 
-### 4.4 バフアイテム統合の特殊パターン
+### 4.4 バフアイテム統合のモーダル選択パターン
 
-バフアイテムフォームでは12カテゴリのアイテム選択を管理するため、シンプルな統合パターンを使用:
+バフアイテムフォームでは装備・クリスタ選択と統一されたモーダル選択UIを使用:
 
 ```typescript
-// バフアイテムフォームの例
+// バフアイテムフォームの例（モーダル選択対応）
 const BuffItemForm = () => {
   const storeBuffItems = useCalculatorStore(state => state.data.buffItems)
   const updateBuffItems = useCalculatorStore(state => state.updateBuffItems)
-  const [isInitialized, setIsInitialized] = useState(false)
   
-  // フォーム設定
-  const {
-    register,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm<BuffItemFormData>({
-    resolver: zodResolver(buffItemFormDataSchema),
-    values: storeBuffItems, // Zustandからのデータ
-    mode: 'onChange',
+  // モーダル状態管理
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean
+    category: BuffItemCategory | null
+    title: string
+  }>({
+    isOpen: false,
+    category: null,
+    title: '',
   })
   
-  // 変更検知とストア更新
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      if (!isInitialized || !name || !value || type !== 'change') {
-        return
-      }
-      updateBuffItems(value as BuffItemFormData)
+  // モーダル開閉ハンドラ
+  const handleOpenModal = (category: BuffItemCategory) => {
+    setModalState({
+      isOpen: true,
+      category,
+      title: `${buffItemCategoryNameMap[category]}バフアイテム選択`,
     })
-    return () => subscription.unsubscribe()
-  }, [watch, isInitialized, updateBuffItems])
+  }
   
-  // 初期化管理
-  useEffect(() => {
-    setIsInitialized(false)
-    const timer = setTimeout(() => setIsInitialized(true), 30)
-    return () => clearTimeout(timer)
-  }, [storeBuffItems])
+  const handleCloseModal = () => {
+    setModalState({
+      isOpen: false,
+      category: null,
+      title: '',
+    })
+  }
+  
+  // アイテム選択ハンドラ
+  const handleSelectBuffItem = (buffItemId: string | null) => {
+    if (!modalState.category) return
+    
+    const updatedBuffItems = {
+      ...storeBuffItems,
+      [modalState.category]: buffItemId,
+    }
+    
+    updateBuffItems(updatedBuffItems)
+  }
   
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold text-gray-800">バフアイテム設定</h2>
       
-      {/* カテゴリ別セレクトボックス */}
+      {/* カテゴリ別選択ボタン */}
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            物理威力
-          </label>
-          <select
-            {...register('physicalPower')}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">なし</option>
-            {getBuffItemsByCategory('physicalPower').map(item => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            魔法威力
-          </label>
-          <select
-            {...register('magicalPower')}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            <option value="">なし</option>
-            {getBuffItemsByCategory('magicalPower').map(item => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        {/* 他の10カテゴリも同様に実装 */}
+        {buffItemCategories.map(({ key, label }) => (
+          <BuffItemButton
+            key={key}
+            category={key}
+            label={label}
+            onOpenModal={handleOpenModal}
+          />
+        ))}
       </div>
+      
+      {/* バフアイテム選択モーダル */}
+      {modalState.category && (
+        <BuffItemSelectionModal
+          isOpen={modalState.isOpen}
+          onClose={handleCloseModal}
+          onSelect={handleSelectBuffItem}
+          selectedBuffItemId={storeBuffItems[modalState.category]}
+          category={modalState.category}
+          title={modalState.title}
+        />
+      )}
+    </div>
+  )
+}
+
+// バフアイテム選択ボタンコンポーネント
+const BuffItemButton = ({ category, label, onOpenModal }) => {
+  const selectedName = getSelectedBuffItemName(category)
+  const properties = formatBuffItemProperties(category)
+  const hasSelection = storeBuffItems[category] !== null
+  
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      <button
+        type="button"
+        onClick={() => onOpenModal(category)}
+        className={`
+          w-full p-3 rounded-md border text-left transition-colors hover:bg-gray-50
+          ${hasSelection ? 'border-blue-300 bg-blue-50' : 'border-gray-300 bg-white'}
+        `}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex-1 min-w-0">
+            <div className={`text-sm font-medium truncate ${
+              hasSelection ? 'text-blue-900' : 'text-gray-500'
+            }`}>
+              {selectedName}
+            </div>
+            {properties && (
+              <div className="text-xs text-gray-600 mt-1 truncate">
+                {properties}
+              </div>
+            )}
+          </div>
+          <div className="ml-2 flex-shrink-0">
+            <ChevronRightIcon className="w-5 h-5 text-gray-400" />
+          </div>
+        </div>
+      </button>
     </div>
   )
 }
 ```
+
+**モーダル選択の特徴**:
+- 装備・クリスタ選択と統一されたUI/UX
+- カテゴリ別の専用モーダル表示
+- 選択状態の視覚的フィードバック
+- アイテム詳細情報の表示
 
 ### 4.5 初期化管理
 
