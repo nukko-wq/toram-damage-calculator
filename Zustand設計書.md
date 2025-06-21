@@ -600,8 +600,20 @@ SaveDataManager表示 → SaveDataStore.loadSaveDataList → ユーザー作成�
 ### 5.11 データ破棄フロー（リロード/切り替え）
 
 ```
-セーブデータ切り替え/リロード → CalculatorStore.cleanupTemporaryData → 仮データ削除 → 編集セッション削除 → 永続データ復元
+セーブデータ切り替え/リロード → CalculatorStore.cleanupTemporaryData → 仮データ削除 → 現在セーブデータの編集セッション削除 → 永続データ復元
 ```
+
+### 5.12 セーブデータ固有編集セッション管理フロー
+
+```
+セーブデータ切り替え → SaveDataStore.switchSaveData → setCurrentSaveDataId(新セーブID) → cleanupCurrentEditSessions() → 前セーブデータの編集セッション削除
+```
+
+**セーブデータ固有の編集セッション特徴**：
+- 編集セッションキー：`${saveDataId}:${equipmentId}`
+- 各セーブデータで独立した編集状態を維持
+- セーブデータ切り替え時は該当セーブデータの編集セッションのみクリーンアップ
+- 異なるセーブデータ間での編集セッション混在を完全防止
 
 ## 6. 型安全性
 
