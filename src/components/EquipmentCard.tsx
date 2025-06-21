@@ -13,36 +13,6 @@ export default function EquipmentCard({
 	isSelected,
 	onClick,
 }: EquipmentCardProps) {
-	const getTypeLabel = (type: string) => {
-		switch (type) {
-			case 'weapon':
-				return '武器'
-			case 'armor':
-				return '防具'
-			case 'accessory':
-				return 'アクセサリ'
-			case 'fashion':
-				return 'オシャレ'
-			default:
-				return type
-		}
-	}
-
-	const getTypeColor = (type: string) => {
-		switch (type) {
-			case 'weapon':
-				return 'bg-red-100 text-red-800'
-			case 'armor':
-				return 'bg-blue-100 text-blue-800'
-			case 'accessory':
-				return 'bg-green-100 text-green-800'
-			case 'fashion':
-				return 'bg-purple-100 text-purple-800'
-			default:
-				return 'bg-gray-100 text-gray-800'
-		}
-	}
-
 	const formatBaseStats = () => {
 		const stats = Object.entries(equipment.baseStats)
 			.filter(([_, value]) => value !== undefined && value !== 0)
@@ -248,15 +218,6 @@ export default function EquipmentCard({
 					</svg>
 				</div>
 			)}
-
-			{/* タイプバッジ */}
-			<div className="mb-2">
-				<span
-					className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(equipment.type)}`}
-				>
-					{getTypeLabel(equipment.type)}
-				</span>
-			</div>
 
 			{/* 装備名 */}
 			<h3 className="font-semibold text-gray-900 mb-2 pr-8">
