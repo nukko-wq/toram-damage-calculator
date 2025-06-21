@@ -1,22 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useCalculatorStore } from '@/stores'
-import type {
-	PresetEnemy,
-	UserEnemy,
-	EnemyFormData,
-	EnemyCategory,
-} from '@/types/calculator'
-import { enemyFormDataSchema } from '@/schemas/enemy'
-import {
-	getAllEnemies,
-	getEnemiesByCategory,
-	getEnemyById,
-	getCategoryDisplayName,
-} from '@/utils/enemyDatabase'
+import type { EnemyFormData, EnemyCategory } from '@/types/calculator'
+import { getPresetEnemyById } from '@/utils/enemyDatabase'
+import EnemySelectionModal from './EnemySelectionModal'
 
 interface NewEnemyFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -44,36 +32,40 @@ export default function NewEnemyForm({
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEnemyData = storeEnemyData
-	const [selectedCategory, setSelectedCategory] = useState<
-		EnemyCategory | 'all'
-	>('all')
 
-	const {
-		register,
-		watch,
-		setValue,
-		formState: { errors },
-	} = useForm<EnemyFormData>({
-		resolver: zodResolver(enemyFormDataSchema),
-		defaultValues: enemyData,
-		mode: 'onChange',
+	// モーダル状態管理
+	const [modalState, setModalState] = useState<{
+		isOpen: boolean
+		title: string
+	}>({
+		isOpen: false,
+		title: '',
 	})
 
 	// 現在選択されている敵情報を取得
 	const selectedEnemy =
 		effectiveEnemyData.selectedId && effectiveEnemyData.type
-			? getEnemyById(effectiveEnemyData.selectedId)
+			? getPresetEnemyById(effectiveEnemyData.selectedId)
 			: null
 
-	// カテゴリ別の敵情報を取得
-	const availableEnemies =
-		selectedCategory === 'all'
-			? getAllEnemies()
-			: getEnemiesByCategory(selectedCategory)
+	// モーダル開閉の処理
+	const handleOpenModal = () => {
+		setModalState({
+			isOpen: true,
+			title: '敵を選択',
+		})
+	}
 
-	// プリセット選択の処理
-	const handleEnemySelect = (enemyId: string) => {
-		if (enemyId === '') {
+	const handleCloseModal = () => {
+		setModalState({
+			isOpen: false,
+			title: '',
+		})
+	}
+
+	// 敵選択の処理
+	const handleEnemySelect = (enemyId: string | null) => {
+		if (enemyId === null) {
 			// 未選択の場合
 			const newData = getDefaultEnemyFormData()
 			// Zustandストアを更新
@@ -86,13 +78,12 @@ export default function NewEnemyForm({
 			return
 		}
 
-		const enemy = getEnemyById(enemyId)
+		const enemy = getPresetEnemyById(enemyId)
 		if (!enemy) return
 
-		const isPreset = !('createdAt' in enemy)
 		const newData: EnemyFormData = {
 			selectedId: enemyId,
-			type: isPreset ? 'preset' : 'custom',
+			type: 'preset',
 			manualOverrides: {
 				resistCritical: 0, // プリセットは0から開始
 				requiredHIT: 0, // プリセットは0から開始
@@ -136,49 +127,90 @@ export default function NewEnemyForm({
 		return baseValue + (overrideValue || 0)
 	}
 
+	// カテゴリ表示名の取得
+	const getCategoryDisplayName = (category: EnemyCategory): string => {
+		switch (category) {
+			case 'mob':
+				return 'モブ'
+			case 'fieldBoss':
+				return 'フィールドボス'
+			case 'boss':
+				return 'ボス'
+			case 'raidBoss':
+				return 'レイドボス'
+			default:
+				return category
+		}
+	}
+
+	// 選択済み敵の名前を取得
+	const getSelectedEnemyName = (): string => {
+		if (!selectedEnemy) return 'なし'
+		return `${selectedEnemy.name} (Lv.${selectedEnemy.level})`
+	}
+
+	// 選択済み敵の詳細情報を取得
+	const getSelectedEnemyInfo = (): string => {
+		if (!selectedEnemy) return ''
+		const parts = []
+		if (selectedEnemy.stats.DEF > 0)
+			parts.push(`DEF ${selectedEnemy.stats.DEF}`)
+		if (selectedEnemy.stats.MDEF > 0)
+			parts.push(`MDEF ${selectedEnemy.stats.MDEF}`)
+		return parts.slice(0, 2).join(', ')
+	}
+
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-6 lg:row-end-7">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">敵情報</h2>
 
 			<div className="space-y-4">
-				{/* カテゴリフィルター */}
+				{/* 敵選択ボタン */}
 				<div className="flex items-center gap-2">
-					<label className="text-sm font-medium text-gray-700 w-20 flex-shrink-0">
-						カテゴリ:
-					</label>
-					<select
-						value={selectedCategory}
-						onChange={(e) =>
-							setSelectedCategory(e.target.value as EnemyCategory | 'all')
-						}
-						className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-					>
-						<option value="all">全て</option>
-						<option value="mob">モブ</option>
-						<option value="fieldBoss">フィールドボス</option>
-						<option value="boss">ボス</option>
-						<option value="raidBoss">レイドボス</option>
-					</select>
-				</div>
-
-				{/* 敵選択 */}
-				<div className="flex items-center gap-2">
-					<label className="text-sm font-medium text-gray-700 w-20 flex-shrink-0">
+					<label className="text-sm font-medium text-gray-700 w-16 sm:w-20 flex-shrink-0">
 						敵選択:
 					</label>
-					<select
-						value={effectiveEnemyData.selectedId || ''}
-						onChange={(e) => handleEnemySelect(e.target.value)}
-						className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+					<button
+						type="button"
+						onClick={handleOpenModal}
+						className={`
+							flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-left transition-colors hover:bg-gray-50
+							${selectedEnemy ? 'bg-blue-50 border-blue-300' : 'bg-white'}
+						`}
 					>
-						<option value="">-- 敵を選択 --</option>
-						{availableEnemies.map((enemy) => (
-							<option key={enemy.id} value={enemy.id}>
-								{enemy.name} (Lv.{enemy.level}) [
-								{getCategoryDisplayName(enemy.category)}]
-							</option>
-						))}
-					</select>
+						<div className="flex items-center justify-between">
+							<div className="flex-1 min-w-0">
+								<div
+									className={`font-medium truncate ${
+										selectedEnemy ? 'text-blue-900' : 'text-gray-500'
+									}`}
+								>
+									{getSelectedEnemyName()}
+								</div>
+								{selectedEnemy && (
+									<div className="text-xs text-gray-600 mt-1 truncate">
+										{getSelectedEnemyInfo()}
+									</div>
+								)}
+							</div>
+							<div className="ml-2 flex-shrink-0">
+								<svg
+									className="w-5 h-5 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-label="選択"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</div>
+						</div>
+					</button>
 				</div>
 
 				{/* 選択された敵の基本情報表示 */}
@@ -274,10 +306,19 @@ export default function NewEnemyForm({
 				{/* 未選択時のメッセージ */}
 				{!selectedEnemy && (
 					<div className="bg-gray-50 p-3 rounded text-sm text-gray-600 text-center">
-						敵を選択してください
+						敵選択ボタンをクリックして敵を選択してください
 					</div>
 				)}
 			</div>
+
+			{/* 敵選択モーダル */}
+			<EnemySelectionModal
+				isOpen={modalState.isOpen}
+				onClose={handleCloseModal}
+				onSelect={handleEnemySelect}
+				selectedEnemyId={effectiveEnemyData.selectedId}
+				title={modalState.title}
+			/>
 		</section>
 	)
 }
