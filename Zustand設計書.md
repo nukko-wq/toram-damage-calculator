@@ -441,13 +441,14 @@ const BuffItemButton = ({ category, label, onOpenModal }) => {
 
 ### 4.5 装備カスタム機能統合
 
-装備フォームではカスタム装備の作成・削除機能を統合:
+装備フォームではカスタム装備の作成・名前変更・削除機能を統合:
 
 ```typescript
 // 装備フォーム統合の例（src/components/equipment/EquipmentForm.tsx）
 const EquipmentForm = () => {
   const storeEquipment = useCalculatorStore(state => state.data.equipment)
   const createCustomEquipment = useCalculatorStore(state => state.createCustomEquipment)
+  const renameCustomEquipment = useCalculatorStore(state => state.renameCustomEquipment)
   const deleteCustomEquipment = useCalculatorStore(state => state.deleteCustomEquipment)
   
   // カスタム装備作成処理（仮データ作成）
@@ -455,6 +456,13 @@ const EquipmentForm = () => {
     await createTemporaryCustomEquipment(equipmentCategory, name)
     // 作成後は自動的に装備スロットにセット（仮データとして）
     // カスタム装備はプリセット選択モーダルからも選択可能
+    setHasUnsavedChanges(true)
+  }
+  
+  // カスタム装備名前変更処理
+  const handleRenameEquipment = async (equipmentId: string, newName: string) => {
+    await renameCustomEquipment(equipmentId, newName)
+    // 永続データ・仮データ・編集セッション全てで装備名を更新
     setHasUnsavedChanges(true)
   }
   
@@ -488,6 +496,11 @@ const EquipmentForm = () => {
         新規作成
       </button>
       
+      {/* 名前変更ボタン */}
+      <button onClick={() => openRenameModal()}>
+        名前変更
+      </button>
+      
       {/* 削除ボタン */}
       <button onClick={() => openDeleteModal()}>
         削除
@@ -501,6 +514,8 @@ const EquipmentForm = () => {
 - プリセット選択UIと統合されたボタン配置
 - 装備名入力モーダルでの新規作成
 - 新規作成後の自動装備セット機能（仮データとして）
+- 名前変更モーダルでの装備名編集（カスタム装備のみ）
+- 名前変更時の全データ層での一括更新（永続・仮データ・編集セッション）
 - 削除確認モーダルでの安全な削除
 - プリセット選択モーダルでのカスタム装備表示統合
 - 全セーブデータ間でのカスタム装備共有
@@ -579,31 +594,37 @@ SaveDataManager表示 → SaveDataStore.loadSaveDataList → ユーザー作成�
 [新規作成] → 装備名入力モーダル → CalculatorStore.createTemporaryCustomEquipment → メモリ上仮データ作成 → 自動装備セット → 未保存変更フラグ設定
 ```
 
-### 5.8 カスタム装備削除フロー
+### 5.8 カスタム装備名前変更フロー
+
+```
+[名前変更] → 名前変更モーダル → 現在名を初期値表示 → 新しい名前入力 → CalculatorStore.renameCustomEquipment → 全データ層で名前更新 → 未保存変更フラグ設定
+```
+
+### 5.9 カスタム装備削除フロー
 
 ```
 [削除] → 削除確認モーダル → CalculatorStore.deleteCustomEquipment → LocalStorage除去 → 未保存変更フラグ設定
 ```
 
-### 5.9 既存カスタム装備編集フロー
+### 5.10 既存カスタム装備編集フロー
 
 ```
 カスタム装備選択 → 編集セッション開始 → プロパティ変更 → メモリ上編集データ更新 → 装備選択UI反映 → 未保存変更フラグ設定
 ```
 
-### 5.10 カスタム装備保存フロー
+### 5.11 カスタム装備保存フロー
 
 ```
 [現在のデータを保存] → CalculatorStore.saveTemporaryCustomEquipments → 仮データ永続化 → 編集セッション永続化 → LocalStorage保存 → 仮データクリーンアップ
 ```
 
-### 5.11 データ破棄フロー（リロード/切り替え）
+### 5.12 データ破棄フロー（リロード/切り替え）
 
 ```
 セーブデータ切り替え/リロード → CalculatorStore.cleanupTemporaryData → 仮データ削除 → 現在セーブデータの編集セッション削除 → 永続データ復元
 ```
 
-### 5.12 セーブデータ固有編集セッション管理フロー
+### 5.13 セーブデータ固有編集セッション管理フロー
 
 ```
 セーブデータ切り替え → SaveDataStore.switchSaveData → setCurrentSaveDataId(新セーブID) → cleanupCurrentEditSessions() → 前セーブデータの編集セッション削除

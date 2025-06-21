@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { useCalculatorStore, useUIStore } from '@/stores'
-import BaseStatsForm from '@/components/base-stats/BaseStatsForm'
-import WeaponForm from '@/components/weapon/WeaponForm'
-import CrystalForm from '@/components/crystal/CrystalForm'
-import EquipmentForm from '@/components/equipment/EquipmentForm'
-import FoodForm from '@/components/food/FoodForm'
-import EnemyForm from '@/components/enemy/EnemyForm'
-import BuffSkillForm from '@/components/buff-skill/BuffSkillForm'
-import BuffItemForm from '@/components/buff-item/BuffItemForm'
-import StatsSummary from '@/components/summary/StatsSummary'
-import SaveDataManager from '@/components/save-data/SaveDataManager'
 import type { UpdateNotification } from '@/types/calculator'
 import { initializeStorage } from '@/utils/saveDataManager'
+import BaseStatsForm from '@/components/base-stats/BaseStatsForm'
+import BuffItemForm from '@/components/buff-item/BuffItemForm'
+import BuffSkillForm from '@/components/buff-skill/BuffSkillForm'
+import CrystalForm from '@/components/crystal/CrystalForm'
+import EnemyForm from '@/components/enemy/EnemyForm'
+import EquipmentForm from '@/components/equipment/EquipmentForm'
+import FoodForm from '@/components/food/FoodForm'
+import SaveDataManager from '@/components/save-data/SaveDataManager'
+import StatsSummary from '@/components/summary/StatsSummary'
+import WeaponForm from '@/components/weapon/WeaponForm'
 
 export default function Home() {
 	// Zustandストアからデータを取得
@@ -108,6 +108,7 @@ export default function Home() {
 										className="h-5 w-5 text-green-400"
 										viewBox="0 0 20 20"
 										fill="currentColor"
+										aria-label="成功アイコン"
 									>
 										<path
 											fillRule="evenodd"
