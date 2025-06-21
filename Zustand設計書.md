@@ -56,8 +56,11 @@ interface CalculatorStore {
   updateSubWeapon: (weapon: SubWeapon) => void
   updateCrystals: (crystals: CrystalSlots) => void
   updateEquipment: (equipment: EquipmentSlots) => void
-  createCustomEquipment: (equipmentType: EquipmentType, name: string) => Promise<void>
+  createTemporaryCustomEquipment: (equipmentCategory: EquipmentCategory, name: string) => Promise<void>
+  saveTemporaryCustomEquipments: () => Promise<void>
   deleteCustomEquipment: (equipmentId: string) => Promise<void>
+  updateCustomEquipmentProperties: (equipmentId: string, properties: Partial<EquipmentProperties>) => Promise<void>
+  cleanupTemporaryData: () => void
   updateFood: (food: FoodFormData) => void
   updateEnemy: (enemy: EnemyFormData) => void
   updateBuffSkills: (buffSkills: BuffSkillFormData) => void
@@ -70,7 +73,9 @@ interface CalculatorStore {
 - 未保存変更の検知（UI表示用の色分けに使用）
 - セーブデータの読み込み・保存
 - 各フォームからの個別更新
-- カスタム装備の作成・削除管理
+- カスタム装備の仮データ作成・管理
+- カスタム装備のプロパティ連動更新
+- 仮データの自動クリーンアップ
 
 **保存ボタンの統一仕様**:
 - ボタンラベル: 常に「現在のデータを保存」
@@ -445,10 +450,10 @@ const EquipmentForm = () => {
   const createCustomEquipment = useCalculatorStore(state => state.createCustomEquipment)
   const deleteCustomEquipment = useCalculatorStore(state => state.deleteCustomEquipment)
   
-  // カスタム装備作成処理
-  const handleCreateEquipment = async (equipmentType: EquipmentType, name: string) => {
-    await createCustomEquipment(equipmentType, name)
-    // 作成後は自動的に装備スロットにセット
+  // カスタム装備作成処理（仮データ作成）
+  const handleCreateEquipment = async (equipmentCategory: EquipmentCategory, name: string) => {
+    await createTemporaryCustomEquipment(equipmentCategory, name)
+    // 作成後は自動的に装備スロットにセット（仮データとして）
     // カスタム装備はプリセット選択モーダルからも選択可能
     setHasUnsavedChanges(true)
   }
@@ -456,7 +461,18 @@ const EquipmentForm = () => {
   // カスタム装備削除処理
   const handleDeleteEquipment = async (equipmentId: string) => {
     await deleteCustomEquipment(equipmentId)
-    // 削除後はLocalStorageから除去
+    // 永続データはLocalStorageから除去、仮データはメモリから削除
+    setHasUnsavedChanges(true)
+  }
+  
+  // プロパティ変更処理（カスタム装備連動）
+  const handlePropertyChange = (property: string, value: number) => {
+    // 現在セット中の装備がカスタム装備の場合、リアルタイムで装備データを更新
+    if (isCustomEquipmentActive() && currentEquipmentId) {
+      updateCustomEquipmentProperties(currentEquipmentId, { [property]: value })
+    }
+    // 通常のプロパティ更新処理
+    updateEquipmentProperties(property, value)
     setHasUnsavedChanges(true)
   }
   
@@ -484,12 +500,22 @@ const EquipmentForm = () => {
 **カスタム装備機能の特徴**:
 - プリセット選択UIと統合されたボタン配置
 - 装備名入力モーダルでの新規作成
-- 新規作成後の自動装備セット機能
+- 新規作成後の自動装備セット機能（仮データとして）
 - 削除確認モーダルでの安全な削除
-- LocalStorageへの即座保存・削除
 - プリセット選択モーダルでのカスタム装備表示統合
 - 全セーブデータ間でのカスタム装備共有
 - プロパティリセット機能
+
+**カスタム装備仮データ管理**:
+- 仮データ作成：新規作成時はメモリ上に一時的なデータを作成
+- セーブ時永続化：「現在のデータを保存」実行時のみLocalStorageに保存
+- 自動クリーンアップ：セーブデータ切り替え・リロード時に仮データを削除
+- 保存状態表示：未保存カスタム装備の視覚的インジケーター
+
+**カスタム装備プロパティ連動**:
+- リアルタイム反映：プロパティフォーム変更時の装備データ自動更新
+- 双方向同期：装備選択とプロパティ編集の整合性維持
+- 仮データ対応：永続・仮データ問わずプロパティ連動機能が動作
 
 ### 4.6 初期化管理
 
