@@ -3,10 +3,11 @@
 		"physicalPower": [
 			{
 				"id": "penetrate_oil",
-				"name": "ペネトレイトオイル",
+				"name": "ペネトレートオイル",
 				"category": "physicalPower",
 				"properties": {
-					"PhysicalPenetration_Rate": 15
+					"ATK_Rate": 3,
+					"PhysicalPenetration_Rate": 10
 				}
 			},
 			{
@@ -14,7 +15,8 @@
 				"name": "みなぎる丸薬",
 				"category": "physicalPower",
 				"properties": {
-					"ATK_Rate": 15
+					"ATK": 50,
+					"ATK_Rate": 5
 				}
 			},
 			{
@@ -22,7 +24,7 @@
 				"name": "ランタンケーキ",
 				"category": "physicalPower",
 				"properties": {
-					"ATK": 100
+					"ATK_Rate": 10
 				}
 			}
 		],
@@ -32,7 +34,8 @@
 				"name": "魔法障壁の石板",
 				"category": "magicalPower",
 				"properties": {
-					"MagicalPenetration_Rate": 15
+					"MATK_Rate": 5,
+					"MagicalPenetration_Rate": 10
 				}
 			},
 			{
@@ -40,7 +43,8 @@
 				"name": "魔道士の秘薬",
 				"category": "magicalPower",
 				"properties": {
-					"MATK_Rate": 15
+					"MATK_Rate": 5,
+					"MATK": 50
 				}
 			},
 			{
@@ -48,7 +52,8 @@
 				"name": "苦いプルプル",
 				"category": "magicalPower",
 				"properties": {
-					"MATK": 100
+					"MATK": -4,
+					"CastingSpeed": 800
 				}
 			}
 		],
@@ -58,7 +63,7 @@
 				"name": "謎のポーション(Y)",
 				"category": "physicalDefense",
 				"properties": {
-					"PhysicalResistance_Rate": 15
+					"ATK_Rate": 1
 				}
 			},
 			{
@@ -66,7 +71,8 @@
 				"name": "銀杏の炊き込みご飯",
 				"category": "physicalDefense",
 				"properties": {
-					"DEF_Rate": 20
+					"PhysicalResistance_Rate": 25,
+					"MagicalResistance_Rate": 25
 				}
 			}
 		],
@@ -76,7 +82,7 @@
 				"name": "謎のポーション(P)",
 				"category": "magicalDefense",
 				"properties": {
-					"MagicalResistance_Rate": 15
+					"MATK_Rate": 1
 				}
 			}
 		],
@@ -86,7 +92,9 @@
 				"name": "ゾンビケーキ(有利共通)",
 				"category": "elementalAttack",
 				"properties": {
-					"ElementAdvantage_Rate": 15
+					"ElementAdvantage_Rate": 5,
+					"AttackSpeed": 100,
+					"CastingSpeed": 100
 				}
 			},
 			{
@@ -94,7 +102,9 @@
 				"name": "かぼちゃの飴玉(有利共通)",
 				"category": "elementalAttack",
 				"properties": {
-					"ElementAdvantage_Rate": 10
+					"ElementAdvantage_Rate": 5,
+					"AttackSpeed": 100,
+					"CastingSpeed": 100
 				}
 			}
 		],
@@ -104,13 +114,7 @@
 				"name": "属性ケーキ類(共通)",
 				"category": "elementalDefense",
 				"properties": {
-					"FireResistance_Rate": 10,
-					"WaterResistance_Rate": 10,
-					"EarthResistance_Rate": 10,
-					"WindResistance_Rate": 10,
-					"LightResistance_Rate": 10,
-					"DarkResistance_Rate": 10,
-					"NeutralResistance_Rate": 10
+					"MP": 100
 				}
 			},
 			{
@@ -118,13 +122,7 @@
 				"name": "たこけん焼き(共通)",
 				"category": "elementalDefense",
 				"properties": {
-					"FireResistance_Rate": 8,
-					"WaterResistance_Rate": 8,
-					"EarthResistance_Rate": 8,
-					"WindResistance_Rate": 8,
-					"LightResistance_Rate": 8,
-					"DarkResistance_Rate": 8,
-					"NeutralResistance_Rate": 8
+					"Critical": 15
 				}
 			}
 		],
@@ -142,7 +140,7 @@
 				"name": "ギガスピードポッド",
 				"category": "speed",
 				"properties": {
-					"AttackSpeed": 500
+					"AttackSpeed": 750
 				}
 			}
 		],
@@ -152,7 +150,7 @@
 				"name": "リスニングホン",
 				"category": "casting",
 				"properties": {
-					"CastingSpeed": 1000
+					"CastingSpeed": 700
 				}
 			},
 			{
@@ -160,7 +158,8 @@
 				"name": "ぶどうゼリー",
 				"category": "casting",
 				"properties": {
-					"CastingSpeed": 500
+					"CastingSpeed": 300,
+					"MP": 300
 				}
 			}
 		],
@@ -170,7 +169,7 @@
 				"name": "アドマジクルⅢ",
 				"category": "mp",
 				"properties": {
-					"MP_Rate": 30
+					"MP": 300
 				}
 			},
 			{
@@ -178,7 +177,8 @@
 				"name": "ロノーゴ海老ソテー",
 				"category": "mp",
 				"properties": {
-					"MP": 500
+					"MP": 300,
+					"CastingSpeed": 250
 				}
 			}
 		],
@@ -188,7 +188,8 @@
 				"name": "ドラゴンステーキ",
 				"category": "hp",
 				"properties": {
-					"HP": 2000
+					"HP": 1500,
+					"AttackSpeed": 250
 				}
 			},
 			{
@@ -196,7 +197,7 @@
 				"name": "プラスバイタⅥ",
 				"category": "hp",
 				"properties": {
-					"HP_Rate": 30
+					"HP": 3000
 				}
 			}
 		],
@@ -206,7 +207,7 @@
 				"name": "戦霊の輪",
 				"category": "accuracy",
 				"properties": {
-					"Accuracy": 30
+					"Accuracy": 60
 				}
 			},
 			{
@@ -214,17 +215,19 @@
 				"name": "葉桜茶",
 				"category": "accuracy",
 				"properties": {
-					"Accuracy_Rate": 15
+					"Accuracy_Rate": 12,
+					"Critical": 6
 				}
 			}
 		],
 		"evasion": [
 			{
 				"id": "golden_pom_salmon",
-				"name": "黄金ポム鮭",
+				"name": "黄金ポム酒",
 				"category": "evasion",
 				"properties": {
-					"Dodge": 30
+					"Accuracy": 50,
+					"Dodge": 50
 				}
 			}
 		]
