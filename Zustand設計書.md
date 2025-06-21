@@ -154,7 +154,7 @@ useEffect(() => {
 バフスキルフォームでは複数のスキルを管理するため、より複雑な統合パターンを使用:
 
 ```typescript
-// バフスキルフォームの例
+// バフスキルフォームの例（src/components/buff-skill/BuffSkillForm.tsx）
 const BuffSkillForm = () => {
   const storeBuffSkills = useCalculatorStore(state => state.data.buffSkills)
   const mainWeaponType = useCalculatorStore(state => state.data.mainWeapon.weaponType)
@@ -307,7 +307,7 @@ const BuffSkillForm = () => {
 バフアイテムフォームでは装備・クリスタ選択と統一されたモーダル選択UIを使用:
 
 ```typescript
-// バフアイテムフォームの例（モーダル選択対応）
+// バフアイテムフォームの例（src/components/buff-item/BuffItemForm.tsx）
 const BuffItemForm = () => {
   const storeBuffItems = useCalculatorStore(state => state.data.buffItems)
   const updateBuffItems = useCalculatorStore(state => state.updateBuffItems)
@@ -368,7 +368,7 @@ const BuffItemForm = () => {
         ))}
       </div>
       
-      {/* バフアイテム選択モーダル */}
+      {/* バフアイテム選択モーダル（src/components/buff-item/BuffItemSelectionModal.tsx） */}
       {modalState.category && (
         <BuffItemSelectionModal
           isOpen={modalState.isOpen}
