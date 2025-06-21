@@ -686,9 +686,45 @@ export default function EquipmentForm({
 									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
 							)
 						}
-						className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+						className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
 					>
-						{effectiveEquipment[activeTab].name || 'プリセット選択'}
+						{effectiveEquipment[activeTab].name ? (
+							<div className="flex items-center justify-between">
+								<span className="text-sm truncate text-gray-900">
+									{effectiveEquipment[activeTab].name}
+								</span>
+								<svg
+									className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</div>
+						) : (
+							<div className="flex items-center justify-between">
+								<span className="text-gray-500">プリセット選択</span>
+								<svg
+									className="w-4 h-4 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</div>
+						)}
 					</button>
 					{/* メイン装備の場合のみカスタム機能ボタンを表示 */}
 					{activeTab === 'main' && (
@@ -701,12 +737,14 @@ export default function EquipmentForm({
 							>
 								新規作成
 							</button>
-							{effectiveEquipment[activeTab].id && (
+							{effectiveEquipment[activeTab].id && 
+							 'isCustom' in effectiveEquipment[activeTab] && 
+							 effectiveEquipment[activeTab].isCustom && (
 								<button
 									type="button"
 									onClick={() => handleDeleteEquipment(activeTab)}
 									className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-									title="選択中の装備を削除"
+									title="選択中のカスタム装備を削除"
 								>
 									削除
 								</button>
