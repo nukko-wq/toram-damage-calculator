@@ -3,12 +3,12 @@
 /**
  * データ同期スクリプト
  * src/data/ から public/data/ にJSONファイルを同期します
- * 
+ *
  * 同期対象ファイル:
  * - crystals.json
- * - enemies.json  
+ * - enemies.json
  * - equipments.json
- * 
+ *
  * buffItems.json は src/data/ のみに存在するため同期対象外
  */
 
@@ -20,11 +20,7 @@ const srcDir = path.join(__dirname, '../src/data')
 const publicDir = path.join(__dirname, '../public/data')
 
 // 同期対象ファイル
-const filesToSync = [
-	'crystals.json',
-	'enemies.json', 
-	'equipments.json'
-]
+const filesToSync = ['crystals.json', 'enemies.json', 'equipments.json']
 
 console.log('🔄 データファイル同期を開始します...\n')
 
@@ -37,10 +33,10 @@ if (!fs.existsSync(publicDir)) {
 let syncCount = 0
 let errorCount = 0
 
-filesToSync.forEach(filename => {
+filesToSync.forEach((filename) => {
 	const srcPath = path.join(srcDir, filename)
 	const destPath = path.join(publicDir, filename)
-	
+
 	try {
 		// ソースファイルの存在チェック
 		if (!fs.existsSync(srcPath)) {
@@ -48,17 +44,16 @@ filesToSync.forEach(filename => {
 			errorCount++
 			return
 		}
-		
+
 		// ファイルコピー
 		fs.copyFileSync(srcPath, destPath)
-		
+
 		// ファイルサイズの確認
 		const srcStats = fs.statSync(srcPath)
 		const destStats = fs.statSync(destPath)
-		
+
 		console.log(`✅ ${filename}: ${srcStats.size} bytes 同期完了`)
 		syncCount++
-		
 	} catch (error) {
 		console.log(`❌ ${filename}: 同期エラー - ${error.message}`)
 		errorCount++

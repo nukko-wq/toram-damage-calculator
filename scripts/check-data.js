@@ -3,10 +3,10 @@
 /**
  * データファイル整合性チェックスクリプト
  * src/data/ と public/data/ の対応ファイルが同一かどうかをチェックします
- * 
+ *
  * チェック対象ファイル:
  * - crystals.json
- * - enemies.json  
+ * - enemies.json
  * - equipments.json
  */
 
@@ -19,11 +19,7 @@ const srcDir = path.join(__dirname, '../src/data')
 const publicDir = path.join(__dirname, '../public/data')
 
 // チェック対象ファイル
-const filesToCheck = [
-	'crystals.json',
-	'enemies.json', 
-	'equipments.json'
-]
+const filesToCheck = ['crystals.json', 'enemies.json', 'equipments.json']
 
 console.log('🔍 データファイル整合性チェックを開始します...\n')
 
@@ -62,34 +58,34 @@ let identicalCount = 0
 let differentCount = 0
 let missingCount = 0
 
-filesToCheck.forEach(filename => {
+filesToCheck.forEach((filename) => {
 	const srcPath = path.join(srcDir, filename)
 	const destPath = path.join(publicDir, filename)
-	
+
 	console.log(`📄 ${filename}:`)
-	
+
 	// ファイル存在チェック
 	const srcExists = fs.existsSync(srcPath)
 	const destExists = fs.existsSync(destPath)
-	
+
 	if (!srcExists && !destExists) {
 		console.log(`   ❌ 両方のファイルが存在しません`)
 		missingCount++
 		return
 	}
-	
+
 	if (!srcExists) {
 		console.log(`   ❌ src/data/${filename} が存在しません`)
 		missingCount++
 		return
 	}
-	
+
 	if (!destExists) {
 		console.log(`   ❌ public/data/${filename} が存在しません`)
 		missingCount++
 		return
 	}
-	
+
 	// ファイル情報取得
 	const srcHash = getFileHash(srcPath)
 	const destHash = getFileHash(destPath)
@@ -97,7 +93,7 @@ filesToCheck.forEach(filename => {
 	const destSize = getFileSize(destPath)
 	const srcModTime = getFileModTime(srcPath)
 	const destModTime = getFileModTime(destPath)
-	
+
 	// 比較結果
 	if (srcHash === destHash) {
 		console.log(`   ✅ ファイルは同一です`)
@@ -106,13 +102,17 @@ filesToCheck.forEach(filename => {
 		identicalCount++
 	} else {
 		console.log(`   ⚠️  ファイルが異なります`)
-		console.log(`      src/data/  - サイズ: ${srcSize} bytes, 更新: ${srcModTime}`)
-		console.log(`      public/data/ - サイズ: ${destSize} bytes, 更新: ${destModTime}`)
+		console.log(
+			`      src/data/  - サイズ: ${srcSize} bytes, 更新: ${srcModTime}`,
+		)
+		console.log(
+			`      public/data/ - サイズ: ${destSize} bytes, 更新: ${destModTime}`,
+		)
 		console.log(`      src ハッシュ:    ${srcHash}`)
 		console.log(`      public ハッシュ: ${destHash}`)
 		differentCount++
 	}
-	
+
 	console.log('')
 })
 
