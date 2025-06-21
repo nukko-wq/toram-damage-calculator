@@ -101,26 +101,105 @@ export default function BuffItemForm({ onBuffItemsChange }: BuffItemFormProps) {
 		const buffItem = getBuffItemById(selectedId)
 		if (!buffItem) return ''
 
+		// 装備フォームと同じプロパティ名マッピング
+		const propertyNameMap: Record<string, string> = {
+			// 基本攻撃力系
+			ATK_Rate: 'ATK',
+			ATK: 'ATK',
+			MATK_Rate: 'MATK',
+			MATK: 'MATK',
+			WeaponATK_Rate: '武器ATK',
+			WeaponATK: '武器ATK',
+
+			// 防御力系
+			DEF_Rate: 'DEF',
+			DEF: 'DEF',
+			MDEF_Rate: 'MDEF',
+			MDEF: 'MDEF',
+
+			// 貫通系
+			PhysicalPenetration_Rate: '物理貫通',
+			MagicalPenetration_Rate: '魔法貫通',
+			ElementAdvantage_Rate: '属性有利',
+
+			// 威力系
+			UnsheatheAttack_Rate: '抜刀威力',
+			UnsheatheAttack: '抜刀威力',
+			ShortRangeDamage_Rate: '近距離威力',
+			LongRangeDamage_Rate: '遠距離威力',
+
+			// クリティカル系
+			CriticalDamage_Rate: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+			CriticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+			Critical_Rate: 'ｸﾘﾃｨｶﾙ率',
+			Critical: 'ｸﾘﾃｨｶﾙ率',
+
+			// 安定率
+			Stability_Rate: '安定率',
+
+			// HP/MP系
+			HP_Rate: 'HP',
+			HP: 'HP',
+			MP_Rate: 'MP',
+			MP: 'MP',
+
+			// ステータス系
+			STR_Rate: 'STR',
+			STR: 'STR',
+			INT_Rate: 'INT',
+			INT: 'INT',
+			VIT_Rate: 'VIT',
+			VIT: 'VIT',
+			AGI_Rate: 'AGI',
+			AGI: 'AGI',
+			DEX_Rate: 'DEX',
+			DEX: 'DEX',
+			CRT_Rate: 'CRT',
+			CRT: 'CRT',
+			MEN_Rate: 'MEN',
+			MEN: 'MEN',
+			TEC_Rate: 'TEC',
+			TEC: 'TEC',
+			LUK_Rate: 'LUK',
+			LUK: 'LUK',
+
+			// 命中・回避系
+			Accuracy_Rate: '命中',
+			Accuracy: '命中',
+			Dodge_Rate: '回避',
+			Dodge: '回避',
+
+			// 速度系
+			AttackSpeed_Rate: '攻撃速度',
+			AttackSpeed: '攻撃速度',
+			CastingSpeed_Rate: '詠唱速度',
+			CastingSpeed: '詠唱速度',
+
+			// 耐性系
+			PhysicalResistance_Rate: '物理耐性',
+			MagicalResistance_Rate: '魔法耐性',
+
+			// 属性耐性
+			FireResistance_Rate: '火耐性',
+			WaterResistance_Rate: '水耐性',
+			WindResistance_Rate: '風耐性',
+			EarthResistance_Rate: '地耐性',
+			LightResistance_Rate: '光耐性',
+			DarkResistance_Rate: '闇耐性',
+			NeutralResistance_Rate: '無耐性',
+		}
+
 		const props = Object.entries(buffItem.properties)
 			.filter(([_, value]) => value !== 0)
 			.map(([key, value]) => {
-				// プロパティ名を簡潔に表示
-				const propName = key
-					.replace('_Rate', '%')
-					.replace('PhysicalPenetration_Rate', '物理貫通%')
-					.replace('MagicalPenetration_Rate', '魔法貫通%')
-					.replace('ElementAdvantage_Rate', '属性有利%')
-					.replace('PhysicalResistance_Rate', '物理耐性%')
-					.replace('MagicalResistance_Rate', '魔法耐性%')
-					.replace('ATK_Rate', 'ATK%')
-					.replace('MATK_Rate', 'MATK%')
-					.replace('DEF_Rate', 'DEF%')
-					.replace('HP_Rate', 'HP%')
-					.replace('MP_Rate', 'MP%')
-					.replace('AttackSpeed', '攻撃速度')
-					.replace('CastingSpeed', '詠唱速度')
+				// マッピングから日本語名を取得、なければ元のキーを使用
+				const propName = propertyNameMap[key] || key
 
-				return `${propName}${value > 0 ? '+' : ''}${value}`
+				// %系プロパティかどうかを判定
+				const isPercentage = key.endsWith('_Rate')
+				const suffix = isPercentage ? '%' : ''
+
+				return `${propName}${value > 0 ? '+' : ''}${value}${suffix}`
 			})
 			.slice(0, 2) // 最大2つまで表示
 
