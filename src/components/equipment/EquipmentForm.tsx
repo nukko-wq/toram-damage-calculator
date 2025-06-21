@@ -1,17 +1,22 @@
 'use client'
 
 import { useState } from 'react'
+
+import { useCalculatorStore } from '@/stores'
 import type {
 	Equipment,
 	EquipmentSlots,
 	EquipmentProperties,
 	EquipmentCategory,
 } from '@/types/calculator'
-import { getCombinedEquipmentById, getEquipmentCategoryLabel } from '@/utils/equipmentDatabase'
-import EquipmentSelectionModal from './EquipmentSelectionModal'
+import {
+	getCombinedEquipmentById,
+	getEquipmentCategoryLabel,
+} from '@/utils/equipmentDatabase'
+
 import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
-import { useCalculatorStore } from '@/stores'
+import EquipmentSelectionModal from './EquipmentSelectionModal'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -20,14 +25,18 @@ interface EquipmentFormProps {
 }
 
 export default function EquipmentForm({
-	equipment,
+	equipment: _equipment,
 	onEquipmentChange,
 }: EquipmentFormProps) {
 	// Zustandストアから装備データを取得
 	const storeEquipment = useCalculatorStore((state) => state.data.equipment)
 	const updateEquipment = useCalculatorStore((state) => state.updateEquipment)
-	const createCustomEquipment = useCalculatorStore((state) => state.createCustomEquipment)
-	const deleteCustomEquipment = useCalculatorStore((state) => state.deleteCustomEquipment)
+	const createCustomEquipment = useCalculatorStore(
+		(state) => state.createCustomEquipment,
+	)
+	const deleteCustomEquipment = useCalculatorStore(
+		(state) => state.deleteCustomEquipment,
+	)
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
@@ -422,7 +431,10 @@ export default function EquipmentForm({
 					[slotKey]: {
 						name: equipment.name,
 						properties: { ...equipment.properties },
-						presetId: 'isCustom' in equipment && equipment.isCustom ? null : equipmentId,
+						presetId:
+							'isCustom' in equipment && equipment.isCustom
+								? null
+								: equipmentId,
 						id: equipment.id,
 						isCustom: 'isCustom' in equipment && equipment.isCustom,
 					},
@@ -467,7 +479,10 @@ export default function EquipmentForm({
 		if (!createModalState.equipmentType) return
 
 		try {
-			await createCustomEquipment(createModalState.equipmentType as EquipmentCategory, equipmentName)
+			await createCustomEquipment(
+				createModalState.equipmentType as EquipmentCategory,
+				equipmentName,
+			)
 			setCreateModalState({
 				isOpen: false,
 				equipmentType: null,
@@ -645,48 +660,43 @@ export default function EquipmentForm({
 
 			{/* タブコンテンツ */}
 			<div className="space-y-4">
-				<div className="flex items-center justify-between">
-					<h3 className="text-lg font-semibold text-gray-700">
-						{equipmentSlots.find((slot) => slot.key === activeTab)?.label}
-					</h3>
-					<div className="flex gap-2">
-						<button
-							type="button"
-							onClick={() =>
-								openEquipmentModal(
-									activeTab as EquipmentCategory,
-									effectiveEquipment[activeTab].name ||
-										`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
-								)
-							}
-							className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-						>
-							{effectiveEquipment[activeTab].name || 'プリセット選択'}
-						</button>
-						{/* メイン装備の場合のみカスタム機能ボタンを表示 */}
-						{activeTab === 'main' && (
-							<>
+				<div className="flex gap-2">
+					<button
+						type="button"
+						onClick={() =>
+							openEquipmentModal(
+								activeTab as EquipmentCategory,
+								effectiveEquipment[activeTab].name ||
+									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
+							)
+						}
+						className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+					>
+						{effectiveEquipment[activeTab].name || 'プリセット選択'}
+					</button>
+					{/* メイン装備の場合のみカスタム機能ボタンを表示 */}
+					{activeTab === 'main' && (
+						<>
+							<button
+								type="button"
+								onClick={() => handleCreateEquipment(activeTab)}
+								className="px-3 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+								title="新規カスタム装備を作成"
+							>
+								新規作成
+							</button>
+							{effectiveEquipment[activeTab].id && (
 								<button
 									type="button"
-									onClick={() => handleCreateEquipment(activeTab)}
-									className="px-3 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
-									title="新規カスタム装備を作成"
+									onClick={() => handleDeleteEquipment(activeTab)}
+									className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+									title="選択中の装備を削除"
 								>
-									新規作成
+									削除
 								</button>
-								{effectiveEquipment[activeTab].id && (
-									<button
-										type="button"
-										onClick={() => handleDeleteEquipment(activeTab)}
-										className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-										title="選択中の装備を削除"
-									>
-										削除
-									</button>
-								)}
-							</>
-						)}
-					</div>
+							)}
+						</>
+					)}
 				</div>
 
 				{/* 現在選択されている装備表示 */}
@@ -729,7 +739,9 @@ export default function EquipmentForm({
 				onConfirm={handleCreateConfirm}
 				equipmentType={
 					createModalState.equipmentType
-						? getEquipmentCategoryLabel(createModalState.equipmentType as EquipmentCategory)
+						? getEquipmentCategoryLabel(
+								createModalState.equipmentType as EquipmentCategory,
+							)
 						: ''
 				}
 			/>

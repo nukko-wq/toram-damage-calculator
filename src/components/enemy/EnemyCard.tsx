@@ -43,7 +43,6 @@ export default function EnemyCard({
 		}
 	}
 
-
 	return (
 		<button
 			type="button"
@@ -102,7 +101,6 @@ export default function EnemyCard({
 
 			{/* 敵名 */}
 			<h3 className="font-semibold text-gray-900 mb-2 pr-8">{enemy.name}</h3>
-
 		</button>
 	)
 }

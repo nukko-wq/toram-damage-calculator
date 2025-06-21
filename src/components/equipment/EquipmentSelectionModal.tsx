@@ -45,7 +45,7 @@ export default function EquipmentSelectionModal({
 	useEffect(() => {
 		if (!isOpen) return
 
-			// カテゴリに対応するプリセット + カスタム装備を統合して取得
+		// カテゴリに対応するプリセット + カスタム装備を統合して取得
 		const equipments = getCombinedEquipmentsByCategory(category)
 		setAvailableEquipments(equipments)
 	}, [isOpen, category])

@@ -196,12 +196,15 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				try {
 					// カスタム装備を作成
 					const customEquipment = createCustomEquipment(equipmentCategory, name)
-					
+
 					// LocalStorageに保存
 					saveCustomEquipment(customEquipment)
-					
+
 					// 作成したカスタム装備を自動的に装備スロットにセット
-					const equipmentCategoryToSlotMap: Record<string, keyof EquipmentSlots> = {
+					const equipmentCategoryToSlotMap: Record<
+						string,
+						keyof EquipmentSlots
+					> = {
 						main: 'main',
 						body: 'body',
 						additional: 'additional',
@@ -211,7 +214,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						fashion2: 'fashion2',
 						fashion3: 'fashion3',
 					}
-					
+
 					const slotKey = equipmentCategoryToSlotMap[equipmentCategory]
 					if (slotKey) {
 						set(
@@ -245,20 +248,22 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				try {
 					// LocalStorageから削除
 					deleteCustomEquipment(equipmentId)
-					
+
 					// 現在選択中の装備がこのIDだった場合、選択を解除
 					const { data } = get()
 					const updatedEquipment = { ...data.equipment }
 					let hasChanges = false
-					
+
 					Object.keys(updatedEquipment).forEach((key) => {
-						const equipmentSlot = updatedEquipment[key as keyof typeof updatedEquipment]
+						const equipmentSlot =
+							updatedEquipment[key as keyof typeof updatedEquipment]
 						if (equipmentSlot && equipmentSlot.id === equipmentId) {
-							updatedEquipment[key as keyof typeof updatedEquipment] = createInitialEquipment()
+							updatedEquipment[key as keyof typeof updatedEquipment] =
+								createInitialEquipment()
 							hasChanges = true
 						}
 					})
-					
+
 					if (hasChanges) {
 						set(
 							(state) => ({

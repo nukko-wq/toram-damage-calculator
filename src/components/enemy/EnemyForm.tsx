@@ -22,10 +22,7 @@ const getDefaultEnemyFormData = (): EnemyFormData => ({
 	},
 })
 
-export default function EnemyForm({
-	enemyData,
-	onChange,
-}: EnemyFormProps) {
+export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 	// Zustandストアから敵データを取得
 	const storeEnemyData = useCalculatorStore((state) => state.data.enemy)
 	const updateEnemy = useCalculatorStore((state) => state.updateEnemy)

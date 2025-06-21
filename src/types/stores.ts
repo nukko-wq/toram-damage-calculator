@@ -76,7 +76,10 @@ export interface CalculatorStore {
 	updateBuffItems: (buffItems: BuffItemFormData) => void
 
 	// ===== カスタム装備管理 =====
-	createCustomEquipment: (equipmentCategory: EquipmentCategory, name: string) => Promise<void>
+	createCustomEquipment: (
+		equipmentCategory: EquipmentCategory,
+		name: string,
+	) => Promise<void>
 	deleteCustomEquipment: (equipmentId: string) => Promise<void>
 
 	// ===== 将来の計算機能 =====

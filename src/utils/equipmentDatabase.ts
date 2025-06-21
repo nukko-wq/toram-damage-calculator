@@ -403,15 +403,22 @@ export function createCustomEquipment(
 		name,
 		category: equipmentCategory,
 		properties: {}, // 全プロパティをリセット状態で作成
-		weaponStats: equipmentCategory === 'main' ? {
-			ATK: 0,
-			stability: 0,
-			refinement: 0,
-		} : undefined,
-		crystalSlots: ['main', 'body', 'additional', 'special'].includes(equipmentCategory) ? {
-			slot1: undefined,
-			slot2: undefined,
-		} : undefined,
+		weaponStats:
+			equipmentCategory === 'main'
+				? {
+						ATK: 0,
+						stability: 0,
+						refinement: 0,
+					}
+				: undefined,
+		crystalSlots: ['main', 'body', 'additional', 'special'].includes(
+			equipmentCategory,
+		)
+			? {
+					slot1: undefined,
+					slot2: undefined,
+				}
+			: undefined,
 		createdAt: now,
 		updatedAt: now,
 		isFavorite: false,
@@ -450,15 +457,17 @@ export function getCustomEquipmentById(id: string): UserEquipment | null {
 }
 
 // プリセット装備とカスタム装備を統合して取得（装備選択モーダル用）
-export function getCombinedEquipmentsByCategory(equipmentCategory: EquipmentCategory): Equipment[] {
+export function getCombinedEquipmentsByCategory(
+	equipmentCategory: EquipmentCategory,
+): Equipment[] {
 	const presetEquipments = getEquipmentsByCategory(equipmentCategory)
 	const customEquipments = getUserCustomEquipments()
-	
+
 	// カスタム装備を該当カテゴリでフィルタリング
 	const filteredCustomEquipments = customEquipments.filter(
-		(equipment) => equipment.category === equipmentCategory
+		(equipment) => equipment.category === equipmentCategory,
 	)
-	
+
 	// カテゴリからタイプへのマップ
 	const categoryToTypeMap: Record<EquipmentCategory, EquipmentType> = {
 		main: 'weapon',
@@ -471,7 +480,7 @@ export function getCombinedEquipmentsByCategory(equipmentCategory: EquipmentCate
 		fashion2: 'fashion',
 		fashion3: 'fashion',
 	}
-	
+
 	// カスタム装備をEquipment形式に変換
 	const formattedCustomEquipments: Equipment[] = filteredCustomEquipments.map(
 		(equipment) => ({
@@ -487,11 +496,11 @@ export function getCombinedEquipmentsByCategory(equipmentCategory: EquipmentCate
 			isModified: false,
 			createdAt: equipment.createdAt,
 			updatedAt: equipment.updatedAt,
-		})
+		}),
 	)
-	
+
 	// プリセット装備とカスタム装備を結合
-	const convertedPresetEquipments = presetEquipments.map(preset => ({
+	const convertedPresetEquipments = presetEquipments.map((preset) => ({
 		...preset,
 		isPreset: true as const,
 		isFavorite: false,
@@ -499,7 +508,7 @@ export function getCombinedEquipmentsByCategory(equipmentCategory: EquipmentCate
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
 	}))
-	
+
 	return [...convertedPresetEquipments, ...formattedCustomEquipments]
 }
 
@@ -517,7 +526,7 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 			updatedAt: new Date().toISOString(),
 		}
 	}
-	
+
 	// カスタム装備から検索
 	const customEquipment = getCustomEquipmentById(id)
 	if (customEquipment) {
@@ -533,7 +542,7 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 			fashion2: 'fashion',
 			fashion3: 'fashion',
 		}
-		
+
 		return {
 			id: customEquipment.id,
 			name: customEquipment.name,
@@ -549,6 +558,6 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 			updatedAt: customEquipment.updatedAt,
 		}
 	}
-	
+
 	return null
 }

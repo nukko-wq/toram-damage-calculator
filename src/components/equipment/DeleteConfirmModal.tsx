@@ -91,7 +91,12 @@ export default function DeleteConfirmModal({
 							className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
 							aria-label="モーダルを閉じる"
 						>
-							<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<svg
+								className="w-6 h-6"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"

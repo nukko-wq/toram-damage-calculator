@@ -75,7 +75,12 @@ export default function CreateEquipmentModal({
 							className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
 							aria-label="モーダルを閉じる"
 						>
-							<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<svg
+								className="w-6 h-6"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"
@@ -92,7 +97,8 @@ export default function CreateEquipmentModal({
 							id="create-equipment-description"
 							className="text-sm text-gray-600 mb-4"
 						>
-							{equipmentType}のカスタム装備を作成します。作成後、全プロパティがリセットされます。
+							{equipmentType}
+							のカスタム装備を作成します。作成後、全プロパティがリセットされます。
 						</div>
 
 						<div className="mb-6">
