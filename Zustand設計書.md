@@ -56,6 +56,8 @@ interface CalculatorStore {
   updateSubWeapon: (weapon: SubWeapon) => void
   updateCrystals: (crystals: CrystalSlots) => void
   updateEquipment: (equipment: EquipmentSlots) => void
+  createCustomEquipment: (equipmentType: EquipmentType, name: string) => Promise<void>
+  deleteCustomEquipment: (equipmentId: string) => Promise<void>
   updateFood: (food: FoodFormData) => void
   updateEnemy: (enemy: EnemyFormData) => void
   updateBuffSkills: (buffSkills: BuffSkillFormData) => void
@@ -68,6 +70,7 @@ interface CalculatorStore {
 - 未保存変更の検知（UI表示用の色分けに使用）
 - セーブデータの読み込み・保存
 - 各フォームからの個別更新
+- カスタム装備の作成・削除管理
 
 **保存ボタンの統一仕様**:
 - ボタンラベル: 常に「現在のデータを保存」
@@ -431,7 +434,60 @@ const BuffItemButton = ({ category, label, onOpenModal }) => {
 - 選択状態の視覚的フィードバック
 - アイテム詳細情報の表示
 
-### 4.5 初期化管理
+### 4.5 装備カスタム機能統合
+
+装備フォームではカスタム装備の作成・削除機能を統合:
+
+```typescript
+// 装備フォーム統合の例（src/components/equipment/EquipmentForm.tsx）
+const EquipmentForm = () => {
+  const storeEquipment = useCalculatorStore(state => state.data.equipment)
+  const createCustomEquipment = useCalculatorStore(state => state.createCustomEquipment)
+  const deleteCustomEquipment = useCalculatorStore(state => state.deleteCustomEquipment)
+  
+  // カスタム装備作成処理
+  const handleCreateEquipment = async (equipmentType: EquipmentType, name: string) => {
+    await createCustomEquipment(equipmentType, name)
+    // 作成後は現在のプロパティをリセット
+    setHasUnsavedChanges(true)
+  }
+  
+  // カスタム装備削除処理
+  const handleDeleteEquipment = async (equipmentId: string) => {
+    await deleteCustomEquipment(equipmentId)
+    // 削除後はLocalStorageから除去
+    setHasUnsavedChanges(true)
+  }
+  
+  return (
+    <div className="space-y-4">
+      {/* プリセット選択ボタン */}
+      <button onClick={() => openEquipmentModal()}>
+        装備を選択
+      </button>
+      
+      {/* 新規作成ボタン */}
+      <button onClick={() => openCreateModal()}>
+        新規作成
+      </button>
+      
+      {/* 削除ボタン */}
+      <button onClick={() => openDeleteModal()}>
+        削除
+      </button>
+    </div>
+  )
+}
+```
+
+**カスタム装備機能の特徴**:
+- プリセット選択UIと統合されたボタン配置
+- 装備名入力モーダルでの新規作成
+- 削除確認モーダルでの安全な削除
+- LocalStorageへの即座保存・削除
+- プロパティリセット機能
+
+### 4.6 初期化管理
 
 セーブデータ切り替え時のちらつき防止機能:
 
@@ -483,6 +539,18 @@ SaveDataManager → SaveDataStore.switchSaveData → CalculatorStore.loadSaveDat
 
 ```
 SaveDataManager表示 → SaveDataStore.loadSaveDataList → ユーザー作成データのみフィルタリング → リスト表示
+```
+
+### 5.7 カスタム装備作成フロー
+
+```
+[新規作成] → 装備名入力モーダル → CalculatorStore.createCustomEquipment → LocalStorage保存 → プロパティリセット → 未保存変更フラグ設定
+```
+
+### 5.8 カスタム装備削除フロー
+
+```
+[削除] → 削除確認モーダル → CalculatorStore.deleteCustomEquipment → LocalStorage除去 → 未保存変更フラグ設定
 ```
 
 ## 6. 型安全性
