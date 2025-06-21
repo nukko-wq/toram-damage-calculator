@@ -80,13 +80,18 @@ export default function EnemyCard({
 		<div
 			onClick={onClick}
 			className={`
-				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]
+				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200'
 						: 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
 				}
 			`}
+			style={{
+				WebkitFontSmoothing: 'antialiased',
+				MozOsxFontSmoothing: 'grayscale',
+				textRendering: 'optimizeLegibility',
+			}}
 			role="gridcell"
 			tabIndex={0}
 			aria-selected={isSelected}
