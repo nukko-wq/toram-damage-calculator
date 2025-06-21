@@ -206,68 +206,54 @@ export default function BuffItemForm({ onBuffItemsChange }: BuffItemFormProps) {
 		return props.join(', ')
 	}
 
-	// バフアイテム選択ボタンコンポーネント
-	const BuffItemButton = ({
-		category,
-		label,
-	}: {
-		category: BuffItemCategory
-		label: string
-	}) => {
+	// バフアイテム選択ボタンコンポーネント（ラベル無し版）
+	const BuffItemButton = ({ category }: { category: BuffItemCategory }) => {
 		const selectedName = getSelectedBuffItemName(category)
 		const properties = formatBuffItemProperties(category)
 		const hasSelection = effectiveBuffItems[category] !== null
 
 		return (
-			<div>
-				<label className="block text-sm font-medium text-gray-700 mb-1">
-					{label}
-				</label>
-				<button
-					type="button"
-					onClick={() => handleOpenModal(category)}
-					className={`
-						w-full p-3 rounded-md border text-left transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-						${
-							hasSelection
-								? 'border-blue-300 bg-blue-50'
-								: 'border-gray-300 bg-white'
-						}
-					`}
-				>
-					<div className="flex items-center justify-between">
-						<div className="flex-1 min-w-0">
-							<div
-								className={`text-sm font-medium truncate ${
-									hasSelection ? 'text-blue-900' : 'text-gray-500'
-								}`}
-							>
-								{selectedName}
+			<button
+				type="button"
+				onClick={() => handleOpenModal(category)}
+				className={`
+					px-1 py-1 w-full text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent text-left transition-colors hover:bg-gray-50
+					${hasSelection ? 'bg-blue-50 border-blue-300' : 'bg-white'}
+				`}
+			>
+				<div className="flex items-center justify-between">
+					<div className="flex-1 min-w-0">
+						<div
+							className={`text-sm truncate ${
+								hasSelection ? 'text-gray-900' : 'text-gray-500'
+							}`}
+						>
+							{selectedName}
+						</div>
+						{properties && (
+							<div className="text-xs text-gray-600 mt-1 truncate">
+								{properties}
 							</div>
-							{properties && (
-								<div className="text-xs text-gray-600 mt-1 truncate">
-									{properties}
-								</div>
-							)}
-						</div>
-						<div className="ml-2 flex-shrink-0">
-							<svg
-								className="w-5 h-5 text-gray-400"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M9 5l7 7-7 7"
-								/>
-							</svg>
-						</div>
+						)}
 					</div>
-				</button>
-			</div>
+					<div className="ml-2 flex-shrink-0">
+						<svg
+							className="w-4 h-4 text-gray-400"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							aria-label="選択"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 9l-7 7-7-7"
+							/>
+						</svg>
+					</div>
+				</div>
+			</button>
 		)
 	}
 
@@ -277,16 +263,18 @@ export default function BuffItemForm({ onBuffItemsChange }: BuffItemFormProps) {
 				バフアイテム設定
 			</h3>
 
-			{/* 12カテゴリのバフアイテム選択ボタン */}
-			<div className="grid grid-cols-2 gap-4">
+			{/* 12カテゴリのバフアイテム選択ボタン（WeaponFormスタイルに合わせたグリッド配置） */}
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
 				{buffItemCategories.map(({ key, label }) => (
-					<BuffItemButton key={key} category={key} label={label} />
+					<div key={key} className="flex items-center gap-2">
+						<div className="text-sm font-medium text-gray-700 w-20 flex-shrink-0">
+							{label}:
+						</div>
+						<div className="flex-1 mr-6">
+							<BuffItemButton category={key} />
+						</div>
+					</div>
 				))}
-			</div>
-
-			{/* 説明テキスト */}
-			<div className="mt-4 text-xs text-gray-500">
-				各カテゴリから1つずつバフアイテムを選択できます。クリックしてアイテムを選択してください。
 			</div>
 
 			{/* バフアイテム選択モーダル */}
