@@ -77,10 +77,11 @@ export default function EnemyCard({
 	const statsDisplay = formatStats()
 
 	return (
-		<div
+		<button
+			type="button"
 			onClick={onClick}
 			className={`
-				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0
+				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 w-full text-left
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-200'
@@ -92,16 +93,8 @@ export default function EnemyCard({
 				MozOsxFontSmoothing: 'grayscale',
 				textRendering: 'optimizeLegibility',
 			}}
-			role="gridcell"
-			tabIndex={0}
-			aria-selected={isSelected}
+			aria-pressed={isSelected}
 			aria-label={`${enemy.name} レベル${enemy.level} ${getCategoryLabel(enemy.category)}${isSelected ? ' 選択中' : ''}`}
-			onKeyDown={(e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault()
-					onClick()
-				}
-			}}
 		>
 			{/* 選択状態のチェックマーク */}
 			{isSelected && (
@@ -111,6 +104,7 @@ export default function EnemyCard({
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
+						aria-hidden="true"
 					>
 						<path
 							strokeLinecap="round"
@@ -144,8 +138,8 @@ export default function EnemyCard({
 			{/* ステータス */}
 			{statsDisplay.length > 0 && (
 				<div className="text-sm text-gray-600 mb-2 space-y-1">
-					{statsDisplay.map((stat, index) => (
-						<div key={index} className="truncate">
+					{statsDisplay.map((stat) => (
+						<div key={stat} className="truncate">
 							{stat}
 						</div>
 					))}
@@ -158,6 +152,6 @@ export default function EnemyCard({
 					低レベル敵・ステータス調整用
 				</div>
 			)}
-		</div>
+		</button>
 	)
 }

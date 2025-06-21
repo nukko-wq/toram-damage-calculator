@@ -110,16 +110,17 @@ export default function EnemySelectionModal({
 	return (
 		<dialog
 			open={isOpen}
-			className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 animate-in fade-in duration-200"
+			className="fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-black/50 transition-opacity"
 			onClick={handleBackgroundClick}
 			aria-labelledby="enemy-modal-title"
 			aria-describedby="enemy-modal-description"
 			role="dialog"
 		>
-			<div
-				data-modal-content="true"
-				className="bg-white rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] flex flex-col m-4 animate-in slide-in-from-bottom-4 duration-300"
-			>
+			<div className="min-h-screen flex items-center justify-center p-4">
+				<div
+					data-modal-content="true"
+					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+				>
 				{/* ヘッダー */}
 				<div className="flex items-center justify-between p-6 border-b border-gray-200">
 					<h2
@@ -276,6 +277,7 @@ export default function EnemySelectionModal({
 					>
 						キャンセル
 					</button>
+				</div>
 				</div>
 			</div>
 		</dialog>
