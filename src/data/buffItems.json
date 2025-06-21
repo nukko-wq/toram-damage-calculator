@@ -1,0 +1,235 @@
+{
+	"buffItems": {
+		"physicalPower": [
+			{
+				"id": "penetrate_oil",
+				"name": "ペネトレートオイル",
+				"category": "physicalPower",
+				"properties": {
+					"ATK_Rate": 3,
+					"PhysicalPenetration_Rate": 10
+				}
+			},
+			{
+				"id": "minagiru_pill",
+				"name": "みなぎる丸薬",
+				"category": "physicalPower",
+				"properties": {
+					"ATK": 50,
+					"ATK_Rate": 5
+				}
+			},
+			{
+				"id": "lantern_cake",
+				"name": "ランタンケーキ",
+				"category": "physicalPower",
+				"properties": {
+					"ATK_Rate": 10
+				}
+			}
+		],
+		"magicalPower": [
+			{
+				"id": "magic_barrier_tablet",
+				"name": "魔法障壁の石板",
+				"category": "magicalPower",
+				"properties": {
+					"MATK_Rate": 5,
+					"MagicalPenetration_Rate": 10
+				}
+			},
+			{
+				"id": "mage_secret_potion",
+				"name": "魔道士の秘薬",
+				"category": "magicalPower",
+				"properties": {
+					"MATK_Rate": 5,
+					"MATK": 50
+				}
+			},
+			{
+				"id": "bitter_purupuru",
+				"name": "苦いプルプル",
+				"category": "magicalPower",
+				"properties": {
+					"MATK": -4,
+					"CastingSpeed": 800
+				}
+			}
+		],
+		"physicalDefense": [
+			{
+				"id": "mystery_potion_y",
+				"name": "謎のポーション(Y)",
+				"category": "physicalDefense",
+				"properties": {
+					"ATK_Rate": 1
+				}
+			},
+			{
+				"id": "ginkgo_takikomi_gohan",
+				"name": "銀杏の炊き込みご飯",
+				"category": "physicalDefense",
+				"properties": {
+					"PhysicalResistance_Rate": 25,
+					"MagicalResistance_Rate": 25
+				}
+			}
+		],
+		"magicalDefense": [
+			{
+				"id": "mystery_potion_p",
+				"name": "謎のポーション(P)",
+				"category": "magicalDefense",
+				"properties": {
+					"MATK_Rate": 1
+				}
+			}
+		],
+		"elementalAttack": [
+			{
+				"id": "zombie_cake",
+				"name": "ゾンビケーキ(有利共通)",
+				"category": "elementalAttack",
+				"properties": {
+					"ElementAdvantage_Rate": 5,
+					"AttackSpeed": 100,
+					"CastingSpeed": 100
+				}
+			},
+			{
+				"id": "pumpkin_candy",
+				"name": "かぼちゃの飴玉(有利共通)",
+				"category": "elementalAttack",
+				"properties": {
+					"ElementAdvantage_Rate": 5,
+					"AttackSpeed": 100,
+					"CastingSpeed": 100
+				}
+			}
+		],
+		"elementalDefense": [
+			{
+				"id": "elemental_cake_common",
+				"name": "属性ケーキ類(共通)",
+				"category": "elementalDefense",
+				"properties": {
+					"MP": 100
+				}
+			},
+			{
+				"id": "takoken_yaki",
+				"name": "たこけん焼き(共通)",
+				"category": "elementalDefense",
+				"properties": {
+					"Critical": 15
+				}
+			}
+		],
+		"speed": [
+			{
+				"id": "tera_speed_pod",
+				"name": "テラスピードポッド",
+				"category": "speed",
+				"properties": {
+					"AttackSpeed": 1000
+				}
+			},
+			{
+				"id": "giga_speed_pod",
+				"name": "ギガスピードポッド",
+				"category": "speed",
+				"properties": {
+					"AttackSpeed": 750
+				}
+			}
+		],
+		"casting": [
+			{
+				"id": "listening_horn",
+				"name": "リスニングホン",
+				"category": "casting",
+				"properties": {
+					"CastingSpeed": 700
+				}
+			},
+			{
+				"id": "grape_jelly",
+				"name": "ぶどうゼリー",
+				"category": "casting",
+				"properties": {
+					"CastingSpeed": 300,
+					"MP": 300
+				}
+			}
+		],
+		"mp": [
+			{
+				"id": "ad_magic_3",
+				"name": "アドマジクルⅢ",
+				"category": "mp",
+				"properties": {
+					"MP": 300
+				}
+			},
+			{
+				"id": "ronogo_shrimp_saute",
+				"name": "ロノーゴ海老ソテー",
+				"category": "mp",
+				"properties": {
+					"MP": 300,
+					"CastingSpeed": 250
+				}
+			}
+		],
+		"hp": [
+			{
+				"id": "dragon_steak",
+				"name": "ドラゴンステーキ",
+				"category": "hp",
+				"properties": {
+					"HP": 1500,
+					"AttackSpeed": 250
+				}
+			},
+			{
+				"id": "plus_vita_6",
+				"name": "プラスバイタⅥ",
+				"category": "hp",
+				"properties": {
+					"HP": 3000
+				}
+			}
+		],
+		"accuracy": [
+			{
+				"id": "spirit_ring",
+				"name": "戦霊の輪",
+				"category": "accuracy",
+				"properties": {
+					"Accuracy": 60
+				}
+			},
+			{
+				"id": "leaf_cherry_tea",
+				"name": "葉桜茶",
+				"category": "accuracy",
+				"properties": {
+					"Accuracy_Rate": 12,
+					"Critical": 6
+				}
+			}
+		],
+		"evasion": [
+			{
+				"id": "golden_pom_salmon",
+				"name": "黄金ポム酒",
+				"category": "evasion",
+				"properties": {
+					"Accuracy": 50,
+					"Dodge": 50
+				}
+			}
+		]
+	}
+}

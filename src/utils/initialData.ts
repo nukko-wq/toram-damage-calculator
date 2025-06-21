@@ -1,14 +1,20 @@
-import {
+import type {
 	BaseStats,
 	MainWeapon,
 	SubWeapon,
 	Equipment,
 	EquipmentSlots,
 	CrystalSlots,
+	FoodFormData,
 	EnemyInfo,
+	EnemyFormData,
+	BuffSkillFormData,
+	BuffItemFormData,
 	CalculatorData,
 	EquipmentProperties,
 } from '@/types/calculator'
+import { getDefaultBuffSkillFormData } from './buffSkillDefaults'
+import { getDefaultBuffItems } from './buffItemDefaults'
 
 export const createInitialBaseStats = (): BaseStats => ({
 	STR: 1,
@@ -39,51 +45,93 @@ export const createInitialSubWeapon = (): SubWeapon => ({
 
 export const createInitialEquipmentProperties =
 	(): Partial<EquipmentProperties> => ({
-		'ATK%': 0,
+		// 基本攻撃力系
+		ATK_Rate: 0,
 		ATK: 0,
-		'MATK%': 0,
+		MATK_Rate: 0,
 		MATK: 0,
-		'武器ATK%': 0,
-		武器ATK: 0,
-		'物理貫通%': 0,
-		'魔法貫通%': 0,
-		'属性有利%': 0,
-		'抜刀威力%': 0,
-		抜刀威力: 0,
-		'近距離威力%': 0,
-		'遠距離威力%': 0,
-		'クリティカルダメージ%': 0,
-		クリティカルダメージ: 0,
-		'クリティカル率%': 0,
-		クリティカル率: 0,
-		'安定率%': 0,
-		'HP%': 0,
+		WeaponATK_Rate: 0,
+		WeaponATK: 0,
+
+		// 防御力系
+		DEF_Rate: 0,
+		DEF: 0,
+		MDEF_Rate: 0,
+		MDEF: 0,
+
+		// 貫通系
+		PhysicalPenetration_Rate: 0,
+		MagicalPenetration_Rate: 0,
+		ElementAdvantage_Rate: 0,
+
+		// 威力系
+		UnsheatheAttack_Rate: 0,
+		UnsheatheAttack: 0,
+		ShortRangeDamage_Rate: 0,
+		LongRangeDamage_Rate: 0,
+
+		// クリティカル系
+		CriticalDamage_Rate: 0,
+		CriticalDamage: 0,
+		Critical_Rate: 0,
+		Critical: 0,
+
+		// 安定率
+		Stability_Rate: 0,
+
+		// HP/MP系
+		HP_Rate: 0,
 		HP: 0,
+		MP_Rate: 0,
 		MP: 0,
-		'STR%': 0,
+
+		// ステータス系
+		STR_Rate: 0,
 		STR: 0,
-		'INT%': 0,
+		INT_Rate: 0,
 		INT: 0,
-		'VIT%': 0,
+		VIT_Rate: 0,
 		VIT: 0,
-		'AGI%': 0,
+		AGI_Rate: 0,
 		AGI: 0,
-		'DEX%': 0,
+		DEX_Rate: 0,
 		DEX: 0,
-		'命中%': 0,
-		命中: 0,
-		'回避%': 0,
-		回避: 0,
-		'攻撃速度%': 0,
-		攻撃速度: 0,
-		'詠唱速度%': 0,
-		詠唱速度: 0,
+		CRT_Rate: 0,
+		CRT: 0,
+		MEN_Rate: 0,
+		MEN: 0,
+		TEC_Rate: 0,
+		TEC: 0,
+		LUK_Rate: 0,
+		LUK: 0,
+
+		// 命中・回避系
+		Accuracy_Rate: 0,
+		Accuracy: 0,
+		Dodge_Rate: 0,
+		Dodge: 0,
+
+		// 速度系
+		AttackSpeed_Rate: 0,
+		AttackSpeed: 0,
+		CastingSpeed_Rate: 0,
+		CastingSpeed: 0,
+		MotionSpeed_Rate: 0,
 	})
 
 export const createInitialEquipment = (): Equipment => ({
+	id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
 	name: '',
+	type: 'weapon',
+	category: ['main'],
+	baseStats: {},
 	properties: createInitialEquipmentProperties(),
-	presetId: null,
+	isPreset: false,
+	isCustom: true,
+	isFavorite: false,
+	isModified: false,
+	createdAt: new Date().toISOString(),
+	updatedAt: new Date().toISOString(),
 })
 
 export const createInitialEquipmentSlots = (): EquipmentSlots => ({
@@ -116,11 +164,34 @@ export const createInitialEnemyInfo = (): EnemyInfo => ({
 	freeValue: 0,
 })
 
+// 料理システムの初期値
+export const createInitialFoodFormData = (): FoodFormData => ({
+	slot1: { selectedFood: 'none', level: 0 },
+	slot2: { selectedFood: 'none', level: 0 },
+	slot3: { selectedFood: 'none', level: 0 },
+	slot4: { selectedFood: 'none', level: 0 },
+	slot5: { selectedFood: 'none', level: 0 },
+})
+
+// 新しい敵情報システムの初期値
+export const createInitialEnemyFormData = (): EnemyFormData => ({
+	selectedId: null,
+	type: null,
+	manualOverrides: {
+		resistCritical: 0,
+		requiredHIT: 0,
+	},
+})
+
 export const createInitialCalculatorData = (): CalculatorData => ({
 	baseStats: createInitialBaseStats(),
 	mainWeapon: createInitialMainWeapon(),
 	subWeapon: createInitialSubWeapon(),
 	equipment: createInitialEquipmentSlots(),
 	crystals: createInitialCrystalSlots(),
-	enemy: createInitialEnemyInfo(),
+	food: createInitialFoodFormData(), // 料理システム
+	enemy: createInitialEnemyFormData(), // 新しい敵情報システム
+	buffSkills: getDefaultBuffSkillFormData(), // バフスキルシステム
+	buffItems: getDefaultBuffItems(), // バフアイテムシステム
+	legacyEnemy: createInitialEnemyInfo(), // 後方互換性
 })

@@ -29,47 +29,152 @@ export interface BaseStats {
 	level: number
 }
 
-// 装備プロパティ
+// 装備プロパティ（技術仕様書 4.1.5 に基づく完全定義）
 export interface EquipmentProperties {
-	'ATK%': number
-	ATK: number
-	'MATK%': number
-	MATK: number
-	'武器ATK%': number
-	武器ATK: number
-	'物理貫通%': number
-	'魔法貫通%': number
-	'属性有利%': number
-	'抜刀威力%': number
-	抜刀威力: number
-	'近距離威力%': number
-	'遠距離威力%': number
-	'クリティカルダメージ%': number
-	クリティカルダメージ: number
-	'クリティカル率%': number
-	クリティカル率: number
-	'安定率%': number
-	'HP%': number
-	HP: number
-	MP: number
-	'STR%': number
-	STR: number
-	'INT%': number
-	INT: number
-	'VIT%': number
-	VIT: number
-	'AGI%': number
-	AGI: number
-	'DEX%': number
-	DEX: number
-	'命中%': number
-	命中: number
-	'回避%': number
-	回避: number
-	'攻撃速度%': number
-	攻撃速度: number
-	'詠唱速度%': number
-	詠唱速度: number
+	// 基本攻撃力系
+	ATK_Rate: number // ATK%
+	ATK: number // ATK
+	MATK_Rate: number // MATK%
+	MATK: number // MATK
+	WeaponATK_Rate: number // 武器ATK%
+	WeaponATK: number // 武器ATK
+
+	// 防御力系
+	DEF_Rate: number // DEF%
+	DEF: number // DEF
+	MDEF_Rate: number // MDEF%
+	MDEF: number // MDEF
+
+	// 貫通系
+	PhysicalPenetration_Rate: number // 物理貫通%
+	MagicalPenetration_Rate: number // 魔法貫通%
+	ElementAdvantage_Rate: number // 属性有利%
+
+	// 威力系
+	UnsheatheAttack_Rate: number // 抜刀威力%
+	UnsheatheAttack: number // 抜刀威力
+	ShortRangeDamage_Rate: number // 近距離威力%
+	LongRangeDamage_Rate: number // 遠距離威力%
+
+	// クリティカル系
+	CriticalDamage_Rate: number // クリティカルダメージ%
+	CriticalDamage: number // クリティカルダメージ
+	Critical_Rate: number // クリティカル率%
+	Critical: number // クリティカル率
+
+	// 安定率
+	Stability_Rate: number // 安定率%
+
+	// HP/MP系
+	HP_Rate: number // HP%
+	HP: number // HP
+	MP_Rate: number // MP%
+	MP: number // MP
+
+	// ステータス系
+	STR_Rate: number // STR%
+	STR: number // STR
+	INT_Rate: number // INT%
+	INT: number // INT
+	VIT_Rate: number // VIT%
+	VIT: number // VIT
+	AGI_Rate: number // AGI%
+	AGI: number // AGI
+	DEX_Rate: number // DEX%
+	DEX: number // DEX
+	CRT_Rate: number // CRT%
+	CRT: number // CRT
+	MEN_Rate: number // MEN%
+	MEN: number // MEN
+	TEC_Rate: number // TEC%
+	TEC: number // TEC
+	LUK_Rate: number // LUK%
+	LUK: number // LUK
+
+	// 命中・回避系
+	Accuracy_Rate: number // 命中%
+	Accuracy: number // 命中
+	Dodge_Rate: number // 回避%
+	Dodge: number // 回避
+
+	// 速度系
+	AttackSpeed_Rate: number // 攻撃速度%
+	AttackSpeed: number // 攻撃速度
+	CastingSpeed_Rate: number // 詠唱速度%
+	CastingSpeed: number // 詠唱速度
+	MotionSpeed_Rate: number // 行動速度%
+
+	// MP回復系
+	AttackMPRecovery_Rate: number // 攻撃MP回復%
+	AttackMPRecovery: number // 攻撃MP回復
+
+	// 耐性系
+	PhysicalResistance_Rate: number // 物理耐性%
+	MagicalResistance_Rate: number // 魔法耐性%
+	AilmentResistance_Rate: number // 異常耐性%
+
+	// その他戦闘系
+	Aggro_Rate: number // ヘイト%
+	RevivalTime_Rate: number // 復帰短縮%
+
+	// 自然回復系
+	NaturalHPRecovery_Rate: number // HP自然回復%
+	NaturalHPRecovery: number // HP自然回復
+	NaturalMPRecovery_Rate: number // MP自然回復%
+	NaturalMPRecovery: number // MP自然回復
+
+	// 特殊系
+	ArmorBreak_Rate: number // 防御崩し%
+	Anticipate_Rate: number // 先読み%
+	GuardPower_Rate: number // Guard力%
+	GuardRecharge_Rate: number // Guard回復%
+	AvoidRecharge_Rate: number // Avoid回復%
+	ItemCooldown: number // 道具速度
+	AbsoluteAccuracy_Rate: number // 絶対命中%
+	AbsoluteDodge_Rate: number // 絶対回避%
+
+	// ステータス連動攻撃力
+	ATK_STR_Rate: number // ATK+(STR)%
+	ATK_INT_Rate: number // ATK+(INT)%
+	ATK_VIT_Rate: number // ATK+(VIT)%
+	ATK_AGI_Rate: number // ATK+(AGI)%
+	ATK_DEX_Rate: number // ATK+(DEX)%
+	MATK_STR_Rate: number // MATK+(STR)%
+	MATK_INT_Rate: number // MATK+(INT)%
+	MATK_VIT_Rate: number // MATK+(VIT)%
+	MATK_AGI_Rate: number // MATK+(AGI)%
+	MATK_DEX_Rate: number // MATK+(DEX)%
+
+	// 属性耐性
+	FireResistance_Rate: number // 火耐性%
+	WaterResistance_Rate: number // 水耐性%
+	WindResistance_Rate: number // 風耐性%
+	EarthResistance_Rate: number // 地耐性%
+	LightResistance_Rate: number // 光耐性%
+	DarkResistance_Rate: number // 闇耐性%
+	NeutralResistance_Rate: number // 無耐性%
+
+	// ダメージ軽減系
+	LinearReduction_Rate: number // 直線軽減%
+	RushReduction_Rate: number // 突進軽減%
+	BulletReduction_Rate: number // 弾丸軽減%
+	ProximityReduction_Rate: number // 周囲軽減%
+	AreaReduction_Rate: number // 範囲軽減%
+	FloorTrapReduction_Rate: number // 痛床軽減%
+	MeteorReduction_Rate: number // 隕石軽減%
+	BladeReduction_Rate: number // 射刃軽減%
+	SuctionReduction_Rate: number // 吸引軽減%
+	ExplosionReduction_Rate: number // 爆発軽減%
+
+	// バリア系
+	PhysicalBarrier: number // 物理バリア
+	MagicalBarrier: number // 魔法バリア
+	FractionalBarrier: number // 割合バリア
+	BarrierCooldown_Rate: number // バリア速度%
+
+	// 追撃系
+	PhysicalFollowup_Rate: number // 物理追撃%
+	MagicalFollowup_Rate: number // 魔法追撃%
 }
 
 // メイン武器
@@ -88,8 +193,8 @@ export interface SubWeapon {
 	refinement: number
 }
 
-// 装備アイテム
-export interface Equipment {
+// 装備アイテム（レガシー - 統合型を使用することを推奨）
+export interface LegacyEquipment {
 	name: string
 	properties: Partial<EquipmentProperties>
 	presetId?: string | null // プリセット装備のID（プリセット選択時のみ）
@@ -99,15 +204,15 @@ export interface Equipment {
 export type EquipmentType = 'weapon' | 'armor' | 'accessory' | 'fashion'
 
 // 装備カテゴリ
-export type EquipmentCategory = 
-	| 'main' 
+export type EquipmentCategory =
+	| 'main'
 	| 'mainWeapon'
-	| 'body' 
-	| 'additional' 
-	| 'special' 
-	| 'subWeapon' 
-	| 'fashion1' 
-	| 'fashion2' 
+	| 'body'
+	| 'additional'
+	| 'special'
+	| 'subWeapon'
+	| 'fashion1'
+	| 'fashion2'
 	| 'fashion3'
 
 // プリセット装備
@@ -130,7 +235,12 @@ export interface PresetEquipment {
 }
 
 // クリスタル種別
-export type CrystalType = 'weapon' | 'armor' | 'additional' | 'special' | 'normal'
+export type CrystalType =
+	| 'weapon'
+	| 'armor'
+	| 'additional'
+	| 'special'
+	| 'normal'
 
 // プリセットクリスタル
 export interface PresetCrystal {
@@ -165,7 +275,42 @@ export interface CrystalSlots {
 	special2: string | null
 }
 
-// 敵の情報
+// 新しい敵情報システム
+
+// 敵のカテゴリ
+export type EnemyCategory = 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
+
+// 敵の基本ステータス
+export interface EnemyStats {
+	DEF: number // 物理防御力 (0-9999)
+	MDEF: number // 魔法防御力 (0-9999)
+	physicalResistance: number // 物理耐性% (-100-100)
+	magicalResistance: number // 魔法耐性% (-100-100)
+	resistCritical: number // クリティカル耐性 (0-999) ※プリセットでは0、ユーザーが調整可能
+	requiredHIT: number // 必要HIT (0-9999) ※プリセットでは0、ユーザーが調整可能
+}
+
+// プリセット敵情報
+export interface PresetEnemy {
+	id: string // 一意識別子
+	name: string // 敵名
+	level: number // レベル (1-999)
+	stats: EnemyStats // 基本ステータス
+	category: EnemyCategory // 敵カテゴリ
+}
+
+// 敵フォームデータ（セーブデータ用）
+export interface EnemyFormData {
+	selectedId: string | null // プリセット敵情報ID or カスタム敵情報ID
+	type: 'preset' | 'custom' | null // データソースの識別
+	// 手動入力値（プリセット・カスタム選択後のresistCriticalとrequiredHIT調整用）
+	manualOverrides?: {
+		resistCritical?: number // プリセット値(0)からの調整値
+		requiredHIT?: number // プリセット値(0)からの調整値
+	}
+}
+
+// 従来のEnemyInfo（後方互換性のため残す、将来的に削除予定）
 export interface EnemyInfo {
 	DEF: number
 	MDEF: number
@@ -174,14 +319,19 @@ export interface EnemyInfo {
 	freeValue: number
 }
 
-// 計算機の全データ
+// 計算機の全データ（新しい敵情報システム対応）
 export interface CalculatorData {
 	baseStats: BaseStats
 	mainWeapon: MainWeapon
 	subWeapon: SubWeapon
 	equipment: EquipmentSlots
 	crystals: CrystalSlots
-	enemy: EnemyInfo
+	food: FoodFormData // 料理データ
+	enemy: EnemyFormData // 新しい敵情報システム
+	buffSkills: BuffSkillFormData // バフスキルデータ
+	buffItems: BuffItemFormData // バフアイテムデータ
+	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
+	legacyEnemy?: EnemyInfo
 }
 
 // 計算結果
@@ -192,4 +342,329 @@ export interface CalculationResult {
 		skill: number
 		critical: number
 	}
+}
+
+// セーブデータ管理用の型定義
+export interface SaveData {
+	id: string
+	name: string
+	isDefault: boolean
+	createdAt: string
+	updatedAt: string
+	order: number
+	data: CalculatorData
+}
+
+// デフォルトセーブデータ
+export interface DefaultSaveData extends SaveData {
+	id: 'default'
+	name: 'メインデータ'
+	isDefault: true
+}
+
+// データ検証結果
+export interface DataValidation {
+	isValid: boolean
+	errors: string[]
+	warnings: string[]
+	brokenReferences: { type: string; id: string }[]
+}
+
+// ストレージ使用量
+export interface StorageUsage {
+	totalSize: number
+	maxSize: number
+	usage: number
+	warning: boolean
+	critical: boolean
+}
+
+// ユーザーカスタム装備
+export interface UserEquipment {
+	id: string
+	name: string
+	category: EquipmentCategory
+	properties: Partial<EquipmentProperties>
+	weaponStats?: {
+		ATK?: number
+		stability?: number
+		refinement?: number
+	}
+	crystalSlots?: {
+		slot1?: string
+		slot2?: string
+	}
+	createdAt: string
+	updatedAt: string
+	isFavorite: boolean
+}
+
+// ユーザーカスタムクリスタル
+export interface UserCrystal {
+	id: string
+	name: string
+	type: CrystalType
+	properties: Partial<EquipmentProperties>
+	description?: string
+	isCustom: true
+	createdAt: string
+	updatedAt: string
+	isFavorite?: boolean
+}
+
+// ユーザーカスタム敵情報
+export interface UserEnemy {
+	id: string
+	name: string
+	level: number
+	stats: {
+		DEF: number
+		MDEF: number
+		physicalResistance: number
+		magicalResistance: number
+		resistCritical: number
+		requiredHIT: number
+	}
+	category: 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
+	createdAt: string
+	updatedAt: string
+	isFavorite: boolean
+}
+
+// バージョン管理システム用の型定義
+
+// プリセットデータバージョン情報
+export interface PresetVersionInfo {
+	version: string
+	releaseDate: string
+	equipments: {
+		version: string
+		checksum: string
+	}
+	crystals: {
+		version: string
+		checksum: string
+	}
+	enemies: {
+		version: string
+		checksum: string
+	}
+	lastUpdated: string // ISO date
+}
+
+// 更新チェック結果
+export interface UpdateCheckResult {
+	needsUpdate: boolean
+	equipmentsUpdate: boolean
+	crystalsUpdate: boolean
+	enemiesUpdate: boolean
+	oldVersion: string
+	newVersion: string
+}
+
+// ローカルストレージ用のプリセットアイテム（共通フィールド）
+interface LocalStoragePresetItemBase {
+	isPreset: true
+	isFavorite: boolean
+	isModified: boolean
+	modifiedAt?: string
+	originalChecksum?: string
+	createdAt: string
+	updatedAt: string
+}
+
+// ローカルストレージ用のユーザーカスタムアイテム（共通フィールド）
+interface LocalStorageCustomItemBase {
+	isPreset: false
+	isFavorite: boolean
+	isModified: boolean
+	createdAt: string
+	updatedAt: string
+}
+
+// ローカルストレージ装備（プリセット由来）
+export interface LocalStorageEquipment
+	extends PresetEquipment,
+		LocalStoragePresetItemBase {}
+
+// ローカルストレージクリスタル（プリセット由来）
+export interface LocalStorageCrystal
+	extends PresetCrystal,
+		LocalStoragePresetItemBase {
+	description?: string
+}
+
+// ローカルストレージ敵情報（プリセット由来）
+export interface LocalStorageEnemy
+	extends PresetEnemy,
+		LocalStoragePresetItemBase {}
+
+// ユーザーカスタムアイテム
+export interface CustomEquipment
+	extends PresetEquipment,
+		LocalStorageCustomItemBase {
+	isCustom: true
+}
+
+export interface CustomCrystal
+	extends PresetCrystal,
+		LocalStorageCustomItemBase {
+	isCustom: true
+	description?: string
+}
+
+export interface CustomEnemy extends PresetEnemy, LocalStorageCustomItemBase {
+	isCustom: true
+}
+
+// 統合型（アプリ内で使用する型）
+export type Equipment = LocalStorageEquipment | CustomEquipment
+export type Crystal = LocalStorageCrystal | CustomCrystal
+export type Enemy = LocalStorageEnemy | CustomEnemy
+
+// 更新通知の種類
+export type UpdateNotificationType = 'equipments' | 'crystals' | 'enemies'
+
+// 更新通知データ
+export interface UpdateNotification {
+	type: UpdateNotificationType
+	count: number
+	items: string[] // 追加されたアイテム名のリスト
+}
+
+// 料理システム
+
+// 料理タイプ
+export type FoodType =
+	| 'none' // なし
+	| 'okaka_onigiri' // おかかおにぎり(STR)
+	| 'sake_onigiri' // 鮭おにぎり(DEX)
+	| 'umeboshi_onigiri' // 梅干しおにぎり(INT)
+	| 'mentaiko_onigiri' // 明太子おにぎり(AGI)
+	| 'tuna_mayo_onigiri' // ツナマヨおにぎり(VIT)
+	| 'shoyu_ramen' // しょうゆラーメン(命中)
+	| 'zokusei_pasta' // 属性パスタ(属性有利共通)
+	| 'takoyaki' // たこ焼き(クリ率)
+	| 'yakisoba' // 焼きそば(攻撃MP回復)
+	| 'golden_fried_rice' // 黄金チャーハン(HP)
+	| 'ankake_fried_rice' // あんかけチャーハン(MP)
+	| 'margherita_pizza' // マルゲリータピザ(武器ATK+)
+	| 'diabola_pizza' // ディアボラピザ(ATK+)
+	| 'seafood_pizza' // シーフードピザ(MATK+)
+	| 'beef_stew' // ビーフシチュー(ヘイト+)
+	| 'white_stew' // ホワイトシチュー(ヘイト-)
+	| 'beef_burger' // ビーフバーガー(物理耐性)
+	| 'fish_burger' // フィッシュバーガー(魔法耐性)
+
+// 料理スロットデータ
+export interface FoodSlotData {
+	selectedFood: FoodType // 選択された料理タイプ
+	level: number // 料理レベル (1-10、「なし」の場合は0)
+}
+
+// 料理フォームデータ
+export interface FoodFormData {
+	slot1: FoodSlotData
+	slot2: FoodSlotData
+	slot3: FoodSlotData
+	slot4: FoodSlotData
+	slot5: FoodSlotData
+}
+
+// バフスキルシステム
+
+// バフスキルカテゴリ
+export type BuffSkillCategory =
+	| 'mastery'
+	| 'blade'
+	| 'shoot'
+	| 'halberd'
+	| 'mononofu'
+	| 'dualSword'
+	| 'sprite'
+	| 'darkPower'
+	| 'shield'
+	| 'knight'
+	| 'hunter'
+	| 'assassin'
+	| 'ninja'
+	| 'support'
+	| 'survival'
+	| 'battle'
+	| 'pet'
+	| 'minstrel'
+	| 'partisan'
+
+// バフスキルパラメータ
+export interface BuffSkillParameters {
+	skillLevel?: number // 1-10
+	stackCount?: number // 重ねがけ数
+	playerCount?: number // プレイヤー数
+	refinement?: number // 精錬値
+	spUsed?: number // 使用SP
+	isCaster?: number // 使用者フラグ (0:他者使用, 1:自己使用)
+}
+
+// バフスキルデータ
+export interface BuffSkill {
+	id: string
+	name: string
+	category: BuffSkillCategory
+	isEnabled: boolean
+	parameters: BuffSkillParameters
+}
+
+// バフスキルフォームデータ
+export interface BuffSkillFormData {
+	skills: BuffSkill[]
+}
+
+// バフアイテムカテゴリ
+export type BuffItemCategory =
+	| 'physicalPower' // 物理威力
+	| 'magicalPower' // 魔法威力
+	| 'physicalDefense' // 物理防御
+	| 'magicalDefense' // 魔法防御
+	| 'elementalAttack' // 属性攻撃
+	| 'elementalDefense' // 属性防御
+	| 'speed' // 速度
+	| 'casting' // 詠唱
+	| 'mp' // MP
+	| 'hp' // HP
+	| 'accuracy' // 命中
+	| 'evasion' // 回避
+
+// プリセットバフアイテム（JSON用）
+export interface PresetBuffItem {
+	id: string
+	name: string
+	category: BuffItemCategory
+	properties: Partial<EquipmentProperties>
+}
+
+// ローカルストレージバフアイテム（プリセット拡張版）
+export interface LocalStorageBuffItem extends PresetBuffItem {
+	isPreset: boolean // 常にtrue（プリセットのみ）
+	isFavorite: boolean // お気に入り設定
+	createdAt: string // 作成日時
+	updatedAt: string // 更新日時
+}
+
+// 統合バフアイテム型
+export type BuffItem = LocalStorageBuffItem
+
+// バフアイテムフォームデータ
+export interface BuffItemFormData {
+	physicalPower: string | null // 選択されたアイテムID（null = なし）
+	magicalPower: string | null
+	physicalDefense: string | null
+	magicalDefense: string | null
+	elementalAttack: string | null
+	elementalDefense: string | null
+	speed: string | null
+	casting: string | null
+	mp: string | null
+	hp: string | null
+	accuracy: string | null
+	evasion: string | null
 }

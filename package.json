@@ -7,22 +7,28 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-		"format": "biome format --write"
+		"format": "npx @biomejs/biome format --write",
+		"upgrade-interactive": "ncu --interactive --format group",
+		"sync-data": "node scripts/sync-data.js",
+		"check-data": "node scripts/check-data.js",
+		"prebuild": "npm run sync-data"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.1.1",
+		"@types/uuid": "^10.0.0",
 		"date-fns": "^4.1.0",
 		"lodash.debounce": "^4.0.8",
-		"next": "15.3.3",
-		"react": "^19.0.0",
+		"next": "15.3.4",
+		"react": "^19.1.0",
 		"react-aria-components": "^1.10.1",
-		"react-dom": "^19.0.0",
-		"react-hook-form": "^7.58.0",
+		"react-dom": "^19.1.0",
+		"react-hook-form": "^7.58.1",
 		"uuid": "^11.1.0",
-		"zod": "^3.25.64"
+		"zod": "^3.25.67",
+		"zustand": "^5.0.5"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
+		"@biomejs/biome": "2.0.0",
 		"@tailwindcss/postcss": "^4",
 		"@types/node": "^20",
 		"@types/react": "^19",

@@ -4,13 +4,21 @@ import { useState } from 'react'
 import type { CrystalSlots, CrystalType } from '@/types/calculator'
 import { getCrystalById } from '@/utils/crystalDatabase'
 import CrystalSelectionModal from './CrystalSelectionModal'
+import { useCalculatorStore } from '@/stores'
 
 interface CrystalFormProps {
-	crystals: CrystalSlots
-	onChange: (crystals: CrystalSlots) => void
+	// Zustand移行後は不要（後方互換性のため残存）
+	crystals?: CrystalSlots
+	onChange?: (crystals: CrystalSlots) => void
 }
 
 export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
+	// Zustandストアからクリスタルデータを取得
+	const storeCrystals = useCalculatorStore((state) => state.data.crystals)
+	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)
+
+	// Zustandストアの値を使用（完全移行）
+	const effectiveCrystals = storeCrystals
 	const [modalState, setModalState] = useState<{
 		isOpen: boolean
 		slotKey: keyof CrystalSlots | null
@@ -26,10 +34,18 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 	const handleCrystalChange = (crystalId: string | null) => {
 		if (!modalState.slotKey) return
 
-		onChange({
-			...crystals,
+		const newCrystals = {
+			...effectiveCrystals,
 			[modalState.slotKey]: crystalId,
-		})
+		}
+
+		// Zustandストアを更新
+		updateCrystals(newCrystals)
+
+		// 後方互換性のため従来のonChangeも呼び出し
+		if (onChange) {
+			onChange(newCrystals)
+		}
 	}
 
 	const openModal = (
@@ -54,123 +70,102 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 		})
 	}
 
-	const crystalSlots = [
-		{
-			title: '武器クリスタ',
-			type: 'weapon' as CrystalType,
-			slots: [
-				{ key: 'weapon1' as const, label: '武器クリスタ1' },
-				{ key: 'weapon2' as const, label: '武器クリスタ2' },
-			],
-		},
-		{
-			title: '防具クリスタ',
-			type: 'armor' as CrystalType,
-			slots: [
-				{ key: 'armor1' as const, label: '防具クリスタ1' },
-				{ key: 'armor2' as const, label: '防具クリスタ2' },
-			],
-		},
-		{
-			title: '追加クリスタ',
-			type: 'additional' as CrystalType,
-			slots: [
-				{ key: 'additional1' as const, label: '追加クリスタ1' },
-				{ key: 'additional2' as const, label: '追加クリスタ2' },
-			],
-		},
-		{
-			title: '特殊クリスタ',
-			type: 'special' as CrystalType,
-			slots: [
-				{ key: 'special1' as const, label: '特殊クリスタ1' },
-				{ key: 'special2' as const, label: '特殊クリスタ2' },
-			],
-		},
-	]
-
-	const renderCrystalSlot = (
+	const renderCrystalButton = (
 		slotKey: keyof CrystalSlots,
-		label: string,
 		crystalType: CrystalType,
 	) => {
-		const selectedCrystalId = crystals[slotKey]
+		const selectedCrystalId = effectiveCrystals[slotKey]
 		const selectedCrystal = selectedCrystalId
 			? getCrystalById(selectedCrystalId)
 			: null
 
-		return (
-			<div key={slotKey} className="space-y-2">
-				<label className="text-sm font-medium text-gray-700">{label}</label>
+		const getSlotNumber = (key: string) => {
+			return key.includes('1') ? '1' : '2'
+		}
 
-				<button
-					onClick={() => openModal(slotKey, [crystalType], `${label}を選択`)}
-					className="w-full p-3 text-left border border-gray-300 rounded-md hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-				>
-					{selectedCrystal ? (
-						<div className="space-y-1">
-							<div className="flex items-center justify-between">
-								<span className="font-medium text-gray-900">
-									{selectedCrystal.name}
-								</span>
-								<span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
-									{selectedCrystal.type === 'weapon'
-										? '武器'
-										: selectedCrystal.type === 'armor'
-											? '防具'
-											: selectedCrystal.type === 'additional'
-												? '追加'
-												: selectedCrystal.type === 'special'
-													? '特殊'
-													: 'ノーマル'}
-								</span>
-							</div>
-							{selectedCrystal.description && (
-								<div className="text-xs text-gray-500 truncate">
-									{selectedCrystal.description}
-								</div>
-							)}
-						</div>
-					) : (
-						<div className="flex items-center justify-between">
-							<span className="text-gray-500">なし</span>
-							<svg
-								className="w-5 h-5 text-gray-400"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M19 9l-7 7-7-7"
-								/>
-							</svg>
-						</div>
-					)}
-				</button>
-			</div>
+		return (
+			<button
+				key={slotKey}
+				type="button"
+				onClick={() =>
+					openModal(
+						slotKey,
+						[crystalType],
+						`${
+							crystalType === 'weapon'
+								? '武器'
+								: crystalType === 'armor'
+									? '防具'
+									: crystalType === 'additional'
+										? '追加'
+										: '特殊'
+						}クリスタ${getSlotNumber(slotKey)}を選択`,
+					)
+				}
+				className="px-1 py-1 mr-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
+			>
+				{selectedCrystal ? (
+					<div className="flex items-center">
+						<span className="text-sm truncate">{selectedCrystal.name}</span>
+					</div>
+				) : (
+					<div className="flex items-center justify-between">
+						<span className="text-gray-500">なし</span>
+						<svg
+							className="w-4 h-4 text-gray-400"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M19 9l-7 7-7-7"
+							/>
+						</svg>
+					</div>
+				)}
+			</button>
 		)
 	}
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6 lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4">
-			<h2 className="text-xl font-bold text-gray-800 mb-4">クリスタ選択</h2>
+		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-3 lg:row-end-4">
+			<h2 className="text-lg font-bold text-gray-800 mb-3">クリスタ選択</h2>
 
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				{crystalSlots.map(({ title, type, slots }) => (
-					<div key={type} className="border rounded-lg p-4">
-						<h3 className="text-lg font-semibold text-gray-700 mb-4">
-							{title}
-						</h3>
-						<div className="space-y-4">
-							{slots.map(({ key, label }) =>
-								renderCrystalSlot(key, label, type),
-							)}
-						</div>
-					</div>
-				))}
+			<div className="grid grid-cols-[40px_1fr_40px_1fr] gap-2">
+				{/* 武器クリスタ行 */}
+				<div className="text-sm font-medium text-gray-700 w-12 flex items-center">
+					武器:
+				</div>
+				{renderCrystalButton('weapon1', 'weapon')}
+				<div className="text-sm font-medium text-gray-700 w-12 flex items-center">
+					防具:
+				</div>
+				{renderCrystalButton('armor1', 'armor')}
+
+				{/* 2つ目のボタン行 */}
+				<div />
+				{renderCrystalButton('weapon2', 'weapon')}
+				<div />
+				{renderCrystalButton('armor2', 'armor')}
+
+				{/* 追加クリスタ行 */}
+				<div className="text-sm font-medium text-gray-700 w-12 flex items-center">
+					追加:
+				</div>
+				{renderCrystalButton('additional1', 'additional')}
+				<div className="text-sm font-medium text-gray-700 w-12 flex items-center">
+					特殊:
+				</div>
+				{renderCrystalButton('special1', 'special')}
+
+				{/* 2つ目のボタン行 */}
+				<div />
+				{renderCrystalButton('additional2', 'additional')}
+				<div />
+				{renderCrystalButton('special2', 'special')}
 			</div>
 
 			{/* クリスタ選択モーダル */}
@@ -179,7 +174,7 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 				onClose={closeModal}
 				onSelect={handleCrystalChange}
 				selectedCrystalId={
-					modalState.slotKey ? crystals[modalState.slotKey] : null
+					modalState.slotKey ? effectiveCrystals[modalState.slotKey] : null
 				}
 				allowedTypes={modalState.allowedTypes}
 				title={modalState.title}
