@@ -7,7 +7,7 @@ import WeaponForm from '@/components/WeaponForm'
 import CrystalForm from '@/components/CrystalForm'
 import EquipmentForm from '@/components/EquipmentForm'
 import FoodForm from '@/components/FoodForm'
-import NewEnemyForm from '@/components/NewEnemyForm'
+import EnemyForm from '@/components/EnemyForm'
 import BuffSkillForm from '@/components/BuffSkillForm'
 import BuffItemForm from '@/components/BuffItemForm'
 import StatsSummary from '@/components/StatsSummary'
@@ -163,7 +163,7 @@ export default function Home() {
 					<EquipmentForm />
 					<FoodForm />
 					<BuffItemForm />
-					<NewEnemyForm />
+					<EnemyForm />
 					<BuffSkillForm />
 				</div>
 				<StatsSummary data={data} />
