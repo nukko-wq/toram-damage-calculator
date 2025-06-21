@@ -377,3 +377,178 @@ export function getEquipmentCategoryLabel(category: EquipmentCategory): string {
 			return category
 	}
 }
+
+// カスタム装備を作成
+export function createCustomEquipment(
+	equipmentCategory: EquipmentCategory,
+	name: string,
+): UserEquipment {
+	const now = new Date().toISOString()
+	const id = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+	// EquipmentCategory を EquipmentCategory にマップ（実際は不要だが型整合性のため）
+	const categoryMap: Record<string, EquipmentCategory> = {
+		main: 'main',
+		body: 'body',
+		additional: 'additional',
+		special: 'special',
+		subWeapon: 'subWeapon',
+		fashion1: 'fashion1',
+		fashion2: 'fashion2',
+		fashion3: 'fashion3',
+	}
+
+	const customEquipment: UserEquipment = {
+		id,
+		name,
+		category: equipmentCategory,
+		properties: {}, // 全プロパティをリセット状態で作成
+		weaponStats: equipmentCategory === 'main' ? {
+			ATK: 0,
+			stability: 0,
+			refinement: 0,
+		} : undefined,
+		crystalSlots: ['main', 'body', 'additional', 'special'].includes(equipmentCategory) ? {
+			slot1: undefined,
+			slot2: undefined,
+		} : undefined,
+		createdAt: now,
+		updatedAt: now,
+		isFavorite: false,
+	}
+
+	return customEquipment
+}
+
+// カスタム装備を保存
+export function saveCustomEquipment(equipment: UserEquipment): void {
+	saveUserCustomEquipment(equipment)
+}
+
+// カスタム装備を削除
+export function deleteCustomEquipment(equipmentId: string): void {
+	try {
+		const customEquipments = getUserCustomEquipments()
+		const filteredEquipments = customEquipments.filter(
+			(equipment) => equipment.id !== equipmentId,
+		)
+
+		localStorage.setItem(
+			STORAGE_KEYS.CUSTOM_EQUIPMENTS,
+			JSON.stringify(filteredEquipments),
+		)
+	} catch (error) {
+		console.error('Failed to delete custom equipment:', error)
+		throw error
+	}
+}
+
+// カスタム装備をIDで取得
+export function getCustomEquipmentById(id: string): UserEquipment | null {
+	const customEquipments = getUserCustomEquipments()
+	return customEquipments.find((equipment) => equipment.id === id) || null
+}
+
+// プリセット装備とカスタム装備を統合して取得（装備選択モーダル用）
+export function getCombinedEquipmentsByCategory(equipmentCategory: EquipmentCategory): Equipment[] {
+	const presetEquipments = getEquipmentsByCategory(equipmentCategory)
+	const customEquipments = getUserCustomEquipments()
+	
+	// カスタム装備を該当カテゴリでフィルタリング
+	const filteredCustomEquipments = customEquipments.filter(
+		(equipment) => equipment.category === equipmentCategory
+	)
+	
+	// カテゴリからタイプへのマップ
+	const categoryToTypeMap: Record<EquipmentCategory, EquipmentType> = {
+		main: 'weapon',
+		mainWeapon: 'weapon',
+		body: 'armor',
+		additional: 'accessory',
+		special: 'accessory',
+		subWeapon: 'weapon',
+		fashion1: 'fashion',
+		fashion2: 'fashion',
+		fashion3: 'fashion',
+	}
+	
+	// カスタム装備をEquipment形式に変換
+	const formattedCustomEquipments: Equipment[] = filteredCustomEquipments.map(
+		(equipment) => ({
+			id: equipment.id,
+			name: equipment.name,
+			type: categoryToTypeMap[equipment.category],
+			category: [equipment.category] as EquipmentCategory[],
+			baseStats: equipment.weaponStats || {},
+			properties: equipment.properties,
+			isPreset: false,
+			isCustom: true,
+			isFavorite: equipment.isFavorite,
+			isModified: false,
+			createdAt: equipment.createdAt,
+			updatedAt: equipment.updatedAt,
+		})
+	)
+	
+	// プリセット装備とカスタム装備を結合
+	const convertedPresetEquipments = presetEquipments.map(preset => ({
+		...preset,
+		isPreset: true as const,
+		isFavorite: false,
+		isModified: false,
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+	}))
+	
+	return [...convertedPresetEquipments, ...formattedCustomEquipments]
+}
+
+// 統合装備をIDで取得（プリセット・カスタム両対応）
+export function getCombinedEquipmentById(id: string): Equipment | null {
+	// プリセット装備から検索
+	const presetEquipment = getEquipmentById(id)
+	if (presetEquipment) {
+		return {
+			...presetEquipment,
+			isPreset: true as const,
+			isFavorite: false,
+			isModified: false,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+		}
+	}
+	
+	// カスタム装備から検索
+	const customEquipment = getCustomEquipmentById(id)
+	if (customEquipment) {
+		// カスタム装備をEquipment形式に変換
+		const categoryToTypeMap: Record<EquipmentCategory, EquipmentType> = {
+			main: 'weapon',
+			mainWeapon: 'weapon',
+			body: 'armor',
+			additional: 'accessory',
+			special: 'accessory',
+			subWeapon: 'weapon',
+			fashion1: 'fashion',
+			fashion2: 'fashion',
+			fashion3: 'fashion',
+		}
+		
+		return {
+			id: customEquipment.id,
+			name: customEquipment.name,
+			type: categoryToTypeMap[customEquipment.category],
+			category: [customEquipment.category],
+			baseStats: customEquipment.weaponStats || {},
+			properties: customEquipment.properties,
+			isPreset: false,
+			isCustom: true,
+			isFavorite: customEquipment.isFavorite,
+			isModified: false,
+			createdAt: customEquipment.createdAt,
+			updatedAt: customEquipment.updatedAt,
+		}
+	}
+	
+	return null
+}

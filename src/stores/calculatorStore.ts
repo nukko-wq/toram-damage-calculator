@@ -5,12 +5,19 @@ import type {
 	DamageCalculationResult,
 	CalculationSettings,
 } from '@/types/stores'
+import type { EquipmentSlots } from '@/types/calculator'
 import { createInitialCalculatorData } from '@/utils/initialData'
 import {
 	saveCurrentData,
 	getCurrentSaveData,
 	initializeStorage,
 } from '@/utils/saveDataManager'
+import {
+	createCustomEquipment,
+	saveCustomEquipment,
+	deleteCustomEquipment,
+} from '@/utils/equipmentDatabase'
+import { createInitialEquipment } from '@/utils/initialData'
 
 // 初期計算設定
 const initialCalculationSettings: CalculationSettings = {
@@ -182,6 +189,90 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					false,
 					'updateBuffItems',
 				)
+			},
+
+			// ===== カスタム装備管理 =====
+			createCustomEquipment: async (equipmentCategory, name) => {
+				try {
+					// カスタム装備を作成
+					const customEquipment = createCustomEquipment(equipmentCategory, name)
+					
+					// LocalStorageに保存
+					saveCustomEquipment(customEquipment)
+					
+					// 作成したカスタム装備を自動的に装備スロットにセット
+					const equipmentCategoryToSlotMap: Record<string, keyof EquipmentSlots> = {
+						main: 'main',
+						body: 'body',
+						additional: 'additional',
+						special: 'special',
+						subWeapon: 'subWeapon',
+						fashion1: 'fashion1',
+						fashion2: 'fashion2',
+						fashion3: 'fashion3',
+					}
+					
+					const slotKey = equipmentCategoryToSlotMap[equipmentCategory]
+					if (slotKey) {
+						set(
+							(state) => ({
+								data: {
+									...state.data,
+									equipment: {
+										...state.data.equipment,
+										[slotKey]: {
+											id: customEquipment.id,
+											name: customEquipment.name,
+											properties: {},
+											isPreset: false,
+											isCustom: true,
+										},
+									},
+								},
+								hasUnsavedChanges: true,
+							}),
+							false,
+							'createCustomEquipment',
+						)
+					}
+				} catch (error) {
+					console.error('カスタム装備作成エラー:', error)
+					throw error
+				}
+			},
+
+			deleteCustomEquipment: async (equipmentId) => {
+				try {
+					// LocalStorageから削除
+					deleteCustomEquipment(equipmentId)
+					
+					// 現在選択中の装備がこのIDだった場合、選択を解除
+					const { data } = get()
+					const updatedEquipment = { ...data.equipment }
+					let hasChanges = false
+					
+					Object.keys(updatedEquipment).forEach((key) => {
+						const equipmentSlot = updatedEquipment[key as keyof typeof updatedEquipment]
+						if (equipmentSlot && equipmentSlot.id === equipmentId) {
+							updatedEquipment[key as keyof typeof updatedEquipment] = createInitialEquipment()
+							hasChanges = true
+						}
+					})
+					
+					if (hasChanges) {
+						set(
+							(state) => ({
+								data: { ...state.data, equipment: updatedEquipment },
+								hasUnsavedChanges: true,
+							}),
+							false,
+							'deleteCustomEquipment',
+						)
+					}
+				} catch (error) {
+					console.error('カスタム装備削除エラー:', error)
+					throw error
+				}
 			},
 
 			// ===== 将来の計算機能 =====

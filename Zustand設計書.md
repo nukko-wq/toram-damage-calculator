@@ -448,7 +448,8 @@ const EquipmentForm = () => {
   // カスタム装備作成処理
   const handleCreateEquipment = async (equipmentType: EquipmentType, name: string) => {
     await createCustomEquipment(equipmentType, name)
-    // 作成後は現在のプロパティをリセット
+    // 作成後は自動的に装備スロットにセット
+    // カスタム装備はプリセット選択モーダルからも選択可能
     setHasUnsavedChanges(true)
   }
   
@@ -483,8 +484,11 @@ const EquipmentForm = () => {
 **カスタム装備機能の特徴**:
 - プリセット選択UIと統合されたボタン配置
 - 装備名入力モーダルでの新規作成
+- 新規作成後の自動装備セット機能
 - 削除確認モーダルでの安全な削除
 - LocalStorageへの即座保存・削除
+- プリセット選択モーダルでのカスタム装備表示統合
+- 全セーブデータ間でのカスタム装備共有
 - プロパティリセット機能
 
 ### 4.6 初期化管理

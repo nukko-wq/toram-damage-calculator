@@ -7,8 +7,10 @@ import type {
 	EquipmentProperties,
 	EquipmentCategory,
 } from '@/types/calculator'
-import { getEquipmentById } from '@/utils/equipmentDatabase'
+import { getCombinedEquipmentById, getEquipmentCategoryLabel } from '@/utils/equipmentDatabase'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
+import CreateEquipmentModal from './CreateEquipmentModal'
+import DeleteConfirmModal from './DeleteConfirmModal'
 import { useCalculatorStore } from '@/stores'
 
 interface EquipmentFormProps {
@@ -24,6 +26,8 @@ export default function EquipmentForm({
 	// Zustandストアから装備データを取得
 	const storeEquipment = useCalculatorStore((state) => state.data.equipment)
 	const updateEquipment = useCalculatorStore((state) => state.updateEquipment)
+	const createCustomEquipment = useCalculatorStore((state) => state.createCustomEquipment)
+	const deleteCustomEquipment = useCalculatorStore((state) => state.deleteCustomEquipment)
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
@@ -36,6 +40,25 @@ export default function EquipmentForm({
 		isOpen: false,
 		category: null,
 		title: '',
+	})
+
+	// カスタム装備関連のモーダル状態
+	const [createModalState, setCreateModalState] = useState<{
+		isOpen: boolean
+		equipmentType: keyof EquipmentSlots | null
+	}>({
+		isOpen: false,
+		equipmentType: null,
+	})
+
+	const [deleteModalState, setDeleteModalState] = useState<{
+		isOpen: boolean
+		equipmentId: string | null
+		equipmentName: string
+	}>({
+		isOpen: false,
+		equipmentId: null,
+		equipmentName: '',
 	})
 
 	const equipmentSlots = [
@@ -391,15 +414,17 @@ export default function EquipmentForm({
 				onEquipmentChange(updatedEquipment)
 			}
 		} else {
-			// プリセット装備を選択
-			const presetEquipment = getEquipmentById(equipmentId)
-			if (presetEquipment) {
+			// プリセット・カスタム装備を選択（統合データから取得）
+			const equipment = getCombinedEquipmentById(equipmentId)
+			if (equipment) {
 				const updatedEquipment = {
 					...effectiveEquipment,
 					[slotKey]: {
-						name: presetEquipment.name,
-						properties: { ...presetEquipment.properties },
-						presetId: equipmentId,
+						name: equipment.name,
+						properties: { ...equipment.properties },
+						presetId: 'isCustom' in equipment && equipment.isCustom ? null : equipmentId,
+						id: equipment.id,
+						isCustom: 'isCustom' in equipment && equipment.isCustom,
 					},
 				}
 
@@ -427,6 +452,74 @@ export default function EquipmentForm({
 			isOpen: false,
 			category: null,
 			title: '',
+		})
+	}
+
+	// カスタム装備作成のハンドラー
+	const handleCreateEquipment = (slotKey: keyof EquipmentSlots) => {
+		setCreateModalState({
+			isOpen: true,
+			equipmentType: slotKey,
+		})
+	}
+
+	const handleCreateConfirm = async (equipmentName: string) => {
+		if (!createModalState.equipmentType) return
+
+		try {
+			await createCustomEquipment(createModalState.equipmentType as EquipmentCategory, equipmentName)
+			setCreateModalState({
+				isOpen: false,
+				equipmentType: null,
+			})
+		} catch (error) {
+			console.error('カスタム装備作成エラー:', error)
+		}
+	}
+
+	const handleCreateCancel = () => {
+		setCreateModalState({
+			isOpen: false,
+			equipmentType: null,
+		})
+	}
+
+	// カスタム装備削除のハンドラー
+	const handleDeleteEquipment = (slotKey: keyof EquipmentSlots) => {
+		const equipment = effectiveEquipment[slotKey]
+		if (!equipment.id) return
+
+		// 装備名を取得（統合装備データから）
+		const equipmentData = getCombinedEquipmentById(equipment.id)
+		const equipmentName = equipmentData?.name || equipment.name || '不明な装備'
+
+		setDeleteModalState({
+			isOpen: true,
+			equipmentId: equipment.id,
+			equipmentName,
+		})
+	}
+
+	const handleDeleteConfirm = async () => {
+		if (!deleteModalState.equipmentId) return
+
+		try {
+			await deleteCustomEquipment(deleteModalState.equipmentId)
+			setDeleteModalState({
+				isOpen: false,
+				equipmentId: null,
+				equipmentName: '',
+			})
+		} catch (error) {
+			console.error('カスタム装備削除エラー:', error)
+		}
+	}
+
+	const handleDeleteCancel = () => {
+		setDeleteModalState({
+			isOpen: false,
+			equipmentId: null,
+			equipmentName: '',
 		})
 	}
 
@@ -556,19 +649,44 @@ export default function EquipmentForm({
 					<h3 className="text-lg font-semibold text-gray-700">
 						{equipmentSlots.find((slot) => slot.key === activeTab)?.label}
 					</h3>
-					<button
-						type="button"
-						onClick={() =>
-							openEquipmentModal(
-								activeTab as EquipmentCategory,
-								effectiveEquipment[activeTab].name ||
-									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
-							)
-						}
-						className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-					>
-						{effectiveEquipment[activeTab].name || 'プリセット選択'}
-					</button>
+					<div className="flex gap-2">
+						<button
+							type="button"
+							onClick={() =>
+								openEquipmentModal(
+									activeTab as EquipmentCategory,
+									effectiveEquipment[activeTab].name ||
+										`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
+								)
+							}
+							className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+						>
+							{effectiveEquipment[activeTab].name || 'プリセット選択'}
+						</button>
+						{/* メイン装備の場合のみカスタム機能ボタンを表示 */}
+						{activeTab === 'main' && (
+							<>
+								<button
+									type="button"
+									onClick={() => handleCreateEquipment(activeTab)}
+									className="px-3 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+									title="新規カスタム装備を作成"
+								>
+									新規作成
+								</button>
+								{effectiveEquipment[activeTab].id && (
+									<button
+										type="button"
+										onClick={() => handleDeleteEquipment(activeTab)}
+										className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+										title="選択中の装備を削除"
+									>
+										削除
+									</button>
+								)}
+							</>
+						)}
+					</div>
 				</div>
 
 				{/* 現在選択されている装備表示 */}
@@ -602,6 +720,27 @@ export default function EquipmentForm({
 				}
 				category={modalState.category || 'main'}
 				title={modalState.title}
+			/>
+
+			{/* カスタム装備作成モーダル */}
+			<CreateEquipmentModal
+				isOpen={createModalState.isOpen}
+				onClose={handleCreateCancel}
+				onConfirm={handleCreateConfirm}
+				equipmentType={
+					createModalState.equipmentType
+						? getEquipmentCategoryLabel(createModalState.equipmentType as EquipmentCategory)
+						: ''
+				}
+			/>
+
+			{/* カスタム装備削除確認モーダル */}
+			<DeleteConfirmModal
+				isOpen={deleteModalState.isOpen}
+				onClose={handleDeleteCancel}
+				onConfirm={handleDeleteConfirm}
+				equipmentName={deleteModalState.equipmentName}
+				message="この装備を削除しますか？"
 			/>
 		</section>
 	)

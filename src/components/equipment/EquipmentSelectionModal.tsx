@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Equipment, EquipmentCategory } from '@/types/calculator'
-import { getAvailableEquipmentsByCategory } from '@/utils/equipmentDatabase'
+import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import EquipmentCard from './EquipmentCard'
 
 interface EquipmentSelectionModalProps {
@@ -45,8 +45,8 @@ export default function EquipmentSelectionModal({
 	useEffect(() => {
 		if (!isOpen) return
 
-		// カテゴリに対応する装備を取得
-		const equipments = getAvailableEquipmentsByCategory(category)
+			// カテゴリに対応するプリセット + カスタム装備を統合して取得
+		const equipments = getCombinedEquipmentsByCategory(category)
 		setAvailableEquipments(equipments)
 	}, [isOpen, category])
 
