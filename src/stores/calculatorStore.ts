@@ -88,7 +88,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			loadSaveData: async (data) => {
 				// セーブデータ切り替え時に仮データをクリーンアップ
 				cleanupAllTemporaryEquipments()
-				
+
 				// 編集セッションは全てクリーンアップ（セーブデータ切り替え時は編集状態をリセット）
 				cleanupAllEditSessions()
 
@@ -241,6 +241,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						fashion1: 'fashion1',
 						fashion2: 'fashion2',
 						fashion3: 'fashion3',
+						freeInput1: 'freeInput1',
+						freeInput2: 'freeInput2',
+						freeInput3: 'freeInput3',
 					}
 
 					const slotKey = equipmentCategoryToSlotMap[equipmentCategory]
@@ -309,7 +312,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					// 編集セッションを確実にクリーンアップ
 					// 保存処理完了後は編集セッションを全てクリアして永続データを優先
 					cleanupAllEditSessions()
-					
+
 					// さらに念のため、現在のセーブデータのセッションも個別にクリア
 					cleanupCurrentEditSessions()
 				} catch (error) {

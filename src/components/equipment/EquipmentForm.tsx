@@ -11,8 +11,6 @@ import type {
 import {
 	getCombinedEquipmentById,
 	getEquipmentCategoryLabel,
-	getEquipmentCategoryDisplayName,
-	generateInitialEquipmentName,
 } from '@/utils/equipmentDatabase'
 import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
@@ -96,6 +94,9 @@ export default function EquipmentForm({
 		{ key: 'fashion1' as const, label: 'オシャレ1' },
 		{ key: 'fashion2' as const, label: 'オシャレ2' },
 		{ key: 'fashion3' as const, label: 'オシャレ3' },
+		{ key: 'freeInput1' as const, label: '自由入力1' },
+		{ key: 'freeInput2' as const, label: '自由入力2' },
+		{ key: 'freeInput3' as const, label: '自由入力3' },
 	]
 
 	const propertyGroups = [
@@ -396,6 +397,8 @@ export default function EquipmentForm({
 		const numValue = Number.parseInt(value) || 0
 		const currentEquipment = effectiveEquipment[slotKey]
 
+		if (!currentEquipment) return
+
 		// カスタム装備の場合、プロパティ連動更新を実行
 		if (
 			currentEquipment.id &&
@@ -410,9 +413,9 @@ export default function EquipmentForm({
 		const updatedEquipment = {
 			...effectiveEquipment,
 			[slotKey]: {
-				...effectiveEquipment[slotKey],
+				...currentEquipment,
 				properties: {
-					...effectiveEquipment[slotKey].properties,
+					...currentEquipment.properties,
 					[property]: numValue,
 				},
 				// プロパティを手動変更した場合はプリセットIDをクリア
@@ -532,7 +535,7 @@ export default function EquipmentForm({
 	// カスタム装備削除のハンドラー
 	const handleDeleteEquipment = (slotKey: keyof EquipmentSlots) => {
 		const equipment = effectiveEquipment[slotKey]
-		if (!equipment.id) return
+		if (!equipment?.id) return
 
 		// 装備名を取得（統合装備データから）
 		const equipmentData = getCombinedEquipmentById(equipment.id)
@@ -571,7 +574,7 @@ export default function EquipmentForm({
 	// カスタム装備名前変更のハンドラー
 	const handleRenameEquipment = (slotKey: keyof EquipmentSlots) => {
 		const equipment = effectiveEquipment[slotKey]
-		if (!equipment.id) return
+		if (!equipment?.id) return
 
 		// 装備名を取得（統合装備データから）
 		const equipmentData = getCombinedEquipmentById(equipment.id)
@@ -709,7 +712,7 @@ export default function EquipmentForm({
 
 			{/* タブヘッダー */}
 			<div className="mb-6">
-				<nav className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+				<nav className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
 					{equipmentSlots.map(({ key, label }) => (
 						<button
 							key={key}
@@ -730,21 +733,22 @@ export default function EquipmentForm({
 			{/* タブコンテンツ */}
 			<div className="space-y-4">
 				<div className="flex gap-2">
+					{/* プリセット選択ボタンを表示 - 自由入力スロットは「なし」とカスタム装備のみ選択可能 */}
 					<button
 						type="button"
 						onClick={() =>
 							openEquipmentModal(
 								activeTab as EquipmentCategory,
-								effectiveEquipment[activeTab].name ||
+								effectiveEquipment[activeTab]?.name ||
 									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
 							)
 						}
 						className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
 					>
-						{effectiveEquipment[activeTab].name ? (
+						{effectiveEquipment[activeTab]?.name ? (
 							<div className="flex items-center justify-between">
 								<span className="text-sm truncate text-gray-900">
-									{effectiveEquipment[activeTab].name}
+									{effectiveEquipment[activeTab]?.name}
 								</span>
 								<svg
 									className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
@@ -764,7 +768,13 @@ export default function EquipmentForm({
 							</div>
 						) : (
 							<div className="flex items-center justify-between">
-								<span className="text-gray-500">プリセット選択</span>
+								<span className="text-gray-500">
+									{['freeInput1', 'freeInput2', 'freeInput3'].includes(
+										activeTab,
+									)
+										? '装備選択'
+										: 'プリセット選択'}
+								</span>
 								<svg
 									className="w-4 h-4 text-gray-400"
 									fill="none"
@@ -783,7 +793,12 @@ export default function EquipmentForm({
 							</div>
 						)}
 					</button>
-					{/* 全装備スロットでカスタム機能ボタンを表示 */}
+					{/* カスタム機能ボタンを表示 - 自由入力スロットは常に表示、通常スロットはカスタム装備選択時のみ */}
+					{(['freeInput1', 'freeInput2', 'freeInput3'].includes(activeTab) ||
+						(effectiveEquipment[activeTab]?.id &&
+							effectiveEquipment[activeTab] &&
+							'isCustom' in effectiveEquipment[activeTab] &&
+							effectiveEquipment[activeTab]?.isCustom)) && (
 						<>
 							<button
 								type="button"
@@ -793,9 +808,10 @@ export default function EquipmentForm({
 							>
 								新規作成
 							</button>
-							{effectiveEquipment[activeTab].id &&
+							{effectiveEquipment[activeTab]?.id &&
+								effectiveEquipment[activeTab] &&
 								'isCustom' in effectiveEquipment[activeTab] &&
-								effectiveEquipment[activeTab].isCustom && (
+								effectiveEquipment[activeTab]?.isCustom && (
 									<>
 										<button
 											type="button"
@@ -816,13 +832,14 @@ export default function EquipmentForm({
 									</>
 								)}
 						</>
+					)}
 				</div>
 
 				{/* 現在選択されている装備表示 */}
-				{effectiveEquipment[activeTab].isPreset && (
+				{effectiveEquipment[activeTab]?.isPreset && (
 					<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
 						<span className="text-sm font-medium text-blue-800">
-							プリセット: {effectiveEquipment[activeTab].name}
+							プリセット: {effectiveEquipment[activeTab]?.name}
 						</span>
 						<div className="text-xs text-blue-600 mt-1">
 							※ 下記の値を変更するとプリセットが解除されます
@@ -830,11 +847,12 @@ export default function EquipmentForm({
 					</div>
 				)}
 
-				{renderPropertyInputs(
-					effectiveEquipment[activeTab],
-					(property, value) =>
-						handleEquipmentPropertyChange(activeTab, property, value),
-				)}
+				{effectiveEquipment[activeTab] &&
+					renderPropertyInputs(
+						effectiveEquipment[activeTab],
+						(property, value) =>
+							handleEquipmentPropertyChange(activeTab, property, value),
+					)}
 			</div>
 
 			{/* 装備選択モーダル */}
@@ -842,10 +860,10 @@ export default function EquipmentForm({
 				isOpen={modalState.isOpen}
 				onClose={closeEquipmentModal}
 				onSelect={handlePresetEquipmentSelect}
-				selectedEquipmentId={effectiveEquipment[activeTab].id}
+				selectedEquipmentId={effectiveEquipment[activeTab]?.id || null}
 				category={modalState.category || 'main'}
 				title={modalState.title}
-				currentFormProperties={effectiveEquipment[activeTab].properties} // 現在のフォーム値を渡す
+				currentFormProperties={effectiveEquipment[activeTab]?.properties || {}} // 現在のフォーム値を渡す
 			/>
 
 			{/* カスタム装備作成モーダル */}
@@ -860,7 +878,6 @@ export default function EquipmentForm({
 							)
 						: ''
 				}
-				initialName=""
 			/>
 
 			{/* カスタム装備削除確認モーダル */}

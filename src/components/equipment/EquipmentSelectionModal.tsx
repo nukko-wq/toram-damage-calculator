@@ -54,6 +54,13 @@ export default function EquipmentSelectionModal({
 		// カテゴリに対応するプリセット + カスタム装備を統合して取得
 		let equipments = getCombinedEquipmentsByCategory(category)
 
+		// 自由入力スロット（freeInput1-3）の場合は、カスタム装備のみを表示
+		if (['freeInput1', 'freeInput2', 'freeInput3'].includes(category)) {
+			equipments = equipments.filter((equipment) => 
+				'isCustom' in equipment && equipment.isCustom
+			)
+		}
+
 		// 現在選択中の装備にフォーム値を反映
 		if (selectedEquipmentId && currentFormProperties) {
 			equipments = equipments.map((equipment) => {

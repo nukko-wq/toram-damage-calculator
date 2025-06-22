@@ -214,6 +214,9 @@ export type EquipmentCategory =
 	| 'fashion1'
 	| 'fashion2'
 	| 'fashion3'
+	| 'freeInput1'
+	| 'freeInput2'
+	| 'freeInput3'
 
 // プリセット装備
 export interface PresetEquipment {
@@ -261,6 +264,9 @@ export interface EquipmentSlots {
 	fashion1: Equipment
 	fashion2: Equipment
 	fashion3: Equipment
+	freeInput1: Equipment
+	freeInput2: Equipment
+	freeInput3: Equipment
 }
 
 // クリスタルスロット（選択されたクリスタルのIDを保存）

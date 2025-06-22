@@ -386,13 +386,21 @@ export function getEquipmentCategoryLabel(category: EquipmentCategory): string {
 			return 'オシャレ2'
 		case 'fashion3':
 			return 'オシャレ3'
+		case 'freeInput1':
+			return '自由入力1'
+		case 'freeInput2':
+			return '自由入力2'
+		case 'freeInput3':
+			return '自由入力3'
 		default:
 			return category
 	}
 }
 
 // 装備カテゴリ表示名を取得
-export function getEquipmentCategoryDisplayName(category: EquipmentCategory): string {
+export function getEquipmentCategoryDisplayName(
+	category: EquipmentCategory,
+): string {
 	switch (category) {
 		case 'main':
 			return 'メイン装備'
@@ -410,13 +418,21 @@ export function getEquipmentCategoryDisplayName(category: EquipmentCategory): st
 			return 'オシャレ2'
 		case 'fashion3':
 			return 'オシャレ3'
+		case 'freeInput1':
+			return '自由入力1'
+		case 'freeInput2':
+			return '自由入力2'
+		case 'freeInput3':
+			return '自由入力3'
 		default:
 			return category
 	}
 }
 
 // 装備カテゴリ別の初期名を生成
-export function generateInitialEquipmentName(category: EquipmentCategory): string {
+export function generateInitialEquipmentName(
+	category: EquipmentCategory,
+): string {
 	const timestamp = Date.now().toString().slice(-4) // 末尾4桁を使用
 	const categoryName = getEquipmentCategoryDisplayName(category)
 	return `カスタム${categoryName}_${timestamp}`
@@ -515,6 +531,9 @@ export function getCombinedEquipmentsByCategory(
 		fashion1: 'fashion',
 		fashion2: 'fashion',
 		fashion3: 'fashion',
+		freeInput1: 'accessory',
+		freeInput2: 'accessory',
+		freeInput3: 'accessory',
 	}
 
 	// カスタム装備をEquipment形式に変換
@@ -582,6 +601,9 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 		fashion1: 'fashion',
 		fashion2: 'fashion',
 		fashion3: 'fashion',
+		freeInput1: 'accessory',
+		freeInput2: 'accessory',
+		freeInput3: 'accessory',
 	}
 
 	// 編集セッション中のデータから検索（最優先）

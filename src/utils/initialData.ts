@@ -143,6 +143,9 @@ export const createInitialEquipmentSlots = (): EquipmentSlots => ({
 	fashion1: createInitialEquipment(),
 	fashion2: createInitialEquipment(),
 	fashion3: createInitialEquipment(),
+	freeInput1: createInitialEquipment(),
+	freeInput2: createInitialEquipment(),
+	freeInput3: createInitialEquipment(),
 })
 
 export const createInitialCrystalSlots = (): CrystalSlots => ({
