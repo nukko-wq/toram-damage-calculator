@@ -63,7 +63,7 @@ export default function Home() {
 
 	return (
 		<div className="min-h-screen bg-gray-50 py-8">
-			<div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
+			<div className="max-w-[1500px] mx-auto px-2 sm:px-6 lg:px-8">
 				<div className="text-center mb-8">
 					<h1 className="text-3xl font-bold text-gray-900">
 						トーラムダメージ計算
@@ -158,7 +158,7 @@ export default function Home() {
 					</div>
 				)}
 
-				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto_auto_auto] gap-4">
+				<div className="grid grid-cols-[1fr] grid-rows-[repeat(9,auto)] md:grid-cols-[repeat(8,1fr)] md:grid-rows-[repeat(6,auto)] lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto_auto_auto] gap-2 md:gap-4">
 					<BaseStatsForm />
 					<WeaponForm />
 					<CrystalForm />
