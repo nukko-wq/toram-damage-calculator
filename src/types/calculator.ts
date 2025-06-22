@@ -13,7 +13,16 @@ export type WeaponType =
 	| '素手'
 
 // サブ武器種の定義
-export type SubWeaponType = 'ナイフ' | '矢' | 'なし'
+export type SubWeaponType = 
+	| 'ナイフ' 
+	| '矢' 
+	| '盾'
+	| '魔道具'
+	| '手甲'
+	| '巻物'
+	| '片手剣'
+	| '抜刀剣'
+	| 'なし'
 
 // 基本ステータス
 export interface BaseStats {
