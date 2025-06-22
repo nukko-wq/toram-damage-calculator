@@ -56,10 +56,11 @@ interface CalculatorStore {
   updateSubWeapon: (weapon: SubWeapon) => void
   updateCrystals: (crystals: CrystalSlots) => void
   updateEquipment: (equipment: EquipmentSlots) => void
-  createTemporaryCustomEquipment: (equipmentCategory: EquipmentCategory, name: string) => Promise<void>
+  createTemporaryCustomEquipment: (equipmentCategory: EquipmentCategory, name: string) => Promise<void>  // 全装備スロット対応
   saveTemporaryCustomEquipments: () => Promise<void>
-  deleteCustomEquipment: (equipmentId: string) => Promise<void>
-  updateCustomEquipmentProperties: (equipmentId: string, properties: Partial<EquipmentProperties>) => Promise<void>
+  renameCustomEquipment: (equipmentId: string, newName: string) => Promise<boolean>  // 全装備スロット対応
+  deleteCustomEquipment: (equipmentId: string) => Promise<void>  // 全装備スロット対応
+  updateCustomEquipmentProperties: (equipmentId: string, properties: Partial<EquipmentProperties>) => Promise<void>  // 全装備スロット対応
   cleanupTemporaryData: () => void
   updateFood: (food: FoodFormData) => void
   updateEnemy: (enemy: EnemyFormData) => void
@@ -73,8 +74,11 @@ interface CalculatorStore {
 - 未保存変更の検知（UI表示用の色分けに使用）
 - セーブデータの読み込み・保存
 - 各フォームからの個別更新
-- カスタム装備の仮データ作成・管理
-- カスタム装備のプロパティ連動更新
+- **全装備スロット対応カスタム装備機能**:
+  - 仮データ作成・管理（メイン装備、体装備、追加装備、特殊装備、サブ武器、オシャレ1、オシャレ2、オシャレ3）
+  - カスタム装備名前変更（全装備スロット共通）
+  - カスタム装備削除（全装備スロット共通）
+  - プロパティ連動更新（全装備スロット共通）
 - 仮データの自動クリーンアップ
 
 **保存ボタンの統一仕様**:
@@ -588,22 +592,22 @@ SaveDataManager → SaveDataStore.switchSaveData → CalculatorStore.loadSaveDat
 SaveDataManager表示 → SaveDataStore.loadSaveDataList → ユーザー作成データのみフィルタリング → リスト表示
 ```
 
-### 5.7 カスタム装備作成フロー（仮データ）
+### 5.7 カスタム装備作成フロー（全装備スロット対応）
 
 ```
-[新規作成] → 装備名入力モーダル → CalculatorStore.createTemporaryCustomEquipment → メモリ上仮データ作成 → 自動装備セット → 未保存変更フラグ設定
+[新規作成] → 装備名入力モーダル → 装備カテゴリに応じた初期名設定 → CalculatorStore.createTemporaryCustomEquipment → メモリ上仮データ作成 → 該当装備スロットに自動セット → 未保存変更フラグ設定
 ```
 
-### 5.8 カスタム装備名前変更フロー
+### 5.8 カスタム装備名前変更フロー（全装備スロット対応）
 
 ```
-[名前変更] → 名前変更モーダル → 現在名を初期値表示 → 新しい名前入力 → CalculatorStore.renameCustomEquipment → 全データ層で名前更新 → 未保存変更フラグ設定
+[名前変更] → 名前変更モーダル → 現在名を初期値表示 → 新しい名前入力 → CalculatorStore.renameCustomEquipment → 全データ層で名前更新（永続データ・仮データ・編集セッション） → 装備選択UI反映 → 未保存変更フラグ設定
 ```
 
-### 5.9 カスタム装備削除フロー
+### 5.9 カスタム装備削除フロー（全装備スロット対応）
 
 ```
-[削除] → 削除確認モーダル → CalculatorStore.deleteCustomEquipment → LocalStorage除去 → 未保存変更フラグ設定
+[削除] → 削除確認モーダル → 装備名・カテゴリ表示 → CalculatorStore.deleteCustomEquipment → LocalStorage除去 → 全装備スロットから該当装備を解除 → 未保存変更フラグ設定
 ```
 
 ### 5.10 既存カスタム装備編集フロー
