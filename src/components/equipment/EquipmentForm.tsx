@@ -11,6 +11,8 @@ import type {
 import {
 	getCombinedEquipmentById,
 	getEquipmentCategoryLabel,
+	getEquipmentCategoryDisplayName,
+	generateInitialEquipmentName,
 } from '@/utils/equipmentDatabase'
 import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
@@ -781,8 +783,7 @@ export default function EquipmentForm({
 							</div>
 						)}
 					</button>
-					{/* メイン装備の場合のみカスタム機能ボタンを表示 */}
-					{activeTab === 'main' && (
+					{/* 全装備スロットでカスタム機能ボタンを表示 */}
 						<>
 							<button
 								type="button"
@@ -815,7 +816,6 @@ export default function EquipmentForm({
 									</>
 								)}
 						</>
-					)}
 				</div>
 
 				{/* 現在選択されている装備表示 */}
@@ -860,6 +860,7 @@ export default function EquipmentForm({
 							)
 						: ''
 				}
+				initialName=""
 			/>
 
 			{/* カスタム装備削除確認モーダル */}
