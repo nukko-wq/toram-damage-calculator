@@ -134,18 +134,34 @@ export const createInitialEquipment = (): Equipment => ({
 	updatedAt: new Date().toISOString(),
 })
 
+// 装備なしを表現する空の装備オブジェクト
+export const createEmptyEquipment = (): Equipment => ({
+	id: '',
+	name: '',
+	type: 'weapon',
+	category: ['main'],
+	baseStats: {},
+	properties: createInitialEquipmentProperties(),
+	isPreset: false,
+	isCustom: false,
+	isFavorite: false,
+	isModified: false,
+	createdAt: new Date().toISOString(),
+	updatedAt: new Date().toISOString(),
+})
+
 export const createInitialEquipmentSlots = (): EquipmentSlots => ({
-	main: createInitialEquipment(),
-	body: createInitialEquipment(),
-	additional: createInitialEquipment(),
-	special: createInitialEquipment(),
-	subWeapon: createInitialEquipment(),
-	fashion1: createInitialEquipment(),
-	fashion2: createInitialEquipment(),
-	fashion3: createInitialEquipment(),
-	freeInput1: createInitialEquipment(),
-	freeInput2: createInitialEquipment(),
-	freeInput3: createInitialEquipment(),
+	main: createEmptyEquipment(),
+	body: createEmptyEquipment(),
+	additional: createEmptyEquipment(),
+	special: createEmptyEquipment(),
+	subWeapon: createEmptyEquipment(),
+	fashion1: createEmptyEquipment(),
+	fashion2: createEmptyEquipment(),
+	fashion3: createEmptyEquipment(),
+	freeInput1: createEmptyEquipment(),
+	freeInput2: createEmptyEquipment(),
+	freeInput3: createEmptyEquipment(),
 })
 
 export const createInitialCrystalSlots = (): CrystalSlots => ({

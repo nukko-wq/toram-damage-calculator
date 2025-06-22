@@ -656,7 +656,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-1 py-1 text-sm border border-gray-300 rounded bg-sky-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<input
 												id={`${item.name}-${pair.properties[1]}`}
@@ -665,7 +665,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[1], e.target.value)
 												}
-												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-1 py-1 text-sm border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 										</>
 									) : pair.type === 'percent' ? (
@@ -678,7 +678,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-1 py-1 text-sm border border-gray-300 bg-sky-50 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<div /> {/* 空白の固定値列 */}
 										</>
@@ -693,7 +693,7 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 										</>
 									)}
@@ -769,9 +769,9 @@ export default function EquipmentForm({
 						) : (
 							<div className="flex items-center justify-between">
 								<span className="text-gray-500">
-									{['freeInput1', 'freeInput2', 'freeInput3'].includes(
-										activeTab,
-									)
+									{!effectiveEquipment[activeTab]?.id || !effectiveEquipment[activeTab]?.name
+										? 'なし'
+										: ['freeInput1', 'freeInput2', 'freeInput3'].includes(activeTab)
 										? '装備選択'
 										: 'プリセット選択'}
 								</span>
