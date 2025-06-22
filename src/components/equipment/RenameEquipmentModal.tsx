@@ -133,6 +133,7 @@ export default function RenameEquipmentModal({
 								stroke="currentColor"
 								aria-label="閉じるアイコン"
 							>
+								<title>閉じるアイコン</title>
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"

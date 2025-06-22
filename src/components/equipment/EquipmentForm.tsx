@@ -751,6 +751,7 @@ export default function EquipmentForm({
 									viewBox="0 0 24 24"
 									aria-label="選択メニューを開く"
 								>
+									<title>選択メニューを開く</title>
 									<path
 										strokeLinecap="round"
 										strokeLinejoin="round"
@@ -769,6 +770,7 @@ export default function EquipmentForm({
 									viewBox="0 0 24 24"
 									aria-label="選択メニューを開く"
 								>
+									<title>選択メニューを開く</title>
 									<path
 										strokeLinecap="round"
 										strokeLinejoin="round"

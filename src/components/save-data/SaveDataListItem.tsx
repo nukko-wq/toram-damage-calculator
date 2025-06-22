@@ -147,6 +147,7 @@ export default function SaveDataListItem({
 									viewBox="0 0 24 24"
 									stroke="currentColor"
 								>
+									<title>名前を変更</title>
 									<path
 										strokeLinecap="round"
 										strokeLinejoin="round"
@@ -167,6 +168,7 @@ export default function SaveDataListItem({
 									viewBox="0 0 24 24"
 									stroke="currentColor"
 								>
+									<title>削除</title>
 									<path
 										strokeLinecap="round"
 										strokeLinejoin="round"
