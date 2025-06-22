@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { baseStatsSchema, type BaseStatsFormData } from '@/schemas/baseStats'
 import type { BaseStats } from '@/types/calculator'
-import { useEffect, useCallback, useState, useRef } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { useCalculatorStore } from '@/stores'
 
 interface BaseStatsFormProps {

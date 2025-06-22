@@ -108,6 +108,30 @@ export default function WeaponForm({
 		setValueSub('refinement', refinementValue)
 	}
 
+	// フォーカス状態でのクリックによる値クリア機能（メイン武器）
+	const handleMainClickToClear = (fieldName: 'ATK' | 'stability') => {
+		setValueMain(fieldName, 0, { shouldValidate: true })
+		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
+		setTimeout(() => {
+			const element = document.getElementById(`main-weapon-${fieldName}`) as HTMLInputElement
+			if (element) {
+				element.select()
+			}
+		}, 0)
+	}
+
+	// フォーカス状態でのクリックによる値クリア機能（サブ武器）
+	const handleSubClickToClear = (fieldName: 'ATK' | 'stability') => {
+		setValueSub(fieldName, 0, { shouldValidate: true })
+		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
+		setTimeout(() => {
+			const element = document.getElementById(`sub-weapon-${fieldName}`) as HTMLInputElement
+			if (element) {
+				element.select()
+			}
+		}, 0)
+	}
+
 	// メイン武器フォーム
 	const {
 		register: registerMain,
@@ -286,10 +310,16 @@ export default function WeaponForm({
 								武器ATK:
 							</label>
 							<input
+								id="main-weapon-ATK"
 								type="number"
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="1500"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleMainClickToClear('ATK')
+									}
+								}}
 								{...registerMain('ATK', {
 									setValueAs: (value: string | number) => {
 										if (value === '' || value === null || value === undefined) {
@@ -308,10 +338,16 @@ export default function WeaponForm({
 								安定率:
 							</label>
 							<input
+								id="main-weapon-stability"
 								type="number"
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="100"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleMainClickToClear('stability')
+									}
+								}}
 								{...registerMain('stability', {
 									setValueAs: (value: string | number) => {
 										if (value === '' || value === null || value === undefined) {
@@ -375,10 +411,16 @@ export default function WeaponForm({
 								武器ATK:
 							</label>
 							<input
+								id="sub-weapon-ATK"
 								type="number"
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="1500"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleSubClickToClear('ATK')
+									}
+								}}
 								{...registerSub('ATK', {
 									setValueAs: (value: string | number) => {
 										if (value === '' || value === null || value === undefined) {
@@ -397,10 +439,16 @@ export default function WeaponForm({
 								安定率:
 							</label>
 							<input
+								id="sub-weapon-stability"
 								type="number"
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								min="0"
 								max="100"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleSubClickToClear('stability')
+									}
+								}}
 								{...registerSub('stability', {
 									setValueAs: (value: string | number) => {
 										if (value === '' || value === null || value === undefined) {
