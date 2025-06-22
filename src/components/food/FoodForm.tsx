@@ -184,7 +184,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 	}
 
 	return (
-		<div className="rounded-lg border border-gray-200 bg-white p-4 col-start-1 col-end-2 row-start-5 row-end-6">
+		<div className="rounded-lg border border-gray-200 bg-white p-4 md:col-start-1 md:col-end-5 md:row-start-4 md:row-end-5 lg:col-start-1 lg:col-end-2 lg:row-start-5 lg:row-end-6">
 			<h3 className="mb-3 text-base font-semibold text-gray-900">料理設定</h3>
 			<div className="space-y-2">
 				<FoodSlot slotName="slot1" slotLabel="1つ目" />

@@ -158,7 +158,7 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 	}
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-6 lg:row-end-7">
+		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-6 md:row-end-7 lg:col-start-1 lg:col-end-3 lg:row-start-6 lg:row-end-7">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">敵情報</h2>
 
 			<div className="space-y-4">

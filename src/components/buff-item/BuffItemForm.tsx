@@ -258,7 +258,7 @@ export default function BuffItemForm({ onBuffItemsChange }: BuffItemFormProps) {
 	}
 
 	return (
-		<div className="rounded-lg border border-gray-200 bg-white p-4 col-start-2 col-end-4 row-start-5 row-end-6">
+		<div className="rounded-lg border border-gray-200 bg-white p-4 md:col-start-5 md:col-end-9 md:row-start-3 md:row-end-5 lg:col-start-2 lg:col-end-4 lg:row-start-5 lg:row-end-6">
 			<h3 className="mb-4 text-base font-semibold text-gray-900">
 				バフアイテム設定
 			</h3>

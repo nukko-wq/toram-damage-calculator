@@ -113,7 +113,9 @@ export default function WeaponForm({
 		setValueMain(fieldName, 0, { shouldValidate: true })
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
-			const element = document.getElementById(`main-weapon-${fieldName}`) as HTMLInputElement
+			const element = document.getElementById(
+				`main-weapon-${fieldName}`,
+			) as HTMLInputElement
 			if (element) {
 				element.select()
 			}
@@ -125,7 +127,9 @@ export default function WeaponForm({
 		setValueSub(fieldName, 0, { shouldValidate: true })
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
-			const element = document.getElementById(`sub-weapon-${fieldName}`) as HTMLInputElement
+			const element = document.getElementById(
+				`sub-weapon-${fieldName}`,
+			) as HTMLInputElement
 			if (element) {
 				element.select()
 			}
@@ -279,7 +283,7 @@ export default function WeaponForm({
 	}, [watchSub, onSubWeaponChange, isInitialized, updateSubWeapon])
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
+		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-5 md:col-end-9 md:row-start-1 md:row-end-2 lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">武器情報</h2>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -766,7 +766,7 @@ export default function EquipmentForm({
 	)
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-4">
+		<section className="bg-white rounded-lg shadow-md p-6 md:col-start-1 md:col-end-9 md:row-start-2 md:row-end-3 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-4">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">装備/プロパティ</h2>
 
 			{/* タブヘッダー */}
