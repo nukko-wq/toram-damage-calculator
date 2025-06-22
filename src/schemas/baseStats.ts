@@ -33,10 +33,6 @@ export const baseStatsSchema = z.object({
 		.number()
 		.min(1, 'TECは1以上である必要があります')
 		.max(255, 'TECは255以下である必要があります'),
-	LUK: z
-		.number()
-		.min(1, 'LUKは1以上である必要があります')
-		.max(255, 'LUKは255以下である必要があります'),
 	level: z
 		.number()
 		.min(1, 'レベルは1以上である必要があります')

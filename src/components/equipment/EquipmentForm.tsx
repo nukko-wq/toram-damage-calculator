@@ -295,8 +295,6 @@ export default function EquipmentForm({
 			MEN: 'MEN',
 			TEC_Rate: 'TEC',
 			TEC: 'TEC',
-			LUK_Rate: 'LUK',
-			LUK: 'LUK',
 
 			// 命中・回避系
 			Accuracy_Rate: '命中',
