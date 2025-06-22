@@ -16,6 +16,7 @@ import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
 import RenameEquipmentModal from './RenameEquipmentModal'
+import { RegisterForm } from './RegisterForm'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -45,7 +46,9 @@ export default function EquipmentForm({
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
-	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots>('main')
+	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots | 'register'>(
+		'main',
+	)
 	const [modalState, setModalState] = useState<{
 		isOpen: boolean
 		category: EquipmentCategory | null
@@ -94,6 +97,10 @@ export default function EquipmentForm({
 		{ key: 'fashion1' as const, label: 'オシャレ1' },
 		{ key: 'fashion2' as const, label: 'オシャレ2' },
 		{ key: 'fashion3' as const, label: 'オシャレ3' },
+		{ key: 'register' as const, label: 'レジスタ他' },
+		{ key: 'freeInput1' as const, label: '自由入力1' },
+		{ key: 'freeInput2' as const, label: '自由入力2' },
+		{ key: 'freeInput3' as const, label: '自由入力3' },
 	]
 
 	const propertyGroups = [
@@ -386,6 +393,22 @@ export default function EquipmentForm({
 		return property.replace(/_Rate$/, '').replace(/_/g, '')
 	}
 
+	// フォーカス状態でのクリックによる値クリア機能（装備プロパティ）
+	const handlePropertyClickToClear = (
+		slotKey: keyof EquipmentSlots,
+		property: keyof EquipmentProperties,
+		equipmentId: string,
+	) => {
+		handleEquipmentPropertyChange(slotKey, property, '0')
+		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
+		setTimeout(() => {
+			const element = document.getElementById(`${equipmentId}-${property}`) as HTMLInputElement
+			if (element) {
+				element.select()
+			}
+		}, 0)
+	}
+
 	const handleEquipmentPropertyChange = (
 		slotKey: keyof EquipmentSlots,
 		property: keyof EquipmentProperties,
@@ -393,6 +416,8 @@ export default function EquipmentForm({
 	) => {
 		const numValue = Number.parseInt(value) || 0
 		const currentEquipment = effectiveEquipment[slotKey]
+
+		if (!currentEquipment) return
 
 		// カスタム装備の場合、プロパティ連動更新を実行
 		if (
@@ -408,9 +433,9 @@ export default function EquipmentForm({
 		const updatedEquipment = {
 			...effectiveEquipment,
 			[slotKey]: {
-				...effectiveEquipment[slotKey],
+				...currentEquipment,
 				properties: {
-					...effectiveEquipment[slotKey].properties,
+					...currentEquipment.properties,
 					[property]: numValue,
 				},
 				// プロパティを手動変更した場合はプリセットIDをクリア
@@ -530,7 +555,7 @@ export default function EquipmentForm({
 	// カスタム装備削除のハンドラー
 	const handleDeleteEquipment = (slotKey: keyof EquipmentSlots) => {
 		const equipment = effectiveEquipment[slotKey]
-		if (!equipment.id) return
+		if (!equipment?.id) return
 
 		// 装備名を取得（統合装備データから）
 		const equipmentData = getCombinedEquipmentById(equipment.id)
@@ -569,7 +594,7 @@ export default function EquipmentForm({
 	// カスタム装備名前変更のハンドラー
 	const handleRenameEquipment = (slotKey: keyof EquipmentSlots) => {
 		const equipment = effectiveEquipment[slotKey]
-		if (!equipment.id) return
+		if (!equipment?.id) return
 
 		// 装備名を取得（統合装備データから）
 		const equipmentData = getCombinedEquipmentById(equipment.id)
@@ -607,6 +632,7 @@ export default function EquipmentForm({
 
 	const renderPropertyInputs = (
 		item: Equipment,
+		slotKey: keyof EquipmentSlots,
 		onPropertyChange: (
 			property: keyof EquipmentProperties,
 			value: string,
@@ -651,7 +677,12 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+													}
+												}}
+												className="px-1 py-1 text-sm border border-gray-300 rounded bg-sky-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<input
 												id={`${item.name}-${pair.properties[1]}`}
@@ -660,7 +691,12 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[1], e.target.value)
 												}
-												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(slotKey, pair.properties[1], item.name || item.id)
+													}
+												}}
+												className="px-1 py-1 text-sm border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 										</>
 									) : pair.type === 'percent' ? (
@@ -673,7 +709,12 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+													}
+												}}
+												className="px-1 py-1 text-sm border border-gray-300 bg-sky-50 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<div /> {/* 空白の固定値列 */}
 										</>
@@ -688,7 +729,12 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
-												className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+													}
+												}}
+												className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 										</>
 									)}
@@ -707,7 +753,7 @@ export default function EquipmentForm({
 
 			{/* タブヘッダー */}
 			<div className="mb-6">
-				<nav className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+				<nav className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
 					{equipmentSlots.map(({ key, label }) => (
 						<button
 							key={key}
@@ -727,61 +773,76 @@ export default function EquipmentForm({
 
 			{/* タブコンテンツ */}
 			<div className="space-y-4">
-				<div className="flex gap-2">
-					<button
-						type="button"
-						onClick={() =>
-							openEquipmentModal(
-								activeTab as EquipmentCategory,
-								effectiveEquipment[activeTab].name ||
-									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
-							)
-						}
-						className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
-					>
-						{effectiveEquipment[activeTab].name ? (
-							<div className="flex items-center justify-between">
-								<span className="text-sm truncate text-gray-900">
-									{effectiveEquipment[activeTab].name}
-								</span>
-								<svg
-									className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									aria-label="選択メニューを開く"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 9l-7 7-7-7"
-									/>
-								</svg>
-							</div>
-						) : (
-							<div className="flex items-center justify-between">
-								<span className="text-gray-500">プリセット選択</span>
-								<svg
-									className="w-4 h-4 text-gray-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									aria-label="選択メニューを開く"
-								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 9l-7 7-7-7"
-									/>
-								</svg>
-							</div>
-						)}
-					</button>
-					{/* メイン装備の場合のみカスタム機能ボタンを表示 */}
-					{activeTab === 'main' && (
-						<>
+				{activeTab === 'register' ? (
+					/* レジスタ他フォーム */
+					<RegisterForm />
+				) : (
+					<>
+						<div className="flex gap-2">
+							{/* プリセット選択ボタンを表示 - 自由入力スロットは「なし」とカスタム装備のみ選択可能 */}
+							<button
+								type="button"
+								onClick={() =>
+									openEquipmentModal(
+										activeTab as EquipmentCategory,
+										effectiveEquipment[activeTab]?.name ||
+											`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
+									)
+								}
+								className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
+							>
+								{effectiveEquipment[activeTab]?.name ? (
+									<div className="flex items-center justify-between">
+										<span className="text-sm truncate text-gray-900">
+											{effectiveEquipment[activeTab]?.name}
+										</span>
+										<svg
+											className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-label="選択メニューを開く"
+										>
+											<title>選択メニューを開く</title>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M19 9l-7 7-7-7"
+											/>
+										</svg>
+									</div>
+								) : (
+									<div className="flex items-center justify-between">
+										<span className="text-gray-500">
+											{!effectiveEquipment[activeTab]?.id ||
+											!effectiveEquipment[activeTab]?.name
+												? 'なし'
+												: ['freeInput1', 'freeInput2', 'freeInput3'].includes(
+															activeTab,
+														)
+													? '装備選択'
+													: 'プリセット選択'}
+										</span>
+										<svg
+											className="w-4 h-4 text-gray-400"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-label="選択メニューを開く"
+										>
+											<title>選択メニューを開く</title>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M19 9l-7 7-7-7"
+											/>
+										</svg>
+									</div>
+								)}
+							</button>
+							{/* カスタム機能ボタンを表示 - 全スロットで常に表示 */}
 							<button
 								type="button"
 								onClick={() => handleCreateEquipment(activeTab)}
@@ -790,9 +851,10 @@ export default function EquipmentForm({
 							>
 								新規作成
 							</button>
-							{effectiveEquipment[activeTab].id &&
+							{effectiveEquipment[activeTab]?.id &&
+								effectiveEquipment[activeTab] &&
 								'isCustom' in effectiveEquipment[activeTab] &&
-								effectiveEquipment[activeTab].isCustom && (
+								effectiveEquipment[activeTab]?.isCustom && (
 									<>
 										<button
 											type="button"
@@ -812,39 +874,48 @@ export default function EquipmentForm({
 										</button>
 									</>
 								)}
-						</>
-					)}
-				</div>
-
-				{/* 現在選択されている装備表示 */}
-				{effectiveEquipment[activeTab].isPreset && (
-					<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-						<span className="text-sm font-medium text-blue-800">
-							プリセット: {effectiveEquipment[activeTab].name}
-						</span>
-						<div className="text-xs text-blue-600 mt-1">
-							※ 下記の値を変更するとプリセットが解除されます
 						</div>
-					</div>
-				)}
 
-				{renderPropertyInputs(
-					effectiveEquipment[activeTab],
-					(property, value) =>
-						handleEquipmentPropertyChange(activeTab, property, value),
+						{/* 現在選択されている装備表示 */}
+						{effectiveEquipment[activeTab]?.isPreset && (
+							<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+								<span className="text-sm font-medium text-blue-800">
+									プリセット: {effectiveEquipment[activeTab]?.name}
+								</span>
+								<div className="text-xs text-blue-600 mt-1">
+									※ 下記の値を変更するとプリセットが解除されます
+								</div>
+							</div>
+						)}
+
+						{effectiveEquipment[activeTab] &&
+							renderPropertyInputs(
+								effectiveEquipment[activeTab],
+								activeTab,
+								(property: keyof EquipmentProperties, value: string) =>
+									handleEquipmentPropertyChange(activeTab, property, value),
+							)}
+					</>
 				)}
 			</div>
 
 			{/* 装備選択モーダル */}
-			<EquipmentSelectionModal
-				isOpen={modalState.isOpen}
-				onClose={closeEquipmentModal}
-				onSelect={handlePresetEquipmentSelect}
-				selectedEquipmentId={effectiveEquipment[activeTab].id}
-				category={modalState.category || 'main'}
-				title={modalState.title}
-				currentFormProperties={effectiveEquipment[activeTab].properties} // 現在のフォーム値を渡す
-			/>
+			{activeTab !== 'register' && (
+				<EquipmentSelectionModal
+					isOpen={modalState.isOpen}
+					onClose={closeEquipmentModal}
+					onSelect={handlePresetEquipmentSelect}
+					selectedEquipmentId={
+						effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null
+					}
+					category={modalState.category || 'main'}
+					title={modalState.title}
+					currentFormProperties={
+						effectiveEquipment[activeTab as keyof EquipmentSlots]?.properties ||
+						{}
+					} // 現在のフォーム値を渡す
+				/>
+			)}
 
 			{/* カスタム装備作成モーダル */}
 			<CreateEquipmentModal

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useCalculatorStore, useUIStore } from '@/stores'
 import type { UpdateNotification } from '@/types/calculator'
 import { initializeStorage } from '@/utils/saveDataManager'
@@ -86,6 +86,7 @@ export default function Home() {
 								stroke="currentColor"
 								aria-label="セーブデータ管理アイコン"
 							>
+								<title>セーブデータ管理</title>
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"
@@ -110,6 +111,7 @@ export default function Home() {
 										fill="currentColor"
 										aria-label="成功アイコン"
 									>
+										<title>成功</title>
 										<path
 											fillRule="evenodd"
 											d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"

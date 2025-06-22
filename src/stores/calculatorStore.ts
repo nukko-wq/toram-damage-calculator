@@ -88,7 +88,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			loadSaveData: async (data) => {
 				// セーブデータ切り替え時に仮データをクリーンアップ
 				cleanupAllTemporaryEquipments()
-				
+
 				// 編集セッションは全てクリーンアップ（セーブデータ切り替え時は編集状態をリセット）
 				cleanupAllEditSessions()
 
@@ -219,6 +219,86 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				)
 			},
 
+			updateRegister: (register) => {
+				set(
+					(state) => ({
+						data: { ...state.data, register },
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'updateRegister',
+				)
+			},
+
+			updateRegisterEffect: (effectId, enabled) => {
+				set(
+					(state) => ({
+						data: {
+							...state.data,
+							register: {
+								...state.data.register,
+								effects: state.data.register.effects.map((effect) =>
+									effect.id === effectId
+										? { ...effect, isEnabled: enabled }
+										: effect,
+								),
+							},
+						},
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'updateRegisterEffect',
+				)
+			},
+
+			updateRegisterLevel: (effectId, level, partyMembers) => {
+				set(
+					(state) => ({
+						data: {
+							...state.data,
+							register: {
+								...state.data.register,
+								effects: state.data.register.effects.map((effect) =>
+									effect.id === effectId
+										? {
+												...effect,
+												level,
+												...(partyMembers !== undefined && { partyMembers }),
+											}
+										: effect,
+								),
+							},
+						},
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'updateRegisterLevel',
+				)
+			},
+
+			resetRegisterData: () => {
+				set(
+					(state) => ({
+						data: {
+							...state.data,
+							register: {
+								effects: state.data.register.effects.map((effect) => ({
+									...effect,
+									isEnabled: false,
+									level: 1,
+									...(effect.type === 'fateCompanionship' && {
+										partyMembers: 3,
+									}),
+								})),
+							},
+						},
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'resetRegisterData',
+				)
+			},
+
 			// ===== カスタム装備管理 =====
 			createTemporaryCustomEquipment: async (equipmentCategory, name) => {
 				try {
@@ -241,6 +321,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						fashion1: 'fashion1',
 						fashion2: 'fashion2',
 						fashion3: 'fashion3',
+						freeInput1: 'freeInput1',
+						freeInput2: 'freeInput2',
+						freeInput3: 'freeInput3',
 					}
 
 					const slotKey = equipmentCategoryToSlotMap[equipmentCategory]
@@ -309,7 +392,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					// 編集セッションを確実にクリーンアップ
 					// 保存処理完了後は編集セッションを全てクリアして永続データを優先
 					cleanupAllEditSessions()
-					
+
 					// さらに念のため、現在のセーブデータのセッションも個別にクリア
 					cleanupCurrentEditSessions()
 				} catch (error) {

@@ -56,15 +56,20 @@ interface CalculatorStore {
   updateSubWeapon: (weapon: SubWeapon) => void
   updateCrystals: (crystals: CrystalSlots) => void
   updateEquipment: (equipment: EquipmentSlots) => void
-  createTemporaryCustomEquipment: (equipmentCategory: EquipmentCategory, name: string) => Promise<void>
+  createTemporaryCustomEquipment: (equipmentCategory: EquipmentCategory, name: string) => Promise<void>  // 全装備スロット対応
   saveTemporaryCustomEquipments: () => Promise<void>
-  deleteCustomEquipment: (equipmentId: string) => Promise<void>
-  updateCustomEquipmentProperties: (equipmentId: string, properties: Partial<EquipmentProperties>) => Promise<void>
+  renameCustomEquipment: (equipmentId: string, newName: string) => Promise<boolean>  // 全装備スロット対応
+  deleteCustomEquipment: (equipmentId: string) => Promise<void>  // 全装備スロット対応
+  updateCustomEquipmentProperties: (equipmentId: string, properties: Partial<EquipmentProperties>) => Promise<void>  // 全装備スロット対応
   cleanupTemporaryData: () => void
   updateFood: (food: FoodFormData) => void
   updateEnemy: (enemy: EnemyFormData) => void
   updateBuffSkills: (buffSkills: BuffSkillFormData) => void
   updateBuffItems: (buffItems: BuffItemFormData) => void
+  updateRegister: (register: RegisterFormData) => void
+  updateRegisterEffect: (effectId: string, enabled: boolean) => void
+  updateRegisterLevel: (effectId: string, level: number, partyMembers?: number) => void
+  resetRegisterData: () => void
 }
 ```
 
@@ -73,8 +78,16 @@ interface CalculatorStore {
 - 未保存変更の検知（UI表示用の色分けに使用）
 - セーブデータの読み込み・保存
 - 各フォームからの個別更新
-- カスタム装備の仮データ作成・管理
-- カスタム装備のプロパティ連動更新
+- **全装備スロット対応カスタム装備機能**:
+  - 仮データ作成・管理（メイン装備、体装備、追加装備、特殊装備、サブ武器、オシャレ1、オシャレ2、オシャレ3、自由入力1、自由入力2、自由入力3）
+  - カスタム装備名前変更（全装備スロット共通）
+  - カスタム装備削除（全装備スロット共通）
+  - プロパティ連動更新（全装備スロット共通）
+- **レジスタ他効果管理**:
+  - レジスタレット効果のオン/オフ制御（18種類）
+  - ギルド料理効果のオン/オフ制御（2種類）
+  - 効果レベル設定とパーティメンバー数設定（運命共同体）
+  - プロパティシステムとの連動（リアルタイム反映）
 - 仮データの自動クリーンアップ
 
 **保存ボタンの統一仕様**:
@@ -588,22 +601,22 @@ SaveDataManager → SaveDataStore.switchSaveData → CalculatorStore.loadSaveDat
 SaveDataManager表示 → SaveDataStore.loadSaveDataList → ユーザー作成データのみフィルタリング → リスト表示
 ```
 
-### 5.7 カスタム装備作成フロー（仮データ）
+### 5.7 カスタム装備作成フロー（全装備スロット対応）
 
 ```
-[新規作成] → 装備名入力モーダル → CalculatorStore.createTemporaryCustomEquipment → メモリ上仮データ作成 → 自動装備セット → 未保存変更フラグ設定
+[新規作成] → 装備名入力モーダル → 装備カテゴリに応じた初期名設定 → CalculatorStore.createTemporaryCustomEquipment → メモリ上仮データ作成 → 該当装備スロットに自動セット → 未保存変更フラグ設定
 ```
 
-### 5.8 カスタム装備名前変更フロー
+### 5.8 カスタム装備名前変更フロー（全装備スロット対応）
 
 ```
-[名前変更] → 名前変更モーダル → 現在名を初期値表示 → 新しい名前入力 → CalculatorStore.renameCustomEquipment → 全データ層で名前更新 → 未保存変更フラグ設定
+[名前変更] → 名前変更モーダル → 現在名を初期値表示 → 新しい名前入力 → CalculatorStore.renameCustomEquipment → 全データ層で名前更新（永続データ・仮データ・編集セッション） → 装備選択UI反映 → 未保存変更フラグ設定
 ```
 
-### 5.9 カスタム装備削除フロー
+### 5.9 カスタム装備削除フロー（全装備スロット対応）
 
 ```
-[削除] → 削除確認モーダル → CalculatorStore.deleteCustomEquipment → LocalStorage除去 → 未保存変更フラグ設定
+[削除] → 削除確認モーダル → 装備名・カテゴリ表示 → CalculatorStore.deleteCustomEquipment → LocalStorage除去 → 全装備スロットから該当装備を解除 → 未保存変更フラグ設定
 ```
 
 ### 5.10 既存カスタム装備編集フロー
@@ -764,6 +777,167 @@ saveCurrentData: async () => {
 - レンダリング回数
 - メモリ使用量
 - ユーザー操作の応答性
+
+## 12. レジスタ他システム状態管理
+
+### 12.1 状態管理設計
+
+**目的**: レジスタレットとギルド料理効果をCalculatorStoreに統合し、装備/プロパティシステムとの連動を実現
+
+**データフロー**:
+```
+RegisterForm (UI) ↔ CalculatorStore ↔ LocalStorage (SaveData)
+                          ↓
+                  プロパティ変換システム
+                          ↓
+                    ダメージ計算エンジン
+```
+
+### 12.2 ストアメソッド詳細
+
+**レジスタ他データ更新**:
+```typescript
+// 全体データ更新
+updateRegister: (register: RegisterFormData) => void
+// 個別効果のオン/オフ切り替え
+updateRegisterEffect: (effectId: string, enabled: boolean) => void
+// レベル設定（運命共同体は特殊処理）
+updateRegisterLevel: (effectId: string, level: number, partyMembers?: number) => void
+// 初期化
+resetRegisterData: () => void
+```
+
+### 12.3 React Hook Form統合
+
+**RegisterFormでの統合パターン**:
+```typescript
+const RegisterForm = () => {
+  const registerData = useCalculatorStore(state => state.data.register)
+  const updateRegister = useCalculatorStore(state => state.updateRegister)
+  const updateRegisterEffect = useCalculatorStore(state => state.updateRegisterEffect)
+  const updateRegisterLevel = useCalculatorStore(state => state.updateRegisterLevel)
+
+  const {
+    register,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    values: registerData, // Zustandからのデータ自動同期
+    mode: 'onChange',
+  })
+
+  // フォーム変更時の自動更新
+  useEffect(() => {
+    const subscription = watch((data) => {
+      if (data) {
+        updateRegister(data as RegisterFormData)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [watch, updateRegister])
+
+  // 個別効果のトグル操作
+  const handleToggleEffect = (effectId: string) => {
+    const currentEnabled = registerData[effectId]?.enabled || false
+    updateRegisterEffect(effectId, !currentEnabled)
+  }
+
+  // レベル設定モーダルからの更新
+  const handleLevelUpdate = (effectId: string, level: number, partyMembers?: number) => {
+    updateRegisterLevel(effectId, level, partyMembers)
+  }
+
+  return (
+    // UI実装...
+  )
+}
+```
+
+### 12.4 プロパティシステム連動
+
+**自動変換とリアルタイム反映**:
+```typescript
+// CalculatorStore内でのプロパティ統合
+const getCalculatedProperties = (): Partial<EquipmentProperties> => {
+  const equipmentProps = calculateEquipmentProperties(data.equipment)
+  const registerProps = convertRegisterToProperties(data.register)
+  const buffSkillProps = convertBuffSkillsToProperties(data.buffSkills)
+  const buffItemProps = convertBuffItemsToProperties(data.buffItems)
+  
+  // 全プロパティを統合
+  return mergeProperties([
+    equipmentProps,
+    registerProps,
+    buffSkillProps,
+    buffItemProps
+  ])
+}
+```
+
+### 12.5 バリデーション仕様
+
+**Zodスキーマ定義**:
+```typescript
+// RegisterFormDataスキーマ
+const registerEffectSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(['registlet', 'guild_food']),
+  enabled: z.boolean(),
+  level: z.number().min(1),
+  maxLevel: z.number(),
+  partyMembers: z.number().min(1).max(3).optional(),
+  maxPartyMembers: z.number().optional()
+})
+
+const registerFormSchema = z.object({
+  physicalAttackUp: registerEffectSchema,
+  magicalAttackUp: registerEffectSchema,
+  maxHPUp: registerEffectSchema,
+  maxMPUp: registerEffectSchema,
+  accuracyUp: registerEffectSchema,
+  dodgeUp: registerEffectSchema,
+  attackSpeedUp: registerEffectSchema,
+  magicSpeedUp: registerEffectSchema,
+  fatefulCompanionship: registerEffectSchema.extend({
+    level: z.literal(1), // レベル1固定
+    partyMembers: z.number().min(1).max(3).default(1)
+  }),
+  voidStance: registerEffectSchema,
+  magicArrowPursuit: registerEffectSchema,
+  airSlideCompression: registerEffectSchema,
+  assassinStabEnhancement: registerEffectSchema,
+  resonancePower: registerEffectSchema,
+  resonanceAcceleration: registerEffectSchema,
+  resonanceConcentration: registerEffectSchema,
+  deliciousIngredientTrade: registerEffectSchema,
+  freshFruitTrade: registerEffectSchema
+})
+```
+
+### 12.6 未保存変更の検知
+
+**レジスタ他変更の監視**:
+```typescript
+// CalculatorStore内での変更検知
+const updateRegisterEffect = (effectId: string, enabled: boolean) => {
+  set((state) => ({
+    data: {
+      ...state.data,
+      register: {
+        ...state.data.register,
+        [effectId]: {
+          ...state.data.register[effectId],
+          enabled
+        }
+      }
+    },
+    hasUnsavedChanges: true // 変更フラグ設定
+  }))
+}
+```
 
 ---
 

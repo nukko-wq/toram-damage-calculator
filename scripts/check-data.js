@@ -69,7 +69,7 @@ filesToCheck.forEach((filename) => {
 	const destExists = fs.existsSync(destPath)
 
 	if (!srcExists && !destExists) {
-		console.log(`   ❌ 両方のファイルが存在しません`)
+		console.log('   ❌ 両方のファイルが存在しません')
 		missingCount++
 		return
 	}
@@ -96,12 +96,12 @@ filesToCheck.forEach((filename) => {
 
 	// 比較結果
 	if (srcHash === destHash) {
-		console.log(`   ✅ ファイルは同一です`)
+		console.log('   ✅ ファイルは同一です')
 		console.log(`      サイズ: ${srcSize} bytes`)
 		console.log(`      ハッシュ: ${srcHash}`)
 		identicalCount++
 	} else {
-		console.log(`   ⚠️  ファイルが異なります`)
+		console.log('   ⚠️  ファイルが異なります')
 		console.log(
 			`      src/data/  - サイズ: ${srcSize} bytes, 更新: ${srcModTime}`,
 		)

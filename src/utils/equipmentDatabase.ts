@@ -386,12 +386,59 @@ export function getEquipmentCategoryLabel(category: EquipmentCategory): string {
 			return 'オシャレ2'
 		case 'fashion3':
 			return 'オシャレ3'
+		case 'freeInput1':
+			return '自由入力1'
+		case 'freeInput2':
+			return '自由入力2'
+		case 'freeInput3':
+			return '自由入力3'
 		default:
 			return category
 	}
 }
 
-// カスタム装備を作成
+// 装備カテゴリ表示名を取得
+export function getEquipmentCategoryDisplayName(
+	category: EquipmentCategory,
+): string {
+	switch (category) {
+		case 'main':
+			return 'メイン装備'
+		case 'body':
+			return '体装備'
+		case 'additional':
+			return '追加装備'
+		case 'special':
+			return '特殊装備'
+		case 'subWeapon':
+			return 'サブ武器'
+		case 'fashion1':
+			return 'オシャレ1'
+		case 'fashion2':
+			return 'オシャレ2'
+		case 'fashion3':
+			return 'オシャレ3'
+		case 'freeInput1':
+			return '自由入力1'
+		case 'freeInput2':
+			return '自由入力2'
+		case 'freeInput3':
+			return '自由入力3'
+		default:
+			return category
+	}
+}
+
+// 装備カテゴリ別の初期名を生成
+export function generateInitialEquipmentName(
+	category: EquipmentCategory,
+): string {
+	const timestamp = Date.now().toString().slice(-4) // 末尾4桁を使用
+	const categoryName = getEquipmentCategoryDisplayName(category)
+	return `カスタム${categoryName}_${timestamp}`
+}
+
+// カスタム装備を作成（全装備スロット対応）
 export function createCustomEquipment(
 	equipmentCategory: EquipmentCategory,
 	name: string,
@@ -399,31 +446,21 @@ export function createCustomEquipment(
 	const now = new Date().toISOString()
 	const id = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
 
-	// EquipmentCategory を EquipmentCategory にマップ（実際は不要だが型整合性のため）
-	const categoryMap: Record<string, EquipmentCategory> = {
-		main: 'main',
-		body: 'body',
-		additional: 'additional',
-		special: 'special',
-		subWeapon: 'subWeapon',
-		fashion1: 'fashion1',
-		fashion2: 'fashion2',
-		fashion3: 'fashion3',
-	}
-
 	const customEquipment: UserEquipment = {
 		id,
 		name,
 		category: equipmentCategory,
 		properties: {}, // 全プロパティをリセット状態で作成
+		// 武器系装備（メイン・サブ）には武器ステータスを初期化
 		weaponStats:
-			equipmentCategory === 'main'
+			equipmentCategory === 'main' || equipmentCategory === 'subWeapon'
 				? {
 						ATK: 0,
 						stability: 0,
 						refinement: 0,
 					}
 				: undefined,
+		// クリスタルスロット対応装備にはスロットを初期化
 		crystalSlots: ['main', 'body', 'additional', 'special'].includes(
 			equipmentCategory,
 		)
@@ -494,6 +531,9 @@ export function getCombinedEquipmentsByCategory(
 		fashion1: 'fashion',
 		fashion2: 'fashion',
 		fashion3: 'fashion',
+		freeInput1: 'accessory',
+		freeInput2: 'accessory',
+		freeInput3: 'accessory',
 	}
 
 	// カスタム装備をEquipment形式に変換
@@ -561,6 +601,9 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 		fashion1: 'fashion',
 		fashion2: 'fashion',
 		fashion3: 'fashion',
+		freeInput1: 'accessory',
+		freeInput2: 'accessory',
+		freeInput3: 'accessory',
 	}
 
 	// 編集セッション中のデータから検索（最優先）

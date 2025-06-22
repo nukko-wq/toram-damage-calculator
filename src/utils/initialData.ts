@@ -10,6 +10,8 @@ import type {
 	EnemyFormData,
 	BuffSkillFormData,
 	BuffItemFormData,
+	RegisterFormData,
+	RegisterEffect,
 	CalculatorData,
 	EquipmentProperties,
 } from '@/types/calculator'
@@ -134,15 +136,33 @@ export const createInitialEquipment = (): Equipment => ({
 	updatedAt: new Date().toISOString(),
 })
 
+// 装備なしを表現する空の装備オブジェクト
+export const createEmptyEquipment = (): Equipment => ({
+	id: '',
+	name: '',
+	type: 'weapon',
+	category: ['main'],
+	baseStats: {},
+	properties: createInitialEquipmentProperties(),
+	isPreset: true,
+	isFavorite: false,
+	isModified: false,
+	createdAt: new Date().toISOString(),
+	updatedAt: new Date().toISOString(),
+})
+
 export const createInitialEquipmentSlots = (): EquipmentSlots => ({
-	main: createInitialEquipment(),
-	body: createInitialEquipment(),
-	additional: createInitialEquipment(),
-	special: createInitialEquipment(),
-	subWeapon: createInitialEquipment(),
-	fashion1: createInitialEquipment(),
-	fashion2: createInitialEquipment(),
-	fashion3: createInitialEquipment(),
+	main: createEmptyEquipment(),
+	body: createEmptyEquipment(),
+	additional: createEmptyEquipment(),
+	special: createEmptyEquipment(),
+	subWeapon: createEmptyEquipment(),
+	fashion1: createEmptyEquipment(),
+	fashion2: createEmptyEquipment(),
+	fashion3: createEmptyEquipment(),
+	freeInput1: createEmptyEquipment(),
+	freeInput2: createEmptyEquipment(),
+	freeInput3: createEmptyEquipment(),
 })
 
 export const createInitialCrystalSlots = (): CrystalSlots => ({
@@ -183,6 +203,161 @@ export const createInitialEnemyFormData = (): EnemyFormData => ({
 	},
 })
 
+// レジスタ他システムの初期値
+export const createInitialRegisterFormData = (): RegisterFormData => {
+	const effects: RegisterEffect[] = [
+		// レジスタレット効果
+		{
+			id: 'physicalAttackUp',
+			name: '物理攻撃アップ',
+			type: 'physicalAttackUp',
+			isEnabled: false,
+			level: 30,
+			maxLevel: 30,
+		},
+		{
+			id: 'magicalAttackUp',
+			name: '魔法攻撃アップ',
+			type: 'magicalAttackUp',
+			isEnabled: false,
+			level: 30,
+			maxLevel: 30,
+		},
+		{
+			id: 'maxHpUp',
+			name: '最大HPアップ',
+			type: 'maxHpUp',
+			isEnabled: false,
+			level: 100,
+			maxLevel: 100,
+		},
+		{
+			id: 'maxMpUp',
+			name: '最大MPアップ',
+			type: 'maxMpUp',
+			isEnabled: false,
+			level: 100,
+			maxLevel: 100,
+		},
+		{
+			id: 'accuracyUp',
+			name: '命中アップ',
+			type: 'accuracyUp',
+			isEnabled: false,
+			level: 10,
+			maxLevel: 10,
+		},
+		{
+			id: 'evasionUp',
+			name: '回避アップ',
+			type: 'evasionUp',
+			isEnabled: false,
+			level: 10,
+			maxLevel: 10,
+		},
+		{
+			id: 'attackSpeedUp',
+			name: '攻撃速度アップ',
+			type: 'attackSpeedUp',
+			isEnabled: false,
+			level: 100,
+			maxLevel: 100,
+		},
+		{
+			id: 'magicalSpeedUp',
+			name: '魔法速度アップ',
+			type: 'magicalSpeedUp',
+			isEnabled: false,
+			level: 100,
+			maxLevel: 100,
+		},
+		{
+			id: 'fateCompanionship',
+			name: '運命共同体',
+			type: 'fateCompanionship',
+			isEnabled: false,
+			level: 1,
+			maxLevel: 1,
+			partyMembers: 3,
+		},
+		{
+			id: 'voidStance',
+			name: '無の構え',
+			type: 'voidStance',
+			isEnabled: false,
+			level: 10,
+			maxLevel: 10,
+		},
+		{
+			id: 'arrowPursuit',
+			name: '術式アロー・追撃',
+			type: 'arrowPursuit',
+			isEnabled: false,
+			level: 4,
+			maxLevel: 4,
+		},
+		{
+			id: 'airSlideCompress',
+			name: 'エアスライド・圧縮',
+			type: 'airSlideCompress',
+			isEnabled: false,
+			level: 10,
+			maxLevel: 10,
+		},
+		{
+			id: 'assassinStabEnhance',
+			name: 'アサシンスタブ・強化',
+			type: 'assassinStabEnhance',
+			isEnabled: false,
+			level: 10,
+			maxLevel: 10,
+		},
+		{
+			id: 'resonancePower',
+			name: 'レゾナンス・火力',
+			type: 'resonancePower',
+			isEnabled: false,
+			level: 9,
+			maxLevel: 9,
+		},
+		{
+			id: 'resonanceAcceleration',
+			name: 'レゾナンス・加速',
+			type: 'resonanceAcceleration',
+			isEnabled: false,
+			level: 9,
+			maxLevel: 9,
+		},
+		{
+			id: 'resonanceConcentration',
+			name: 'レゾナンス・集中',
+			type: 'resonanceConcentration',
+			isEnabled: false,
+			level: 9,
+			maxLevel: 9,
+		},
+		// ギルド料理効果
+		{
+			id: 'deliciousFoodTrade',
+			name: 'おいしい食材取引',
+			type: 'deliciousFoodTrade',
+			isEnabled: false,
+			level: 10,
+			maxLevel: 10,
+		},
+		{
+			id: 'freshFruitTrade',
+			name: '新鮮な果物取引',
+			type: 'freshFruitTrade',
+			isEnabled: false,
+			level: 10,
+			maxLevel: 10,
+		},
+	]
+
+	return { effects }
+}
+
 export const createInitialCalculatorData = (): CalculatorData => ({
 	baseStats: createInitialBaseStats(),
 	mainWeapon: createInitialMainWeapon(),
@@ -193,5 +368,6 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	enemy: createInitialEnemyFormData(), // 新しい敵情報システム
 	buffSkills: getDefaultBuffSkillFormData(), // バフスキルシステム
 	buffItems: getDefaultBuffItems(), // バフアイテムシステム
+	register: createInitialRegisterFormData(), // レジスタ他システム
 	legacyEnemy: createInitialEnemyInfo(), // 後方互換性
 })

@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export interface CreateEquipmentModalProps {
 	isOpen: boolean
 	onClose: () => void
 	onConfirm: (equipmentName: string) => void
 	equipmentType: string
+	initialName?: string
 }
 
 export default function CreateEquipmentModal({
@@ -14,6 +15,7 @@ export default function CreateEquipmentModal({
 	onClose,
 	onConfirm,
 	equipmentType,
+	initialName,
 }: CreateEquipmentModalProps) {
 	const [equipmentName, setEquipmentName] = useState('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
@@ -39,6 +41,13 @@ export default function CreateEquipmentModal({
 		setEquipmentName('')
 		onClose()
 	}
+
+	// 初期名が提供された場合は設定
+	useEffect(() => {
+		if (initialName && isOpen) {
+			setEquipmentName(initialName)
+		}
+	}, [initialName, isOpen])
 
 	const handleBackgroundClick = (e: React.MouseEvent) => {
 		if (e.target === e.currentTarget) {
