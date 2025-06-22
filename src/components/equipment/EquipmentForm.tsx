@@ -402,7 +402,9 @@ export default function EquipmentForm({
 		handleEquipmentPropertyChange(slotKey, property, '0')
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
-			const element = document.getElementById(`${equipmentId}-${property}`) as HTMLInputElement
+			const element = document.getElementById(
+				`${equipmentId}-${property}`,
+			) as HTMLInputElement
 			if (element) {
 				element.select()
 			}
@@ -679,7 +681,11 @@ export default function EquipmentForm({
 												}
 												onMouseDown={(e) => {
 													if (document.activeElement === e.target) {
-														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+														handlePropertyClickToClear(
+															slotKey,
+															pair.properties[0],
+															item.name || item.id,
+														)
 													}
 												}}
 												className="px-1 py-1 text-sm border border-gray-300 rounded bg-sky-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
@@ -693,7 +699,11 @@ export default function EquipmentForm({
 												}
 												onMouseDown={(e) => {
 													if (document.activeElement === e.target) {
-														handlePropertyClickToClear(slotKey, pair.properties[1], item.name || item.id)
+														handlePropertyClickToClear(
+															slotKey,
+															pair.properties[1],
+															item.name || item.id,
+														)
 													}
 												}}
 												className="px-1 py-1 text-sm border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
@@ -711,7 +721,11 @@ export default function EquipmentForm({
 												}
 												onMouseDown={(e) => {
 													if (document.activeElement === e.target) {
-														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+														handlePropertyClickToClear(
+															slotKey,
+															pair.properties[0],
+															item.name || item.id,
+														)
 													}
 												}}
 												className="px-1 py-1 text-sm border border-gray-300 bg-sky-50 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
@@ -731,7 +745,11 @@ export default function EquipmentForm({
 												}
 												onMouseDown={(e) => {
 													if (document.activeElement === e.target) {
-														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+														handlePropertyClickToClear(
+															slotKey,
+															pair.properties[0],
+															item.name || item.id,
+														)
 													}
 												}}
 												className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
@@ -875,18 +893,6 @@ export default function EquipmentForm({
 									</>
 								)}
 						</div>
-
-						{/* 現在選択されている装備表示 */}
-						{effectiveEquipment[activeTab]?.isPreset && (
-							<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-								<span className="text-sm font-medium text-blue-800">
-									プリセット: {effectiveEquipment[activeTab]?.name}
-								</span>
-								<div className="text-xs text-blue-600 mt-1">
-									※ 下記の値を変更するとプリセットが解除されます
-								</div>
-							</div>
-						)}
 
 						{effectiveEquipment[activeTab] &&
 							renderPropertyInputs(

@@ -116,7 +116,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		setValue(fieldName, 1, { shouldValidate: true })
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
-			const element = document.getElementById(`stat-${fieldName}`) as HTMLInputElement
+			const element = document.getElementById(
+				`stat-${fieldName}`,
+			) as HTMLInputElement
 			if (element) {
 				element.select()
 			}
@@ -225,7 +227,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 				</div>
 
 				{/* 特殊ステータス行 */}
-				<div className="grid grid-cols-4 gap-3">
+				<div className="grid grid-cols-3 gap-3">
 					<StatField
 						label="CRT"
 						name="CRT"
@@ -245,14 +247,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 					<StatField
 						label="TEC"
 						name="TEC"
-						max={255}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
-					<StatField
-						label="LUK"
-						name="LUK"
 						max={255}
 						register={register}
 						handleBlur={handleBlur}
