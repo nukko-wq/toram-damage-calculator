@@ -167,7 +167,6 @@ export default function Home() {
 					<BuffSkillForm />
 				</div>
 				<StatsSummary data={data} />
-
 			</div>
 		</div>
 	)

@@ -680,3 +680,52 @@ export function hasTemporaryEquipments(): boolean {
 export function hasEditSessions(): boolean {
 	return getAllEditSessionEquipments().length > 0
 }
+
+// カスタム装備の名前を変更（全データ層対応）
+export function renameCustomEquipment(id: string, newName: string): boolean {
+	let updated = false
+
+	// 1. 編集セッション中のデータがある場合は編集セッション内で更新
+	if (isInEditSession(id)) {
+		try {
+			const { updateEditSessionName } = require('./editSessionManager')
+			if (updateEditSessionName(id, newName)) {
+				updated = true
+			}
+		} catch (error) {
+			console.error('Failed to update edit session name:', error)
+		}
+	}
+
+	// 2. 仮データの場合は仮データを更新
+	if (isTemporaryEquipment(id)) {
+		try {
+			const {
+				updateTemporaryEquipmentName,
+			} = require('./temporaryEquipmentManager')
+			if (updateTemporaryEquipmentName(id, newName)) {
+				updated = true
+			}
+		} catch (error) {
+			console.error('Failed to update temporary equipment name:', error)
+		}
+	}
+
+	// 3. 永続データのカスタム装備を更新
+	const customEquipment = getCustomEquipmentById(id)
+	if (customEquipment) {
+		try {
+			const updatedEquipment: UserEquipment = {
+				...customEquipment,
+				name: newName,
+				updatedAt: new Date().toISOString(),
+			}
+			saveUserCustomEquipment(updatedEquipment)
+			updated = true
+		} catch (error) {
+			console.error('Failed to update custom equipment name:', error)
+		}
+	}
+
+	return updated
+}

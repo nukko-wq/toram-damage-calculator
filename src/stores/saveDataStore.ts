@@ -63,7 +63,7 @@ export const useSaveDataStore = create<SaveDataStore>()(
 				try {
 					// 編集セッション管理にセーブデータIDを設定
 					setCurrentSaveDataId(saveId)
-					
+
 					await setCurrentSaveData(saveId)
 					set({ currentSaveId: saveId })
 

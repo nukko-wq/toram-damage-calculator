@@ -1,7 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { Equipment, EquipmentCategory, EquipmentProperties } from '@/types/calculator'
+import type {
+	Equipment,
+	EquipmentCategory,
+	EquipmentProperties,
+} from '@/types/calculator'
 import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import EquipmentCard from './EquipmentCard'
 
@@ -49,23 +53,23 @@ export default function EquipmentSelectionModal({
 
 		// カテゴリに対応するプリセット + カスタム装備を統合して取得
 		let equipments = getCombinedEquipmentsByCategory(category)
-		
+
 		// 現在選択中の装備にフォーム値を反映
 		if (selectedEquipmentId && currentFormProperties) {
-			equipments = equipments.map(equipment => {
+			equipments = equipments.map((equipment) => {
 				if (equipment.id === selectedEquipmentId) {
 					return {
 						...equipment,
 						properties: {
 							...equipment.properties,
-							...currentFormProperties
-						}
+							...currentFormProperties,
+						},
 					}
 				}
 				return equipment
 			})
 		}
-		
+
 		setAvailableEquipments(equipments)
 	}, [isOpen, category, selectedEquipmentId, currentFormProperties])
 

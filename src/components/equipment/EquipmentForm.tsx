@@ -15,6 +15,7 @@ import {
 import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
+import RenameEquipmentModal from './RenameEquipmentModal'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -31,6 +32,9 @@ export default function EquipmentForm({
 	const updateEquipment = useCalculatorStore((state) => state.updateEquipment)
 	const createTemporaryCustomEquipment = useCalculatorStore(
 		(state) => state.createTemporaryCustomEquipment,
+	)
+	const renameCustomEquipment = useCalculatorStore(
+		(state) => state.renameCustomEquipment,
 	)
 	const deleteCustomEquipment = useCalculatorStore(
 		(state) => state.deleteCustomEquipment,
@@ -69,6 +73,16 @@ export default function EquipmentForm({
 		isOpen: false,
 		equipmentId: null,
 		equipmentName: '',
+	})
+
+	const [renameModalState, setRenameModalState] = useState<{
+		isOpen: boolean
+		equipmentId: string | null
+		currentName: string
+	}>({
+		isOpen: false,
+		equipmentId: null,
+		currentName: '',
 	})
 
 	const equipmentSlots = [
@@ -552,6 +566,45 @@ export default function EquipmentForm({
 		})
 	}
 
+	// カスタム装備名前変更のハンドラー
+	const handleRenameEquipment = (slotKey: keyof EquipmentSlots) => {
+		const equipment = effectiveEquipment[slotKey]
+		if (!equipment.id) return
+
+		// 装備名を取得（統合装備データから）
+		const equipmentData = getCombinedEquipmentById(equipment.id)
+		const currentName = equipmentData?.name || equipment.name || '不明な装備'
+
+		setRenameModalState({
+			isOpen: true,
+			equipmentId: equipment.id,
+			currentName,
+		})
+	}
+
+	const handleRenameConfirm = async (newName: string) => {
+		if (!renameModalState.equipmentId) return
+
+		try {
+			await renameCustomEquipment(renameModalState.equipmentId, newName)
+			setRenameModalState({
+				isOpen: false,
+				equipmentId: null,
+				currentName: '',
+			})
+		} catch (error) {
+			console.error('カスタム装備名前変更エラー:', error)
+		}
+	}
+
+	const handleRenameCancel = () => {
+		setRenameModalState({
+			isOpen: false,
+			equipmentId: null,
+			currentName: '',
+		})
+	}
+
 	const renderPropertyInputs = (
 		item: Equipment,
 		onPropertyChange: (
@@ -737,18 +790,28 @@ export default function EquipmentForm({
 							>
 								新規作成
 							</button>
-							{effectiveEquipment[activeTab].id && 
-							 'isCustom' in effectiveEquipment[activeTab] && 
-							 effectiveEquipment[activeTab].isCustom && (
-								<button
-									type="button"
-									onClick={() => handleDeleteEquipment(activeTab)}
-									className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-									title="選択中のカスタム装備を削除"
-								>
-									削除
-								</button>
-							)}
+							{effectiveEquipment[activeTab].id &&
+								'isCustom' in effectiveEquipment[activeTab] &&
+								effectiveEquipment[activeTab].isCustom && (
+									<>
+										<button
+											type="button"
+											onClick={() => handleRenameEquipment(activeTab)}
+											className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+											title="選択中のカスタム装備の名前を変更"
+										>
+											名前変更
+										</button>
+										<button
+											type="button"
+											onClick={() => handleDeleteEquipment(activeTab)}
+											className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+											title="選択中のカスタム装備を削除"
+										>
+											削除
+										</button>
+									</>
+								)}
 						</>
 					)}
 				</div>
@@ -804,6 +867,15 @@ export default function EquipmentForm({
 				onConfirm={handleDeleteConfirm}
 				equipmentName={deleteModalState.equipmentName}
 				message="この装備を削除しますか？"
+			/>
+
+			{/* カスタム装備名前変更モーダル */}
+			<RenameEquipmentModal
+				isOpen={renameModalState.isOpen}
+				onClose={handleRenameCancel}
+				onConfirm={handleRenameConfirm}
+				currentName={renameModalState.currentName}
+				equipmentId={renameModalState.equipmentId || ''}
 			/>
 		</section>
 	)

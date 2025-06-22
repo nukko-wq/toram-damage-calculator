@@ -76,6 +76,26 @@ export function updateTemporaryEquipmentProperties(
 }
 
 /**
+ * 仮データ装備の名前を更新
+ */
+export function updateTemporaryEquipmentName(
+	id: string,
+	newName: string,
+): boolean {
+	const equipment = temporaryEquipments.get(id)
+	if (!equipment) {
+		return false
+	}
+
+	// 名前を更新
+	equipment.name = newName
+	equipment.updatedAt = new Date().toISOString()
+
+	temporaryEquipments.set(id, equipment)
+	return true
+}
+
+/**
  * 仮データかどうかを判定
  */
 export function isTemporaryEquipment(id: string): boolean {

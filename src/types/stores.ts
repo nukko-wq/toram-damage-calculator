@@ -82,6 +82,10 @@ export interface CalculatorStore {
 		name: string,
 	) => Promise<void>
 	saveTemporaryCustomEquipments: () => Promise<void>
+	renameCustomEquipment: (
+		equipmentId: string,
+		newName: string,
+	) => Promise<boolean>
 	deleteCustomEquipment: (equipmentId: string) => Promise<void>
 	updateCustomEquipmentProperties: (
 		equipmentId: string,

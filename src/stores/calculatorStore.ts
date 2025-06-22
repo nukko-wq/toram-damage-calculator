@@ -19,6 +19,7 @@ import {
 	updateCustomEquipmentProperties,
 	hasTemporaryEquipments,
 	hasEditSessions,
+	renameCustomEquipment,
 } from '@/utils/equipmentDatabase'
 import {
 	createTemporaryCustomEquipment,
@@ -343,6 +344,52 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					hasUnsavedChanges: get().hasUnsavedChanges,
 					hasTemporaryEquipments: hasTemporaryEquipments(),
 					hasEditSessions: hasEditSessions(),
+				}
+			},
+
+			renameCustomEquipment: async (equipmentId, newName) => {
+				try {
+					const success = renameCustomEquipment(equipmentId, newName)
+					if (success) {
+						// 現在選択中の装備がこのIDだった場合、表示名を更新
+						const { data } = get()
+						const updatedEquipment = { ...data.equipment }
+						let hasChanges = false
+
+						Object.keys(updatedEquipment).forEach((key) => {
+							const equipmentSlot =
+								updatedEquipment[key as keyof typeof updatedEquipment]
+							if (equipmentSlot && equipmentSlot.id === equipmentId) {
+								updatedEquipment[key as keyof typeof updatedEquipment] = {
+									...equipmentSlot,
+									name: newName,
+								}
+								hasChanges = true
+							}
+						})
+
+						if (hasChanges) {
+							set(
+								(state) => ({
+									data: { ...state.data, equipment: updatedEquipment },
+									hasUnsavedChanges: true,
+								}),
+								false,
+								'renameCustomEquipment',
+							)
+						} else {
+							// 装備が選択されていない場合でも未保存変更フラグを設定
+							set(
+								(state) => ({ ...state, hasUnsavedChanges: true }),
+								false,
+								'renameCustomEquipment',
+							)
+						}
+					}
+					return success
+				} catch (error) {
+					console.error('カスタム装備名前変更エラー:', error)
+					throw error
 				}
 			},
 
