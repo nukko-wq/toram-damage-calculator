@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { baseStatsSchema, type BaseStatsFormData } from '@/schemas/baseStats'
 import type { BaseStats } from '@/types/calculator'
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useRef } from 'react'
 import { useCalculatorStore } from '@/stores'
 
 interface BaseStatsFormProps {
@@ -20,6 +20,7 @@ interface StatFieldProps {
 	max: number
 	register: any
 	handleBlur: (name: keyof BaseStatsFormData) => void
+	handleClickToClear: (name: keyof BaseStatsFormData) => void
 }
 
 const StatField = ({
@@ -28,36 +29,45 @@ const StatField = ({
 	max,
 	register,
 	handleBlur,
-}: StatFieldProps) => (
-	<div className="flex items-center gap-2">
-		<label
-			htmlFor={`stat-${name}`}
-			className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
-		>
-			{label}:
-		</label>
-		<div className="flex-1">
-			<input
-				id={`stat-${name}`}
-				type="number"
-				className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-				min="1"
-				max={max}
-				{...register(name, {
-					setValueAs: (value: string | number) => {
-						// 空文字やNaNの場合は1を返す
-						if (value === '' || value === null || value === undefined) {
-							return 1
+	handleClickToClear,
+}: StatFieldProps) => {
+	return (
+		<div className="flex items-center gap-2">
+			<label
+				htmlFor={`stat-${name}`}
+				className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+			>
+				{label}:
+			</label>
+			<div className="flex-1">
+				<input
+					id={`stat-${name}`}
+					type="number"
+					className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+					min="1"
+					max={max}
+					onBlur={() => handleBlur(name)}
+					onMouseDown={(e) => {
+						// 既にフォーカスが当たっている要素をマウスダウンした場合のみクリア処理
+						if (document.activeElement === e.target) {
+							handleClickToClear(name)
 						}
-						const numValue = Number(value)
-						return Number.isNaN(numValue) ? 1 : numValue
-					},
-					onBlur: () => handleBlur(name),
-				})}
-			/>
+					}}
+					{...register(name, {
+						setValueAs: (value: string | number) => {
+							// 空文字やNaNの場合は1を返す
+							if (value === '' || value === null || value === undefined) {
+								return 1
+							}
+							const numValue = Number(value)
+							return Number.isNaN(numValue) ? 1 : numValue
+						},
+					})}
+				/>
+			</div>
 		</div>
-	</div>
-)
+	)
+}
 
 export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	// 初期化状態管理
@@ -98,6 +108,19 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		} else if (value > max) {
 			setValue(fieldName, max, { shouldValidate: true })
 		}
+	}
+
+	// フォーカス状態でのクリックによる値クリア機能
+	const handleClickToClear = (fieldName: keyof BaseStatsFormData) => {
+		// 最小値の1を設定してから、テキストを選択状態にする
+		setValue(fieldName, 1, { shouldValidate: true })
+		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
+		setTimeout(() => {
+			const element = document.getElementById(`stat-${fieldName}`) as HTMLInputElement
+			if (element) {
+				element.select()
+			}
+		}, 0)
 	}
 
 	// 外部データ変更時の初期化管理（軽量化でちらつき防止）
@@ -150,6 +173,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						max={510}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 				</div>
 				{/* メインステータス第1行 */}
@@ -160,6 +184,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						max={510}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 					<StatField
 						label="INT"
@@ -167,6 +192,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						max={510}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 					<StatField
 						label="VIT"
@@ -174,6 +200,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						max={510}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 				</div>
 
@@ -185,6 +212,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						max={510}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 					<StatField
 						label="DEX"
@@ -192,17 +220,19 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						max={510}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 				</div>
 
 				{/* 特殊ステータス行 */}
-				<div className="grid grid-cols-3 gap-3">
+				<div className="grid grid-cols-4 gap-3">
 					<StatField
 						label="CRT"
 						name="CRT"
 						max={255}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 					<StatField
 						label="MEN"
@@ -210,6 +240,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						max={255}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 					<StatField
 						label="TEC"
@@ -217,6 +248,15 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 						max={255}
 						register={register}
 						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
+					/>
+					<StatField
+						label="LUK"
+						name="LUK"
+						max={255}
+						register={register}
+						handleBlur={handleBlur}
+						handleClickToClear={handleClickToClear}
 					/>
 				</div>
 			</div>
