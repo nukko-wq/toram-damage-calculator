@@ -219,6 +219,82 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				)
 			},
 
+			updateRegister: (register) => {
+				set(
+					(state) => ({
+						data: { ...state.data, register },
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'updateRegister',
+				)
+			},
+
+			updateRegisterEffect: (effectId, enabled) => {
+				set(
+					(state) => ({
+						data: {
+							...state.data,
+							register: {
+								...state.data.register,
+								effects: state.data.register.effects.map((effect) =>
+									effect.id === effectId ? { ...effect, isEnabled: enabled } : effect
+								),
+							},
+						},
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'updateRegisterEffect',
+				)
+			},
+
+			updateRegisterLevel: (effectId, level, partyMembers) => {
+				set(
+					(state) => ({
+						data: {
+							...state.data,
+							register: {
+								...state.data.register,
+								effects: state.data.register.effects.map((effect) =>
+									effect.id === effectId
+										? {
+												...effect,
+												level,
+												...(partyMembers !== undefined && { partyMembers }),
+										  }
+										: effect
+								),
+							},
+						},
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'updateRegisterLevel',
+				)
+			},
+
+			resetRegisterData: () => {
+				set(
+					(state) => ({
+						data: {
+							...state.data,
+							register: {
+								effects: state.data.register.effects.map((effect) => ({
+									...effect,
+									isEnabled: false,
+									level: 1,
+									...(effect.type === 'fateCompanionship' && { partyMembers: 3 }),
+								})),
+							},
+						},
+						hasUnsavedChanges: true,
+					}),
+					false,
+					'resetRegisterData',
+				)
+			},
+
 			// ===== カスタム装備管理 =====
 			createTemporaryCustomEquipment: async (equipmentCategory, name) => {
 				try {

@@ -336,6 +336,7 @@ export interface CalculatorData {
 	enemy: EnemyFormData // 新しい敵情報システム
 	buffSkills: BuffSkillFormData // バフスキルデータ
 	buffItems: BuffItemFormData // バフアイテムデータ
+	register: RegisterFormData // レジスタ他データ
 	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
 	legacyEnemy?: EnemyInfo
 }
@@ -673,4 +674,43 @@ export interface BuffItemFormData {
 	hp: string | null
 	accuracy: string | null
 	evasion: string | null
+}
+
+// レジスタ他システム
+
+// レジスタ効果タイプ
+export type RegisterEffectType =
+	| 'physicalAttackUp' // 物理攻撃アップ
+	| 'magicalAttackUp' // 魔法攻撃アップ
+	| 'maxHpUp' // 最大HPアップ
+	| 'maxMpUp' // 最大MPアップ
+	| 'accuracyUp' // 命中アップ
+	| 'evasionUp' // 回避アップ
+	| 'attackSpeedUp' // 攻撃速度アップ
+	| 'magicalSpeedUp' // 魔法速度アップ
+	| 'fateCompanionship' // 運命共同体
+	| 'voidStance' // 無の構え
+	| 'arrowPursuit' // 術式アロー・追撃
+	| 'airSlideCompress' // エアスライド・圧縮
+	| 'assassinStabEnhance' // アサシンスタブ・強化
+	| 'resonancePower' // レゾナンス・火力
+	| 'resonanceAcceleration' // レゾナンス・加速
+	| 'resonanceConcentration' // レゾナンス・集中
+	| 'deliciousFoodTrade' // おいしい食材取引
+	| 'freshFruitTrade' // 新鮮な果物取引
+
+// レジスタ効果データ
+export interface RegisterEffect {
+	id: string
+	name: string
+	type: RegisterEffectType
+	isEnabled: boolean
+	level: number
+	maxLevel: number
+	partyMembers?: number // 運命共同体専用
+}
+
+// レジスタフォームデータ
+export interface RegisterFormData {
+	effects: RegisterEffect[]
 }

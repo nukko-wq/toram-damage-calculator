@@ -16,6 +16,7 @@ import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
 import RenameEquipmentModal from './RenameEquipmentModal'
+import { RegisterForm } from './RegisterForm'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -45,7 +46,7 @@ export default function EquipmentForm({
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
-	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots>('main')
+	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots | 'register'>('main')
 	const [modalState, setModalState] = useState<{
 		isOpen: boolean
 		category: EquipmentCategory | null
@@ -94,6 +95,7 @@ export default function EquipmentForm({
 		{ key: 'fashion1' as const, label: 'オシャレ1' },
 		{ key: 'fashion2' as const, label: 'オシャレ2' },
 		{ key: 'fashion3' as const, label: 'オシャレ3' },
+		{ key: 'register' as const, label: 'レジスタ他' },
 		{ key: 'freeInput1' as const, label: '自由入力1' },
 		{ key: 'freeInput2' as const, label: '自由入力2' },
 		{ key: 'freeInput3' as const, label: '自由入力3' },
@@ -732,19 +734,24 @@ export default function EquipmentForm({
 
 			{/* タブコンテンツ */}
 			<div className="space-y-4">
-				<div className="flex gap-2">
-					{/* プリセット選択ボタンを表示 - 自由入力スロットは「なし」とカスタム装備のみ選択可能 */}
-					<button
-						type="button"
-						onClick={() =>
-							openEquipmentModal(
-								activeTab as EquipmentCategory,
-								effectiveEquipment[activeTab]?.name ||
-									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
-							)
-						}
-						className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
-					>
+				{activeTab === 'register' ? (
+					/* レジスタ他フォーム */
+					<RegisterForm />
+				) : (
+					<>
+						<div className="flex gap-2">
+							{/* プリセット選択ボタンを表示 - 自由入力スロットは「なし」とカスタム装備のみ選択可能 */}
+							<button
+								type="button"
+								onClick={() =>
+									openEquipmentModal(
+										activeTab as EquipmentCategory,
+										effectiveEquipment[activeTab]?.name ||
+											`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
+									)
+								}
+								className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
+							>
 						{effectiveEquipment[activeTab]?.name ? (
 							<div className="flex items-center justify-between">
 								<span className="text-sm truncate text-gray-900">
@@ -842,24 +849,28 @@ export default function EquipmentForm({
 					</div>
 				)}
 
-				{effectiveEquipment[activeTab] &&
-					renderPropertyInputs(
-						effectiveEquipment[activeTab],
-						(property, value) =>
-							handleEquipmentPropertyChange(activeTab, property, value),
-					)}
+						{effectiveEquipment[activeTab] &&
+							renderPropertyInputs(
+								effectiveEquipment[activeTab],
+								(property, value) =>
+									handleEquipmentPropertyChange(activeTab, property, value),
+							)}
+					</>
+				)}
 			</div>
 
 			{/* 装備選択モーダル */}
-			<EquipmentSelectionModal
-				isOpen={modalState.isOpen}
-				onClose={closeEquipmentModal}
-				onSelect={handlePresetEquipmentSelect}
-				selectedEquipmentId={effectiveEquipment[activeTab]?.id || null}
-				category={modalState.category || 'main'}
-				title={modalState.title}
-				currentFormProperties={effectiveEquipment[activeTab]?.properties || {}} // 現在のフォーム値を渡す
-			/>
+			{activeTab !== 'register' && (
+				<EquipmentSelectionModal
+					isOpen={modalState.isOpen}
+					onClose={closeEquipmentModal}
+					onSelect={handlePresetEquipmentSelect}
+					selectedEquipmentId={effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null}
+					category={modalState.category || 'main'}
+					title={modalState.title}
+					currentFormProperties={effectiveEquipment[activeTab as keyof EquipmentSlots]?.properties || {}} // 現在のフォーム値を渡す
+				/>
+			)}
 
 			{/* カスタム装備作成モーダル */}
 			<CreateEquipmentModal

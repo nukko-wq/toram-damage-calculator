@@ -12,6 +12,7 @@ import type {
 	EnemyFormData,
 	BuffSkillFormData,
 	BuffItemFormData,
+	RegisterFormData,
 	SaveData,
 } from './calculator'
 
@@ -75,6 +76,10 @@ export interface CalculatorStore {
 	updateEnemy: (enemy: EnemyFormData) => void
 	updateBuffSkills: (buffSkills: BuffSkillFormData) => void
 	updateBuffItems: (buffItems: BuffItemFormData) => void
+	updateRegister: (register: RegisterFormData) => void
+	updateRegisterEffect: (effectId: string, enabled: boolean) => void
+	updateRegisterLevel: (effectId: string, level: number, partyMembers?: number) => void
+	resetRegisterData: () => void
 
 	// ===== カスタム装備管理 =====
 	createTemporaryCustomEquipment: (
