@@ -1,15 +1,21 @@
 'use client'
 
 import { useState } from 'react'
+import { useCalculatorStore } from '@/stores'
 import type {
 	Equipment,
 	EquipmentSlots,
 	EquipmentProperties,
 	EquipmentCategory,
 } from '@/types/calculator'
-import { getEquipmentById } from '@/utils/equipmentDatabase'
+import {
+	getCombinedEquipmentById,
+	getEquipmentCategoryLabel,
+} from '@/utils/equipmentDatabase'
+import CreateEquipmentModal from './CreateEquipmentModal'
+import DeleteConfirmModal from './DeleteConfirmModal'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
-import { useCalculatorStore } from '@/stores'
+import RenameEquipmentModal from './RenameEquipmentModal'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -18,12 +24,24 @@ interface EquipmentFormProps {
 }
 
 export default function EquipmentForm({
-	equipment,
+	equipment: _equipment,
 	onEquipmentChange,
 }: EquipmentFormProps) {
 	// Zustandストアから装備データを取得
 	const storeEquipment = useCalculatorStore((state) => state.data.equipment)
 	const updateEquipment = useCalculatorStore((state) => state.updateEquipment)
+	const createTemporaryCustomEquipment = useCalculatorStore(
+		(state) => state.createTemporaryCustomEquipment,
+	)
+	const renameCustomEquipment = useCalculatorStore(
+		(state) => state.renameCustomEquipment,
+	)
+	const deleteCustomEquipment = useCalculatorStore(
+		(state) => state.deleteCustomEquipment,
+	)
+	const updateCustomEquipmentProperties = useCalculatorStore(
+		(state) => state.updateCustomEquipmentProperties,
+	)
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
@@ -36,6 +54,35 @@ export default function EquipmentForm({
 		isOpen: false,
 		category: null,
 		title: '',
+	})
+
+	// カスタム装備関連のモーダル状態
+	const [createModalState, setCreateModalState] = useState<{
+		isOpen: boolean
+		equipmentType: keyof EquipmentSlots | null
+	}>({
+		isOpen: false,
+		equipmentType: null,
+	})
+
+	const [deleteModalState, setDeleteModalState] = useState<{
+		isOpen: boolean
+		equipmentId: string | null
+		equipmentName: string
+	}>({
+		isOpen: false,
+		equipmentId: null,
+		equipmentName: '',
+	})
+
+	const [renameModalState, setRenameModalState] = useState<{
+		isOpen: boolean
+		equipmentId: string | null
+		currentName: string
+	}>({
+		isOpen: false,
+		equipmentId: null,
+		currentName: '',
 	})
 
 	const equipmentSlots = [
@@ -345,6 +392,19 @@ export default function EquipmentForm({
 		value: string,
 	) => {
 		const numValue = Number.parseInt(value) || 0
+		const currentEquipment = effectiveEquipment[slotKey]
+
+		// カスタム装備の場合、プロパティ連動更新を実行
+		if (
+			currentEquipment.id &&
+			'isCustom' in currentEquipment &&
+			currentEquipment.isCustom
+		) {
+			updateCustomEquipmentProperties(currentEquipment.id, {
+				[property]: numValue,
+			})
+		}
+
 		const updatedEquipment = {
 			...effectiveEquipment,
 			[slotKey]: {
@@ -391,15 +451,20 @@ export default function EquipmentForm({
 				onEquipmentChange(updatedEquipment)
 			}
 		} else {
-			// プリセット装備を選択
-			const presetEquipment = getEquipmentById(equipmentId)
-			if (presetEquipment) {
+			// プリセット・カスタム装備を選択（統合データから取得）
+			const equipment = getCombinedEquipmentById(equipmentId)
+			if (equipment) {
 				const updatedEquipment = {
 					...effectiveEquipment,
 					[slotKey]: {
-						name: presetEquipment.name,
-						properties: { ...presetEquipment.properties },
-						presetId: equipmentId,
+						name: equipment.name,
+						properties: { ...equipment.properties },
+						presetId:
+							'isCustom' in equipment && equipment.isCustom
+								? null
+								: equipmentId,
+						id: equipment.id,
+						isCustom: 'isCustom' in equipment && equipment.isCustom,
 					},
 				}
 
@@ -427,6 +492,116 @@ export default function EquipmentForm({
 			isOpen: false,
 			category: null,
 			title: '',
+		})
+	}
+
+	// カスタム装備作成のハンドラー
+	const handleCreateEquipment = (slotKey: keyof EquipmentSlots) => {
+		setCreateModalState({
+			isOpen: true,
+			equipmentType: slotKey,
+		})
+	}
+
+	const handleCreateConfirm = async (equipmentName: string) => {
+		if (!createModalState.equipmentType) return
+
+		try {
+			await createTemporaryCustomEquipment(
+				createModalState.equipmentType as EquipmentCategory,
+				equipmentName,
+			)
+			setCreateModalState({
+				isOpen: false,
+				equipmentType: null,
+			})
+		} catch (error) {
+			console.error('カスタム装備作成エラー:', error)
+		}
+	}
+
+	const handleCreateCancel = () => {
+		setCreateModalState({
+			isOpen: false,
+			equipmentType: null,
+		})
+	}
+
+	// カスタム装備削除のハンドラー
+	const handleDeleteEquipment = (slotKey: keyof EquipmentSlots) => {
+		const equipment = effectiveEquipment[slotKey]
+		if (!equipment.id) return
+
+		// 装備名を取得（統合装備データから）
+		const equipmentData = getCombinedEquipmentById(equipment.id)
+		const equipmentName = equipmentData?.name || equipment.name || '不明な装備'
+
+		setDeleteModalState({
+			isOpen: true,
+			equipmentId: equipment.id,
+			equipmentName,
+		})
+	}
+
+	const handleDeleteConfirm = async () => {
+		if (!deleteModalState.equipmentId) return
+
+		try {
+			await deleteCustomEquipment(deleteModalState.equipmentId)
+			setDeleteModalState({
+				isOpen: false,
+				equipmentId: null,
+				equipmentName: '',
+			})
+		} catch (error) {
+			console.error('カスタム装備削除エラー:', error)
+		}
+	}
+
+	const handleDeleteCancel = () => {
+		setDeleteModalState({
+			isOpen: false,
+			equipmentId: null,
+			equipmentName: '',
+		})
+	}
+
+	// カスタム装備名前変更のハンドラー
+	const handleRenameEquipment = (slotKey: keyof EquipmentSlots) => {
+		const equipment = effectiveEquipment[slotKey]
+		if (!equipment.id) return
+
+		// 装備名を取得（統合装備データから）
+		const equipmentData = getCombinedEquipmentById(equipment.id)
+		const currentName = equipmentData?.name || equipment.name || '不明な装備'
+
+		setRenameModalState({
+			isOpen: true,
+			equipmentId: equipment.id,
+			currentName,
+		})
+	}
+
+	const handleRenameConfirm = async (newName: string) => {
+		if (!renameModalState.equipmentId) return
+
+		try {
+			await renameCustomEquipment(renameModalState.equipmentId, newName)
+			setRenameModalState({
+				isOpen: false,
+				equipmentId: null,
+				currentName: '',
+			})
+		} catch (error) {
+			console.error('カスタム装備名前変更エラー:', error)
+		}
+	}
+
+	const handleRenameCancel = () => {
+		setRenameModalState({
+			isOpen: false,
+			equipmentId: null,
+			currentName: '',
 		})
 	}
 
@@ -538,9 +713,9 @@ export default function EquipmentForm({
 							key={key}
 							type="button"
 							onClick={() => setActiveTab(key)}
-							className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+							className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
 								activeTab === key
-									? 'bg-blue-500 text-white'
+									? 'bg-blue-500/90 text-white'
 									: 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
 							}`}
 						>
@@ -552,10 +727,7 @@ export default function EquipmentForm({
 
 			{/* タブコンテンツ */}
 			<div className="space-y-4">
-				<div className="flex items-center justify-between">
-					<h3 className="text-lg font-semibold text-gray-700">
-						{equipmentSlots.find((slot) => slot.key === activeTab)?.label}
-					</h3>
+				<div className="flex gap-2">
 					<button
 						type="button"
 						onClick={() =>
@@ -565,10 +737,83 @@ export default function EquipmentForm({
 									`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
 							)
 						}
-						className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+						className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
 					>
-						{effectiveEquipment[activeTab].name || 'プリセット選択'}
+						{effectiveEquipment[activeTab].name ? (
+							<div className="flex items-center justify-between">
+								<span className="text-sm truncate text-gray-900">
+									{effectiveEquipment[activeTab].name}
+								</span>
+								<svg
+									className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-label="選択メニューを開く"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</div>
+						) : (
+							<div className="flex items-center justify-between">
+								<span className="text-gray-500">プリセット選択</span>
+								<svg
+									className="w-4 h-4 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-label="選択メニューを開く"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</div>
+						)}
 					</button>
+					{/* メイン装備の場合のみカスタム機能ボタンを表示 */}
+					{activeTab === 'main' && (
+						<>
+							<button
+								type="button"
+								onClick={() => handleCreateEquipment(activeTab)}
+								className="px-3 py-1 text-sm bg-rose-300/80 text-gray-900 rounded-md hover:bg-rose-300/90 transition-colors cursor-pointer"
+								title="新規カスタム装備を作成"
+							>
+								新規作成
+							</button>
+							{effectiveEquipment[activeTab].id &&
+								'isCustom' in effectiveEquipment[activeTab] &&
+								effectiveEquipment[activeTab].isCustom && (
+									<>
+										<button
+											type="button"
+											onClick={() => handleRenameEquipment(activeTab)}
+											className="px-3 py-1 text-sm bg-sky-400/80 text-gray-900 rounded-md hover:bg-sky-400/90 transition-colors cursor-pointer"
+											title="選択中のカスタム装備の名前を変更"
+										>
+											名前変更
+										</button>
+										<button
+											type="button"
+											onClick={() => handleDeleteEquipment(activeTab)}
+											className="px-3 py-1 text-sm bg-gray-400/80 text-gray-900 rounded-md hover:bg-gray-400/90 transition-colors cursor-pointer"
+											title="選択中のカスタム装備を削除"
+										>
+											削除
+										</button>
+									</>
+								)}
+						</>
+					)}
 				</div>
 
 				{/* 現在選択されている装備表示 */}
@@ -595,13 +840,42 @@ export default function EquipmentForm({
 				isOpen={modalState.isOpen}
 				onClose={closeEquipmentModal}
 				onSelect={handlePresetEquipmentSelect}
-				selectedEquipmentId={
-					effectiveEquipment[activeTab].isPreset
-						? effectiveEquipment[activeTab].id
-						: null
-				}
+				selectedEquipmentId={effectiveEquipment[activeTab].id}
 				category={modalState.category || 'main'}
 				title={modalState.title}
+				currentFormProperties={effectiveEquipment[activeTab].properties} // 現在のフォーム値を渡す
+			/>
+
+			{/* カスタム装備作成モーダル */}
+			<CreateEquipmentModal
+				isOpen={createModalState.isOpen}
+				onClose={handleCreateCancel}
+				onConfirm={handleCreateConfirm}
+				equipmentType={
+					createModalState.equipmentType
+						? getEquipmentCategoryLabel(
+								createModalState.equipmentType as EquipmentCategory,
+							)
+						: ''
+				}
+			/>
+
+			{/* カスタム装備削除確認モーダル */}
+			<DeleteConfirmModal
+				isOpen={deleteModalState.isOpen}
+				onClose={handleDeleteCancel}
+				onConfirm={handleDeleteConfirm}
+				equipmentName={deleteModalState.equipmentName}
+				message="この装備を削除しますか？"
+			/>
+
+			{/* カスタム装備名前変更モーダル */}
+			<RenameEquipmentModal
+				isOpen={renameModalState.isOpen}
+				onClose={handleRenameCancel}
+				onConfirm={handleRenameConfirm}
+				currentName={renameModalState.currentName}
+				equipmentId={renameModalState.equipmentId || ''}
 			/>
 		</section>
 	)

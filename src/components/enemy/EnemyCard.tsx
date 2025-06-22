@@ -43,39 +43,6 @@ export default function EnemyCard({
 		}
 	}
 
-	const formatStats = () => {
-		const stats = []
-
-		// DEF表示
-		if (enemy.stats.DEF > 0) {
-			stats.push(`DEF ${enemy.stats.DEF}`)
-		}
-
-		// MDEF表示
-		if (enemy.stats.MDEF > 0) {
-			stats.push(`MDEF ${enemy.stats.MDEF}`)
-		}
-
-		// 物理耐性表示
-		if (enemy.stats.physicalResistance !== 0) {
-			stats.push(
-				`物理耐性 ${enemy.stats.physicalResistance > 0 ? '+' : ''}${enemy.stats.physicalResistance}%`,
-			)
-		}
-
-		// 魔法耐性表示
-		if (enemy.stats.magicalResistance !== 0) {
-			stats.push(
-				`魔法耐性 ${enemy.stats.magicalResistance > 0 ? '+' : ''}${enemy.stats.magicalResistance}%`,
-			)
-		}
-
-		// 最大4つまで表示
-		return stats.slice(0, 4)
-	}
-
-	const statsDisplay = formatStats()
-
 	return (
 		<button
 			type="button"
@@ -134,24 +101,6 @@ export default function EnemyCard({
 
 			{/* 敵名 */}
 			<h3 className="font-semibold text-gray-900 mb-2 pr-8">{enemy.name}</h3>
-
-			{/* ステータス */}
-			{statsDisplay.length > 0 && (
-				<div className="text-sm text-gray-600 mb-2 space-y-1">
-					{statsDisplay.map((stat) => (
-						<div key={stat} className="truncate">
-							{stat}
-						</div>
-					))}
-				</div>
-			)}
-
-			{/* デフォルト敵の場合の説明 */}
-			{enemy.stats.DEF === 0 && enemy.stats.MDEF === 0 && (
-				<div className="text-xs text-gray-500">
-					低レベル敵・ステータス調整用
-				</div>
-			)}
 		</button>
 	)
 }

@@ -47,6 +47,20 @@
 			},
 			{
 				"id": "003",
+				"name": "ドリドディ",
+				"level": 296,
+				"stats": {
+					"DEF": 1658,
+					"MDEF": 1658,
+					"physicalResistance": 14,
+					"magicalResistance": 14,
+					"resistCritical": 0,
+					"requiredHIT": 0
+				},
+				"category": "fieldBoss"
+			},
+			{
+				"id": "004",
 				"name": "カレリーフ",
 				"level": 305,
 				"stats": {
@@ -60,28 +74,14 @@
 				"category": "fieldBoss"
 			},
 			{
-				"id": "poison_spider_lv40",
-				"name": "ポイズンスパイダー",
-				"level": 40,
+				"id": "005",
+				"name": "ダンドリオン",
+				"level": 308,
 				"stats": {
-					"DEF": 180,
-					"MDEF": 120,
-					"physicalResistance": 10,
-					"magicalResistance": 20,
-					"resistCritical": 0,
-					"requiredHIT": 0
-				},
-				"category": "fieldBoss"
-			},
-			{
-				"id": "ice_golem_lv50",
-				"name": "アイスゴーレム",
-				"level": 50,
-				"stats": {
-					"DEF": 300,
-					"MDEF": 200,
-					"physicalResistance": 25,
-					"magicalResistance": 15,
+					"DEF": 1077,
+					"MDEF": 770,
+					"physicalResistance": 24,
+					"magicalResistance": 12,
 					"resistCritical": 0,
 					"requiredHIT": 0
 				},
@@ -90,7 +90,7 @@
 		],
 		"boss": [
 			{
-				"id": "004",
+				"id": "006",
 				"name": "ピヌグールガ",
 				"level": 286,
 				"stats": {
@@ -104,7 +104,7 @@
 				"category": "boss"
 			},
 			{
-				"id": "005",
+				"id": "007",
 				"name": "バクザン",
 				"level": 292,
 				"stats": {
@@ -120,42 +120,28 @@
 		],
 		"raidBoss": [
 			{
-				"id": "ancient_dragon_lv100",
-				"name": "エンシェントドラゴン",
-				"level": 100,
+				"id": "008",
+				"name": "竜骨の魔人",
+				"level": null,
 				"stats": {
-					"DEF": 800,
-					"MDEF": 600,
-					"physicalResistance": 50,
-					"magicalResistance": 45,
+					"DEF": null,
+					"MDEF": null,
+					"physicalResistance": null,
+					"magicalResistance": null,
 					"resistCritical": 0,
 					"requiredHIT": 0
 				},
 				"category": "raidBoss"
 			},
 			{
-				"id": "demon_lord_lv120",
-				"name": "魔王",
-				"level": 120,
+				"id": "009",
+				"name": "赫灼のセルディテ",
+				"level": null,
 				"stats": {
-					"DEF": 600,
-					"MDEF": 800,
-					"physicalResistance": 40,
-					"magicalResistance": 55,
-					"resistCritical": 0,
-					"requiredHIT": 0
-				},
-				"category": "raidBoss"
-			},
-			{
-				"id": "void_emperor_lv150",
-				"name": "ヴォイドエンペラー",
-				"level": 288,
-				"stats": {
-					"DEF": 1000,
-					"MDEF": 1000,
-					"physicalResistance": 60,
-					"magicalResistance": 60,
+					"DEF": null,
+					"MDEF": null,
+					"physicalResistance": null,
+					"magicalResistance": null,
 					"resistCritical": 0,
 					"requiredHIT": 0
 				},

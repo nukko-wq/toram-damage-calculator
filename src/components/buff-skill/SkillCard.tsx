@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { BuffSkill, BuffSkillParameters } from '@/types/calculator'
-import { Popover } from './Popover'
+import { Popover } from '../ui/Popover'
 import { SkillParameterForm } from './SkillParameterForm'
 import SkillToggleButtons from './SkillToggleButton'
 

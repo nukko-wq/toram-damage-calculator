@@ -6,7 +6,7 @@ import type { EnemyFormData, EnemyCategory } from '@/types/calculator'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import EnemySelectionModal from './EnemySelectionModal'
 
-interface NewEnemyFormProps {
+interface EnemyFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
 	enemyData?: EnemyFormData
 	onChange?: (enemyData: EnemyFormData) => void
@@ -22,10 +22,7 @@ const getDefaultEnemyFormData = (): EnemyFormData => ({
 	},
 })
 
-export default function NewEnemyForm({
-	enemyData,
-	onChange,
-}: NewEnemyFormProps) {
+export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 	// Zustandストアから敵データを取得
 	const storeEnemyData = useCalculatorStore((state) => state.data.enemy)
 	const updateEnemy = useCalculatorStore((state) => state.updateEnemy)

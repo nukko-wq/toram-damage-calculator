@@ -5,6 +5,9 @@ import type {
 	SubWeapon,
 	CrystalSlots,
 	EquipmentSlots,
+	EquipmentType,
+	EquipmentCategory,
+	EquipmentProperties,
 	FoodFormData,
 	EnemyFormData,
 	BuffSkillFormData,
@@ -72,6 +75,29 @@ export interface CalculatorStore {
 	updateEnemy: (enemy: EnemyFormData) => void
 	updateBuffSkills: (buffSkills: BuffSkillFormData) => void
 	updateBuffItems: (buffItems: BuffItemFormData) => void
+
+	// ===== カスタム装備管理 =====
+	createTemporaryCustomEquipment: (
+		equipmentCategory: EquipmentCategory,
+		name: string,
+	) => Promise<void>
+	saveTemporaryCustomEquipments: () => Promise<void>
+	renameCustomEquipment: (
+		equipmentId: string,
+		newName: string,
+	) => Promise<boolean>
+	deleteCustomEquipment: (equipmentId: string) => Promise<void>
+	updateCustomEquipmentProperties: (
+		equipmentId: string,
+		properties: Partial<EquipmentProperties>,
+	) => Promise<boolean>
+	cleanupTemporaryData: () => void
+	getUnsavedDataStatus: () => {
+		hasUnsavedChanges: boolean
+		hasTemporaryEquipments: boolean
+		hasEditSessions: boolean
+	}
+	saveEditSessions: () => Promise<void>
 
 	// ===== 将来の計算機能 =====
 	calculateDamage: () => Promise<void>

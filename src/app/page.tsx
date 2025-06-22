@@ -2,19 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { useCalculatorStore, useUIStore } from '@/stores'
-import BaseStatsForm from '@/components/BaseStatsForm'
-import WeaponForm from '@/components/WeaponForm'
-import CrystalForm from '@/components/CrystalForm'
-import EquipmentForm from '@/components/EquipmentForm'
-import FoodForm from '@/components/FoodForm'
-import NewEnemyForm from '@/components/NewEnemyForm'
-import BuffSkillForm from '@/components/BuffSkillForm'
-import BuffItemForm from '@/components/BuffItemForm'
-import StatsSummary from '@/components/StatsSummary'
-import SaveDataManager from '@/components/SaveDataManager'
-import ZustandTest from '@/components/ZustandTest'
 import type { UpdateNotification } from '@/types/calculator'
 import { initializeStorage } from '@/utils/saveDataManager'
+import BaseStatsForm from '@/components/base-stats/BaseStatsForm'
+import BuffItemForm from '@/components/buff-item/BuffItemForm'
+import BuffSkillForm from '@/components/buff-skill/BuffSkillForm'
+import CrystalForm from '@/components/crystal/CrystalForm'
+import EnemyForm from '@/components/enemy/EnemyForm'
+import EquipmentForm from '@/components/equipment/EquipmentForm'
+import FoodForm from '@/components/food/FoodForm'
+import SaveDataManager from '@/components/save-data/SaveDataManager'
+import StatsSummary from '@/components/summary/StatsSummary'
+import WeaponForm from '@/components/weapon/WeaponForm'
 
 export default function Home() {
 	// Zustandストアからデータを取得
@@ -78,7 +77,7 @@ export default function Home() {
 						<button
 							type="button"
 							onClick={() => setShowSaveManager(!showSaveManager)}
-							className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+							className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-500/90 hover:bg-blue-600/80 outline-none cursor-pointer"
 						>
 							<svg
 								className="mr-2 h-4 w-4"
@@ -109,6 +108,7 @@ export default function Home() {
 										className="h-5 w-5 text-green-400"
 										viewBox="0 0 20 20"
 										fill="currentColor"
+										aria-label="成功アイコン"
 									>
 										<path
 											fillRule="evenodd"
@@ -163,13 +163,10 @@ export default function Home() {
 					<EquipmentForm />
 					<FoodForm />
 					<BuffItemForm />
-					<NewEnemyForm />
+					<EnemyForm />
 					<BuffSkillForm />
 				</div>
 				<StatsSummary data={data} />
-
-				{/* Zustand動作確認用（開発環境のみ） */}
-				{process.env.NODE_ENV === 'development' && <ZustandTest />}
 			</div>
 		</div>
 	)
