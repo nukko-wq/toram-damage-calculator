@@ -393,6 +393,22 @@ export default function EquipmentForm({
 		return property.replace(/_Rate$/, '').replace(/_/g, '')
 	}
 
+	// フォーカス状態でのクリックによる値クリア機能（装備プロパティ）
+	const handlePropertyClickToClear = (
+		slotKey: keyof EquipmentSlots,
+		property: keyof EquipmentProperties,
+		equipmentId: string,
+	) => {
+		handleEquipmentPropertyChange(slotKey, property, '0')
+		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
+		setTimeout(() => {
+			const element = document.getElementById(`${equipmentId}-${property}`) as HTMLInputElement
+			if (element) {
+				element.select()
+			}
+		}, 0)
+	}
+
 	const handleEquipmentPropertyChange = (
 		slotKey: keyof EquipmentSlots,
 		property: keyof EquipmentProperties,
@@ -616,6 +632,7 @@ export default function EquipmentForm({
 
 	const renderPropertyInputs = (
 		item: Equipment,
+		slotKey: keyof EquipmentSlots,
 		onPropertyChange: (
 			property: keyof EquipmentProperties,
 			value: string,
@@ -660,6 +677,11 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+													}
+												}}
 												className="px-1 py-1 text-sm border border-gray-300 rounded bg-sky-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<input
@@ -669,6 +691,11 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[1], e.target.value)
 												}
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(slotKey, pair.properties[1], item.name || item.id)
+													}
+												}}
 												className="px-1 py-1 text-sm border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 										</>
@@ -682,6 +709,11 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+													}
+												}}
 												className="px-1 py-1 text-sm border border-gray-300 bg-sky-50 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 											<div /> {/* 空白の固定値列 */}
@@ -697,6 +729,11 @@ export default function EquipmentForm({
 												onChange={(e) =>
 													onPropertyChange(pair.properties[0], e.target.value)
 												}
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
+													}
+												}}
 												className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
 											/>
 										</>
@@ -854,7 +891,8 @@ export default function EquipmentForm({
 						{effectiveEquipment[activeTab] &&
 							renderPropertyInputs(
 								effectiveEquipment[activeTab],
-								(property, value) =>
+								activeTab,
+								(property: keyof EquipmentProperties, value: string) =>
 									handleEquipmentPropertyChange(activeTab, property, value),
 							)}
 					</>
