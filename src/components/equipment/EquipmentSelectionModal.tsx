@@ -56,8 +56,8 @@ export default function EquipmentSelectionModal({
 
 		// 自由入力スロット（freeInput1-3）の場合は、カスタム装備のみを表示
 		if (['freeInput1', 'freeInput2', 'freeInput3'].includes(category)) {
-			equipments = equipments.filter((equipment) => 
-				'isCustom' in equipment && equipment.isCustom
+			equipments = equipments.filter(
+				(equipment) => 'isCustom' in equipment && equipment.isCustom,
 			)
 		}
 

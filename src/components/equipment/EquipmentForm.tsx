@@ -769,11 +769,14 @@ export default function EquipmentForm({
 						) : (
 							<div className="flex items-center justify-between">
 								<span className="text-gray-500">
-									{!effectiveEquipment[activeTab]?.id || !effectiveEquipment[activeTab]?.name
+									{!effectiveEquipment[activeTab]?.id ||
+									!effectiveEquipment[activeTab]?.name
 										? 'なし'
-										: ['freeInput1', 'freeInput2', 'freeInput3'].includes(activeTab)
-										? '装備選択'
-										: 'プリセット選択'}
+										: ['freeInput1', 'freeInput2', 'freeInput3'].includes(
+													activeTab,
+												)
+											? '装備選択'
+											: 'プリセット選択'}
 								</span>
 								<svg
 									className="w-4 h-4 text-gray-400"
@@ -793,46 +796,38 @@ export default function EquipmentForm({
 							</div>
 						)}
 					</button>
-					{/* カスタム機能ボタンを表示 - 自由入力スロットは常に表示、通常スロットはカスタム装備選択時のみ */}
-					{(['freeInput1', 'freeInput2', 'freeInput3'].includes(activeTab) ||
-						(effectiveEquipment[activeTab]?.id &&
-							effectiveEquipment[activeTab] &&
-							'isCustom' in effectiveEquipment[activeTab] &&
-							effectiveEquipment[activeTab]?.isCustom)) && (
-						<>
-							<button
-								type="button"
-								onClick={() => handleCreateEquipment(activeTab)}
-								className="px-3 py-1 text-sm bg-rose-300/80 text-gray-900 rounded-md hover:bg-rose-300/90 transition-colors cursor-pointer"
-								title="新規カスタム装備を作成"
-							>
-								新規作成
-							</button>
-							{effectiveEquipment[activeTab]?.id &&
-								effectiveEquipment[activeTab] &&
-								'isCustom' in effectiveEquipment[activeTab] &&
-								effectiveEquipment[activeTab]?.isCustom && (
-									<>
-										<button
-											type="button"
-											onClick={() => handleRenameEquipment(activeTab)}
-											className="px-3 py-1 text-sm bg-sky-400/80 text-gray-900 rounded-md hover:bg-sky-400/90 transition-colors cursor-pointer"
-											title="選択中のカスタム装備の名前を変更"
-										>
-											名前変更
-										</button>
-										<button
-											type="button"
-											onClick={() => handleDeleteEquipment(activeTab)}
-											className="px-3 py-1 text-sm bg-gray-400/80 text-gray-900 rounded-md hover:bg-gray-400/90 transition-colors cursor-pointer"
-											title="選択中のカスタム装備を削除"
-										>
-											削除
-										</button>
-									</>
-								)}
-						</>
-					)}
+					{/* カスタム機能ボタンを表示 - 全スロットで常に表示 */}
+					<button
+						type="button"
+						onClick={() => handleCreateEquipment(activeTab)}
+						className="px-3 py-1 text-sm bg-rose-300/80 text-gray-900 rounded-md hover:bg-rose-300/90 transition-colors cursor-pointer"
+						title="新規カスタム装備を作成"
+					>
+						新規作成
+					</button>
+					{effectiveEquipment[activeTab]?.id &&
+						effectiveEquipment[activeTab] &&
+						'isCustom' in effectiveEquipment[activeTab] &&
+						effectiveEquipment[activeTab]?.isCustom && (
+							<>
+								<button
+									type="button"
+									onClick={() => handleRenameEquipment(activeTab)}
+									className="px-3 py-1 text-sm bg-sky-400/80 text-gray-900 rounded-md hover:bg-sky-400/90 transition-colors cursor-pointer"
+									title="選択中のカスタム装備の名前を変更"
+								>
+									名前変更
+								</button>
+								<button
+									type="button"
+									onClick={() => handleDeleteEquipment(activeTab)}
+									className="px-3 py-1 text-sm bg-gray-400/80 text-gray-900 rounded-md hover:bg-gray-400/90 transition-colors cursor-pointer"
+									title="選択中のカスタム装備を削除"
+								>
+									削除
+								</button>
+							</>
+						)}
 				</div>
 
 				{/* 現在選択されている装備表示 */}
