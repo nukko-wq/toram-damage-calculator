@@ -34,9 +34,9 @@ export function RegisterForm({ className }: RegisterFormProps) {
 	// エフェクトのオン/オフ切り替え
 	const handleToggleEffect = (effectId: string, enabled: boolean) => {
 		const updatedEffects = watchedData.effects.map((effect) =>
-			effect.id === effectId ? { ...effect, isEnabled: enabled } : effect
+			effect.id === effectId ? { ...effect, isEnabled: enabled } : effect,
 		)
-		
+
 		form.setValue('effects', updatedEffects)
 		updateRegister({ effects: updatedEffects })
 	}
@@ -52,17 +52,21 @@ export function RegisterForm({ className }: RegisterFormProps) {
 	}
 
 	// レベル更新
-	const handleUpdateLevel = (effectId: string, level: number, partyMembers?: number) => {
+	const handleUpdateLevel = (
+		effectId: string,
+		level: number,
+		partyMembers?: number,
+	) => {
 		const updatedEffects = watchedData.effects.map((effect) =>
 			effect.id === effectId
 				? {
 						...effect,
 						level,
 						...(partyMembers !== undefined && { partyMembers }),
-				  }
-				: effect
+					}
+				: effect,
 		)
-		
+
 		form.setValue('effects', updatedEffects)
 		updateRegister({ effects: updatedEffects })
 		setSelectedEffectId(null)
@@ -82,8 +86,11 @@ export function RegisterForm({ className }: RegisterFormProps) {
 					</h3>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 						{watchedData.effects
-							.filter((effect) => 
-								!['deliciousFoodTrade', 'freshFruitTrade'].includes(effect.type)
+							.filter(
+								(effect) =>
+									!['deliciousFoodTrade', 'freshFruitTrade'].includes(
+										effect.type,
+									),
 							)
 							.map((effect) => (
 								<RegisterEffectItem
@@ -103,8 +110,8 @@ export function RegisterForm({ className }: RegisterFormProps) {
 					</h3>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 						{watchedData.effects
-							.filter((effect) => 
-								['deliciousFoodTrade', 'freshFruitTrade'].includes(effect.type)
+							.filter((effect) =>
+								['deliciousFoodTrade', 'freshFruitTrade'].includes(effect.type),
 							)
 							.map((effect) => (
 								<RegisterEffectItem

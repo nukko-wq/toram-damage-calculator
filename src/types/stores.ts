@@ -78,7 +78,11 @@ export interface CalculatorStore {
 	updateBuffItems: (buffItems: BuffItemFormData) => void
 	updateRegister: (register: RegisterFormData) => void
 	updateRegisterEffect: (effectId: string, enabled: boolean) => void
-	updateRegisterLevel: (effectId: string, level: number, partyMembers?: number) => void
+	updateRegisterLevel: (
+		effectId: string,
+		level: number,
+		partyMembers?: number,
+	) => void
 	resetRegisterData: () => void
 
 	// ===== カスタム装備管理 =====

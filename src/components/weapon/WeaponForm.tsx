@@ -16,11 +16,17 @@ import type {
 } from '@/types/calculator'
 import { useEffect, useState, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
-import { 
-	getAvailableSubWeaponTypes, 
-	isValidWeaponCombination, 
-	getAutoFixedSubWeapon 
+import {
+	getAvailableSubWeaponTypes,
+	isValidWeaponCombination,
+	getAutoFixedSubWeapon,
 } from '@/utils/weaponCombinations'
+import {
+	getRefinementDisplayOptions,
+	refinementDisplayToValue,
+	refinementValueToDisplay,
+	type RefinementDisplay,
+} from '@/utils/refinementUtils'
 
 interface WeaponFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -64,8 +70,43 @@ export default function WeaponForm({
 		return getAvailableSubWeaponTypes(effectiveMainWeapon.weaponType)
 	}, [effectiveMainWeapon.weaponType])
 
+	// 精錬値の選択肢を取得
+	const refinementOptions = useMemo(() => {
+		return getRefinementDisplayOptions()
+	}, [])
+
 	// 初期化状態管理
 	const [isInitialized, setIsInitialized] = useState(false)
+
+	// 精錬値変換ヘルパー関数
+	const getCurrentMainRefinementDisplay = (): RefinementDisplay => {
+		return refinementValueToDisplay(effectiveMainWeapon.refinement as any)
+	}
+
+	const getCurrentSubRefinementDisplay = (): RefinementDisplay => {
+		return refinementValueToDisplay(effectiveSubWeapon.refinement as any)
+	}
+
+	// 精錬値変更ハンドラ
+	const handleMainRefinementChange = (refinementDisplay: RefinementDisplay) => {
+		const refinementValue = refinementDisplayToValue(refinementDisplay)
+		const updatedMainWeapon = {
+			...effectiveMainWeapon,
+			refinement: refinementValue,
+		}
+		updateMainWeapon(updatedMainWeapon)
+		setValueMain('refinement', refinementValue)
+	}
+
+	const handleSubRefinementChange = (refinementDisplay: RefinementDisplay) => {
+		const refinementValue = refinementDisplayToValue(refinementDisplay)
+		const updatedSubWeapon = {
+			...effectiveSubWeapon,
+			refinement: refinementValue,
+		}
+		updateSubWeapon(updatedSubWeapon)
+		setValueSub('refinement', refinementValue)
+	}
 
 	// メイン武器フォーム
 	const {
@@ -155,16 +196,18 @@ export default function WeaponForm({
 				if (name === 'weaponType') {
 					const newMainWeaponType = value.weaponType as WeaponType
 					const currentSubWeaponType = effectiveSubWeapon.weaponType
-					
+
 					// 現在のサブ武器が新しいメイン武器で選択可能かチェック
-					if (!isValidWeaponCombination(newMainWeaponType, currentSubWeaponType)) {
+					if (
+						!isValidWeaponCombination(newMainWeaponType, currentSubWeaponType)
+					) {
 						// 無効な場合は自動修正
 						const fixedSubWeaponType = getAutoFixedSubWeapon(newMainWeaponType)
 						const fixedSubWeapon = {
 							...effectiveSubWeapon,
-							weaponType: fixedSubWeaponType
+							weaponType: fixedSubWeaponType,
 						}
-						
+
 						// サブ武器を自動修正
 						updateSubWeapon(fixedSubWeapon)
 						setValueSub('weaponType', fixedSubWeaponType)
@@ -181,7 +224,15 @@ export default function WeaponForm({
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watchMain, onMainWeaponChange, isInitialized, updateMainWeapon, updateSubWeapon, effectiveSubWeapon, setValueSub])
+	}, [
+		watchMain,
+		onMainWeaponChange,
+		isInitialized,
+		updateMainWeapon,
+		updateSubWeapon,
+		effectiveSubWeapon,
+		setValueSub,
+	])
 
 	// フォーム値変更を監視してZustandストアに通知（サブ武器）
 	useEffect(() => {
@@ -278,22 +329,21 @@ export default function WeaponForm({
 							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
 								精錬値:
 							</label>
-							<input
-								type="number"
+							<select
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-								min="0"
-								max="15"
-								{...registerMain('refinement', {
-									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
-											return 0
-										}
-										const numValue = Number(value)
-										return Number.isNaN(numValue) ? 0 : numValue
-									},
-									onBlur: () => handleMainBlur('refinement'),
-								})}
-							/>
+								value={getCurrentMainRefinementDisplay()}
+								onChange={(e) =>
+									handleMainRefinementChange(
+										e.target.value as RefinementDisplay,
+									)
+								}
+							>
+								{refinementOptions.map((option) => (
+									<option key={option} value={option}>
+										{option}
+									</option>
+								))}
+							</select>
 						</div>
 					</div>
 				</div>
@@ -368,22 +418,19 @@ export default function WeaponForm({
 							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
 								精錬値:
 							</label>
-							<input
-								type="number"
+							<select
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-								min="0"
-								max="15"
-								{...registerSub('refinement', {
-									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
-											return 0
-										}
-										const numValue = Number(value)
-										return Number.isNaN(numValue) ? 0 : numValue
-									},
-									onBlur: () => handleSubBlur('refinement'),
-								})}
-							/>
+								value={getCurrentSubRefinementDisplay()}
+								onChange={(e) =>
+									handleSubRefinementChange(e.target.value as RefinementDisplay)
+								}
+							>
+								{refinementOptions.map((option) => (
+									<option key={option} value={option}>
+										{option}
+									</option>
+								))}
+							</select>
 						</div>
 					</div>
 				</div>

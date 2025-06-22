@@ -52,11 +52,8 @@ export function RegisterLevelModal({
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center">
 			{/* オーバーレイ */}
-			<div 
-				className="fixed inset-0 bg-black bg-opacity-50"
-				onClick={onClose}
-			/>
-			
+			<div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
+
 			{/* モーダルコンテンツ */}
 			<div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
 				<h2 className="text-xl font-bold mb-4">{effect.name}</h2>
@@ -64,7 +61,10 @@ export function RegisterLevelModal({
 				<div className="space-y-4">
 					{/* レベル設定 */}
 					<div className="space-y-2">
-						<label htmlFor="level" className="block text-sm font-medium text-gray-700">
+						<label
+							htmlFor="level"
+							className="block text-sm font-medium text-gray-700"
+						>
 							レベル (1-{effect.maxLevel})
 						</label>
 						<input
@@ -81,7 +81,10 @@ export function RegisterLevelModal({
 					{/* 運命共同体の場合はパーティメンバー数も設定 */}
 					{effect.type === 'fateCompanionship' && (
 						<div className="space-y-2">
-							<label htmlFor="partyMembers" className="block text-sm font-medium text-gray-700">
+							<label
+								htmlFor="partyMembers"
+								className="block text-sm font-medium text-gray-700"
+							>
 								パーティメンバー数 (1-3)
 							</label>
 							<input

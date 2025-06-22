@@ -238,7 +238,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							register: {
 								...state.data.register,
 								effects: state.data.register.effects.map((effect) =>
-									effect.id === effectId ? { ...effect, isEnabled: enabled } : effect
+									effect.id === effectId
+										? { ...effect, isEnabled: enabled }
+										: effect,
 								),
 							},
 						},
@@ -262,8 +264,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
 												...effect,
 												level,
 												...(partyMembers !== undefined && { partyMembers }),
-										  }
-										: effect
+											}
+										: effect,
 								),
 							},
 						},
@@ -284,7 +286,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 									...effect,
 									isEnabled: false,
 									level: 1,
-									...(effect.type === 'fateCompanionship' && { partyMembers: 3 }),
+									...(effect.type === 'fateCompanionship' && {
+										partyMembers: 3,
+									}),
 								})),
 							},
 						},

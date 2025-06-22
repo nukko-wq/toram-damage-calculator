@@ -46,7 +46,9 @@ export default function EquipmentForm({
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
-	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots | 'register'>('main')
+	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots | 'register'>(
+		'main',
+	)
 	const [modalState, setModalState] = useState<{
 		isOpen: boolean
 		category: EquipmentCategory | null
@@ -752,102 +754,102 @@ export default function EquipmentForm({
 								}
 								className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
 							>
-						{effectiveEquipment[activeTab]?.name ? (
-							<div className="flex items-center justify-between">
-								<span className="text-sm truncate text-gray-900">
-									{effectiveEquipment[activeTab]?.name}
-								</span>
-								<svg
-									className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									aria-label="選択メニューを開く"
-								>
-									<title>選択メニューを開く</title>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 9l-7 7-7-7"
-									/>
-								</svg>
-							</div>
-						) : (
-							<div className="flex items-center justify-between">
-								<span className="text-gray-500">
-									{!effectiveEquipment[activeTab]?.id ||
-									!effectiveEquipment[activeTab]?.name
-										? 'なし'
-										: ['freeInput1', 'freeInput2', 'freeInput3'].includes(
-													activeTab,
-												)
-											? '装備選択'
-											: 'プリセット選択'}
-								</span>
-								<svg
-									className="w-4 h-4 text-gray-400"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									aria-label="選択メニューを開く"
-								>
-									<title>選択メニューを開く</title>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 9l-7 7-7-7"
-									/>
-								</svg>
-							</div>
-						)}
-					</button>
-					{/* カスタム機能ボタンを表示 - 全スロットで常に表示 */}
-					<button
-						type="button"
-						onClick={() => handleCreateEquipment(activeTab)}
-						className="px-3 py-1 text-sm bg-rose-300/80 text-gray-900 rounded-md hover:bg-rose-300/90 transition-colors cursor-pointer"
-						title="新規カスタム装備を作成"
-					>
-						新規作成
-					</button>
-					{effectiveEquipment[activeTab]?.id &&
-						effectiveEquipment[activeTab] &&
-						'isCustom' in effectiveEquipment[activeTab] &&
-						effectiveEquipment[activeTab]?.isCustom && (
-							<>
-								<button
-									type="button"
-									onClick={() => handleRenameEquipment(activeTab)}
-									className="px-3 py-1 text-sm bg-sky-400/80 text-gray-900 rounded-md hover:bg-sky-400/90 transition-colors cursor-pointer"
-									title="選択中のカスタム装備の名前を変更"
-								>
-									名前変更
-								</button>
-								<button
-									type="button"
-									onClick={() => handleDeleteEquipment(activeTab)}
-									className="px-3 py-1 text-sm bg-gray-400/80 text-gray-900 rounded-md hover:bg-gray-400/90 transition-colors cursor-pointer"
-									title="選択中のカスタム装備を削除"
-								>
-									削除
-								</button>
-							</>
-						)}
-				</div>
-
-				{/* 現在選択されている装備表示 */}
-				{effectiveEquipment[activeTab]?.isPreset && (
-					<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-						<span className="text-sm font-medium text-blue-800">
-							プリセット: {effectiveEquipment[activeTab]?.name}
-						</span>
-						<div className="text-xs text-blue-600 mt-1">
-							※ 下記の値を変更するとプリセットが解除されます
+								{effectiveEquipment[activeTab]?.name ? (
+									<div className="flex items-center justify-between">
+										<span className="text-sm truncate text-gray-900">
+											{effectiveEquipment[activeTab]?.name}
+										</span>
+										<svg
+											className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-label="選択メニューを開く"
+										>
+											<title>選択メニューを開く</title>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M19 9l-7 7-7-7"
+											/>
+										</svg>
+									</div>
+								) : (
+									<div className="flex items-center justify-between">
+										<span className="text-gray-500">
+											{!effectiveEquipment[activeTab]?.id ||
+											!effectiveEquipment[activeTab]?.name
+												? 'なし'
+												: ['freeInput1', 'freeInput2', 'freeInput3'].includes(
+															activeTab,
+														)
+													? '装備選択'
+													: 'プリセット選択'}
+										</span>
+										<svg
+											className="w-4 h-4 text-gray-400"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-label="選択メニューを開く"
+										>
+											<title>選択メニューを開く</title>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M19 9l-7 7-7-7"
+											/>
+										</svg>
+									</div>
+								)}
+							</button>
+							{/* カスタム機能ボタンを表示 - 全スロットで常に表示 */}
+							<button
+								type="button"
+								onClick={() => handleCreateEquipment(activeTab)}
+								className="px-3 py-1 text-sm bg-rose-300/80 text-gray-900 rounded-md hover:bg-rose-300/90 transition-colors cursor-pointer"
+								title="新規カスタム装備を作成"
+							>
+								新規作成
+							</button>
+							{effectiveEquipment[activeTab]?.id &&
+								effectiveEquipment[activeTab] &&
+								'isCustom' in effectiveEquipment[activeTab] &&
+								effectiveEquipment[activeTab]?.isCustom && (
+									<>
+										<button
+											type="button"
+											onClick={() => handleRenameEquipment(activeTab)}
+											className="px-3 py-1 text-sm bg-sky-400/80 text-gray-900 rounded-md hover:bg-sky-400/90 transition-colors cursor-pointer"
+											title="選択中のカスタム装備の名前を変更"
+										>
+											名前変更
+										</button>
+										<button
+											type="button"
+											onClick={() => handleDeleteEquipment(activeTab)}
+											className="px-3 py-1 text-sm bg-gray-400/80 text-gray-900 rounded-md hover:bg-gray-400/90 transition-colors cursor-pointer"
+											title="選択中のカスタム装備を削除"
+										>
+											削除
+										</button>
+									</>
+								)}
 						</div>
-					</div>
-				)}
+
+						{/* 現在選択されている装備表示 */}
+						{effectiveEquipment[activeTab]?.isPreset && (
+							<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+								<span className="text-sm font-medium text-blue-800">
+									プリセット: {effectiveEquipment[activeTab]?.name}
+								</span>
+								<div className="text-xs text-blue-600 mt-1">
+									※ 下記の値を変更するとプリセットが解除されます
+								</div>
+							</div>
+						)}
 
 						{effectiveEquipment[activeTab] &&
 							renderPropertyInputs(
@@ -865,10 +867,15 @@ export default function EquipmentForm({
 					isOpen={modalState.isOpen}
 					onClose={closeEquipmentModal}
 					onSelect={handlePresetEquipmentSelect}
-					selectedEquipmentId={effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null}
+					selectedEquipmentId={
+						effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null
+					}
 					category={modalState.category || 'main'}
 					title={modalState.title}
-					currentFormProperties={effectiveEquipment[activeTab as keyof EquipmentSlots]?.properties || {}} // 現在のフォーム値を渡す
+					currentFormProperties={
+						effectiveEquipment[activeTab as keyof EquipmentSlots]?.properties ||
+						{}
+					} // 現在のフォーム値を渡す
 				/>
 			)}
 

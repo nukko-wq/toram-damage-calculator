@@ -47,12 +47,8 @@ export function RegisterEffectItem({
 						className="p-0 text-left hover:text-blue-600 transition-colors cursor-pointer"
 					>
 						<div>
-							<div className="font-medium text-slate-900">
-								{effect.name}
-							</div>
-							<div className="text-sm text-slate-500">
-								{getLevelDisplay()}
-							</div>
+							<div className="font-medium text-slate-900">{effect.name}</div>
+							<div className="text-sm text-slate-500">{getLevelDisplay()}</div>
 						</div>
 					</button>
 				</div>
