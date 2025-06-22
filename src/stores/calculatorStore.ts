@@ -86,8 +86,11 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			// ===== セーブデータ管理 =====
 			loadSaveData: async (data) => {
-				// セーブデータ切り替え時に仮データと編集セッションをクリーンアップ
-				get().cleanupTemporaryData()
+				// セーブデータ切り替え時に仮データをクリーンアップ
+				cleanupAllTemporaryEquipments()
+				
+				// 編集セッションは全てクリーンアップ（セーブデータ切り替え時は編集状態をリセット）
+				cleanupAllEditSessions()
 
 				// isLoadingを使わずに直接データを更新（ちらつき防止）
 				set({
@@ -303,8 +306,12 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						saveCustomEquipment(editedEquipment)
 					}
 
-					// 編集セッションをクリーンアップ
+					// 編集セッションを確実にクリーンアップ
+					// 保存処理完了後は編集セッションを全てクリアして永続データを優先
 					cleanupAllEditSessions()
+					
+					// さらに念のため、現在のセーブデータのセッションも個別にクリア
+					cleanupCurrentEditSessions()
 				} catch (error) {
 					console.error('編集セッション永続化エラー:', error)
 					throw error

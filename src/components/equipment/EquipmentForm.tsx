@@ -713,9 +713,9 @@ export default function EquipmentForm({
 							key={key}
 							type="button"
 							onClick={() => setActiveTab(key)}
-							className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+							className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
 								activeTab === key
-									? 'bg-blue-500 text-white'
+									? 'bg-blue-500/90 text-white'
 									: 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
 							}`}
 						>
@@ -785,7 +785,7 @@ export default function EquipmentForm({
 							<button
 								type="button"
 								onClick={() => handleCreateEquipment(activeTab)}
-								className="px-3 py-1 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors"
+								className="px-3 py-1 text-sm bg-rose-300/80 text-gray-900 rounded-md hover:bg-rose-300/90 transition-colors cursor-pointer"
 								title="新規カスタム装備を作成"
 							>
 								新規作成
@@ -797,7 +797,7 @@ export default function EquipmentForm({
 										<button
 											type="button"
 											onClick={() => handleRenameEquipment(activeTab)}
-											className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+											className="px-3 py-1 text-sm bg-sky-400/80 text-gray-900 rounded-md hover:bg-sky-400/90 transition-colors cursor-pointer"
 											title="選択中のカスタム装備の名前を変更"
 										>
 											名前変更
@@ -805,7 +805,7 @@ export default function EquipmentForm({
 										<button
 											type="button"
 											onClick={() => handleDeleteEquipment(activeTab)}
-											className="px-3 py-1 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+											className="px-3 py-1 text-sm bg-gray-400/80 text-gray-900 rounded-md hover:bg-gray-400/90 transition-colors cursor-pointer"
 											title="選択中のカスタム装備を削除"
 										>
 											削除

@@ -136,6 +136,7 @@ export default function SaveDataListItem({
 					{!saveData.isDefault && !isEditing && (
 						<>
 							<button
+								type="button"
 								onClick={handleStartEdit}
 								className="p-1 text-gray-400 hover:text-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
 								title="名前を変更"
@@ -155,6 +156,7 @@ export default function SaveDataListItem({
 								</svg>
 							</button>
 							<button
+								type="button"
 								onClick={handleDeleteClick}
 								className="p-1 text-gray-400 hover:text-red-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500"
 								title="削除"
@@ -192,12 +194,14 @@ export default function SaveDataListItem({
 						</p>
 						<div className="flex space-x-3 justify-end">
 							<button
+								type="button"
 								onClick={() => setShowDeleteConfirm(false)}
 								className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
 							>
 								キャンセル
 							</button>
 							<button
+								type="button"
 								onClick={handleConfirmDelete}
 								className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 							>

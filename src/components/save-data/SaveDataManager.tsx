@@ -169,7 +169,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 		return (
 			<div className="bg-white rounded-lg shadow-md p-6">
 				<div className="flex items-center justify-center py-8">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
 					<span className="ml-3 text-gray-600">読み込み中...</span>
 				</div>
 			</div>
@@ -189,6 +189,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 				<h2 className="text-xl font-bold text-gray-800">セーブデータ管理</h2>
 				<div className="flex space-x-3">
 					<button
+						type="button"
 						onClick={handleSaveCurrentData}
 						className={`px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors flex items-center ${
 							hasAnyUnsavedData
@@ -196,9 +197,9 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 										unsavedStatus.hasTemporaryEquipments ||
 											unsavedStatus.hasEditSessions
 									)
-									? 'bg-orange-600 hover:bg-orange-700 cursor-pointer'
-									: 'bg-green-600 hover:bg-green-700 cursor-pointer'
-								: 'bg-gray-600'
+									? 'bg-rose-400/65 hover:bg-rose-400/70 cursor-pointer'
+									: 'bg-rose-400/65 hover:bg-rose-400/70 cursor-pointer'
+								: 'bg-gray-500 cursor-not-allowed'
 						}`}
 						title={
 							unsavedStatus.hasTemporaryEquipments
@@ -239,7 +240,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 					<button
 						type="button"
 						onClick={() => setIsNewSaveModalOpen(true)}
-						className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+						className="px-4 py-2 cursor-pointer bg-blue-400/90 text-white rounded-md hover:bg-blue-500/80 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
 					>
 						新規セーブ作成
 					</button>
@@ -267,6 +268,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 						</div>
 						<div className="ml-auto pl-3">
 							<button
+								type="button"
 								onClick={() => setError(null)}
 								className="inline-flex text-red-400 hover:text-red-600"
 							>
