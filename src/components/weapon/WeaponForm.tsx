@@ -14,8 +14,13 @@ import type {
 	WeaponType,
 	SubWeaponType,
 } from '@/types/calculator'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
+import { 
+	getAvailableSubWeaponTypes, 
+	isValidWeaponCombination, 
+	getAutoFixedSubWeapon 
+} from '@/utils/weaponCombinations'
 
 interface WeaponFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -54,7 +59,10 @@ export default function WeaponForm({
 		'素手',
 	]
 
-	const subWeaponTypes: SubWeaponType[] = ['ナイフ', '矢', 'なし']
+	// メイン武器に応じて選択可能なサブ武器種を動的に取得
+	const availableSubWeaponTypes = useMemo(() => {
+		return getAvailableSubWeaponTypes(effectiveMainWeapon.weaponType)
+	}, [effectiveMainWeapon.weaponType])
 
 	// 初期化状態管理
 	const [isInitialized, setIsInitialized] = useState(false)
@@ -143,6 +151,26 @@ export default function WeaponForm({
 				return
 			}
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
+				// メイン武器が変更された場合、サブ武器の組み合わせをチェック
+				if (name === 'weaponType') {
+					const newMainWeaponType = value.weaponType as WeaponType
+					const currentSubWeaponType = effectiveSubWeapon.weaponType
+					
+					// 現在のサブ武器が新しいメイン武器で選択可能かチェック
+					if (!isValidWeaponCombination(newMainWeaponType, currentSubWeaponType)) {
+						// 無効な場合は自動修正
+						const fixedSubWeaponType = getAutoFixedSubWeapon(newMainWeaponType)
+						const fixedSubWeapon = {
+							...effectiveSubWeapon,
+							weaponType: fixedSubWeaponType
+						}
+						
+						// サブ武器を自動修正
+						updateSubWeapon(fixedSubWeapon)
+						setValueSub('weaponType', fixedSubWeaponType)
+					}
+				}
+
 				// Zustandストアを更新
 				updateMainWeapon(value as MainWeapon)
 
@@ -153,7 +181,7 @@ export default function WeaponForm({
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watchMain, onMainWeaponChange, isInitialized, updateMainWeapon])
+	}, [watchMain, onMainWeaponChange, isInitialized, updateMainWeapon, updateSubWeapon, effectiveSubWeapon, setValueSub])
 
 	// フォーム値変更を監視してZustandストアに通知（サブ武器）
 	useEffect(() => {
@@ -284,7 +312,7 @@ export default function WeaponForm({
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								{...registerSub('weaponType')}
 							>
-								{subWeaponTypes.map((type) => (
+								{availableSubWeaponTypes.map((type) => (
 									<option key={type} value={type}>
 										{type}
 									</option>
