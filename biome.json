@@ -22,6 +22,9 @@
 				"noUnusedImports": "warn",
 				"noUnusedVariables": "warn"
 			},
+			"a11y": {
+				"noSvgWithoutTitle": "off"
+			},
 			"style": {
 				"noParameterAssign": "error",
 				"useAsConstAssertion": "error",

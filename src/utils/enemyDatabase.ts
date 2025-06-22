@@ -217,7 +217,7 @@ export function getEnemiesByLevelRange(
 	maxLevel: number,
 	category?: EnemyCategory,
 ): (PresetEnemy | UserEnemy)[] {
-	let enemies = category ? getEnemiesByCategory(category) : getAllEnemies()
+	const enemies = category ? getEnemiesByCategory(category) : getAllEnemies()
 
 	return enemies.filter(
 		(enemy) => enemy.level >= minLevel && enemy.level <= maxLevel,

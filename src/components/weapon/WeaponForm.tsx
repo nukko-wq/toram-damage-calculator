@@ -90,7 +90,7 @@ export default function WeaponForm({
 		const value = getValuesMain(fieldName)
 		if (typeof value !== 'number') return
 
-		let min = 0
+		const min = 0
 		let max = 1500
 
 		if (fieldName === 'stability') {
@@ -111,7 +111,7 @@ export default function WeaponForm({
 		const value = getValuesSub(fieldName)
 		if (typeof value !== 'number') return
 
-		let min = 0
+		const min = 0
 		let max = 1500
 
 		if (fieldName === 'stability') {
