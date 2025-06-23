@@ -92,6 +92,28 @@
 					"MeteorReduction_Rate": 27,
 					"Critical_Rate": -5
 				}
+			},
+			{
+				"id": "additional_naitaria",
+				"name": "ナイアータティアラ",
+				"properties": {
+					"PhysicalPenetration_Rate": 15,
+					"Critical": 25,
+					"Accuracy_Rate": 100,
+					"AttackSpeed": -1000
+				}
+			},
+			{
+				"id": "additional_shadow_horn",
+				"name": "シャドウホーン",
+				"properties": {
+					"HP": 5000,
+					"AGI_Rate": 10,
+					"ATK_Rate": 10,
+					"Accuracy_Rate": 50,
+					"Accuracy": 100,
+					"AbsoluteAccuracy_Rate": 5
+				}
 			}
 		],
 		"special": [
