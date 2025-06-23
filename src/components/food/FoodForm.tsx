@@ -103,11 +103,8 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		if (newFood === 'none') {
 			setValue(`${slotName}.level`, 0)
 		} else {
-			// 「なし」以外が選択された場合で現在のレベルが0の場合は1に設定
-			const currentLevel = watchedValues[slotName].level
-			if (currentLevel === 0) {
-				setValue(`${slotName}.level`, 1)
-			}
+			// 「なし」以外が選択された場合は自動的に10に設定
+			setValue(`${slotName}.level`, 10)
 		}
 	}
 
