@@ -353,9 +353,10 @@ interface UIStore {
 - **現在は準備のみ（ダミーデータ表示）**
 
 #### StatusPreview.tsx（ステータス確認）
-- 既存のCalculationResultContentを活用
-- 基本ステータス、補正後ステータス等の表示
-- 簡易版表示（主要項目のみ）
+- **2024-06-23 変更**: CalculationResultContentの内容を完全統合
+- 詳細なステータス計算結果の表示（簡易版から詳細版に変更）
+- 基本ステータス、補正後ステータス、装備品補正値1-3の全セクション表示
+- StatSection、StatItemコンポーネントを活用した統一UI
 
 ### スタイリング仕様
 
@@ -456,6 +457,29 @@ export default function RootLayout({
   )
 }
 ```
+
+### ファイル構成変更（2024-06-23）
+
+#### 統合・削除対象ファイル
+```
+src/components/calculation-result/
+├── CalculationResultDisplay.tsx     → 削除予定
+├── CalculationResultContent.tsx     → StatusPreviewに統合
+├── StatSection.tsx                  → StatusPreviewに移動
+└── StatItem.tsx                     → StatusPreviewに移動
+```
+
+#### 変更理由
+1. **重複機能の解消**: ResultToggleBarで十分な機能を提供
+2. **UIの一元化**: ヘッダー下のトグルボタンバーで統一
+3. **メンテナンス性向上**: ファイル数削減とコード統合
+4. **パフォーマンス**: 不要なコンポーネントレンダリング削減
+
+#### 移行内容
+- `CalculationResultContent.tsx`の表示ロジックを`StatusPreview.tsx`に統合
+- `StatSection.tsx`、`StatItem.tsx`を`src/components/layout/`に移動
+- 既存の`CalculationResultDisplay.tsx`を削除
+- 関連するストア参照とimportを更新
 
 ### 将来拡張
 
