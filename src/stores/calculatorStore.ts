@@ -623,10 +623,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						isLoading: false,
 					})
 
-					// 計算結果表示設定の初期化（setState後に実行）
-					const store = get()
-					store.initializeCalculationResultVisibility()
-					store.updateCalculationResults()
+					// 計算結果表示設定の初期化（将来実装）
+					// const store = get()
+					// store.initializeCalculationResultVisibility()
+					// store.updateCalculationResults()
 				} catch (error) {
 					console.error('アプリケーション初期化エラー:', error)
 					set({ isInitialized: true, isLoading: false })

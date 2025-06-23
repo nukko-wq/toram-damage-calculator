@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Header from '@/components/layout/Header'
 
 export const metadata: Metadata = {
 	title: 'トーラムダメージ計算',
@@ -17,7 +18,10 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="ja">
-			<body>{children}</body>
+			<body>
+				<Header />
+				<main>{children}</main>
+			</body>
 		</html>
 	)
 }
