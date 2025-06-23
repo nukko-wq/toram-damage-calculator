@@ -30,11 +30,23 @@
 - [buff-item.md](./database/buff-item.md) - バフアイテムデータベース構造
 - [data-management.md](./database/data-management.md) - データ管理パターン
 
+## docs/calculations/ - ステータス計算式
+
+### 計算式仕様
+- [overview.md](./calculations/overview.md) - 計算式ドキュメント概要
+- [basic-stats.md](./calculations/basic-stats.md) - 基本ステータス計算式（HP、MP）
+- [attack-stats.md](./calculations/attack-stats.md) - 攻撃関連ステータス計算式
+- [defense-stats.md](./calculations/defense-stats.md) - 防御関連ステータス計算式
+- [equipment-bonuses.md](./calculations/equipment-bonuses.md) - 装備品補正値計算
+- [crystal-effects.md](./calculations/crystal-effects.md) - クリスタ効果計算
+- [damage-formulas.md](./calculations/damage-formulas.md) - 最終ダメージ計算式
+
 ## docs/ui/ - UI設計
 
 ### インターフェース
 - [equipment-customization.md](./ui/equipment-customization.md) - 装備カスタム機能UI仕様
 - [selection-modals.md](./ui/selection-modals.md) - 選択モーダルUI仕様
+- [header-component.md](./ui/header-component.md) - ヘッダーコンポーネント・計算結果ボタンバー設計
 
 ## docs/store/ - Zustand状態管理設計
 
@@ -89,6 +101,7 @@
 - **フロントエンド開発者**: requirements/ → technical/ → store/ → ui/
 - **データベース設計者**: database/ → store/
 - **UI/UXデザイナー**: requirements/ → ui/
+- **ゲームシステム設計者**: calculations/ → requirements/
 - **プロジェクトマネージャー**: requirements/ → technical/00_overview.md
 
 ## 元の設計書について
