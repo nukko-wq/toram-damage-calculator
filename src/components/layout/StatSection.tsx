@@ -17,7 +17,7 @@ export default React.memo<StatSectionProps>(
 				<h3 className="text-lg font-semibold text-gray-900 mb-3 border-b border-gray-200 pb-2">
 					{title}
 				</h3>
-				<div className="space-y-1">
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
 					{Object.entries(stats).map(([key, value]) => (
 						<StatItem
 							key={key}
