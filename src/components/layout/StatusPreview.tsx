@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
 import {
 	calculateHP,
@@ -5,6 +6,12 @@ import {
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
 } from '@/utils/basicStatsCalculation'
+import {
+	getEquipmentBonuses,
+	getCrystalBonuses,
+	getFoodBonuses,
+	getBuffBonuses,
+} from '@/utils/dataSourceIntegration'
 import StatSection from './StatSection'
 
 interface StatusPreviewProps {
@@ -14,38 +21,60 @@ interface StatusPreviewProps {
 export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const { data } = useCalculatorStore()
 
-	if (!isVisible) {
-		return null
-	}
-
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
 
-	// TODO: 実際の装備・クリスタ・料理・バフから補正値を集計
-	// 現在は仮の補正値を使用（将来的には各フォームからデータ取得）
-	const equipmentBonuses = {} // TODO: 装備フォームから取得
-	const crystalBonuses = {} // TODO: クリスタルフォームから取得
-	const foodBonuses = {} // TODO: 料理フォームから取得
-	const buffBonuses = {} // TODO: バフフォームから取得
-
-	const allBonuses = aggregateAllBonuses(
-		equipmentBonuses,
-		crystalBonuses,
-		foodBonuses,
-		buffBonuses,
+	// データソース別のメモ化
+	const equipmentBonuses = useMemo(
+		() => getEquipmentBonuses(data.equipment),
+		[data.equipment],
 	)
 
-	// 装備品補正値1〜3を計算
-	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
-		calculateEquipmentBonuses(
+	const crystalBonuses = useMemo(
+		() => getCrystalBonuses(data.crystals),
+		[data.crystals],
+	)
+
+	const foodBonuses = useMemo(() => getFoodBonuses(data.food), [data.food])
+
+	const buffBonuses = useMemo(
+		() => getBuffBonuses(data.buffItems),
+		[data.buffItems],
+	)
+
+	// 統合計算のメモ化
+	const calculationResults = useMemo(() => {
+		const allBonuses = aggregateAllBonuses(
 			equipmentBonuses,
 			crystalBonuses,
 			foodBonuses,
 			buffBonuses,
 		)
 
-	const hpCalculation = calculateHP(baseStats, allBonuses)
-	const mpCalculation = calculateMP(baseStats, allBonuses)
+		return {
+			allBonuses,
+			equipmentBonuses: calculateEquipmentBonuses(
+				equipmentBonuses,
+				crystalBonuses,
+				foodBonuses,
+				buffBonuses,
+			),
+			hpCalculation: calculateHP(baseStats, allBonuses),
+			mpCalculation: calculateMP(baseStats, allBonuses),
+		}
+	}, [equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses, baseStats])
+
+	const {
+		equipmentBonuses: calculatedEquipmentBonuses,
+		hpCalculation,
+		mpCalculation,
+	} = calculationResults
+	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
+		calculatedEquipmentBonuses
+
+	if (!isVisible) {
+		return null
+	}
 
 	// TODO: 将来的には全98項目の計算を実装
 	// 現在は基本的な項目のみ計算
