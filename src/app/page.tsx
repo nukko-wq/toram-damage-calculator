@@ -12,13 +12,12 @@ import EnemyForm from '@/components/enemy/EnemyForm'
 import EquipmentForm from '@/components/equipment/EquipmentForm'
 import FoodForm from '@/components/food/FoodForm'
 import SaveDataManager from '@/components/save-data/SaveDataManager'
-import StatsSummary from '@/components/summary/StatsSummary'
 import WeaponForm from '@/components/weapon/WeaponForm'
 
 export default function Home() {
 	// Zustandストアからデータを取得
 	const { showSaveManager } = useUIStore()
-	const { data, isInitialized, isLoading, initialize } = useCalculatorStore()
+	const { isInitialized, isLoading, initialize } = useCalculatorStore()
 
 	// アップデート通知（Zustand移行後も必要）
 	const [updateNotifications, setUpdateNotifications] = useState<
@@ -140,7 +139,6 @@ export default function Home() {
 					<EnemyForm />
 					<BuffSkillForm />
 				</div>
-				<StatsSummary data={data} />
 			</div>
 		</div>
 	)
