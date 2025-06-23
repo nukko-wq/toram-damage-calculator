@@ -14,6 +14,7 @@ import FoodForm from '@/components/food/FoodForm'
 import SaveDataManager from '@/components/save-data/SaveDataManager'
 import StatsSummary from '@/components/summary/StatsSummary'
 import WeaponForm from '@/components/weapon/WeaponForm'
+import CalculationResultDisplay from '@/components/calculation-result/CalculationResultDisplay'
 
 export default function Home() {
 	// Zustandストアからデータを取得
@@ -157,6 +158,9 @@ export default function Home() {
 						<SaveDataManager key="save-manager" />
 					</div>
 				)}
+
+				{/* 計算結果表示 */}
+				<CalculationResultDisplay />
 
 				<div className="grid grid-cols-[1fr] grid-rows-[repeat(9,auto)] md:grid-cols-[repeat(8,1fr)] md:grid-rows-[repeat(6,auto)] lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto_auto_auto] gap-2 md:gap-4">
 					<BaseStatsForm />
