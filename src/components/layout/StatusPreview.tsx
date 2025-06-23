@@ -3,6 +3,7 @@ import {
 	calculateHP,
 	calculateMP,
 	aggregateAllBonuses,
+	calculateEquipmentBonuses,
 } from '@/utils/basicStatsCalculation'
 import StatSection from './StatSection'
 
@@ -21,13 +22,27 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const baseStats = data.baseStats
 
 	// TODO: 実際の装備・クリスタ・料理・バフから補正値を集計
-	// 現在は仮の補正値を使用
+	// 現在は仮の補正値を使用（将来的には各フォームからデータ取得）
+	const equipmentBonuses = {} // TODO: 装備フォームから取得
+	const crystalBonuses = {} // TODO: クリスタルフォームから取得
+	const foodBonuses = {} // TODO: 料理フォームから取得
+	const buffBonuses = {} // TODO: バフフォームから取得
+
 	const allBonuses = aggregateAllBonuses(
-		{}, // equipment bonuses
-		{}, // crystal bonuses
-		{}, // food bonuses
-		{}, // buff bonuses
+		equipmentBonuses,
+		crystalBonuses,
+		foodBonuses,
+		buffBonuses,
 	)
+
+	// 装備品補正値1〜3を計算
+	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
+		calculateEquipmentBonuses(
+			equipmentBonuses,
+			crystalBonuses,
+			foodBonuses,
+			buffBonuses,
+		)
 
 	const hpCalculation = calculateHP(baseStats, allBonuses)
 	const mpCalculation = calculateMP(baseStats, allBonuses)
@@ -79,86 +94,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		TEC: baseStats.TEC,
 	}
 
-	// 装備品補正値1 (31項目のうち基本的な項目)
-	const equipmentBonus1 = {
-		ATK: 0, // TODO: 装備からのATK補正
-		physicalPenetration: 0, // TODO: 物理貫通
-		MATK: 0, // TODO: 装備からのMATK補正
-		magicalPenetration: 0, // TODO: 魔法貫通
-		weaponATK: data.mainWeapon.ATK, // 武器ATK（現在値）
-		elementPower: 0, // TODO: 属性威力
-		unsheatheAttack: 0, // TODO: 抜刀威力
-		shortRangeDamage: 0, // TODO: 近距離威力
-		longRangeDamage: 0, // TODO: 遠距離威力
-		criticalDamage: 0, // TODO: クリティカルダメージ補正
-		criticalRate: 0, // TODO: クリティカル率補正
-		STR: 0, // TODO: STR補正
-		AGI: 0, // TODO: AGI補正
-		INT: 0, // TODO: INT補正
-		DEX: 0, // TODO: DEX補正
-		VIT: 0, // TODO: VIT補正
-		ASPD: 0, // TODO: ASPD補正
-		CSPD: 0, // TODO: CSPD補正
-		stability: 0, // TODO: 安定率補正
-		motionSpeed: 0, // TODO: 行動速度補正
-		accuracy: 0, // TODO: 命中補正
-		dodge: 0, // TODO: 回避補正
-		MP: 0, // TODO: MP補正
-		attackMPRecovery: 0, // TODO: 攻撃MP回復
-		HP: 0, // TODO: HP補正
-		ailmentResistance: 0, // TODO: 異常耐性補正
-		physicalResistance: 0, // TODO: 物理耐性補正
-		magicalResistance: 0, // TODO: 魔法耐性補正
-		aggroPlus: 0, // TODO: ヘイト+
-		aggroMinus: 0, // TODO: ヘイト-
-	}
-
-	// 装備品補正値2 (32項目のうち基本的な項目)
-	const equipmentBonus2 = {
-		ATK_STR: 0, // TODO: ATK+(STR%)
-		MATK_STR: 0, // TODO: MATK+(STR%)
-		ATK_INT: 0, // TODO: ATK+(INT%)
-		MATK_INT: 0, // TODO: MATK+(INT%)
-		ATK_VIT: 0, // TODO: ATK+(VIT%)
-		MATK_VIT: 0, // TODO: MATK+(VIT%)
-		ATK_AGI: 0, // TODO: ATK+(AGI%)
-		MATK_AGI: 0, // TODO: MATK+(AGI%)
-		ATK_DEX: 0, // TODO: ATK+(DEX%)
-		MATK_DEX: 0, // TODO: MATK+(DEX%)
-		neutralResistance: 0, // TODO: 無耐性
-		fireResistance: 0, // TODO: 火耐性
-		waterResistance: 0, // TODO: 水耐性
-		windResistance: 0, // TODO: 風耐性
-		earthResistance: 0, // TODO: 地耐性
-		lightResistance: 0, // TODO: 光耐性
-		darkResistance: 0, // TODO: 闇耐性
-		linearReduction: 0, // TODO: 直線軽減
-		rushReduction: 0, // TODO: 突進軽減
-		bulletReduction: 0, // TODO: 弾丸軽減
-		proximityReduction: 0, // TODO: 周囲軽減
-		areaReduction: 0, // TODO: 範囲軽減
-		floorTrapReduction: 0, // TODO: 痛床軽減
-		meteorReduction: 0, // TODO: 隕石軽減
-		bladeReduction: 0, // TODO: 射刃軽減
-		suctionReduction: 0, // TODO: 吸引軽減
-		explosionReduction: 0, // TODO: 爆発軽減
-		physicalBarrier: 0, // TODO: 物理バリア
-		magicalBarrier: 0, // TODO: 魔法バリア
-		fractionalBarrier: 0, // TODO: 割合バリア
-		barrierCooldown: 0, // TODO: バリア速度
-	}
-
-	// 装備品補正値3 (8項目)
-	const equipmentBonus3 = {
-		physicalFollowup: 0, // TODO: 物理追撃
-		magicalFollowup: 0, // TODO: 魔法追撃
-		naturalHPRecovery: 0, // TODO: HP自然回復
-		naturalMPRecovery: 0, // TODO: MP自然回復
-		absoluteAccuracy: 0, // TODO: 絶対命中
-		absoluteDodge: 0, // TODO: 絶対回避
-		revivalTime: 0, // TODO: 復帰短縮
-		itemCooldown: 0, // TODO: 道具速度
-	}
+	// 装備品補正値1〜3は計算された値を使用
+	// 現在は仮値だが、将来的には calculateEquipmentBonuses の結果を使用
 
 	return (
 		<div className="bg-gray-50 border-b border-gray-200 transition-all duration-300 ease-in-out">

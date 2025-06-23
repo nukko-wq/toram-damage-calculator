@@ -9,12 +9,155 @@ import type { BaseStats } from '@/types/calculator'
 
 // 全補正値（装備・クリスタ・料理・バフアイテムの合計）
 export interface AllBonuses {
-	VIT?: number // VIT固定値の合計
-	VIT_Rate?: number // VIT%の合計
-	HP?: number // HP固定値の合計
-	HP_Rate?: number // HP%の合計
-	MP?: number // MP固定値の合計
-	MP_Rate?: number // MP%の合計
+	// 基本ステータス
+	STR?: number
+	STR_Rate?: number
+	AGI?: number
+	AGI_Rate?: number
+	INT?: number
+	INT_Rate?: number
+	DEX?: number
+	DEX_Rate?: number
+	VIT?: number
+	VIT_Rate?: number
+	CRT?: number
+	CRT_Rate?: number
+	MEN?: number
+	MEN_Rate?: number
+	TEC?: number
+	TEC_Rate?: number
+
+	// HP/MP関連
+	HP?: number
+	HP_Rate?: number
+	MP?: number
+	MP_Rate?: number
+
+	// 装備品補正値1系プロパティ
+	ATK?: number
+	ATK_Rate?: number
+	MATK?: number
+	MATK_Rate?: number
+	weaponATK?: number
+	weaponATK_Rate?: number
+	physicalPenetration?: number
+	physicalPenetration_Rate?: number
+	magicalPenetration?: number
+	magicalPenetration_Rate?: number
+	elementPower?: number
+	elementPower_Rate?: number
+	unsheatheAttack?: number
+	unsheatheAttack_Rate?: number
+	shortRangeDamage?: number
+	shortRangeDamage_Rate?: number
+	longRangeDamage?: number
+	longRangeDamage_Rate?: number
+	criticalRate?: number
+	criticalRate_Rate?: number
+	criticalDamage?: number
+	criticalDamage_Rate?: number
+	ASPD?: number
+	ASPD_Rate?: number
+	CSPD?: number
+	CSPD_Rate?: number
+	stability?: number
+	stability_Rate?: number
+	motionSpeed?: number
+	motionSpeed_Rate?: number
+	accuracy?: number
+	accuracy_Rate?: number
+	dodge?: number
+	dodge_Rate?: number
+	attackMPRecovery?: number
+	attackMPRecovery_Rate?: number
+	ailmentResistance?: number
+	ailmentResistance_Rate?: number
+	physicalResistance?: number
+	physicalResistance_Rate?: number
+	magicalResistance?: number
+	magicalResistance_Rate?: number
+	aggroPlus?: number
+	aggroPlus_Rate?: number
+	aggroMinus?: number
+	aggroMinus_Rate?: number
+
+	// 装備品補正値2系プロパティ
+	ATK_STR?: number
+	ATK_STR_Rate?: number
+	MATK_STR?: number
+	MATK_STR_Rate?: number
+	ATK_INT?: number
+	ATK_INT_Rate?: number
+	MATK_INT?: number
+	MATK_INT_Rate?: number
+	ATK_VIT?: number
+	ATK_VIT_Rate?: number
+	MATK_VIT?: number
+	MATK_VIT_Rate?: number
+	ATK_AGI?: number
+	ATK_AGI_Rate?: number
+	MATK_AGI?: number
+	MATK_AGI_Rate?: number
+	ATK_DEX?: number
+	ATK_DEX_Rate?: number
+	MATK_DEX?: number
+	MATK_DEX_Rate?: number
+	neutralResistance?: number
+	neutralResistance_Rate?: number
+	fireResistance?: number
+	fireResistance_Rate?: number
+	waterResistance?: number
+	waterResistance_Rate?: number
+	windResistance?: number
+	windResistance_Rate?: number
+	earthResistance?: number
+	earthResistance_Rate?: number
+	lightResistance?: number
+	lightResistance_Rate?: number
+	darkResistance?: number
+	darkResistance_Rate?: number
+	linearReduction?: number
+	linearReduction_Rate?: number
+	rushReduction?: number
+	rushReduction_Rate?: number
+	bulletReduction?: number
+	bulletReduction_Rate?: number
+	proximityReduction?: number
+	proximityReduction_Rate?: number
+	areaReduction?: number
+	areaReduction_Rate?: number
+	floorTrapReduction?: number
+	floorTrapReduction_Rate?: number
+	meteorReduction?: number
+	meteorReduction_Rate?: number
+	bladeReduction?: number
+	bladeReduction_Rate?: number
+	suctionReduction?: number
+	suctionReduction_Rate?: number
+	explosionReduction?: number
+	explosionReduction_Rate?: number
+	physicalBarrier?: number
+	magicalBarrier?: number
+	fractionalBarrier?: number
+	barrierCooldown?: number
+	barrierCooldown_Rate?: number
+
+	// 装備品補正値3系プロパティ
+	physicalFollowup?: number
+	physicalFollowup_Rate?: number
+	magicalFollowup?: number
+	magicalFollowup_Rate?: number
+	naturalHPRecovery?: number
+	naturalHPRecovery_Rate?: number
+	naturalMPRecovery?: number
+	naturalMPRecovery_Rate?: number
+	absoluteAccuracy?: number
+	absoluteAccuracy_Rate?: number
+	absoluteDodge?: number
+	absoluteDodge_Rate?: number
+	revivalTime?: number
+	revivalTime_Rate?: number
+	itemCooldown?: number
 }
 
 // HP計算の中間結果
@@ -104,36 +247,130 @@ export function aggregateAllBonuses(
 	foods: Partial<AllBonuses> = {},
 	buffs: Partial<AllBonuses> = {},
 ): AllBonuses {
+	const result: AllBonuses = {}
+
+	// 全プロパティキーを収集
+	const allKeys = new Set<keyof AllBonuses>([
+		...(Object.keys(equipment) as (keyof AllBonuses)[]),
+		...(Object.keys(crystals) as (keyof AllBonuses)[]),
+		...(Object.keys(foods) as (keyof AllBonuses)[]),
+		...(Object.keys(buffs) as (keyof AllBonuses)[]),
+	])
+
+	// 各プロパティの4ソース合計を計算
+	for (const key of allKeys) {
+		result[key] =
+			(equipment[key] || 0) +
+			(crystals[key] || 0) +
+			(foods[key] || 0) +
+			(buffs[key] || 0)
+	}
+
+	return result
+}
+
+/**
+ * 装備品補正値を装備・クリスタ・料理・バフから計算
+ * StatusPreviewで使用される装備品補正値1〜3の計算
+ *
+ * @param equipment 装備補正値
+ * @param crystals クリスタ補正値
+ * @param foods 料理補正値
+ * @param buffs バフアイテム補正値
+ */
+export function calculateEquipmentBonuses(
+	equipment: Partial<AllBonuses> = {},
+	crystals: Partial<AllBonuses> = {},
+	foods: Partial<AllBonuses> = {},
+	buffs: Partial<AllBonuses> = {},
+) {
+	// 全ソースを統合
+	const allBonuses = aggregateAllBonuses(equipment, crystals, foods, buffs)
+
+	// 装備品補正値1 (31項目)
+	const equipmentBonus1 = {
+		ATK: allBonuses.ATK || 0,
+		physicalPenetration: allBonuses.physicalPenetration || 0,
+		MATK: allBonuses.MATK || 0,
+		magicalPenetration: allBonuses.magicalPenetration || 0,
+		weaponATK: allBonuses.weaponATK || 0,
+		elementPower: allBonuses.elementPower || 0,
+		unsheatheAttack: allBonuses.unsheatheAttack || 0,
+		shortRangeDamage: allBonuses.shortRangeDamage || 0,
+		longRangeDamage: allBonuses.longRangeDamage || 0,
+		criticalDamage: allBonuses.criticalDamage || 0,
+		criticalRate: allBonuses.criticalRate || 0,
+		STR: allBonuses.STR || 0,
+		AGI: allBonuses.AGI || 0,
+		INT: allBonuses.INT || 0,
+		DEX: allBonuses.DEX || 0,
+		VIT: allBonuses.VIT || 0,
+		ASPD: allBonuses.ASPD || 0,
+		CSPD: allBonuses.CSPD || 0,
+		stability: allBonuses.stability || 0,
+		motionSpeed: allBonuses.motionSpeed || 0,
+		accuracy: allBonuses.accuracy || 0,
+		dodge: allBonuses.dodge || 0,
+		MP: allBonuses.MP || 0,
+		attackMPRecovery: allBonuses.attackMPRecovery || 0,
+		HP: allBonuses.HP || 0,
+		ailmentResistance: allBonuses.ailmentResistance || 0,
+		physicalResistance: allBonuses.physicalResistance || 0,
+		magicalResistance: allBonuses.magicalResistance || 0,
+		aggroPlus: allBonuses.aggroPlus || 0,
+		aggroMinus: allBonuses.aggroMinus || 0,
+	}
+
+	// 装備品補正値2 (31項目)
+	const equipmentBonus2 = {
+		ATK_STR: allBonuses.ATK_STR || 0,
+		MATK_STR: allBonuses.MATK_STR || 0,
+		ATK_INT: allBonuses.ATK_INT || 0,
+		MATK_INT: allBonuses.MATK_INT || 0,
+		ATK_VIT: allBonuses.ATK_VIT || 0,
+		MATK_VIT: allBonuses.MATK_VIT || 0,
+		ATK_AGI: allBonuses.ATK_AGI || 0,
+		MATK_AGI: allBonuses.MATK_AGI || 0,
+		ATK_DEX: allBonuses.ATK_DEX || 0,
+		MATK_DEX: allBonuses.MATK_DEX || 0,
+		neutralResistance: allBonuses.neutralResistance || 0,
+		fireResistance: allBonuses.fireResistance || 0,
+		waterResistance: allBonuses.waterResistance || 0,
+		windResistance: allBonuses.windResistance || 0,
+		earthResistance: allBonuses.earthResistance || 0,
+		lightResistance: allBonuses.lightResistance || 0,
+		darkResistance: allBonuses.darkResistance || 0,
+		linearReduction: allBonuses.linearReduction || 0,
+		rushReduction: allBonuses.rushReduction || 0,
+		bulletReduction: allBonuses.bulletReduction || 0,
+		proximityReduction: allBonuses.proximityReduction || 0,
+		areaReduction: allBonuses.areaReduction || 0,
+		floorTrapReduction: allBonuses.floorTrapReduction || 0,
+		meteorReduction: allBonuses.meteorReduction || 0,
+		bladeReduction: allBonuses.bladeReduction || 0,
+		suctionReduction: allBonuses.suctionReduction || 0,
+		explosionReduction: allBonuses.explosionReduction || 0,
+		physicalBarrier: allBonuses.physicalBarrier || 0,
+		magicalBarrier: allBonuses.magicalBarrier || 0,
+		fractionalBarrier: allBonuses.fractionalBarrier || 0,
+		barrierCooldown: allBonuses.barrierCooldown || 0,
+	}
+
+	// 装備品補正値3 (8項目)
+	const equipmentBonus3 = {
+		physicalFollowup: allBonuses.physicalFollowup || 0,
+		magicalFollowup: allBonuses.magicalFollowup || 0,
+		naturalHPRecovery: allBonuses.naturalHPRecovery || 0,
+		naturalMPRecovery: allBonuses.naturalMPRecovery || 0,
+		absoluteAccuracy: allBonuses.absoluteAccuracy || 0,
+		absoluteDodge: allBonuses.absoluteDodge || 0,
+		revivalTime: allBonuses.revivalTime || 0,
+		itemCooldown: allBonuses.itemCooldown || 0,
+	}
+
 	return {
-		VIT:
-			(equipment.VIT || 0) +
-			(crystals.VIT || 0) +
-			(foods.VIT || 0) +
-			(buffs.VIT || 0),
-		VIT_Rate:
-			(equipment.VIT_Rate || 0) +
-			(crystals.VIT_Rate || 0) +
-			(foods.VIT_Rate || 0) +
-			(buffs.VIT_Rate || 0),
-		HP:
-			(equipment.HP || 0) +
-			(crystals.HP || 0) +
-			(foods.HP || 0) +
-			(buffs.HP || 0),
-		HP_Rate:
-			(equipment.HP_Rate || 0) +
-			(crystals.HP_Rate || 0) +
-			(foods.HP_Rate || 0) +
-			(buffs.HP_Rate || 0),
-		MP:
-			(equipment.MP || 0) +
-			(crystals.MP || 0) +
-			(foods.MP || 0) +
-			(buffs.MP || 0),
-		MP_Rate:
-			(equipment.MP_Rate || 0) +
-			(crystals.MP_Rate || 0) +
-			(foods.MP_Rate || 0) +
-			(buffs.MP_Rate || 0),
+		equipmentBonus1,
+		equipmentBonus2,
+		equipmentBonus3,
 	}
 }
