@@ -1,13 +1,12 @@
-# StatusPreview コンポーネント設計書
+# StatusPreview コンポーネントUI設計書
 
 ## 概要
 
-ヘッダー下に配置されるステータス計算結果の詳細表示コンポーネント。98項目の詳細ステータス情報を4つのセクションに整理表示し、正確なトーラムオンライン計算式を使用したリアルタイム統合・計算処理を提供する。
+ヘッダー下に配置されるステータス計算結果の詳細表示コンポーネント。98項目の詳細ステータス情報を4つのセクションに整理表示するUIコンポーネントの設計書。
 
-**継承機能**: 削除されたCalculationResultDisplay.tsxの全機能を統合
-- 全入力フォームデータのリアルタイム統合・計算処理
-- 98項目の詳細ステータス情報の表示
-- 4つのセクション（基本ステータス、補正後ステータス、装備品補正値1-3）への整理表示
+**機能要件詳細**: [StatusPreview機能要件](../requirements/10_status-preview-requirements.md)を参照
+
+**計算ロジック詳細**: [基本ステータス計算式](../calculations/basic-stats.md)を参照
 
 ## コンポーネント構成
 
@@ -20,9 +19,9 @@
 - **StatSection**: 統一されたステータス表示セクション
 - **StatItem**: 個別ステータス項目表示
 
-## 表示内容（統合後の97項目ステータス）
+## UIレイアウト設計
 
-### レイアウト構造
+### 全体構造
 ```
 ┌─────────────────────────────────────┐
 │ ┌─────────────┐ ┌─────────────┐    │
@@ -150,28 +149,18 @@
 └─────────────────────────────┘
 ```
 
-## 計算ロジック
+## データ表示仕様
 
-### HP計算式
-```
-HP = INT(INT(93+(補正後VIT+22.41)*Lv/3)*(1+HP%/100))+HP固定値
-```
+### 数値表示フォーマット
+- **整数値**: カンマ区切り（例: 14,413）
+- **パーセント**: %記号付き（例: 85%）
+- **小数値**: 必要に応じて小数点1桁まで
 
-**計算段階:**
-1. 補正後VIT = ステータスVIT × (1 + VIT%/100) + VIT固定値
-2. HP基本値 = INT(93 + (補正後VIT + 22.41) × Lv / 3)
-3. HP%適用後 = INT(HP基本値 × (1 + HP%/100))
-4. 最終HP = HP%適用後 + HP固定値
-
-### MP計算式
-```
-MP = INT(INT(Lv+99+TEC+総INT/10)*(1+MP%/100))+MP固定値
-```
-
-**計算段階:**
-1. MP基本値 = INT(Lv + 99 + TEC + 総INT/10)
-2. MP%適用後 = INT(MP基本値 × (1 + MP%/100))
-3. 最終MP = MP%適用後 + MP固定値
+### 色分け表示
+- **基本値**: 通常色（黒）
+- **補正値**: 強調色（青）
+- **計算結果**: 結果色（緑）
+- **エラー値**: 警告色（赤）
 
 ## 技術仕様
 
@@ -319,64 +308,25 @@ interface AllBonuses {
 }
 ```
 
-### 計算ロジック統合
+### データ取得とバインディング
 
 ```typescript
-import { calculateHP, calculateMP, aggregateAllBonuses } from '@/utils/basicStatsCalculation'
-import { calculateResults } from '@/utils/calculationEngine'
-
-// 統合計算処理（CalculationResultDisplay.tsxから継承）
-export const calculateResults = (data: CalculatorData): CalculationResults => {
-  // 1. 基本ステータスの取得
-  const baseStats = data.baseStats
-  
-  // 2. 武器データの統合
-  const weaponStats = combineWeaponStats(data.mainWeapon, data.subWeapon)
-  
-  // 3. 装備プロパティの統合
-  const equipmentProps = combineEquipmentProperties(data.equipment)
-  
-  // 4. クリスタルプロパティの統合
-  const crystalProps = combineCrystalProperties(data.crystals)
-  
-  // 5. 料理効果の統合
-  const foodEffects = combineFoodEffects(data.food)
-  
-  // 6. バフスキル効果の統合
-  const buffSkillEffects = combineBuffSkillEffects(data.buffSkills)
-  
-  // 7. バフアイテム効果の統合
-  const buffItemEffects = combineBuffItemEffects(data.buffItems)
-  
-  // 8. レジスタ他効果の統合
-  const registerEffects = combineRegisterEffects(data.register)
-  
-  // 9. 全効果の統合計算
-  return integrateAllEffects({
-    baseStats,
-    weaponStats,
-    equipmentProps,
-    crystalProps,
-    foodEffects,
-    buffSkillEffects,
-    buffItemEffects,
-    registerEffects
-  })
-}
-
-// StatusPreviewでの使用方法
+// Zustandストアからデータを取得
+const { data } = useCalculatorStore()
 const calculationResults = useCalculatorStore((state) => state.calculationResults)
 
-// 現在実装済み: HP・MP計算
-const allBonuses = aggregateAllBonuses(
-  {}, // equipment bonuses（将来実装）
-  {}, // crystal bonuses（将来実装）
-  {}, // food bonuses（将来実装）
-  {}  // buff bonuses（将来実装）
-)
-
-const hpCalculation = calculateHP(baseStats, allBonuses)
-const mpCalculation = calculateMP(baseStats, allBonuses)
+// 計算結果の表示バインディング
+const displayData = useMemo(() => {
+  if (!calculationResults) return null
+  
+  return {
+    basicStats: formatBasicStats(calculationResults.basicStats),
+    adjustedStats: formatAdjustedStats(calculationResults.adjustedStats),
+    equipmentBonus1: formatEquipmentBonus1(calculationResults.equipmentBonus1),
+    equipmentBonus2: formatEquipmentBonus2(calculationResults.equipmentBonus2),
+    equipmentBonus3: formatEquipmentBonus3(calculationResults.equipmentBonus3)
+  }
+}, [calculationResults])
 ```
 
 ### データソース
@@ -497,132 +447,172 @@ const calculatedStats = useMemo(() => ({
 - 中間結果の適切なキャッシュ
 - 大量データでの性能考慮
 
-## 将来拡張
+## インタラクション設計
 
-### Phase 2: 98項目完全計算実装
+### 表示制御
+- ResultToggleBarからの表示/非表示制御
+- スライドダウン/アップアニメーション（300ms）
+- フェードイン/アウト効果
+
+### 値変更時の視覚フィードバック
 ```typescript
-// 全ステータス計算エンジンの実装
-const calculationResults = calculateResults(data)
+// 値が変更された項目のハイライト表示
+interface StatItemProps {
+  name: string
+  value: number
+  isChanged?: boolean  // 変更フラグ
+  previousValue?: number  // 変更前の値
+}
 
-// 4つのセクションすべての表示
-<StatSection 
-  title={SECTION_TITLES.basicStats}
-  stats={calculationResults.basicStats}
-  labels={STAT_LABELS.basicStats}
-/>
-<StatSection 
-  title={SECTION_TITLES.adjustedStats}
-  stats={calculationResults.adjustedStats}
-  labels={STAT_LABELS.adjustedStats}
-/>
-<StatSection 
-  title={SECTION_TITLES.equipmentBonus1}
-  stats={calculationResults.equipmentBonus1}
-  labels={STAT_LABELS.equipmentBonus1}
-/>
-// equipmentBonus2, equipmentBonus3も同様
+// 変更時のアニメーション
+.stat-changed {
+  @apply bg-yellow-100 border-yellow-300 
+         transition-colors duration-500 ease-out
+}
 ```
 
-### Phase 3: 補正値自動集計
-```typescript
-// 装備・クリスタ・料理・バフから自動集計
-const allBonuses = aggregateAllBonuses(
-  calculateEquipmentBonuses(data.equipment),
-  calculateCrystalBonuses(data.crystals),
-  calculateFoodBonuses(data.foods),
-  calculateBuffBonuses(data.buffs)
-)
-```
-
-### Phase 4: リアルタイム更新
-- フォーム入力変更時の即座な計算更新
-- アニメーション付きの値変更表示
-- 計算差分のハイライト表示
-- 変更された項目の視覚的ハイライト
-
-### Phase 5: 詳細表示機能
-- 計算過程の詳細展開表示
-- デバッグモードでの全中間値表示
-- 計算式の対話的説明
-- 複数ビルドパターンの比較表示
+### 計算過程の詳細表示（将来実装）
+- 各ステータス項目をクリックで詳細展開
+- 計算式と中間値の表示
+- ツールチップでの簡単な説明
 
 ## パフォーマンス最適化
 
-### 計算結果キャッシュ戦略
-```typescript
-// Zustandでの計算結果キャッシュ
-interface CalculatorStore {
-  calculationResults: CalculationResults | null
-  updateCalculationResults: () => void
-}
-
-const useCalculatorStore = create<CalculatorStore>((set, get) => ({
-  calculationResults: null,
-  
-  updateCalculationResults: () => {
-    const currentData = get().data
-    const results = calculateResults(currentData)
-    set({ calculationResults: results })
-  }
-}))
-```
-
 ### レンダリング最適化
 ```typescript
-// StatSectionのメモ化（CalculationResultDisplay.tsxから継承）
+// StatSectionコンポーネントのメモ化
 export const StatSection = React.memo<StatSectionProps>(({ 
   title, 
   stats, 
   className 
 }) => {
   return (
-    <div className={className}>
-      <h3>{title}</h3>
-      {Object.entries(stats).map(([key, value]) => (
-        <StatItem key={key} name={key} value={value} />
-      ))}
+    <div className={cn("bg-white rounded-lg border p-4", className)}>
+      <h3 className="text-lg font-semibold mb-3">{title}</h3>
+      <div className="grid grid-cols-2 gap-2">
+        {Object.entries(stats).map(([key, value]) => (
+          <StatItem key={key} name={key} value={value} />
+        ))}
+      </div>
     </div>
   )
-}, (prevProps, nextProps) => {
-  return JSON.stringify(prevProps.stats) === JSON.stringify(nextProps.stats)
 })
-```
 
-### 差分計算の実装
-- データ変更検知: Zustandのサブスクリプション機能を活用
-- 変更されたデータ部分のみ再計算
-- メモ化: React.memoとuseMemoによるレンダリング最適化
-
-## エラーハンドリング
-
-### 計算エラー対応
-```typescript
-try {
-  const hpCalculation = calculateHP(baseStats, allBonuses)
-} catch (error) {
-  console.error('HP計算エラー:', error)
-  // フォールバック値の使用
+// StatItemコンポーネント
+export const StatItem: React.FC<StatItemProps> = ({ 
+  name, 
+  value, 
+  isChanged,
+  previousValue 
+}) => {
+  return (
+    <div className={cn(
+      "flex justify-between items-center py-1 px-2 rounded",
+      isChanged && "stat-changed"
+    )}>
+      <span className="text-sm text-gray-600">{name}</span>
+      <span className="font-mono text-sm">
+        {formatDisplayValue(value)}
+      </span>
+    </div>
+  )
 }
 ```
 
-### 表示エラー対応
-- 異常値に対する適切な表示
-- 計算不可能な場合のユーザー通知
-- グレースフルな劣化
+## エラー表示設計
+
+### 計算エラー時の表示
+```typescript
+// エラー状態の表示コンポーネント
+const ErrorDisplay: React.FC<{ error: string }> = ({ error }) => {
+  return (
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+      <div className="text-red-600 font-medium">計算エラー</div>
+      <div className="text-red-500 text-sm mt-1">{error}</div>
+    </div>
+  )
+}
+
+// 異常値の表示
+const formatDisplayValue = (value: number | null | undefined): string => {
+  if (value === null || value === undefined) return '---'
+  if (isNaN(value)) return 'エラー'
+  if (!isFinite(value)) return '∞'
+  return value.toLocaleString()
+}
+```
+
+### ローディング状態
+```typescript
+const LoadingDisplay: React.FC = () => {
+  return (
+    <div className="animate-pulse space-y-4">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="bg-gray-200 rounded-lg h-32" />
+      ))}
+    </div>
+  )
+}
+```
+
+## 実装例
+
+### StatusPreviewコンポーネント
+```typescript
+export const StatusPreview: React.FC<StatusPreviewProps> = ({ isVisible }) => {
+  const calculationResults = useCalculatorStore((state) => state.calculationResults)
+  
+  if (!isVisible) return null
+  
+  if (!calculationResults) {
+    return <LoadingDisplay />
+  }
+  
+  return (
+    <div className="status-preview">
+      <div className="status-container">
+        <div className="status-grid">
+          <StatSection 
+            title="基本ステータス"
+            stats={calculationResults.basicStats}
+            className="basic-stats"
+          />
+          <StatSection 
+            title="補正後ステータス"
+            stats={calculationResults.adjustedStats}
+            className="adjusted-stats"
+          />
+          <StatSection 
+            title="装備品補正値1"
+            stats={calculationResults.equipmentBonus1}
+            className="equipment-bonus-1"
+          />
+          <StatSection 
+            title="装備品補正値2"
+            stats={calculationResults.equipmentBonus2}
+            className="equipment-bonus-2"
+          />
+          <StatSection 
+            title="装備品補正値3"
+            stats={calculationResults.equipmentBonus3}
+            className="equipment-bonus-3"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+```
 
 ## 更新履歴
 
 | 日付 | 更新内容 | 備考 |
 |------|----------|------|
 | 2024-06-23 | StatusPreview独立設計書作成 | header-component.mdから分離 |
-| 2024-06-23 | 正確なHP・MP計算式実装 | ゲーム内計算式完全対応 |
-| 2024-06-23 | CalculationResults型定義統合 | calculation-result-system.mdから97項目仕様を継承 |
-| 2024-06-23 | CalculationResultDisplay.tsx機能統合 | 削除されたコンポーネントの全機能をStatusPreviewに統合 |
-| 2024-06-23 | 基礎ATK項目追加 | 基本ステータスに基礎ATK(baseATK)を追加、30項目→98項目合計に更新 |
+| 2024-06-23 | UI設計書に特化した内容に変更 | 計算ロジックをrequirements/に分離 |
 
 ## 関連ドキュメント
-- [基本ステータス計算式](../calculations/basic-stats.md)
-- [基本ステータス計算システム](../technical/basic-stats-calculation.md)
-- [ステータス計算結果表示システム](../technical/calculation-result-system.md) - 97項目仕様の詳細
+- [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細
+- [基本ステータス計算式](../calculations/basic-stats.md) - 計算ロジックの詳細
 - [ヘッダーコンポーネント設計](./header-component.md)
 - [結果トグルバー設計](./result-toggle-bar.md)
