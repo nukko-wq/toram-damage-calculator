@@ -2,14 +2,17 @@ import React from 'react'
 import StatItem from './StatItem'
 import PropertyDisplay from './PropertyDisplay'
 import PropertySectionHeader from './PropertySectionHeader'
+import PropertyDoubleDisplay from './PropertyDoubleDisplay'
+import PropertyDoubleSectionHeader from './PropertyDoubleSectionHeader'
 import type { PropertyConfig } from './PropertyDisplay'
+import type { PropertyDisplayData } from './PropertyDoubleDisplay'
 
 interface StatSectionProps {
 	title: string
 	stats: Record<string, number>
 	labels: Record<string, string>
 	className?: string
-	displayMode?: 'normal' | 'property'
+	displayMode?: 'normal' | 'property' | 'property-double'
 	propertyConfigs?: Record<string, PropertyConfig>
 }
 
@@ -58,6 +61,77 @@ export default React.memo<StatSectionProps>(
 									/>
 								)
 							})}
+						</div>
+					</div>
+				) : displayMode === 'property-double' ? (
+					<div>
+						<PropertyDoubleSectionHeader />
+						<div className="space-y-0">
+							{(() => {
+								// プロパティを2つずつペアにする
+								const entries = Object.entries(stats)
+								const pairs: Array<{
+									property1: PropertyDisplayData
+									property2?: PropertyDisplayData
+								}> = []
+
+								for (let i = 0; i < entries.length; i += 2) {
+									const [key1, value1] = entries[i]
+									const config1 = propertyConfigs[key1] || {
+										hasRate: false,
+										hasFixed: true,
+									}
+									const baseKey1 = key1.replace('_Rate', '')
+									const isRateKey1 = key1.endsWith('_Rate')
+									const rateValue1 = isRateKey1
+										? value1
+										: stats[`${key1}_Rate`] || null
+									const fixedValue1 = isRateKey1
+										? stats[baseKey1] || null
+										: value1
+
+									const property1: PropertyDisplayData = {
+										propertyName: labels[key1] || key1,
+										rateValue: config1.hasRate ? rateValue1 : null,
+										fixedValue: config1.hasFixed ? fixedValue1 : null,
+										propertyConfig: config1,
+									}
+
+									let property2: PropertyDisplayData | undefined
+									if (i + 1 < entries.length) {
+										const [key2, value2] = entries[i + 1]
+										const config2 = propertyConfigs[key2] || {
+											hasRate: false,
+											hasFixed: true,
+										}
+										const baseKey2 = key2.replace('_Rate', '')
+										const isRateKey2 = key2.endsWith('_Rate')
+										const rateValue2 = isRateKey2
+											? value2
+											: stats[`${key2}_Rate`] || null
+										const fixedValue2 = isRateKey2
+											? stats[baseKey2] || null
+											: value2
+
+										property2 = {
+											propertyName: labels[key2] || key2,
+											rateValue: config2.hasRate ? rateValue2 : null,
+											fixedValue: config2.hasFixed ? fixedValue2 : null,
+											propertyConfig: config2,
+										}
+									}
+
+									pairs.push({ property1, property2 })
+								}
+
+								return pairs.map((pair) => (
+									<PropertyDoubleDisplay
+										key={`${pair.property1.propertyName}-${pair.property2?.propertyName || 'empty'}`}
+										property1={pair.property1}
+										property2={pair.property2}
+									/>
+								))
+							})()}
 						</div>
 					</div>
 				) : (

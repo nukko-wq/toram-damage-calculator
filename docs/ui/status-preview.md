@@ -69,135 +69,101 @@
 └─────────────────────────────┘
 ```
 
-### 装備品補正値1（31プロパティ - 3列表示）
+### 装備品補正値1（31プロパティ - 2プロパティ/行表示）
 ```
-┌────── 装備品補正値1 ───────┐
-│ プロパティ      %     +      │
-│ ───────────────────── │
-│ ATK           15   150    │
-│ MATK          12   120    │
-│ 武器ATK       10   200    │
-│ 物理貫通      25    -     │
-│ 魔法貫通      20    -     │
-│ 属性威力      15    -     │
-│ 抜刀威力      10    -     │
-│ 近距離威力    8     -     │
-│ 遠距離威力    5     -     │
-│ クリダメ      20    5     │
-│ クリ率        5     2     │
-│ STR           10   15     │
-│ AGI           8    15     │
-│ INT           12   10     │
-│ DEX           6    10     │
-│ VIT           5    5      │
-│ ASPD          15   200    │
-│ CSPD          10   150    │
-│ 安定率        5     -     │
-│ 行動速度      5     -     │
-│ 命中          8    34     │
-│ 回避          6    29     │
-│ HP            10   200    │
-│ MP            8    100    │
-│ 攻撃MP回復    3    2      │
-│ 異常耐性      3     -     │
-│ 物理耐性      5     -     │
-│ 魔法耐性      3     -     │
-│ ヘイト        15    -     │
-└───────────────────────┘
+┌─────────────── 装備品補正値1 ───────────────┐
+│ プロパティ      %    +    プロパティ      %    +  │
+│ ─────────────────────────────────────── │
+│ ATK           15  150    物理貫通      25   -   │
+│ MATK          12  120    魔法貫通      20   -   │
+│ 武器ATK       10  200    属性威力      15   -   │
+│ 抜刀威力      10   -     近距離威力    8    -   │
+│ 遠距離威力    5    -     クリダメ      20   5   │
+│ クリ率        5    2     STR           10  15   │
+│ AGI           8   15     INT           12  10   │
+│ DEX           6   10     VIT           5    5   │
+│ ASPD          15  200    CSPD          10  150  │
+│ 安定率        5    -     行動速度      5    -   │
+│ 命中          8   34     回避          6   29   │
+│ HP            10  200    MP            8   100  │
+│ 攻撃MP回復    3    2     異常耐性      3    -   │
+│ 物理耐性      5    -     魔法耐性      3    -   │
+│ ヘイト        15   -     (空き)         -    -   │
+└─────────────────────────────────────────┘
 ```
 
-### 装備品補正値2（16プロパティ - 3列表示）
+### 装備品補正値2（31プロパティ - 2プロパティ/行表示）
 ```
-┌────── 装備品補正値2 ───────┐
-│ プロパティ      %     +      │
-│ ───────────────────── │
-│ ATK(STR)      8     -     │
-│ MATK(STR)     6     -     │
-│ ATK(INT)      10    -     │
-│ MATK(INT)     12    -     │
-│ ATK(VIT)      5     -     │
-│ MATK(VIT)     4     -     │
-│ ATK(AGI)      3     -     │
-│ MATK(AGI)     2     -     │
-│ ATK(DEX)      4     -     │
-│ MATK(DEX)     3     -     │
-│ 無耐性        5     -     │
-│ 火耐性        8     -     │
-│ 水耐性        6     -     │
-│ 風耐性        7     -     │
-│ 地耐性        5     -     │
-│ 光耐性        9     -     │
-│ 闇耐性        4     -     │
-│ 直線軽減      3     -     │
-│ 突進軽減      4     -     │
-│ 弾丸軽減      2     -     │
-│ 周囲軽減      5     -     │
-│ 範囲軽減      3     -     │
-│ 痛床軽減      2     -     │
-│ 隕石軍減      1     -     │
-│ 射刃軽減      2     -     │
-│ 吸引軽減      1     -     │
-│ 爆発軽減      3     -     │
-│ 物理バリア    -    150    │
-│ 魔法バリア    -    120    │
-│ 割合バリア    -    5      │
-│ バリア速度    10    -     │
-└───────────────────────┘
+┌─────────────── 装備品補正値2 ───────────────┐
+│ プロパティ      %    +    プロパティ      %    +  │
+│ ─────────────────────────────────────── │
+│ ATK(STR)      8    -     MATK(STR)     6    -   │
+│ ATK(INT)      10   -     MATK(INT)     12   -   │
+│ ATK(VIT)      5    -     MATK(VIT)     4    -   │
+│ ATK(AGI)      3    -     MATK(AGI)     2    -   │
+│ ATK(DEX)      4    -     MATK(DEX)     3    -   │
+│ 無耐性        5    -     火耐性        8    -   │
+│ 水耐性        6    -     風耐性        7    -   │
+│ 地耐性        5    -     光耐性        9    -   │
+│ 闇耐性        4    -     直線軽減      3    -   │
+│ 突進軽減      4    -     弾丸軽減      2    -   │
+│ 周囲軽減      5    -     範囲軽減      3    -   │
+│ 痛床軽減      2    -     隕石軽減      1    -   │
+│ 射刃軽減      2    -     吸引軽減      1    -   │
+│ 爆発軽減      3    -     物理バリア    -   150  │
+│ 魔法バリア    -   120    割合バリア    -    5   │
+│ バリア速度    10   -     (空き)         -    -   │
+└─────────────────────────────────────────┘
 ```
 
-### 装備品補正値3（7プロパティ - 3列表示）
+### 装備品補正値3（8プロパティ - 2プロパティ/行表示）
 ```
-┌────── 装備品補正値3 ───────┐
-│ プロパティ      %     +      │
-│ ───────────────────── │
-│ 物理追撃      8     -     │
-│ 魔法追撃      6     -     │
-│ HP自然回復   12   15     │
-│ MP自然回復   10   10     │
-│ 絶対命中      8    5      │
-│ 絶対回避      6    3      │
-│ 復帰短縮      20   -     │
-│ 道具速度      -   15     │
-└───────────────────────┘
+┌─────────────── 装備品補正値3 ───────────────┐
+│ プロパティ      %    +    プロパティ      %    +  │
+│ ─────────────────────────────────────── │
+│ 物理追撃      8    -     魔法追撃      6    -   │
+│ HP自然回復   12   15     MP自然回復   10   10   │
+│ 絶対命中      8    5     絶対回避      6    3   │
+│ 復帰短縮      20   -     道具速度      -   15   │
+└─────────────────────────────────────────┘
 ```
 
 ## データ表示仕様
 
 ### プロパティ表示パターン
 
-#### 1. 3列レイアウトパターン
+#### 1. 2プロパティ/行レイアウトパターン
 
-**基本構造**: `プロパティ名 | % | +`
+**基本構造**: `プロパティ名1 | %1 | +1 | プロパティ名2 | %2 | +2`
 
 ```
-プロパティ      %     +
-─────────────────────
-ATK           15   150     // 両方あり
-HP            10    -      // %のみ
-物理バリア    -    150     // +のみ
+プロパティ      %    +    プロパティ      %    +
+─────────────────────────────────────
+ATK           15  150    物理貫通      25   -     // 両方あり + %のみ
+HP            10  200    MP            8   100    // 両方あり + 両方あり
+物理バリア    -   150    魔法バリア    -   120    // +のみ + +のみ
 ```
 
 #### 2. 各パターンの表示例
 
 **両方表示プロパティ**: 両方の列に値を表示
 ```
-ATK           15   150
-HP            10   200  
-STR           5    15
+ATK           15  150    MATK          12  120
+HP            10  200    MP            8   100
+STR           5   15     AGI           8   15
 ```
 
 **%のみプロパティ**: +列は「-」表示
 ```
-ヘイト        15    -
-火耐性        8     -
-属性威力      15    -
+ヘイト        15   -     火耐性        8    -
+属性威力      15   -     安定率        5    -
+物理貫通      25   -     魔法貫通      20   -
 ```
 
 **+のみプロパティ**: %列は「-」表示
 ```
-道具速度      -    15
-物理バリア    -   150
-魔法バリア    -   120
+道具速度      -   15     物理バリア    -   150
+魔法バリア    -   120    割合バリア    -    5
 ```
 
 ### 数値表示フォーマット
@@ -418,9 +384,13 @@ const PropertyDisplay: React.FC<PropertyDisplayProps> = ({
 #### セクションヘッダーの追加
 
 ```typescript
-const PropertySectionHeader: React.FC = () => {
+// 2プロパティ/行表示用ヘッダー
+const PropertyDoubleSectionHeader: React.FC = () => {
   return (
-    <div className="grid grid-cols-[100px_60px_60px] gap-2 py-2 px-2 border-b border-gray-200 bg-gray-50">
+    <div className="grid grid-cols-[80px_40px_40px_80px_40px_40px] gap-2 py-2 px-2 border-b border-gray-200 bg-gray-50">
+      <span className="text-xs font-medium text-gray-600">プロパティ</span>
+      <span className="text-xs font-medium text-center text-sky-600">%</span>
+      <span className="text-xs font-medium text-center text-rose-600">+</span>
       <span className="text-xs font-medium text-gray-600">プロパティ</span>
       <span className="text-xs font-medium text-center text-sky-600">%</span>
       <span className="text-xs font-medium text-center text-rose-600">+</span>
@@ -432,19 +402,24 @@ const PropertySectionHeader: React.FC = () => {
 ### データバインディングパターン
 
 ```typescript
-// 装備品補正値セクションの表示データ構造
-interface EquipmentBonusDisplayData {
+// 2プロパティ/行表示用データ構造
+interface PropertyDoubleDisplayData {
+  property1: PropertyDisplayData
+  property2?: PropertyDisplayData  // 奇数個の場合は空
+}
+
+interface PropertyDisplayData {
   propertyName: string
-  rateValue: number | null  // %値（ない場合はnull）
-  fixedValue: number | null // 固定値（ない場合はnull）
+  rateValue: number | null
+  fixedValue: number | null
   propertyConfig: PropertyConfig
 }
 
-// 表示データの変換
-const formatEquipmentBonusSection = (
+// 2プロパティ/行形式への変換
+const formatEquipmentBonusDoubleSection = (
   bonusData: EquipmentBonusResult
-): EquipmentBonusDisplayData[] => {
-  return Object.entries(bonusData).map(([key, value]) => {
+): PropertyDoubleDisplayData[] => {
+  const singleProperties = Object.entries(bonusData).map(([key, value]) => {
     const config = PROPERTY_DISPLAY_CONFIG[key]
     const isRateProperty = key.endsWith('_Rate')
     const basePropertyName = isRateProperty ? key.replace('_Rate', '') : key
@@ -456,6 +431,17 @@ const formatEquipmentBonusSection = (
       propertyConfig: config
     }
   })
+  
+  // 2つずつペアに分割
+  const pairs: PropertyDoubleDisplayData[] = []
+  for (let i = 0; i < singleProperties.length; i += 2) {
+    pairs.push({
+      property1: singleProperties[i],
+      property2: singleProperties[i + 1] || undefined
+    })
+  }
+  
+  return pairs
 }
 ```
 

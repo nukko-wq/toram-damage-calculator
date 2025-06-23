@@ -255,7 +255,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							aggroPlus: 'ヘイト+',
 							aggroMinus: 'ヘイト-',
 						}}
-						displayMode="property"
+						displayMode="property-double"
 						propertyConfigs={{
 							ATK: { hasRate: true, hasFixed: true },
 							physicalPenetration: { hasRate: true, hasFixed: false },
@@ -328,7 +328,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							fractionalBarrier: '割合バリア',
 							barrierCooldown: 'バリア速度',
 						}}
-						displayMode="property"
+						displayMode="property-double"
 						propertyConfigs={{
 							ATK_STR: { hasRate: true, hasFixed: false },
 							MATK_STR: { hasRate: true, hasFixed: false },
@@ -379,7 +379,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							revivalTime: '復帰短縮',
 							itemCooldown: '道具速度',
 						}}
-						displayMode="property"
+						displayMode="property-double"
 						propertyConfigs={{
 							physicalFollowup: { hasRate: true, hasFixed: false },
 							magicalFollowup: { hasRate: true, hasFixed: false },
