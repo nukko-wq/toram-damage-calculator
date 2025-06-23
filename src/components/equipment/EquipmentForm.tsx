@@ -638,7 +638,7 @@ export default function EquipmentForm({
 			value: string,
 		) => void,
 	) => (
-		<div className="flex overflow-x-scroll w-full flex-nowrap">
+		<div className="flex overflow-x-scroll w-full max-w-[95vw] flex-nowrap">
 			{propertyGroups.map((group) => (
 				<div
 					key={group.title}
