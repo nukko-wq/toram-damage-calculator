@@ -29,7 +29,9 @@ export default function EquipmentForm({
 	onEquipmentChange,
 }: EquipmentFormProps) {
 	// 一時的な入力値を管理するstate（プロパティキー -> 入力値のマップ）
-	const [tempInputValues, setTempInputValues] = useState<Record<string, string>>({})
+	const [tempInputValues, setTempInputValues] = useState<
+		Record<string, string>
+	>({})
 
 	// Zustandストアから装備データを取得
 	const storeEquipment = useCalculatorStore((state) => state.data.equipment)
@@ -413,7 +415,10 @@ export default function EquipmentForm({
 	}
 
 	// 一時的な入力値のキーを生成
-	const getTempInputKey = (slotKey: keyof EquipmentSlots, property: keyof EquipmentProperties) => {
+	const getTempInputKey = (
+		slotKey: keyof EquipmentSlots,
+		property: keyof EquipmentProperties,
+	) => {
 		return `${slotKey}-${property}`
 	}
 
@@ -428,7 +433,7 @@ export default function EquipmentForm({
 			return tempInputValues[tempKey]
 		}
 		const actualValue = item.properties[property]
-		return actualValue === 0 ? '' : (actualValue || '')
+		return actualValue === 0 ? '' : actualValue || ''
 	}
 
 	// フォーカスが外れたときに0を空文字に変換する機能
@@ -439,7 +444,7 @@ export default function EquipmentForm({
 	) => {
 		const tempKey = getTempInputKey(slotKey, property)
 		// 一時的な入力値をクリア
-		setTempInputValues(prev => {
+		setTempInputValues((prev) => {
 			const newValues = { ...prev }
 			delete newValues[tempKey]
 			return newValues
@@ -456,9 +461,9 @@ export default function EquipmentForm({
 	) => {
 		const tempKey = getTempInputKey(slotKey, property)
 		// 一時的な入力値を保存
-		setTempInputValues(prev => ({
+		setTempInputValues((prev) => ({
 			...prev,
-			[tempKey]: value
+			[tempKey]: value,
 		}))
 		// 実際の値も更新（内部データ用）
 		handleEquipmentPropertyChange(slotKey, property, value)
@@ -729,10 +734,18 @@ export default function EquipmentForm({
 											type="number"
 											value={getDisplayValue(slotKey, pair.properties[0], item)}
 											onChange={(e) =>
-												handlePropertyInputChange(slotKey, pair.properties[0], e.target.value)
+												handlePropertyInputChange(
+													slotKey,
+													pair.properties[0],
+													e.target.value,
+												)
 											}
 											onBlur={(e) =>
-												handlePropertyBlur(slotKey, pair.properties[0], e.target.value)
+												handlePropertyBlur(
+													slotKey,
+													pair.properties[0],
+													e.target.value,
+												)
 											}
 											onMouseDown={(e) => {
 												if (document.activeElement === e.target) {
@@ -750,10 +763,18 @@ export default function EquipmentForm({
 											type="number"
 											value={getDisplayValue(slotKey, pair.properties[1], item)}
 											onChange={(e) =>
-												handlePropertyInputChange(slotKey, pair.properties[1], e.target.value)
+												handlePropertyInputChange(
+													slotKey,
+													pair.properties[1],
+													e.target.value,
+												)
 											}
 											onBlur={(e) =>
-												handlePropertyBlur(slotKey, pair.properties[1], e.target.value)
+												handlePropertyBlur(
+													slotKey,
+													pair.properties[1],
+													e.target.value,
+												)
 											}
 											onMouseDown={(e) => {
 												if (document.activeElement === e.target) {
@@ -775,10 +796,18 @@ export default function EquipmentForm({
 											type="number"
 											value={getDisplayValue(slotKey, pair.properties[0], item)}
 											onChange={(e) =>
-												handlePropertyInputChange(slotKey, pair.properties[0], e.target.value)
+												handlePropertyInputChange(
+													slotKey,
+													pair.properties[0],
+													e.target.value,
+												)
 											}
 											onBlur={(e) =>
-												handlePropertyBlur(slotKey, pair.properties[0], e.target.value)
+												handlePropertyBlur(
+													slotKey,
+													pair.properties[0],
+													e.target.value,
+												)
 											}
 											onMouseDown={(e) => {
 												if (document.activeElement === e.target) {
@@ -802,10 +831,18 @@ export default function EquipmentForm({
 											type="number"
 											value={getDisplayValue(slotKey, pair.properties[0], item)}
 											onChange={(e) =>
-												handlePropertyInputChange(slotKey, pair.properties[0], e.target.value)
+												handlePropertyInputChange(
+													slotKey,
+													pair.properties[0],
+													e.target.value,
+												)
 											}
 											onBlur={(e) =>
-												handlePropertyBlur(slotKey, pair.properties[0], e.target.value)
+												handlePropertyBlur(
+													slotKey,
+													pair.properties[0],
+													e.target.value,
+												)
 											}
 											onMouseDown={(e) => {
 												if (document.activeElement === e.target) {

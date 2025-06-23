@@ -3,10 +3,10 @@ import type { CalculationResults } from '@/types/calculationResult'
 
 /**
  * 計算結果を生成する（現在はダミーデータ）
- * 
+ *
  * @param data - 全入力フォームデータ
  * @returns 計算結果
- * 
+ *
  * 注意: これは表示確認用のダミーデータです。
  * 実際の計算ロジックは後の実装フェーズで追加予定です。
  */
@@ -33,7 +33,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			MP: Math.floor(50 + baseInt * 2 + baseMen * 1.5 + level * 2),
 			ATK: Math.floor(mainWeaponAtk + baseStr * 1.5),
 			subBaseATK: Math.floor(subWeaponAtk + baseDex * 1.2),
-			totalATK: Math.floor(mainWeaponAtk + subWeaponAtk + baseStr * 1.5 + baseDex * 0.8),
+			totalATK: Math.floor(
+				mainWeaponAtk + subWeaponAtk + baseStr * 1.5 + baseDex * 0.8,
+			),
 			bringerAM: Math.floor((baseStr + baseInt) * 0.7),
 			MATK: Math.floor(baseInt * 2 + baseMen * 1.5),
 			baseMATK: Math.floor(baseInt * 1.8),

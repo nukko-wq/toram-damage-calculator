@@ -125,7 +125,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 					{/* 補助情報 */}
 					<div className="bg-white rounded-lg border border-gray-200 p-4 md:col-span-2">
-						<h3 className="text-lg font-semibold text-gray-900 mb-3">補助情報</h3>
+						<h3 className="text-lg font-semibold text-gray-900 mb-3">
+							補助情報
+						</h3>
 						<div className="grid grid-cols-2 gap-4">
 							<div className="flex justify-between">
 								<span className="text-sm text-gray-600">命中率:</span>

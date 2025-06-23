@@ -255,6 +255,39 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							aggroPlus: 'ヘイト+',
 							aggroMinus: 'ヘイト-',
 						}}
+						displayMode="property"
+						propertyConfigs={{
+							ATK: { hasRate: true, hasFixed: true },
+							physicalPenetration: { hasRate: true, hasFixed: false },
+							MATK: { hasRate: true, hasFixed: true },
+							magicalPenetration: { hasRate: true, hasFixed: false },
+							weaponATK: { hasRate: true, hasFixed: true },
+							elementPower: { hasRate: true, hasFixed: false },
+							unsheatheAttack: { hasRate: true, hasFixed: false },
+							shortRangeDamage: { hasRate: true, hasFixed: false },
+							longRangeDamage: { hasRate: true, hasFixed: false },
+							criticalDamage: { hasRate: true, hasFixed: true },
+							criticalRate: { hasRate: true, hasFixed: true },
+							STR: { hasRate: true, hasFixed: true },
+							AGI: { hasRate: true, hasFixed: true },
+							INT: { hasRate: true, hasFixed: true },
+							DEX: { hasRate: true, hasFixed: true },
+							VIT: { hasRate: true, hasFixed: true },
+							ASPD: { hasRate: true, hasFixed: true },
+							CSPD: { hasRate: true, hasFixed: true },
+							stability: { hasRate: true, hasFixed: false },
+							motionSpeed: { hasRate: true, hasFixed: false },
+							accuracy: { hasRate: true, hasFixed: true },
+							dodge: { hasRate: true, hasFixed: true },
+							MP: { hasRate: true, hasFixed: true },
+							attackMPRecovery: { hasRate: true, hasFixed: true },
+							HP: { hasRate: true, hasFixed: true },
+							ailmentResistance: { hasRate: true, hasFixed: false },
+							physicalResistance: { hasRate: true, hasFixed: false },
+							magicalResistance: { hasRate: true, hasFixed: false },
+							aggroPlus: { hasRate: true, hasFixed: false },
+							aggroMinus: { hasRate: true, hasFixed: false },
+						}}
 						className=""
 					/>
 
@@ -295,6 +328,40 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							fractionalBarrier: '割合バリア',
 							barrierCooldown: 'バリア速度',
 						}}
+						displayMode="property"
+						propertyConfigs={{
+							ATK_STR: { hasRate: true, hasFixed: false },
+							MATK_STR: { hasRate: true, hasFixed: false },
+							ATK_INT: { hasRate: true, hasFixed: false },
+							MATK_INT: { hasRate: true, hasFixed: false },
+							ATK_VIT: { hasRate: true, hasFixed: false },
+							MATK_VIT: { hasRate: true, hasFixed: false },
+							ATK_AGI: { hasRate: true, hasFixed: false },
+							MATK_AGI: { hasRate: true, hasFixed: false },
+							ATK_DEX: { hasRate: true, hasFixed: false },
+							MATK_DEX: { hasRate: true, hasFixed: false },
+							neutralResistance: { hasRate: true, hasFixed: false },
+							fireResistance: { hasRate: true, hasFixed: false },
+							waterResistance: { hasRate: true, hasFixed: false },
+							windResistance: { hasRate: true, hasFixed: false },
+							earthResistance: { hasRate: true, hasFixed: false },
+							lightResistance: { hasRate: true, hasFixed: false },
+							darkResistance: { hasRate: true, hasFixed: false },
+							linearReduction: { hasRate: true, hasFixed: false },
+							rushReduction: { hasRate: true, hasFixed: false },
+							bulletReduction: { hasRate: true, hasFixed: false },
+							proximityReduction: { hasRate: true, hasFixed: false },
+							areaReduction: { hasRate: true, hasFixed: false },
+							floorTrapReduction: { hasRate: true, hasFixed: false },
+							meteorReduction: { hasRate: true, hasFixed: false },
+							bladeReduction: { hasRate: true, hasFixed: false },
+							suctionReduction: { hasRate: true, hasFixed: false },
+							explosionReduction: { hasRate: true, hasFixed: false },
+							physicalBarrier: { hasRate: false, hasFixed: true },
+							magicalBarrier: { hasRate: false, hasFixed: true },
+							fractionalBarrier: { hasRate: false, hasFixed: true },
+							barrierCooldown: { hasRate: true, hasFixed: false },
+						}}
 						className=""
 					/>
 
@@ -311,6 +378,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							absoluteDodge: '絶対回避',
 							revivalTime: '復帰短縮',
 							itemCooldown: '道具速度',
+						}}
+						displayMode="property"
+						propertyConfigs={{
+							physicalFollowup: { hasRate: true, hasFixed: false },
+							magicalFollowup: { hasRate: true, hasFixed: false },
+							naturalHPRecovery: { hasRate: true, hasFixed: true },
+							naturalMPRecovery: { hasRate: true, hasFixed: true },
+							absoluteAccuracy: { hasRate: true, hasFixed: true },
+							absoluteDodge: { hasRate: true, hasFixed: true },
+							revivalTime: { hasRate: true, hasFixed: false },
+							itemCooldown: { hasRate: false, hasFixed: true },
 						}}
 						className=""
 					/>

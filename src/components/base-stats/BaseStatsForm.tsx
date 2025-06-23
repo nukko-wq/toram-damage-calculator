@@ -13,7 +13,6 @@ interface BaseStatsFormProps {
 	onChange?: (stats: BaseStats) => void
 }
 
-
 export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	// 初期化状態管理
 	const [isInitialized, setIsInitialized] = useState(false)

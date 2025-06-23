@@ -4,7 +4,11 @@ interface StatItemProps {
 	className?: string
 }
 
-export default function StatItem({ name, value, className = '' }: StatItemProps) {
+export default function StatItem({
+	name,
+	value,
+	className = '',
+}: StatItemProps) {
 	// 数値のフォーマット（3桁区切り）
 	const formatValue = (num: number): string => {
 		return num.toLocaleString('ja-JP')
