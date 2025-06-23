@@ -720,12 +720,158 @@ export const StatusPreview: React.FC<StatusPreviewProps> = ({ isVisible }) => {
 }
 ```
 
+## 装備品補正値計算仕様
+
+### 計算方法
+
+装備品補正値1〜3の各プロパティ値は、以下の4つのソースからの値を加算して算出される：
+
+```typescript
+// 各プロパティの計算式
+equipmentBonusValue = equipmentValue + crystalValue + foodValue + buffValue
+```
+
+### データソース詳細
+
+#### 1. 装備品/プロパティ (Equipment Properties)
+- **ソース**: 装備フォームで設定された8スロットの装備品
+- **対象**: メイン、ボディ、アディショナル、スペシャル、サブ武器、ファッション1-3
+- **取得**: 各装備品の選択されたプロパティ値
+
+#### 2. クリスタル (Crystal Properties)  
+- **ソース**: クリスタルフォームで設定された8スロットのクリスタル
+- **対象**: 武器クリスタル×2、防具クリスタル×2、アディショナルクリスタル×2、スペシャルクリスタル×2
+- **取得**: 各クリスタルの効果値
+
+#### 3. 料理 (Food Effects)
+- **ソース**: 料理選択フォームで設定された料理とレベル
+- **対象**: HP系、MP系、ATK系等の各種料理
+- **取得**: 選択された料理の指定レベル効果値
+- **詳細**: [料理データ設計書](../data/food-data.md)参照
+
+#### 4. バフアイテム (Buff Items)
+- **ソース**: バフアイテム選択フォームで設定されたアイテム
+- **対象**: 各種バフアイテム、スキルバフ
+- **取得**: 選択されたバフの効果値
+
+### 計算実装例
+
+```typescript
+// 装備品補正値計算の実装例
+interface BonusCalculationSources {
+  equipment: Record<string, number>  // 装備品からの補正値
+  crystal: Record<string, number>    // クリスタルからの補正値  
+  food: Record<string, number>       // 料理からの補正値
+  buff: Record<string, number>       // バフからの補正値
+}
+
+function calculateEquipmentBonus(
+  propertyName: string,
+  sources: BonusCalculationSources
+): number {
+  const equipmentValue = sources.equipment[propertyName] || 0
+  const crystalValue = sources.crystal[propertyName] || 0
+  const foodValue = sources.food[propertyName] || 0
+  const buffValue = sources.buff[propertyName] || 0
+  
+  return equipmentValue + crystalValue + foodValue + buffValue
+}
+
+// 全プロパティの計算
+function calculateAllEquipmentBonuses(
+  sources: BonusCalculationSources
+): Record<string, number> {
+  const allProperties = new Set([
+    ...Object.keys(sources.equipment),
+    ...Object.keys(sources.crystal),
+    ...Object.keys(sources.food),
+    ...Object.keys(sources.buff)
+  ])
+  
+  const result: Record<string, number> = {}
+  
+  for (const property of allProperties) {
+    result[property] = calculateEquipmentBonus(property, sources)
+  }
+  
+  return result
+}
+```
+
+### 計算フロー
+
+1. **データ収集**: 各フォームから現在の設定値を取得
+2. **プロパティ集約**: 同一プロパティの値を4ソースから収集
+3. **加算計算**: プロパティごとに4つの値を合計
+4. **結果格納**: 装備品補正値1〜3の適切なセクションに配置
+5. **UI更新**: StatusPreviewで計算結果を表示
+
+### プロパティ分類
+
+#### 装備品補正値1 (31プロパティ)
+- **攻撃系**: ATK, MATK, 武器ATK, 物理貫通, 魔法貫通
+- **属性系**: 属性威力, 抜刀威力, 近距離威力, 遠距離威力
+- **クリティカル**: クリ率, クリダメ
+- **ステータス**: STR, AGI, INT, DEX, VIT
+- **速度系**: ASPD, CSPD, 安定率, 行動速度
+- **命中回避**: 命中, 回避
+- **HP/MP**: HP, MP, 攻撃MP回復
+- **耐性**: 異常耐性, 物理耐性, 魔法耐性
+- **ヘイト**: ヘイト+, ヘイト-
+
+#### 装備品補正値2 (31プロパティ)  
+- **ステータス依存攻撃**: ATK+(STR%), MATK+(STR%), ATK+(INT%), MATK+(INT%), etc.
+- **属性耐性**: 無耐性, 火耐性, 水耐性, 風耐性, 地耐性, 光耐性, 闇耐性
+- **ダメージ軽減**: 直線軽減, 突進軽減, 弾丸軽減, 周囲軽減, 範囲軽減, 痛床軽減, 隕石軽減, 射刃軽減, 吸引軽減, 爆発軽減
+- **バリア**: 物理バリア, 魔法バリア, 割合バリア, バリア速度
+
+#### 装備品補正値3 (8プロパティ)
+- **追撃**: 物理追撃, 魔法追撃  
+- **自然回復**: HP自然回復, MP自然回復
+- **絶対系**: 絶対命中, 絶対回避
+- **特殊**: 復帰短縮, 道具速度
+
+### データ統合ポイント
+
+#### aggregateAllBonuses関数での統合
+```typescript
+// src/utils/basicStatsCalculation.ts での実装
+export function aggregateAllBonuses(
+  equipmentBonuses: Record<string, number>,
+  crystalBonuses: Record<string, number>, 
+  foodBonuses: Record<string, number>,
+  buffBonuses: Record<string, number>
+): AllBonuses {
+  // 4つのソースから値を集約して装備品補正値を計算
+  const aggregated: Record<string, number> = {}
+  
+  // 全プロパティを収集
+  const allKeys = new Set([
+    ...Object.keys(equipmentBonuses),
+    ...Object.keys(crystalBonuses),
+    ...Object.keys(foodBonuses), 
+    ...Object.keys(buffBonuses)
+  ])
+  
+  // プロパティごとに4ソースの値を加算
+  for (const key of allKeys) {
+    aggregated[key] = (equipmentBonuses[key] || 0) +
+                     (crystalBonuses[key] || 0) +
+                     (foodBonuses[key] || 0) +
+                     (buffBonuses[key] || 0)
+  }
+  
+  return aggregated
+}
+```
+
 ## 更新履歴
 
 | 日付 | 更新内容 | 備考 |
 |------|----------|------|
 | 2024-06-23 | StatusPreview独立設計書作成 | header-component.mdから分離 |
 | 2024-06-23 | UI設計書に特化した内容に変更 | 計算ロジックをrequirements/に分離 |
+| 2024-06-23 | 装備品補正値計算仕様を追加 | 4ソース加算方式の詳細化 |
 
 ## 関連ドキュメント
 - [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細
