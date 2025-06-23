@@ -90,56 +90,72 @@ HP%適用後 = INT(HP基本値 × (1 + HP%/100))
 
 ### 基本計算式
 ```
-最終MP = MP基本値 + 装備MP補正 + クリスタMP補正 + 料理MP補正 + スキルMP補正
+MP = INT(INT(Lv+99+TEC+総INT/10)*(1+MP%/100))+MP固定値
 ```
+
+**注意:** `INT(数値)`は小数点以下を切り捨てる関数（ステータスのINTとは異なる）
+- 例: INT(-2.7) = -3
 
 ### 詳細計算
 
 #### 1. MP基本値計算
 ```
-MP基本値 = (INT × 2) + (MEN × 1.5) + (レベル × 2) + 50
+MP基本値 = INT(Lv + 99 + TEC + 総INT/10)
 ```
+
+**構成要素:**
+- **Lv**: ステータスのレベル
+- **TEC**: ステータスのTEC
+- **総INT**: ステータスのINT（装備・クリスタ補正は含まない）
 
 **計算例:**
-- INT: 150, MEN: 100, レベル: 150の場合
-- MP基本値 = (150 × 2) + (100 × 1.5) + (150 × 2) + 50
-- MP基本値 = 300 + 150 + 300 + 50 = 800
+- Lv: 150
+- TEC: 80
+- 総INT: 200
+- MP基本値 = INT(150 + 99 + 80 + 200/10)
+- MP基本値 = INT(150 + 99 + 80 + 20)
+- MP基本値 = INT(349) = 349
 
-#### 2. 装備MP補正
-HPと同様に固定値と%値の2種類:
-
-**a) 固定MP補正**
+#### 2. MP%補正適用
 ```
-装備MP固定補正 = Σ(各装備のMP固定値)
-```
-
-**b) MP%補正**
-```
-装備MP%補正 = MP基本値 × (Σ(各装備のMP%値) / 100)
+MP%適用後 = INT(MP基本値 × (1 + MP%/100))
 ```
 
-#### 3. クリスタMP補正
-**a) 固定MP補正**
+**構成要素:**
+- **MP%**: 装備/プロパティとセットしてあるクリスタ、バフアイテムのMP%の合計
+
+**計算例:**
+- MP基本値: 349
+- MP%: 30% (装備+クリスタ+バフアイテム)
+- MP%適用後 = INT(349 × (1 + 30/100))
+- MP%適用後 = INT(349 × 1.30)
+- MP%適用後 = INT(453.7) = 453
+
+#### 3. 最終MP計算
 ```
-クリスタMP固定補正 = Σ(各クリスタのMP固定値)
+最終MP = MP%適用後 + MP固定値
 ```
 
-**b) MP%補正**
-```
-クリスタMP%補正 = MP基本値 × (Σ(各クリスタのMP%値) / 100)
-```
+**構成要素:**
+- **MP固定値**: 装備/プロパティとセットしてあるクリスタ、バフアイテムのMP固定値の合計
 
-#### 4. 最終MP計算
-```
-最終MP = MP基本値 + 装備MP固定補正 + 装備MP%補正 + クリスタMP固定補正 + クリスタMP%補正 + その他補正
-```
+**計算例:**
+- MP%適用後: 453
+- MP固定値: 100 (装備+クリスタ+バフアイテム)
+- 最終MP = 453 + 100 = 553
 
-**完全計算例:**
-- MP基本値: 800
-- 装備MP固定補正: +50
-- 装備MP%補正: +80 (10%)
-- クリスタMP固定補正: +30
-- 最終MP = 800 + 50 + 80 + 30 = 960
+### 完全計算例
+**入力値:**
+- Lv: 150
+- TEC: 80
+- 総INT: 200
+- MP%: 30%
+- MP固定値: 100
+
+**計算手順:**
+1. MP基本値 = INT(150 + 99 + 80 + 200/10) = INT(349) = 349
+2. MP%適用後 = INT(349 × (1 + 30/100)) = INT(453.7) = 453
+3. 最終MP = 453 + 100 = 553
 
 ## 実装における注意点
 
@@ -147,7 +163,9 @@ HPと同様に固定値と%値の2種類:
 - **HP計算**: INT()関数による切り捨て処理を2段階で実施
   - HP基本値計算時: `INT(93+(補正後VIT+22.41)*Lv/3)`
   - HP%適用時: `INT(HP基本値*(1+HP%/100))`
-- **MP計算**: 従来通り小数点以下切り捨て
+- **MP計算**: INT()関数による切り捨て処理を2段階で実施
+  - MP基本値計算時: `INT(Lv+99+TEC+総INT/10)`
+  - MP%適用時: `INT(MP基本値*(1+MP%/100))`
 - **負数の切り捨て**: INT(-2.7) = -3（より小さい整数）
 
 ### HP計算順序（新計算式）
@@ -156,13 +174,10 @@ HPと同様に固定値と%値の2種類:
 3. **HP%補正適用**: INT(HP基本値 × (1 + HP%/100))
 4. **HP固定値加算**: HP%適用後 + HP固定値
 
-### MP計算順序（従来通り）
-1. MP基本値計算（INT、MEN、レベルから）
-2. 装備固定値補正の加算
-3. 装備%補正の計算と加算
-4. クリスタ固定値補正の加算
-5. クリスタ%補正の計算と加算
-6. その他バフ補正の加算
+### MP計算順序（新計算式）
+1. **MP基本値計算**: INT(Lv + 99 + TEC + 総INT/10)
+2. **MP%補正適用**: INT(MP基本値 × (1 + MP%/100))
+3. **MP固定値加算**: MP%適用後 + MP固定値
 
 ### TypeScript実装例
 ```typescript
@@ -187,20 +202,19 @@ interface BasicStatsCalculation {
     return hpAfterPercent + hpFixed
   }
 
-  calculateMP(stats: BaseStats, equipmentBonus: EquipmentBonus, crystalBonus: CrystalBonus): number {
-    // MP基本値
-    const baseMP = Math.floor(stats.INT * 2) + Math.floor(stats.MEN * 1.5) + (stats.level * 2) + 50
+  calculateMP(stats: BaseStats, allBonuses: AllBonuses): number {
+    // 1. MP基本値計算
+    const baseMP = Math.floor(stats.level + 99 + stats.TEC + stats.INT / 10)
     
-    // 装備補正（HPと同様の処理）
-    const equipmentFixedMP = equipmentBonus.MP || 0
-    const equipmentPercentMP = Math.floor(baseMP * (equipmentBonus.MP_Rate || 0) / 100)
+    // 2. MP%補正適用
+    const mpPercent = allBonuses.MP_Rate || 0
+    const mpAfterPercent = Math.floor(baseMP * (1 + mpPercent / 100))
     
-    // クリスタ補正
-    const crystalFixedMP = crystalBonus.MP || 0
-    const crystalPercentMP = Math.floor(baseMP * (crystalBonus.MP_Rate || 0) / 100)
+    // 3. MP固定値加算
+    const mpFixed = allBonuses.MP || 0
     
-    // 最終MP
-    return baseMP + equipmentFixedMP + equipmentPercentMP + crystalFixedMP + crystalPercentMP
+    // 4. 最終MP
+    return mpAfterPercent + mpFixed
   }
 }
 
@@ -210,6 +224,8 @@ interface AllBonuses {
   VIT_Rate?: number     // VIT%の合計
   HP?: number           // HP固定値の合計
   HP_Rate?: number      // HP%の合計
+  MP?: number           // MP固定値の合計
+  MP_Rate?: number      // MP%の合計
   // その他のステータス...
 }
 ```
@@ -229,12 +245,17 @@ interface AllBonuses {
 3. HP%適用後 = INT(14213 × 1.25) = 17766
 4. 最終HP = 17766 + 200 = 17966
 
-### MP計算検証例
-| INT | MEN | レベル | 装備MP | 装備MP% | 期待MP | 実測MP | 状態 |
-|-----|-----|-------|--------|---------|--------|--------|------|
-| 100 | 50  | 100   | 0      | 0%      | 525    | 525    | ✅   |
-| 150 | 100 | 150   | 50     | 10%     | 960    | -      | 🔄   |
-| 200 | 150 | 200   | 100    | 15%     | 1365   | -      | 🔄   |
+### MP計算検証例（新計算式）
+| Lv | TEC | 総INT | MP% | MP固定 | 期待MP | 実測MP | 状態 |
+|----|-----|-------|-----|--------|--------|--------|------|
+| 100 | 50 | 100 | 0% | 0 | 259 | - | 🔄 |
+| 150 | 80 | 200 | 30% | 100 | 553 | - | 🔄 |
+| 200 | 100 | 300 | 40% | 150 | 696 | - | 🔄 |
+
+**計算詳細例（Lv:150, TEC:80, 総INT:200）:**
+1. MP基本値 = INT(150 + 99 + 80 + 200/10) = 349
+2. MP%適用後 = INT(349 × 1.30) = 453
+3. 最終MP = 453 + 100 = 553
 
 **凡例:**
 - ✅: 検証済み（正確）
@@ -247,6 +268,7 @@ interface AllBonuses {
 |------|----------|------|
 | 2024-06-23 | HP・MP計算式の初期作成 | 基本的な計算式を記述 |
 | 2024-06-23 | HP計算式を正確な式に修正 | INT()関数使用、補正後VIT導入、2段階計算に変更 |
+| 2024-06-23 | MP計算式を正確な式に修正 | INT()関数使用、TECとINT活用、2段階計算に変更 |
 
 ## 関連ドキュメント
 - [計算式概要](./overview.md)
