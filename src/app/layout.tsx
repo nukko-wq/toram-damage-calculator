@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/layout/Header'
+import ResultToggleBar from '@/components/layout/ResultToggleBar'
 
 export const metadata: Metadata = {
 	title: 'トーラムダメージ計算',
@@ -20,6 +21,7 @@ export default function RootLayout({
 		<html lang="ja">
 			<body>
 				<Header />
+				<ResultToggleBar />
 				<main>{children}</main>
 			</body>
 		</html>

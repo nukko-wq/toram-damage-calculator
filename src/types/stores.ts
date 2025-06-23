@@ -126,8 +126,13 @@ export interface UIStore {
 	showSaveManager: boolean
 	showUpdateNotifications: boolean
 
+	// 計算結果表示制御
+	activeResultView: 'damage' | 'status' | null
+
 	setShowSaveManager: (value: boolean) => void
 	setShowUpdateNotifications: (value: boolean) => void
+	setActiveResultView: (view: 'damage' | 'status' | null) => void
+	toggleResultView: (view: 'damage' | 'status') => void
 }
 
 // ===== セーブデータストア =====
