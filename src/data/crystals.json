@@ -26,17 +26,18 @@
 		"armor": [
 			{
 				"id": "armor_altadal",
-				"name": "アルタダール",
+				"name": "アルタダール(軽鎧装備)",
 				"type": "armor",
 				"properties": {
-					"HP_Rate": 15,
-					"VIT_Rate": 8,
-					"PhysicalResistance_Rate": 5
+					"Stability_Rate": 6,
+					"STR_Rate": 6,
+					"VIT_Rate": 6,
+					"ShortRangeDamage_Rate": 11
 				}
 			},
 			{
 				"id": "bangledrum",
-				"name": "バングルドム",
+				"name": "バングルドム(軽鎧装備)",
 				"type": "armor",
 				"properties": {
 					"ATK_Rate": 10,
