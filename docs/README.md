@@ -18,6 +18,7 @@
 - [free-input-slots.md](./technical/free-input-slots.md) - 自由入力装備スロット拡張
 - [register-system.md](./technical/register-system.md) - レジスタ他システム
 - [calculation-result-system.md](./technical/calculation-result-system.md) - ステータス計算結果表示システム
+- [basic-stats-calculation.md](./technical/basic-stats-calculation.md) - 基本ステータス計算システム（HP・MP）
 
 ## docs/database/ - データベース設計
 
@@ -46,7 +47,9 @@
 ### インターフェース
 - [equipment-customization.md](./ui/equipment-customization.md) - 装備カスタム機能UI仕様
 - [selection-modals.md](./ui/selection-modals.md) - 選択モーダルUI仕様
-- [header-component.md](./ui/header-component.md) - ヘッダーコンポーネント・計算結果ボタンバー設計
+- [header-component.md](./ui/header-component.md) - ヘッダーコンポーネント設計
+- [result-toggle-bar.md](./ui/result-toggle-bar.md) - 計算結果トグルバー設計
+- [status-preview.md](./ui/status-preview.md) - ステータス計算結果表示設計
 
 ## docs/store/ - Zustand状態管理設計
 
