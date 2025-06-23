@@ -1,5 +1,9 @@
 import { useCalculatorStore } from '@/stores'
-import { calculateHP, calculateMP, aggregateAllBonuses } from '@/utils/basicStatsCalculation'
+import {
+	calculateHP,
+	calculateMP,
+	aggregateAllBonuses,
+} from '@/utils/basicStatsCalculation'
 import StatSection from './StatSection'
 
 interface StatusPreviewProps {
@@ -15,14 +19,14 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
-	
+
 	// TODO: 実際の装備・クリスタ・料理・バフから補正値を集計
 	// 現在は仮の補正値を使用
 	const allBonuses = aggregateAllBonuses(
 		{}, // equipment bonuses
-		{}, // crystal bonuses  
+		{}, // crystal bonuses
 		{}, // food bonuses
-		{}  // buff bonuses
+		{}, // buff bonuses
 	)
 
 	const hpCalculation = calculateHP(baseStats, allBonuses)
@@ -30,7 +34,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// TODO: 将来的には全98項目の計算を実装
 	// 現在は基本的な項目のみ計算
-	
+
 	// 基本ステータス (30項目のうち実装可能な項目)
 	const basicStats = {
 		HP: hpCalculation.finalHP,
@@ -60,7 +64,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		ailmentResistance: 0, // TODO: 異常耐性
 		motionSpeed: 100, // TODO: 行動速度計算
 		armorBreak: 0, // TODO: 防御崩し
-		anticipate: 0 // TODO: 先読み
+		anticipate: 0, // TODO: 先読み
 	}
 
 	// 補正後ステータス (8項目)
@@ -72,7 +76,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		VIT: Math.floor(hpCalculation.adjustedVIT), // HP計算で使用した補正後VIT
 		CRT: baseStats.CRT,
 		MEN: baseStats.MEN,
-		TEC: baseStats.TEC
+		TEC: baseStats.TEC,
 	}
 
 	// 装備品補正値1 (31項目のうち基本的な項目)
@@ -106,7 +110,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		physicalResistance: 0, // TODO: 物理耐性補正
 		magicalResistance: 0, // TODO: 魔法耐性補正
 		aggroPlus: 0, // TODO: ヘイト+
-		aggroMinus: 0 // TODO: ヘイト-
+		aggroMinus: 0, // TODO: ヘイト-
 	}
 
 	// 装備品補正値2 (32項目のうち基本的な項目)
@@ -141,7 +145,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		physicalBarrier: 0, // TODO: 物理バリア
 		magicalBarrier: 0, // TODO: 魔法バリア
 		fractionalBarrier: 0, // TODO: 割合バリア
-		barrierCooldown: 0 // TODO: バリア速度
+		barrierCooldown: 0, // TODO: バリア速度
 	}
 
 	// 装備品補正値3 (8項目)
@@ -153,14 +157,14 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		absoluteAccuracy: 0, // TODO: 絶対命中
 		absoluteDodge: 0, // TODO: 絶対回避
 		revivalTime: 0, // TODO: 復帰短縮
-		itemCooldown: 0 // TODO: 道具速度
+		itemCooldown: 0, // TODO: 道具速度
 	}
 
 	return (
 		<div className="bg-gray-50 border-b border-gray-200 transition-all duration-300 ease-in-out">
-			<div className="container mx-auto px-4 py-6">
+			<div className="px-4 py-6">
 				{/* レスポンシブグリッドレイアウト - 5つのセクション */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+				<div className="flex gap-6 flex-wrap">
 					{/* 基本ステータス (30項目) */}
 					<StatSection
 						title="基本ステータス"
@@ -193,9 +197,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							ailmentResistance: '異常耐性',
 							motionSpeed: '行動速度',
 							armorBreak: '防御崩し',
-							anticipate: '先読み'
+							anticipate: '先読み',
 						}}
-						className="md:col-span-2 lg:col-span-2"
+						className=""
 					/>
 
 					{/* 補正後ステータス (8項目) */}
@@ -210,9 +214,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							VIT: 'VIT',
 							CRT: 'CRT',
 							MEN: 'MEN',
-							TEC: 'TEC'
+							TEC: 'TEC',
 						}}
-						className="md:col-span-1 lg:col-span-1"
+						className=""
 					/>
 
 					{/* 装備品補正値1 (31項目) */}
@@ -249,9 +253,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							physicalResistance: '物理耐性',
 							magicalResistance: '魔法耐性',
 							aggroPlus: 'ヘイト+',
-							aggroMinus: 'ヘイト-'
+							aggroMinus: 'ヘイト-',
 						}}
-						className="md:col-span-1 lg:col-span-1"
+						className=""
 					/>
 
 					{/* 装備品補正値2 (32項目) */}
@@ -289,14 +293,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							physicalBarrier: '物理バリア',
 							magicalBarrier: '魔法バリア',
 							fractionalBarrier: '割合バリア',
-							barrierCooldown: 'バリア速度'
+							barrierCooldown: 'バリア速度',
 						}}
-						className="md:col-span-1 lg:col-span-1"
+						className=""
 					/>
-				</div>
 
-				{/* 装備品補正値3を独立行で表示 */}
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
 					{/* 装備品補正値3 (8項目) */}
 					<StatSection
 						title="装備品補正値3"
@@ -309,9 +310,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							absoluteAccuracy: '絶対命中',
 							absoluteDodge: '絶対回避',
 							revivalTime: '復帰短縮',
-							itemCooldown: '道具速度'
+							itemCooldown: '道具速度',
 						}}
-						className="md:col-span-1 lg:col-span-1"
+						className=""
 					/>
 				</div>
 
@@ -334,10 +335,21 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								実装状況 (Phase 2: 部分実装)
 							</h3>
 							<div className="mt-2 text-sm text-yellow-700">
-								<p><strong>✅ 実装済み:</strong> HP・MP計算（正確なトーラム計算式）</p>
-								<p><strong>🔄 部分実装:</strong> 基本ステータス表示構造（98項目対応）</p>
-								<p><strong>❌ 未実装:</strong> 装備・クリスタ・バフ補正値の統合計算</p>
-								<p className="mt-1 text-xs">現在は基本ステータスとHP・MPのみ正確な値を表示。その他は0または仮値です。</p>
+								<p>
+									<strong>✅ 実装済み:</strong>{' '}
+									HP・MP計算（正確なトーラム計算式）
+								</p>
+								<p>
+									<strong>🔄 部分実装:</strong>{' '}
+									基本ステータス表示構造（98項目対応）
+								</p>
+								<p>
+									<strong>❌ 未実装:</strong>{' '}
+									装備・クリスタ・バフ補正値の統合計算
+								</p>
+								<p className="mt-1 text-xs">
+									現在は基本ステータスとHP・MPのみ正確な値を表示。その他は0または仮値です。
+								</p>
 							</div>
 						</div>
 					</div>

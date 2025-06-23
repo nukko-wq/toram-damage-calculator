@@ -42,28 +42,20 @@
 ### 基本ステータス（30項目）
 ```
 ┌─────── 基本ステータス ─────────┐
-│ HP: 14,413      MP: 459       │
-│ ATK: 2,341      基礎ATK: 1,890 │
-│ MATK: 1,876                   │
-│ サブ基本ATK: 156              │
-│ 総ATK: 2,497                  │
-│ ブリンガーAM: 124            │
-│ 基本MATK: 1,542              │
-│ 安定率: 85%                   │
-│ サブ安定率: 75%              │
-│ クリティカル率: 12%          │
-│ クリティカルダメージ: 150%    │
-│ 魔法クリティカル率: 8%       │
-│ 魔法クリティカルダメージ: 130% │
-│ 総属性有利: 25%              │
-│ 属性覚醒有利: 15%            │
-│ ASPD: 1,200    CSPD: 890     │
-│ HIT: 234       FLEE: 189     │
-│ 物理耐性: 15%   魔法耐性: 12% │
-│ 異常耐性: 8%                 │
-│ 行動速度: 105%               │
-│ 防御崩し: 5%                 │
-│ 先読み: 3%                   │
+│ HP 14,413      MP 459         │
+│ ATK 2,341      基礎ATK 1,890   │
+│ サブATK 156    サブ基礎ATK 0   │
+│ 総ATK 2,497    ブリンガーAM 124│
+│ MATK 1,876     基本MATK 1,542 │
+│ 安定率 85%     サブ安定率 75%  │
+│ クリ率 12%     クリダメ 150%   │
+│ 魔クリ率 8%    魔クリダメ 130% │
+│ 総属性有利 25% 属性覚醒 15%    │
+│ ASPD 1,200     CSPD 890       │
+│ HIT 234        FLEE 189       │
+│ 物理耐性 15%   魔法耐性 12%    │
+│ 異常耐性 8%    行動速度 105%   │
+│ 防御崩し 5%    先読み 3%       │
 └─────────────────────────────┘
 ```
 
@@ -77,90 +69,148 @@
 └─────────────────────────────┘
 ```
 
-### 装備品補正値1（31項目）
+### 装備品補正値1（31プロパティ - 3列表示）
 ```
-┌─────── 装備品補正値1 ─────────┐
-│ ATK: +150      物理貫通: +25 │
-│ MATK: +120     魔法貫通: +20 │
-│ 武器ATK: +200               │
-│ 属性威力: +15%              │
-│ 抜刀威力: +10%              │
-│ 近距離威力: +8%             │
-│ 遠距離威力: +5%             │
-│ クリティカルダメージ: +20%  │
-│ クリティカル率: +5%         │
-│ STR: +15       AGI: +15     │
-│ INT: +10       DEX: +10     │
-│ VIT: +5                     │
-│ ASPD: +200     CSPD: +150   │
-│ 安定率: +5%                 │
-│ 行動速度: +5%               │
-│ 命中: +34      回避: +29     │
-│ MP: +100                    │
-│ 攻撃MP回復: +2              │
-│ HP: +200                    │
-│ 異常耐性: +3%               │
-│ 物理耐性: +5%               │
-│ 魔法耐性: +3%               │
-│ ヘイト+: +15   ヘイト-: +10  │
-└─────────────────────────────┘
-```
-
-### 装備品補正値2（32項目）
-```
-┌─────── 装備品補正値2 ─────────┐
-│ ATK+(STR%): +8%             │
-│ MATK+(STR%): +6%            │
-│ ATK+(INT%): +10%            │
-│ MATK+(INT%): +12%           │
-│ ATK+(VIT%): +5%             │
-│ MATK+(VIT%): +4%            │
-│ ATK+(AGI%): +3%             │
-│ MATK+(AGI%): +2%            │
-│ ATK+(DEX%): +4%             │
-│ MATK+(DEX%): +3%            │
-│ 無耐性: +5%    火耐性: +8%   │
-│ 水耐性: +6%    風耐性: +7%   │
-│ 地耐性: +5%    光耐性: +9%   │
-│ 闇耐性: +4%                 │
-│ 直線軽減: +3%  突進軽減: +4% │
-│ 弾丸軽減: +2%  周囲軽減: +5% │
-│ 範囲軽減: +3%  痛床軽減: +2% │
-│ 隕石軽減: +1%  射刃軽減: +2% │
-│ 吸引軽減: +1%  爆発軽減: +3% │
-│ 物理バリア: +150            │
-│ 魔法バリア: +120            │
-│ 割合バリア: +5%             │
-│ バリア速度: +10%            │
-└─────────────────────────────┘
+┌────── 装備品補正値1 ───────┐
+│ プロパティ      %     +      │
+│ ───────────────────── │
+│ ATK           15   150    │
+│ MATK          12   120    │
+│ 武器ATK       10   200    │
+│ 物理貫通      25    -     │
+│ 魔法貫通      20    -     │
+│ 属性威力      15    -     │
+│ 抜刀威力      10    -     │
+│ 近距離威力    8     -     │
+│ 遠距離威力    5     -     │
+│ クリダメ      20    5     │
+│ クリ率        5     2     │
+│ STR           10   15     │
+│ AGI           8    15     │
+│ INT           12   10     │
+│ DEX           6    10     │
+│ VIT           5    5      │
+│ ASPD          15   200    │
+│ CSPD          10   150    │
+│ 安定率        5     -     │
+│ 行動速度      5     -     │
+│ 命中          8    34     │
+│ 回避          6    29     │
+│ HP            10   200    │
+│ MP            8    100    │
+│ 攻撃MP回復    3    2      │
+│ 異常耐性      3     -     │
+│ 物理耐性      5     -     │
+│ 魔法耐性      3     -     │
+│ ヘイト        15    -     │
+└───────────────────────┘
 ```
 
-### 装備品補正値3（8項目）
+### 装備品補正値2（16プロパティ - 3列表示）
 ```
-┌─────── 装備品補正値3 ─────────┐
-│ 物理追撃: +8%               │
-│ 魔法追撃: +6%               │
-│ HP自然回復: +15             │
-│ MP自然回復: +10             │
-│ 絶対命中: +5                │
-│ 絶対回避: +3                │
-│ 復帰短縮: +20%              │
-│ 道具速度: +15%              │
-└─────────────────────────────┘
+┌────── 装備品補正値2 ───────┐
+│ プロパティ      %     +      │
+│ ───────────────────── │
+│ ATK(STR)      8     -     │
+│ MATK(STR)     6     -     │
+│ ATK(INT)      10    -     │
+│ MATK(INT)     12    -     │
+│ ATK(VIT)      5     -     │
+│ MATK(VIT)     4     -     │
+│ ATK(AGI)      3     -     │
+│ MATK(AGI)     2     -     │
+│ ATK(DEX)      4     -     │
+│ MATK(DEX)     3     -     │
+│ 無耐性        5     -     │
+│ 火耐性        8     -     │
+│ 水耐性        6     -     │
+│ 風耐性        7     -     │
+│ 地耐性        5     -     │
+│ 光耐性        9     -     │
+│ 闇耐性        4     -     │
+│ 直線軽減      3     -     │
+│ 突進軽減      4     -     │
+│ 弾丸軽減      2     -     │
+│ 周囲軽減      5     -     │
+│ 範囲軽減      3     -     │
+│ 痛床軽減      2     -     │
+│ 隕石軍減      1     -     │
+│ 射刃軽減      2     -     │
+│ 吸引軽減      1     -     │
+│ 爆発軽減      3     -     │
+│ 物理バリア    -    150    │
+│ 魔法バリア    -    120    │
+│ 割合バリア    -    5      │
+│ バリア速度    10    -     │
+└───────────────────────┘
+```
+
+### 装備品補正値3（7プロパティ - 3列表示）
+```
+┌────── 装備品補正値3 ───────┐
+│ プロパティ      %     +      │
+│ ───────────────────── │
+│ 物理追撃      8     -     │
+│ 魔法追撃      6     -     │
+│ HP自然回復   12   15     │
+│ MP自然回復   10   10     │
+│ 絶対命中      8    5      │
+│ 絶対回避      6    3      │
+│ 復帰短縮      20   -     │
+│ 道具速度      -   15     │
+└───────────────────────┘
 ```
 
 ## データ表示仕様
 
+### プロパティ表示パターン
+
+#### 1. 3列レイアウトパターン
+
+**基本構造**: `プロパティ名 | % | +`
+
+```
+プロパティ      %     +
+─────────────────────
+ATK           15   150     // 両方あり
+HP            10    -      // %のみ
+物理バリア    -    150     // +のみ
+```
+
+#### 2. 各パターンの表示例
+
+**両方表示プロパティ**: 両方の列に値を表示
+```
+ATK           15   150
+HP            10   200  
+STR           5    15
+```
+
+**%のみプロパティ**: +列は「-」表示
+```
+ヘイト        15    -
+火耐性        8     -
+属性威力      15    -
+```
+
+**+のみプロパティ**: %列は「-」表示
+```
+道具速度      -    15
+物理バリア    -   150
+魔法バリア    -   120
+```
+
 ### 数値表示フォーマット
 - **整数値**: カンマ区切り（例: 14,413）
-- **パーセント**: %記号付き（例: 85%）
-- **小数値**: 必要に応じて小数点1桁まで
+- **パーセント**: %記号付き（例: +15%、85%）
+- **固定値**: 符号付き数値（例: +150、-50）
+- **ゼロ値**: 「0」で表示（非表示にしない）
 
 ### 色分け表示
 - **基本値**: 通常色（黒）
-- **補正値**: 強調色（青）
+- **正の補正値**: 強調色（青）
+- **負の補正値**: 警告色（赤）
 - **計算結果**: 結果色（緑）
-- **エラー値**: 警告色（赤）
 
 ## 技術仕様
 
@@ -308,25 +358,105 @@ interface AllBonuses {
 }
 ```
 
-### データ取得とバインディング
+### UIコンポーネント設計
+
+#### StatItemコンポーネントの拡張
 
 ```typescript
-// Zustandストアからデータを取得
-const { data } = useCalculatorStore()
-const calculationResults = useCalculatorStore((state) => state.calculationResults)
+interface PropertyDisplayProps {
+  propertyName: string
+  rateValue: number | null
+  fixedValue: number | null
+  propertyConfig: PropertyConfig
+}
 
-// 計算結果の表示バインディング
-const displayData = useMemo(() => {
-  if (!calculationResults) return null
-  
-  return {
-    basicStats: formatBasicStats(calculationResults.basicStats),
-    adjustedStats: formatAdjustedStats(calculationResults.adjustedStats),
-    equipmentBonus1: formatEquipmentBonus1(calculationResults.equipmentBonus1),
-    equipmentBonus2: formatEquipmentBonus2(calculationResults.equipmentBonus2),
-    equipmentBonus3: formatEquipmentBonus3(calculationResults.equipmentBonus3)
-  }
-}, [calculationResults])
+const PropertyDisplay: React.FC<PropertyDisplayProps> = ({ 
+  propertyName, 
+  rateValue, 
+  fixedValue, 
+  propertyConfig 
+}) => {
+  return (
+    <div className="grid grid-cols-[100px_60px_60px] gap-2 py-1 px-2">
+      {/* プロパティ名 */}
+      <span className="text-sm text-gray-700 font-medium truncate">
+        {propertyName}
+      </span>
+      
+      {/* %値 */}
+      <div className="text-center">
+        {propertyConfig.hasRate ? (
+          <span className={cn(
+            "text-xs tabular-nums px-1 py-0.5 rounded",
+            rateValue > 0 ? "bg-sky-50 text-sky-700" : "text-gray-400"
+          )}>
+            {rateValue > 0 ? rateValue : '-'}
+          </span>
+        ) : (
+          <span className="text-gray-300">-</span>
+        )}
+      </div>
+      
+      {/* +値 */}
+      <div className="text-center">
+        {propertyConfig.hasFixed ? (
+          <span className={cn(
+            "text-xs tabular-nums px-1 py-0.5 rounded",
+            fixedValue > 0 ? "bg-rose-50 text-rose-700" : "text-gray-400"
+          )}>
+            {fixedValue > 0 ? fixedValue : '-'}
+          </span>
+        ) : (
+          <span className="text-gray-300">-</span>
+        )}
+      </div>
+    </div>
+  )
+}
+```
+
+#### セクションヘッダーの追加
+
+```typescript
+const PropertySectionHeader: React.FC = () => {
+  return (
+    <div className="grid grid-cols-[100px_60px_60px] gap-2 py-2 px-2 border-b border-gray-200 bg-gray-50">
+      <span className="text-xs font-medium text-gray-600">プロパティ</span>
+      <span className="text-xs font-medium text-center text-sky-600">%</span>
+      <span className="text-xs font-medium text-center text-rose-600">+</span>
+    </div>
+  )
+}
+```
+
+### データバインディングパターン
+
+```typescript
+// 装備品補正値セクションの表示データ構造
+interface EquipmentBonusDisplayData {
+  propertyName: string
+  rateValue: number | null  // %値（ない場合はnull）
+  fixedValue: number | null // 固定値（ない場合はnull）
+  propertyConfig: PropertyConfig
+}
+
+// 表示データの変換
+const formatEquipmentBonusSection = (
+  bonusData: EquipmentBonusResult
+): EquipmentBonusDisplayData[] => {
+  return Object.entries(bonusData).map(([key, value]) => {
+    const config = PROPERTY_DISPLAY_CONFIG[key]
+    const isRateProperty = key.endsWith('_Rate')
+    const basePropertyName = isRateProperty ? key.replace('_Rate', '') : key
+    
+    return {
+      propertyName: PROPERTY_LABELS[basePropertyName],
+      rateValue: config.hasRate ? bonusData[`${basePropertyName}_Rate`] || null : null,
+      fixedValue: config.hasFixed ? bonusData[basePropertyName] || null : null,
+      propertyConfig: config
+    }
+  })
+}
 ```
 
 ### データソース
