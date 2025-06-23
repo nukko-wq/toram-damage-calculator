@@ -11,7 +11,9 @@ interface StatSectionProps {
 export default React.memo<StatSectionProps>(
 	({ title, stats, labels, className = '' }) => {
 		return (
-			<div className={`bg-white rounded-lg border border-gray-200 p-4 ${className}`}>
+			<div
+				className={`bg-white rounded-lg border border-gray-200 p-4 ${className}`}
+			>
 				<h3 className="text-lg font-semibold text-gray-900 mb-3 border-b border-gray-200 pb-2">
 					{title}
 				</h3>
