@@ -158,7 +158,7 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 	}
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-6 lg:row-end-7">
+		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-6 md:row-end-7 lg:col-start-1 lg:col-end-3 lg:row-start-6 lg:row-end-7">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">敵情報</h2>
 
 			<div className="space-y-4">
@@ -212,88 +212,98 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 
 				{/* 選択された敵の基本情報表示 */}
 				{selectedEnemy && (
-					<div className="bg-gray-50 p-3 rounded space-y-2">
-						<h3 className="text-sm font-semibold text-gray-700">
-							選択中: {selectedEnemy.name}
-						</h3>
-						<div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-							<div>レベル: {selectedEnemy.level}</div>
-							<div>DEF: {selectedEnemy.stats.DEF}</div>
-							<div>MDEF: {selectedEnemy.stats.MDEF}</div>
-							<div>物理耐性: {selectedEnemy.stats.physicalResistance}%</div>
-							<div>魔法耐性: {selectedEnemy.stats.magicalResistance}%</div>
-							<div>
-								カテゴリ: {getCategoryDisplayName(selectedEnemy.category)}
-							</div>
-						</div>
-					</div>
+					<table>
+						<tbody>
+							<tr>
+								<td colSpan={2} />
+								<td colSpan={2}>
+									物理耐性: {selectedEnemy.stats.physicalResistance}%
+								</td>
+								<td colSpan={2}>
+									魔法耐性: {selectedEnemy.stats.magicalResistance}%
+								</td>
+							</tr>
+							<tr>
+								<th />
+								<th>Normal</th>
+								<th>Hard</th>
+								<th>Lunatic</th>
+								<th>Ultimate</th>
+							</tr>
+							<tr>
+								<th>レベル</th>
+								<td>{selectedEnemy.level}</td>
+								<td />
+								<td />
+								<td />
+							</tr>
+							<tr>
+								<th>DEF</th>
+								<td>{selectedEnemy.stats.DEF}</td>
+								<td />
+								<td />
+								<td />
+							</tr>
+							<tr>
+								<th>MDEF</th>
+								<td>{selectedEnemy.stats.MDEF}</td>
+								<td />
+								<td />
+								<td />
+							</tr>
+						</tbody>
+					</table>
 				)}
 
 				{/* 手動調整値入力 */}
 				{selectedEnemy && (
 					<div className="space-y-2">
-						<h3 className="text-sm font-semibold text-gray-700">手動調整値</h3>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-							<div className="flex items-center gap-2">
-								<label className="text-sm font-medium text-gray-700 w-20 flex-shrink-0">
-									クリ耐性:
-								</label>
-								<div className="flex-1 flex items-center gap-1 text-sm">
-									<span className="text-gray-500">
-										{selectedEnemy.stats.resistCritical}
-									</span>
-									<span className="text-gray-500">+</span>
-									<input
-										type="number"
-										value={
-											effectiveEnemyData.manualOverrides?.resistCritical || 0
-										}
-										onChange={(e) =>
-											handleManualOverrideChange(
-												'resistCritical',
-												e.target.value,
-											)
-										}
-										className="w-16 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-										min="0"
-										max="999"
-									/>
-									<span className="text-gray-500">=</span>
-									<span className="font-medium">
-										{getFinalValue(
-											selectedEnemy.stats.resistCritical,
-											effectiveEnemyData.manualOverrides?.resistCritical,
-										)}
-									</span>
+							<div className="flex flex-col gap-2">
+								<div className="flex items-center gap-2">
+									<label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">
+										確定クリティカル:
+									</label>
+									<div className="flex-1 flex items-center gap-1 text-sm">
+										<input
+											type="number"
+											value={
+												effectiveEnemyData.manualOverrides?.resistCritical || 0
+											}
+											onChange={(e) =>
+												handleManualOverrideChange(
+													'resistCritical',
+													e.target.value,
+												)
+											}
+											className="w-16 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+											min="0"
+											max="999"
+										/>
+									</div>
 								</div>
-							</div>
 
-							<div className="flex items-center gap-2">
-								<label className="text-sm font-medium text-gray-700 w-20 flex-shrink-0">
-									必要HIT:
-								</label>
-								<div className="flex-1 flex items-center gap-1 text-sm">
-									<span className="text-gray-500">
-										{selectedEnemy.stats.requiredHIT}
-									</span>
-									<span className="text-gray-500">+</span>
-									<input
-										type="number"
-										value={effectiveEnemyData.manualOverrides?.requiredHIT || 0}
-										onChange={(e) =>
-											handleManualOverrideChange('requiredHIT', e.target.value)
-										}
-										className="w-16 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-										min="0"
-										max="9999"
-									/>
-									<span className="text-gray-500">=</span>
-									<span className="font-medium">
-										{getFinalValue(
-											selectedEnemy.stats.requiredHIT,
-											effectiveEnemyData.manualOverrides?.requiredHIT,
-										)}
-									</span>
+								<div className="flex items-center gap-2">
+									<label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">
+										必要HIT:
+									</label>
+									<div className="flex-1 flex items-center gap-1 text-sm">
+										<input
+											type="number"
+											value={
+												effectiveEnemyData.manualOverrides?.requiredHIT || 0
+											}
+											onChange={(e) =>
+												handleManualOverrideChange(
+													'requiredHIT',
+													e.target.value,
+												)
+											}
+											className="w-16 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+											min="0"
+											max="9999"
+										/>
+									</div>
 								</div>
 							</div>
 						</div>

@@ -27,7 +27,6 @@ export const createInitialBaseStats = (): BaseStats => ({
 	CRT: 1,
 	MEN: 1,
 	TEC: 1,
-	LUK: 1,
 	level: 1,
 })
 
@@ -104,8 +103,6 @@ export const createInitialEquipmentProperties =
 		MEN: 0,
 		TEC_Rate: 0,
 		TEC: 0,
-		LUK_Rate: 0,
-		LUK: 0,
 
 		// 命中・回避系
 		Accuracy_Rate: 0,

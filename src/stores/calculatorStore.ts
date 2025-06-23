@@ -12,6 +12,11 @@ import {
 	getCurrentSaveData,
 	initializeStorage,
 } from '@/utils/saveDataManager'
+import { calculateResults } from '@/utils/calculationEngine'
+import {
+	CALC_RESULT_SETTINGS_KEY,
+	type CalculationResultSettings,
+} from '@/types/calculationResult'
 import {
 	createCustomEquipment,
 	saveCustomEquipment,
@@ -55,6 +60,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			calculationResult: null,
 			isCalculating: false,
 			calculationSettings: initialCalculationSettings,
+
+			// ===== ステータス計算結果表示 =====
+			calculationResults: null,
+			isCalculationResultVisible: false,
 
 			// ===== 基本アクション =====
 			updateData: (updates) => {
@@ -563,6 +572,39 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				)
 			},
 
+			// ===== ステータス計算結果表示アクション =====
+			updateCalculationResults: () => {
+				const currentData = get().data
+				const results = calculateResults(currentData)
+				set({ calculationResults: results })
+			},
+
+			toggleCalculationResultVisibility: () => {
+				const newVisibility = !get().isCalculationResultVisible
+				set({ isCalculationResultVisible: newVisibility })
+
+				// LocalStorageに状態を保存
+				const settings: CalculationResultSettings = {
+					isVisible: newVisibility,
+					lastToggleTime: new Date().toISOString(),
+				}
+				localStorage.setItem(CALC_RESULT_SETTINGS_KEY, JSON.stringify(settings))
+			},
+
+			initializeCalculationResultVisibility: () => {
+				try {
+					const saved = localStorage.getItem(CALC_RESULT_SETTINGS_KEY)
+					if (saved) {
+						const settings: CalculationResultSettings = JSON.parse(saved)
+						set({ isCalculationResultVisible: settings.isVisible })
+					}
+				} catch (error) {
+					console.warn('計算結果表示設定の読み込みに失敗:', error)
+					// デフォルトは非表示
+					set({ isCalculationResultVisible: false })
+				}
+			},
+
 			// ===== 初期化 =====
 			initialize: async () => {
 				try {
@@ -573,12 +615,18 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 					// 現在のセーブデータを読み込み
 					const currentSave = getCurrentSaveData()
+
 					set({
 						data: currentSave.data,
 						hasUnsavedChanges: false,
 						isInitialized: true,
 						isLoading: false,
 					})
+
+					// 計算結果表示設定の初期化（将来実装）
+					// const store = get()
+					// store.initializeCalculationResultVisibility()
+					// store.updateCalculationResults()
 				} catch (error) {
 					console.error('アプリケーション初期化エラー:', error)
 					set({ isInitialized: true, isLoading: false })

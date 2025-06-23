@@ -22,6 +22,9 @@
 				"noUnusedImports": "warn",
 				"noUnusedVariables": "warn"
 			},
+			"nursery": {
+				"useUniqueElementIds": "off"
+			},
 			"a11y": "off",
 			"style": {
 				"noParameterAssign": "error",

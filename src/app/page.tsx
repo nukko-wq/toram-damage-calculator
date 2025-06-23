@@ -12,13 +12,12 @@ import EnemyForm from '@/components/enemy/EnemyForm'
 import EquipmentForm from '@/components/equipment/EquipmentForm'
 import FoodForm from '@/components/food/FoodForm'
 import SaveDataManager from '@/components/save-data/SaveDataManager'
-import StatsSummary from '@/components/summary/StatsSummary'
 import WeaponForm from '@/components/weapon/WeaponForm'
 
 export default function Home() {
 	// Zustandストアからデータを取得
-	const { showSaveManager, setShowSaveManager } = useUIStore()
-	const { data, isInitialized, isLoading, initialize } = useCalculatorStore()
+	const { showSaveManager } = useUIStore()
+	const { isInitialized, isLoading, initialize } = useCalculatorStore()
 
 	// アップデート通知（Zustand移行後も必要）
 	const [updateNotifications, setUpdateNotifications] = useState<
@@ -63,40 +62,11 @@ export default function Home() {
 
 	return (
 		<div className="min-h-screen bg-gray-50 py-8">
-			<div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8">
+			<div className="max-w-[1500px] mx-auto px-2 sm:px-6 lg:px-8">
 				<div className="text-center mb-8">
-					<h1 className="text-3xl font-bold text-gray-900">
-						トーラムダメージ計算
-					</h1>
-					<p className="mt-2 text-gray-600">
+					<p className="text-gray-600">
 						ステータスを入力してダメージを計算しましょう
 					</p>
-
-					{/* セーブデータ管理切り替えボタン */}
-					<div className="mt-4">
-						<button
-							type="button"
-							onClick={() => setShowSaveManager(!showSaveManager)}
-							className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-500/90 hover:bg-blue-600/80 outline-none cursor-pointer"
-						>
-							<svg
-								className="mr-2 h-4 w-4"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								aria-label="セーブデータ管理アイコン"
-							>
-								<title>セーブデータ管理</title>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-								/>
-							</svg>
-							{showSaveManager ? 'セーブ管理を閉じる' : 'セーブデータ管理'}
-						</button>
-					</div>
 				</div>
 
 				{/* 更新通知 */}
@@ -158,7 +128,8 @@ export default function Home() {
 					</div>
 				)}
 
-				<div className="grid grid-cols-1 lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto_auto_auto] gap-4">
+
+				<div className="grid grid-cols-[1fr] grid-rows-[repeat(9,auto)] md:grid-cols-[repeat(8,1fr)] md:grid-rows-[repeat(6,auto)] lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto_auto_auto] gap-2 md:gap-4">
 					<BaseStatsForm />
 					<WeaponForm />
 					<CrystalForm />
@@ -168,7 +139,6 @@ export default function Home() {
 					<EnemyForm />
 					<BuffSkillForm />
 				</div>
-				<StatsSummary data={data} />
 			</div>
 		</div>
 	)

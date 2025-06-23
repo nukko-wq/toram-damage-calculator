@@ -13,61 +13,6 @@ interface BaseStatsFormProps {
 	onChange?: (stats: BaseStats) => void
 }
 
-// ステータスフィールドコンポーネント（コンポーネント外に定義して再作成を防ぐ）
-interface StatFieldProps {
-	label: string
-	name: keyof BaseStatsFormData
-	max: number
-	register: any
-	handleBlur: (name: keyof BaseStatsFormData) => void
-	handleClickToClear: (name: keyof BaseStatsFormData) => void
-}
-
-const StatField = ({
-	label,
-	name,
-	max,
-	register,
-	handleBlur,
-	handleClickToClear,
-}: StatFieldProps) => {
-	return (
-		<div className="flex items-center gap-2">
-			<label
-				htmlFor={`stat-${name}`}
-				className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
-			>
-				{label}:
-			</label>
-			<div className="flex-1">
-				<input
-					id={`stat-${name}`}
-					type="number"
-					className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-					min="1"
-					max={max}
-					onBlur={() => handleBlur(name)}
-					onMouseDown={(e) => {
-						// 既にフォーカスが当たっている要素をマウスダウンした場合のみクリア処理
-						if (document.activeElement === e.target) {
-							handleClickToClear(name)
-						}
-					}}
-					{...register(name, {
-						setValueAs: (value: string | number) => {
-							// 空文字やNaNの場合は1を返す
-							if (value === '' || value === null || value === undefined) {
-								return 1
-							}
-							const numValue = Number(value)
-							return Number.isNaN(numValue) ? 1 : numValue
-						},
-					})}
-				/>
-			</div>
-		</div>
-	)
-}
 
 export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	// 初期化状態管理
@@ -99,7 +44,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		let max = 510
 
 		// フィールドごとの最大値を設定
-		if (['CRT', 'MEN', 'TEC', 'LUK'].includes(fieldName)) {
+		if (['CRT', 'MEN', 'TEC'].includes(fieldName)) {
 			max = 255
 		}
 
@@ -116,7 +61,9 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		setValue(fieldName, 1, { shouldValidate: true })
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
-			const element = document.getElementById(`stat-${fieldName}`) as HTMLInputElement
+			const element = document.getElementById(
+				`stat-${fieldName}`,
+			) as HTMLInputElement
 			if (element) {
 				element.select()
 			}
@@ -162,102 +109,310 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	}, [watch, stableOnChange, isInitialized, updateBaseStats])
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-4 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
+		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-1 md:row-end-2 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">基本ステータス</h2>
 			<div className="flex flex-col gap-2">
 				{/* レベル行 */}
 				<div className="grid grid-cols-3 gap-3">
-					<StatField
-						label="レベル"
-						name="level"
-						max={510}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-level"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							レベル:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-level"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="510"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('level')
+									}
+								}}
+								{...register('level', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('level'),
+								})}
+							/>
+						</div>
+					</div>
 				</div>
 				{/* メインステータス第1行 */}
 				<div className="grid grid-cols-3 gap-3">
-					<StatField
-						label="STR"
-						name="STR"
-						max={510}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
-					<StatField
-						label="INT"
-						name="INT"
-						max={510}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
-					<StatField
-						label="VIT"
-						name="VIT"
-						max={510}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-STR"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							STR:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-STR"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="510"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('STR')
+									}
+								}}
+								{...register('STR', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('STR'),
+								})}
+							/>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-INT"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							INT:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-INT"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="510"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('INT')
+									}
+								}}
+								{...register('INT', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('INT'),
+								})}
+							/>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-VIT"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							VIT:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-VIT"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="510"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('VIT')
+									}
+								}}
+								{...register('VIT', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('VIT'),
+								})}
+							/>
+						</div>
+					</div>
 				</div>
 
 				{/* メインステータス第2行 */}
 				<div className="grid grid-cols-3 gap-3">
-					<StatField
-						label="AGI"
-						name="AGI"
-						max={510}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
-					<StatField
-						label="DEX"
-						name="DEX"
-						max={510}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-AGI"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							AGI:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-AGI"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="510"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('AGI')
+									}
+								}}
+								{...register('AGI', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('AGI'),
+								})}
+							/>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-DEX"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							DEX:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-DEX"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="510"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('DEX')
+									}
+								}}
+								{...register('DEX', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('DEX'),
+								})}
+							/>
+						</div>
+					</div>
 				</div>
 
 				{/* 特殊ステータス行 */}
-				<div className="grid grid-cols-4 gap-3">
-					<StatField
-						label="CRT"
-						name="CRT"
-						max={255}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
-					<StatField
-						label="MEN"
-						name="MEN"
-						max={255}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
-					<StatField
-						label="TEC"
-						name="TEC"
-						max={255}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
-					<StatField
-						label="LUK"
-						name="LUK"
-						max={255}
-						register={register}
-						handleBlur={handleBlur}
-						handleClickToClear={handleClickToClear}
-					/>
+				<div className="grid grid-cols-3 gap-3">
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-CRT"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							CRT:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-CRT"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="255"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('CRT')
+									}
+								}}
+								{...register('CRT', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('CRT'),
+								})}
+							/>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-MEN"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							MEN:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-MEN"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="255"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('MEN')
+									}
+								}}
+								{...register('MEN', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('MEN'),
+								})}
+							/>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<label
+							htmlFor="stat-TEC"
+							className="text-sm font-medium text-gray-700 w-12 flex-shrink-0"
+						>
+							TEC:
+						</label>
+						<div className="flex-1">
+							<input
+								id="stat-TEC"
+								type="number"
+								className="px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+								min="1"
+								max="255"
+								onMouseDown={(e) => {
+									if (document.activeElement === e.target) {
+										handleClickToClear('TEC')
+									}
+								}}
+								{...register('TEC', {
+									setValueAs: (value: string | number) => {
+										if (value === '' || value === null || value === undefined) {
+											return 1
+										}
+										const numValue = Number(value)
+										return Number.isNaN(numValue) ? 1 : numValue
+									},
+									onBlur: () => handleBlur('TEC'),
+								})}
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>

@@ -15,6 +15,7 @@ import type {
 	RegisterFormData,
 	SaveData,
 } from './calculator'
+import type { CalculationResults } from './calculationResult'
 
 // ===== 計算結果関連（将来実装）=====
 export interface DamageCalculationResult {
@@ -54,6 +55,10 @@ export interface CalculatorStore {
 	calculationResult: DamageCalculationResult | null
 	isCalculating: boolean
 	calculationSettings: CalculationSettings
+
+	// ===== ステータス計算結果表示 =====
+	calculationResults: CalculationResults | null
+	isCalculationResultVisible: boolean
 
 	// ===== 基本アクション =====
 	updateData: (updates: Partial<CalculatorData>) => void
@@ -121,8 +126,13 @@ export interface UIStore {
 	showSaveManager: boolean
 	showUpdateNotifications: boolean
 
+	// 計算結果表示制御
+	activeResultView: 'damage' | 'status' | null
+
 	setShowSaveManager: (value: boolean) => void
 	setShowUpdateNotifications: (value: boolean) => void
+	setActiveResultView: (view: 'damage' | 'status' | null) => void
+	toggleResultView: (view: 'damage' | 'status') => void
 }
 
 // ===== セーブデータストア =====
@@ -148,4 +158,9 @@ export interface SaveDataStore {
 	setPendingSaveId: (saveId: string | null) => void
 	setShowUnsavedChangesModal: (value: boolean) => void
 	setError: (error: string | null) => void
+
+	// ===== ステータス計算結果表示アクション =====
+	updateCalculationResults: () => void
+	toggleCalculationResultVisibility: () => void
+	initializeCalculationResultVisibility: () => void
 }

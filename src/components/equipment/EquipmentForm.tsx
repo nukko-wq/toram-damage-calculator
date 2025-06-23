@@ -28,6 +28,9 @@ export default function EquipmentForm({
 	equipment: _equipment,
 	onEquipmentChange,
 }: EquipmentFormProps) {
+	// 一時的な入力値を管理するstate（プロパティキー -> 入力値のマップ）
+	const [tempInputValues, setTempInputValues] = useState<Record<string, string>>({})
+
 	// Zustandストアから装備データを取得
 	const storeEquipment = useCalculatorStore((state) => state.data.equipment)
 	const updateEquipment = useCalculatorStore((state) => state.updateEquipment)
@@ -295,8 +298,6 @@ export default function EquipmentForm({
 			MEN: 'MEN',
 			TEC_Rate: 'TEC',
 			TEC: 'TEC',
-			LUK_Rate: 'LUK',
-			LUK: 'LUK',
 
 			// 命中・回避系
 			Accuracy_Rate: '命中',
@@ -402,11 +403,65 @@ export default function EquipmentForm({
 		handleEquipmentPropertyChange(slotKey, property, '0')
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
-			const element = document.getElementById(`${equipmentId}-${property}`) as HTMLInputElement
+			const element = document.getElementById(
+				`${equipmentId}-${property}`,
+			) as HTMLInputElement
 			if (element) {
 				element.select()
 			}
 		}, 0)
+	}
+
+	// 一時的な入力値のキーを生成
+	const getTempInputKey = (slotKey: keyof EquipmentSlots, property: keyof EquipmentProperties) => {
+		return `${slotKey}-${property}`
+	}
+
+	// 表示用の値を取得（一時入力値 > 実際の値 > 空文字）
+	const getDisplayValue = (
+		slotKey: keyof EquipmentSlots,
+		property: keyof EquipmentProperties,
+		item: Equipment,
+	) => {
+		const tempKey = getTempInputKey(slotKey, property)
+		if (tempInputValues[tempKey] !== undefined) {
+			return tempInputValues[tempKey]
+		}
+		const actualValue = item.properties[property]
+		return actualValue === 0 ? '' : (actualValue || '')
+	}
+
+	// フォーカスが外れたときに0を空文字に変換する機能
+	const handlePropertyBlur = (
+		slotKey: keyof EquipmentSlots,
+		property: keyof EquipmentProperties,
+		value: string,
+	) => {
+		const tempKey = getTempInputKey(slotKey, property)
+		// 一時的な入力値をクリア
+		setTempInputValues(prev => {
+			const newValues = { ...prev }
+			delete newValues[tempKey]
+			return newValues
+		})
+		// 実際の値を更新
+		handleEquipmentPropertyChange(slotKey, property, value)
+	}
+
+	// 入力値変更時の処理
+	const handlePropertyInputChange = (
+		slotKey: keyof EquipmentSlots,
+		property: keyof EquipmentProperties,
+		value: string,
+	) => {
+		const tempKey = getTempInputKey(slotKey, property)
+		// 一時的な入力値を保存
+		setTempInputValues(prev => ({
+			...prev,
+			[tempKey]: value
+		}))
+		// 実際の値も更新（内部データ用）
+		handleEquipmentPropertyChange(slotKey, property, value)
 	}
 
 	const handleEquipmentPropertyChange = (
@@ -638,117 +693,143 @@ export default function EquipmentForm({
 			value: string,
 		) => void,
 	) => (
-		<div className="overflow-x-auto w-full">
-			<div className="flex gap-4 min-w-max">
-				{propertyGroups.map((group) => (
-					<div
-						key={group.title}
-						className="w-[240px] flex-shrink-0 border-gray-300 rounded-lg p-3"
-					>
-						<h4 className="font-medium text-gray-700 mb-3 text-sm sticky top-0 bg-white">
-							{group.title}
-						</h4>
-						{/* 列見出し */}
-						<div className="grid grid-cols-[100px_60px_60px] gap-1 mb-2">
-							<div className="text-gray-700 text-sm">プロパティ</div>
-							<div className="text-center text-gray-700 text-sm">%</div>
-							<div className="text-center text-gray-700 text-sm">+</div>
-						</div>
-						{/* プロパティ行 */}
-						<div className="space-y-1">
-							{group.propertyPairs.map((pair) => (
-								<div
-									key={pair.properties[0]}
-									className="grid grid-cols-[100px_60px_60px] gap-1 items-center"
-								>
-									<div
-										className="text-xs text-gray-700 font-medium truncate"
-										title={getBasePropertyLabel(pair.properties[0])}
-									>
-										{getBasePropertyLabel(pair.properties[0])}
-									</div>
-									{pair.type === 'pair' ? (
-										// ペア項目: %系と固定値系
-										<>
-											<input
-												id={`${item.name}-${pair.properties[0]}`}
-												type="number"
-												value={item.properties[pair.properties[0]] || 0}
-												onChange={(e) =>
-													onPropertyChange(pair.properties[0], e.target.value)
-												}
-												onMouseDown={(e) => {
-													if (document.activeElement === e.target) {
-														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
-													}
-												}}
-												className="px-1 py-1 text-sm border border-gray-300 rounded bg-sky-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-											/>
-											<input
-												id={`${item.name}-${pair.properties[1]}`}
-												type="number"
-												value={item.properties[pair.properties[1]] || 0}
-												onChange={(e) =>
-													onPropertyChange(pair.properties[1], e.target.value)
-												}
-												onMouseDown={(e) => {
-													if (document.activeElement === e.target) {
-														handlePropertyClickToClear(slotKey, pair.properties[1], item.name || item.id)
-													}
-												}}
-												className="px-1 py-1 text-sm border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-											/>
-										</>
-									) : pair.type === 'percent' ? (
-										// %系単独項目: %列に配置
-										<>
-											<input
-												id={`${item.name}-${pair.properties[0]}`}
-												type="number"
-												value={item.properties[pair.properties[0]] || 0}
-												onChange={(e) =>
-													onPropertyChange(pair.properties[0], e.target.value)
-												}
-												onMouseDown={(e) => {
-													if (document.activeElement === e.target) {
-														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
-													}
-												}}
-												className="px-1 py-1 text-sm border border-gray-300 bg-sky-50 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-											/>
-											<div /> {/* 空白の固定値列 */}
-										</>
-									) : (
-										// 固定値単独項目: 固定値列に配置
-										<>
-											<div /> {/* 空白の%列 */}
-											<input
-												id={`${item.name}-${pair.properties[0]}`}
-												type="number"
-												value={item.properties[pair.properties[0]] || 0}
-												onChange={(e) =>
-													onPropertyChange(pair.properties[0], e.target.value)
-												}
-												onMouseDown={(e) => {
-													if (document.activeElement === e.target) {
-														handlePropertyClickToClear(slotKey, pair.properties[0], item.name || item.id)
-													}
-												}}
-												className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-											/>
-										</>
-									)}
-								</div>
-							))}
-						</div>
+		<div className="flex overflow-x-scroll w-full max-w-[86vw] sm:max-w-[90vw] md:max-w-[95vw] flex-nowrap">
+			{propertyGroups.map((group) => (
+				<div
+					key={group.title}
+					className="w-[240px] border-gray-300 rounded-lg p-3"
+				>
+					<h4 className="font-medium text-gray-700 mb-3 text-sm bg-white">
+						{group.title}
+					</h4>
+					{/* 列見出し */}
+					<div className="grid grid-cols-[100px_60px_60px] gap-1 mb-2">
+						<div className="text-gray-700 text-sm">プロパティ</div>
+						<div className="text-center text-gray-700 text-sm">%</div>
+						<div className="text-center text-gray-700 text-sm">+</div>
 					</div>
-				))}
-			</div>
+					{/* プロパティ行 */}
+					<div className="space-y-1">
+						{group.propertyPairs.map((pair) => (
+							<div
+								key={pair.properties[0]}
+								className="grid grid-cols-[100px_60px_60px] gap-1 items-center"
+							>
+								<div
+									className="text-xs text-gray-700 font-medium truncate"
+									title={getBasePropertyLabel(pair.properties[0])}
+								>
+									{getBasePropertyLabel(pair.properties[0])}
+								</div>
+								{pair.type === 'pair' ? (
+									// ペア項目: %系と固定値系
+									<>
+										<input
+											id={`${item.name}-${pair.properties[0]}`}
+											type="number"
+											value={getDisplayValue(slotKey, pair.properties[0], item)}
+											onChange={(e) =>
+												handlePropertyInputChange(slotKey, pair.properties[0], e.target.value)
+											}
+											onBlur={(e) =>
+												handlePropertyBlur(slotKey, pair.properties[0], e.target.value)
+											}
+											onMouseDown={(e) => {
+												if (document.activeElement === e.target) {
+													handlePropertyClickToClear(
+														slotKey,
+														pair.properties[0],
+														item.name || item.id,
+													)
+												}
+											}}
+											className="px-1 py-1 text-sm border border-gray-300 rounded bg-sky-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+										/>
+										<input
+											id={`${item.name}-${pair.properties[1]}`}
+											type="number"
+											value={getDisplayValue(slotKey, pair.properties[1], item)}
+											onChange={(e) =>
+												handlePropertyInputChange(slotKey, pair.properties[1], e.target.value)
+											}
+											onBlur={(e) =>
+												handlePropertyBlur(slotKey, pair.properties[1], e.target.value)
+											}
+											onMouseDown={(e) => {
+												if (document.activeElement === e.target) {
+													handlePropertyClickToClear(
+														slotKey,
+														pair.properties[1],
+														item.name || item.id,
+													)
+												}
+											}}
+											className="px-1 py-1 text-sm border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+										/>
+									</>
+								) : pair.type === 'percent' ? (
+									// %系単独項目: %列に配置
+									<>
+										<input
+											id={`${item.name}-${pair.properties[0]}`}
+											type="number"
+											value={getDisplayValue(slotKey, pair.properties[0], item)}
+											onChange={(e) =>
+												handlePropertyInputChange(slotKey, pair.properties[0], e.target.value)
+											}
+											onBlur={(e) =>
+												handlePropertyBlur(slotKey, pair.properties[0], e.target.value)
+											}
+											onMouseDown={(e) => {
+												if (document.activeElement === e.target) {
+													handlePropertyClickToClear(
+														slotKey,
+														pair.properties[0],
+														item.name || item.id,
+													)
+												}
+											}}
+											className="px-1 py-1 text-sm border border-gray-300 bg-sky-50 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+										/>
+										<div /> {/* 空白の固定値列 */}
+									</>
+								) : (
+									// 固定値単独項目: 固定値列に配置
+									<>
+										<div /> {/* 空白の%列 */}
+										<input
+											id={`${item.name}-${pair.properties[0]}`}
+											type="number"
+											value={getDisplayValue(slotKey, pair.properties[0], item)}
+											onChange={(e) =>
+												handlePropertyInputChange(slotKey, pair.properties[0], e.target.value)
+											}
+											onBlur={(e) =>
+												handlePropertyBlur(slotKey, pair.properties[0], e.target.value)
+											}
+											onMouseDown={(e) => {
+												if (document.activeElement === e.target) {
+													handlePropertyClickToClear(
+														slotKey,
+														pair.properties[0],
+														item.name || item.id,
+													)
+												}
+											}}
+											className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+										/>
+									</>
+								)}
+							</div>
+						))}
+					</div>
+				</div>
+			))}
 		</div>
 	)
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-4">
+		<section className="bg-white rounded-lg shadow-md p-6 md:col-start-1 md:col-end-9 md:row-start-2 md:row-end-3 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-4">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">装備/プロパティ</h2>
 
 			{/* タブヘッダー */}
@@ -772,132 +853,118 @@ export default function EquipmentForm({
 			</div>
 
 			{/* タブコンテンツ */}
-			<div className="space-y-4">
-				{activeTab === 'register' ? (
-					/* レジスタ他フォーム */
-					<RegisterForm />
-				) : (
-					<>
-						<div className="flex gap-2">
-							{/* プリセット選択ボタンを表示 - 自由入力スロットは「なし」とカスタム装備のみ選択可能 */}
-							<button
-								type="button"
-								onClick={() =>
-									openEquipmentModal(
-										activeTab as EquipmentCategory,
-										effectiveEquipment[activeTab]?.name ||
-											`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
-									)
-								}
-								className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
-							>
-								{effectiveEquipment[activeTab]?.name ? (
-									<div className="flex items-center justify-between">
-										<span className="text-sm truncate text-gray-900">
-											{effectiveEquipment[activeTab]?.name}
-										</span>
-										<svg
-											className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											aria-label="選択メニューを開く"
-										>
-											<title>選択メニューを開く</title>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M19 9l-7 7-7-7"
-											/>
-										</svg>
-									</div>
-								) : (
-									<div className="flex items-center justify-between">
-										<span className="text-gray-500">
-											{!effectiveEquipment[activeTab]?.id ||
-											!effectiveEquipment[activeTab]?.name
-												? 'なし'
-												: ['freeInput1', 'freeInput2', 'freeInput3'].includes(
-															activeTab,
-														)
-													? '装備選択'
-													: 'プリセット選択'}
-										</span>
-										<svg
-											className="w-4 h-4 text-gray-400"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											aria-label="選択メニューを開く"
-										>
-											<title>選択メニューを開く</title>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M19 9l-7 7-7-7"
-											/>
-										</svg>
-									</div>
-								)}
-							</button>
-							{/* カスタム機能ボタンを表示 - 全スロットで常に表示 */}
-							<button
-								type="button"
-								onClick={() => handleCreateEquipment(activeTab)}
-								className="px-3 py-1 text-sm bg-rose-300/80 text-gray-900 rounded-md hover:bg-rose-300/90 transition-colors cursor-pointer"
-								title="新規カスタム装備を作成"
-							>
-								新規作成
-							</button>
-							{effectiveEquipment[activeTab]?.id &&
-								effectiveEquipment[activeTab] &&
-								'isCustom' in effectiveEquipment[activeTab] &&
-								effectiveEquipment[activeTab]?.isCustom && (
-									<>
-										<button
-											type="button"
-											onClick={() => handleRenameEquipment(activeTab)}
-											className="px-3 py-1 text-sm bg-sky-400/80 text-gray-900 rounded-md hover:bg-sky-400/90 transition-colors cursor-pointer"
-											title="選択中のカスタム装備の名前を変更"
-										>
-											名前変更
-										</button>
-										<button
-											type="button"
-											onClick={() => handleDeleteEquipment(activeTab)}
-											className="px-3 py-1 text-sm bg-gray-400/80 text-gray-900 rounded-md hover:bg-gray-400/90 transition-colors cursor-pointer"
-											title="選択中のカスタム装備を削除"
-										>
-											削除
-										</button>
-									</>
-								)}
-						</div>
-
-						{/* 現在選択されている装備表示 */}
-						{effectiveEquipment[activeTab]?.isPreset && (
-							<div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-								<span className="text-sm font-medium text-blue-800">
-									プリセット: {effectiveEquipment[activeTab]?.name}
-								</span>
-								<div className="text-xs text-blue-600 mt-1">
-									※ 下記の値を変更するとプリセットが解除されます
+			{activeTab === 'register' ? (
+				/* レジスタ他フォーム */
+				<RegisterForm />
+			) : (
+				<>
+					<div className="flex gap-2">
+						{/* プリセット選択ボタンを表示 - 自由入力スロットは「なし」とカスタム装備のみ選択可能 */}
+						<button
+							type="button"
+							onClick={() =>
+								openEquipmentModal(
+									activeTab as EquipmentCategory,
+									effectiveEquipment[activeTab]?.name ||
+										`${equipmentSlots.find((slot) => slot.key === activeTab)?.label}を選択`,
+								)
+							}
+							className="px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-[200px]"
+						>
+							{effectiveEquipment[activeTab]?.name ? (
+								<div className="flex items-center justify-between">
+									<span className="text-sm truncate text-gray-900">
+										{effectiveEquipment[activeTab]?.name}
+									</span>
+									<svg
+										className="w-4 h-4 text-gray-400 ml-2 flex-shrink-0"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										aria-label="選択メニューを開く"
+									>
+										<title>選択メニューを開く</title>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M19 9l-7 7-7-7"
+										/>
+									</svg>
 								</div>
-							</div>
-						)}
-
-						{effectiveEquipment[activeTab] &&
-							renderPropertyInputs(
-								effectiveEquipment[activeTab],
-								activeTab,
-								(property: keyof EquipmentProperties, value: string) =>
-									handleEquipmentPropertyChange(activeTab, property, value),
+							) : (
+								<div className="flex items-center justify-between">
+									<span className="text-gray-500">
+										{!effectiveEquipment[activeTab]?.id ||
+										!effectiveEquipment[activeTab]?.name
+											? 'なし'
+											: ['freeInput1', 'freeInput2', 'freeInput3'].includes(
+														activeTab,
+													)
+												? '装備選択'
+												: 'プリセット選択'}
+									</span>
+									<svg
+										className="w-4 h-4 text-gray-400"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										aria-label="選択メニューを開く"
+									>
+										<title>選択メニューを開く</title>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M19 9l-7 7-7-7"
+										/>
+									</svg>
+								</div>
 							)}
-					</>
-				)}
-			</div>
+						</button>
+						{/* カスタム機能ボタンを表示 - 全スロットで常に表示 */}
+						<button
+							type="button"
+							onClick={() => handleCreateEquipment(activeTab)}
+							className="px-3 py-1 text-sm bg-rose-300/80 text-gray-900 rounded-md hover:bg-rose-300/90 transition-colors cursor-pointer"
+							title="新規カスタム装備を作成"
+						>
+							新規作成
+						</button>
+						{effectiveEquipment[activeTab]?.id &&
+							effectiveEquipment[activeTab] &&
+							'isCustom' in effectiveEquipment[activeTab] &&
+							effectiveEquipment[activeTab]?.isCustom && (
+								<>
+									<button
+										type="button"
+										onClick={() => handleRenameEquipment(activeTab)}
+										className="px-3 py-1 text-sm bg-sky-400/80 text-gray-900 rounded-md hover:bg-sky-400/90 transition-colors cursor-pointer"
+										title="選択中のカスタム装備の名前を変更"
+									>
+										名前変更
+									</button>
+									<button
+										type="button"
+										onClick={() => handleDeleteEquipment(activeTab)}
+										className="px-3 py-1 text-sm bg-gray-400/80 text-gray-900 rounded-md hover:bg-gray-400/90 transition-colors cursor-pointer"
+										title="選択中のカスタム装備を削除"
+									>
+										削除
+									</button>
+								</>
+							)}
+					</div>
+
+					{effectiveEquipment[activeTab] &&
+						renderPropertyInputs(
+							effectiveEquipment[activeTab],
+							activeTab,
+							(property: keyof EquipmentProperties, value: string) =>
+								handleEquipmentPropertyChange(activeTab, property, value),
+						)}
+				</>
+			)}
 
 			{/* 装備選択モーダル */}
 			{activeTab !== 'register' && (

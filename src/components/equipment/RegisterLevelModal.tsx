@@ -34,15 +34,19 @@ export function RegisterLevelModal({
 	}
 
 	const handleLevelChange = (value: string) => {
-		const numValue = parseInt(value, 10)
-		if (!isNaN(numValue) && numValue >= 1 && numValue <= effect.maxLevel) {
+		const numValue = Number.parseInt(value, 10)
+		if (
+			!Number.isNaN(numValue) &&
+			numValue >= 1 &&
+			numValue <= effect.maxLevel
+		) {
 			setLevel(numValue)
 		}
 	}
 
 	const handlePartyMembersChange = (value: string) => {
-		const numValue = parseInt(value, 10)
-		if (!isNaN(numValue) && numValue >= 1 && numValue <= 3) {
+		const numValue = Number.parseInt(value, 10)
+		if (!Number.isNaN(numValue) && numValue >= 1 && numValue <= 3) {
 			setPartyMembers(numValue)
 		}
 	}

@@ -34,7 +34,6 @@ export interface BaseStats {
 	CRT: number
 	MEN: number
 	TEC: number
-	LUK: number
 	level: number
 }
 
@@ -97,8 +96,6 @@ export interface EquipmentProperties {
 	MEN: number // MEN
 	TEC_Rate: number // TEC%
 	TEC: number // TEC
-	LUK_Rate: number // LUK%
-	LUK: number // LUK
 
 	// 命中・回避系
 	Accuracy_Rate: number // 命中%
