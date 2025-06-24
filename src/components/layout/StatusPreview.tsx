@@ -25,10 +25,12 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const baseStats = data.baseStats
 
 	// データソース別のメモ化
-	const equipmentBonuses = useMemo(
-		() => getEquipmentBonuses(data.equipment),
-		[data.equipment],
-	)
+	const equipmentBonuses = useMemo(() => {
+		console.log('StatusPreview: Getting equipment bonuses for:', data.equipment)
+		const result = getEquipmentBonuses(data.equipment)
+		console.log('StatusPreview: Equipment bonuses result:', result)
+		return result
+	}, [data.equipment])
 
 	const crystalBonuses = useMemo(
 		() => getCrystalBonuses(data.crystals),
@@ -71,6 +73,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	} = calculationResults
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
 		calculatedEquipmentBonuses
+
+	// デバッグ：計算結果を確認
+	console.log('Final equipmentBonus1:', equipmentBonus1)
+	console.log('Final equipmentBonus2:', equipmentBonus2)
+	console.log('Final equipmentBonus3:', equipmentBonus3)
 
 	if (!isVisible) {
 		return null
