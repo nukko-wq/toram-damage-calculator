@@ -57,9 +57,9 @@ export function RegisterEffectItem({
 			{/* 有効状態インジケーター */}
 			<div className="shrink-0">
 				{effect.isEnabled ? (
-					<div className="w-2 h-2 bg-green-500 rounded-full"></div>
+					<div className="w-2 h-2 bg-green-500 rounded-full" />
 				) : (
-					<div className="w-2 h-2 bg-slate-300 rounded-full"></div>
+					<div className="w-2 h-2 bg-slate-300 rounded-full" />
 				)}
 			</div>
 		</div>

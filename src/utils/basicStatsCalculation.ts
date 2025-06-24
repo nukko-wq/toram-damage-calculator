@@ -373,33 +373,72 @@ export interface WeaponType {
 	statusATKFormula: (baseStats: BaseStats) => number
 }
 
-// 武器種別定義
+// 武器種別定義（英語キーと日本語名称）
 const WEAPON_TYPES: Record<string, WeaponType> = {
 	halberd: {
 		id: 'halberd',
 		name: '旋風槍',
 		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5,
 	},
-	sword: {
-		id: 'sword',
-		name: '剣',
+	'1hsword': {
+		id: '1hsword',
+		name: '片手剣',
+		statusATKFormula: (stats) => stats.STR * 2.0 + stats.DEX * 2.0,
+	},
+	'2hsword': {
+		id: '2hsword',
+		name: '両手剣',
 		statusATKFormula: (stats) => stats.STR * 3.0 + stats.DEX * 1.0,
 	},
-	spear: {
-		id: 'spear',
-		name: '槍',
-		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5,
+	bow: {
+		id: 'bow',
+		name: '弓',
+		statusATKFormula: (stats) => stats.DEX * 3.5 + stats.STR * 1.0,
 	},
-	// 他の武器種も将来実装予定
+	bowgun: {
+		id: 'bowgun',
+		name: '自動弓',
+		statusATKFormula: (stats) => stats.DEX * 3.5 + stats.STR * 1.0,
+	},
+	staff: {
+		id: 'staff',
+		name: '杖',
+		statusATKFormula: (stats) => stats.INT * 3.0 + stats.DEX * 1.5,
+	},
+	'magic-device': {
+		id: 'magic-device',
+		name: '魔導具',
+		statusATKFormula: (stats) => stats.INT * 3.0 + stats.DEX * 1.5,
+	},
+	knuckle: {
+		id: 'knuckle',
+		name: '手甲',
+		statusATKFormula: (stats) => stats.AGI * 2.5 + stats.STR * 2.0,
+	},
+	katana: {
+		id: 'katana',
+		name: '抜刀剣',
+		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 2.0,
+	},
+	'dual-sword': {
+		id: 'dual-sword',
+		name: '双剣',
+		statusATKFormula: (stats) => stats.STR * 2.0 + stats.AGI * 2.0,
+	},
+	barehand: {
+		id: 'barehand',
+		name: '素手',
+		statusATKFormula: (stats) => stats.AGI * 2.5 + stats.STR * 2.0,
+	},
 }
 
 /**
- * ATK計算（旋風槍対応）
+ * ATK計算（全武器種対応）
  * ATK = INT((自Lv + 総武器ATK + ステータスATK + ATKアップ - ATKダウン) × (1 + ATK%/100)) + ATK固定値
  */
 export function calculateATK(
 	stats: BaseStats,
-	weapon: { ATK: number; stability: number; refinement: number; type: string },
+	weapon: { weaponType: string; ATK: number; stability: number; refinement: number },
 	bonuses: AllBonuses = {},
 ): ATKCalculationSteps {
 	// 1. 総武器ATK計算
@@ -417,7 +456,7 @@ export function calculateATK(
 		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
 
 	// 2. ステータスATK計算（武器種別対応）
-	const weaponType = WEAPON_TYPES[weapon.type] || WEAPON_TYPES.halberd
+	const weaponType = WEAPON_TYPES[weapon.weaponType] || WEAPON_TYPES.halberd
 	const statusATK = weaponType.statusATKFormula(stats)
 
 	// 3. ATKアップ・ダウン計算

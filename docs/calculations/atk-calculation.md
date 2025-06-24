@@ -84,16 +84,29 @@ ATK = INT((自Lv + 総武器ATK + ステータスATK + ATKアップ(ステータ
 - 基礎AGI: 150
 - ステータスATK = 200 × 2.5 + 150 × 1.5 = 500 + 225 = 725
 
+### 片手剣（One-Handed Sword）
+```
+ステータスATK = 基礎STR × 2.0 + 基礎DEX × 2.0
+```
+
+### 両手剣（Two-Handed Sword）
+```
+ステータスATK = 基礎STR × 3.0 + 基礎DEX × 1.0
+```
+
 ### その他の武器種（将来実装予定）
 ```
-// 剣系
-ステータスATK = 基礎STR × 3.0 + 基礎DEX × 1.0
-
 // 弓系  
 ステータスATK = 基礎DEX × 3.5 + 基礎STR × 1.0
 
 // 杖系
 ステータスATK = 基礎INT × 3.0 + 基礎DEX × 1.5
+
+// 手甲系
+ステータスATK = 基礎AGI × 2.5 + 基礎STR × 2.0
+
+// 抜刀剣系
+ステータスATK = 基礎STR × 2.5 + 基礎AGI × 2.0
 
 // 他の武器種も同様の形式で定義
 ```
@@ -189,13 +202,16 @@ ATK = 5999 + 200 = 6199
 | 武器種 | ステータスATK計算式 | 実装状況 |
 |--------|-------------------|----------|
 | 旋風槍 | STR×2.5 + AGI×1.5 | ✅ 実装済み |
-| 剣 | STR×3.0 + DEX×1.0 | 🔄 実装予定 |
-| 弓 | DEX×3.5 + STR×1.0 | 🔄 実装予定 |
-| 杖 | INT×3.0 + DEX×1.5 | 🔄 実装予定 |
-| 手甲 | AGI×2.5 + STR×2.0 | 🔄 実装予定 |
-| 槍 | STR×2.5 + AGI×1.5 | 🔄 実装予定 |
-| 抜刀剣 | STR×2.5 + AGI×2.0 | 🔄 実装予定 |
-| 忍刀 | AGI×3.0 + STR×1.5 | 🔄 実装予定 |
+| 片手剣 | STR×2.0 + DEX×2.0 | ✅ 実装済み |
+| 両手剣 | STR×3.0 + DEX×1.0 | ✅ 実装済み |
+| 弓 | DEX×3.5 + STR×1.0 | ✅ 実装済み |
+| 自動弓 | DEX×3.5 + STR×1.0 | ✅ 実装済み |
+| 杖 | INT×3.0 + DEX×1.5 | ✅ 実装済み |
+| 魔導具 | INT×3.0 + DEX×1.5 | ✅ 実装済み |
+| 手甲 | AGI×2.5 + STR×2.0 | ✅ 実装済み |
+| 抜刀剣 | STR×2.5 + AGI×2.0 | ✅ 実装済み |
+| 双剣 | STR×2.0 + AGI×2.0 | ✅ 実装済み |
+| 素手 | AGI×2.5 + STR×2.0 | ✅ 実装済み |
 
 ## TypeScript実装例
 
@@ -244,15 +260,35 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
     name: '旋風槍',
     statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5
   },
-  sword: {
-    id: 'sword', 
-    name: '剣',
+  oneHandedSword: {
+    id: 'oneHandedSword', 
+    name: '片手剣',
+    statusATKFormula: (stats) => stats.STR * 2.0 + stats.DEX * 2.0
+  },
+  twoHandedSword: {
+    id: 'twoHandedSword',
+    name: '両手剣',
     statusATKFormula: (stats) => stats.STR * 3.0 + stats.DEX * 1.0
   },
-  spear: {
-    id: 'spear',
-    name: '槍',
-    statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5
+  bow: {
+    id: 'bow',
+    name: '弓',
+    statusATKFormula: (stats) => stats.DEX * 3.5 + stats.STR * 1.0
+  },
+  staff: {
+    id: 'staff',
+    name: '杖',
+    statusATKFormula: (stats) => stats.INT * 3.0 + stats.DEX * 1.5
+  },
+  knuckle: {
+    id: 'knuckle',
+    name: '手甲',
+    statusATKFormula: (stats) => stats.AGI * 2.5 + stats.STR * 2.0
+  },
+  katana: {
+    id: 'katana',
+    name: '抜刀剣',
+    statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 2.0
   },
   // 他の武器種も同様に定義
 }
@@ -370,7 +406,8 @@ export function calculateATK(
 
 | 日付 | 更新内容 | 備考 |
 |------|----------|------|
-| 2024-06-24 | ATK計算式設計書を新規作成 | 槍のATK計算式を実装 |
+| 2024-06-24 | ATK計算式設計書を新規作成 | 旋風槍のATK計算式を実装 |
+| 2024-06-24 | 武器種別を整理・更新 | 片手剣・両手剣を追加、剣・槍・忍刀を削除 |
 
 ## 関連ドキュメント
 - [基本ステータス計算式](./basic-stats.md) - 補正後ステータス計算

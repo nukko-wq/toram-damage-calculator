@@ -1,4 +1,4 @@
-import React from 'react'
+import type React from 'react'
 import type { PropertyConfig } from './PropertyDisplay'
 
 interface PropertyDisplayData {

@@ -117,7 +117,16 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	}
 
 	// 補正後ステータス (8項目) - 正確な計算結果を使用
-	const adjustedStats = adjustedStatsCalculation
+	const adjustedStats: Record<string, number> = {
+		STR: adjustedStatsCalculation.STR,
+		AGI: adjustedStatsCalculation.AGI,
+		INT: adjustedStatsCalculation.INT,
+		DEX: adjustedStatsCalculation.DEX,
+		VIT: adjustedStatsCalculation.VIT,
+		CRT: adjustedStatsCalculation.CRT,
+		MEN: adjustedStatsCalculation.MEN,
+		TEC: adjustedStatsCalculation.TEC,
+	}
 
 	// 装備品補正値1〜3は計算された値を使用
 	// 現在は仮値だが、将来的には calculateEquipmentBonuses の結果を使用

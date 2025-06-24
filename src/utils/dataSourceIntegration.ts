@@ -28,10 +28,9 @@ function validatePropertyValue(value: number, propertyId: string): number {
 	if (propertyId.includes('Rate')) {
 		// %系は-100〜1000の範囲
 		return Math.max(-100, Math.min(1000, value))
-	} else {
+	}
 		// 固定値系は-9999〜9999の範囲
 		return Math.max(-9999, Math.min(9999, value))
-	}
 }
 
 /**
