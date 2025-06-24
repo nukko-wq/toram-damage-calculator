@@ -334,6 +334,138 @@ export function calculateAdjustedStats(
 	}
 }
 
+// ATK計算の中間結果
+export interface ATKCalculationSteps {
+	// 総武器ATK関連
+	baseWeaponATK: number // 武器の基本ATK
+	refinementLevel: number // 精錬値
+	refinedWeaponATK: number // 精錬補正後武器ATK
+	weaponATKPercentBonus: number // 武器ATK%補正
+	weaponATKFixedBonus: number // 武器ATK固定値
+	totalWeaponATK: number // 総武器ATK
+
+	// ステータスATK関連
+	baseSTR: number // 基礎STR
+	baseAGI: number // 基礎AGI（旋風槍の場合）
+	statusATK: number // ステータスATK
+
+	// ATKアップ・ダウン関連
+	atkUpSTR: number // ATKアップ(STR%)
+	atkUpAGI: number // ATKアップ(AGI%)
+	atkUpINT: number // ATKアップ(INT%)
+	atkUpVIT: number // ATKアップ(VIT%)
+	atkUpDEX: number // ATKアップ(DEX%)
+	atkUpTotal: number // ATKアップ合計
+	atkDownTotal: number // ATKダウン合計
+
+	// 最終計算
+	atkBeforePercent: number // ATK%適用前
+	atkPercent: number // ATK%
+	atkAfterPercent: number // ATK%適用後
+	atkFixed: number // ATK固定値
+	finalATK: number // 最終ATK
+}
+
+// 武器種別定義
+export interface WeaponType {
+	id: string
+	name: string
+	statusATKFormula: (baseStats: BaseStats) => number
+}
+
+// 武器種別定義
+const WEAPON_TYPES: Record<string, WeaponType> = {
+	halberd: {
+		id: 'halberd',
+		name: '旋風槍',
+		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5,
+	},
+	sword: {
+		id: 'sword',
+		name: '剣',
+		statusATKFormula: (stats) => stats.STR * 3.0 + stats.DEX * 1.0,
+	},
+	spear: {
+		id: 'spear',
+		name: '槍',
+		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5,
+	},
+	// 他の武器種も将来実装予定
+}
+
+/**
+ * ATK計算（旋風槍対応）
+ * ATK = INT((自Lv + 総武器ATK + ステータスATK + ATKアップ - ATKダウン) × (1 + ATK%/100)) + ATK固定値
+ */
+export function calculateATK(
+	stats: BaseStats,
+	weapon: { ATK: number; stability: number; refinement: number; type: string },
+	bonuses: AllBonuses = {},
+): ATKCalculationSteps {
+	// 1. 総武器ATK計算
+	const refinedWeaponATK = Math.floor(
+		weapon.ATK * (1 + weapon.refinement ** 2 / 100) + weapon.refinement,
+	)
+
+	const weaponATKPercent = bonuses.weaponATK_Rate || 0
+	const weaponATKPercentBonus = Math.floor(
+		(weapon.ATK * weaponATKPercent) / 100,
+	)
+
+	const weaponATKFixedBonus = bonuses.weaponATK || 0
+	const totalWeaponATK =
+		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
+
+	// 2. ステータスATK計算（武器種別対応）
+	const weaponType = WEAPON_TYPES[weapon.type] || WEAPON_TYPES.halberd
+	const statusATK = weaponType.statusATKFormula(stats)
+
+	// 3. ATKアップ・ダウン計算
+	const atkUpSTR = Math.floor((stats.STR * (bonuses.ATK_STR_Rate || 0)) / 100)
+	const atkUpAGI = Math.floor((stats.AGI * (bonuses.ATK_AGI_Rate || 0)) / 100)
+	const atkUpINT = Math.floor((stats.INT * (bonuses.ATK_INT_Rate || 0)) / 100)
+	const atkUpVIT = Math.floor((stats.VIT * (bonuses.ATK_VIT_Rate || 0)) / 100)
+	const atkUpDEX = Math.floor((stats.DEX * (bonuses.ATK_DEX_Rate || 0)) / 100)
+	const atkUpTotal = atkUpSTR + atkUpAGI + atkUpINT + atkUpVIT + atkUpDEX
+
+	// ATKダウンは現在なしと仮定
+	const atkDownTotal = 0
+
+	// 4. 最終ATK計算
+	const atkBeforePercent =
+		stats.level + totalWeaponATK + statusATK + atkUpTotal - atkDownTotal
+	const atkPercent = bonuses.ATK_Rate || 0
+	const atkAfterPercent = Math.floor(
+		atkBeforePercent * (1 + atkPercent / 100),
+	)
+	const atkFixed = bonuses.ATK || 0
+	const finalATK = atkAfterPercent + atkFixed
+
+	return {
+		baseWeaponATK: weapon.ATK,
+		refinementLevel: weapon.refinement,
+		refinedWeaponATK,
+		weaponATKPercentBonus,
+		weaponATKFixedBonus,
+		totalWeaponATK,
+		baseSTR: stats.STR,
+		baseAGI: stats.AGI,
+		statusATK,
+		atkUpSTR,
+		atkUpAGI,
+		atkUpINT,
+		atkUpVIT,
+		atkUpDEX,
+		atkUpTotal,
+		atkDownTotal,
+		atkBeforePercent,
+		atkPercent,
+		atkAfterPercent,
+		atkFixed,
+		finalATK,
+	}
+}
+
 /**
  * 装備品補正値を装備・クリスタ・料理・バフから計算
  * StatusPreviewで使用される装備品補正値1〜3の計算

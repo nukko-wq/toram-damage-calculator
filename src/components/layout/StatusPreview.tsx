@@ -3,6 +3,7 @@ import { useCalculatorStore } from '@/stores'
 import {
 	calculateHP,
 	calculateMP,
+	calculateATK,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -61,14 +62,16 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			hpCalculation: calculateHP(baseStats, allBonuses),
 			mpCalculation: calculateMP(baseStats, allBonuses),
+			atkCalculation: calculateATK(baseStats, data.mainWeapon, allBonuses),
 			adjustedStatsCalculation: calculateAdjustedStats(baseStats, allBonuses),
 		}
-	}, [equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses, baseStats])
+	}, [equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses, baseStats, data.mainWeapon])
 
 	const {
 		equipmentBonuses: calculatedEquipmentBonuses,
 		hpCalculation,
 		mpCalculation,
+		atkCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
@@ -85,7 +88,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const basicStats = {
 		HP: hpCalculation.finalHP,
 		MP: mpCalculation.finalMP,
-		ATK: data.mainWeapon.ATK, // メイン武器ATK（暫定）
+		ATK: atkCalculation.finalATK, // 旋風槍ATK計算結果
 		baseATK: 0, // TODO: 基礎ATK計算
 		subATK: data.subWeapon.ATK, // サブ武器ATK
 		subBaseATK: 0, // TODO: サブ武器基礎ATK
