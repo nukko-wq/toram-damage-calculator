@@ -43,7 +43,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 						<span
 							className={`text-xs tabular-nums px-1 py-0.5 rounded ${
 								property.rateValue && property.rateValue > 0
-									? 'bg-sky-50 text-sky-700'
+									? 'text-gray-900'
 									: 'text-gray-400'
 							}`}
 						>
@@ -62,7 +62,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 						<span
 							className={`text-xs tabular-nums px-1 py-0.5 rounded ${
 								property.fixedValue && property.fixedValue > 0
-									? 'bg-blue-50 text-blue-700'
+									? 'text-gray-900'
 									: 'text-gray-400'
 							}`}
 						>
@@ -79,7 +79,9 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 	}
 
 	return (
-		<div className={`grid grid-cols-[80px_40px_40px_80px_40px_40px] gap-2 py-1 px-2 hover:bg-blue-50 rounded ${className}`}>
+		<div
+			className={`grid grid-cols-[80px_40px_40px_80px_40px_40px] gap-2 py-1 px-2 hover:bg-blue-100/80 rounded ${className}`}
+		>
 			{/* プロパティ1 */}
 			{renderProperty(property1)}
 

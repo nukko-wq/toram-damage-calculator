@@ -140,7 +140,7 @@ export default React.memo<StatSectionProps>(
 										key={`${pair.property1.propertyName}-${pair.property2?.propertyName || 'empty'}`}
 										property1={pair.property1}
 										property2={pair.property2}
-										className={index % 2 === 0 ? 'bg-slate-50' : 'bg-white'}
+										className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
 									/>
 								))
 							})()}
@@ -150,35 +150,35 @@ export default React.memo<StatSectionProps>(
 					<div className="space-y-0">
 						{(() => {
 							const entries = Object.entries(stats)
-							const rows: JSX.Element[] = []
-							
+							const rows: React.ReactElement[] = []
+
 							for (let i = 0; i < entries.length; i += 2) {
 								const [leftKey, leftValue] = entries[i]
 								const rightEntry = entries[i + 1]
 								const rowIndex = Math.floor(i / 2)
-								
+
 								const leftStat = {
 									name: labels[leftKey] || leftKey,
 									value: leftValue,
 								}
-								
+
 								const rightStat = rightEntry
 									? {
 											name: labels[rightEntry[0]] || rightEntry[0],
 											value: rightEntry[1],
-									  }
+										}
 									: undefined
-								
+
 								rows.push(
 									<StatRow
 										key={`row-${i}`}
 										leftStat={leftStat}
 										rightStat={rightStat}
-										className={rowIndex % 2 === 0 ? 'bg-slate-50' : 'bg-white'}
-									/>
+										className={rowIndex % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
+									/>,
 								)
 							}
-							
+
 							return rows
 						})()}
 					</div>

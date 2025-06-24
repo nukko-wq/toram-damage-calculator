@@ -30,9 +30,7 @@ const PropertyDisplay: React.FC<PropertyDisplayProps> = ({
 				{propertyConfig.hasRate ? (
 					<span
 						className={`text-xs tabular-nums px-1 py-0.5 rounded ${
-							rateValue && rateValue > 0
-								? 'bg-sky-50 text-sky-700'
-								: 'text-gray-400'
+							rateValue && rateValue > 0 ? 'text-gray-900' : 'text-gray-400'
 						}`}
 					>
 						{rateValue && rateValue > 0 ? rateValue : '-'}
