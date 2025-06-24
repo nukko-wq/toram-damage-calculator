@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useUIStore } from '@/stores'
 import DamagePreview from './DamagePreview'
 import StatusPreview from './StatusPreview'
@@ -91,35 +92,46 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 			</div>
 
 			{/* プレビューエリア - main要素の下に配置 */}
-			{(showDamagePreview || showStatusPreview) && (
-				<div className="relative left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
-					<div className="grid grid-cols-[520px_1fr]">
-						{/* 与ダメージプレビュー */}
-						{showDamagePreview ? (
-							<div
-								className="bg-orange-50 rounded-lg"
-								id="damage-preview"
-								aria-labelledby="damage-toggle"
-							>
-								<DamagePreview isVisible={showDamagePreview} />
-							</div>
-						) : (
-							<div /> /* プレースホルダー */
-						)}
+			<AnimatePresence>
+				{(showDamagePreview || showStatusPreview) && (
+					<motion.div
+						className="relative left-0 right-0 z-30 max-h-[80vh] overflow-y-auto"
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: 'auto', opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						transition={{
+							duration: 0,
+							ease: [0.4, 0.0, 0.2, 1],
+						}}
+					>
+						<div className="grid grid-cols-[520px_1fr]">
+							{/* 与ダメージプレビュー */}
+							{showDamagePreview ? (
+								<div
+									className="bg-orange-50 rounded-lg"
+									id="damage-preview"
+									aria-labelledby="damage-toggle"
+								>
+									<DamagePreview isVisible={showDamagePreview} />
+								</div>
+							) : (
+								<div /> /* プレースホルダー */
+							)}
 
-						{/* ステータスプレビュー */}
-						{showStatusPreview && (
-							<div
-								className="bg-blue-50"
-								id="status-preview"
-								aria-labelledby="status-toggle"
-							>
-								<StatusPreview isVisible={showStatusPreview} />
-							</div>
-						)}
-					</div>
-				</div>
-			)}
+							{/* ステータスプレビュー */}
+							{showStatusPreview && (
+								<div
+									className="bg-blue-50"
+									id="status-preview"
+									aria-labelledby="status-toggle"
+								>
+									<StatusPreview isVisible={showStatusPreview} />
+								</div>
+							)}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	)
 })
