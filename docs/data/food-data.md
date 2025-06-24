@@ -872,6 +872,17 @@ interface FoodSelection {
 - **関数**: `aggregateAllBonuses()` 内で料理効果を加算
 - **表示**: StatusPreviewの装備品補正値セクションに含める
 
+#### 現在の実装状況
+✅ **実装済み**: 
+- StatusPreviewでの4ソース統合（装備・クリスタル・料理・バフ）
+- `getFoodBonuses()`関数の基本フレームワーク
+- `calculateEquipmentBonuses()`での料理データ統合
+
+❌ **未実装/修正必要**:
+- `getFoodBonuses()`の料理フォームデータ構造対応
+- 料理データベースアクセス機能
+- プロパティマッピング処理
+
 #### StatusPreview統合の詳細仕様
 
 ##### 統合ポイント

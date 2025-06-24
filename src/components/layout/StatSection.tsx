@@ -71,11 +71,6 @@ export default React.memo<StatSectionProps>(
 						<div className="space-y-0">
 							{(() => {
 								// プロパティを整理してペアを作成
-								console.log(`StatSection ${title} received stats:`, stats)
-								console.log(
-									`StatSection ${title} propertyOrder:`,
-									propertyOrder,
-								)
 
 								const pairs: Array<{
 									property1: PropertyDisplayData
@@ -84,7 +79,6 @@ export default React.memo<StatSectionProps>(
 
 								// propertyOrderが指定されている場合はその順序で処理、そうでなければObject.entriesの順序で処理
 								const orderedKeys = propertyOrder || Object.keys(stats)
-								console.log(`StatSection ${title} orderedKeys:`, orderedKeys)
 
 								// プロパティを関数で作成
 								const createProperty = (

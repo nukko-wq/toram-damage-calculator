@@ -80,6 +80,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 			}
 
 			// Zustandストアを更新
+			console.log('FoodForm: Updating food data:', value)
 			updateFood(value as FoodFormData)
 
 			// 後方互換性のため従来のonChangeも呼び出し
@@ -98,14 +99,27 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		slotName: keyof FoodFormData,
 		newFood: FoodType,
 	) => {
-		setValue(`${slotName}.selectedFood`, newFood)
+		console.log(`FoodForm: Changing ${slotName} to ${newFood}`)
+		setValue(`${slotName}.selectedFood`, newFood, { shouldValidate: true })
 		// 「なし」が選択された場合はレベルを0に設定
 		if (newFood === 'none') {
-			setValue(`${slotName}.level`, 0)
+			setValue(`${slotName}.level`, 0, { shouldValidate: true })
 		} else {
 			// 「なし」以外が選択された場合は自動的に10に設定
-			setValue(`${slotName}.level`, 10)
+			setValue(`${slotName}.level`, 10, { shouldValidate: true })
 		}
+		
+		// 即座にストアを更新
+		const currentValues = watch()
+		const updatedValues = {
+			...currentValues,
+			[slotName]: {
+				selectedFood: newFood,
+				level: newFood === 'none' ? 0 : 10
+			}
+		}
+		console.log('FoodForm: Manually updating store with:', updatedValues)
+		updateFood(updatedValues as FoodFormData)
 	}
 
 	// レベル選択オプション生成
