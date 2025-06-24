@@ -804,6 +804,59 @@ export class FoodDatabase {
     const levelData = food.levels.find(l => l.level === level)
     return levelData?.value || 0
   }
+  
+  // StatusPreview統合用の新規関数
+  static calculateFoodBonuses(foodSelections: FoodSelection[]): Record<string, number> {
+    const bonuses: Record<string, number> = {}
+    
+    for (const selection of foodSelections) {
+      if (!selection.foodId || selection.level < 1) continue
+      
+      const food = this.getFoodById(selection.foodId)
+      if (!food) continue
+      
+      const effectValue = this.getFoodEffect(selection.foodId, selection.level)
+      const propertyKey = this.mapPropertyType(food.propertyType)
+      
+      if (propertyKey) {
+        bonuses[propertyKey] = (bonuses[propertyKey] || 0) + effectValue
+      }
+    }
+    
+    return bonuses
+  }
+  
+  // プロパティタイプマッピング
+  private static mapPropertyType(propertyType: string): string | null {
+    const mapping: Record<string, string> = {
+      'HP': 'HP',
+      'MP': 'MP', 
+      'ATK': 'ATK',
+      'MATK': 'MATK',
+      'weaponATK': 'weaponATK',
+      'elementAdvantage': 'elementPower',
+      'accuracy': 'accuracy',
+      'STR': 'STR',
+      'INT': 'INT',
+      'VIT': 'VIT',
+      'DEX': 'DEX',
+      'AGI': 'AGI',
+      'attackMPRecovery': 'attackMPRecovery',
+      'criticalRate': 'criticalRate',
+      'aggroPlus': 'aggroPlus',
+      'aggroMinus': 'aggroMinus',
+      'physicalResistance': 'physicalResistance',
+      'magicalResistance': 'magicalResistance'
+    }
+    
+    return mapping[propertyType] || null
+  }
+}
+
+// 料理選択データの型定義
+interface FoodSelection {
+  foodId: string | null
+  level: number
 }
 ```
 
@@ -818,6 +871,50 @@ export class FoodDatabase {
 - **統合先**: `src/utils/basicStatsCalculation.ts`
 - **関数**: `aggregateAllBonuses()` 内で料理効果を加算
 - **表示**: StatusPreviewの装備品補正値セクションに含める
+
+#### StatusPreview統合の詳細仕様
+
+##### 統合ポイント
+```typescript
+// src/utils/basicStatsCalculation.ts の calculateEquipmentBonuses 関数
+export function calculateEquipmentBonuses(
+  equipment: EquipmentBonuses,
+  crystals: CrystalBonuses,
+  foods: FoodBonuses,     // ← 料理データを追加
+  buffs: BuffBonuses
+): EquipmentBonusesResult
+```
+
+##### プロパティマッピング表
+料理のpropertyTypeと装備品補正値のプロパティ名の対応：
+
+| 料理propertyType | 装備品補正値プロパティ | 補正値セクション | 備考 |
+|------------------|------------------------|------------------|------|
+| `HP` | `HP` | 装備品補正値1 | 黄金チャーハン |
+| `MP` | `MP` | 装備品補正値1 | あんかけチャーハン |
+| `ATK` | `ATK` | 装備品補正値1 | ディアボラピザ |
+| `MATK` | `MATK` | 装備品補正値1 | シーフードピザ |
+| `weaponATK` | `weaponATK` | 装備品補正値1 | マルゲリータ |
+| `elementAdvantage` | `elementPower` | 装備品補正値1 | 属性パスタ |
+| `accuracy` | `accuracy` | 装備品補正値1 | しょうゆラーメン |
+| `STR` | `STR` | 装備品補正値1 | おかかおにぎり |
+| `INT` | `INT` | 装備品補正値1 | 梅干おにぎり |
+| `VIT` | `VIT` | 装備品補正値1 | ツナマヨおにぎり |
+| `DEX` | `DEX` | 装備品補正値1 | 鮭おにぎり |
+| `AGI` | `AGI` | 装備品補正値1 | 明太子おにぎり |
+| `attackMPRecovery` | `attackMPRecovery` | 装備品補正値1 | 焼きそば |
+| `criticalRate` | `criticalRate` | 装備品補正値1 | たこやき |
+| `aggroPlus` | `aggroPlus` | 装備品補正値1 | ビーフシチュー |
+| `aggroMinus` | `aggroMinus` | 装備品補正値1 | ホワイトシチュー |
+| `physicalResistance` | `physicalResistance` | 装備品補正値2 | ビーフバーガー |
+| `magicalResistance` | `magicalResistance` | 装備品補正値2 | フィッシュバーガー |
+
+##### 統合処理フロー
+1. **フォームデータ取得**: 料理フォームから選択された料理とレベルを取得
+2. **料理効果計算**: 各料理のレベルに対応する効果値を取得
+3. **プロパティマッピング**: propertyTypeを装備品補正値のプロパティ名に変換
+4. **加算処理**: 装備品・クリスタル・バフと合算
+5. **表示統合**: StatusPreviewの装備品補正値1〜3に反映
 
 ## バリデーション仕様
 
@@ -867,6 +964,7 @@ export class FoodDatabase {
 | 2024-06-24 | 耐性系料理（2種）追加 | ビーフバーガー(物理耐性)、フィッシュバーガー(魔法耐性)データ追加 |
 | 2024-06-24 | ATK・MATK系料理（ピザ2種）追加 | ディアボラピザ(ATK)、シーフードピザ(MATK)データ追加 |
 | 2024-06-24 | 属性系料理追加 | 属性パスタ(属性有利共通)データ追加 |
+| 2024-06-24 | StatusPreview統合設計追加 | 料理効果を装備品補正値に統合する仕様を追加 |
 
 ## 関連ドキュメント
 - [基本ステータス計算式](../calculations/basic-stats.md) - 計算ロジックとの統合
