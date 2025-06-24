@@ -129,12 +129,12 @@ export default React.memo<StatSectionProps>(
 									}
 								}
 
-								return pairs.map((pair, index) => (
+								return pairs.map((pair) => (
 									<PropertyDoubleDisplay
 										key={`${pair.property1.propertyName}-${pair.property2?.propertyName || 'empty'}`}
 										property1={pair.property1}
 										property2={pair.property2}
-										className={index % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
+										className=""
 									/>
 								))
 							})()}
@@ -149,7 +149,6 @@ export default React.memo<StatSectionProps>(
 							for (let i = 0; i < entries.length; i += 2) {
 								const [leftKey, leftValue] = entries[i]
 								const rightEntry = entries[i + 1]
-								const rowIndex = Math.floor(i / 2)
 
 								const leftStat = {
 									name: labels[leftKey] || leftKey,
@@ -168,7 +167,7 @@ export default React.memo<StatSectionProps>(
 										key={`row-${i}`}
 										leftStat={leftStat}
 										rightStat={rightStat}
-										className={rowIndex % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
+										className=""
 									/>,
 								)
 							}

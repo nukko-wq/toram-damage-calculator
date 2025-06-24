@@ -30,7 +30,7 @@ export default function StatRow({
 	}
 
 	return (
-		<div className={`flex hover:bg-blue-100/80 rounded ${className}`}>
+		<div className={`flex hover:bg-blue-100/80 rounded border-b border-gray-200 ${className}`}>
 			{renderStat(leftStat)}
 			{renderStat(rightStat)}
 		</div>
