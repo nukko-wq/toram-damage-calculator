@@ -60,11 +60,12 @@
 ```
 
 **ATK計算仕様**:
-- **武器種別**: 旋風槍の場合の計算を実装
-- **計算式**: `INT((自Lv + 総武器ATK + ステータスATK + ATKアップ - ATKダウン) × (1 + ATK%/100)) + ATK固定値`
-- **ステータスATK**: `基礎STR × 2.5 + 基礎AGI × 1.5`（旋風槍の場合）
-- **データソース**: メイン武器の種別に基づいて計算式を選択
-- **条件分岐**: 武器種が旋風槍以外の場合は暫定値を表示
+- **武器種別**: 選択された武器種に応じた計算式を適用
+- **ATK計算式**: `INT((自Lv + 総武器ATK + ステータスATK + ATKアップ - ATKダウン) × (1 + ATK%/100)) + ATK固定値`
+- **基礎ATK表示**: `Lv+総武器ATK+ステータスATK+ATKアップ(ステータス%) - ATKダウン(ステータス%)` (表示時のみ小数点以下切り捨て)
+- **ステータスATK**: 武器種別に応じた計算式（例：旋風槍の場合 `補正後STR × 2.5 + 補正後AGI × 1.5`）
+- **データソース**: メイン武器の種別に基づいて計算式を自動選択
+- **対応武器種**: 全11種の武器種（旋風槍、片手剣、両手剣、弓、自動弓、杖、魔導具、手甲、抜刀剣、双剣、素手）
 
 **計算詳細**: [ATK計算式設計書](../calculations/atk-calculation.md)を参照
 
@@ -212,7 +213,7 @@ interface CalculationResults {
     HP: number                          // HP計算結果
     MP: number                          // MP計算結果
     ATK: number                         // ATK計算結果（武器種別対応）
-    baseATK: number                     // 基礎ATK（暫定値）
+    baseATK: number                     // 基礎ATK（表示時のみ小数点以下切り捨て）
     subATK: number                      // サブ武器ATK
     subBaseATK: number                  // サブ武器基礎ATK（暫定値）
     totalATK: number                    // 総ATK（暫定値）
@@ -891,6 +892,8 @@ export function aggregateAllBonuses(
 | 2024-06-23 | StatusPreview独立設計書作成 | header-component.mdから分離 |
 | 2024-06-23 | UI設計書に特化した内容に変更 | 計算ロジックをrequirements/に分離 |
 | 2024-06-23 | 装備品補正値計算仕様を追加 | 4ソース加算方式の詳細化 |
+| 2024-06-24 | 基礎ATK仕様を更新 | 基礎ATK＝ステータスATKであることを明記 |
+| 2024-06-24 | 基礎ATK計算式を修正 | 正しい基礎ATK計算式に変更 |
 
 ## 関連ドキュメント
 - [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細

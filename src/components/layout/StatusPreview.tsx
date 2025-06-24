@@ -88,8 +88,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const basicStats = {
 		HP: hpCalculation.finalHP,
 		MP: mpCalculation.finalMP,
-		ATK: atkCalculation.finalATK, // 旋風槍ATK計算結果
-		baseATK: 0, // TODO: 基礎ATK計算
+		ATK: atkCalculation.finalATK, // 武器種別ATK計算結果
+		baseATK: Math.floor(atkCalculation.baseATK), // 基礎ATK（表示時のみ小数点以下切り捨て）
 		subATK: data.subWeapon.ATK, // サブ武器ATK
 		subBaseATK: 0, // TODO: サブ武器基礎ATK
 		totalATK: 0, // TODO: 総ATK計算

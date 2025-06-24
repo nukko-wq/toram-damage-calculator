@@ -5,7 +5,8 @@
  * 詳細な計算式は docs/calculations/basic-stats.md を参照
  */
 
-import type { BaseStats } from '@/types/calculator'
+import type { BaseStats, WeaponType as WeaponTypeEnum } from '@/types/calculator'
+import { getWeaponTypeKey } from '@/utils/weaponTypeMapping'
 
 // 全補正値（装備・クリスタ・料理・バフアイテムの合計）
 export interface AllBonuses {
@@ -359,6 +360,7 @@ export interface ATKCalculationSteps {
 	atkDownTotal: number // ATKダウン合計
 
 	// 最終計算
+	baseATK: number // 基礎ATK（Lv+総武器ATK+ステータスATK+ATKアップ-ATKダウン、小数点処理なし）
 	atkBeforePercent: number // ATK%適用前
 	atkPercent: number // ATK%
 	atkAfterPercent: number // ATK%適用後
@@ -438,7 +440,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
  */
 export function calculateATK(
 	stats: BaseStats,
-	weapon: { weaponType: string; ATK: number; stability: number; refinement: number },
+	weapon: { weaponType: WeaponTypeEnum; ATK: number; stability: number; refinement: number },
 	bonuses: AllBonuses = {},
 ): ATKCalculationSteps {
 	// 1. 総武器ATK計算
@@ -456,7 +458,8 @@ export function calculateATK(
 		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
 
 	// 2. ステータスATK計算（武器種別対応）
-	const weaponType = WEAPON_TYPES[weapon.weaponType] || WEAPON_TYPES.halberd
+	const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
+	const weaponType = WEAPON_TYPES[weaponTypeKey] || WEAPON_TYPES.halberd
 	const statusATK = weaponType.statusATKFormula(stats)
 
 	// 3. ATKアップ・ダウン計算
@@ -470,9 +473,11 @@ export function calculateATK(
 	// ATKダウンは現在なしと仮定
 	const atkDownTotal = 0
 
-	// 4. 最終ATK計算
-	const atkBeforePercent =
-		stats.level + totalWeaponATK + statusATK + atkUpTotal - atkDownTotal
+	// 4. 基礎ATK計算（ATK%適用前の値、小数点処理なし）
+	const baseATK = stats.level + totalWeaponATK + statusATK + atkUpTotal - atkDownTotal
+	
+	// 5. 最終ATK計算
+	const atkBeforePercent = baseATK
 	const atkPercent = bonuses.ATK_Rate || 0
 	const atkAfterPercent = Math.floor(
 		atkBeforePercent * (1 + atkPercent / 100),
@@ -497,6 +502,7 @@ export function calculateATK(
 		atkUpDEX,
 		atkUpTotal,
 		atkDownTotal,
+		baseATK,
 		atkBeforePercent,
 		atkPercent,
 		atkAfterPercent,
