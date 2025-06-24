@@ -395,16 +395,9 @@ export function getBuffBonuses(buffData: any): Partial<AllBonuses> {
 			const itemId = buffData[category]
 			if (!itemId) continue
 
-			console.log(`BuffItem found: ${category} = ${itemId}`)
-
 			// アイテムIDからアイテムデータを取得
 			const buffItem = getBuffItemById(itemId)
-			if (!buffItem?.properties) {
-				console.log(`BuffItem not found for ID: ${itemId}`)
-				continue
-			}
-
-			console.log(`BuffItem properties:`, buffItem.properties)
+			if (!buffItem?.properties) continue
 
 			// プロパティを処理
 			for (const [propertyKey, value] of Object.entries(buffItem.properties)) {
@@ -415,13 +408,7 @@ export function getBuffBonuses(buffData: any): Partial<AllBonuses> {
 
 				bonuses[normalizedKey as keyof AllBonuses] =
 					(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
-
-				console.log(`BuffItem bonus: ${propertyKey} → ${normalizedKey}: +${validatedValue}`)
 			}
-		}
-
-		if (Object.keys(bonuses).length > 0) {
-			console.log('Buff bonuses calculated:', bonuses)
 		}
 
 		return bonuses

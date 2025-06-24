@@ -42,12 +42,14 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 					{property.propertyConfig.hasRate ? (
 						<span
 							className={`text-xs tabular-nums px-1 py-0.5 rounded ${
-								property.rateValue && property.rateValue > 0
-									? 'text-gray-900'
+								property.rateValue !== null && property.rateValue !== 0
+									? property.rateValue > 0
+										? 'text-gray-900'
+										: 'text-red-600'
 									: 'text-gray-400'
 							}`}
 						>
-							{property.rateValue && property.rateValue > 0
+							{property.rateValue !== null && property.rateValue !== 0
 								? property.rateValue
 								: '-'}
 						</span>
@@ -61,12 +63,14 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 					{property.propertyConfig.hasFixed ? (
 						<span
 							className={`text-xs tabular-nums px-1 py-0.5 rounded ${
-								property.fixedValue && property.fixedValue > 0
-									? 'text-gray-900'
+								property.fixedValue !== null && property.fixedValue !== 0
+									? property.fixedValue > 0
+										? 'text-gray-900'
+										: 'text-red-600'
 									: 'text-gray-400'
 							}`}
 						>
-							{property.fixedValue && property.fixedValue > 0
+							{property.fixedValue !== null && property.fixedValue !== 0
 								? property.fixedValue
 								: '-'}
 						</span>
