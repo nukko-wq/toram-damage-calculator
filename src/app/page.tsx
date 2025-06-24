@@ -63,12 +63,6 @@ export default function Home() {
 	return (
 		<div className="min-h-screen bg-gray-50 py-8">
 			<div className="max-w-[1500px] mx-auto px-2 sm:px-6 lg:px-8">
-				<div className="text-center mb-8">
-					<p className="text-gray-600">
-						ステータスを入力してダメージを計算しましょう
-					</p>
-				</div>
-
 				{/* 更新通知 */}
 				{showUpdateNotifications && updateNotifications.length > 0 && (
 					<div className="mb-8">

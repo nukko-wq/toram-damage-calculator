@@ -104,7 +104,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 							ease: [0.4, 0.0, 0.2, 1],
 						}}
 					>
-						<div className="grid grid-cols-[520px_1fr]">
+						<div className="grid grid-cols-[520px_1fr] bg-gray-50">
 							{/* 与ダメージプレビュー */}
 							{showDamagePreview ? (
 								<div
