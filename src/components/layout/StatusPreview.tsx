@@ -126,7 +126,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// 現在は仮値だが、将来的には calculateEquipmentBonuses の結果を使用
 
 	return (
-		<div className="bg-gray-50 border-b border-gray-200 transition-all duration-300 ease-in-out">
+		<div className=" border-b border-blue-200 transition-all duration-300 ease-in-out">
 			<div className="px-4 py-6">
 				{/* レスポンシブグリッドレイアウト - 5つのセクション */}
 				<div className="flex gap-6 flex-wrap">

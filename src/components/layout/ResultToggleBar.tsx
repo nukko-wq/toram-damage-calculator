@@ -20,11 +20,11 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 	} = useUIStore()
 
 	return (
-		<div className={`border-b border-gray-200 ${className}`}>
+		<div className={`fixed top-16 left-0 right-0 z-40 ${className}`}>
 			{/* トグルボタンバー */}
 			<div className="">
 				<div
-					className="grid lg:grid-cols-[520px_1fr] bg-blue-300"
+					className="grid grid-cols-2 lg:grid-cols-[520px_1fr]"
 					role="group"
 					aria-label="計算結果表示切り替え"
 				>
@@ -33,7 +33,9 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 						type="button"
 						onClick={toggleDamagePreview}
 						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-							showDamagePreview ? ' text-white' : 'text-orange-600'
+							showDamagePreview
+								? 'bg-blue-300 text-white'
+								: 'bg-blue-300 text-white'
 						}`}
 						aria-pressed={showDamagePreview}
 						id="damage-toggle"
@@ -61,7 +63,9 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 						type="button"
 						onClick={toggleStatusPreview}
 						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-							showStatusPreview ? ' text-white' : 'text-blue-600'
+							showStatusPreview
+								? 'bg-blue-300 text-white'
+								: 'bg-blue-300 text-white'
 						}`}
 						aria-pressed={showStatusPreview}
 						id="status-toggle"
@@ -86,14 +90,14 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 				</div>
 			</div>
 
-			{/* プレビューエリア - 2カラム表示 */}
+			{/* プレビューエリア - 固定位置でmain要素に重なる */}
 			{(showDamagePreview || showStatusPreview) && (
-				<div className="border-t border-gray-200">
-					<div className="grid grid-cols-[520px_1fr] gap-4 p-4">
+				<div className="fixed top-[100px] left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
+					<div className="grid grid-cols-[520px_1fr]">
 						{/* 与ダメージプレビュー */}
 						{showDamagePreview ? (
 							<div
-								className="bg-orange-50 rounded-lg border border-orange-200"
+								className="bg-orange-50 rounded-lg"
 								id="damage-preview"
 								aria-labelledby="damage-toggle"
 							>
@@ -106,7 +110,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 						{/* ステータスプレビュー */}
 						{showStatusPreview && (
 							<div
-								className="bg-blue-50 rounded-lg border border-blue-200"
+								className="bg-blue-50 rounded-lg"
 								id="status-preview"
 								aria-labelledby="status-toggle"
 							>
