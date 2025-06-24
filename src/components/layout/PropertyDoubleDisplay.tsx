@@ -33,7 +33,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 		return (
 			<>
 				{/* プロパティ名 */}
-				<span className="text-sm text-gray-700 truncate">
+				<span className="font-semibold text-[13px] text-gray-700 truncate">
 					{property.propertyName}
 				</span>
 
@@ -41,7 +41,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 				<div className="text-center">
 					{property.propertyConfig.hasRate ? (
 						<span
-							className={`text-xs tabular-nums px-1 py-0.5 rounded ${
+							className={`font-semibold text-[13px] px-1 py-0.5 rounded ${
 								property.rateValue !== null && property.rateValue !== 0
 									? property.rateValue > 0
 										? 'text-gray-900'
@@ -62,7 +62,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 				<div className="text-center">
 					{property.propertyConfig.hasFixed ? (
 						<span
-							className={`text-xs tabular-nums px-1 py-0.5 rounded ${
+							className={`font-semibold text-[13px] tabular-nums px-1 py-0.5 rounded ${
 								property.fixedValue !== null && property.fixedValue !== 0
 									? property.fixedValue > 0
 										? 'text-gray-900'
@@ -84,7 +84,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 
 	return (
 		<div
-			className={`grid grid-cols-[90px_40px_40px_90px_40px_40px] gap-2 py-1 px-2 hover:bg-blue-100/80 rounded border-b border-gray-200 ${className}`}
+			className={`grid grid-cols-[90px_40px_40px_90px_40px_40px] items-center gap-2 py-0.5 px-2 hover:bg-blue-100/80 rounded border-b border-blue-200 ${className}`}
 		>
 			{/* プロパティ1 */}
 			{renderProperty(property1)}

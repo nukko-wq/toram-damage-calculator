@@ -110,7 +110,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 						{/* ステータスプレビュー */}
 						{showStatusPreview && (
 							<div
-								className="bg-blue-50 rounded-lg"
+								className="bg-blue-50"
 								id="status-preview"
 								aria-labelledby="status-toggle"
 							>

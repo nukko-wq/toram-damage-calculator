@@ -127,7 +127,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	return (
 		<div className=" border-b border-blue-200 transition-all duration-300 ease-in-out">
-			<div className="px-4 py-6">
+			<div className="px-4 py-2">
 				{/* レスポンシブグリッドレイアウト - 5つのセクション */}
 				<div className="flex gap-6 flex-wrap">
 					{/* 基本ステータス (30項目) */}
