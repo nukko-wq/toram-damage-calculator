@@ -60,7 +60,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 						<span
 							className={`text-xs tabular-nums px-1 py-0.5 rounded ${
 								property.fixedValue && property.fixedValue > 0
-									? 'bg-rose-50 text-rose-700'
+									? 'bg-blue-50 text-blue-700'
 									: 'text-gray-400'
 							}`}
 						>

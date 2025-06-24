@@ -155,10 +155,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							baseMATK: '基本MATK',
 							stabilityRate: '安定率',
 							subStabilityRate: 'サブ安定率',
-							criticalRate: 'クリティカル率',
-							criticalDamage: 'クリティカルダメージ',
-							magicCriticalRate: '魔法クリティカル率',
-							magicCriticalDamage: '魔法クリティカルダメージ',
+							criticalRate: 'ｸﾘﾃｨｶﾙ率',
+							criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+							magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',
+							magicCriticalDamage: '魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
 							totalElementAdvantage: '総属性有利',
 							elementAwakeningAdvantage: '属性覚醒有利',
 							ASPD: 'ASPD',
@@ -206,8 +206,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							unsheatheAttack: '抜刀威力',
 							shortRangeDamage: '近距離威力',
 							longRangeDamage: '遠距離威力',
-							criticalDamage: 'クリティカルダメージ',
-							criticalRate: 'クリティカル率',
+							criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+							criticalRate: 'ｸﾘﾃｨｶﾙ率',
 							STR: 'STR',
 							AGI: 'AGI',
 							INT: 'INT',
@@ -229,6 +229,40 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							aggroMinus: 'ヘイト-',
 						}}
 						displayMode="property-double"
+						propertyOrder={[
+							'ATK',
+							'physicalPenetration',
+							'MATK',
+							'magicalPenetration',
+							'weaponATK',
+							'',
+							'elementPower',
+							'unsheatheAttack',
+							'shortRangeDamage',
+							'longRangeDamage',
+							'criticalDamage',
+							'criticalRate',
+							'STR',
+							'AGI',
+							'INT',
+							'DEX',
+							'VIT',
+							'',
+							'ASPD',
+							'CSPD',
+							'stability',
+							'motionSpeed',
+							'accuracy',
+							'dodge',
+							'MP',
+							'attackMPRecovery',
+							'HP',
+							'ailmentResistance',
+							'physicalResistance',
+							'magicalResistance',
+							'aggroPlus',
+							'aggroMinus',
+						]}
 						propertyConfigs={{
 							ATK: { hasRate: true, hasFixed: true },
 							physicalPenetration: { hasRate: true, hasFixed: false },
@@ -302,6 +336,24 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							barrierCooldown: 'バリア速度',
 						}}
 						displayMode="property-double"
+						propertyOrder={[
+							'ATK_STR', 'MATK_STR',
+							'ATK_INT', 'MATK_INT',
+							'ATK_VIT', 'MATK_VIT',
+							'ATK_AGI', 'MATK_AGI',
+							'ATK_DEX', 'MATK_DEX',
+							'neutralResistance', '',
+							'fireResistance', 'waterResistance',
+							'windResistance', 'earthResistance',
+							'lightResistance', 'darkResistance',
+							'linearReduction', 'rushReduction',
+							'bulletReduction', 'proximityReduction',
+							'areaReduction', 'floorTrapReduction',
+							'meteorReduction', 'bladeReduction',
+							'suctionReduction', 'explosionReduction',
+							'physicalBarrier', 'magicalBarrier',
+							'fractionalBarrier', 'barrierCooldown'
+						]}
 						propertyConfigs={{
 							ATK_STR: { hasRate: true, hasFixed: false },
 							MATK_STR: { hasRate: true, hasFixed: false },
@@ -353,6 +405,12 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							itemCooldown: '道具速度',
 						}}
 						displayMode="property-double"
+						propertyOrder={[
+							'physicalFollowup', 'magicalFollowup',
+							'naturalHPRecovery', 'naturalMPRecovery',
+							'absoluteAccuracy', 'absoluteDodge',
+							'revivalTime', 'itemCooldown'
+						]}
 						propertyConfigs={{
 							physicalFollowup: { hasRate: true, hasFixed: false },
 							magicalFollowup: { hasRate: true, hasFixed: false },

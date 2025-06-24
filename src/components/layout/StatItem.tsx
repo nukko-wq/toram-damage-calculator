@@ -16,8 +16,8 @@ export default function StatItem({
 
 	return (
 		<div className={`flex justify-between items-center py-1 px-2 ${className}`}>
-			<span className="text-sm text-gray-700 font-medium">{name}:</span>
-			<span className="text-sm text-gray-900 font-semibold tabular-nums">
+			<span className="text-sm text-gray-700">{name}:</span>
+			<span className="text-sm text-gray-900 tabular-nums">
 				{formatValue(value)}
 			</span>
 		</div>
