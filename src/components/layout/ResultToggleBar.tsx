@@ -90,9 +90,9 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 				</div>
 			</div>
 
-			{/* プレビューエリア - 固定位置でmain要素に重なる */}
+			{/* プレビューエリア - main要素の下に配置 */}
 			{(showDamagePreview || showStatusPreview) && (
-				<div className="absolute top-full left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
+				<div className="relative left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
 					<div className="grid grid-cols-[520px_1fr]">
 						{/* 与ダメージプレビュー */}
 						{showDamagePreview ? (

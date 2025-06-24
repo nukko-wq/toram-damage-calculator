@@ -20,9 +20,11 @@ export default function RootLayout({
 	return (
 		<html lang="ja">
 			<body>
-				<Header />
-				<ResultToggleBar />
-				<main>{children}</main>
+				<div className="min-h-screen">
+					<Header />
+					<ResultToggleBar />
+					<main>{children}</main>
+				</div>
 			</body>
 		</html>
 	)
