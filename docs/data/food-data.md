@@ -33,7 +33,7 @@ interface FoodEffect {
   id: string
   name: string
   category: 'HP' | 'MP' | 'ATK' | 'MATK' | 'STAT' | 'RESIST'
-  propertyType: string  // 'HP', 'MP', 'ATK', 'weaponATK', 'STR', 'INT', 'VIT', 'DEX', 'AGI', 'accuracy', 'attackMPRecovery', 'criticalRate', 'aggroPlus', 'aggroMinus', etc.
+  propertyType: string  // 'HP', 'MP', 'ATK', 'MATK', 'weaponATK', 'elementAdvantage', 'STR', 'INT', 'VIT', 'DEX', 'AGI', 'accuracy', 'attackMPRecovery', 'criticalRate', 'aggroPlus', 'aggroMinus', 'physicalResistance', 'magicalResistance', etc.
   isPercentage: boolean // true: %, false: 固定値
   levels: Array<{
     level: number
@@ -169,6 +169,123 @@ const margherita: FoodEffect = {
     { level: 10, value: 100 }
   ],
   description: '武器ATK固定値を増加させる料理'
+}
+```
+
+#### ディアボラピザ(ATK)
+ATK固定値を増加させる料理。
+
+| レベル | ATK(+) | 効果値 |
+|--------|--------|--------|
+| Lv1    | +6     | 6      |
+| Lv2    | +12    | 12     |
+| Lv3    | +18    | 18     |
+| Lv4    | +24    | 24     |
+| Lv5    | +30    | 30     |
+| Lv6    | +44    | 44     |
+| Lv7    | +58    | 58     |
+| Lv8    | +72    | 72     |
+| Lv9    | +86    | 86     |
+| Lv10   | +100   | 100    |
+
+```typescript
+const diabolaPizza: FoodEffect = {
+  id: 'diabola_pizza',
+  name: 'ディアボラピザ(ATK)',
+  category: 'ATK',
+  propertyType: 'ATK',
+  isPercentage: false,
+  levels: [
+    { level: 1, value: 6 },
+    { level: 2, value: 12 },
+    { level: 3, value: 18 },
+    { level: 4, value: 24 },
+    { level: 5, value: 30 },
+    { level: 6, value: 44 },
+    { level: 7, value: 58 },
+    { level: 8, value: 72 },
+    { level: 9, value: 86 },
+    { level: 10, value: 100 }
+  ],
+  description: 'ATK固定値を増加させる料理'
+}
+```
+
+#### シーフードピザ(MATK)
+MATK固定値を増加させる料理。
+
+| レベル | MATK(+) | 効果値 |
+|--------|---------|--------|
+| Lv1    | +6      | 6      |
+| Lv2    | +12     | 12     |
+| Lv3    | +18     | 18     |
+| Lv4    | +24     | 24     |
+| Lv5    | +30     | 30     |
+| Lv6    | +44     | 44     |
+| Lv7    | +58     | 58     |
+| Lv8    | +72     | 72     |
+| Lv9    | +86     | 86     |
+| Lv10   | +100    | 100    |
+
+```typescript
+const seafoodPizza: FoodEffect = {
+  id: 'seafood_pizza',
+  name: 'シーフードピザ(MATK)',
+  category: 'MATK',
+  propertyType: 'MATK',
+  isPercentage: false,
+  levels: [
+    { level: 1, value: 6 },
+    { level: 2, value: 12 },
+    { level: 3, value: 18 },
+    { level: 4, value: 24 },
+    { level: 5, value: 30 },
+    { level: 6, value: 44 },
+    { level: 7, value: 58 },
+    { level: 8, value: 72 },
+    { level: 9, value: 86 },
+    { level: 10, value: 100 }
+  ],
+  description: 'MATK固定値を増加させる料理'
+}
+```
+
+#### 属性パスタ(属性有利共通)
+属性有利共通固定値を増加させる料理。
+
+| レベル | 属性有利共通(+) | 効果値 |
+|--------|-----------------|--------|
+| Lv1    | +1              | 1      |
+| Lv2    | +2              | 2      |
+| Lv3    | +3              | 3      |
+| Lv4    | +4              | 4      |
+| Lv5    | +5              | 5      |
+| Lv6    | +7              | 7      |
+| Lv7    | +9              | 9      |
+| Lv8    | +11             | 11     |
+| Lv9    | +13             | 13     |
+| Lv10   | +15             | 15     |
+
+```typescript
+const elementPasta: FoodEffect = {
+  id: 'element_pasta',
+  name: '属性パスタ(属性有利共通)',
+  category: 'ATK',
+  propertyType: 'elementAdvantage',
+  isPercentage: false,
+  levels: [
+    { level: 1, value: 1 },
+    { level: 2, value: 2 },
+    { level: 3, value: 3 },
+    { level: 4, value: 4 },
+    { level: 5, value: 5 },
+    { level: 6, value: 7 },
+    { level: 7, value: 9 },
+    { level: 8, value: 11 },
+    { level: 9, value: 13 },
+    { level: 10, value: 15 }
+  ],
+  description: '属性有利共通固定値を増加させる料理'
 }
 ```
 
@@ -569,7 +686,84 @@ const mentaikoOnigiri: FoodEffect = {
 ```
 
 ### 耐性系料理
-※今後追加予定
+
+#### ビーフバーガー(物理耐性)
+物理耐性固定値を増加させる料理。
+
+| レベル | 物理耐性(+) | 効果値 |
+|--------|-------------|--------|
+| Lv1    | +4          | 4      |
+| Lv2    | +8          | 8      |
+| Lv3    | +12         | 12     |
+| Lv4    | +16         | 16     |
+| Lv5    | +20         | 20     |
+| Lv6    | +26         | 26     |
+| Lv7    | +32         | 32     |
+| Lv8    | +38         | 38     |
+| Lv9    | +44         | 44     |
+| Lv10   | +50         | 50     |
+
+```typescript
+const beefBurger: FoodEffect = {
+  id: 'beef_burger',
+  name: 'ビーフバーガー(物理耐性)',
+  category: 'RESIST',
+  propertyType: 'physicalResistance',
+  isPercentage: false,
+  levels: [
+    { level: 1, value: 4 },
+    { level: 2, value: 8 },
+    { level: 3, value: 12 },
+    { level: 4, value: 16 },
+    { level: 5, value: 20 },
+    { level: 6, value: 26 },
+    { level: 7, value: 32 },
+    { level: 8, value: 38 },
+    { level: 9, value: 44 },
+    { level: 10, value: 50 }
+  ],
+  description: '物理耐性固定値を増加させる料理'
+}
+```
+
+#### フィッシュバーガー(魔法耐性)
+魔法耐性固定値を増加させる料理。
+
+| レベル | 魔法耐性(+) | 効果値 |
+|--------|-------------|--------|
+| Lv1    | +4          | 4      |
+| Lv2    | +8          | 8      |
+| Lv3    | +12         | 12     |
+| Lv4    | +16         | 16     |
+| Lv5    | +20         | 20     |
+| Lv6    | +26         | 26     |
+| Lv7    | +32         | 32     |
+| Lv8    | +38         | 38     |
+| Lv9    | +44         | 44     |
+| Lv10   | +50         | 50     |
+
+```typescript
+const fishBurger: FoodEffect = {
+  id: 'fish_burger',
+  name: 'フィッシュバーガー(魔法耐性)',
+  category: 'RESIST',
+  propertyType: 'magicalResistance',
+  isPercentage: false,
+  levels: [
+    { level: 1, value: 4 },
+    { level: 2, value: 8 },
+    { level: 3, value: 12 },
+    { level: 4, value: 16 },
+    { level: 5, value: 20 },
+    { level: 6, value: 26 },
+    { level: 7, value: 32 },
+    { level: 8, value: 38 },
+    { level: 9, value: 44 },
+    { level: 10, value: 50 }
+  ],
+  description: '魔法耐性固定値を増加させる料理'
+}
+```
 
 ## ファイル構成
 
@@ -670,6 +864,9 @@ export class FoodDatabase {
 | 2024-06-24 | MP系・ATK系料理追加 | あんかけチャーハン(MP)、マルゲリータ(武器ATK)データ追加 |
 | 2024-06-24 | 特殊効果系料理（3種）追加 | 焼きそば(攻撃MP回復)、たこやき(クリ率)、ビーフシチュー(ヘイト+)データ追加 |
 | 2024-06-24 | ヘイト-系料理追加 | ホワイトシチュー(ヘイト-)データ追加 |
+| 2024-06-24 | 耐性系料理（2種）追加 | ビーフバーガー(物理耐性)、フィッシュバーガー(魔法耐性)データ追加 |
+| 2024-06-24 | ATK・MATK系料理（ピザ2種）追加 | ディアボラピザ(ATK)、シーフードピザ(MATK)データ追加 |
+| 2024-06-24 | 属性系料理追加 | 属性パスタ(属性有利共通)データ追加 |
 
 ## 関連ドキュメント
 - [基本ステータス計算式](../calculations/basic-stats.md) - 計算ロジックとの統合
