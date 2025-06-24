@@ -12,27 +12,32 @@ interface ResultToggleBarProps {
 export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 	className = '',
 }) {
-	const { activeResultView, toggleResultView } = useUIStore()
+	const {
+		showStatusPreview,
+		showDamagePreview,
+		toggleStatusPreview,
+		toggleDamagePreview,
+	} = useUIStore()
 
 	return (
 		<div className={`bg-white border-b border-gray-200 ${className}`}>
 			{/* トグルボタンバー */}
-			<div className="">
+			<div className="px-4 py-2">
 				<div
-					className="grid grid-cols-2 bg-blue-300"
-					role="tablist"
-					aria-label="計算結果表示"
+					className="grid grid-cols-2 gap-2"
+					role="group"
+					aria-label="計算結果表示切り替え"
 				>
 					{/* 与ダメージ確認ボタン */}
 					<button
 						type="button"
-						onClick={() => toggleResultView('damage')}
-						className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium transition-colors duration-200 ${
-							activeResultView === 'damage' ? 'text-white' : 'text-orange-700'
+						onClick={toggleDamagePreview}
+						className={`inline-flex items-center justify-center px-4 py-2 rounded-md border text-sm font-medium transition-colors duration-200 ${
+							showDamagePreview
+								? 'bg-orange-600 text-white border-orange-600 hover:bg-orange-700'
+								: 'bg-white text-orange-600 border-orange-300 hover:bg-orange-50'
 						}`}
-						role="tab"
-						aria-selected={activeResultView === 'damage'}
-						aria-controls="damage-preview"
+						aria-pressed={showDamagePreview}
 						id="damage-toggle"
 					>
 						<svg
@@ -56,15 +61,13 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					{/* ステータス確認ボタン */}
 					<button
 						type="button"
-						onClick={() => toggleResultView('status')}
-						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-							activeResultView === 'status'
-								? 'text-white hover:bg-blue-500'
-								: 'text-blue-700 hover:bg-blue-200'
+						onClick={toggleStatusPreview}
+						className={`inline-flex items-center justify-center px-4 py-2 rounded-md border text-sm font-medium transition-colors duration-200 ${
+							showStatusPreview
+								? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+								: 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
 						}`}
-						role="tab"
-						aria-selected={activeResultView === 'status'}
-						aria-controls="status-preview"
+						aria-pressed={showStatusPreview}
 						id="status-toggle"
 					>
 						<svg
@@ -87,32 +90,40 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 				</div>
 			</div>
 
-			{/* プレビューエリア */}
-			<div
-				className={`overflow-hidden transition-all duration-300 ease-in-out ${
-					activeResultView ? 'max-h-screen border-t border-gray-200' : 'max-h-0'
-				}`}
-			>
-				{/* 与ダメージプレビュー */}
-				<div
-					role="tabpanel"
-					aria-labelledby="damage-toggle"
-					id="damage-preview"
-					hidden={activeResultView !== 'damage'}
-				>
-					<DamagePreview isVisible={activeResultView === 'damage'} />
-				</div>
+			{/* プレビューエリア - 2カラム表示 */}
+			{(showDamagePreview || showStatusPreview) && (
+				<div className="border-t border-gray-200">
+					<div
+						className={`grid gap-4 p-4 ${
+							showDamagePreview && showStatusPreview
+								? 'lg:grid-cols-[520px_1fr]'
+								: 'grid-cols-1'
+						}`}
+					>
+						{/* 与ダメージプレビュー */}
+						{showDamagePreview && (
+							<div
+								className="bg-orange-50 rounded-lg border border-orange-200"
+								id="damage-preview"
+								aria-labelledby="damage-toggle"
+							>
+								<DamagePreview isVisible={showDamagePreview} />
+							</div>
+						)}
 
-				{/* ステータスプレビュー */}
-				<div
-					role="tabpanel"
-					aria-labelledby="status-toggle"
-					id="status-preview"
-					hidden={activeResultView !== 'status'}
-				>
-					<StatusPreview isVisible={activeResultView === 'status'} />
+						{/* ステータスプレビュー */}
+						{showStatusPreview && (
+							<div
+								className="bg-blue-50 rounded-lg border border-blue-200"
+								id="status-preview"
+								aria-labelledby="status-toggle"
+							>
+								<StatusPreview isVisible={showStatusPreview} />
+							</div>
+						)}
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	)
 })
