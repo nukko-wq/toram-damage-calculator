@@ -31,7 +31,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 		return (
 			<>
 				{/* プロパティ名 */}
-				<span className="text-sm text-gray-700 font-medium truncate">
+				<span className="text-sm text-gray-700 truncate">
 					{property.propertyName}
 				</span>
 
