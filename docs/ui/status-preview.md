@@ -59,6 +59,15 @@
 └─────────────────────────────┘
 ```
 
+**ATK計算仕様**:
+- **武器種別**: 旋風槍の場合の計算を実装
+- **計算式**: `INT((自Lv + 総武器ATK + ステータスATK + ATKアップ - ATKダウン) × (1 + ATK%/100)) + ATK固定値`
+- **ステータスATK**: `基礎STR × 2.5 + 基礎AGI × 1.5`（旋風槍の場合）
+- **データソース**: メイン武器の種別に基づいて計算式を選択
+- **条件分岐**: 武器種が旋風槍以外の場合は暫定値を表示
+
+**計算詳細**: [ATK計算式設計書](../calculations/atk-calculation.md)を参照
+
 ### 補正後ステータス（8項目）
 ```
 ┌─────── 補正後ステータス ─────┐
@@ -200,33 +209,34 @@ interface StatusPreviewProps {
 interface CalculationResults {
   // 基本ステータス（30項目）
   basicStats: {
-    HP: number
-    MP: number
-    ATK: number
-    baseATK: number
-    subBaseATK: number
-    totalATK: number
-    bringerAM: number
-    MATK: number
-    baseMATK: number
-    stabilityRate: number
-    subStabilityRate: number
-    criticalRate: number
-    criticalDamage: number
-    magicCriticalRate: number
-    magicCriticalDamage: number
-    totalElementAdvantage: number
-    elementAwakeningAdvantage: number
-    ASPD: number
-    CSPD: number
-    HIT: number
-    FLEE: number
-    physicalResistance: number
-    magicalResistance: number
-    ailmentResistance: number
-    motionSpeed: number
-    armorBreak: number
-    anticipate: number
+    HP: number                          // HP計算結果
+    MP: number                          // MP計算結果
+    ATK: number                         // ATK計算結果（武器種別対応）
+    baseATK: number                     // 基礎ATK（暫定値）
+    subATK: number                      // サブ武器ATK
+    subBaseATK: number                  // サブ武器基礎ATK（暫定値）
+    totalATK: number                    // 総ATK（暫定値）
+    bringerAM: number                   // ブリンガーAM（暫定値）
+    MATK: number                        // MATK（暫定値）
+    baseMATK: number                    // 基本MATK（暫定値）
+    stabilityRate: number               // メイン武器安定率
+    subStabilityRate: number            // サブ武器安定率
+    criticalRate: number                // クリティカル率（暫定値）
+    criticalDamage: number              // クリティカルダメージ（暫定値）
+    magicCriticalRate: number           // 魔法クリティカル率（暫定値）
+    magicCriticalDamage: number         // 魔法クリティカルダメージ（暫定値）
+    totalElementAdvantage: number       // 総属性有利（暫定値）
+    elementAwakeningAdvantage: number   // 属性覚醒有利（暫定値）
+    ASPD: number                        // 攻撃速度（暫定値）
+    CSPD: number                        // 詠唱速度（暫定値）
+    HIT: number                         // 命中（暫定値）
+    FLEE: number                        // 回避（暫定値）
+    physicalResistance: number          // 物理耐性（暫定値）
+    magicalResistance: number           // 魔法耐性（暫定値）
+    ailmentResistance: number           // 異常耐性（暫定値）
+    motionSpeed: number                 // 行動速度（暫定値）
+    armorBreak: number                  // 防御崩し（暫定値）
+    anticipate: number                  // 先読み（暫定値）
   }
   
   // 補正後ステータス（8項目）
