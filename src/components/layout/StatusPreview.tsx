@@ -34,12 +34,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		[data.crystals],
 	)
 
-	const foodBonuses = useMemo(() => {
-		console.log('StatusPreview: Food data received:', data.food)
-		const result = getFoodBonuses(data.food)
-		console.log('StatusPreview: Food bonuses result:', result)
-		return result
-	}, [data.food])
+	const foodBonuses = useMemo(() => getFoodBonuses(data.food), [data.food])
 
 	const buffBonuses = useMemo(
 		() => getBuffBonuses(data.buffItems),
@@ -75,7 +70,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	} = calculationResults
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
 		calculatedEquipmentBonuses
-
 
 	if (!isVisible) {
 		return null
@@ -335,22 +329,38 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 						}}
 						displayMode="property-double"
 						propertyOrder={[
-							'ATK_STR', 'MATK_STR',
-							'ATK_INT', 'MATK_INT',
-							'ATK_VIT', 'MATK_VIT',
-							'ATK_AGI', 'MATK_AGI',
-							'ATK_DEX', 'MATK_DEX',
-							'neutralResistance', '',
-							'fireResistance', 'waterResistance',
-							'windResistance', 'earthResistance',
-							'lightResistance', 'darkResistance',
-							'linearReduction', 'rushReduction',
-							'bulletReduction', 'proximityReduction',
-							'areaReduction', 'floorTrapReduction',
-							'meteorReduction', 'bladeReduction',
-							'suctionReduction', 'explosionReduction',
-							'physicalBarrier', 'magicalBarrier',
-							'fractionalBarrier', 'barrierCooldown'
+							'ATK_STR',
+							'MATK_STR',
+							'ATK_INT',
+							'MATK_INT',
+							'ATK_VIT',
+							'MATK_VIT',
+							'ATK_AGI',
+							'MATK_AGI',
+							'ATK_DEX',
+							'MATK_DEX',
+							'neutralResistance',
+							'',
+							'fireResistance',
+							'waterResistance',
+							'windResistance',
+							'earthResistance',
+							'lightResistance',
+							'darkResistance',
+							'linearReduction',
+							'rushReduction',
+							'bulletReduction',
+							'proximityReduction',
+							'areaReduction',
+							'floorTrapReduction',
+							'meteorReduction',
+							'bladeReduction',
+							'suctionReduction',
+							'explosionReduction',
+							'physicalBarrier',
+							'magicalBarrier',
+							'fractionalBarrier',
+							'barrierCooldown',
 						]}
 						propertyConfigs={{
 							ATK_STR: { hasRate: true, hasFixed: false },
@@ -404,10 +414,14 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 						}}
 						displayMode="property-double"
 						propertyOrder={[
-							'physicalFollowup', 'magicalFollowup',
-							'naturalHPRecovery', 'naturalMPRecovery',
-							'absoluteAccuracy', 'absoluteDodge',
-							'revivalTime', 'itemCooldown'
+							'physicalFollowup',
+							'magicalFollowup',
+							'naturalHPRecovery',
+							'naturalMPRecovery',
+							'absoluteAccuracy',
+							'absoluteDodge',
+							'revivalTime',
+							'itemCooldown',
 						]}
 						propertyConfigs={{
 							physicalFollowup: { hasRate: true, hasFixed: false },
@@ -421,45 +435,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 						}}
 						className=""
 					/>
-				</div>
-
-				{/* 実装状況の説明 */}
-				<div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-					<div className="flex">
-						<svg
-							className="flex-shrink-0 h-5 w-5 text-yellow-400"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-						>
-							<path
-								fillRule="evenodd"
-								d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-								clipRule="evenodd"
-							/>
-						</svg>
-						<div className="ml-3">
-							<h3 className="text-sm font-medium text-yellow-800">
-								実装状況 (Phase 2: 部分実装)
-							</h3>
-							<div className="mt-2 text-sm text-yellow-700">
-								<p>
-									<strong>✅ 実装済み:</strong>{' '}
-									HP・MP計算（正確なトーラム計算式）
-								</p>
-								<p>
-									<strong>🔄 部分実装:</strong>{' '}
-									基本ステータス表示構造（98項目対応）
-								</p>
-								<p>
-									<strong>❌ 未実装:</strong>{' '}
-									装備・クリスタ・バフ補正値の統合計算
-								</p>
-								<p className="mt-1 text-xs">
-									現在は基本ステータスとHP・MPのみ正確な値を表示。その他は0または仮値です。
-								</p>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
