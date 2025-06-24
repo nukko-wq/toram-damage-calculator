@@ -20,7 +20,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 	} = useUIStore()
 
 	return (
-		<div className={`fixed top-16 left-0 right-0 z-40 ${className}`}>
+		<div className={`sticky top-0 left-0 right-0 z-40 ${className}`}>
 			{/* トグルボタンバー */}
 			<div className="">
 				<div
@@ -92,7 +92,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 
 			{/* プレビューエリア - 固定位置でmain要素に重なる */}
 			{(showDamagePreview || showStatusPreview) && (
-				<div className="fixed top-[100px] left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
+				<div className="absolute top-full left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
 					<div className="grid grid-cols-[520px_1fr]">
 						{/* 与ダメージプレビュー */}
 						{showDamagePreview ? (
