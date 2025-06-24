@@ -170,6 +170,7 @@ export interface HPCalculationSteps {
 
 // MP計算の中間結果
 export interface MPCalculationSteps {
+	adjustedINT: number // 補正後INT
 	baseMP: number // MP基本値
 	mpAfterPercent: number // MP%適用後
 	finalMP: number // 最終MP
@@ -209,24 +210,30 @@ export function calculateHP(
 
 /**
  * MP計算（正確な計算式）
- * MP = INT(INT(Lv+99+TEC+総INT/10)*(1+MP%/100))+MP固定値
+ * MP = INT(INT(Lv+99+TEC+補正後INT/10)*(1+MP%/100))+MP固定値
  */
 export function calculateMP(
 	stats: BaseStats,
 	bonuses: AllBonuses = {},
 ): MPCalculationSteps {
-	// 1. MP基本値計算
-	const baseMP = Math.floor(stats.level + 99 + stats.TEC + stats.INT / 10)
+	// 1. 補正後INT計算
+	const intPercent = bonuses.INT_Rate || 0
+	const intFixed = bonuses.INT || 0
+	const adjustedINT = Math.floor(stats.INT * (1 + intPercent / 100)) + intFixed
 
-	// 2. MP%補正適用
+	// 2. MP基本値計算
+	const baseMP = Math.floor(stats.level + 99 + stats.TEC + adjustedINT / 10)
+
+	// 3. MP%補正適用
 	const mpPercent = bonuses.MP_Rate || 0
 	const mpAfterPercent = Math.floor(baseMP * (1 + mpPercent / 100))
 
-	// 3. MP固定値加算
+	// 4. MP固定値加算
 	const mpFixed = bonuses.MP || 0
 	const finalMP = mpAfterPercent + mpFixed
 
 	return {
+		adjustedINT,
 		baseMP,
 		mpAfterPercent,
 		finalMP,
