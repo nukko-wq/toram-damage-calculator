@@ -20,11 +20,11 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 	} = useUIStore()
 
 	return (
-		<div className={`bg-white border-b border-gray-200 ${className}`}>
+		<div className={`border-b border-gray-200 ${className}`}>
 			{/* トグルボタンバー */}
-			<div className="px-4 py-2">
+			<div className="">
 				<div
-					className="grid grid-cols-2 gap-2"
+					className="grid lg:grid-cols-[520px_1fr] bg-blue-300"
 					role="group"
 					aria-label="計算結果表示切り替え"
 				>
@@ -32,10 +32,8 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					<button
 						type="button"
 						onClick={toggleDamagePreview}
-						className={`inline-flex items-center justify-center px-4 py-2 rounded-md border text-sm font-medium transition-colors duration-200 ${
-							showDamagePreview
-								? 'bg-orange-600 text-white border-orange-600 hover:bg-orange-700'
-								: 'bg-white text-orange-600 border-orange-300 hover:bg-orange-50'
+						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+							showDamagePreview ? ' text-white' : 'text-orange-600'
 						}`}
 						aria-pressed={showDamagePreview}
 						id="damage-toggle"
@@ -62,10 +60,8 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					<button
 						type="button"
 						onClick={toggleStatusPreview}
-						className={`inline-flex items-center justify-center px-4 py-2 rounded-md border text-sm font-medium transition-colors duration-200 ${
-							showStatusPreview
-								? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-								: 'bg-white text-blue-600 border-blue-300 hover:bg-blue-50'
+						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+							showStatusPreview ? ' text-white' : 'text-blue-600'
 						}`}
 						aria-pressed={showStatusPreview}
 						id="status-toggle"
@@ -93,15 +89,9 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 			{/* プレビューエリア - 2カラム表示 */}
 			{(showDamagePreview || showStatusPreview) && (
 				<div className="border-t border-gray-200">
-					<div
-						className={`grid gap-4 p-4 ${
-							showDamagePreview && showStatusPreview
-								? 'lg:grid-cols-[520px_1fr]'
-								: 'grid-cols-1'
-						}`}
-					>
+					<div className="grid grid-cols-[520px_1fr] gap-4 p-4">
 						{/* 与ダメージプレビュー */}
-						{showDamagePreview && (
+						{showDamagePreview ? (
 							<div
 								className="bg-orange-50 rounded-lg border border-orange-200"
 								id="damage-preview"
@@ -109,6 +99,8 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 							>
 								<DamagePreview isVisible={showDamagePreview} />
 							</div>
+						) : (
+							<div /> /* プレースホルダー */
 						)}
 
 						{/* ステータスプレビュー */}
