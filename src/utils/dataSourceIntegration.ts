@@ -6,6 +6,7 @@
  */
 
 import type { AllBonuses } from './basicStatsCalculation'
+import { getBuffItemById as getBuffItemFromDB } from '@/utils/buffItemDatabase'
 import type {
 	EquipmentBonusSource,
 	CrystalBonusSource,
@@ -44,16 +45,11 @@ function normalizePropertyKey(propertyKey: string): string {
 		'Critical_Rate': 'criticalRate_Rate', // %値
 		'CriticalDamage': 'criticalDamage',
 		'CriticalDamage_Rate': 'criticalDamage_Rate',
-		'NaturalHPRecovery': 'naturalHPRecovery',
-		'NaturalMPRecovery': 'naturalMPRecovery',
 		'ElementAdvantage_Rate': 'elementPower_Rate',
 		'PhysicalPenetration_Rate': 'physicalPenetration_Rate',
 		'MagicalPenetration_Rate': 'magicalPenetration_Rate',
-		'AttackSpeed': 'ASPD',
 		'AttackSpeed_Rate': 'ASPD_Rate',
-		'CastingSpeed': 'CSPD',
 		'CastingSpeed_Rate': 'CSPD_Rate',
-		'MotionSpeed_Rate': 'motionSpeed_Rate',
 		'Stability_Rate': 'stability_Rate',
 		'WeaponATK': 'weaponATK',
 		'WeaponATK_Rate': 'weaponATK_Rate',
@@ -75,6 +71,13 @@ function normalizePropertyKey(propertyKey: string): string {
 		'aggroMinus': 'aggroMinus',
 		'physicalResistance': 'physicalResistance',
 		'magicalResistance': 'magicalResistance',
+		
+		// バフアイテムプロパティ名のマッピング（重複しないもの）
+		'AttackSpeed': 'ASPD',
+		'CastingSpeed': 'CSPD',
+		'NaturalHPRecovery': 'naturalHPRecovery',
+		'NaturalMPRecovery': 'naturalMPRecovery',
+		'MotionSpeed_Rate': 'motionSpeed_Rate',
 	}
 
 	return propertyMapping[propertyKey] || propertyKey
@@ -379,32 +382,73 @@ export function getBuffBonuses(buffData: any): Partial<AllBonuses> {
 		const bonuses: Partial<AllBonuses> = {}
 
 		// nullチェック
-		if (!buffData?.activeBuffs) return bonuses
+		if (!buffData) return bonuses
 
-		for (const buff of buffData.activeBuffs) {
-			// 時間切れバフは除外
-			if (!buff?.effects || buff.duration <= 0) continue
+		// 12カテゴリのバフアイテムを確認
+		const categories = [
+			'physicalPower', 'magicalPower', 'physicalDefense', 'magicalDefense',
+			'elementalAttack', 'elementalDefense', 'speed', 'casting',
+			'mp', 'hp', 'accuracy', 'evasion'
+		]
 
-			for (const effect of buff.effects) {
-				if (!effect?.propertyId || typeof effect.value !== 'number') continue
+		for (const category of categories) {
+			const itemId = buffData[category]
+			if (!itemId) continue
 
-				const validatedValue = validatePropertyValue(
-					effect.value,
-					effect.propertyId,
-				)
-				const key = effect.isPercentage
-					? `${effect.propertyId}_Rate`
-					: effect.propertyId
+			console.log(`BuffItem found: ${category} = ${itemId}`)
 
-				bonuses[key as keyof AllBonuses] =
-					(bonuses[key as keyof AllBonuses] || 0) + validatedValue
+			// アイテムIDからアイテムデータを取得
+			const buffItem = getBuffItemById(itemId)
+			if (!buffItem?.properties) {
+				console.log(`BuffItem not found for ID: ${itemId}`)
+				continue
 			}
+
+			console.log(`BuffItem properties:`, buffItem.properties)
+
+			// プロパティを処理
+			for (const [propertyKey, value] of Object.entries(buffItem.properties)) {
+				if (typeof value !== 'number' || value === 0) continue
+
+				const validatedValue = validatePropertyValue(value, propertyKey)
+				const normalizedKey = normalizePropertyKey(propertyKey)
+
+				bonuses[normalizedKey as keyof AllBonuses] =
+					(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
+
+				console.log(`BuffItem bonus: ${propertyKey} → ${normalizedKey}: +${validatedValue}`)
+			}
+		}
+
+		if (Object.keys(bonuses).length > 0) {
+			console.log('Buff bonuses calculated:', bonuses)
 		}
 
 		return bonuses
 	} catch (error) {
 		console.error('Buff bonus calculation error:', error)
 		return {}
+	}
+}
+
+/**
+ * バフアイテムIDからアイテムデータを取得
+ */
+function getBuffItemById(id: string): { properties: Record<string, number> } | null {
+	// buffItemDatabase.tsのgetBuffItemById関数を使用
+	try {
+		const buffItem = getBuffItemFromDB(id)
+		
+		if (!buffItem?.properties) {
+			return null
+		}
+
+		return {
+			properties: buffItem.properties
+		}
+	} catch (error) {
+		console.error('Error loading buff item:', error)
+		return null
 	}
 }
 
