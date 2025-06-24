@@ -1,5 +1,5 @@
 import React from 'react'
-import StatItem from './StatItem'
+import StatRow from './StatRow'
 import PropertyDisplay from './PropertyDisplay'
 import PropertySectionHeader from './PropertySectionHeader'
 import PropertyDoubleDisplay from './PropertyDoubleDisplay'
@@ -135,26 +135,52 @@ export default React.memo<StatSectionProps>(
 									}
 								}
 
-								return pairs.map((pair) => (
+								return pairs.map((pair, index) => (
 									<PropertyDoubleDisplay
 										key={`${pair.property1.propertyName}-${pair.property2?.propertyName || 'empty'}`}
 										property1={pair.property1}
 										property2={pair.property2}
+										className={index % 2 === 0 ? 'bg-slate-50' : 'bg-white'}
 									/>
 								))
 							})()}
 						</div>
 					</div>
 				) : (
-					<div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1">
-						{Object.entries(stats).map(([key, value]) => (
-							<StatItem
-								key={key}
-								name={labels[key] || key}
-								value={value}
-								className="hover:bg-gray-50 rounded"
-							/>
-						))}
+					<div className="space-y-0">
+						{(() => {
+							const entries = Object.entries(stats)
+							const rows: JSX.Element[] = []
+							
+							for (let i = 0; i < entries.length; i += 2) {
+								const [leftKey, leftValue] = entries[i]
+								const rightEntry = entries[i + 1]
+								const rowIndex = Math.floor(i / 2)
+								
+								const leftStat = {
+									name: labels[leftKey] || leftKey,
+									value: leftValue,
+								}
+								
+								const rightStat = rightEntry
+									? {
+											name: labels[rightEntry[0]] || rightEntry[0],
+											value: rightEntry[1],
+									  }
+									: undefined
+								
+								rows.push(
+									<StatRow
+										key={`row-${i}`}
+										leftStat={leftStat}
+										rightStat={rightStat}
+										className={rowIndex % 2 === 0 ? 'bg-slate-50' : 'bg-white'}
+									/>
+								)
+							}
+							
+							return rows
+						})()}
 					</div>
 				)}
 			</div>

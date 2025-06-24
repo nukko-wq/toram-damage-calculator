@@ -11,11 +11,13 @@ interface PropertyDisplayData {
 interface PropertyDoubleDisplayProps {
 	property1: PropertyDisplayData
 	property2?: PropertyDisplayData
+	className?: string
 }
 
 const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 	property1,
 	property2,
+	className = '',
 }) => {
 	const renderProperty = (property: PropertyDisplayData | undefined) => {
 		if (!property) {
@@ -77,7 +79,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 	}
 
 	return (
-		<div className="grid grid-cols-[80px_40px_40px_80px_40px_40px] gap-2 py-1 px-2">
+		<div className={`grid grid-cols-[80px_40px_40px_80px_40px_40px] gap-2 py-1 px-2 hover:bg-blue-50 rounded ${className}`}>
 			{/* プロパティ1 */}
 			{renderProperty(property1)}
 
