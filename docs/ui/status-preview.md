@@ -69,6 +69,15 @@
 └─────────────────────────────┘
 ```
 
+**計算方式**:
+- **STR/INT/VIT/AGI/DEX**: `INT(基礎ステータス × (1 + ステータス%/100)) + ステータス固定値`
+- **CRT/MEN/TEC**: 基本ステータスの値をそのまま表示（補正なし）
+
+**データソース**:
+- **基礎ステータス**: BaseStatsFormの入力値
+- **ステータス%**: 装備・クリスタ・料理・バフアイテムの%補正の合計
+- **ステータス固定値**: 装備・クリスタ・料理・バフアイテムの固定値補正の合計
+
 ### 装備品補正値1（31プロパティ - 2プロパティ/行表示）
 ```
 ┌─────────────── 装備品補正値1 ───────────────┐
@@ -222,14 +231,14 @@ interface CalculationResults {
   
   // 補正後ステータス（8項目）
   adjustedStats: {
-    STR: number
-    AGI: number
-    INT: number
-    DEX: number
-    VIT: number
-    CRT: number
-    MEN: number
-    TEC: number
+    STR: number      // INT(基礎STR × (1 + STR%/100)) + STR固定値
+    AGI: number      // INT(基礎AGI × (1 + AGI%/100)) + AGI固定値
+    INT: number      // INT(基礎INT × (1 + INT%/100)) + INT固定値
+    DEX: number      // INT(基礎DEX × (1 + DEX%/100)) + DEX固定値
+    VIT: number      // INT(基礎VIT × (1 + VIT%/100)) + VIT固定値
+    CRT: number      // 基本ステータスの値をそのまま表示
+    MEN: number      // 基本ステータスの値をそのまま表示
+    TEC: number      // 基本ステータスの値をそのまま表示
   }
   
   // 装備品補正値1（31項目）

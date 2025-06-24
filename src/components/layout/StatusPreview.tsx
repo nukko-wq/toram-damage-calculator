@@ -3,6 +3,7 @@ import { useCalculatorStore } from '@/stores'
 import {
 	calculateHP,
 	calculateMP,
+	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
 } from '@/utils/basicStatsCalculation'
@@ -60,6 +61,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			hpCalculation: calculateHP(baseStats, allBonuses),
 			mpCalculation: calculateMP(baseStats, allBonuses),
+			adjustedStatsCalculation: calculateAdjustedStats(baseStats, allBonuses),
 		}
 	}, [equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses, baseStats])
 
@@ -67,6 +69,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		equipmentBonuses: calculatedEquipmentBonuses,
 		hpCalculation,
 		mpCalculation,
+		adjustedStatsCalculation,
 	} = calculationResults
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
 		calculatedEquipmentBonuses
@@ -110,17 +113,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		anticipate: 0, // TODO: 先読み
 	}
 
-	// 補正後ステータス (8項目)
-	const adjustedStats = {
-		STR: baseStats.STR, // TODO: 装備・クリスタ補正後の値
-		AGI: baseStats.AGI,
-		INT: baseStats.INT,
-		DEX: baseStats.DEX,
-		VIT: Math.floor(hpCalculation.adjustedVIT), // HP計算で使用した補正後VIT
-		CRT: baseStats.CRT,
-		MEN: baseStats.MEN,
-		TEC: baseStats.TEC,
-	}
+	// 補正後ステータス (8項目) - 正確な計算結果を使用
+	const adjustedStats = adjustedStatsCalculation
 
 	// 装備品補正値1〜3は計算された値を使用
 	// 現在は仮値だが、将来的には calculateEquipmentBonuses の結果を使用

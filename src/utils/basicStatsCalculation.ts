@@ -276,6 +276,64 @@ export function aggregateAllBonuses(
 	return result
 }
 
+// 補正後ステータス計算の中間結果
+export interface AdjustedStatsCalculation {
+	STR: number
+	AGI: number
+	INT: number
+	DEX: number
+	VIT: number
+	CRT: number // 基本ステータスの値をそのまま
+	MEN: number // 基本ステータスの値をそのまま
+	TEC: number // 基本ステータスの値をそのまま
+}
+
+/**
+ * 補正後ステータス計算
+ * STR/INT/VIT/AGI/DEX: INT(基礎ステータス × (1 + ステータス%/100)) + ステータス固定値
+ * CRT/MEN/TEC: 基本ステータスの値をそのまま表示
+ */
+export function calculateAdjustedStats(
+	stats: BaseStats,
+	bonuses: AllBonuses = {},
+): AdjustedStatsCalculation {
+	// STR補正後計算
+	const strPercent = bonuses.STR_Rate || 0
+	const strFixed = bonuses.STR || 0
+	const adjustedSTR = Math.floor(stats.STR * (1 + strPercent / 100)) + strFixed
+
+	// AGI補正後計算
+	const agiPercent = bonuses.AGI_Rate || 0
+	const agiFixed = bonuses.AGI || 0
+	const adjustedAGI = Math.floor(stats.AGI * (1 + agiPercent / 100)) + agiFixed
+
+	// INT補正後計算
+	const intPercent = bonuses.INT_Rate || 0
+	const intFixed = bonuses.INT || 0
+	const adjustedINT = Math.floor(stats.INT * (1 + intPercent / 100)) + intFixed
+
+	// DEX補正後計算
+	const dexPercent = bonuses.DEX_Rate || 0
+	const dexFixed = bonuses.DEX || 0
+	const adjustedDEX = Math.floor(stats.DEX * (1 + dexPercent / 100)) + dexFixed
+
+	// VIT補正後計算
+	const vitPercent = bonuses.VIT_Rate || 0
+	const vitFixed = bonuses.VIT || 0
+	const adjustedVIT = Math.floor(stats.VIT * (1 + vitPercent / 100)) + vitFixed
+
+	return {
+		STR: adjustedSTR,
+		AGI: adjustedAGI,
+		INT: adjustedINT,
+		DEX: adjustedDEX,
+		VIT: adjustedVIT,
+		CRT: stats.CRT, // 基本ステータスの値をそのまま
+		MEN: stats.MEN, // 基本ステータスの値をそのまま
+		TEC: stats.TEC, // 基本ステータスの値をそのまま
+	}
+}
+
 /**
  * 装備品補正値を装備・クリスタ・料理・バフから計算
  * StatusPreviewで使用される装備品補正値1〜3の計算
