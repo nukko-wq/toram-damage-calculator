@@ -52,7 +52,7 @@
 				"name": "苦いプルプル",
 				"category": "magicalPower",
 				"properties": {
-					"MATK": -4,
+					"MATK_Rate": -4,
 					"CastingSpeed": 800
 				}
 			}

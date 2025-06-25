@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useCalculatorStore, useUIStore } from '@/stores'
+import { useCalculatorStore } from '@/stores'
 import type { UpdateNotification } from '@/types/calculator'
 import { initializeStorage } from '@/utils/saveDataManager'
 import BaseStatsForm from '@/components/base-stats/BaseStatsForm'
@@ -11,12 +11,10 @@ import CrystalForm from '@/components/crystal/CrystalForm'
 import EnemyForm from '@/components/enemy/EnemyForm'
 import EquipmentForm from '@/components/equipment/EquipmentForm'
 import FoodForm from '@/components/food/FoodForm'
-import SaveDataManager from '@/components/save-data/SaveDataManager'
 import WeaponForm from '@/components/weapon/WeaponForm'
 
 export default function Home() {
 	// Zustandストアからデータを取得
-	const { showSaveManager } = useUIStore()
 	const { isInitialized, isLoading, initialize } = useCalculatorStore()
 
 	// アップデート通知（Zustand移行後も必要）
@@ -63,12 +61,6 @@ export default function Home() {
 	return (
 		<div className="min-h-screen bg-gray-50 py-8">
 			<div className="max-w-[1500px] mx-auto px-2 sm:px-6 lg:px-8">
-				<div className="text-center mb-8">
-					<p className="text-gray-600">
-						ステータスを入力してダメージを計算しましょう
-					</p>
-				</div>
-
 				{/* 更新通知 */}
 				{showUpdateNotifications && updateNotifications.length > 0 && (
 					<div className="mb-8">
@@ -118,13 +110,6 @@ export default function Home() {
 								</div>
 							</div>
 						</div>
-					</div>
-				)}
-
-				{/* セーブデータ管理パネル */}
-				{showSaveManager && (
-					<div className="mb-8">
-						<SaveDataManager key="save-manager" />
 					</div>
 				)}
 

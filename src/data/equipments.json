@@ -31,19 +31,6 @@
 					"STR_Rate": 10,
 					"Critical_Rate": 10
 				}
-			},
-			{
-				"id": "mystic_staff_of_wisdom",
-				"name": "ミスティックスタッフ・オブ・ウィズダム",
-				"properties": {
-					"MATK_Rate": 18,
-					"CastingSpeed_Rate": 15,
-					"MP": 200
-				},
-				"crystalSlots": {
-					"slot1": "weapon_black_dress_princess",
-					"slot2": "normal_int_boost"
-				}
 			}
 		],
 		"body": [

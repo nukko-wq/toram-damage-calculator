@@ -4,7 +4,11 @@ interface StatItemProps {
 	className?: string
 }
 
-export default function StatItem({ name, value, className = '' }: StatItemProps) {
+export default function StatItem({
+	name,
+	value,
+	className = '',
+}: StatItemProps) {
 	// 数値のフォーマット（3桁区切り）
 	const formatValue = (num: number): string => {
 		return num.toLocaleString('ja-JP')
@@ -12,8 +16,8 @@ export default function StatItem({ name, value, className = '' }: StatItemProps)
 
 	return (
 		<div className={`flex justify-between items-center py-1 px-2 ${className}`}>
-			<span className="text-sm text-gray-700 font-medium">{name}:</span>
-			<span className="text-sm text-gray-900 font-semibold tabular-nums">
+			<span className="text-sm text-gray-700">{name}:</span>
+			<span className="text-sm text-gray-900 tabular-nums">
 				{formatValue(value)}
 			</span>
 		</div>

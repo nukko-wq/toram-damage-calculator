@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useUIStore } from '@/stores'
 import DamagePreview from './DamagePreview'
 import StatusPreview from './StatusPreview'
@@ -12,29 +13,32 @@ interface ResultToggleBarProps {
 export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 	className = '',
 }) {
-	const { activeResultView, toggleResultView } = useUIStore()
+	const {
+		showStatusPreview,
+		showDamagePreview,
+		toggleStatusPreview,
+		toggleDamagePreview,
+	} = useUIStore()
 
 	return (
-		<div className={`bg-white border-b border-gray-200 ${className}`}>
+		<div className={`sticky top-0 left-0 right-0 z-40 ${className}`}>
 			{/* トグルボタンバー */}
-			<div className="container mx-auto px-4 py-3">
+			<div className="">
 				<div
-					className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:justify-start"
-					role="tablist"
-					aria-label="計算結果表示"
+					className="grid grid-cols-2 lg:grid-cols-[520px_1fr]"
+					role="group"
+					aria-label="計算結果表示切り替え"
 				>
 					{/* 与ダメージ確認ボタン */}
 					<button
 						type="button"
-						onClick={() => toggleResultView('damage')}
-						className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-							activeResultView === 'damage'
-								? 'text-white bg-orange-600 hover:bg-orange-700 focus:ring-orange-500'
-								: 'text-orange-700 bg-orange-100 hover:bg-orange-200 focus:ring-orange-500'
+						onClick={toggleDamagePreview}
+						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+							showDamagePreview
+								? 'bg-blue-300 text-white'
+								: 'bg-blue-300 text-white'
 						}`}
-						role="tab"
-						aria-selected={activeResultView === 'damage'}
-						aria-controls="damage-preview"
+						aria-pressed={showDamagePreview}
 						id="damage-toggle"
 					>
 						<svg
@@ -58,15 +62,13 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					{/* ステータス確認ボタン */}
 					<button
 						type="button"
-						onClick={() => toggleResultView('status')}
-						className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-							activeResultView === 'status'
-								? 'text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
-								: 'text-blue-700 bg-blue-100 hover:bg-blue-200 focus:ring-blue-500'
+						onClick={toggleStatusPreview}
+						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+							showStatusPreview
+								? 'bg-blue-300 text-white'
+								: 'bg-blue-300 text-white'
 						}`}
-						role="tab"
-						aria-selected={activeResultView === 'status'}
-						aria-controls="status-preview"
+						aria-pressed={showStatusPreview}
 						id="status-toggle"
 					>
 						<svg
@@ -89,32 +91,47 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 				</div>
 			</div>
 
-			{/* プレビューエリア */}
-			<div
-				className={`overflow-hidden transition-all duration-300 ease-in-out ${
-					activeResultView ? 'max-h-screen border-t border-gray-200' : 'max-h-0'
-				}`}
-			>
-				{/* 与ダメージプレビュー */}
-				<div
-					role="tabpanel"
-					aria-labelledby="damage-toggle"
-					id="damage-preview"
-					hidden={activeResultView !== 'damage'}
-				>
-					<DamagePreview isVisible={activeResultView === 'damage'} />
-				</div>
+			{/* プレビューエリア - main要素の下に配置 */}
+			<AnimatePresence>
+				{(showDamagePreview || showStatusPreview) && (
+					<motion.div
+						className="relative left-0 right-0 z-30 max-h-[80vh] overflow-y-auto"
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: 'auto', opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						transition={{
+							duration: 0,
+							ease: [0.4, 0.0, 0.2, 1],
+						}}
+					>
+						<div className="grid grid-cols-[520px_1fr] bg-gray-50">
+							{/* 与ダメージプレビュー */}
+							{showDamagePreview ? (
+								<div
+									className="bg-orange-50 rounded-lg"
+									id="damage-preview"
+									aria-labelledby="damage-toggle"
+								>
+									<DamagePreview isVisible={showDamagePreview} />
+								</div>
+							) : (
+								<div /> /* プレースホルダー */
+							)}
 
-				{/* ステータスプレビュー */}
-				<div
-					role="tabpanel"
-					aria-labelledby="status-toggle"
-					id="status-preview"
-					hidden={activeResultView !== 'status'}
-				>
-					<StatusPreview isVisible={activeResultView === 'status'} />
-				</div>
-			</div>
+							{/* ステータスプレビュー */}
+							{showStatusPreview && (
+								<div
+									className="bg-blue-50"
+									id="status-preview"
+									aria-labelledby="status-toggle"
+								>
+									<StatusPreview isVisible={showStatusPreview} />
+								</div>
+							)}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	)
 })

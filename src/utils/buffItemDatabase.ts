@@ -3,7 +3,7 @@ import type {
 	BuffItem,
 	BuffItemCategory,
 } from '@/types/calculator'
-import buffItemsData from '@/data/buffItems.json'
+import { buffItemsData } from '@/data/buffItems'
 
 // JSONデータからプリセットバフアイテムを取得
 export const getPresetBuffItems = (): PresetBuffItem[] => {

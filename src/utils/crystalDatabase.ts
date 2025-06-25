@@ -6,7 +6,7 @@ import type {
 	UserCrystal,
 } from '@/types/calculator'
 import { StorageHelper, STORAGE_KEYS } from './storage'
-import crystalsData from '@/data/crystals.json'
+import { crystalsData } from '@/data/crystals'
 
 // ストレージキー
 const NEW_STORAGE_KEYS = {

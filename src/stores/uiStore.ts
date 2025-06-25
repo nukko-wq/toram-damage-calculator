@@ -8,7 +8,8 @@ export const useUIStore = create<UIStore>()(
 			// ===== 初期状態 =====
 			showSaveManager: false,
 			showUpdateNotifications: false,
-			activeResultView: null,
+			showStatusPreview: false,
+			showDamagePreview: false,
 
 			// ===== アクション =====
 			setShowSaveManager: (value) => {
@@ -23,14 +24,22 @@ export const useUIStore = create<UIStore>()(
 				)
 			},
 
-			setActiveResultView: (view) => {
-				set({ activeResultView: view }, false, 'setActiveResultView')
+			setShowStatusPreview: (show) => {
+				set({ showStatusPreview: show }, false, 'setShowStatusPreview')
 			},
 
-			toggleResultView: (view) => {
-				const currentView = get().activeResultView
-				const newView = currentView === view ? null : view
-				set({ activeResultView: newView }, false, 'toggleResultView')
+			setShowDamagePreview: (show) => {
+				set({ showDamagePreview: show }, false, 'setShowDamagePreview')
+			},
+
+			toggleStatusPreview: () => {
+				const current = get().showStatusPreview
+				set({ showStatusPreview: !current }, false, 'toggleStatusPreview')
+			},
+
+			toggleDamagePreview: () => {
+				const current = get().showDamagePreview
+				set({ showDamagePreview: !current }, false, 'toggleDamagePreview')
 			},
 		}),
 		{

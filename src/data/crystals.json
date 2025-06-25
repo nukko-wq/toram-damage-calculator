@@ -21,6 +21,16 @@
 					"INT_Rate": 5,
 					"CastingSpeed_Rate": 10
 				}
+			},
+			{
+				"id": "weapon_diark",
+				"name": "ディアルク",
+				"type": "weapon",
+				"properties": {
+					"MATK_Rate": 8,
+					"MagicalPenetration_Rate": 20,
+					"CastingSpeed_Rate": -16
+				}
 			}
 		],
 		"armor": [

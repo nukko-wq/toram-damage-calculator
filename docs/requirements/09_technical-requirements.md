@@ -18,15 +18,23 @@
 
 **プリセットデータのローカルストレージコピー**:
 - 初回アクセス時に以下のプリセットデータをローカルストレージにコピー
-  - プリセット装備データ（`src/data/equipments.json`）
-  - プリセットクリスタデータ（`src/data/crystals.json`）
-  - プリセット敵情報データ（`src/data/enemies.json`）
+  - プリセット装備データ（`src/data/equipments.ts`）※TypeScript型安全版
+  - プリセットクリスタデータ（`src/data/crystals.ts`）※TypeScript型安全版
+  - プリセット敵情報データ（`src/data/enemies.ts`）※TypeScript型安全版
+  - プリセットバフアイテムデータ（`src/data/buffItems.ts`）※TypeScript型安全版
 - コピー後は全てローカルストレージから参照
 - `isFavorite`プロパティをプリセットデータにも適用可能
 - プリセット由来のデータでも数値調整・保存が可能
 
+**TypeScript移行の技術的利点**:
+- EquipmentPropertiesインターフェースによる厳密な型チェック
+- コンパイル時エラー検出によるデータ整合性確保
+- エディタでの自動補完とIntelliSense
+- プロパティ名統一の強制（PascalCase + アンダースコア）
+- リファクタリング時の型安全性保証
+
 ### データ管理方式
-- **プリセットデータ**: JSONファイル → 初回時にLocalStorageにコピー
+- **プリセットデータ**: TypeScriptファイル → 初回時にLocalStorageにコピー
 - **ユーザーカスタムデータ**: LocalStorage管理
   - カスタムクリスタ
   - カスタム装備
