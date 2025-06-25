@@ -2,27 +2,30 @@
 
 /**
  * データ同期スクリプト
- * src/data/ から public/data/ にJSONファイルを同期します
+ * TypeScriptモジュールをrequireで読み込み、JSONファイルを生成して public/data/ に同期します
  *
  * 同期対象ファイル:
- * - crystals.json
- * - enemies.json
- * - equipments.json
+ * - crystals.ts → crystals.json
+ * - enemies.ts → enemies.json 
+ * - equipments.ts → equipments.json
  *
- * buffItems.json は src/data/ のみに存在するため同期対象外
+ * buffItems.ts は src/data/ のみに存在するため同期対象外
  */
 
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 // ファイルパス設定
-const srcDir = path.join(__dirname, '../src/data')
 const publicDir = path.join(__dirname, '../public/data')
 
-// 同期対象ファイル
-const filesToSync = ['crystals.json', 'enemies.json', 'equipments.json']
+// 同期対象データ
+const dataToSync = [
+	{ name: 'crystals.json', getData: () => require('../src/data/crystals.ts').crystalsData },
+	{ name: 'enemies.json', getData: () => require('../src/data/enemies.ts').enemiesData },
+	{ name: 'equipments.json', getData: () => require('../src/data/equipments.ts').equipmentsData }
+]
 
-console.log('🔄 データファイル同期を開始します...\n')
+console.log('🔄 TypeScriptモジュールからJSONデータ同期を開始します...\n')
 
 // public/data ディレクトリが存在しない場合は作成
 if (!fs.existsSync(publicDir)) {
@@ -33,29 +36,23 @@ if (!fs.existsSync(publicDir)) {
 let syncCount = 0
 let errorCount = 0
 
-filesToSync.forEach((filename) => {
-	const srcPath = path.join(srcDir, filename)
-	const destPath = path.join(publicDir, filename)
+dataToSync.forEach(({ name, getData }) => {
+	const destPath = path.join(publicDir, name)
 
 	try {
-		// ソースファイルの存在チェック
-		if (!fs.existsSync(srcPath)) {
-			console.log(`⚠️  ${filename}: ソースファイルが見つかりません`)
-			errorCount++
-			return
-		}
-
-		// ファイルコピー
-		fs.copyFileSync(srcPath, destPath)
+		// TypeScriptモジュールからデータを取得
+		const data = getData()
+		
+		// JSONに変換して保存
+		fs.writeFileSync(destPath, JSON.stringify(data, null, 2), 'utf8')
 
 		// ファイルサイズの確認
-		const srcStats = fs.statSync(srcPath)
 		const destStats = fs.statSync(destPath)
 
-		console.log(`✅ ${filename}: ${srcStats.size} bytes 同期完了`)
+		console.log(`✅ ${name}: ${destStats.size} bytes 同期完了`)
 		syncCount++
 	} catch (error) {
-		console.log(`❌ ${filename}: 同期エラー - ${error.message}`)
+		console.log(`❌ ${name}: 同期エラー - ${error.message}`)
 		errorCount++
 	}
 })

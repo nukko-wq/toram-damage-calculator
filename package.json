@@ -11,8 +11,7 @@
 		"format": "npx @biomejs/biome format --write",
 		"upgrade-interactive": "ncu --interactive --format group",
 		"sync-data": "node scripts/sync-data.js",
-		"check-data": "node scripts/check-data.js",
-		"prebuild": "npm run sync-data"
+		"check-data": "node scripts/check-data.js"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.1.1",
