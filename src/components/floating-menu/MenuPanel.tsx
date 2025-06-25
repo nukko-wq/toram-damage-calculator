@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
-import MenuNavigation from './MenuNavigation'
+import { useEffect, useRef } from 'react'
+
 import MenuContent from './MenuContent'
+import MenuNavigation from './MenuNavigation'
 import type { MenuSection } from './hooks/useFloatingMenu'
 
 interface MenuPanelProps {
@@ -55,12 +56,6 @@ export default function MenuPanel({
 
 	return (
 		<>
-			{/* オーバーレイ */}
-			<div
-				className="fixed inset-0 bg-black/25 z-[9998] transition-opacity duration-200"
-				aria-hidden="true"
-			/>
-
 			{/* メニューパネル */}
 			<div
 				ref={panelRef}

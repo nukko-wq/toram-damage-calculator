@@ -41,15 +41,10 @@ export function useFloatingMenu(
 
 		if (isOpen) {
 			document.addEventListener('keydown', handleKeyDown)
-			// メニューが開いているときは背景のスクロールを防ぐ
-			document.body.style.overflow = 'hidden'
-		} else {
-			document.body.style.overflow = ''
 		}
 
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
-			document.body.style.overflow = ''
 		}
 	}, [isOpen, closeMenu])
 
