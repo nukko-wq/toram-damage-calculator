@@ -3,6 +3,8 @@
 ## 概要
 キャラクターの基本的な生存力を表すHPとMPの計算式と、補正後基本ステータス（STR/INT/VIT/AGI/DEX）の計算式について記述する。
 
+**重要**: 2024年統一により、AllBonusesインターフェースはEquipmentPropertiesと同じ命名規則（PascalCase + アンダースコア）を使用。例：`STR_Rate`, `HP_Rate`, `AttackMPRecovery_Rate`
+
 ## 補正後基本ステータス計算
 
 ### STR（筋力）

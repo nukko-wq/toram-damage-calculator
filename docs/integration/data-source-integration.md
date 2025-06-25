@@ -4,6 +4,8 @@
 
 装備品補正値計算における4つのデータソース（装備品・クリスタ・料理・バフアイテム）の統合設計。StatusPreviewでの計算に必要なデータを各フォームから取得し、統一的な形式で処理する仕組みを定義する。
 
+**重要**: 2024年統一により、全データソースでEquipmentPropertiesの命名規則（PascalCase + アンダースコア）を使用。例：`PhysicalPenetration_Rate`, `AttackMPRecovery`, `WeaponATK_Rate`
+
 ## 統合アーキテクチャ
 
 ### データフロー
@@ -88,6 +90,7 @@ function getEquipmentBonuses(equipmentData: EquipmentData): Partial<AllBonuses> 
     if (!slot.selectedProperties) continue
     
     for (const prop of slot.selectedProperties) {
+      // EquipmentProperties標準命名を使用
       const key = prop.isPercentage ? `${prop.propertyId}_Rate` : prop.propertyId
       bonuses[key] = (bonuses[key] || 0) + prop.value
     }
@@ -403,7 +406,8 @@ describe('データソース統合', () => {
       main: {
         selectedProperties: [
           { propertyId: 'ATK', value: 100, isPercentage: false },
-          { propertyId: 'ATK', value: 15, isPercentage: true }
+          { propertyId: 'ATK_Rate', value: 15, isPercentage: true },
+          { propertyId: 'PhysicalPenetration_Rate', value: 10, isPercentage: true }
         ]
       }
     }
@@ -412,6 +416,7 @@ describe('データソース統合', () => {
     
     expect(result.ATK).toBe(100)
     expect(result.ATK_Rate).toBe(15)
+    expect(result.PhysicalPenetration_Rate).toBe(10)
   })
   
   test('4ソース統合計算', () => {

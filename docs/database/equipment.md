@@ -58,7 +58,7 @@
 interface PresetEquipment {
   id: string                    // 一意識別子
   name: string                  // 装備名
-  properties: Partial<EquipmentProperties> // 付与プロパティ
+  properties: Partial<EquipmentProperties> // 付与プロパティ（PascalCase統一済み）
   source?: string              // 入手方法
   weaponStats?: WeaponStats    // mainWeaponカテゴリ専用：武器基本ステータス（オプション）
   crystalSlots?: CrystalSlots  // mainWeapon, body, additional, special専用：クリスタル枠（オプション）

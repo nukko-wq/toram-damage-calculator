@@ -22,7 +22,7 @@ interface PresetCrystal {
   id: string
   name: string
   type: CrystalType
-  properties: Partial<EquipmentProperties>
+  properties: Partial<EquipmentProperties> // PascalCase統一済み
 }
 ```
 

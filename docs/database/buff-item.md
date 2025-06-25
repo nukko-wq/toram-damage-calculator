@@ -42,7 +42,7 @@ interface PresetBuffItem {
   id: string                           // 一意識別子
   name: string                         // アイテム名
   category: BuffItemCategory           // カテゴリ
-  properties: Partial<EquipmentProperties>  // 装備と同一のプロパティ構造
+  properties: Partial<EquipmentProperties>  // 装備と同一のプロパティ構造（PascalCase統一済み）
 }
 
 type BuffItemCategory = 
