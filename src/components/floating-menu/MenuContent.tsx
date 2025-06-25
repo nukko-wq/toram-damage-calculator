@@ -2,6 +2,7 @@
 
 import React from 'react'
 import type { MenuSection } from './hooks/useFloatingMenu'
+import SaveDataContent from './content/SaveDataContent'
 
 interface MenuContentProps {
 	activeSection: MenuSection
@@ -52,24 +53,6 @@ function SampleDataContent() {
 	)
 }
 
-function SaveDataContent() {
-	return (
-		<div className="p-4">
-			<h3 className="text-lg font-semibold text-gray-900 mb-4">
-				セーブデータ管理
-			</h3>
-			<div className="text-sm text-gray-600">
-				<p>詳細なセーブデータ管理機能がここに表示されます。</p>
-				<p className="mt-2">
-					現在はヘッダーのセーブデータ管理ボタンをご利用ください。
-				</p>
-				<p className="mt-2 text-xs">
-					※この機能は今後実装予定です
-				</p>
-			</div>
-		</div>
-	)
-}
 
 function SubsystemContent() {
 	return (
