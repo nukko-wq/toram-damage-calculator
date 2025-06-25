@@ -15,7 +15,9 @@ export default React.memo<HeaderActionsProps>(
 
 		// 現在のセーブデータ名を取得
 		const currentSaveData = saveDataList.find(save => save.id === currentSaveId)
-		const currentSaveName = currentSaveData?.name || 'メインデータ'
+		const currentSaveName = currentSaveId === 'default' 
+			? 'メインデータ' 
+			: currentSaveData?.name || 'メインデータ'
 
 		// 現在のデータを保存
 		const handleSaveCurrentData = async () => {

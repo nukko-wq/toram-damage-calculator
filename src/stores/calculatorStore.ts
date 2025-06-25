@@ -616,6 +616,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					// 現在のセーブデータを読み込み
 					const currentSave = getCurrentSaveData()
 
+					// saveDataStoreの初期化も実行
+					const { useSaveDataStore } = await import('./saveDataStore')
+					await useSaveDataStore.getState().loadSaveDataList()
+
 					set({
 						data: currentSave.data,
 						hasUnsavedChanges: false,
