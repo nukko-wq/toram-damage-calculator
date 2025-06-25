@@ -9,156 +9,151 @@ import type { BaseStats, WeaponType as WeaponTypeEnum } from '@/types/calculator
 import { getWeaponTypeKey } from '@/utils/weaponTypeMapping'
 
 // 全補正値（装備・クリスタ・料理・バフアイテムの合計）
+// EquipmentPropertiesと同じ命名規則を使用
 export interface AllBonuses {
-	// 基本ステータス
-	STR?: number
-	STR_Rate?: number
-	AGI?: number
-	AGI_Rate?: number
-	INT?: number
-	INT_Rate?: number
-	DEX?: number
-	DEX_Rate?: number
-	VIT?: number
-	VIT_Rate?: number
-	CRT?: number
-	CRT_Rate?: number
-	MEN?: number
-	MEN_Rate?: number
-	TEC?: number
-	TEC_Rate?: number
+	// 基本攻撃力系
+	ATK_Rate?: number // ATK%
+	ATK?: number // ATK
+	MATK_Rate?: number // MATK%
+	MATK?: number // MATK
+	WeaponATK_Rate?: number // 武器ATK%
+	WeaponATK?: number // 武器ATK
 
-	// HP/MP関連
-	HP?: number
-	HP_Rate?: number
-	MP?: number
-	MP_Rate?: number
+	// 防御力系
+	DEF_Rate?: number // DEF%
+	DEF?: number // DEF
+	MDEF_Rate?: number // MDEF%
+	MDEF?: number // MDEF
 
-	// 装備品補正値1系プロパティ
-	ATK?: number
-	ATK_Rate?: number
-	MATK?: number
-	MATK_Rate?: number
-	weaponATK?: number
-	weaponATK_Rate?: number
-	physicalPenetration?: number
-	physicalPenetration_Rate?: number
-	magicalPenetration?: number
-	magicalPenetration_Rate?: number
-	elementPower?: number
-	elementPower_Rate?: number
-	unsheatheAttack?: number
-	unsheatheAttack_Rate?: number
-	shortRangeDamage?: number
-	shortRangeDamage_Rate?: number
-	longRangeDamage?: number
-	longRangeDamage_Rate?: number
-	criticalRate?: number
-	criticalRate_Rate?: number
-	criticalDamage?: number
-	criticalDamage_Rate?: number
-	ASPD?: number
-	ASPD_Rate?: number
-	CSPD?: number
-	CSPD_Rate?: number
-	stability?: number
-	stability_Rate?: number
-	motionSpeed?: number
-	motionSpeed_Rate?: number
-	accuracy?: number
-	accuracy_Rate?: number
-	dodge?: number
-	dodge_Rate?: number
-	attackMPRecovery?: number
-	attackMPRecovery_Rate?: number
-	ailmentResistance?: number
-	ailmentResistance_Rate?: number
-	physicalResistance?: number
-	physicalResistance_Rate?: number
-	magicalResistance?: number
-	magicalResistance_Rate?: number
-	aggroPlus?: number
-	aggroPlus_Rate?: number
-	aggroMinus?: number
-	aggroMinus_Rate?: number
+	// 貫通系
+	PhysicalPenetration_Rate?: number // 物理貫通%
+	MagicalPenetration_Rate?: number // 魔法貫通%
+	ElementAdvantage_Rate?: number // 属性有利%
 
-	// 装備品補正値2系プロパティ
-	ATK_STR?: number
-	ATK_STR_Rate?: number
-	MATK_STR?: number
-	MATK_STR_Rate?: number
-	ATK_INT?: number
-	ATK_INT_Rate?: number
-	MATK_INT?: number
-	MATK_INT_Rate?: number
-	ATK_VIT?: number
-	ATK_VIT_Rate?: number
-	MATK_VIT?: number
-	MATK_VIT_Rate?: number
-	ATK_AGI?: number
-	ATK_AGI_Rate?: number
-	MATK_AGI?: number
-	MATK_AGI_Rate?: number
-	ATK_DEX?: number
-	ATK_DEX_Rate?: number
-	MATK_DEX?: number
-	MATK_DEX_Rate?: number
-	neutralResistance?: number
-	neutralResistance_Rate?: number
-	fireResistance?: number
-	fireResistance_Rate?: number
-	waterResistance?: number
-	waterResistance_Rate?: number
-	windResistance?: number
-	windResistance_Rate?: number
-	earthResistance?: number
-	earthResistance_Rate?: number
-	lightResistance?: number
-	lightResistance_Rate?: number
-	darkResistance?: number
-	darkResistance_Rate?: number
-	linearReduction?: number
-	linearReduction_Rate?: number
-	rushReduction?: number
-	rushReduction_Rate?: number
-	bulletReduction?: number
-	bulletReduction_Rate?: number
-	proximityReduction?: number
-	proximityReduction_Rate?: number
-	areaReduction?: number
-	areaReduction_Rate?: number
-	floorTrapReduction?: number
-	floorTrapReduction_Rate?: number
-	meteorReduction?: number
-	meteorReduction_Rate?: number
-	bladeReduction?: number
-	bladeReduction_Rate?: number
-	suctionReduction?: number
-	suctionReduction_Rate?: number
-	explosionReduction?: number
-	explosionReduction_Rate?: number
-	physicalBarrier?: number
-	magicalBarrier?: number
-	fractionalBarrier?: number
-	barrierCooldown?: number
-	barrierCooldown_Rate?: number
+	// 威力系
+	UnsheatheAttack_Rate?: number // 抜刀威力%
+	UnsheatheAttack?: number // 抜刀威力
+	ShortRangeDamage_Rate?: number // 近距離威力%
+	LongRangeDamage_Rate?: number // 遠距離威力%
 
-	// 装備品補正値3系プロパティ
-	physicalFollowup?: number
-	physicalFollowup_Rate?: number
-	magicalFollowup?: number
-	magicalFollowup_Rate?: number
-	naturalHPRecovery?: number
-	naturalHPRecovery_Rate?: number
-	naturalMPRecovery?: number
-	naturalMPRecovery_Rate?: number
-	absoluteAccuracy?: number
-	absoluteAccuracy_Rate?: number
-	absoluteDodge?: number
-	absoluteDodge_Rate?: number
-	revivalTime?: number
-	revivalTime_Rate?: number
-	itemCooldown?: number
+	// クリティカル系
+	CriticalDamage_Rate?: number // クリティカルダメージ%
+	CriticalDamage?: number // クリティカルダメージ
+	Critical_Rate?: number // クリティカル率%
+	Critical?: number // クリティカル率
+
+	// 安定率
+	Stability_Rate?: number // 安定率%
+
+	// HP/MP系
+	HP_Rate?: number // HP%
+	HP?: number // HP
+	MP_Rate?: number // MP%
+	MP?: number // MP
+
+	// ステータス系
+	STR_Rate?: number // STR%
+	STR?: number // STR
+	INT_Rate?: number // INT%
+	INT?: number // INT
+	VIT_Rate?: number // VIT%
+	VIT?: number // VIT
+	AGI_Rate?: number // AGI%
+	AGI?: number // AGI
+	DEX_Rate?: number // DEX%
+	DEX?: number // DEX
+	CRT_Rate?: number // CRT%
+	CRT?: number // CRT
+	MEN_Rate?: number // MEN%
+	MEN?: number // MEN
+	TEC_Rate?: number // TEC%
+	TEC?: number // TEC
+
+	// 命中・回避系
+	Accuracy_Rate?: number // 命中%
+	Accuracy?: number // 命中
+	Dodge_Rate?: number // 回避%
+	Dodge?: number // 回避
+
+	// 速度系
+	AttackSpeed_Rate?: number // 攻撃速度%
+	AttackSpeed?: number // 攻撃速度
+	CastingSpeed_Rate?: number // 詠唱速度%
+	CastingSpeed?: number // 詠唱速度
+	MotionSpeed_Rate?: number // 行動速度%
+
+	// MP回復系
+	AttackMPRecovery_Rate?: number // 攻撃MP回復%
+	AttackMPRecovery?: number // 攻撃MP回復
+
+	// 耐性系
+	PhysicalResistance_Rate?: number // 物理耐性%
+	MagicalResistance_Rate?: number // 魔法耐性%
+	AilmentResistance_Rate?: number // 異常耐性%
+
+	// その他戦闘系
+	Aggro_Rate?: number // ヘイト%
+	Aggro?: number // ヘイト固定値（正負両方対応）
+	RevivalTime_Rate?: number // 復帰短縮%
+
+	// 自然回復系
+	NaturalHPRecovery_Rate?: number // HP自然回復%
+	NaturalHPRecovery?: number // HP自然回復
+	NaturalMPRecovery_Rate?: number // MP自然回復%
+	NaturalMPRecovery?: number // MP自然回復
+
+	// 特殊系
+	ArmorBreak_Rate?: number // 防御崩し%
+	Anticipate_Rate?: number // 先読み%
+	GuardPower_Rate?: number // Guard力%
+	GuardRecharge_Rate?: number // Guard回復%
+	AvoidRecharge_Rate?: number // Avoid回復%
+	ItemCooldown?: number // 道具速度
+	AbsoluteAccuracy_Rate?: number // 絶対命中%
+	AbsoluteDodge_Rate?: number // 絶対回避%
+
+	// ステータス連動攻撃力
+	ATK_STR_Rate?: number // ATK+(STR)%
+	ATK_INT_Rate?: number // ATK+(INT)%
+	ATK_VIT_Rate?: number // ATK+(VIT)%
+	ATK_AGI_Rate?: number // ATK+(AGI)%
+	ATK_DEX_Rate?: number // ATK+(DEX)%
+	MATK_STR_Rate?: number // MATK+(STR)%
+	MATK_INT_Rate?: number // MATK+(INT)%
+	MATK_VIT_Rate?: number // MATK+(VIT)%
+	MATK_AGI_Rate?: number // MATK+(AGI)%
+	MATK_DEX_Rate?: number // MATK+(DEX)%
+
+	// 属性耐性
+	FireResistance_Rate?: number // 火耐性%
+	WaterResistance_Rate?: number // 水耐性%
+	WindResistance_Rate?: number // 風耐性%
+	EarthResistance_Rate?: number // 地耐性%
+	LightResistance_Rate?: number // 光耐性%
+	DarkResistance_Rate?: number // 闇耐性%
+	NeutralResistance_Rate?: number // 無耐性%
+
+	// ダメージ軽減系
+	LinearReduction_Rate?: number // 直線軽減%
+	RushReduction_Rate?: number // 突進軽減%
+	BulletReduction_Rate?: number // 弾丸軽減%
+	ProximityReduction_Rate?: number // 周囲軽減%
+	AreaReduction_Rate?: number // 範囲軽減%
+	FloorTrapReduction_Rate?: number // 痛床軽減%
+	MeteorReduction_Rate?: number // 隕石軽減%
+	BladeReduction_Rate?: number // 射刃軽減%
+	SuctionReduction_Rate?: number // 吸引軽減%
+	ExplosionReduction_Rate?: number // 爆発軽減%
+
+	// バリア系
+	PhysicalBarrier?: number // 物理バリア
+	MagicalBarrier?: number // 魔法バリア
+	FractionalBarrier?: number // 割合バリア
+	BarrierCooldown_Rate?: number // バリア速度%
+
+	// 追撃系
+	PhysicalFollowup_Rate?: number // 物理追撃%
+	MagicalFollowup_Rate?: number // 魔法追撃%
 }
 
 // HP計算の中間結果
@@ -503,12 +498,12 @@ export function calculateATK(
 		weapon.ATK * (1 + weapon.refinement ** 2 / 100) + weapon.refinement,
 	)
 
-	const weaponATKPercent = bonuses.weaponATK_Rate || 0
+	const weaponATKPercent = bonuses.WeaponATK_Rate || 0
 	const weaponATKPercentBonus = Math.floor(
 		(weapon.ATK * weaponATKPercent) / 100,
 	)
 
-	const weaponATKFixedBonus = bonuses.weaponATK || 0
+	const weaponATKFixedBonus = bonuses.WeaponATK || 0
 	const totalWeaponATK =
 		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
 
@@ -588,26 +583,26 @@ export function calculateEquipmentBonuses(
 	const equipmentBonus1 = {
 		ATK: allBonuses.ATK || 0,
 		ATK_Rate: allBonuses.ATK_Rate || 0,
-		physicalPenetration: allBonuses.physicalPenetration || 0,
-		physicalPenetration_Rate: allBonuses.physicalPenetration_Rate || 0,
+		physicalPenetration: allBonuses.PhysicalPenetration_Rate || 0,
+		physicalPenetration_Rate: allBonuses.PhysicalPenetration_Rate || 0,
 		MATK: allBonuses.MATK || 0,
 		MATK_Rate: allBonuses.MATK_Rate || 0,
-		magicalPenetration: allBonuses.magicalPenetration || 0,
-		magicalPenetration_Rate: allBonuses.magicalPenetration_Rate || 0,
-		weaponATK: allBonuses.weaponATK || 0,
-		weaponATK_Rate: allBonuses.weaponATK_Rate || 0,
-		elementPower: allBonuses.elementPower || 0,
-		elementPower_Rate: allBonuses.elementPower_Rate || 0,
-		unsheatheAttack: allBonuses.unsheatheAttack || 0,
-		unsheatheAttack_Rate: allBonuses.unsheatheAttack_Rate || 0,
-		shortRangeDamage: allBonuses.shortRangeDamage || 0,
-		shortRangeDamage_Rate: allBonuses.shortRangeDamage_Rate || 0,
-		longRangeDamage: allBonuses.longRangeDamage || 0,
-		longRangeDamage_Rate: allBonuses.longRangeDamage_Rate || 0,
-		criticalDamage: allBonuses.criticalDamage || 0,
-		criticalDamage_Rate: allBonuses.criticalDamage_Rate || 0,
-		criticalRate: allBonuses.criticalRate || 0,
-		criticalRate_Rate: allBonuses.criticalRate_Rate || 0,
+		magicalPenetration: allBonuses.MagicalPenetration_Rate || 0,
+		magicalPenetration_Rate: allBonuses.MagicalPenetration_Rate || 0,
+		weaponATK: allBonuses.WeaponATK || 0,
+		weaponATK_Rate: allBonuses.WeaponATK_Rate || 0,
+		elementPower: allBonuses.ElementAdvantage_Rate || 0,
+		elementPower_Rate: allBonuses.ElementAdvantage_Rate || 0,
+		unsheatheAttack: allBonuses.UnsheatheAttack || 0,
+		unsheatheAttack_Rate: allBonuses.UnsheatheAttack_Rate || 0,
+		shortRangeDamage: allBonuses.ShortRangeDamage_Rate || 0,
+		shortRangeDamage_Rate: allBonuses.ShortRangeDamage_Rate || 0,
+		longRangeDamage: allBonuses.LongRangeDamage_Rate || 0,
+		longRangeDamage_Rate: allBonuses.LongRangeDamage_Rate || 0,
+		criticalDamage: allBonuses.CriticalDamage || 0,
+		criticalDamage_Rate: allBonuses.CriticalDamage_Rate || 0,
+		criticalRate: allBonuses.Critical || 0,
+		criticalRate_Rate: allBonuses.Critical_Rate || 0,
 		STR: allBonuses.STR || 0,
 		STR_Rate: allBonuses.STR_Rate || 0,
 		AGI: allBonuses.AGI || 0,
@@ -618,34 +613,34 @@ export function calculateEquipmentBonuses(
 		DEX_Rate: allBonuses.DEX_Rate || 0,
 		VIT: allBonuses.VIT || 0,
 		VIT_Rate: allBonuses.VIT_Rate || 0,
-		ASPD: allBonuses.ASPD || 0,
-		ASPD_Rate: allBonuses.ASPD_Rate || 0,
-		CSPD: allBonuses.CSPD || 0,
-		CSPD_Rate: allBonuses.CSPD_Rate || 0,
-		stability: allBonuses.stability || 0,
-		stability_Rate: allBonuses.stability_Rate || 0,
-		motionSpeed: allBonuses.motionSpeed || 0,
-		motionSpeed_Rate: allBonuses.motionSpeed_Rate || 0,
-		accuracy: allBonuses.accuracy || 0,
-		accuracy_Rate: allBonuses.accuracy_Rate || 0,
-		dodge: allBonuses.dodge || 0,
-		dodge_Rate: allBonuses.dodge_Rate || 0,
+		ASPD: allBonuses.AttackSpeed || 0,
+		ASPD_Rate: allBonuses.AttackSpeed_Rate || 0,
+		CSPD: allBonuses.CastingSpeed || 0,
+		CSPD_Rate: allBonuses.CastingSpeed_Rate || 0,
+		stability: allBonuses.Stability_Rate || 0,
+		stability_Rate: allBonuses.Stability_Rate || 0,
+		motionSpeed: allBonuses.MotionSpeed_Rate || 0,
+		motionSpeed_Rate: allBonuses.MotionSpeed_Rate || 0,
+		accuracy: allBonuses.Accuracy || 0,
+		accuracy_Rate: allBonuses.Accuracy_Rate || 0,
+		dodge: allBonuses.Dodge || 0,
+		dodge_Rate: allBonuses.Dodge_Rate || 0,
 		MP: allBonuses.MP || 0,
 		MP_Rate: allBonuses.MP_Rate || 0,
-		attackMPRecovery: allBonuses.attackMPRecovery || 0,
-		attackMPRecovery_Rate: allBonuses.attackMPRecovery_Rate || 0,
+		attackMPRecovery: allBonuses.AttackMPRecovery || 0,
+		attackMPRecovery_Rate: allBonuses.AttackMPRecovery_Rate || 0,
 		HP: allBonuses.HP || 0,
 		HP_Rate: allBonuses.HP_Rate || 0,
-		ailmentResistance: allBonuses.ailmentResistance || 0,
-		ailmentResistance_Rate: allBonuses.ailmentResistance_Rate || 0,
-		physicalResistance: allBonuses.physicalResistance || 0,
-		physicalResistance_Rate: allBonuses.physicalResistance_Rate || 0,
-		magicalResistance: allBonuses.magicalResistance || 0,
-		magicalResistance_Rate: allBonuses.magicalResistance_Rate || 0,
-		aggroPlus: allBonuses.aggroPlus || 0,
-		aggroPlus_Rate: allBonuses.aggroPlus_Rate || 0,
-		aggroMinus: allBonuses.aggroMinus || 0,
-		aggroMinus_Rate: allBonuses.aggroMinus_Rate || 0,
+		ailmentResistance: allBonuses.AilmentResistance_Rate || 0,
+		ailmentResistance_Rate: allBonuses.AilmentResistance_Rate || 0,
+		physicalResistance: allBonuses.PhysicalResistance_Rate || 0,
+		physicalResistance_Rate: allBonuses.PhysicalResistance_Rate || 0,
+		magicalResistance: allBonuses.MagicalResistance_Rate || 0,
+		magicalResistance_Rate: allBonuses.MagicalResistance_Rate || 0,
+		aggroPlus: Math.max(0, allBonuses.Aggro || 0),
+		aggroPlus_Rate: Math.max(0, allBonuses.Aggro_Rate || 0),
+		aggroMinus: Math.abs(Math.min(0, allBonuses.Aggro || 0)),
+		aggroMinus_Rate: Math.abs(Math.min(0, allBonuses.Aggro_Rate || 0)),
 	}
 
 	// 装備品補正値2 (31項目) - %と固定値の両方を含む
@@ -756,8 +751,8 @@ export function calculateSubATK(
 	const subRefinedWeaponATK = Math.floor(
 		subWeapon.ATK * (1 + subWeapon.refinement ** 2 / 200) + subWeapon.refinement,
 	)
-	const subWeaponATKPercentBonus = Math.floor(subWeapon.ATK * (bonuses.weaponATK_Rate || 0))
-	const subWeaponATKFixedBonus = bonuses.weaponATK || 0
+	const subWeaponATKPercentBonus = Math.floor(subWeapon.ATK * (bonuses.WeaponATK_Rate || 0))
+	const subWeaponATKFixedBonus = bonuses.WeaponATK || 0
 	const subTotalWeaponATK = subRefinedWeaponATK + subWeaponATKPercentBonus + subWeaponATKFixedBonus
 
 	// 2. サブステータスATK計算（双剣専用計算式: STR × 1.0 + AGI × 3.0）
@@ -812,13 +807,13 @@ export function calculateASPD(
 	const aspdBeforePercent = stats.level + statusASPD + weaponTypeCorrection
 
 	// 4. ASPD%補正適用
-	const aspdPercent = bonuses.ASPD_Rate || 0
+	const aspdPercent = bonuses.AttackSpeed_Rate || 0
 	const aspdAfterPercent = Math.floor(
 		aspdBeforePercent * (1 + aspdPercent / 100),
 	)
 
 	// 5. ASPD固定値加算
-	const aspdFixed = bonuses.ASPD || 0
+	const aspdFixed = bonuses.AttackSpeed || 0
 	const finalASPD = aspdAfterPercent + aspdFixed
 
 	return {
@@ -831,4 +826,24 @@ export function calculateASPD(
 		aspdFixed,
 		finalASPD,
 	}
+}
+
+/**
+ * 異常耐性計算
+ * 異常耐性(%) = INT(MEN/3.4) + 異常耐性%
+ */
+export function calculateAilmentResistance(
+	stats: BaseStats,
+	bonuses: AllBonuses = {},
+): number {
+	// MEN基礎計算
+	const menBaseResistance = Math.floor(stats.MEN / 3.4)
+	
+	// 異常耐性%補正
+	const ailmentResistancePercent = bonuses.AilmentResistance_Rate || 0
+	
+	// 最終異常耐性
+	const finalAilmentResistance = menBaseResistance + ailmentResistancePercent
+	
+	return finalAilmentResistance
 }

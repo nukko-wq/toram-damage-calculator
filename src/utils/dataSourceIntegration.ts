@@ -35,48 +35,27 @@ function validatePropertyValue(value: number, propertyId: string): number {
 
 /**
  * プロパティ名を正規化（実際のデータ名 → AllBonuses型のキー名）
+ * 新しいAllBonusesインターフェースはEquipmentPropertiesと同じ命名規則を使用するため、
+ * ほとんどのプロパティはそのまま使用可能
  */
 function normalizePropertyKey(propertyKey: string): string {
-	// プロパティ名のマッピング表
+	// 特殊な変換が必要なプロパティのみマッピング
 	const propertyMapping: Record<string, string> = {
-		// 実際のデータ名 → AllBonuses型のキー名
-		'Critical': 'criticalRate',        // 固定値
-		'Critical_Rate': 'criticalRate_Rate', // %値
-		'CriticalDamage': 'criticalDamage',
-		'CriticalDamage_Rate': 'criticalDamage_Rate',
-		'ElementAdvantage_Rate': 'elementPower_Rate',
-		'PhysicalPenetration_Rate': 'physicalPenetration_Rate',
-		'MagicalPenetration_Rate': 'magicalPenetration_Rate',
-		'AttackSpeed_Rate': 'ASPD_Rate',
-		'CastingSpeed_Rate': 'CSPD_Rate',
-		'Stability_Rate': 'stability_Rate',
-		'WeaponATK': 'weaponATK',
-		'WeaponATK_Rate': 'weaponATK_Rate',
-		'UnsheatheAttack': 'unsheatheAttack',
-		'UnsheatheAttack_Rate': 'unsheatheAttack_Rate',
-		'ShortRangeDamage_Rate': 'shortRangeDamage_Rate',
-		'LongRangeDamage_Rate': 'longRangeDamage_Rate',
-		'Accuracy': 'accuracy',
-		'Accuracy_Rate': 'accuracy_Rate',
-		'Dodge': 'dodge',
-		'Dodge_Rate': 'dodge_Rate',
+		// 料理プロパティ名の変換
+		'elementAdvantage': 'ElementAdvantage_Rate',
+		'weaponATK': 'WeaponATK',
+		'criticalRate': 'Critical',
+		'attackMPRecovery': 'AttackMPRecovery',
+		'aggroPlus': 'Aggro', // 正の値として処理
+		'aggroMinus': 'Aggro', // 負の値として処理
+		'physicalResistance': 'PhysicalResistance_Rate',
+		'magicalResistance': 'MagicalResistance_Rate',
 		
-		// 料理プロパティ名のマッピング
-		'weaponATK': 'weaponATK',
-		'elementAdvantage': 'elementPower',
-		'criticalRate': 'criticalRate',
-		'attackMPRecovery': 'attackMPRecovery',
-		'aggroPlus': 'aggroPlus',
-		'aggroMinus': 'aggroMinus',
-		'physicalResistance': 'physicalResistance',
-		'magicalResistance': 'magicalResistance',
-		
-		// バフアイテムプロパティ名のマッピング（重複しないもの）
-		'AttackSpeed': 'ASPD',
-		'CastingSpeed': 'CSPD',
-		'NaturalHPRecovery': 'naturalHPRecovery',
-		'NaturalMPRecovery': 'naturalMPRecovery',
-		'MotionSpeed_Rate': 'motionSpeed_Rate',
+		// レガシー名称の変換
+		'AbsoluteEvasion': 'AbsoluteDodge_Rate',
+		'AbsoluteEvasion_Rate': 'AbsoluteDodge_Rate',
+		'ItemSpeed': 'ItemCooldown',
+		'ToolSpeed': 'ItemCooldown',
 	}
 
 	return propertyMapping[propertyKey] || propertyKey
@@ -117,11 +96,19 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 				if (typeof value !== 'number' || value === 0) continue
 
 				const validatedValue = validatePropertyValue(value, propertyKey)
-				const normalizedKey = normalizePropertyKey(propertyKey)
-
-				const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
-				const newValue = previousValue + validatedValue
-				bonuses[normalizedKey as keyof AllBonuses] = newValue
+				
+				// Aggro値の特殊処理（料理の aggroPlus/aggroMinus → Aggro統合）
+				if (propertyKey === 'aggroPlus' || propertyKey === 'aggroMinus') {
+					const normalizedKey = 'Aggro'
+					const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
+					const adjustedValue = propertyKey === 'aggroMinus' ? -Math.abs(validatedValue) : validatedValue
+					bonuses[normalizedKey as keyof AllBonuses] = previousValue + adjustedValue
+				} else {
+					const normalizedKey = normalizePropertyKey(propertyKey)
+					const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
+					const newValue = previousValue + validatedValue
+					bonuses[normalizedKey as keyof AllBonuses] = newValue
+				}
 			}
 		}
 
@@ -166,8 +153,8 @@ export function getCrystalBonuses(crystalData: any): Partial<AllBonuses> {
 				if (typeof value !== 'number' || value === 0) continue
 
 				const validatedValue = validatePropertyValue(value, propertyKey)
+				
 				const normalizedKey = normalizePropertyKey(propertyKey)
-
 				bonuses[normalizedKey as keyof AllBonuses] =
 					(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
 			}
