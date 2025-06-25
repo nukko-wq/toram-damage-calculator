@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useCalculatorStore, useSaveDataStore } from '@/stores'
 
 interface HeaderActionsProps {
@@ -11,13 +11,34 @@ export default React.memo<HeaderActionsProps>(
 	}) {
 		// ストアからデータを取得
 		const { saveCurrentData, hasUnsavedChanges, getUnsavedDataStatus } = useCalculatorStore()
-		const { saveDataList, currentSaveId } = useSaveDataStore()
-
-		// 現在のセーブデータ名を取得
-		const currentSaveData = saveDataList.find(save => save.id === currentSaveId)
-		const currentSaveName = currentSaveId === 'default' 
-			? 'メインデータ' 
-			: currentSaveData?.name || 'メインデータ'
+		const { saveDataList, currentSaveId, isInitialized } = useSaveDataStore()
+		
+		// 安定した表示名の管理（切り替え中の一時的な不整合状態を吸収）
+		const stableNameRef = useRef<string>('メインデータ')
+		
+		// セーブデータ名を直接計算（メモ化で安定化）
+		const currentSaveName = useMemo(() => {
+			// 初期化されていない場合は空文字を返す（ちらつき防止）
+			if (!isInitialized) {
+				return ''
+			}
+			
+			if (currentSaveId === 'default') {
+				const name = 'メインデータ'
+				stableNameRef.current = name
+				return name
+			}
+			
+			const currentSaveData = saveDataList.find(save => save.id === currentSaveId)
+			if (currentSaveData?.name) {
+				// 有効な名前が見つかった場合は更新
+				stableNameRef.current = currentSaveData.name
+				return currentSaveData.name
+			}
+			
+			// セーブデータが見つからない場合は前回の安定した名前を保持（ちらつき防止）
+			return stableNameRef.current
+		}, [currentSaveId, saveDataList, isInitialized])
 
 		// 現在のデータを保存
 		const handleSaveCurrentData = async () => {
@@ -34,9 +55,11 @@ export default React.memo<HeaderActionsProps>(
 		return (
 			<div className={`flex flex-col sm:flex-row gap-2 sm:gap-3 items-center ${className}`}>
 				{/* 現在のセーブデータ名 */}
-				<div className="text-sm text-gray-700 font-medium truncate max-w-32">
-					{currentSaveName}
-				</div>
+				{currentSaveName && (
+					<div className="text-sm text-gray-700 font-medium truncate max-w-32">
+						{currentSaveName}
+					</div>
+				)}
 
 				{/* 現在のデータを保存ボタン */}
 				<button

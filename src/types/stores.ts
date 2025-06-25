@@ -143,6 +143,7 @@ export interface SaveDataStore {
 	saveDataList: SaveData[]
 	currentSaveId: string
 	isLoading: boolean
+	isInitialized: boolean
 	error: string | null
 	pendingSaveId: string | null
 	showUnsavedChangesModal: boolean

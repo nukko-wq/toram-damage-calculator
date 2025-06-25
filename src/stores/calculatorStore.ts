@@ -107,10 +107,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					hasUnsavedChanges: false,
 				})
 
-				// 最小限の遅延でフォームの変更検知を無効化（ちらつき最小化）
-				setTimeout(() => {
-					set({ hasUnsavedChanges: false })
-				}, 30)
+				// フォームの変更検知を同期的に無効化（遅延によるちらつきを防止）
+				// setTimeout削除により、より予測可能な状態管理を実現
 			},
 
 			saveCurrentData: async () => {
