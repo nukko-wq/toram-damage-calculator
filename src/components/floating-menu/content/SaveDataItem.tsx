@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import type { SaveData } from '@/types/saveData'
+import type { SaveData } from '@/types/calculator'
 
 interface SaveDataItemProps {
 	saveData: SaveData
