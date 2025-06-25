@@ -23,10 +23,16 @@ export default function MenuPanel({
 	// パネル外クリックで閉じる
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as Node
+			
+			// FloatingMenuButtonをクリックした場合は何もしない
+			const isFloatingMenuButton = (target as Element)?.closest?.('[aria-controls="floating-menu-panel"]')
+			
 			if (
 				isOpen &&
 				panelRef.current &&
-				!panelRef.current.contains(event.target as Node)
+				!panelRef.current.contains(target) &&
+				!isFloatingMenuButton
 			) {
 				onClose()
 			}
