@@ -6,6 +6,7 @@ import {
 	calculateATK,
 	calculateSubATK,
 	calculateASPD,
+	calculateMotionSpeed,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -221,6 +222,15 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation,
 				allBonuses,
 			),
+			motionSpeedCalculation: (() => {
+				const aspd = calculateASPD(
+					baseStats,
+					data.mainWeapon,
+					adjustedStatsCalculation,
+					allBonuses,
+				).finalASPD
+				return calculateMotionSpeed(aspd, allBonuses)
+			})(),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -244,6 +254,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		atkCalculation,
 		subATKCalculation,
 		aspdCalculation,
+		motionSpeedCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -362,7 +373,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		physicalResistance: 0, // TODO: 物理耐性
 		magicalResistance: 0, // TODO: 魔法耐性
 		ailmentResistance: ailmentResistanceCalculation, // 異常耐性計算結果
-		motionSpeed: 100, // TODO: 行動速度計算
+		motionSpeed: motionSpeedCalculation.finalMotionSpeed, // 行動速度計算結果
 		armorBreak: 0, // TODO: 防御崩し
 		anticipate: 0, // TODO: 先読み
 	}
