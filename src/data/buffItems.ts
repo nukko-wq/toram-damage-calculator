@@ -42,6 +42,15 @@ export const buffItemsData: BuffItemsData = {
 					ATK_Rate: 10,
 				},
 			},
+			{
+				id: 'ec65e74c-b7ca-4303-8e2f-95e5a75fcf5b',
+				name: 'スラッシュオイル',
+				category: 'physicalPower',
+				properties: {
+					ATK_Rate: 3,
+					UnsheatheAttack_Rate: 5,
+				},
+			},
 		],
 		magicalPower: [
 			{
@@ -124,7 +133,47 @@ export const buffItemsData: BuffItemsData = {
 			},
 			{
 				id: '41cf5d08-48de-4e38-8a1b-16aa44474d58',
-				name: 'かぼちゃのクッキー(有利共通)',
+				name: 'かぼちゃクッキー(有利共通)',
+				category: 'elementalAttack',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					AttackSpeed: 100,
+					CastingSpeed: 100,
+				},
+			},
+			{
+				id: 'e96647d9-4edb-4b82-a339-25be215d3003',
+				name: 'ジンジャーケーキ(有利共通)',
+				category: 'elementalAttack',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					AttackSpeed: 100,
+					CastingSpeed: 100,
+				},
+			},
+			{
+				id: 'b378522c-6078-442b-a087-d1f5ca41ef06',
+				name: 'ジャックプリン(有利共通)',
+				category: 'elementalAttack',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					AttackSpeed: 100,
+					CastingSpeed: 100,
+				},
+			},
+			{
+				id: 'a46e7c22-2311-41d6-8e22-dcc446d83875',
+				name: 'ブラックバーム(有利共通)',
+				category: 'elementalAttack',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					AttackSpeed: 100,
+					CastingSpeed: 100,
+				},
+			},
+			{
+				id: 'b19816b5-24a7-4b57-b3e1-16c7a86ebf72',
+				name: 'パンプキンスープ(有利共通)',
 				category: 'elementalAttack',
 				properties: {
 					ElementAdvantage_Rate: 5,
@@ -198,12 +247,62 @@ export const buffItemsData: BuffItemsData = {
 				},
 			},
 			{
+				id: '509fc242-0b59-456c-b340-d53f490208f5',
+				name: 'アドマジクルⅣ',
+				category: 'mp',
+				properties: {
+					MP: 400,
+				},
+			},
+			{
+				id: '814a4671-236b-4547-8dad-9096195d2ef3',
+				name: 'アドマジクルⅤ',
+				category: 'mp',
+				properties: {
+					MP: 500,
+				},
+			},
+			{
+				id: 'ecadf062-43a3-49b2-995f-87ac80acf9fc',
+				name: 'アドマジクルⅥ',
+				category: 'mp',
+				properties: {
+					MP: 600,
+				},
+			},
+			{
+				id: '8a873057-846d-4f4b-9ac5-858dafde6703',
+				name: 'アドマジクルSP',
+				category: 'mp',
+				properties: {
+					MP: 1000,
+				},
+			},
+			{
 				id: '03bbfe51-9234-40e2-9290-a651de6dfb7a',
 				name: 'ロノーゴ海老ソテー',
 				category: 'mp',
 				properties: {
 					MP: 300,
 					CastingSpeed: 250,
+				},
+			},
+			{
+				id: '2e82bdee-d593-4180-9d21-01687cfc6eda',
+				name: 'ソウルプリン',
+				category: 'mp',
+				properties: {
+					MP: 300,
+					HP: 1000,
+				},
+			},
+			{
+				id: 'e2248663-d8e7-4227-ab78-df63e946a244',
+				name: 'キニナーレ',
+				category: 'mp',
+				properties: {
+					MP: 100,
+					Aggro_Rate: 20,
 				},
 			},
 		],
@@ -244,6 +343,15 @@ export const buffItemsData: BuffItemsData = {
 					Critical: 6,
 				},
 			},
+			{
+				id: '294e0bb6-ac37-4055-ac14-b96000b73bb1',
+				name: 'エスカルバター焼き',
+				category: 'accuracy',
+				properties: {
+					Accuracy: 30,
+					Critical: 5,
+				},
+			},
 		],
 		evasion: [
 			{
@@ -252,6 +360,14 @@ export const buffItemsData: BuffItemsData = {
 				category: 'evasion',
 				properties: {
 					Accuracy: 50,
+					Dodge: 50,
+				},
+			},
+			{
+				id: 'f25c18d9-0942-4a38-abe0-fccea29b68fe',
+				name: '白いプルプル',
+				category: 'evasion',
+				properties: {
 					Dodge: 50,
 				},
 			},
