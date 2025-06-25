@@ -12,9 +12,9 @@ import type {
 } from '@/types/calculator'
 
 // フォールバック用の静的インポート
-import equipmentsData from '@/data/equipments.json'
-import crystalsData from '@/data/crystals.json'
-import enemiesData from '@/data/enemies.json'
+import { equipmentsData } from '@/data/equipments'
+import { crystalsData } from '@/data/crystals'
+import { enemiesData } from '@/data/enemies'
 
 // ストレージキー
 const STORAGE_KEYS = {

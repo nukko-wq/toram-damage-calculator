@@ -8,7 +8,7 @@ import type {
 	EnemyCategory,
 } from '@/types/calculator'
 import { getUserEnemies } from './customEnemyManager'
-import enemiesData from '@/data/enemies.json'
+import { enemiesData } from '@/data/enemies'
 
 // ストレージキー
 const STORAGE_KEYS = {

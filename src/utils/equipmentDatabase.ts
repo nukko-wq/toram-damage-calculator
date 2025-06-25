@@ -7,7 +7,7 @@ import type {
 	EquipmentCategory,
 	EquipmentProperties,
 } from '@/types/calculator'
-import equipmentsData from '@/data/equipments.json'
+import { equipmentsData } from '@/data/equipments'
 import {
 	getAllTemporaryEquipments,
 	getTemporaryEquipmentsByCategory,

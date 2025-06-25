@@ -1,0 +1,232 @@
+/**
+ * クリスタルプリセットデータ（TypeScript版）
+ * 
+ * 型安全性とエディタ補完により開発効率を向上
+ * EquipmentPropertiesインターフェースによる厳密な型チェック
+ */
+
+import type { CrystalType, PresetCrystal } from '@/types/calculator'
+
+// クリスタルデータの型定義
+interface CrystalsData {
+	crystals: Record<CrystalType, PresetCrystal[]>
+}
+
+// クリスタルプリセットデータ
+export const crystalsData: CrystalsData = {
+	crystals: {
+		weapon: [
+			{
+				id: "weapon_don_profundo",
+				name: "ドン・プロフンド",
+				type: "weapon",
+				properties: {
+					ATK_Rate: 10,
+					STR_Rate: 7,
+					Critical_Rate: 8,
+					DEF_Rate: -27
+				}
+			},
+			{
+				id: "weapon_black_dress_princess",
+				name: "黒衣の聖誕姫",
+				type: "weapon",
+				properties: {
+					MATK_Rate: 12,
+					INT_Rate: 5,
+					CastingSpeed_Rate: 10
+				}
+			},
+			{
+				id: "weapon_diark",
+				name: "ディアルク",
+				type: "weapon",
+				properties: {
+					MATK_Rate: 8,
+					MagicalPenetration_Rate: 20,
+					CastingSpeed_Rate: -16
+				}
+			}
+		],
+		armor: [
+			{
+				id: "armor_altadal",
+				name: "アルタダール(軽鎧装備)",
+				type: "armor",
+				properties: {
+					Stability_Rate: 6,
+					STR_Rate: 6,
+					VIT_Rate: 6,
+					ShortRangeDamage_Rate: 11
+				}
+			},
+			{
+				id: "bangledrum",
+				name: "バングルドム(軽鎧装備)",
+				type: "armor",
+				properties: {
+					ATK_Rate: 10,
+					MATK_Rate: 10,
+					AttackSpeed_Rate: 10,
+					CastingSpeed_Rate: 10,
+					HP_Rate: -20,
+					MagicalPenetration_Rate: 5
+				}
+			},
+			{
+				id: "armor_delux_fighter_2",
+				name: "デラックスファイターⅡ",
+				type: "armor",
+				properties: {
+					ATK_Rate: 3,
+					ShortRangeDamage_Rate: 6,
+					Accuracy_Rate: 15,
+					HP: 6000,
+					FractionalBarrier: 5
+				}
+			},
+			{
+				id: "armor_gargoyle",
+				name: "ゲーグナー",
+				type: "armor",
+				properties: {
+					MATK_Rate: 10,
+					INT_Rate: 6,
+					CastingSpeed_Rate: 40,
+					AttackMPRecovery_Rate: 10
+				}
+			}
+		],
+		additional: [
+			{
+				id: "additional_king_of_the_king_2",
+				name: "キングウシキングⅡ",
+				type: "additional",
+				properties: {
+					ShortRangeDamage_Rate: 12,
+					Accuracy: 50,
+					MP: 200,
+					HP_Rate: -30
+				}
+			},
+			{
+				id: "additional_jibril_3",
+				name: "ジブリールⅢ",
+				type: "additional",
+				properties: {
+					ShortRangeDamage_Rate: 9,
+					LongRangeDamage_Rate: 11,
+					MP: 100,
+					Critical: 16,
+					Anticipate_Rate: 3,
+					NaturalMPRecovery: 6,
+					NaturalHPRecovery_Rate: 12
+				}
+			},
+			{
+				id: "additional_veran_lefinia",
+				name: "ヴェランレフィーナ",
+				type: "additional",
+				properties: {
+					ATK_Rate: 8,
+					PhysicalPenetration_Rate: 10,
+					Critical: 12,
+					MATK_Rate: -4,
+					PhysicalResistance_Rate: -20
+				}
+			},
+			{
+				id: "additional_god",
+				name: "ゴード",
+				type: "additional",
+				properties: {
+					ATK_Rate: 7,
+					AttackSpeed_Rate: 80,
+					LongRangeDamage_Rate: -15
+				}
+			},
+			{
+				id: "additional_castalia",
+				name: "カスティリア",
+				type: "additional",
+				properties: {
+					ShortRangeDamage_Rate: 12,
+					LongRangeDamage_Rate: 6,
+					Accuracy_Rate: 10,
+					AttackSpeed: -900
+				}
+			}
+		],
+		special: [
+			{
+				id: "special_etwaerz",
+				name: "エトワーズ",
+				type: "special",
+				properties: {
+					Critical_Rate: 40,
+					AttackSpeed: 1100,
+					MotionSpeed_Rate: 5,
+					CastingSpeed_Rate: -70
+				}
+			},
+			{
+				id: "special_ova_bio",
+				name: "茄竜オヴァビオ",
+				type: "special",
+				properties: {
+					MP: 300,
+					ShortRangeDamage_Rate: 4,
+					AttackSpeed: 500,
+					LongRangeDamage_Rate: -12
+				}
+			},
+			{
+				id: "special_call_of_the_devil",
+				name: "叫声の禍影",
+				type: "special",
+				properties: {
+					MP: 300,
+					Critical_Rate: 20,
+					CastingSpeed: 1000,
+					DEF_Rate: -40
+				}
+			}
+		],
+		normal: [
+			{
+				id: "normal_calerif",
+				name: "カレリーフ",
+				type: "normal",
+				properties: {
+					ATK_Rate: 9,
+					CriticalDamage: 12,
+					MagicalPenetration_Rate: -15
+				}
+			},
+			{
+				id: "normal_shadow_of_the_other_side",
+				name: "彼方の残影",
+				type: "normal",
+				properties: {
+					ShortRangeDamage_Rate: 10,
+					PhysicalPenetration_Rate: 5,
+					AttackSpeed: -250
+				}
+			},
+			{
+				id: "normal_dutannen",
+				name: "ドゥターネン",
+				type: "normal",
+				properties: {
+					Anticipate_Rate: 6,
+					ArmorBreak_Rate: 6,
+					Accuracy_Rate: 30,
+					Aggro_Rate: 10
+				}
+			}
+		]
+	}
+} as const
+
+// 後方互換性のためのエクスポート
+export default crystalsData
