@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useCalculatorStore, useUIStore } from '@/stores'
+import { useCalculatorStore } from '@/stores'
 import type { UpdateNotification } from '@/types/calculator'
 import { initializeStorage } from '@/utils/saveDataManager'
 import BaseStatsForm from '@/components/base-stats/BaseStatsForm'
@@ -11,12 +11,10 @@ import CrystalForm from '@/components/crystal/CrystalForm'
 import EnemyForm from '@/components/enemy/EnemyForm'
 import EquipmentForm from '@/components/equipment/EquipmentForm'
 import FoodForm from '@/components/food/FoodForm'
-import SaveDataManager from '@/components/save-data/SaveDataManager'
 import WeaponForm from '@/components/weapon/WeaponForm'
 
 export default function Home() {
 	// Zustandストアからデータを取得
-	const { showSaveManager } = useUIStore()
 	const { isInitialized, isLoading, initialize } = useCalculatorStore()
 
 	// アップデート通知（Zustand移行後も必要）
@@ -115,12 +113,6 @@ export default function Home() {
 					</div>
 				)}
 
-				{/* セーブデータ管理パネル */}
-				{showSaveManager && (
-					<div className="mb-8">
-						<SaveDataManager key="save-manager" />
-					</div>
-				)}
 
 				<div className="grid grid-cols-[1fr] grid-rows-[repeat(9,auto)] md:grid-cols-[repeat(8,1fr)] md:grid-rows-[repeat(6,auto)] lg:grid-cols-[350px_100px_minmax(500px,1000px)] lg:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto_auto_auto] gap-2 md:gap-4">
 					<BaseStatsForm />

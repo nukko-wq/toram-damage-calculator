@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { useCalculatorStore, useUIStore } from '@/stores'
 import HeaderTitle from './HeaderTitle'
 import HeaderActions from './HeaderActions'
 
@@ -10,8 +9,6 @@ interface HeaderProps {
 }
 
 export default React.memo<HeaderProps>(function Header({ className = '' }) {
-	const { showSaveManager, setShowSaveManager } = useUIStore()
-
 	return (
 		<header
 			role="banner"
@@ -25,10 +22,7 @@ export default React.memo<HeaderProps>(function Header({ className = '' }) {
 
 					{/* アクションボタン */}
 					<nav role="navigation" aria-label="ヘッダーアクション">
-						<HeaderActions
-							showSaveManager={showSaveManager}
-							onToggleSaveManager={() => setShowSaveManager(!showSaveManager)}
-						/>
+						<HeaderActions />
 					</nav>
 				</div>
 			</div>
