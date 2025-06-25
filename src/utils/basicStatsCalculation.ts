@@ -645,84 +645,84 @@ export function calculateEquipmentBonuses(
 
 	// 装備品補正値2 (31項目) - %と固定値の両方を含む
 	const equipmentBonus2 = {
-		ATK_STR: allBonuses.ATK_STR || 0,
+		ATK_STR: 0, // ステータス連動攻撃力は固定値なし
 		ATK_STR_Rate: allBonuses.ATK_STR_Rate || 0,
-		MATK_STR: allBonuses.MATK_STR || 0,
+		MATK_STR: 0, // ステータス連動攻撃力は固定値なし
 		MATK_STR_Rate: allBonuses.MATK_STR_Rate || 0,
-		ATK_INT: allBonuses.ATK_INT || 0,
+		ATK_INT: 0, // ステータス連動攻撃力は固定値なし
 		ATK_INT_Rate: allBonuses.ATK_INT_Rate || 0,
-		MATK_INT: allBonuses.MATK_INT || 0,
+		MATK_INT: 0, // ステータス連動攻撃力は固定値なし
 		MATK_INT_Rate: allBonuses.MATK_INT_Rate || 0,
-		ATK_VIT: allBonuses.ATK_VIT || 0,
+		ATK_VIT: 0, // ステータス連動攻撃力は固定値なし
 		ATK_VIT_Rate: allBonuses.ATK_VIT_Rate || 0,
-		MATK_VIT: allBonuses.MATK_VIT || 0,
+		MATK_VIT: 0, // ステータス連動攻撃力は固定値なし
 		MATK_VIT_Rate: allBonuses.MATK_VIT_Rate || 0,
-		ATK_AGI: allBonuses.ATK_AGI || 0,
+		ATK_AGI: 0, // ステータス連動攻撃力は固定値なし
 		ATK_AGI_Rate: allBonuses.ATK_AGI_Rate || 0,
-		MATK_AGI: allBonuses.MATK_AGI || 0,
+		MATK_AGI: 0, // ステータス連動攻撃力は固定値なし
 		MATK_AGI_Rate: allBonuses.MATK_AGI_Rate || 0,
-		ATK_DEX: allBonuses.ATK_DEX || 0,
+		ATK_DEX: 0, // ステータス連動攻撃力は固定値なし
 		ATK_DEX_Rate: allBonuses.ATK_DEX_Rate || 0,
-		MATK_DEX: allBonuses.MATK_DEX || 0,
+		MATK_DEX: 0, // ステータス連動攻撃力は固定値なし
 		MATK_DEX_Rate: allBonuses.MATK_DEX_Rate || 0,
-		neutralResistance: allBonuses.neutralResistance || 0,
-		neutralResistance_Rate: allBonuses.neutralResistance_Rate || 0,
-		fireResistance: allBonuses.fireResistance || 0,
-		fireResistance_Rate: allBonuses.fireResistance_Rate || 0,
-		waterResistance: allBonuses.waterResistance || 0,
-		waterResistance_Rate: allBonuses.waterResistance_Rate || 0,
-		windResistance: allBonuses.windResistance || 0,
-		windResistance_Rate: allBonuses.windResistance_Rate || 0,
-		earthResistance: allBonuses.earthResistance || 0,
-		earthResistance_Rate: allBonuses.earthResistance_Rate || 0,
-		lightResistance: allBonuses.lightResistance || 0,
-		lightResistance_Rate: allBonuses.lightResistance_Rate || 0,
-		darkResistance: allBonuses.darkResistance || 0,
-		darkResistance_Rate: allBonuses.darkResistance_Rate || 0,
-		linearReduction: allBonuses.linearReduction || 0,
-		linearReduction_Rate: allBonuses.linearReduction_Rate || 0,
-		rushReduction: allBonuses.rushReduction || 0,
-		rushReduction_Rate: allBonuses.rushReduction_Rate || 0,
-		bulletReduction: allBonuses.bulletReduction || 0,
-		bulletReduction_Rate: allBonuses.bulletReduction_Rate || 0,
-		proximityReduction: allBonuses.proximityReduction || 0,
-		proximityReduction_Rate: allBonuses.proximityReduction_Rate || 0,
-		areaReduction: allBonuses.areaReduction || 0,
-		areaReduction_Rate: allBonuses.areaReduction_Rate || 0,
-		floorTrapReduction: allBonuses.floorTrapReduction || 0,
-		floorTrapReduction_Rate: allBonuses.floorTrapReduction_Rate || 0,
-		meteorReduction: allBonuses.meteorReduction || 0,
-		meteorReduction_Rate: allBonuses.meteorReduction_Rate || 0,
-		bladeReduction: allBonuses.bladeReduction || 0,
-		bladeReduction_Rate: allBonuses.bladeReduction_Rate || 0,
-		suctionReduction: allBonuses.suctionReduction || 0,
-		suctionReduction_Rate: allBonuses.suctionReduction_Rate || 0,
-		explosionReduction: allBonuses.explosionReduction || 0,
-		explosionReduction_Rate: allBonuses.explosionReduction_Rate || 0,
-		physicalBarrier: allBonuses.physicalBarrier || 0,
-		magicalBarrier: allBonuses.magicalBarrier || 0,
-		fractionalBarrier: allBonuses.fractionalBarrier || 0,
-		barrierCooldown: allBonuses.barrierCooldown || 0,
-		barrierCooldown_Rate: allBonuses.barrierCooldown_Rate || 0,
+		neutralResistance: 0, // 属性耐性は%のみ
+		neutralResistance_Rate: allBonuses.NeutralResistance_Rate || 0,
+		fireResistance: 0, // 属性耐性は%のみ
+		fireResistance_Rate: allBonuses.FireResistance_Rate || 0,
+		waterResistance: 0, // 属性耐性は%のみ
+		waterResistance_Rate: allBonuses.WaterResistance_Rate || 0,
+		windResistance: 0, // 属性耐性は%のみ
+		windResistance_Rate: allBonuses.WindResistance_Rate || 0,
+		earthResistance: 0, // 属性耐性は%のみ
+		earthResistance_Rate: allBonuses.EarthResistance_Rate || 0,
+		lightResistance: 0, // 属性耐性は%のみ
+		lightResistance_Rate: allBonuses.LightResistance_Rate || 0,
+		darkResistance: 0, // 属性耐性は%のみ
+		darkResistance_Rate: allBonuses.DarkResistance_Rate || 0,
+		linearReduction: 0, // ダメージ軽減は%のみ
+		linearReduction_Rate: allBonuses.LinearReduction_Rate || 0,
+		rushReduction: 0, // ダメージ軽減は%のみ
+		rushReduction_Rate: allBonuses.RushReduction_Rate || 0,
+		bulletReduction: 0, // ダメージ軽減は%のみ
+		bulletReduction_Rate: allBonuses.BulletReduction_Rate || 0,
+		proximityReduction: 0, // ダメージ軽減は%のみ
+		proximityReduction_Rate: allBonuses.ProximityReduction_Rate || 0,
+		areaReduction: 0, // ダメージ軽減は%のみ
+		areaReduction_Rate: allBonuses.AreaReduction_Rate || 0,
+		floorTrapReduction: 0, // ダメージ軽減は%のみ
+		floorTrapReduction_Rate: allBonuses.FloorTrapReduction_Rate || 0,
+		meteorReduction: 0, // ダメージ軽減は%のみ
+		meteorReduction_Rate: allBonuses.MeteorReduction_Rate || 0,
+		bladeReduction: 0, // ダメージ軽減は%のみ
+		bladeReduction_Rate: allBonuses.BladeReduction_Rate || 0,
+		suctionReduction: 0, // ダメージ軽減は%のみ
+		suctionReduction_Rate: allBonuses.SuctionReduction_Rate || 0,
+		explosionReduction: 0, // ダメージ軽減は%のみ
+		explosionReduction_Rate: allBonuses.ExplosionReduction_Rate || 0,
+		physicalBarrier: allBonuses.PhysicalBarrier || 0,
+		magicalBarrier: allBonuses.MagicalBarrier || 0,
+		fractionalBarrier: allBonuses.FractionalBarrier || 0,
+		barrierCooldown: 0, // バリア速度は%のみ
+		barrierCooldown_Rate: allBonuses.BarrierCooldown_Rate || 0,
 	}
 
 	// 装備品補正値3 (8項目) - %と固定値の両方を含む
 	const equipmentBonus3 = {
-		physicalFollowup: allBonuses.physicalFollowup || 0,
-		physicalFollowup_Rate: allBonuses.physicalFollowup_Rate || 0,
-		magicalFollowup: allBonuses.magicalFollowup || 0,
-		magicalFollowup_Rate: allBonuses.magicalFollowup_Rate || 0,
-		naturalHPRecovery: allBonuses.naturalHPRecovery || 0,
-		naturalHPRecovery_Rate: allBonuses.naturalHPRecovery_Rate || 0,
-		naturalMPRecovery: allBonuses.naturalMPRecovery || 0,
-		naturalMPRecovery_Rate: allBonuses.naturalMPRecovery_Rate || 0,
-		absoluteAccuracy: allBonuses.absoluteAccuracy || 0,
-		absoluteAccuracy_Rate: allBonuses.absoluteAccuracy_Rate || 0,
-		absoluteDodge: allBonuses.absoluteDodge || 0,
-		absoluteDodge_Rate: allBonuses.absoluteDodge_Rate || 0,
-		revivalTime: allBonuses.revivalTime || 0,
-		revivalTime_Rate: allBonuses.revivalTime_Rate || 0,
-		itemCooldown: allBonuses.itemCooldown || 0,
+		physicalFollowup: 0, // 追撃は%のみ
+		physicalFollowup_Rate: allBonuses.PhysicalFollowup_Rate || 0,
+		magicalFollowup: 0, // 追撃は%のみ
+		magicalFollowup_Rate: allBonuses.MagicalFollowup_Rate || 0,
+		naturalHPRecovery: allBonuses.NaturalHPRecovery || 0,
+		naturalHPRecovery_Rate: allBonuses.NaturalHPRecovery_Rate || 0,
+		naturalMPRecovery: allBonuses.NaturalMPRecovery || 0,
+		naturalMPRecovery_Rate: allBonuses.NaturalMPRecovery_Rate || 0,
+		absoluteAccuracy: 0, // 絶対系は%のみ
+		absoluteAccuracy_Rate: allBonuses.AbsoluteAccuracy_Rate || 0,
+		absoluteDodge: 0, // 絶対系は%のみ
+		absoluteDodge_Rate: allBonuses.AbsoluteDodge_Rate || 0,
+		revivalTime: 0, // 復帰短縮は%のみ
+		revivalTime_Rate: allBonuses.RevivalTime_Rate || 0,
+		itemCooldown: allBonuses.ItemCooldown || 0,
 	}
 
 	return {
