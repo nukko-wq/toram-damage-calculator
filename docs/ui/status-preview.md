@@ -54,7 +54,7 @@
 │ ASPD 1,200     CSPD 890       │
 │ HIT 234        FLEE 189       │
 │ 物理耐性 15%   魔法耐性 12%    │
-│ 異常耐性 8%    行動速度 105%   │
+│ 異常耐性 8%    行動速度 18%    │
 │ 防御崩し 5%    先読み 3%       │
 └─────────────────────────────┘
 ```
@@ -78,6 +78,16 @@
 - **対応武器種**: 全11種の武器種
 
 **計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#aspd（アタックスピード）計算)を参照
+
+**行動速度計算仕様**:
+- **計算式**: `MIN(50, MAX(0, INT((ASPD-1000)/180)) + 行動速度%)`
+- **ASPDベース**: INT((ASPD-1000)/180) で計算、0未満は0に制限
+- **行動速度%**: 装備/プロパティ、クリスタ、バフアイテムのMotionSpeed_Rate補正の合計
+- **上限制限**: 最終結果は50%上限
+- **料理除外**: 料理からの行動速度%補正は存在しない
+- **データソース**: 上記で計算されたASPD値を使用
+
+**計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#行動速度（motion-speed）計算)を参照
 
 **サブATK仕様（双剣専用）**:
 - **適用条件**: メイン武器種が「双剣」の場合のみ
@@ -253,7 +263,7 @@ interface CalculationResults {
     physicalResistance: number          // 物理耐性（暫定値）
     magicalResistance: number           // 魔法耐性（暫定値）
     ailmentResistance: number           // 異常耐性（暫定値）
-    motionSpeed: number                 // 行動速度（暫定値）
+    motionSpeed: number                 // 行動速度（ASPD依存計算結果）
     armorBreak: number                  // 防御崩し（暫定値）
     anticipate: number                  // 先読み（暫定値）
   }
@@ -353,12 +363,15 @@ interface CalculationResults {
 }
 
 interface AllBonuses {
-  VIT?: number          // VIT固定値の合計
-  VIT_Rate?: number     // VIT%の合計
-  HP?: number           // HP固定値の合計
-  HP_Rate?: number      // HP%の合計
-  MP?: number           // MP固定値の合計
-  MP_Rate?: number      // MP%の合計
+  VIT?: number            // VIT固定値の合計
+  VIT_Rate?: number       // VIT%の合計
+  HP?: number             // HP固定値の合計
+  HP_Rate?: number        // HP%の合計
+  MP?: number             // MP固定値の合計
+  MP_Rate?: number        // MP%の合計
+  ASPD?: number           // ASPD固定値の合計
+  ASPD_Rate?: number      // ASPD%の合計
+  MotionSpeed_Rate?: number  // 行動速度%の合計（装備+クリスタ+バフアイテム、料理除外）
 }
 ```
 
@@ -560,6 +573,7 @@ const baseStats = data.baseStats
 3. **MP計算**: calculateMP()
 4. **ATK計算**: calculateATK() - 武器種別対応
 5. **ASPD計算**: calculateASPD() - 武器種別対応（実装予定）
+6. **行動速度計算**: calculateMotionSpeed() - ASPD依存計算
 
 ### 表示データ
 1. **基本ステータス**: 計算結果を含む全ステータス
@@ -885,7 +899,7 @@ function calculateAllEquipmentBonuses(
 - **属性系**: 属性威力, 抜刀威力, 近距離威力, 遠距離威力
 - **クリティカル**: クリ率, クリダメ
 - **ステータス**: STR, AGI, INT, DEX, VIT
-- **速度系**: ASPD, CSPD, 安定率, 行動速度
+- **速度系**: ASPD, CSPD, 安定率, 行動速度% (MotionSpeed_Rate)
 - **命中回避**: 命中, 回避
 - **HP/MP**: HP, MP, 攻撃MP回復
 - **耐性**: 異常耐性, 物理耐性, 魔法耐性
@@ -947,6 +961,7 @@ export function aggregateAllBonuses(
 | 2024-06-24 | 基礎ATK仕様を更新 | 基礎ATK＝ステータスATKであることを明記 |
 | 2024-06-24 | 基礎ATK計算式を修正 | 正しい基礎ATK計算式に変更 |
 | 2024-06-24 | サブATK仕様を追加 | 双剣専用のサブATK・サブ基礎ATK計算仕様を追加 |
+| 2024-06-25 | 行動速度計算仕様を追加 | ASPD依存の行動速度計算式と表示要件を追加 |
 
 ## 関連ドキュメント
 - [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細

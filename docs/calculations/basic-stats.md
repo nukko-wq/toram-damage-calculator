@@ -343,6 +343,119 @@ ASPD = INT((Lv + ステータスASPD + 武器種補正値) × (1 + ASPD%/100)) +
 - クリスタのASPD固定値補正
 - バフアイテムのASPD固定値補正
 
+## 行動速度（Motion Speed）計算
+
+### 基本計算式
+```
+行動速度 = MIN(50, MAX(0, INT((ASPD-1000)/180)) + 行動速度%)
+```
+
+**注意:** 
+- `INT(数値)`は小数点以下を元の数値より小さい整数に切り捨てる関数
+  - 例: INT(-2.7) = -3
+  - ※ステータスのINTと混同しないように注意
+- `MAX(数値,数値,…)`は各数値の最大値を求める関数
+  - 例: MAX(34,26,100) = 100
+- `MIN(数値,数値,…)`は各数値の最小値を求める関数
+  - 例: MIN(34,26,100) = 26
+
+### 詳細計算
+
+#### 1. ASPDベース行動速度計算
+```
+ASPDベース行動速度 = INT((ASPD-1000)/180)
+```
+
+**説明:**
+- ASPDから1000を減算した値を180で除算し、小数点以下を切り捨て
+- ASPD 1000未満の場合は負数になる
+
+#### 2. 下限制限適用
+```
+制限後ベース行動速度 = MAX(0, ASPDベース行動速度)
+```
+
+**説明:**
+- 0未満の値を0に制限（下限制限）
+
+#### 3. 行動速度%補正適用
+```
+補正後行動速度 = 制限後ベース行動速度 + 行動速度%
+```
+
+**構成要素:**
+- **行動速度%**: 装備/プロパティ、クリスタ、バフアイテムの行動速度%(MotionSpeed_Rate)の合計
+- **注意**: 料理には行動速度%はありません
+
+#### 4. 上限制限適用
+```
+最終行動速度 = MIN(50, 補正後行動速度)
+```
+
+**説明:**
+- 最終的な行動速度は最大50%に制限
+
+### 計算例
+
+#### 例1: 標準的なケース
+**入力値:**
+- ASPD: 1540
+- 行動速度%: 15% (装備+クリスタ+バフアイテム)
+
+**計算手順:**
+1. ASPDベース行動速度 = INT((1540-1000)/180) = INT(540/180) = INT(3.0) = 3
+2. 制限後ベース行動速度 = MAX(0, 3) = 3
+3. 補正後行動速度 = 3 + 15 = 18
+4. 最終行動速度 = MIN(50, 18) = 18%
+
+#### 例2: 低ASPDケース
+**入力値:**
+- ASPD: 800
+- 行動速度%: 10%
+
+**計算手順:**
+1. ASPDベース行動速度 = INT((800-1000)/180) = INT(-200/180) = INT(-1.11) = -2
+2. 制限後ベース行動速度 = MAX(0, -2) = 0
+3. 補正後行動速度 = 0 + 10 = 10
+4. 最終行動速度 = MIN(50, 10) = 10%
+
+#### 例3: 高ASPDケース
+**入力値:**
+- ASPD: 2800
+- 行動速度%: 30%
+
+**計算手順:**
+1. ASPDベース行動速度 = INT((2800-1000)/180) = INT(1800/180) = INT(10.0) = 10
+2. 制限後ベース行動速度 = MAX(0, 10) = 10
+3. 補正後行動速度 = 10 + 30 = 40
+4. 最終行動速度 = MIN(50, 40) = 40%
+
+#### 例4: 上限到達ケース
+**入力値:**
+- ASPD: 3000
+- 行動速度%: 50%
+
+**計算手順:**
+1. ASPDベース行動速度 = INT((3000-1000)/180) = INT(2000/180) = INT(11.11) = 11
+2. 制限後ベース行動速度 = MAX(0, 11) = 11
+3. 補正後行動速度 = 11 + 50 = 61
+4. 最終行動速度 = MIN(50, 61) = 50% (上限制限)
+
+### 構成要素
+
+**行動速度%の構成:**
+- 装備/プロパティの行動速度%(MotionSpeed_Rate)補正
+- クリスタの行動速度%(MotionSpeed_Rate)補正
+- バフアイテムの行動速度%(MotionSpeed_Rate)補正
+- **除外**: 料理には行動速度%補正はありません
+
+### 重要な制限事項
+
+1. **下限制限**: ASPDベースの行動速度は0%未満にはならない
+2. **上限制限**: 最終的な行動速度は50%を超えない
+3. **料理除外**: 料理アイテムからの行動速度%補正は存在しない
+4. **整数計算**: ASPD計算部分では小数点以下切り捨て処理が重要
+
 ### HP計算順序（新計算式）
 1. **VIT補正計算**: ステータスVIT × (1 + VIT%/100) + VIT固定値
 2. **HP基本値計算**: INT(93 + (補正後VIT + 22.41) × Lv / 3)
@@ -397,18 +510,36 @@ interface BasicStatsCalculation {
     // 5. 最終MP
     return mpAfterPercent + mpFixed
   }
+
+  calculateMotionSpeed(aspd: number, allBonuses: AllBonuses): number {
+    // 1. ASPDベース行動速度計算
+    const aspdBase = Math.floor((aspd - 1000) / 180)
+    
+    // 2. 下限制限適用（0未満を0に制限）
+    const aspdBaseClamped = Math.max(0, aspdBase)
+    
+    // 3. 行動速度%補正適用
+    const motionSpeedPercent = allBonuses.MotionSpeed_Rate || 0
+    const motionSpeedAfterPercent = aspdBaseClamped + motionSpeedPercent
+    
+    // 4. 上限制限適用（50%上限）
+    const finalMotionSpeed = Math.min(50, motionSpeedAfterPercent)
+    
+    return finalMotionSpeed
+  }
 }
 
 // AllBonusesはequipment, crystal, food, buffの全補正値をまとめたもの
 interface AllBonuses {
-  VIT?: number          // VIT固定値の合計
-  VIT_Rate?: number     // VIT%の合計
-  INT?: number          // INT固定値の合計
-  INT_Rate?: number     // INT%の合計
-  HP?: number           // HP固定値の合計
-  HP_Rate?: number      // HP%の合計
-  MP?: number           // MP固定値の合計
-  MP_Rate?: number      // MP%の合計
+  VIT?: number            // VIT固定値の合計
+  VIT_Rate?: number       // VIT%の合計
+  INT?: number            // INT固定値の合計
+  INT_Rate?: number       // INT%の合計
+  HP?: number             // HP固定値の合計
+  HP_Rate?: number        // HP%の合計
+  MP?: number             // MP固定値の合計
+  MP_Rate?: number        // MP%の合計
+  MotionSpeed_Rate?: number  // 行動速度%の合計（装備+クリスタ+バフアイテム、料理除外）
   // その他のステータス...
 }
 ```
@@ -453,6 +584,7 @@ interface AllBonuses {
 | 2024-06-23 | HP・MP計算式の初期作成 | 基本的な計算式を記述 |
 | 2024-06-23 | HP計算式を正確な式に修正 | INT()関数使用、補正後VIT導入、2段階計算に変更 |
 | 2024-06-23 | MP計算式を正確な式に修正 | INT()関数使用、TECとINT活用、2段階計算に変更 |
+| 2024-06-25 | 行動速度計算式を追加 | MIN/MAX/INT関数使用、ASPD依存、50%上限制限 |
 
 ## 関連ドキュメント
 - [計算式概要](./overview.md)
