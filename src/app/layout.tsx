@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import ResultToggleBar from '@/components/layout/ResultToggleBar'
+import { FloatingMenuSystem } from '@/components/floating-menu'
 
 export const metadata: Metadata = {
 	title: 'トーラムダメージ計算',
@@ -24,6 +25,7 @@ export default function RootLayout({
 					<Header />
 					<ResultToggleBar />
 					<main>{children}</main>
+					<FloatingMenuSystem />
 				</div>
 			</body>
 		</html>

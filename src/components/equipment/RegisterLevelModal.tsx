@@ -56,7 +56,7 @@ export function RegisterLevelModal({
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center">
 			{/* オーバーレイ */}
-			<div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
+			<div className="fixed inset-0 bg-black/50" onClick={onClose} />
 
 			{/* モーダルコンテンツ */}
 			<div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-4">
