@@ -63,11 +63,19 @@
 - **武器種別**: 選択された武器種に応じた計算式を適用
 - **ATK計算式**: `INT((自Lv + 総武器ATK + ステータスATK + ATKアップ - ATKダウン) × (1 + ATK%/100)) + ATK固定値`
 - **基礎ATK表示**: `Lv+総武器ATK+ステータスATK+ATKアップ(ステータス%) - ATKダウン(ステータス%)` (表示時のみ小数点以下切り捨て)
-- **ステータスATK**: 武器種別に応じた計算式（例：旋風槍の場合 `補正後STR × 2.5 + 補正後AGI × 1.5`）
+- **ステータスATK**: 武器種別に応じた計算式（例：旋風槍 `STR × 2.5 + AGI × 1.5`、素手 `STR × 1.0`）
 - **データソース**: メイン武器の種別に基づいて計算式を自動選択
 - **対応武器種**: 全11種の武器種（旋風槍、片手剣、両手剣、弓、自動弓、杖、魔導具、手甲、抜刀剣、双剣、素手）
 
 **計算詳細**: [ATK計算式設計書](../calculations/atk-calculation.md)を参照
+
+**サブATK仕様（双剣専用）**:
+- **適用条件**: メイン武器種が「双剣」の場合のみ
+- **サブATK計算**: `INT(サブ基礎ATK × (1 + ATK%/100)) + ATK固定値`
+- **サブ基礎ATK**: `Lv+サブ総武器ATK+サブステータスATK+ATKアップ-ATKダウン`
+- **サブステータスATK**: `STR × 1.0 + AGI × 3.0`
+- **サブ総武器ATK**: サブ武器の武器ATK・精錬値を使用
+- **非双剣時**: サブ武器ATKをそのまま表示、サブ基礎ATKは0表示
 
 ### 補正後ステータス（8項目）
 ```
@@ -214,8 +222,8 @@ interface CalculationResults {
     MP: number                          // MP計算結果
     ATK: number                         // ATK計算結果（武器種別対応）
     baseATK: number                     // 基礎ATK（表示時のみ小数点以下切り捨て）
-    subATK: number                      // サブ武器ATK
-    subBaseATK: number                  // サブ武器基礎ATK（暫定値）
+    subATK: number                      // サブ武器ATK（双剣時は計算値、非双剣時はサブ武器ATK）
+    subBaseATK: number                  // サブ武器基礎ATK（双剣時は計算値、非双剣時は0）
     totalATK: number                    // 総ATK（暫定値）
     bringerAM: number                   // ブリンガーAM（暫定値）
     MATK: number                        // MATK（暫定値）
@@ -894,6 +902,7 @@ export function aggregateAllBonuses(
 | 2024-06-23 | 装備品補正値計算仕様を追加 | 4ソース加算方式の詳細化 |
 | 2024-06-24 | 基礎ATK仕様を更新 | 基礎ATK＝ステータスATKであることを明記 |
 | 2024-06-24 | 基礎ATK計算式を修正 | 正しい基礎ATK計算式に変更 |
+| 2024-06-24 | サブATK仕様を追加 | 双剣専用のサブATK・サブ基礎ATK計算仕様を追加 |
 
 ## 関連ドキュメント
 - [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細

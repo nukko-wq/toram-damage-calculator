@@ -368,6 +368,26 @@ export interface ATKCalculationSteps {
 	finalATK: number // 最終ATK
 }
 
+// サブATK計算の中間結果（双剣専用）
+export interface SubATKCalculationSteps {
+	// サブ総武器ATK関連
+	subBaseWeaponATK: number // サブ武器の基本ATK
+	subRefinementLevel: number // サブ精錬値
+	subRefinedWeaponATK: number // サブ精錬補正後武器ATK
+	subWeaponATKPercentBonus: number // サブ武器ATK%補正
+	subWeaponATKFixedBonus: number // サブ武器ATK固定値
+	subTotalWeaponATK: number // サブ総武器ATK
+
+	// サブステータスATK関連
+	subStatusATK: number // サブステータスATK（STR×1 + AGI×3）
+
+	// サブATK最終計算
+	subBaseATK: number // サブ基礎ATK
+	subATKBeforePercent: number // サブATK%適用前
+	subATKAfterPercent: number // サブATK%適用後
+	subFinalATK: number // サブ最終ATK
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -395,42 +415,42 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 	bow: {
 		id: 'bow',
 		name: '弓',
-		statusATKFormula: (stats) => stats.DEX * 3.5 + stats.STR * 1.0,
+		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 3.0,
 	},
 	bowgun: {
 		id: 'bowgun',
 		name: '自動弓',
-		statusATKFormula: (stats) => stats.DEX * 3.5 + stats.STR * 1.0,
+		statusATKFormula: (stats) => stats.DEX * 4.0,
 	},
 	staff: {
 		id: 'staff',
 		name: '杖',
-		statusATKFormula: (stats) => stats.INT * 3.0 + stats.DEX * 1.5,
+		statusATKFormula: (stats) => stats.STR * 3.0 + stats.INT * 1.0,
 	},
 	'magic-device': {
 		id: 'magic-device',
 		name: '魔導具',
-		statusATKFormula: (stats) => stats.INT * 3.0 + stats.DEX * 1.5,
+		statusATKFormula: (stats) => stats.AGI * 2.0 + stats.INT * 2.0,
 	},
 	knuckle: {
 		id: 'knuckle',
 		name: '手甲',
-		statusATKFormula: (stats) => stats.AGI * 2.5 + stats.STR * 2.0,
+		statusATKFormula: (stats) => stats.DEX * 0.5 + stats.AGI * 2.0,
 	},
 	katana: {
 		id: 'katana',
 		name: '抜刀剣',
-		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 2.0,
+		statusATKFormula: (stats) => stats.STR * 1.5 + stats.DEX * 2.5,
 	},
 	'dual-sword': {
 		id: 'dual-sword',
 		name: '双剣',
-		statusATKFormula: (stats) => stats.STR * 2.0 + stats.AGI * 2.0,
+		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 2.0 + stats.AGI * 1.0,
 	},
 	barehand: {
 		id: 'barehand',
 		name: '素手',
-		statusATKFormula: (stats) => stats.AGI * 2.5 + stats.STR * 2.0,
+		statusATKFormula: (stats) => stats.STR * 1.0,
 	},
 }
 
@@ -679,5 +699,58 @@ export function calculateEquipmentBonuses(
 		equipmentBonus1,
 		equipmentBonus2,
 		equipmentBonus3,
+	}
+}
+
+/**
+ * サブATK計算（双剣専用）
+ */
+export function calculateSubATK(
+	stats: BaseStats,
+	mainWeapon: { weaponType: WeaponTypeEnum; ATK: number; stability: number; refinement: number },
+	subWeapon: { weaponType: string; ATK: number; stability: number; refinement: number },
+	adjustedStats: AdjustedStatsCalculation,
+	bonuses: AllBonuses = {},
+): SubATKCalculationSteps | null {
+	// 双剣以外は計算しない
+	if (mainWeapon.weaponType !== '双剣') {
+		return null
+	}
+
+	// 1. サブ総武器ATK計算（精錬補正は /200）
+	const subRefinedWeaponATK = Math.floor(
+		subWeapon.ATK * (1 + subWeapon.refinement ** 2 / 200) + subWeapon.refinement,
+	)
+	const subWeaponATKPercentBonus = Math.floor(subWeapon.ATK * (bonuses.weaponATK_Rate || 0))
+	const subWeaponATKFixedBonus = bonuses.weaponATK || 0
+	const subTotalWeaponATK = subRefinedWeaponATK + subWeaponATKPercentBonus + subWeaponATKFixedBonus
+
+	// 2. サブステータスATK計算（双剣専用計算式: STR × 1.0 + AGI × 3.0）
+	const subStatusATK = adjustedStats.STR * 1.0 + adjustedStats.AGI * 3.0
+
+	// 3. サブ基礎ATK計算（ATKアップ・ATKダウンは含まない）
+	const subBaseATK = stats.level + subTotalWeaponATK + subStatusATK
+
+	// 4. サブ最終ATK計算
+	const subATKBeforePercent = subBaseATK
+	const atkPercent = bonuses.ATK_Rate || 0
+	const subATKAfterPercent = Math.floor(
+		subATKBeforePercent * (1 + atkPercent / 100),
+	)
+	const atkFixed = bonuses.ATK || 0
+	const subFinalATK = subATKAfterPercent + atkFixed
+
+	return {
+		subBaseWeaponATK: subWeapon.ATK,
+		subRefinementLevel: subWeapon.refinement,
+		subRefinedWeaponATK,
+		subWeaponATKPercentBonus,
+		subWeaponATKFixedBonus,
+		subTotalWeaponATK,
+		subStatusATK,
+		subBaseATK,
+		subATKBeforePercent,
+		subATKAfterPercent,
+		subFinalATK,
 	}
 }

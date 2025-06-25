@@ -213,14 +213,14 @@ ATK = 5999 + 200 = 6199
 | 旋風槍 | halberd | STR×2.5 + AGI×1.5 | ✅ 実装済み |
 | 片手剣 | 1hsword | STR×2.0 + DEX×2.0 | ✅ 実装済み |
 | 両手剣 | 2hsword | STR×3.0 + DEX×1.0 | ✅ 実装済み |
-| 弓 | bow | DEX×3.5 + STR×1.0 | ✅ 実装済み |
-| 自動弓 | bowgun | DEX×3.5 + STR×1.0 | ✅ 実装済み |
-| 杖 | staff | INT×3.0 + DEX×1.5 | ✅ 実装済み |
-| 魔導具 | magic-device | INT×3.0 + DEX×1.5 | ✅ 実装済み |
-| 手甲 | knuckle | AGI×2.5 + STR×2.0 | ✅ 実装済み |
-| 抜刀剣 | katana | STR×2.5 + AGI×2.0 | ✅ 実装済み |
-| 双剣 | dual-sword | STR×2.0 + AGI×2.0 | ✅ 実装済み |
-| 素手 | barehand | AGI×2.5 + STR×2.0 | ✅ 実装済み |
+| 弓 | bow | STR×1.0 + DEX×3.0 | ✅ 実装済み |
+| 自動弓 | bowgun | DEX×4.0 | ✅ 実装済み |
+| 杖 | staff | STR×3.0 + INT×1.0 | ✅ 実装済み |
+| 魔導具 | magic-device | AGI×2.0 + INT×2.0 | ✅ 実装済み |
+| 手甲 | knuckle | DEX×0.5 + AGI×2.0 | ✅ 実装済み |
+| 抜刀剣 | katana | STR×1.5 + DEX×2.5 | ✅ 実装済み |
+| 双剣 | dual-sword | STR×1.0 + DEX×2.0 + AGI×1.0 | ✅ 実装済み |
+| 素手 | barehand | STR×1.0 | ✅ 実装済み |
 
 ## TypeScript実装例
 
@@ -419,6 +419,195 @@ export function calculateATK(
 | 2024-06-24 | 武器種別を整理・更新 | 片手剣・両手剣を追加、剣・槍・忍刀を削除 |
 | 2024-06-24 | 武器種別マッピング機能を実装 | 日本語武器種と英語キーの対応付けでATK計算を修正 |
 | 2024-06-24 | 基礎ATK計算式を修正 | 基礎ATK = Lv+総武器ATK+ステータスATK+ATKアップ-ATKダウン |
+| 2024-06-24 | 武器種別計算式を修正 | 弓、自動弓、杖、魔導具、手甲、抜刀剣、素手の計算式を更新 |
+| 2024-06-24 | 双剣の計算式を修正 | STR×1.0 + DEX×2.0 + AGI×1.0 に変更 |
+| 2024-06-24 | サブATK計算仕様を追加 | 双剣専用のサブATK・サブ基礎ATK計算設計書を追加 |
+
+## サブATK計算（双剣専用）
+
+### 概要
+双剣武器種を選択している場合のみ、サブATKとサブ基礎ATKの計算を行う。
+
+### サブATK計算式
+```
+サブATK = INT((自Lv + 総サブ武器ATK + ステータスサブATK) × (1 + ATK%/100)) + ATK固定値
+```
+
+### サブ基礎ATK計算式
+```
+サブ基礎ATK = 自Lv + 総サブ武器ATK + ステータスサブATK
+```
+
+**注意**: サブATK計算にはATKアップ(ステータス%)・ATKダウン(ステータス%)は含まれない
+
+### サブステータスATK計算式（双剣専用）
+```
+サブステータスATK = STR × 1.0 + AGI × 3.0
+```
+
+### 総サブ武器ATK計算
+サブ武器の情報を使用して総武器ATKを計算：
+
+```
+総サブ武器ATK = INT(サブ武器ATK × (1 + (サブ精錬値^2)/200) + サブ精錬値) + INT(サブ武器ATK × 武器ATK%) + 武器ATK固定値
+```
+
+**構成要素:**
+- **サブ武器ATK**: サブ武器フォームで設定された武器ATK
+- **サブ精錬値**: サブ武器フォームで設定された精錬値
+- **武器ATK%**: メイン武器と同じ武器ATK%補正を使用
+- **武器ATK固定値**: メイン武器と同じ武器ATK固定値を使用
+
+### 適用条件
+- **武器種**: メイン武器の武器種が「双剣」の場合のみ計算
+- **表示**: StatusPreviewの「サブATK」「サブ基礎ATK」項目に表示
+- **非双剣時**: サブ武器のATKをそのまま表示（現在の実装）
+
+### 計算手順
+
+#### 1. 武器種チェック
+```typescript
+if (mainWeapon.weaponType === '双剣') {
+  // サブATK計算を実行
+} else {
+  // サブ武器ATKをそのまま使用
+}
+```
+
+#### 2. サブ総武器ATK計算（精錬補正は /200）
+```typescript
+const subRefinedWeaponATK = Math.floor(
+  subWeapon.ATK * (1 + subWeapon.refinement ** 2 / 200) + subWeapon.refinement
+)
+const subWeaponATKPercentBonus = Math.floor(subWeapon.ATK * (bonuses.weaponATK_Rate || 0))
+const subWeaponATKFixedBonus = bonuses.weaponATK || 0
+const subTotalWeaponATK = subRefinedWeaponATK + subWeaponATKPercentBonus + subWeaponATKFixedBonus
+```
+
+#### 3. サブステータスATK計算
+```typescript
+const subStatusATK = adjustedStats.STR * 1.0 + adjustedStats.AGI * 3.0
+```
+
+#### 4. サブ基礎ATK計算（ATKアップ・ATKダウンは含まない）
+```typescript
+const subBaseATK = stats.level + subTotalWeaponATK + subStatusATK
+```
+
+#### 5. サブATK計算
+```typescript
+const subATKAfterPercent = Math.floor(subBaseATK * (1 + atkPercent / 100))
+const subFinalATK = subATKAfterPercent + atkFixed
+```
+
+### TypeScript実装例
+
+```typescript
+interface SubATKCalculationSteps {
+  // サブ総武器ATK関連
+  subBaseWeaponATK: number          // サブ武器の基本ATK
+  subRefinementLevel: number        // サブ精錬値
+  subRefinedWeaponATK: number       // サブ精錬補正後武器ATK
+  subWeaponATKPercentBonus: number  // サブ武器ATK%補正
+  subWeaponATKFixedBonus: number    // サブ武器ATK固定値
+  subTotalWeaponATK: number         // サブ総武器ATK
+
+  // サブステータスATK関連
+  subStatusATK: number              // サブステータスATK（STR×1 + AGI×3）
+
+  // サブATK最終計算
+  subBaseATK: number                // サブ基礎ATK
+  subATKBeforePercent: number       // サブATK%適用前
+  subATKAfterPercent: number        // サブATK%適用後
+  subFinalATK: number               // サブ最終ATK
+}
+
+function calculateSubATK(
+  stats: BaseStats,
+  mainWeapon: MainWeapon,
+  subWeapon: SubWeapon,
+  adjustedStats: AdjustedStatsCalculation,
+  bonuses: AllBonuses = {}
+): SubATKCalculationSteps | null {
+  // 双剣以外は計算しない
+  if (mainWeapon.weaponType !== '双剣') {
+    return null
+  }
+
+  // サブ総武器ATK計算（精錬補正は /200）
+  const subRefinedWeaponATK = Math.floor(
+    subWeapon.ATK * (1 + subWeapon.refinement ** 2 / 200) + subWeapon.refinement
+  )
+  const subWeaponATKPercentBonus = Math.floor(subWeapon.ATK * (bonuses.weaponATK_Rate || 0))
+  const subWeaponATKFixedBonus = bonuses.weaponATK || 0
+  const subTotalWeaponATK = subRefinedWeaponATK + subWeaponATKPercentBonus + subWeaponATKFixedBonus
+
+  // サブステータスATK計算（双剣専用計算式）
+  const subStatusATK = adjustedStats.STR * 1.0 + adjustedStats.AGI * 3.0
+
+  // サブ基礎ATK計算（ATKアップ・ATKダウンは含まない）
+  const subBaseATK = stats.level + subTotalWeaponATK + subStatusATK
+
+  // サブATK%適用（メイン武器と同じATK%を使用）
+  const atkPercent = bonuses.ATK_Rate || 0
+  const subATKAfterPercent = Math.floor(subBaseATK * (1 + atkPercent / 100))
+  
+  // サブATK固定値適用（メイン武器と同じATK固定値を使用）
+  const atkFixed = bonuses.ATK || 0
+  const subFinalATK = subATKAfterPercent + atkFixed
+
+  return {
+    subBaseWeaponATK: subWeapon.ATK,
+    subRefinementLevel: subWeapon.refinement,
+    subRefinedWeaponATK,
+    subWeaponATKPercentBonus,
+    subWeaponATKFixedBonus,
+    subTotalWeaponATK,
+    subStatusATK,
+    subBaseATK,
+    subATKBeforePercent: subBaseATK,
+    subATKAfterPercent,
+    subFinalATK,
+  }
+}
+```
+
+### StatusPreview表示仕様
+
+#### 双剣選択時
+- **サブATK**: `subFinalATK` の値を表示
+- **サブ基礎ATK**: `Math.floor(subBaseATK)` の値を表示（表示時のみ小数点以下切り捨て）
+
+#### 非双剣選択時
+- **サブATK**: `subWeapon.ATK` の値を表示（現在の実装）
+- **サブ基礎ATK**: 0 を表示（TODO表示）
+
+### 計算例
+
+**入力値:**
+- メイン武器種: 双剣
+- Lv: 150
+- 補正後STR: 200
+- 補正後AGI: 180
+- サブ武器ATK: 100
+- サブ精錬値: 10
+- 武器ATK%: 15%
+- 武器ATK固定値: 50
+- ATK%: 20%
+- ATK固定値: 100
+
+**計算手順:**
+1. サブ精錬補正後武器ATK = INT(100 × (1 + 10²/200) + 10) = INT(100 × 1.5 + 10) = 160
+2. サブ武器ATK%補正 = INT(100 × 15) = 1500
+3. サブ総武器ATK = 160 + 1500 + 50 = 1710
+4. サブステータスATK = 200 × 1.0 + 180 × 3.0 = 740
+5. サブ基礎ATK = 150 + 1710 + 740 = 2600
+6. サブATK%適用後 = INT(2600 × 1.20) = 3120
+7. サブ最終ATK = 3120 + 100 = 3220
+
+**表示結果:**
+- サブATK: 3220
+- サブ基礎ATK: 2600
 
 ## 関連ドキュメント
 - [基本ステータス計算式](./basic-stats.md) - 補正後ステータス計算

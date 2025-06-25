@@ -4,6 +4,7 @@ import {
 	calculateHP,
 	calculateMP,
 	calculateATK,
+	calculateSubATK,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -52,6 +53,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			buffBonuses,
 		)
 
+		const adjustedStatsCalculation = calculateAdjustedStats(baseStats, allBonuses)
+
 		return {
 			allBonuses,
 			equipmentBonuses: calculateEquipmentBonuses(
@@ -63,15 +66,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			hpCalculation: calculateHP(baseStats, allBonuses),
 			mpCalculation: calculateMP(baseStats, allBonuses),
 			atkCalculation: calculateATK(baseStats, data.mainWeapon, allBonuses),
-			adjustedStatsCalculation: calculateAdjustedStats(baseStats, allBonuses),
+			subATKCalculation: calculateSubATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, allBonuses),
+			adjustedStatsCalculation,
 		}
-	}, [equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses, baseStats, data.mainWeapon])
+	}, [equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses, baseStats, data.mainWeapon, data.subWeapon])
 
 	const {
 		equipmentBonuses: calculatedEquipmentBonuses,
 		hpCalculation,
 		mpCalculation,
 		atkCalculation,
+		subATKCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
@@ -90,8 +95,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		MP: mpCalculation.finalMP,
 		ATK: atkCalculation.finalATK, // 武器種別ATK計算結果
 		baseATK: Math.floor(atkCalculation.baseATK), // 基礎ATK（表示時のみ小数点以下切り捨て）
-		subATK: data.subWeapon.ATK, // サブ武器ATK
-		subBaseATK: 0, // TODO: サブ武器基礎ATK
+		subATK: subATKCalculation ? subATKCalculation.subFinalATK : data.subWeapon.ATK, // 双剣時は計算値、その他は武器ATK
+		subBaseATK: subATKCalculation ? Math.floor(subATKCalculation.subBaseATK) : 0, // 双剣時は計算値、その他は0
 		totalATK: 0, // TODO: 総ATK計算
 		bringerAM: 0, // TODO: ブリンガーAM計算
 		MATK: 0, // TODO: MATK計算
