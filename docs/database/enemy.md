@@ -2,29 +2,40 @@
 
 ## ファイル構成・データフロー
 **初期データ配置**:
-- **プリセットデータ**: `src/data/enemies.json`（静的ファイル）
+- **プリセットデータ**: `src/data/enemies.ts`（TypeScript静的ファイル）
 
 **アプリ起動時の処理**:
 ```
-アプリ起動 → プリセットJSONを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
+アプリ起動 → プリセットTypeScriptモジュールを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
 ```
+
+**TypeScript移行の利点**:
+- EnemyStatsインターフェースによる厳密な型チェック
+- EnemyCategoryとPresetEnemyの型安全性保証
+- 数値範囲の型制約（DEF, MDEF, レベルなど）
+- nullから0への型安全な変換による一貫性確保
 
 **ローカルストレージキー**:
 - **プリセット敵情報（コピー済み）**: LocalStorage (`preset_enemies`)
 - **ユーザーカスタムデータ**: LocalStorage (`custom_enemies`)
 - **統合アクセス**: 両方のデータを統一的に管理
 
-## JSON構造
+## TypeScriptデータ構造
 
-```json
-{
-  "enemies": {
-    "mob": [敵情報配列],
-    "fieldBoss": [敵情報配列],
-    "boss": [敵情報配列],
-    "raidBoss": [敵情報配列]
-  }
+```typescript
+// src/data/enemies.ts
+interface EnemiesData {
+  enemies: Record<EnemyCategory, PresetEnemy[]>
 }
+
+export const enemiesData: EnemiesData = {
+  enemies: {
+    mob: [敵情報配列],
+    fieldBoss: [敵情報配列],
+    boss: [敵情報配列],
+    raidBoss: [敵情報配列]
+  }
+} as const
 ```
 
 ## 敵情報構造

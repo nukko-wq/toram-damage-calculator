@@ -2,37 +2,48 @@
 
 ## ファイル構成・データフロー
 **初期データ配置**:
-- **プリセットデータ**: `src/data/equipments.json`（静的ファイル）
+- **プリセットデータ**: `src/data/equipments.ts`（TypeScript静的ファイル）
 
 **アプリ起動時の処理**:
 ```
-アプリ起動 → プリセットJSONを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
+アプリ起動 → プリセットTypeScriptモジュールを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
 ```
+
+**TypeScript移行の利点**:
+- EquipmentPropertiesインターフェースによる厳密な型チェック
+- weaponStatsとcrystalSlotsの型安全性保証
+- 装備カテゴリごとの型制約
+- エディタでの自動補完とプロパティ検証
 
 **ローカルストレージキー**:
 - **プリセット装備（コピー済み）**: LocalStorage (`preset_equipments`)
 - **ユーザーカスタムデータ**: LocalStorage (`custom_equipments`)
 - **統合アクセス**: 両方のデータを統一的に管理
 
-## JSON構造
+## TypeScriptデータ構造
 
-**プリセット装備データ構造**（初期配置用）:
-```json
-{
-  "equipments": {
-    "mainWeapon": [装備アイテム配列],
-    "body": [装備アイテム配列],
-    "additional": [装備アイテム配列],
-    "special": [装備アイテム配列],
-    "subWeapon": [装備アイテム配列],
-    "fashion1": [装備アイテム配列],
-    "fashion2": [装備アイテム配列],
-    "fashion3": [装備アイテム配列],
-    "freeInput1": [装備アイテム配列],
-    "freeInput2": [装備アイテム配列],
-    "freeInput3": [装備アイテム配列]
-  }
+**プリセット装備データ構造**（型安全版）:
+```typescript
+// src/data/equipments.ts
+interface EquipmentsData {
+  equipments: Record<EquipmentCategory, EquipmentItem[]>
 }
+
+export const equipmentsData: EquipmentsData = {
+  equipments: {
+    mainWeapon: [装備アイテム配列],
+    body: [装備アイテム配列],
+    additional: [装備アイテム配列],
+    special: [装備アイテム配列],
+    subWeapon: [装備アイテム配列],
+    fashion1: [装備アイテム配列],
+    fashion2: [装備アイテム配列],
+    fashion3: [装備アイテム配列],
+    freeInput1: [装備アイテム配列],
+    freeInput2: [装備アイテム配列],
+    freeInput3: [装備アイテム配列]
+  }
+} as const
 ```
 
 **LocalStorage保存時の装備データ構造**（拡張版）:

@@ -1,24 +1,40 @@
 # データ管理パターン
 
-## 初期化・プリセットデータコピー処理
+## 初期化・プリセットデータコピー処理（TypeScript版）
 ```typescript
-// プリセットデータの初期化処理
+// TypeScriptモジュールからプリセットデータをインポート
+import { equipmentsData } from '@/data/equipments'
+import { crystalsData } from '@/data/crystals'
+import { enemiesData } from '@/data/enemies'
+import { buffItemsData } from '@/data/buffItems'
+
+// プリセットデータの初期化処理（型安全版）
 async function initializePresetData(): Promise<void> {
-  // 装備プリセットデータのコピー
-  await copyPresetEquipmentsToLocalStorage()
+  // 装備プリセットデータのコピー（型安全）
+  await copyPresetEquipmentsToLocalStorage(equipmentsData)
   
-  // クリスタルプリセットデータのコピー
-  await copyPresetCrystalsToLocalStorage()
+  // クリスタルプリセットデータのコピー（型安全）
+  await copyPresetCrystalsToLocalStorage(crystalsData)
   
-  // 敵情報プリセットデータのコピー
-  await copyPresetEnemiesToLocalStorage()
+  // 敵情報プリセットデータのコピー（型安全）
+  await copyPresetEnemiesToLocalStorage(enemiesData)
+  
+  // バフアイテムプリセットデータのコピー（型安全）
+  await copyPresetBuffItemsToLocalStorage(buffItemsData)
 }
 
-// プリセットデータコピー関数
-async function copyPresetEquipmentsToLocalStorage(): Promise<void>
-async function copyPresetCrystalsToLocalStorage(): Promise<void>
-async function copyPresetEnemiesToLocalStorage(): Promise<void>
+// プリセットデータコピー関数（型安全版）
+async function copyPresetEquipmentsToLocalStorage(data: EquipmentsData): Promise<void>
+async function copyPresetCrystalsToLocalStorage(data: CrystalsData): Promise<void>
+async function copyPresetEnemiesToLocalStorage(data: EnemiesData): Promise<void>
+async function copyPresetBuffItemsToLocalStorage(data: BuffItemsData): Promise<void>
 ```
+
+**TypeScript移行の利点**:
+- コンパイル時の型チェックによるデータ整合性保証
+- プロパティ名の統一性強制（EquipmentProperties準拠）
+- インポート時の型安全性
+- エディタでの自動補完とエラー検出
 
 ## データアクセス層（統合済み）
 ```typescript

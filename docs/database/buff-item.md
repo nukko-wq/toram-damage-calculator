@@ -2,36 +2,47 @@
 
 ## ファイル構成・データフロー
 **初期データ配置**:
-- **プリセットデータ**: `src/data/buffItems.json`（静的ファイル）
+- **プリセットデータ**: `src/data/buffItems.ts`（TypeScript静的ファイル）
 
 **アプリ起動時の処理**:
 ```
-アプリ起動 → プリセットJSONを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
+アプリ起動 → プリセットTypeScriptモジュールを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
 ```
+
+**TypeScript移行の利点**:
+- EquipmentPropertiesインターフェースによる厳密な型チェック
+- エディタでの自動補完とIntelliSense
+- プロパティ名の統一性強制
+- コンパイル時エラー検出
 
 **ローカルストレージキー**:
 - **プリセットバフアイテム（コピー済み）**: LocalStorage (`preset_buff_items`)
 - **ユーザーカスタム不可**: システム提供アイテムのみ使用
 
-## JSON構造
+## TypeScriptデータ構造
 
-```json
-{
-  "buffItems": {
-    "physicalPower": [バフアイテム配列],
-    "magicalPower": [バフアイテム配列],
-    "physicalDefense": [バフアイテム配列],
-    "magicalDefense": [バフアイテム配列],
-    "elementalAttack": [バフアイテム配列],
-    "elementalDefense": [バフアイテム配列],
-    "speed": [バフアイテム配列],
-    "casting": [バフアイテム配列],
-    "mp": [バフアイテム配列],
-    "hp": [バフアイテム配列],
-    "accuracy": [バフアイテム配列],
-    "evasion": [バフアイテム配列]
-  }
+```typescript
+// src/data/buffItems.ts
+interface BuffItemsData {
+  buffItems: Record<BuffItemCategory, PresetBuffItem[]>
 }
+
+export const buffItemsData: BuffItemsData = {
+  buffItems: {
+    physicalPower: [バフアイテム配列],
+    magicalPower: [バフアイテム配列],
+    physicalDefense: [バフアイテム配列],
+    magicalDefense: [バフアイテム配列],
+    elementalAttack: [バフアイテム配列],
+    elementalDefense: [バフアイテム配列],
+    speed: [バフアイテム配列],
+    casting: [バフアイテム配列],
+    mp: [バフアイテム配列],
+    hp: [バフアイテム配列],
+    accuracy: [バフアイテム配列],
+    evasion: [バフアイテム配列]
+  }
+} as const
 ```
 
 ## バフアイテム構造

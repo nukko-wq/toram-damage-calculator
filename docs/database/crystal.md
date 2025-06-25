@@ -2,12 +2,18 @@
 
 ## ファイル構成・データフロー
 **初期データ配置**:
-- **プリセットデータ**: `src/data/crystals.json`（静的ファイル）
+- **プリセットデータ**: `src/data/crystals.ts`（TypeScript静的ファイル）
 
 **アプリ起動時の処理**:
 ```
-アプリ起動 → プリセットJSONを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
+アプリ起動 → プリセットTypeScriptモジュールを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
 ```
+
+**TypeScript移行の利点**:
+- EquipmentPropertiesインターフェースによる厳密な型チェック
+- CrystalTypeとPresetCrystalの型安全性保証
+- エディタでの自動補完とプロパティ検証
+- コンパイル時エラー検出によるデータ整合性確保
 
 **ローカルストレージキー**:
 - **プリセットクリスタル（コピー済み）**: LocalStorage (`preset_crystals`)
