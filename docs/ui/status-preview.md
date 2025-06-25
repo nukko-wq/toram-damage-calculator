@@ -69,6 +69,16 @@
 
 **計算詳細**: [ATK計算式設計書](../calculations/atk-calculation.md)を参照
 
+**ASPD計算仕様**:
+- **武器種別**: 選択された武器種に応じた計算式を適用
+- **ASPD計算式**: `INT((Lv + ステータスASPD + 武器種補正値) × (1 + ASPD%/100)) + ASPD固定値`
+- **ステータスASPD**: 武器種別に応じた計算式（例：片手剣 `STR × 0.2 + AGI × 4.2`、素手 `AGI × 9.6`）
+- **武器種補正値**: 武器種固有の基本ASPD値（例：片手剣 100、魔道具 900）
+- **データソース**: メイン武器の種別に基づいて計算式を自動選択
+- **対応武器種**: 全11種の武器種
+
+**計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#aspd（アタックスピード）計算)を参照
+
 **サブATK仕様（双剣専用）**:
 - **適用条件**: メイン武器種が「双剣」の場合のみ
 - **サブATK計算**: `INT(サブ基礎ATK × (1 + ATK%/100)) + ATK固定値`
@@ -236,7 +246,7 @@ interface CalculationResults {
     magicCriticalDamage: number         // 魔法クリティカルダメージ（暫定値）
     totalElementAdvantage: number       // 総属性有利（暫定値）
     elementAwakeningAdvantage: number   // 属性覚醒有利（暫定値）
-    ASPD: number                        // 攻撃速度（暫定値）
+    ASPD: number                        // 攻撃速度（武器種別計算結果）
     CSPD: number                        // 詠唱速度（暫定値）
     HIT: number                         // 命中（暫定値）
     FLEE: number                        // 回避（暫定値）
@@ -548,6 +558,8 @@ const baseStats = data.baseStats
 1. **補正値集計**: aggregateAllBonuses()
 2. **HP計算**: calculateHP()
 3. **MP計算**: calculateMP()
+4. **ATK計算**: calculateATK() - 武器種別対応
+5. **ASPD計算**: calculateASPD() - 武器種別対応（実装予定）
 
 ### 表示データ
 1. **基本ステータス**: 計算結果を含む全ステータス
@@ -590,6 +602,38 @@ const calculatedStats = useMemo(() => ({
 - 必要時のみ再計算実行
 - 中間結果の適切なキャッシュ
 - 大量データでの性能考慮
+
+### ASPD実装指針
+```typescript
+// ASPD計算関数の実装（予定）
+function calculateASPD(
+  stats: BaseStats,
+  weapon: { weaponType: WeaponTypeEnum },
+  adjustedStats: AdjustedStatsCalculation,
+  bonuses: AllBonuses
+): ASPDCalculationSteps {
+  // 1. 武器種別ステータスASPD計算
+  const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
+  const weaponType = WEAPON_TYPES[weaponTypeKey]
+  const statusASPD = weaponType.statusASPDFormula(adjustedStats)
+  
+  // 2. 武器種補正値取得
+  const weaponTypeCorrection = weaponType.aspdCorrection
+  
+  // 3. ASPD計算
+  const aspdBeforePercent = stats.level + statusASPD + weaponTypeCorrection
+  const aspdPercent = bonuses.ASPD_Rate || 0
+  const aspdAfterPercent = Math.floor(aspdBeforePercent * (1 + aspdPercent / 100))
+  const aspdFixed = bonuses.ASPD || 0
+  const finalASPD = aspdAfterPercent + aspdFixed
+  
+  return { statusASPD, weaponTypeCorrection, finalASPD, /* ... */ }
+}
+```
+
+**武器種設定への追加項目:**
+- `statusASPDFormula`: ステータスASPD計算関数
+- `aspdCorrection`: 武器種補正値
 
 ## インタラクション設計
 

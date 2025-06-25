@@ -388,11 +388,24 @@ export interface SubATKCalculationSteps {
 	subFinalATK: number // サブ最終ATK
 }
 
+export interface ASPDCalculationSteps {
+	level: number // キャラクターレベル
+	statusASPD: number // ステータスASPD（武器種別計算）
+	weaponTypeCorrection: number // 武器種補正値
+	aspdBeforePercent: number // ASPD%適用前
+	aspdPercent: number // ASPD%補正値
+	aspdAfterPercent: number // ASPD%適用後
+	aspdFixed: number // ASPD固定値
+	finalASPD: number // 最終ASPD
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
 	name: string
 	statusATKFormula: (baseStats: BaseStats) => number
+	statusASPDFormula: (adjustedStats: AdjustedStatsCalculation) => number
+	aspdCorrection: number
 }
 
 // 武器種別定義（英語キーと日本語名称）
@@ -401,56 +414,78 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		id: 'halberd',
 		name: '旋風槍',
 		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5,
+		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 3.5,
+		aspdCorrection: 25,
 	},
 	'1hsword': {
 		id: '1hsword',
 		name: '片手剣',
 		statusATKFormula: (stats) => stats.STR * 2.0 + stats.DEX * 2.0,
+		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 4.2,
+		aspdCorrection: 100,
 	},
 	'2hsword': {
 		id: '2hsword',
 		name: '両手剣',
 		statusATKFormula: (stats) => stats.STR * 3.0 + stats.DEX * 1.0,
+		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 2.1,
+		aspdCorrection: 50,
 	},
 	bow: {
 		id: 'bow',
 		name: '弓',
 		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 3.0,
+		statusASPDFormula: (stats) => stats.DEX * 0.2 + stats.AGI * 3.1,
+		aspdCorrection: 75,
 	},
 	bowgun: {
 		id: 'bowgun',
 		name: '自動弓',
 		statusATKFormula: (stats) => stats.DEX * 4.0,
+		statusASPDFormula: (stats) => stats.DEX * 0.2 + stats.AGI * 2.2,
+		aspdCorrection: 30,
 	},
 	staff: {
 		id: 'staff',
 		name: '杖',
 		statusATKFormula: (stats) => stats.STR * 3.0 + stats.INT * 1.0,
+		statusASPDFormula: (stats) => stats.AGI * 1.8 + stats.INT * 0.2,
+		aspdCorrection: 60,
 	},
 	'magic-device': {
 		id: 'magic-device',
 		name: '魔導具',
 		statusATKFormula: (stats) => stats.AGI * 2.0 + stats.INT * 2.0,
+		statusASPDFormula: (stats) => stats.AGI * 4.0 + stats.INT * 0.2,
+		aspdCorrection: 900,
 	},
 	knuckle: {
 		id: 'knuckle',
 		name: '手甲',
 		statusATKFormula: (stats) => stats.DEX * 0.5 + stats.AGI * 2.0,
+		statusASPDFormula: (stats) => stats.STR * 0.1 + stats.DEX * 0.1 + stats.AGI * 4.6,
+		aspdCorrection: 120,
 	},
 	katana: {
 		id: 'katana',
 		name: '抜刀剣',
 		statusATKFormula: (stats) => stats.STR * 1.5 + stats.DEX * 2.5,
+		statusASPDFormula: (stats) => stats.STR * 0.3 + stats.AGI * 3.9,
+		aspdCorrection: 200,
 	},
 	'dual-sword': {
 		id: 'dual-sword',
 		name: '双剣',
 		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 2.0 + stats.AGI * 1.0,
+		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 4.2,
+		aspdCorrection: 100,
 	},
 	barehand: {
 		id: 'barehand',
 		name: '素手',
 		statusATKFormula: (stats) => stats.STR * 1.0,
+		statusASPDFormula: (stats) => stats.AGI * 9.6,
+		aspdCorrection: 1000,
 	},
 }
 
@@ -752,5 +787,48 @@ export function calculateSubATK(
 		subATKBeforePercent,
 		subATKAfterPercent,
 		subFinalATK,
+	}
+}
+
+/**
+ * ASPD計算（武器種別対応）
+ * ASPD = INT((Lv + ステータスASPD + 武器種補正値) × (1 + ASPD%/100)) + ASPD固定値
+ */
+export function calculateASPD(
+	stats: BaseStats,
+	weapon: { weaponType: WeaponTypeEnum },
+	adjustedStats: AdjustedStatsCalculation,
+	bonuses: AllBonuses = {},
+): ASPDCalculationSteps {
+	// 1. 武器種別ステータスASPD計算
+	const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
+	const weaponType = WEAPON_TYPES[weaponTypeKey] || WEAPON_TYPES.halberd
+	const statusASPD = weaponType.statusASPDFormula(adjustedStats)
+
+	// 2. 武器種補正値取得
+	const weaponTypeCorrection = weaponType.aspdCorrection
+
+	// 3. ASPD%適用前の値計算
+	const aspdBeforePercent = stats.level + statusASPD + weaponTypeCorrection
+
+	// 4. ASPD%補正適用
+	const aspdPercent = bonuses.ASPD_Rate || 0
+	const aspdAfterPercent = Math.floor(
+		aspdBeforePercent * (1 + aspdPercent / 100),
+	)
+
+	// 5. ASPD固定値加算
+	const aspdFixed = bonuses.ASPD || 0
+	const finalASPD = aspdAfterPercent + aspdFixed
+
+	return {
+		level: stats.level,
+		statusASPD,
+		weaponTypeCorrection,
+		aspdBeforePercent,
+		aspdPercent,
+		aspdAfterPercent,
+		aspdFixed,
+		finalASPD,
 	}
 }

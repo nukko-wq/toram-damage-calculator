@@ -5,6 +5,7 @@ import {
 	calculateMP,
 	calculateATK,
 	calculateSubATK,
+	calculateASPD,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -93,6 +94,12 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation,
 				allBonuses,
 			),
+			aspdCalculation: calculateASPD(
+				baseStats,
+				data.mainWeapon,
+				adjustedStatsCalculation,
+				allBonuses,
+			),
 			adjustedStatsCalculation,
 		}
 	}, [
@@ -111,6 +118,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		mpCalculation,
 		atkCalculation,
 		subATKCalculation,
+		aspdCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
@@ -147,7 +155,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
 		totalElementAdvantage: 0, // TODO: 総属性有利
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
-		ASPD: 0, // TODO: 攻撃速度計算
+		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
 		CSPD: 0, // TODO: 詠唱速度計算
 		HIT: 0, // TODO: 命中計算
 		FLEE: 0, // TODO: 回避計算
