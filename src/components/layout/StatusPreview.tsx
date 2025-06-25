@@ -110,7 +110,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				equipment_plus: Math.max(0, equipmentBonuses.Aggro || 0),
 				equipment_plus_rate: Math.max(0, equipmentBonuses.Aggro_Rate || 0),
 				equipment_minus: Math.abs(Math.min(0, equipmentBonuses.Aggro || 0)),
-				equipment_minus_rate: Math.abs(Math.min(0, equipmentBonuses.Aggro_Rate || 0)),
+				equipment_minus_rate: Math.abs(
+					Math.min(0, equipmentBonuses.Aggro_Rate || 0),
+				),
 				total_plus: Math.max(0, allBonuses.Aggro || 0),
 				total_plus_rate: Math.max(0, allBonuses.Aggro_Rate || 0),
 				total_minus: Math.abs(Math.min(0, allBonuses.Aggro || 0)),
@@ -186,8 +188,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					equipment_rate: equipmentBonuses.NeutralResistance_Rate || 0,
 					total: allBonuses.NeutralResistance_Rate || 0,
 					total_rate: allBonuses.NeutralResistance_Rate || 0,
-				}
-			}
+				},
+			},
 		})
 
 		const adjustedStatsCalculation = calculateAdjustedStats(
@@ -262,10 +264,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		aggroPlus_Rate: equipmentBonus1.aggroPlus_Rate,
 		aggroMinus: equipmentBonus1.aggroMinus,
 		aggroMinus_Rate: equipmentBonus1.aggroMinus_Rate,
-		relevantKeys: Object.keys(equipmentBonus1).filter(key => 
-			key.includes('Resistance') || key.includes('resistance') || 
-			key.includes('attackMP') || key.includes('aggro')
-		)
+		relevantKeys: Object.keys(equipmentBonus1).filter(
+			(key) =>
+				key.includes('Resistance') ||
+				key.includes('resistance') ||
+				key.includes('attackMP') ||
+				key.includes('aggro'),
+		),
 	})
 
 	// デバッグ: equipmentBonus3の全プロパティを確認
@@ -282,13 +287,19 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		absoluteDodge_Rate: equipmentBonus3.absoluteDodge_Rate,
 		itemCooldown: equipmentBonus3.itemCooldown,
 		allKeys: Object.keys(equipmentBonus3),
-		specialKeys: Object.keys(equipmentBonus3).filter(key => 
-			key.includes('natural') || key.includes('Natural') || 
-			key.includes('revival') || key.includes('Revival') ||
-			key.includes('absolute') || key.includes('Absolute') ||
-			key.includes('item') || key.includes('Item') ||
-			key.includes('tool') || key.includes('Tool')
-		)
+		specialKeys: Object.keys(equipmentBonus3).filter(
+			(key) =>
+				key.includes('natural') ||
+				key.includes('Natural') ||
+				key.includes('revival') ||
+				key.includes('Revival') ||
+				key.includes('absolute') ||
+				key.includes('Absolute') ||
+				key.includes('item') ||
+				key.includes('Item') ||
+				key.includes('tool') ||
+				key.includes('Tool'),
+		),
 	})
 
 	// デバッグ: equipmentBonus2の属性耐性を確認
@@ -308,9 +319,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		neutralResistance: equipmentBonus2.neutralResistance,
 		neutralResistance_Rate: equipmentBonus2.neutralResistance_Rate,
 		allKeys: Object.keys(equipmentBonus2),
-		resistanceKeys: Object.keys(equipmentBonus2).filter(key => 
-			key.includes('Resistance') || key.includes('resistance')
-		)
+		resistanceKeys: Object.keys(equipmentBonus2).filter(
+			(key) => key.includes('Resistance') || key.includes('resistance'),
+		),
 	})
 
 	if (!isVisible) {
@@ -373,9 +384,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	return (
 		<div className=" border-b border-blue-200 transition-all duration-300 ease-in-out">
-			<div className="flex flex-col items-center px-4 py-2">
+			<div className="flex flex-col items-center px-4 pt-2">
 				{/* セクション表示切り替えボタン */}
-				<div className="mb-4 flex flex-wrap gap-2">
+				<div className="mb-3 flex flex-wrap gap-2">
 					<button
 						type="button"
 						onClick={() => toggleSection('basicStats')}
