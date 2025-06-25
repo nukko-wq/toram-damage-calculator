@@ -404,6 +404,16 @@ export interface MotionSpeedCalculationSteps {
 	finalMotionSpeed: number // 最終行動速度（上限50%制限適用）
 }
 
+// クリティカル率計算の詳細ステップ
+export interface CriticalRateCalculationSteps {
+	crt: number // ステータスのCRT
+	crtBaseCriticalRate: number // CRT基礎クリティカル率 = INT(25 + CRT/3.4)
+	criticalRatePercent: number // クリティカル率%補正
+	criticalRateAfterPercent: number // クリティカル率%適用後 = INT(基礎 × (1 + %/100))
+	criticalRateFixed: number // クリティカル率固定値補正
+	finalCriticalRate: number // 最終クリティカル率
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -886,5 +896,36 @@ export function calculateMotionSpeed(
 		motionSpeedPercent,
 		motionSpeedAfterPercent,
 		finalMotionSpeed,
+	}
+}
+
+/**
+ * クリティカル率計算
+ * クリティカル率(%) = INT(INT(25+CRT/3.4)×(1+クリティカル率%/100))+クリティカル率固定値
+ */
+export function calculateCriticalRate(
+	crt: number,
+	bonuses: AllBonuses = {},
+): CriticalRateCalculationSteps {
+	// 1. CRT基礎クリティカル率計算
+	const crtBaseCriticalRate = Math.floor(25 + crt / 3.4)
+	
+	// 2. クリティカル率%補正適用
+	const criticalRatePercent = bonuses.Critical_Rate || 0
+	const criticalRateAfterPercent = Math.floor(
+		crtBaseCriticalRate * (1 + criticalRatePercent / 100),
+	)
+	
+	// 3. クリティカル率固定値加算
+	const criticalRateFixed = bonuses.Critical || 0
+	const finalCriticalRate = criticalRateAfterPercent + criticalRateFixed
+	
+	return {
+		crt,
+		crtBaseCriticalRate,
+		criticalRatePercent,
+		criticalRateAfterPercent,
+		criticalRateFixed,
+		finalCriticalRate,
 	}
 }

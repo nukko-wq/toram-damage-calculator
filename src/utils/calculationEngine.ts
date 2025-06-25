@@ -8,6 +8,7 @@ import {
 	calculateMotionSpeed,
 	calculateAilmentResistance,
 	calculateATK,
+	calculateCriticalRate,
 	aggregateAllBonuses,
 	type AllBonuses,
 } from './basicStatsCalculation'
@@ -43,6 +44,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 7. 異常耐性計算
 	const ailmentResistance = calculateAilmentResistance(data.baseStats, dummyBonuses)
 
+	// 8. クリティカル率計算
+	const criticalRateCalculation = calculateCriticalRate(data.baseStats.CRT, dummyBonuses)
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -55,7 +59,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			baseMATK: 0, // 暫定
 			stabilityRate: data.mainWeapon.stability,
 			subStabilityRate: data.subWeapon.stability,
-			criticalRate: 0, // 暫定
+			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: 0, // 暫定
 			magicCriticalRate: 0, // 暫定
 			magicCriticalDamage: 0, // 暫定

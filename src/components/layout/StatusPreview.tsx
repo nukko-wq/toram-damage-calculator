@@ -7,6 +7,7 @@ import {
 	calculateSubATK,
 	calculateASPD,
 	calculateMotionSpeed,
+	calculateCriticalRate,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -231,6 +232,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				).finalASPD
 				return calculateMotionSpeed(aspd, allBonuses)
 			})(),
+			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonuses),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -255,6 +257,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		subATKCalculation,
 		aspdCalculation,
 		motionSpeedCalculation,
+		criticalRateCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -360,7 +363,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		baseMATK: 0, // TODO: 基本MATK計算
 		stabilityRate: data.mainWeapon.stability, // メイン武器安定率
 		subStabilityRate: data.subWeapon.stability, // サブ武器安定率
-		criticalRate: 0, // TODO: クリティカル率計算
+		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
 		criticalDamage: 150, // TODO: クリティカルダメージ計算
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
 		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
