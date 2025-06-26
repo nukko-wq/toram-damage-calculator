@@ -18,6 +18,7 @@ export default function FloatingMenuButton({
 			type="button"
 			onClick={onClick}
 			className={`
+				cursor-pointer
 				fixed bottom-4 right-4 z-[9999]
 				w-14 h-14 rounded-full
 				bg-blue-600 hover:bg-blue-700 active:bg-blue-800

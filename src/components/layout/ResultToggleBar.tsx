@@ -33,7 +33,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					<button
 						type="button"
 						onClick={toggleDamagePreview}
-						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
 							showDamagePreview
 								? 'bg-blue-300 text-white'
 								: 'bg-blue-300 text-white'
@@ -63,7 +63,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					<button
 						type="button"
 						onClick={toggleStatusPreview}
-						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
 							showStatusPreview
 								? 'bg-blue-300 text-white'
 								: 'bg-blue-300 text-white'

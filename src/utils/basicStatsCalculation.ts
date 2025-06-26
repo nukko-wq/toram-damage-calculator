@@ -425,6 +425,48 @@ export interface HITCalculationSteps {
 	finalHIT: number // 最終HIT
 }
 
+// 物理耐性計算の詳細ステップ
+export interface PhysicalResistanceCalculationSteps {
+	physicalResistanceRate: number // 物理耐性%補正（4データソース統合済み）
+	finalPhysicalResistance: number // 最終物理耐性%
+}
+
+// 魔法耐性計算の詳細ステップ
+export interface MagicalResistanceCalculationSteps {
+	magicalResistanceRate: number // 魔法耐性%補正（4データソース統合済み）
+	finalMagicalResistance: number // 最終魔法耐性%
+}
+
+// 防御崩し計算の詳細ステップ
+export interface ArmorBreakCalculationSteps {
+	armorBreakRate: number // 防御崩し%補正（3データソース統合済み）
+	finalArmorBreak: number // 最終防御崩し%
+}
+
+// 先読み計算の詳細ステップ
+export interface AnticipateCalculationSteps {
+	anticipateRate: number // 先読み%補正（3データソース統合済み）
+	finalAnticipate: number // 最終先読み%
+}
+
+// CSPD（詠唱速度）計算の詳細ステップ
+export interface CSPDCalculationSteps {
+	level: number // キャラクターレベル
+	adjustedDEX: number // 補正後DEX
+	adjustedAGI: number // 補正後AGI
+	baseCSPD: number // ベースCSPD = INT(Lv + 補正後DEX × 2.94 + 補正後AGI × 1.16)
+	cspd_Rate: number // CSPD%補正
+	cspdAfterPercent: number // CSPD%適用後 = INT(ベースCSPD × (1 + CSPD%/100))
+	cspdFixed: number // CSPD固定値補正
+	finalCSPD: number // 最終CSPD
+}
+
+// 総属性有利計算の詳細ステップ
+export interface TotalElementAdvantageCalculationSteps {
+	elementAdvantageRate: number // 属性有利%補正（4データソース統合済み）
+	finalTotalElementAdvantage: number // 最終総属性有利%
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -971,5 +1013,126 @@ export function calculateHIT(
 		hitAfterPercent,
 		accuracyFixed,
 		finalHIT,
+	}
+}
+
+/**
+ * 物理耐性計算
+ * 物理耐性(%) = 装備/プロパティ物理耐性% + クリスタ物理耐性% + 料理物理耐性% + バフアイテム物理耐性%
+ */
+export function calculatePhysicalResistance(
+	bonuses: AllBonuses = {},
+): PhysicalResistanceCalculationSteps {
+	// 物理耐性%の合計値（4つのデータソースから統合済み）
+	const physicalResistanceRate = bonuses.PhysicalResistance_Rate || 0
+	
+	return {
+		physicalResistanceRate,
+		finalPhysicalResistance: physicalResistanceRate,
+	}
+}
+
+/**
+ * 魔法耐性計算
+ * 魔法耐性(%) = 装備/プロパティ魔法耐性% + クリスタ魔法耐性% + 料理魔法耐性% + バフアイテム魔法耐性%
+ */
+export function calculateMagicalResistance(
+	bonuses: AllBonuses = {},
+): MagicalResistanceCalculationSteps {
+	// 魔法耐性%の合計値（4つのデータソースから統合済み）
+	const magicalResistanceRate = bonuses.MagicalResistance_Rate || 0
+	
+	return {
+		magicalResistanceRate,
+		finalMagicalResistance: magicalResistanceRate,
+	}
+}
+
+/**
+ * 防御崩し計算
+ * 防御崩し(%) = 装備/プロパティ防御崩し% + クリスタ防御崩し% + バフアイテム防御崩し%
+ */
+export function calculateArmorBreak(
+	bonuses: AllBonuses = {},
+): ArmorBreakCalculationSteps {
+	// 防御崩し%の合計値（3つのデータソースから統合済み、料理除外）
+	const armorBreakRate = bonuses.ArmorBreak_Rate || 0
+	
+	return {
+		armorBreakRate,
+		finalArmorBreak: armorBreakRate,
+	}
+}
+
+/**
+ * 先読み計算
+ * 先読み(%) = 装備/プロパティ先読み% + クリスタ先読み% + バフアイテム先読み%
+ */
+export function calculateAnticipate(
+	bonuses: AllBonuses = {},
+): AnticipateCalculationSteps {
+	// 先読み%の合計値（3つのデータソースから統合済み、料理除外）
+	const anticipateRate = bonuses.Anticipate_Rate || 0
+	
+	return {
+		anticipateRate,
+		finalAnticipate: anticipateRate,
+	}
+}
+
+/**
+ * CSPD（詠唱速度）計算
+ * CSPD = INT((INT(Lv+補正後DEX×2.94+補正後AGI×1.16))×(1+CSPD%/100))+CSPD固定値
+ */
+export function calculateCSPD(
+	level: number,
+	adjustedDEX: number,
+	adjustedAGI: number,
+	bonuses: AllBonuses = {},
+): CSPDCalculationSteps {
+	// 1. ベースCSPD計算
+	const baseCSPD = Math.floor(level + adjustedDEX * 2.94 + adjustedAGI * 1.16)
+	
+	// 2. CSPD%補正適用
+	const cspd_Rate = bonuses.CastingSpeed_Rate || 0
+	const cspdAfterPercent = Math.floor(baseCSPD * (1 + cspd_Rate / 100))
+	
+	// 3. CSPD固定値加算
+	const cspdFixed = bonuses.CastingSpeed || 0
+	const finalCSPD = cspdAfterPercent + cspdFixed
+	
+	return {
+		level,
+		adjustedDEX,
+		adjustedAGI,
+		baseCSPD,
+		cspd_Rate,
+		cspdAfterPercent,
+		cspdFixed,
+		finalCSPD,
+	}
+}
+
+/**
+ * 総属性有利計算
+ *
+ * 装備/プロパティ、クリスタ、料理、バフアイテムからの属性有利%補正を統合
+ * 全ての属性攻撃に対して共通で適用される汎用的な属性有利補正
+ *
+ * @param bonuses 全補正値（4データソース統合済み）
+ * @returns 総属性有利計算の詳細ステップ
+ */
+export function calculateTotalElementAdvantage(
+	bonuses: AllBonuses = {},
+): TotalElementAdvantageCalculationSteps {
+	// 属性有利%補正を取得（4データソース統合済み）
+	const elementAdvantageRate = bonuses.ElementAdvantage_Rate || 0
+	
+	// 総属性有利は単純な%補正のみ（固定値補正は存在しない）
+	const finalTotalElementAdvantage = elementAdvantageRate
+	
+	return {
+		elementAdvantageRate,
+		finalTotalElementAdvantage,
 	}
 }

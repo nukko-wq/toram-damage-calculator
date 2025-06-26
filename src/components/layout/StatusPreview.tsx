@@ -9,6 +9,12 @@ import {
 	calculateMotionSpeed,
 	calculateCriticalRate,
 	calculateHIT,
+	calculatePhysicalResistance,
+	calculateMagicalResistance,
+	calculateArmorBreak,
+	calculateAnticipate,
+	calculateCSPD,
+	calculateTotalElementAdvantage,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -239,6 +245,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.DEX,
 				allBonuses,
 			),
+			physicalResistanceCalculation: calculatePhysicalResistance(allBonuses),
+			magicalResistanceCalculation: calculateMagicalResistance(allBonuses),
+			armorBreakCalculation: calculateArmorBreak(allBonuses),
+			anticipateCalculation: calculateAnticipate(allBonuses),
+			cspdCalculation: calculateCSPD(
+				baseStats.level,
+				adjustedStatsCalculation.DEX,
+				adjustedStatsCalculation.AGI,
+				allBonuses,
+			),
+			totalElementAdvantageCalculation: calculateTotalElementAdvantage(allBonuses),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -265,6 +282,12 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		motionSpeedCalculation,
 		criticalRateCalculation,
 		hitCalculation,
+		physicalResistanceCalculation,
+		magicalResistanceCalculation,
+		armorBreakCalculation,
+		anticipateCalculation,
+		cspdCalculation,
+		totalElementAdvantageCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -374,18 +397,18 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		criticalDamage: 150, // TODO: クリティカルダメージ計算
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
 		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
-		totalElementAdvantage: 0, // TODO: 総属性有利
+		totalElementAdvantage: totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
-		CSPD: 0, // TODO: 詠唱速度計算
+		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果
 		HIT: hitCalculation.finalHIT, // HIT計算結果
 		FLEE: 0, // TODO: 回避計算
-		physicalResistance: 0, // TODO: 物理耐性
-		magicalResistance: 0, // TODO: 魔法耐性
+		physicalResistance: physicalResistanceCalculation.finalPhysicalResistance, // 物理耐性計算結果
+		magicalResistance: magicalResistanceCalculation.finalMagicalResistance, // 魔法耐性計算結果
 		ailmentResistance: ailmentResistanceCalculation, // 異常耐性計算結果
 		motionSpeed: motionSpeedCalculation.finalMotionSpeed, // 行動速度計算結果
-		armorBreak: 0, // TODO: 防御崩し
-		anticipate: 0, // TODO: 先読み
+		armorBreak: armorBreakCalculation.finalArmorBreak, // 防御崩し計算結果
+		anticipate: anticipateCalculation.finalAnticipate, // 先読み計算結果
 	}
 
 	// 補正後ステータス (8項目) - 正確な計算結果を使用
@@ -411,7 +434,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('basicStats')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.basicStats
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -422,7 +445,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('adjustedStats')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.adjustedStats
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -433,7 +456,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus1')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.equipmentBonus1
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -444,7 +467,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus2')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.equipmentBonus2
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -455,7 +478,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus3')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.equipmentBonus3
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'

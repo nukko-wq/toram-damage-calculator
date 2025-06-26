@@ -125,7 +125,9 @@ export default function SaveDataItem({
 					/>
 				) : (
 					<div>
-						<div className={`text-sm font-medium truncate ${isActive ? 'text-blue-900' : 'text-gray-900'}`}>
+						<div
+							className={`text-sm font-medium truncate ${isActive ? 'text-blue-900' : 'text-gray-900'}`}
+						>
 							{saveData.name}
 						</div>
 						<div className="text-xs text-gray-500">
@@ -142,7 +144,7 @@ export default function SaveDataItem({
 						<button
 							type="button"
 							onClick={() => onSelect(saveData.id)}
-							className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded transition-colors duration-150"
+							className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded transition-colors duration-150 cursor-pointer"
 							title="このデータに切り替え"
 						>
 							<svg
@@ -166,7 +168,7 @@ export default function SaveDataItem({
 							<button
 								type="button"
 								onClick={handleStartEdit}
-								className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded transition-colors duration-150"
+								className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded transition-colors duration-150 cursor-pointer"
 								title="名前を変更"
 							>
 								<svg
@@ -187,7 +189,7 @@ export default function SaveDataItem({
 							<button
 								type="button"
 								onClick={handleDelete}
-								className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors duration-150"
+								className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors duration-150 cursor-pointer"
 								title="削除"
 							>
 								<svg

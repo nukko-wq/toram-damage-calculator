@@ -10,6 +10,12 @@ import {
 	calculateATK,
 	calculateCriticalRate,
 	calculateHIT,
+	calculatePhysicalResistance,
+	calculateMagicalResistance,
+	calculateArmorBreak,
+	calculateAnticipate,
+	calculateCSPD,
+	calculateTotalElementAdvantage,
 	aggregateAllBonuses,
 	type AllBonuses,
 } from './basicStatsCalculation'
@@ -51,6 +57,24 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 9. HIT計算
 	const hitCalculation = calculateHIT(data.baseStats.level, adjustedStats.DEX, dummyBonuses)
 
+	// 10. 物理耐性計算
+	const physicalResistanceCalculation = calculatePhysicalResistance(dummyBonuses)
+
+	// 11. 魔法耐性計算
+	const magicalResistanceCalculation = calculateMagicalResistance(dummyBonuses)
+
+	// 12. 防御崩し計算
+	const armorBreakCalculation = calculateArmorBreak(dummyBonuses)
+
+	// 13. 先読み計算
+	const anticipateCalculation = calculateAnticipate(dummyBonuses)
+
+	// 14. CSPD計算
+	const cspdCalculation = calculateCSPD(data.baseStats.level, adjustedStats.DEX, adjustedStats.AGI, dummyBonuses)
+
+	// 15. 総属性有利計算
+	const totalElementAdvantageCalculation = calculateTotalElementAdvantage(dummyBonuses)
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -67,18 +91,18 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			criticalDamage: 0, // 暫定
 			magicCriticalRate: 0, // 暫定
 			magicCriticalDamage: 0, // 暫定
-			totalElementAdvantage: 0, // 暫定
+			totalElementAdvantage: totalElementAdvantageCalculation.finalTotalElementAdvantage,
 			elementAwakeningAdvantage: 0, // 暫定
 			ASPD: aspdCalculation.finalASPD,
-			CSPD: 0, // 暫定
+			CSPD: cspdCalculation.finalCSPD,
 			HIT: hitCalculation.finalHIT,
 			FLEE: 0, // 暫定
-			physicalResistance: 0, // 暫定
-			magicalResistance: 0, // 暫定
+			physicalResistance: physicalResistanceCalculation.finalPhysicalResistance,
+			magicalResistance: magicalResistanceCalculation.finalMagicalResistance,
 			ailmentResistance,
 			motionSpeed: motionSpeedCalculation.finalMotionSpeed,
-			armorBreak: 0, // 暫定
-			anticipate: 0, // 暫定
+			armorBreak: armorBreakCalculation.finalArmorBreak,
+			anticipate: anticipateCalculation.finalAnticipate,
 		},
 
 		adjustedStats,
