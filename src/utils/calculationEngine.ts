@@ -12,6 +12,8 @@ import {
 	calculateHIT,
 	calculatePhysicalResistance,
 	calculateMagicalResistance,
+	calculateArmorBreak,
+	calculateAnticipate,
 	aggregateAllBonuses,
 	type AllBonuses,
 } from './basicStatsCalculation'
@@ -59,6 +61,12 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 11. 魔法耐性計算
 	const magicalResistanceCalculation = calculateMagicalResistance(dummyBonuses)
 
+	// 12. 防御崩し計算
+	const armorBreakCalculation = calculateArmorBreak(dummyBonuses)
+
+	// 13. 先読み計算
+	const anticipateCalculation = calculateAnticipate(dummyBonuses)
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -85,8 +93,8 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			magicalResistance: magicalResistanceCalculation.finalMagicalResistance,
 			ailmentResistance,
 			motionSpeed: motionSpeedCalculation.finalMotionSpeed,
-			armorBreak: 0, // 暫定
-			anticipate: 0, // 暫定
+			armorBreak: armorBreakCalculation.finalArmorBreak,
+			anticipate: anticipateCalculation.finalAnticipate,
 		},
 
 		adjustedStats,

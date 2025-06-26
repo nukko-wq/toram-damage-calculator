@@ -11,6 +11,8 @@ import {
 	calculateHIT,
 	calculatePhysicalResistance,
 	calculateMagicalResistance,
+	calculateArmorBreak,
+	calculateAnticipate,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -243,6 +245,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			physicalResistanceCalculation: calculatePhysicalResistance(allBonuses),
 			magicalResistanceCalculation: calculateMagicalResistance(allBonuses),
+			armorBreakCalculation: calculateArmorBreak(allBonuses),
+			anticipateCalculation: calculateAnticipate(allBonuses),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -271,6 +275,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		hitCalculation,
 		physicalResistanceCalculation,
 		magicalResistanceCalculation,
+		armorBreakCalculation,
+		anticipateCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -390,8 +396,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		magicalResistance: magicalResistanceCalculation.finalMagicalResistance, // 魔法耐性計算結果
 		ailmentResistance: ailmentResistanceCalculation, // 異常耐性計算結果
 		motionSpeed: motionSpeedCalculation.finalMotionSpeed, // 行動速度計算結果
-		armorBreak: 0, // TODO: 防御崩し
-		anticipate: 0, // TODO: 先読み
+		armorBreak: armorBreakCalculation.finalArmorBreak, // 防御崩し計算結果
+		anticipate: anticipateCalculation.finalAnticipate, // 先読み計算結果
 	}
 
 	// 補正後ステータス (8項目) - 正確な計算結果を使用

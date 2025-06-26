@@ -437,6 +437,18 @@ export interface MagicalResistanceCalculationSteps {
 	finalMagicalResistance: number // 最終魔法耐性%
 }
 
+// 防御崩し計算の詳細ステップ
+export interface ArmorBreakCalculationSteps {
+	armorBreakRate: number // 防御崩し%補正（3データソース統合済み）
+	finalArmorBreak: number // 最終防御崩し%
+}
+
+// 先読み計算の詳細ステップ
+export interface AnticipateCalculationSteps {
+	anticipateRate: number // 先読み%補正（3データソース統合済み）
+	finalAnticipate: number // 最終先読み%
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -1015,5 +1027,37 @@ export function calculateMagicalResistance(
 	return {
 		magicalResistanceRate,
 		finalMagicalResistance: magicalResistanceRate,
+	}
+}
+
+/**
+ * 防御崩し計算
+ * 防御崩し(%) = 装備/プロパティ防御崩し% + クリスタ防御崩し% + バフアイテム防御崩し%
+ */
+export function calculateArmorBreak(
+	bonuses: AllBonuses = {},
+): ArmorBreakCalculationSteps {
+	// 防御崩し%の合計値（3つのデータソースから統合済み、料理除外）
+	const armorBreakRate = bonuses.ArmorBreak_Rate || 0
+	
+	return {
+		armorBreakRate,
+		finalArmorBreak: armorBreakRate,
+	}
+}
+
+/**
+ * 先読み計算
+ * 先読み(%) = 装備/プロパティ先読み% + クリスタ先読み% + バフアイテム先読み%
+ */
+export function calculateAnticipate(
+	bonuses: AllBonuses = {},
+): AnticipateCalculationSteps {
+	// 先読み%の合計値（3つのデータソースから統合済み、料理除外）
+	const anticipateRate = bonuses.Anticipate_Rate || 0
+	
+	return {
+		anticipateRate,
+		finalAnticipate: anticipateRate,
 	}
 }
