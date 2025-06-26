@@ -698,7 +698,7 @@ export default function EquipmentForm({
 			value: string,
 		) => void,
 	) => (
-		<div className="flex overflow-x-scroll w-full max-w-[86vw] sm:max-w-[90vw] md:max-w-[95vw] flex-nowrap">
+		<div className="flex overflow-x-scroll w-full max-w-[82vw] sm:max-w-[95vw] flex-nowrap">
 			{propertyGroups.map((group) => (
 				<div
 					key={group.title}
@@ -866,7 +866,7 @@ export default function EquipmentForm({
 	)
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-6 md:col-start-1 md:col-end-9 md:row-start-2 md:row-end-3 lg:col-start-3 lg:col-end-4 lg:row-start-1 lg:row-end-4">
+		<section className="bg-white rounded-lg shadow-md p-6 md:col-start-1 md:col-end-9 md:row-start-2 md:row-end-3 xl:col-start-3 xl:col-end-4 xl:row-start-1 xl:row-end-4">
 			<h2 className="text-xl font-bold text-gray-800 mb-4">装備/プロパティ</h2>
 
 			{/* タブヘッダー */}

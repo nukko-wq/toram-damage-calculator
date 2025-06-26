@@ -106,15 +106,15 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 			// 「なし」以外が選択された場合は自動的に10に設定
 			setValue(`${slotName}.level`, 10, { shouldValidate: true })
 		}
-		
+
 		// 即座にストアを更新
 		const currentValues = watch()
 		const updatedValues = {
 			...currentValues,
 			[slotName]: {
 				selectedFood: newFood,
-				level: newFood === 'none' ? 0 : 10
-			}
+				level: newFood === 'none' ? 0 : 10,
+			},
 		}
 		updateFood(updatedValues as FoodFormData)
 	}
@@ -192,7 +192,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 	}
 
 	return (
-		<div className="rounded-lg border border-gray-200 bg-white p-4 md:col-start-1 md:col-end-5 md:row-start-4 md:row-end-5 lg:col-start-1 lg:col-end-2 lg:row-start-5 lg:row-end-6">
+		<div className="rounded-lg border border-gray-200 bg-white p-4 md:col-start-1 md:col-end-5 md:row-start-4 md:row-end-5 xl:col-start-1 xl:col-end-2 xl:row-start-5 xl:row-end-6">
 			<h3 className="mb-3 text-base font-semibold text-gray-900">料理設定</h3>
 			<div className="space-y-2">
 				<FoodSlot slotName="slot1" slotLabel="1つ目" />

@@ -8,6 +8,7 @@ import {
 	calculateASPD,
 	calculateMotionSpeed,
 	calculateCriticalRate,
+	calculateHIT,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -233,6 +234,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				return calculateMotionSpeed(aspd, allBonuses)
 			})(),
 			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonuses),
+			hitCalculation: calculateHIT(
+				baseStats.level,
+				adjustedStatsCalculation.DEX,
+				allBonuses,
+			),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -258,6 +264,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		aspdCalculation,
 		motionSpeedCalculation,
 		criticalRateCalculation,
+		hitCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -371,7 +378,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
 		CSPD: 0, // TODO: 詠唱速度計算
-		HIT: 0, // TODO: 命中計算
+		HIT: hitCalculation.finalHIT, // HIT計算結果
 		FLEE: 0, // TODO: 回避計算
 		physicalResistance: 0, // TODO: 物理耐性
 		magicalResistance: 0, // TODO: 魔法耐性
@@ -404,7 +411,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('basicStats')}
-						className={`px-3 py-1 text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
 							visibleSections.basicStats
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -415,7 +422,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('adjustedStats')}
-						className={`px-3 py-1 text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
 							visibleSections.adjustedStats
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -426,7 +433,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus1')}
-						className={`px-3 py-1 text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
 							visibleSections.equipmentBonus1
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -437,7 +444,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus2')}
-						className={`px-3 py-1 text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
 							visibleSections.equipmentBonus2
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -448,7 +455,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus3')}
-						className={`px-3 py-1 text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
 							visibleSections.equipmentBonus3
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'

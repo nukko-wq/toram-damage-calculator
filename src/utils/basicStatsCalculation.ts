@@ -414,6 +414,17 @@ export interface CriticalRateCalculationSteps {
 	finalCriticalRate: number // 最終クリティカル率
 }
 
+// HIT計算の詳細ステップ
+export interface HITCalculationSteps {
+	level: number // ステータスのレベル
+	adjustedDEX: number // 補正後DEX
+	baseHIT: number // レベル + 補正後DEX
+	accuracyPercent: number // 命中%補正
+	hitAfterPercent: number // 命中%適用後 = INT(baseHIT × (1 + 命中%/100))
+	accuracyFixed: number // 命中固定値補正
+	finalHIT: number // 最終HIT
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -927,5 +938,38 @@ export function calculateCriticalRate(
 		criticalRateAfterPercent,
 		criticalRateFixed,
 		finalCriticalRate,
+	}
+}
+
+/**
+ * HIT計算
+ * HIT = INT((Lv+総DEX)×(1+命中%/100))+命中固定値
+ */
+export function calculateHIT(
+	level: number,
+	adjustedDEX: number,
+	bonuses: AllBonuses = {},
+): HITCalculationSteps {
+	// 1. ベースHIT計算（レベル + 補正後DEX）
+	const baseHIT = level + adjustedDEX
+	
+	// 2. 命中%補正適用
+	const accuracyPercent = bonuses.Accuracy_Rate || 0
+	const hitAfterPercent = Math.floor(
+		baseHIT * (1 + accuracyPercent / 100),
+	)
+	
+	// 3. 命中固定値加算
+	const accuracyFixed = bonuses.Accuracy || 0
+	const finalHIT = hitAfterPercent + accuracyFixed
+	
+	return {
+		level,
+		adjustedDEX,
+		baseHIT,
+		accuracyPercent,
+		hitAfterPercent,
+		accuracyFixed,
+		finalHIT,
 	}
 }

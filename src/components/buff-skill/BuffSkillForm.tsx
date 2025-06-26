@@ -142,7 +142,7 @@ export default function BuffSkillForm() {
 	}
 
 	return (
-		<div className="space-y-4 md:col-start-1 md:col-end-9 md:row-start-5 md:row-end-6 lg:col-start-1 lg:col-end-4 lg:row-start-4 lg:row-end-5 bg-white p-4 rounded-lg shadow-md">
+		<div className="space-y-4 md:col-start-1 md:col-end-9 md:row-start-5 md:row-end-6 xl:col-start-1 xl:col-end-4 xl:row-start-4 xl:row-end-5 bg-white p-4 rounded-lg shadow-md">
 			<h2 className="text-xl font-bold text-gray-800">バフスキル設定</h2>
 
 			<div className="grid grid-cols-2 gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3">

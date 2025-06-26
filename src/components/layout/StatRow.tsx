@@ -21,10 +21,10 @@ export default function StatRow({
 
 		return (
 			<div className="flex justify-between items-center py-1 px-2 flex-1">
-				<span className="font-semibold text-[13px] text-gray-700 min-w-[110px]">
+				<span className="font-semibold text-[12px] md:text-[13px] text-gray-700 min-w-[110px]">
 					{stat.name}
 				</span>
-				<span className="font-semibold text-[13px] text-gray-900 tabular-nums">
+				<span className="font-semibold text-[12px] md:text-[13px] text-gray-900 tabular-nums">
 					{formatValue(stat.value)}
 				</span>
 			</div>

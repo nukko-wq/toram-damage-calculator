@@ -29,7 +29,9 @@ export default React.memo<StatSectionProps>(
 	}) => {
 		return (
 			<div className={`p-2 ${className}`}>
-				<h3 className="font-semibold text-gray-900 mb-1 pb-2">{title}</h3>
+				<h3 className="font-semibold text-center md:text-left text-gray-900 mb-1 pb-2">
+					{title}
+				</h3>
 
 				{displayMode === 'property' ? (
 					<div>

@@ -46,6 +46,7 @@ function normalizePropertyKey(propertyKey: string): string {
 		'weaponATK': 'WeaponATK',
 		'criticalRate': 'Critical',
 		'attackMPRecovery': 'AttackMPRecovery',
+		'accuracy': 'Accuracy', // 命中の正規化を追加
 		'aggroPlus': 'Aggro', // 正の値として処理
 		'aggroMinus': 'Aggro', // 負の値として処理
 		'physicalResistance': 'PhysicalResistance_Rate',

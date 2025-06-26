@@ -108,7 +108,7 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	}, [watch, stableOnChange, isInitialized, updateBaseStats])
 
 	return (
-		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-1 md:row-end-2 lg:col-start-1 lg:col-end-3 lg:row-start-1 lg:row-end-2">
+		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-1 md:row-end-2 xl:col-start-1 xl:col-end-3 xl:row-start-1 xl:row-end-2">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">基本ステータス</h2>
 			<div className="flex flex-col gap-2">
 				{/* レベル行 */}
