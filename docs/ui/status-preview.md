@@ -107,6 +107,28 @@
 
 **計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#hit（命中）計算)を参照
 
+**クリティカル率計算仕様**:
+- **計算式**: `INT(INT(25+CRT/3.4)×(1+クリティカル率%/100))+クリティカル率固定値`
+- **基本クリティカル率**: INT(25+CRT/3.4)で算出（CRTは基本ステータスの値）
+- **クリティカル率%**: 装備/プロパティ、クリスタ、バフアイテムのCritical_Rate補正の合計
+- **クリティカル率固定値**: 装備/プロパティ、クリスタ、料理（たこ焼き）、バフアイテムのCritical固定値の合計
+- **料理特殊性**: 料理にはクリティカル率%補正はないが、固定値補正は存在
+- **データソース**: 基本ステータスのCRT値、各種補正値を使用
+
+**計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#クリティカル率（critical-rate）計算)を参照
+
+**物理耐性計算仕様**:
+- **計算式**: `装備/プロパティ物理耐性% + クリスタ物理耐性% + 料理物理耐性% + バフアイテム物理耐性%`
+- **構成要素**: 
+  - **装備/プロパティ**: 各装備品のPhysicalResistance_Rate補正値の合計
+  - **クリスタ**: セットしてあるクリスタルのPhysicalResistance_Rate補正値の合計
+  - **料理**: 料理（ビーフバーガー(物理耐性)）のPhysicalResistance_Rate補正値
+  - **バフアイテム**: バフアイテムのPhysicalResistance_Rate補正値の合計
+- **計算特性**: パーセンテージのみ（固定値補正なし）、単純加算方式
+- **データソース**: 4つのデータソースからの%補正値を統合
+
+**計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#物理耐性（physicalresistance_rate）計算)を参照
+
 ### 補正後ステータス（8項目）
 ```
 ┌─────── 補正後ステータス ─────┐
@@ -260,7 +282,7 @@ interface CalculationResults {
     baseMATK: number                    // 基本MATK（暫定値）
     stabilityRate: number               // メイン武器安定率
     subStabilityRate: number            // サブ武器安定率
-    criticalRate: number                // クリティカル率（暫定値）
+    criticalRate: number                // クリティカル率（計算結果）
     criticalDamage: number              // クリティカルダメージ（暫定値）
     magicCriticalRate: number           // 魔法クリティカル率（暫定値）
     magicCriticalDamage: number         // 魔法クリティカルダメージ（暫定値）
@@ -268,9 +290,9 @@ interface CalculationResults {
     elementAwakeningAdvantage: number   // 属性覚醒有利（暫定値）
     ASPD: number                        // 攻撃速度（武器種別計算結果）
     CSPD: number                        // 詠唱速度（暫定値）
-    HIT: number                         // 命中（暫定値）
+    HIT: number                         // 命中（計算結果）
     FLEE: number                        // 回避（暫定値）
-    physicalResistance: number          // 物理耐性（暫定値）
+    physicalResistance: number          // 物理耐性（計算結果）
     magicalResistance: number           // 魔法耐性（暫定値）
     ailmentResistance: number           // 異常耐性（暫定値）
     motionSpeed: number                 // 行動速度（ASPD依存計算結果）
@@ -972,6 +994,10 @@ export function aggregateAllBonuses(
 | 2024-06-24 | 基礎ATK計算式を修正 | 正しい基礎ATK計算式に変更 |
 | 2024-06-24 | サブATK仕様を追加 | 双剣専用のサブATK・サブ基礎ATK計算仕様を追加 |
 | 2024-06-25 | 行動速度計算仕様を追加 | ASPD依存の行動速度計算式と表示要件を追加 |
+| 2024-06-26 | クリティカル率計算仕様を追加 | 実装済みクリティカル率計算の詳細仕様を記述 |
+| 2024-06-26 | HIT計算仕様を更新 | 実装済みHIT計算の詳細仕様を記述 |
+| 2024-06-26 | 物理耐性計算仕様を追加 | 4データソース統合による物理耐性計算仕様を記述 |
+| 2024-06-26 | TypeScript型定義を更新 | 実装済み計算項目の型定義コメントを更新 |
 
 ## 関連ドキュメント
 - [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細
