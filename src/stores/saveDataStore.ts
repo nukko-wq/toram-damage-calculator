@@ -13,6 +13,20 @@ import {
 	initializeStorage,
 	loadSaveData,
 } from '@/utils/saveDataManager'
+
+// 初期currentSaveIdを同期的に取得（SSR対応）
+const getInitialCurrentSaveId = () => {
+	// サーバーサイドレンダリング時はデフォルト値を返す
+	if (typeof window === 'undefined') {
+		return 'default'
+	}
+	
+	try {
+		return getCurrentSaveData().id
+	} catch {
+		return 'default'
+	}
+}
 import { setCurrentSaveDataId } from '@/utils/editSessionManager'
 
 export const useSaveDataStore = create<SaveDataStore>()(
@@ -20,8 +34,9 @@ export const useSaveDataStore = create<SaveDataStore>()(
 		(set, get) => ({
 			// ===== 初期状態 =====
 			saveDataList: [],
-			currentSaveId: 'default',
+			currentSaveId: getInitialCurrentSaveId(),
 			isLoading: true,
+			isInitialized: false,
 			error: null,
 			pendingSaveId: null,
 			showUnsavedChangesModal: false,
@@ -48,12 +63,14 @@ export const useSaveDataStore = create<SaveDataStore>()(
 						saveDataList: userSaveData,
 						currentSaveId: current.id,
 						isLoading: false,
+						isInitialized: true,
 					})
 				} catch (err) {
 					console.error('セーブデータの読み込みに失敗しました:', err)
 					set({
 						error: 'セーブデータの読み込みに失敗しました',
 						isLoading: false,
+						isInitialized: true,
 					})
 				}
 			},
@@ -64,11 +81,12 @@ export const useSaveDataStore = create<SaveDataStore>()(
 					// 編集セッション管理にセーブデータIDを設定
 					setCurrentSaveDataId(saveId)
 
+					// データの読み込みと更新を先に行う
 					await setCurrentSaveData(saveId)
-					set({ currentSaveId: saveId })
-
-					// 最新のデータを直接ストレージから読み込み
 					const loadedSaveData = await loadSaveData(saveId)
+
+					// 全ての準備が完了してからcurrentSaveIdを更新（ちらつき防止）
+					set({ currentSaveId: saveId })
 					return loadedSaveData.data
 				} catch (err) {
 					console.error('セーブデータの切り替えに失敗しました:', err)
@@ -81,7 +99,11 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			createSaveData: async (name, data) => {
 				try {
 					const newSaveData = await createSaveDataUtil(name, data)
-					await get().loadSaveDataList() // リストを再読み込み
+					
+					// saveDataListに新しいアイテムを追加（リロードせずに）
+					set((state) => ({
+						saveDataList: [...state.saveDataList, newSaveData]
+					}))
 
 					// 作成したセーブデータに自動切り替え
 					const loadedData = await get().switchSaveData(newSaveData.id)
@@ -97,17 +119,21 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			// ===== セーブデータ削除（全削除時メインデータ自動切り替え） =====
 			deleteSaveData: async (saveId) => {
 				try {
+					const currentState = get()
 					await deleteSaveDataUtil(saveId)
-					await get().loadSaveDataList() // リストを再読み込み
+					
+					// saveDataListから削除したアイテムを除去（リロードせずに）
+					const updatedList = currentState.saveDataList.filter(data => data.id !== saveId)
+					set({ saveDataList: updatedList })
 
 					// 全ユーザーデータが削除された場合、メインデータに自動切り替え
-					if (get().saveDataList.length === 0) {
+					if (updatedList.length === 0) {
 						const mainData = await get().switchToMainData()
 						return mainData
 					}
 
 					// 削除したセーブデータが現在選択中だった場合、メインデータに切り替え
-					if (get().currentSaveId === saveId) {
+					if (currentState.currentSaveId === saveId) {
 						const mainData = await get().switchToMainData()
 						return mainData
 					}
@@ -122,7 +148,15 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			renameSaveData: async (saveId, newName) => {
 				try {
 					await renameSaveDataUtil(saveId, newName)
-					await get().loadSaveDataList() // リストを再読み込み
+					
+					// saveDataListの該当アイテムの名前を更新（リロードせずに）
+					set((state) => ({
+						saveDataList: state.saveDataList.map(saveData => 
+							saveData.id === saveId 
+								? { ...saveData, name: newName, updatedAt: new Date().toISOString() }
+								: saveData
+						)
+					}))
 				} catch (err) {
 					console.error('セーブデータの名前変更に失敗しました:', err)
 					set({ error: 'セーブデータの名前変更に失敗しました' })
@@ -134,7 +168,11 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			reorderSaveData: async (newOrder) => {
 				try {
 					await reorderSaveDataUtil(newOrder)
-					await get().loadSaveDataList() // リストを再読み込み
+					
+					// 並び替え後の完全なセーブデータリストを取得
+					const allSaveData = getAllSaveData()
+					const userSaveData = allSaveData.filter(data => data.id !== 'default')
+					set({ saveDataList: userSaveData })
 				} catch (err) {
 					console.error('セーブデータの並び替えに失敗しました:', err)
 					set({ error: 'セーブデータの並び替えに失敗しました' })

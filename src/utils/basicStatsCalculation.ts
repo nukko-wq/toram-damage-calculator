@@ -394,6 +394,26 @@ export interface ASPDCalculationSteps {
 	finalASPD: number // 最終ASPD
 }
 
+// 行動速度計算の中間結果
+export interface MotionSpeedCalculationSteps {
+	aspd: number // 計算されたASPD値
+	aspdBase: number // ASPDベース行動速度 = INT((ASPD-1000)/180)
+	aspdBaseClamped: number // 下限制限後 = MAX(0, ASPDベース行動速度)
+	motionSpeedPercent: number // 行動速度%補正
+	motionSpeedAfterPercent: number // 行動速度%適用後
+	finalMotionSpeed: number // 最終行動速度（上限50%制限適用）
+}
+
+// クリティカル率計算の詳細ステップ
+export interface CriticalRateCalculationSteps {
+	crt: number // ステータスのCRT
+	crtBaseCriticalRate: number // CRT基礎クリティカル率 = INT(25 + CRT/3.4)
+	criticalRatePercent: number // クリティカル率%補正
+	criticalRateAfterPercent: number // クリティカル率%適用後 = INT(基礎 × (1 + %/100))
+	criticalRateFixed: number // クリティカル率固定値補正
+	finalCriticalRate: number // 最終クリティカル率
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -846,4 +866,66 @@ export function calculateAilmentResistance(
 	const finalAilmentResistance = menBaseResistance + ailmentResistancePercent
 	
 	return finalAilmentResistance
+}
+
+/**
+ * 行動速度計算
+ * 行動速度 = MIN(50, MAX(0, INT((ASPD-1000)/180)) + 行動速度%)
+ */
+export function calculateMotionSpeed(
+	aspd: number,
+	bonuses: AllBonuses = {},
+): MotionSpeedCalculationSteps {
+	// 1. ASPDベース行動速度計算
+	const aspdBase = Math.floor((aspd - 1000) / 180)
+	
+	// 2. 下限制限適用（0未満を0に制限）
+	const aspdBaseClamped = Math.max(0, aspdBase)
+	
+	// 3. 行動速度%補正適用
+	const motionSpeedPercent = bonuses.MotionSpeed_Rate || 0
+	const motionSpeedAfterPercent = aspdBaseClamped + motionSpeedPercent
+	
+	// 4. 上限制限適用（50%上限）
+	const finalMotionSpeed = Math.min(50, motionSpeedAfterPercent)
+	
+	return {
+		aspd,
+		aspdBase,
+		aspdBaseClamped,
+		motionSpeedPercent,
+		motionSpeedAfterPercent,
+		finalMotionSpeed,
+	}
+}
+
+/**
+ * クリティカル率計算
+ * クリティカル率(%) = INT(INT(25+CRT/3.4)×(1+クリティカル率%/100))+クリティカル率固定値
+ */
+export function calculateCriticalRate(
+	crt: number,
+	bonuses: AllBonuses = {},
+): CriticalRateCalculationSteps {
+	// 1. CRT基礎クリティカル率計算
+	const crtBaseCriticalRate = Math.floor(25 + crt / 3.4)
+	
+	// 2. クリティカル率%補正適用
+	const criticalRatePercent = bonuses.Critical_Rate || 0
+	const criticalRateAfterPercent = Math.floor(
+		crtBaseCriticalRate * (1 + criticalRatePercent / 100),
+	)
+	
+	// 3. クリティカル率固定値加算
+	const criticalRateFixed = bonuses.Critical || 0
+	const finalCriticalRate = criticalRateAfterPercent + criticalRateFixed
+	
+	return {
+		crt,
+		crtBaseCriticalRate,
+		criticalRatePercent,
+		criticalRateAfterPercent,
+		criticalRateFixed,
+		finalCriticalRate,
+	}
 }

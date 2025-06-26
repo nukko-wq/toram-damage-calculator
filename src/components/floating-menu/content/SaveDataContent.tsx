@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import NewSaveDataModal from '@/components/save-data/NewSaveDataModal'
 import { useCalculatorStore, useSaveDataStore } from '@/stores'
@@ -23,7 +23,6 @@ export default function SaveDataContent() {
 		error,
 		pendingSaveId,
 		showUnsavedChangesModal,
-		loadSaveDataList,
 		switchSaveData,
 		createSaveData,
 		deleteSaveData,
@@ -35,10 +34,10 @@ export default function SaveDataContent() {
 
 	const [isNewSaveModalOpen, setIsNewSaveModalOpen] = useState(false)
 
-	// 初期化（一度だけ実行）
-	useEffect(() => {
-		loadSaveDataList()
-	}, [loadSaveDataList])
+	// 初期化は既にcalculatorStoreで実行済みなので不要
+	// useEffect(() => {
+	// 	loadSaveDataList()
+	// }, [loadSaveDataList])
 
 	// セーブデータの切り替え
 	const handleSaveDataSelect = async (saveId: string) => {
@@ -50,9 +49,9 @@ export default function SaveDataContent() {
 		}
 
 		try {
-			// Zustandストア経由でセーブデータを切り替え
+			// Zustandストア経由でセーブデータを切り替え（原子操作）
 			const loadedData = await switchSaveData(saveId)
-			// calculatorStoreにデータを読み込んで未保存変更フラグをリセット
+			// calculatorStoreにデータを読み込んで未保存変更フラグをリセット（同期的に実行）
 			await loadSaveData(loadedData)
 		} catch (err) {
 			console.error('セーブデータの切り替えに失敗しました:', err)
@@ -103,7 +102,7 @@ export default function SaveDataContent() {
 			try {
 				// Zustandストア経由でセーブデータを切り替え
 				const loadedData = await switchSaveData(pendingSaveId)
-				// calculatorStoreにデータを読み込んで未保存変更フラグをリセット
+				// calculatorStoreにデータを読み込んで未保存変更フラグをリセット（同期的に実行）
 				await loadSaveData(loadedData)
 			} catch (err) {
 				console.error('セーブデータの切り替えに失敗しました:', err)
@@ -124,7 +123,7 @@ export default function SaveDataContent() {
 				setPendingSaveId(null)
 
 				const loadedData = await switchSaveData(pendingSaveId)
-				// calculatorStoreにデータを読み込んで未保存変更フラグをリセット
+				// calculatorStoreにデータを読み込んで未保存変更フラグをリセット（同期的に実行）
 				await loadSaveData(loadedData)
 			} catch (err) {
 				console.error('セーブデータの切り替えに失敗しました:', err)

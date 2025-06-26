@@ -1,74 +1,83 @@
 import type { CalculatorData } from '@/types/calculator'
 import type { CalculationResults } from '@/types/calculationResult'
+import {
+	calculateHP,
+	calculateMP,
+	calculateAdjustedStats,
+	calculateASPD,
+	calculateMotionSpeed,
+	calculateAilmentResistance,
+	calculateATK,
+	calculateCriticalRate,
+	aggregateAllBonuses,
+	type AllBonuses,
+} from './basicStatsCalculation'
 
 /**
- * 計算結果を生成する（現在はダミーデータ）
+ * 計算結果を生成する（実際の計算式使用）
  *
  * @param data - 全入力フォームデータ
  * @returns 計算結果
- *
- * 注意: これは表示確認用のダミーデータです。
- * 実際の計算ロジックは後の実装フェーズで追加予定です。
  */
 export const calculateResults = (data: CalculatorData): CalculationResults => {
-	// 基本ステータスからの基本値
-	const baseStr = data.baseStats.STR
-	const baseInt = data.baseStats.INT
-	const baseVit = data.baseStats.VIT
-	const baseAgi = data.baseStats.AGI
-	const baseDex = data.baseStats.DEX
-	const baseCrt = data.baseStats.CRT
-	const baseMen = data.baseStats.MEN
-	const baseTec = data.baseStats.TEC
-	const level = data.baseStats.level
+	// 現在は簡単な実装。将来的に装備・クリスタ・料理・バフからの補正値を統合
+	const dummyBonuses: AllBonuses = {}
+	
+	// 1. 補正後ステータス計算
+	const adjustedStats = calculateAdjustedStats(data.baseStats, dummyBonuses)
+	
+	// 2. HP計算
+	const hpCalculation = calculateHP(data.baseStats, dummyBonuses)
+	
+	// 3. MP計算
+	const mpCalculation = calculateMP(data.baseStats, dummyBonuses)
+	
+	// 4. ATK計算
+	const atkCalculation = calculateATK(data.baseStats, data.mainWeapon, dummyBonuses)
+	
+	// 5. ASPD計算
+	const aspdCalculation = calculateASPD(data.baseStats, data.mainWeapon, adjustedStats, dummyBonuses)
+	
+	// 6. 行動速度計算
+	const motionSpeedCalculation = calculateMotionSpeed(aspdCalculation.finalASPD, dummyBonuses)
+	
+	// 7. 異常耐性計算
+	const ailmentResistance = calculateAilmentResistance(data.baseStats, dummyBonuses)
 
-	// 武器ATKの取得
-	const mainWeaponAtk = data.mainWeapon.ATK
-	const subWeaponAtk = data.subWeapon.ATK
+	// 8. クリティカル率計算
+	const criticalRateCalculation = calculateCriticalRate(data.baseStats.CRT, dummyBonuses)
 
-	// ダミー計算結果（実際の計算は将来実装）
 	return {
 		basicStats: {
-			HP: Math.floor(100 + baseVit * 2.5 + level * 5),
-			MP: Math.floor(50 + baseInt * 2 + baseMen * 1.5 + level * 2),
-			ATK: Math.floor(mainWeaponAtk + baseStr * 1.5),
-			subBaseATK: Math.floor(subWeaponAtk + baseDex * 1.2),
-			totalATK: Math.floor(
-				mainWeaponAtk + subWeaponAtk + baseStr * 1.5 + baseDex * 0.8,
-			),
-			bringerAM: Math.floor((baseStr + baseInt) * 0.7),
-			MATK: Math.floor(baseInt * 2 + baseMen * 1.5),
-			baseMATK: Math.floor(baseInt * 1.8),
-			stabilityRate: Math.floor(data.mainWeapon.stability),
-			subStabilityRate: Math.floor(data.subWeapon.stability),
-			criticalRate: Math.floor(baseCrt * 0.2 + baseDex * 0.1),
-			criticalDamage: Math.floor(150 + baseCrt * 0.5),
-			magicCriticalRate: Math.floor(baseCrt * 0.15 + baseInt * 0.05),
-			magicCriticalDamage: Math.floor(130 + baseCrt * 0.4),
-			totalElementAdvantage: 0,
-			elementAwakeningAdvantage: 0,
-			ASPD: Math.floor(100 + baseAgi * 0.2 + baseDex * 0.1),
-			CSPD: Math.floor(100 + baseInt * 0.15 + baseDex * 0.1),
-			HIT: Math.floor(baseDex * 1.5 + level),
-			FLEE: Math.floor(baseAgi * 1.8 + level * 0.5),
-			physicalResistance: 0,
-			magicalResistance: 0,
-			ailmentResistance: Math.floor(baseMen * 0.3),
-			motionSpeed: Math.floor(100 + baseAgi * 0.1),
-			armorBreak: 0,
-			anticipate: 0,
+			HP: hpCalculation.finalHP,
+			MP: mpCalculation.finalMP,
+			ATK: atkCalculation.finalATK,
+			subBaseATK: data.subWeapon.ATK, // 暫定：サブ武器ATKをそのまま表示
+			totalATK: atkCalculation.finalATK + data.subWeapon.ATK, // 暫定
+			bringerAM: 0, // 暫定
+			MATK: 0, // 暫定
+			baseMATK: 0, // 暫定
+			stabilityRate: data.mainWeapon.stability,
+			subStabilityRate: data.subWeapon.stability,
+			criticalRate: criticalRateCalculation.finalCriticalRate,
+			criticalDamage: 0, // 暫定
+			magicCriticalRate: 0, // 暫定
+			magicCriticalDamage: 0, // 暫定
+			totalElementAdvantage: 0, // 暫定
+			elementAwakeningAdvantage: 0, // 暫定
+			ASPD: aspdCalculation.finalASPD,
+			CSPD: 0, // 暫定
+			HIT: 0, // 暫定
+			FLEE: 0, // 暫定
+			physicalResistance: 0, // 暫定
+			magicalResistance: 0, // 暫定
+			ailmentResistance,
+			motionSpeed: motionSpeedCalculation.finalMotionSpeed,
+			armorBreak: 0, // 暫定
+			anticipate: 0, // 暫定
 		},
 
-		adjustedStats: {
-			STR: baseStr,
-			AGI: baseAgi,
-			INT: baseInt,
-			DEX: baseDex,
-			VIT: baseVit,
-			CRT: baseCrt,
-			MEN: baseMen,
-			TEC: baseTec,
-		},
+		adjustedStats,
 
 		equipmentBonus1: {
 			ATK: 0,

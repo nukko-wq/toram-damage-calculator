@@ -6,6 +6,8 @@ import {
 	calculateATK,
 	calculateSubATK,
 	calculateASPD,
+	calculateMotionSpeed,
+	calculateCriticalRate,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -110,7 +112,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				equipment_plus: Math.max(0, equipmentBonuses.Aggro || 0),
 				equipment_plus_rate: Math.max(0, equipmentBonuses.Aggro_Rate || 0),
 				equipment_minus: Math.abs(Math.min(0, equipmentBonuses.Aggro || 0)),
-				equipment_minus_rate: Math.abs(Math.min(0, equipmentBonuses.Aggro_Rate || 0)),
+				equipment_minus_rate: Math.abs(
+					Math.min(0, equipmentBonuses.Aggro_Rate || 0),
+				),
 				total_plus: Math.max(0, allBonuses.Aggro || 0),
 				total_plus_rate: Math.max(0, allBonuses.Aggro_Rate || 0),
 				total_minus: Math.abs(Math.min(0, allBonuses.Aggro || 0)),
@@ -186,8 +190,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					equipment_rate: equipmentBonuses.NeutralResistance_Rate || 0,
 					total: allBonuses.NeutralResistance_Rate || 0,
 					total_rate: allBonuses.NeutralResistance_Rate || 0,
-				}
-			}
+				},
+			},
 		})
 
 		const adjustedStatsCalculation = calculateAdjustedStats(
@@ -219,6 +223,16 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation,
 				allBonuses,
 			),
+			motionSpeedCalculation: (() => {
+				const aspd = calculateASPD(
+					baseStats,
+					data.mainWeapon,
+					adjustedStatsCalculation,
+					allBonuses,
+				).finalASPD
+				return calculateMotionSpeed(aspd, allBonuses)
+			})(),
+			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonuses),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -242,6 +256,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		atkCalculation,
 		subATKCalculation,
 		aspdCalculation,
+		motionSpeedCalculation,
+		criticalRateCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -262,10 +278,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		aggroPlus_Rate: equipmentBonus1.aggroPlus_Rate,
 		aggroMinus: equipmentBonus1.aggroMinus,
 		aggroMinus_Rate: equipmentBonus1.aggroMinus_Rate,
-		relevantKeys: Object.keys(equipmentBonus1).filter(key => 
-			key.includes('Resistance') || key.includes('resistance') || 
-			key.includes('attackMP') || key.includes('aggro')
-		)
+		relevantKeys: Object.keys(equipmentBonus1).filter(
+			(key) =>
+				key.includes('Resistance') ||
+				key.includes('resistance') ||
+				key.includes('attackMP') ||
+				key.includes('aggro'),
+		),
 	})
 
 	// デバッグ: equipmentBonus3の全プロパティを確認
@@ -282,13 +301,19 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		absoluteDodge_Rate: equipmentBonus3.absoluteDodge_Rate,
 		itemCooldown: equipmentBonus3.itemCooldown,
 		allKeys: Object.keys(equipmentBonus3),
-		specialKeys: Object.keys(equipmentBonus3).filter(key => 
-			key.includes('natural') || key.includes('Natural') || 
-			key.includes('revival') || key.includes('Revival') ||
-			key.includes('absolute') || key.includes('Absolute') ||
-			key.includes('item') || key.includes('Item') ||
-			key.includes('tool') || key.includes('Tool')
-		)
+		specialKeys: Object.keys(equipmentBonus3).filter(
+			(key) =>
+				key.includes('natural') ||
+				key.includes('Natural') ||
+				key.includes('revival') ||
+				key.includes('Revival') ||
+				key.includes('absolute') ||
+				key.includes('Absolute') ||
+				key.includes('item') ||
+				key.includes('Item') ||
+				key.includes('tool') ||
+				key.includes('Tool'),
+		),
 	})
 
 	// デバッグ: equipmentBonus2の属性耐性を確認
@@ -308,9 +333,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		neutralResistance: equipmentBonus2.neutralResistance,
 		neutralResistance_Rate: equipmentBonus2.neutralResistance_Rate,
 		allKeys: Object.keys(equipmentBonus2),
-		resistanceKeys: Object.keys(equipmentBonus2).filter(key => 
-			key.includes('Resistance') || key.includes('resistance')
-		)
+		resistanceKeys: Object.keys(equipmentBonus2).filter(
+			(key) => key.includes('Resistance') || key.includes('resistance'),
+		),
 	})
 
 	if (!isVisible) {
@@ -338,7 +363,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		baseMATK: 0, // TODO: 基本MATK計算
 		stabilityRate: data.mainWeapon.stability, // メイン武器安定率
 		subStabilityRate: data.subWeapon.stability, // サブ武器安定率
-		criticalRate: 0, // TODO: クリティカル率計算
+		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
 		criticalDamage: 150, // TODO: クリティカルダメージ計算
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
 		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
@@ -351,7 +376,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		physicalResistance: 0, // TODO: 物理耐性
 		magicalResistance: 0, // TODO: 魔法耐性
 		ailmentResistance: ailmentResistanceCalculation, // 異常耐性計算結果
-		motionSpeed: 100, // TODO: 行動速度計算
+		motionSpeed: motionSpeedCalculation.finalMotionSpeed, // 行動速度計算結果
 		armorBreak: 0, // TODO: 防御崩し
 		anticipate: 0, // TODO: 先読み
 	}
@@ -373,9 +398,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	return (
 		<div className=" border-b border-blue-200 transition-all duration-300 ease-in-out">
-			<div className="flex flex-col items-center px-4 py-2">
+			<div className="flex flex-col items-center px-4 pt-2">
 				{/* セクション表示切り替えボタン */}
-				<div className="mb-4 flex flex-wrap gap-2">
+				<div className="mb-3 flex flex-wrap gap-2">
 					<button
 						type="button"
 						onClick={() => toggleSection('basicStats')}
