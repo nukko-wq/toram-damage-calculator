@@ -21,7 +21,12 @@ const menuItems: MenuItem[] = [
 		label: 'TOP',
 		description: 'ダッシュボード',
 		icon: (
-			<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg
+				className="w-5 h-5"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+			>
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -36,7 +41,12 @@ const menuItems: MenuItem[] = [
 		label: 'サンプルデータ',
 		description: 'プリセット読み込み',
 		icon: (
-			<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg
+				className="w-5 h-5"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+			>
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -51,7 +61,12 @@ const menuItems: MenuItem[] = [
 		label: 'セーブデータ',
 		description: 'データ管理',
 		icon: (
-			<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg
+				className="w-5 h-5"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+			>
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -66,7 +81,12 @@ const menuItems: MenuItem[] = [
 		label: 'サブシステム',
 		description: '追加ツール',
 		icon: (
-			<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg
+				className="w-5 h-5"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+			>
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -81,7 +101,12 @@ const menuItems: MenuItem[] = [
 		label: '設定',
 		description: 'アプリ設定',
 		icon: (
-			<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg
+				className="w-5 h-5"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+			>
 				<path
 					strokeLinecap="round"
 					strokeLinejoin="round"
@@ -115,6 +140,7 @@ export default function MenuNavigation({
 					type="button"
 					onClick={() => onSectionChange(item.id)}
 					className={`
+						cursor-pointer
 						w-full p-3 text-left transition-colors duration-150
 						hover:bg-gray-100 focus:outline-none focus:bg-gray-100
 						border-b border-gray-100 last:border-b-0
@@ -129,16 +155,16 @@ export default function MenuNavigation({
 					title={item.description}
 				>
 					<div className="flex items-center space-x-2">
-						<div className={`
+						<div
+							className={`
 							flex-shrink-0
 							${activeSection === item.id ? 'text-blue-600' : 'text-gray-500'}
-						`}>
+						`}
+						>
 							{item.icon}
 						</div>
 						<div className="min-w-0 flex-1">
-							<div className="text-sm font-medium truncate">
-								{item.label}
-							</div>
+							<div className="text-sm font-medium truncate">{item.label}</div>
 						</div>
 					</div>
 				</button>

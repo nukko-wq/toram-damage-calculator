@@ -411,7 +411,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('basicStats')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.basicStats
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -422,7 +422,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('adjustedStats')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.adjustedStats
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -433,7 +433,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus1')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.equipmentBonus1
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -444,7 +444,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus2')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.equipmentBonus2
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -455,7 +455,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					<button
 						type="button"
 						onClick={() => toggleSection('equipmentBonus3')}
-						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors ${
+						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
 							visibleSections.equipmentBonus3
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'

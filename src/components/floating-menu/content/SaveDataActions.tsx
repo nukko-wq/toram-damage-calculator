@@ -7,7 +7,8 @@ interface SaveDataActionsProps {
 }
 
 export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
-	const { saveCurrentData, hasUnsavedChanges, getUnsavedDataStatus } = useCalculatorStore()
+	const { saveCurrentData, hasUnsavedChanges, getUnsavedDataStatus } =
+		useCalculatorStore()
 
 	// 現在のデータを保存
 	const handleSaveCurrentData = async () => {
@@ -35,8 +36,8 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 						transition-colors duration-200
 						${
 							hasUnsavedChanges
-								? 'text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500'
-								: 'text-gray-400 bg-gray-200 cursor-not-allowed'
+								? 'text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer'
+								: 'text-gray-400 bg-gray-200'
 						}
 					`}
 					title={hasUnsavedChanges ? '現在のデータを保存' : '変更がありません'}
@@ -77,6 +78,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 					type="button"
 					onClick={onCreateNew}
 					className="
+						cursor-pointer
 						flex-1 inline-flex items-center justify-center px-3 py-2 
 						border border-transparent text-sm font-medium rounded-md 
 						text-white bg-blue-600 hover:bg-blue-700 
