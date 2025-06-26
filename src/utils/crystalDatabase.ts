@@ -218,7 +218,17 @@ export const deleteUserCrystal = (id: string): void => {
 
 // すべてのクリスタ（プリセット + ユーザーカスタム）を取得（新システム）
 export const getAllCrystals = (): Crystal[] => {
-	const presetCrystals = getLocalStorageCrystals()
+	// src/data/crystals.ts から直接プリセットデータを取得
+	const presetCrystalsFromTS: Crystal[] = presetCrystals.map((crystal) => ({
+		...crystal,
+		isPreset: true as const,
+		isCustom: false as const,
+		isFavorite: false,
+		isModified: false,
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+	}))
+	
 	const customCrystals = getUserCrystals()
 
 	// カスタムクリスタルをCustomCrystal形式に変換
@@ -232,7 +242,7 @@ export const getAllCrystals = (): Crystal[] => {
 		updatedAt: crystal.updatedAt || new Date().toISOString(),
 	}))
 
-	return [...presetCrystals, ...formattedCustomCrystals]
+	return [...presetCrystalsFromTS, ...formattedCustomCrystals]
 }
 
 // すべてのクリスタ（プリセット + ユーザーカスタム）を取得（後方互換性）

@@ -2,7 +2,7 @@
 
 /**
  * データ同期スクリプト
- * TypeScriptモジュールをrequireで読み込み、JSONファイルを生成して public/data/ に同期します
+ * TypeScriptファイルからデータを抽出してJSONファイルを生成し public/data/ に同期します
  *
  * 同期対象ファイル:
  * - crystals.ts → crystals.json
@@ -16,13 +16,69 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 // ファイルパス設定
+const srcDir = path.join(__dirname, '../src/data')
 const publicDir = path.join(__dirname, '../public/data')
+
+/**
+ * TypeScriptファイルからデータを抽出する関数
+ * export const dataName の部分を正規表現で抽出してJSONに変換
+ */
+function extractDataFromTSFile(filePath, exportName) {
+	try {
+		const content = fs.readFileSync(filePath, 'utf8')
+		
+		// export const exportName: Type = { ... } as const の部分を抽出
+		const exportRegex = new RegExp(
+			`export\\s+const\\s+${exportName}\\s*(?::\\s*[\\w<>,\\[\\]\\s]+\\s*)?=\\s*({[\\s\\S]*?})\\s*(?:as\\s+const)?`, 
+			'm'
+		)
+		const match = content.match(exportRegex)
+		
+		if (!match) {
+			throw new Error(`${exportName} export not found in ${filePath}`)
+		}
+		
+		let dataString = match[1]
+		
+		// TypeScript固有の記法を削除・変換
+		dataString = dataString
+			.replace(/\/\*\*[\s\S]*?\*\//g, '') // /** */ コメント除去
+			.replace(/\/\/.*$/gm, '') // // コメント除去
+			.replace(/\s+as\s+[\w<>]+/g, '') // "as Type" を除去
+			.replace(/\s+as\s+const/g, '') // "as const" を除去
+			.replace(/([{,\[\s])(\w+):/g, '$1"$2":') // プロパティ名をクォートで囲む
+			.replace(/,(\s*[}\]])/g, '$1') // 末尾カンマ除去
+			.replace(/'/g, '"') // シングルクォートをダブルクォートに変換
+		
+		// デバッグ用に抽出されたデータの最初の部分をコンソールに出力
+		console.log(`\n=== Debug: ${exportName} extracted data preview ===`)
+		console.log(dataString.substring(0, 300) + '...')
+		console.log(`=== End preview ===\n`)
+		
+		// JSONとしてパース
+		return JSON.parse(dataString)
+	} catch (error) {
+		throw new Error(`Failed to parse ${filePath}: ${error.message}`)
+	}
+}
 
 // 同期対象データ
 const dataToSync = [
-	{ name: 'crystals.json', getData: () => require('../src/data/crystals.ts').crystalsData },
-	{ name: 'enemies.json', getData: () => require('../src/data/enemies.ts').enemiesData },
-	{ name: 'equipments.json', getData: () => require('../src/data/equipments.ts').equipmentsData }
+	{ 
+		name: 'crystals.json', 
+		tsFile: path.join(srcDir, 'crystals.ts'),
+		exportName: 'crystalsData'
+	},
+	{ 
+		name: 'enemies.json', 
+		tsFile: path.join(srcDir, 'enemies.ts'),
+		exportName: 'enemiesData'
+	},
+	{ 
+		name: 'equipments.json', 
+		tsFile: path.join(srcDir, 'equipments.ts'),
+		exportName: 'equipmentsData'
+	}
 ]
 
 console.log('🔄 TypeScriptモジュールからJSONデータ同期を開始します...\n')
@@ -36,12 +92,12 @@ if (!fs.existsSync(publicDir)) {
 let syncCount = 0
 let errorCount = 0
 
-dataToSync.forEach(({ name, getData }) => {
+dataToSync.forEach(({ name, tsFile, exportName }) => {
 	const destPath = path.join(publicDir, name)
 
 	try {
-		// TypeScriptモジュールからデータを取得
-		const data = getData()
+		// TypeScriptファイルからデータを抽出
+		const data = extractDataFromTSFile(tsFile, exportName)
 		
 		// JSONに変換して保存
 		fs.writeFileSync(destPath, JSON.stringify(data, null, 2), 'utf8')
