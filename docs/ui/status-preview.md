@@ -163,6 +163,20 @@
 
 **計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#先読み計算)を参照
 
+**CSPD（詠唱速度）計算仕様**:
+- **計算式**: `INT((INT(Lv+補正後DEX×2.94+補正後AGI×1.16))×(1+CSPD%/100))+CSPD固定値`
+- **計算段階**: 
+  - **ベースCSPD**: INT(Lv + 補正後DEX × 2.94 + 補正後AGI × 1.16)
+  - **CSPD%適用後**: INT(ベースCSPD × (1 + CSPD%/100))
+  - **最終CSPD**: CSPD%適用後 + CSPD固定値
+- **構成要素**: 
+  - **CSPD%**: 装備/プロパティ、クリスタ、バフアイテムのCastingSpeed_Rate補正の合計
+  - **CSPD固定値**: 装備/プロパティ、クリスタ、バフアイテムのCastingSpeed補正の合計
+- **計算特性**: 2段階INT()切り捨て処理、DEX重要度高（係数2.94）、AGI影響小（係数1.16）
+- **データソース**: 3つのデータソースからの補正値を統合（料理除外）
+
+**計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#cspd詠唱速度計算)を参照
+
 ### 補正後ステータス（8項目）
 ```
 ┌─────── 補正後ステータス ─────┐
@@ -323,7 +337,7 @@ interface CalculationResults {
     totalElementAdvantage: number       // 総属性有利（暫定値）
     elementAwakeningAdvantage: number   // 属性覚醒有利（暫定値）
     ASPD: number                        // 攻撃速度（武器種別計算結果）
-    CSPD: number                        // 詠唱速度（暫定値）
+    CSPD: number                        // 詠唱速度（計算結果）
     HIT: number                         // 命中（計算結果）
     FLEE: number                        // 回避（暫定値）
     physicalResistance: number          // 物理耐性（計算結果）
@@ -1035,6 +1049,7 @@ export function aggregateAllBonuses(
 | 2024-06-26 | 魔法耐性計算仕様を追加 | 4データソース統合による魔法耐性計算仕様を記述 |
 | 2024-06-26 | 防御崩し計算仕様を追加 | 3データソース統合による防御崩し計算仕様を記述 |
 | 2024-06-26 | 先読み計算仕様を追加 | 3データソース統合による先読み計算仕様を記述 |
+| 2024-06-26 | CSPD（詠唱速度）計算仕様を追加 | INT関数2段階処理、Lv+補正後DEX・AGI依存計算仕様を記述 |
 
 ## 関連ドキュメント
 - [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細

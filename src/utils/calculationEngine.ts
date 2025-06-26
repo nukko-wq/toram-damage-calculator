@@ -14,6 +14,7 @@ import {
 	calculateMagicalResistance,
 	calculateArmorBreak,
 	calculateAnticipate,
+	calculateCSPD,
 	aggregateAllBonuses,
 	type AllBonuses,
 } from './basicStatsCalculation'
@@ -67,6 +68,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 13. 先読み計算
 	const anticipateCalculation = calculateAnticipate(dummyBonuses)
 
+	// 14. CSPD計算
+	const cspdCalculation = calculateCSPD(data.baseStats.level, adjustedStats.DEX, adjustedStats.AGI, dummyBonuses)
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -86,7 +90,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			totalElementAdvantage: 0, // 暫定
 			elementAwakeningAdvantage: 0, // 暫定
 			ASPD: aspdCalculation.finalASPD,
-			CSPD: 0, // 暫定
+			CSPD: cspdCalculation.finalCSPD,
 			HIT: hitCalculation.finalHIT,
 			FLEE: 0, // 暫定
 			physicalResistance: physicalResistanceCalculation.finalPhysicalResistance,

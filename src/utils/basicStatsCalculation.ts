@@ -449,6 +449,18 @@ export interface AnticipateCalculationSteps {
 	finalAnticipate: number // 最終先読み%
 }
 
+// CSPD（詠唱速度）計算の詳細ステップ
+export interface CSPDCalculationSteps {
+	level: number // キャラクターレベル
+	adjustedDEX: number // 補正後DEX
+	adjustedAGI: number // 補正後AGI
+	baseCSPD: number // ベースCSPD = INT(Lv + 補正後DEX × 2.94 + 補正後AGI × 1.16)
+	cspd_Rate: number // CSPD%補正
+	cspdAfterPercent: number // CSPD%適用後 = INT(ベースCSPD × (1 + CSPD%/100))
+	cspdFixed: number // CSPD固定値補正
+	finalCSPD: number // 最終CSPD
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -1059,5 +1071,38 @@ export function calculateAnticipate(
 	return {
 		anticipateRate,
 		finalAnticipate: anticipateRate,
+	}
+}
+
+/**
+ * CSPD（詠唱速度）計算
+ * CSPD = INT((INT(Lv+補正後DEX×2.94+補正後AGI×1.16))×(1+CSPD%/100))+CSPD固定値
+ */
+export function calculateCSPD(
+	level: number,
+	adjustedDEX: number,
+	adjustedAGI: number,
+	bonuses: AllBonuses = {},
+): CSPDCalculationSteps {
+	// 1. ベースCSPD計算
+	const baseCSPD = Math.floor(level + adjustedDEX * 2.94 + adjustedAGI * 1.16)
+	
+	// 2. CSPD%補正適用
+	const cspd_Rate = bonuses.CastingSpeed_Rate || 0
+	const cspdAfterPercent = Math.floor(baseCSPD * (1 + cspd_Rate / 100))
+	
+	// 3. CSPD固定値加算
+	const cspdFixed = bonuses.CastingSpeed || 0
+	const finalCSPD = cspdAfterPercent + cspdFixed
+	
+	return {
+		level,
+		adjustedDEX,
+		adjustedAGI,
+		baseCSPD,
+		cspd_Rate,
+		cspdAfterPercent,
+		cspdFixed,
+		finalCSPD,
 	}
 }

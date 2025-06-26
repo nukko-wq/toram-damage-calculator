@@ -13,6 +13,7 @@ import {
 	calculateMagicalResistance,
 	calculateArmorBreak,
 	calculateAnticipate,
+	calculateCSPD,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -247,6 +248,12 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			magicalResistanceCalculation: calculateMagicalResistance(allBonuses),
 			armorBreakCalculation: calculateArmorBreak(allBonuses),
 			anticipateCalculation: calculateAnticipate(allBonuses),
+			cspdCalculation: calculateCSPD(
+				baseStats.level,
+				adjustedStatsCalculation.DEX,
+				adjustedStatsCalculation.AGI,
+				allBonuses,
+			),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -277,6 +284,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		magicalResistanceCalculation,
 		armorBreakCalculation,
 		anticipateCalculation,
+		cspdCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -389,7 +397,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		totalElementAdvantage: 0, // TODO: 総属性有利
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
-		CSPD: 0, // TODO: 詠唱速度計算
+		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果
 		HIT: hitCalculation.finalHIT, // HIT計算結果
 		FLEE: 0, // TODO: 回避計算
 		physicalResistance: physicalResistanceCalculation.finalPhysicalResistance, // 物理耐性計算結果
