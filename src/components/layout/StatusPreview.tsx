@@ -14,6 +14,7 @@ import {
 	calculateArmorBreak,
 	calculateAnticipate,
 	calculateCSPD,
+	calculateTotalElementAdvantage,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -254,6 +255,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.AGI,
 				allBonuses,
 			),
+			totalElementAdvantageCalculation: calculateTotalElementAdvantage(allBonuses),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -285,6 +287,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		armorBreakCalculation,
 		anticipateCalculation,
 		cspdCalculation,
+		totalElementAdvantageCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -394,7 +397,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		criticalDamage: 150, // TODO: クリティカルダメージ計算
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
 		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
-		totalElementAdvantage: 0, // TODO: 総属性有利
+		totalElementAdvantage: totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
 		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果

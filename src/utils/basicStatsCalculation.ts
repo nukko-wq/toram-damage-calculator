@@ -461,6 +461,12 @@ export interface CSPDCalculationSteps {
 	finalCSPD: number // 最終CSPD
 }
 
+// 総属性有利計算の詳細ステップ
+export interface TotalElementAdvantageCalculationSteps {
+	elementAdvantageRate: number // 属性有利%補正（4データソース統合済み）
+	finalTotalElementAdvantage: number // 最終総属性有利%
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -1104,5 +1110,29 @@ export function calculateCSPD(
 		cspdAfterPercent,
 		cspdFixed,
 		finalCSPD,
+	}
+}
+
+/**
+ * 総属性有利計算
+ *
+ * 装備/プロパティ、クリスタ、料理、バフアイテムからの属性有利%補正を統合
+ * 全ての属性攻撃に対して共通で適用される汎用的な属性有利補正
+ *
+ * @param bonuses 全補正値（4データソース統合済み）
+ * @returns 総属性有利計算の詳細ステップ
+ */
+export function calculateTotalElementAdvantage(
+	bonuses: AllBonuses = {},
+): TotalElementAdvantageCalculationSteps {
+	// 属性有利%補正を取得（4データソース統合済み）
+	const elementAdvantageRate = bonuses.ElementAdvantage_Rate || 0
+	
+	// 総属性有利は単純な%補正のみ（固定値補正は存在しない）
+	const finalTotalElementAdvantage = elementAdvantageRate
+	
+	return {
+		elementAdvantageRate,
+		finalTotalElementAdvantage,
 	}
 }
