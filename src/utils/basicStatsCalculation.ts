@@ -431,6 +431,12 @@ export interface PhysicalResistanceCalculationSteps {
 	finalPhysicalResistance: number // 最終物理耐性%
 }
 
+// 魔法耐性計算の詳細ステップ
+export interface MagicalResistanceCalculationSteps {
+	magicalResistanceRate: number // 魔法耐性%補正（4データソース統合済み）
+	finalMagicalResistance: number // 最終魔法耐性%
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -993,5 +999,21 @@ export function calculatePhysicalResistance(
 	return {
 		physicalResistanceRate,
 		finalPhysicalResistance: physicalResistanceRate,
+	}
+}
+
+/**
+ * 魔法耐性計算
+ * 魔法耐性(%) = 装備/プロパティ魔法耐性% + クリスタ魔法耐性% + 料理魔法耐性% + バフアイテム魔法耐性%
+ */
+export function calculateMagicalResistance(
+	bonuses: AllBonuses = {},
+): MagicalResistanceCalculationSteps {
+	// 魔法耐性%の合計値（4つのデータソースから統合済み）
+	const magicalResistanceRate = bonuses.MagicalResistance_Rate || 0
+	
+	return {
+		magicalResistanceRate,
+		finalMagicalResistance: magicalResistanceRate,
 	}
 }

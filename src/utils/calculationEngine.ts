@@ -11,6 +11,7 @@ import {
 	calculateCriticalRate,
 	calculateHIT,
 	calculatePhysicalResistance,
+	calculateMagicalResistance,
 	aggregateAllBonuses,
 	type AllBonuses,
 } from './basicStatsCalculation'
@@ -55,6 +56,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 10. 物理耐性計算
 	const physicalResistanceCalculation = calculatePhysicalResistance(dummyBonuses)
 
+	// 11. 魔法耐性計算
+	const magicalResistanceCalculation = calculateMagicalResistance(dummyBonuses)
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -78,7 +82,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			HIT: hitCalculation.finalHIT,
 			FLEE: 0, // 暫定
 			physicalResistance: physicalResistanceCalculation.finalPhysicalResistance,
-			magicalResistance: 0, // 暫定
+			magicalResistance: magicalResistanceCalculation.finalMagicalResistance,
 			ailmentResistance,
 			motionSpeed: motionSpeedCalculation.finalMotionSpeed,
 			armorBreak: 0, // 暫定
