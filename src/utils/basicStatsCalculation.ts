@@ -425,6 +425,12 @@ export interface HITCalculationSteps {
 	finalHIT: number // 最終HIT
 }
 
+// 物理耐性計算の詳細ステップ
+export interface PhysicalResistanceCalculationSteps {
+	physicalResistanceRate: number // 物理耐性%補正（4データソース統合済み）
+	finalPhysicalResistance: number // 最終物理耐性%
+}
+
 // 武器種別定義
 export interface WeaponType {
 	id: string
@@ -971,5 +977,21 @@ export function calculateHIT(
 		hitAfterPercent,
 		accuracyFixed,
 		finalHIT,
+	}
+}
+
+/**
+ * 物理耐性計算
+ * 物理耐性(%) = 装備/プロパティ物理耐性% + クリスタ物理耐性% + 料理物理耐性% + バフアイテム物理耐性%
+ */
+export function calculatePhysicalResistance(
+	bonuses: AllBonuses = {},
+): PhysicalResistanceCalculationSteps {
+	// 物理耐性%の合計値（4つのデータソースから統合済み）
+	const physicalResistanceRate = bonuses.PhysicalResistance_Rate || 0
+	
+	return {
+		physicalResistanceRate,
+		finalPhysicalResistance: physicalResistanceRate,
 	}
 }

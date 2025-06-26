@@ -10,6 +10,7 @@ import {
 	calculateATK,
 	calculateCriticalRate,
 	calculateHIT,
+	calculatePhysicalResistance,
 	aggregateAllBonuses,
 	type AllBonuses,
 } from './basicStatsCalculation'
@@ -51,6 +52,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 9. HIT計算
 	const hitCalculation = calculateHIT(data.baseStats.level, adjustedStats.DEX, dummyBonuses)
 
+	// 10. 物理耐性計算
+	const physicalResistanceCalculation = calculatePhysicalResistance(dummyBonuses)
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -73,7 +77,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			CSPD: 0, // 暫定
 			HIT: hitCalculation.finalHIT,
 			FLEE: 0, // 暫定
-			physicalResistance: 0, // 暫定
+			physicalResistance: physicalResistanceCalculation.finalPhysicalResistance,
 			magicalResistance: 0, // 暫定
 			ailmentResistance,
 			motionSpeed: motionSpeedCalculation.finalMotionSpeed,

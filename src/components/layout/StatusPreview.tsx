@@ -9,6 +9,7 @@ import {
 	calculateMotionSpeed,
 	calculateCriticalRate,
 	calculateHIT,
+	calculatePhysicalResistance,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -239,6 +240,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.DEX,
 				allBonuses,
 			),
+			physicalResistanceCalculation: calculatePhysicalResistance(allBonuses),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -265,6 +267,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		motionSpeedCalculation,
 		criticalRateCalculation,
 		hitCalculation,
+		physicalResistanceCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -380,7 +383,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		CSPD: 0, // TODO: 詠唱速度計算
 		HIT: hitCalculation.finalHIT, // HIT計算結果
 		FLEE: 0, // TODO: 回避計算
-		physicalResistance: 0, // TODO: 物理耐性
+		physicalResistance: physicalResistanceCalculation.finalPhysicalResistance, // 物理耐性計算結果
 		magicalResistance: 0, // TODO: 魔法耐性
 		ailmentResistance: ailmentResistanceCalculation, // 異常耐性計算結果
 		motionSpeed: motionSpeedCalculation.finalMotionSpeed, // 行動速度計算結果
