@@ -9,6 +9,7 @@ import {
 	calculateAilmentResistance,
 	calculateATK,
 	calculateCriticalRate,
+	calculateHIT,
 	aggregateAllBonuses,
 	type AllBonuses,
 } from './basicStatsCalculation'
@@ -47,6 +48,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 8. クリティカル率計算
 	const criticalRateCalculation = calculateCriticalRate(data.baseStats.CRT, dummyBonuses)
 
+	// 9. HIT計算
+	const hitCalculation = calculateHIT(data.baseStats.level, adjustedStats.DEX, dummyBonuses)
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -67,7 +71,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			elementAwakeningAdvantage: 0, // 暫定
 			ASPD: aspdCalculation.finalASPD,
 			CSPD: 0, // 暫定
-			HIT: 0, // 暫定
+			HIT: hitCalculation.finalHIT,
 			FLEE: 0, // 暫定
 			physicalResistance: 0, // 暫定
 			magicalResistance: 0, // 暫定

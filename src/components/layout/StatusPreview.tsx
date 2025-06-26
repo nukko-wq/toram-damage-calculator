@@ -8,6 +8,7 @@ import {
 	calculateASPD,
 	calculateMotionSpeed,
 	calculateCriticalRate,
+	calculateHIT,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -233,6 +234,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				return calculateMotionSpeed(aspd, allBonuses)
 			})(),
 			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonuses),
+			hitCalculation: calculateHIT(baseStats.level, adjustedStatsCalculation.DEX, allBonuses),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -258,6 +260,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		aspdCalculation,
 		motionSpeedCalculation,
 		criticalRateCalculation,
+		hitCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -371,7 +374,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
 		CSPD: 0, // TODO: 詠唱速度計算
-		HIT: 0, // TODO: 命中計算
+		HIT: hitCalculation.finalHIT, // HIT計算結果
 		FLEE: 0, // TODO: 回避計算
 		physicalResistance: 0, // TODO: 物理耐性
 		magicalResistance: 0, // TODO: 魔法耐性
