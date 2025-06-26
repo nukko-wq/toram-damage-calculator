@@ -104,30 +104,59 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 							ease: [0.4, 0.0, 0.2, 1],
 						}}
 					>
-						<div className="grid grid-cols-[520px_1fr] bg-gray-50">
-							{/* 与ダメージプレビュー */}
-							{showDamagePreview ? (
-								<div
-									className="bg-orange-50 rounded-lg"
-									id="damage-preview"
-									aria-labelledby="damage-toggle"
-								>
-									<DamagePreview isVisible={showDamagePreview} />
-								</div>
-							) : (
-								<div /> /* プレースホルダー */
-							)}
+						{/* デスクトップ: 両方表示可能、モバイル: 一方のみ表示 */}
+						<div className="bg-gray-50">
+							{/* デスクトップレイアウト (lg以上) */}
+							<div className="hidden lg:grid lg:grid-cols-[520px_1fr]">
+								{/* 与ダメージプレビュー */}
+								{showDamagePreview ? (
+									<div
+										className="bg-orange-50 rounded-lg"
+										id="damage-preview"
+										aria-labelledby="damage-toggle"
+									>
+										<DamagePreview isVisible={showDamagePreview} />
+									</div>
+								) : (
+									<div /> /* プレースホルダー */
+								)}
 
-							{/* ステータスプレビュー */}
-							{showStatusPreview && (
-								<div
-									className="bg-blue-50"
-									id="status-preview"
-									aria-labelledby="status-toggle"
-								>
-									<StatusPreview isVisible={showStatusPreview} />
-								</div>
-							)}
+								{/* ステータスプレビュー */}
+								{showStatusPreview && (
+									<div
+										className="bg-blue-50"
+										id="status-preview"
+										aria-labelledby="status-toggle"
+									>
+										<StatusPreview isVisible={showStatusPreview} />
+									</div>
+								)}
+							</div>
+
+							{/* モバイルレイアウト (lg未満) - 一方のみ表示 */}
+							<div className="lg:hidden">
+								{/* 与ダメージプレビューを優先表示 */}
+								{showDamagePreview && (
+									<div
+										className="bg-orange-50 rounded-lg"
+										id="damage-preview-mobile"
+										aria-labelledby="damage-toggle"
+									>
+										<DamagePreview isVisible={showDamagePreview} />
+									</div>
+								)}
+
+								{/* ダメージプレビューが非表示の場合のみステータスプレビューを表示 */}
+								{!showDamagePreview && showStatusPreview && (
+									<div
+										className="bg-blue-50"
+										id="status-preview-mobile"
+										aria-labelledby="status-toggle"
+									>
+										<StatusPreview isVisible={showStatusPreview} />
+									</div>
+								)}
+							</div>
 						</div>
 					</motion.div>
 				)}
