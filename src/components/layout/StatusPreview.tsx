@@ -15,6 +15,7 @@ import {
 	calculateAnticipate,
 	calculateCSPD,
 	calculateTotalElementAdvantage,
+	calculateStability,
 	calculateAdjustedStats,
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
@@ -256,6 +257,12 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				allBonuses,
 			),
 			totalElementAdvantageCalculation: calculateTotalElementAdvantage(allBonuses),
+			stabilityCalculation: calculateStability(
+				data.mainWeapon.stability,
+				data.mainWeapon.weaponType,
+				adjustedStatsCalculation,
+				allBonuses,
+			),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
 				allBonuses,
@@ -288,6 +295,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		anticipateCalculation,
 		cspdCalculation,
 		totalElementAdvantageCalculation,
+		stabilityCalculation,
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
@@ -391,7 +399,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		bringerAM: 0, // TODO: ブリンガーAM計算
 		MATK: 0, // TODO: MATK計算
 		baseMATK: 0, // TODO: 基本MATK計算
-		stabilityRate: data.mainWeapon.stability, // メイン武器安定率
+		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
 		subStabilityRate: data.subWeapon.stability, // サブ武器安定率
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
 		criticalDamage: 150, // TODO: クリティカルダメージ計算

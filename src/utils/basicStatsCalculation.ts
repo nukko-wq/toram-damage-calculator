@@ -172,6 +172,15 @@ export interface MPCalculationSteps {
 	finalMP: number // 最終MP
 }
 
+// 安定率計算の中間結果
+export interface StabilityCalculationSteps {
+	weaponStability: number // メイン武器の安定率
+	statusStability: number // ステータス安定率
+	stabilityPercent: number // 安定率%補正
+	stabilityBeforeLimit: number // 制限適用前の安定率
+	finalStability: number // 最終安定率（0-100制限適用後）
+}
+
 /**
  * HP計算（正確な計算式）
  * HP = INT(INT(93+(補正後VIT+22.41)*Lv/3)*(1+HP%/100))+HP固定値
@@ -473,6 +482,7 @@ export interface WeaponType {
 	name: string
 	statusATKFormula: (baseStats: BaseStats) => number
 	statusASPDFormula: (adjustedStats: AdjustedStatsCalculation) => number
+	statusStabilityFormula: (adjustedStats: AdjustedStatsCalculation) => number
 	aspdCorrection: number
 }
 
@@ -483,6 +493,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '旋風槍',
 		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 3.5,
+		statusStabilityFormula: (stats) => stats.STR * 0.05 + stats.DEX * 0.05,
 		aspdCorrection: 25,
 	},
 	'1hsword': {
@@ -490,6 +501,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '片手剣',
 		statusATKFormula: (stats) => stats.STR * 2.0 + stats.DEX * 2.0,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 4.2,
+		statusStabilityFormula: (stats) => stats.STR * 0.025 + stats.DEX * 0.075,
 		aspdCorrection: 100,
 	},
 	'2hsword': {
@@ -497,6 +509,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '両手剣',
 		statusATKFormula: (stats) => stats.STR * 3.0 + stats.DEX * 1.0,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 2.1,
+		statusStabilityFormula: (stats) => stats.DEX * 0.1,
 		aspdCorrection: 50,
 	},
 	bow: {
@@ -504,6 +517,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '弓',
 		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 3.0,
 		statusASPDFormula: (stats) => stats.DEX * 0.2 + stats.AGI * 3.1,
+		statusStabilityFormula: (stats) => stats.STR * 0.05 + stats.DEX * 0.05,
 		aspdCorrection: 75,
 	},
 	bowgun: {
@@ -511,6 +525,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '自動弓',
 		statusATKFormula: (stats) => stats.DEX * 4.0,
 		statusASPDFormula: (stats) => stats.DEX * 0.2 + stats.AGI * 2.2,
+		statusStabilityFormula: (stats) => stats.STR * 0.05,
 		aspdCorrection: 30,
 	},
 	staff: {
@@ -518,6 +533,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '杖',
 		statusATKFormula: (stats) => stats.STR * 3.0 + stats.INT * 1.0,
 		statusASPDFormula: (stats) => stats.AGI * 1.8 + stats.INT * 0.2,
+		statusStabilityFormula: (stats) => stats.STR * 0.05,
 		aspdCorrection: 60,
 	},
 	'magic-device': {
@@ -525,6 +541,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '魔導具',
 		statusATKFormula: (stats) => stats.AGI * 2.0 + stats.INT * 2.0,
 		statusASPDFormula: (stats) => stats.AGI * 4.0 + stats.INT * 0.2,
+		statusStabilityFormula: (stats) => stats.DEX * 0.1,
 		aspdCorrection: 900,
 	},
 	knuckle: {
@@ -532,6 +549,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '手甲',
 		statusATKFormula: (stats) => stats.DEX * 0.5 + stats.AGI * 2.0,
 		statusASPDFormula: (stats) => stats.STR * 0.1 + stats.DEX * 0.1 + stats.AGI * 4.6,
+		statusStabilityFormula: (stats) => stats.DEX * 0.025,
 		aspdCorrection: 120,
 	},
 	katana: {
@@ -539,6 +557,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '抜刀剣',
 		statusATKFormula: (stats) => stats.STR * 1.5 + stats.DEX * 2.5,
 		statusASPDFormula: (stats) => stats.STR * 0.3 + stats.AGI * 3.9,
+		statusStabilityFormula: (stats) => stats.STR * 0.075 + stats.DEX * 0.025,
 		aspdCorrection: 200,
 	},
 	'dual-sword': {
@@ -546,6 +565,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '双剣',
 		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 2.0 + stats.AGI * 1.0,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 4.2,
+		statusStabilityFormula: (stats) => 0, // 特殊計算（保留）
 		aspdCorrection: 100,
 	},
 	barehand: {
@@ -553,6 +573,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '素手',
 		statusATKFormula: (stats) => stats.STR * 1.0,
 		statusASPDFormula: (stats) => stats.AGI * 9.6,
+		statusStabilityFormula: (stats) => stats.DEX * 0.35,
 		aspdCorrection: 1000,
 	},
 }
@@ -1134,5 +1155,46 @@ export function calculateTotalElementAdvantage(
 	return {
 		elementAdvantageRate,
 		finalTotalElementAdvantage,
+	}
+}
+
+/**
+ * 安定率計算
+ * 
+ * 計算式: MAX(0, MIN(100, メイン武器の安定率 + ステータス安定率 + 安定率%))
+ * ステータス安定率は武器種によって異なる計算式を使用
+ * 
+ * @param weaponStability メイン武器の安定率
+ * @param weaponType 武器種別
+ * @param adjustedStats 補正後ステータス
+ * @param bonuses 全補正値（装備・クリスタ・料理・バフアイテム統合済み）
+ * @returns 安定率計算の詳細ステップ
+ */
+export function calculateStability(
+	weaponStability: number,
+	weaponType: WeaponTypeEnum,
+	adjustedStats: AdjustedStatsCalculation,
+	bonuses: AllBonuses = {},
+): StabilityCalculationSteps {
+	// 1. 武器種別によるステータス安定率計算
+	const weaponTypeKey = getWeaponTypeKey(weaponType)
+	const weaponTypeData = WEAPON_TYPES[weaponTypeKey] || WEAPON_TYPES.halberd
+	const statusStability = weaponTypeData.statusStabilityFormula(adjustedStats)
+	
+	// 2. 安定率%補正取得（3データソース：装備・クリスタ・バフアイテム）
+	const stabilityPercent = bonuses.Stability_Rate || 0
+	
+	// 3. 制限適用前の安定率計算
+	const stabilityBeforeLimit = weaponStability + statusStability + stabilityPercent
+	
+	// 4. 0-100%制限適用と小数点切り捨て
+	const finalStability = Math.floor(Math.max(0, Math.min(100, stabilityBeforeLimit)))
+	
+	return {
+		weaponStability,
+		statusStability,
+		stabilityPercent,
+		stabilityBeforeLimit,
+		finalStability,
 	}
 }

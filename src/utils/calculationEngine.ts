@@ -16,6 +16,7 @@ import {
 	calculateAnticipate,
 	calculateCSPD,
 	calculateTotalElementAdvantage,
+	calculateStability,
 	aggregateAllBonuses,
 	type AllBonuses,
 } from './basicStatsCalculation'
@@ -75,6 +76,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 15. 総属性有利計算
 	const totalElementAdvantageCalculation = calculateTotalElementAdvantage(dummyBonuses)
 
+	// 16. 安定率計算
+	const stabilityCalculation = calculateStability(data.mainWeapon.stability, data.mainWeapon.weaponType, adjustedStats, dummyBonuses)
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -85,7 +89,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			bringerAM: 0, // 暫定
 			MATK: 0, // 暫定
 			baseMATK: 0, // 暫定
-			stabilityRate: data.mainWeapon.stability,
+			stabilityRate: stabilityCalculation.finalStability,
 			subStabilityRate: data.subWeapon.stability,
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: 0, // 暫定
