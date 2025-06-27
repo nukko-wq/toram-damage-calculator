@@ -74,7 +74,7 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 			return bonuses
 		}
 
-		// 8スロット分のプロパティを統合（実際のデータ構造に合わせる）
+		// 11スロット分のプロパティを統合（従来8スロット + 自由入力3スロット）
 		const allSlots = [
 			equipmentData.main,
 			equipmentData.body,
@@ -84,6 +84,9 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 			equipmentData.fashion1,
 			equipmentData.fashion2,
 			equipmentData.fashion3,
+			equipmentData.freeInput1,
+			equipmentData.freeInput2,
+			equipmentData.freeInput3,
 		].filter(Boolean)
 
 

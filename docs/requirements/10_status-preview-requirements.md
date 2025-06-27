@@ -55,7 +55,7 @@ interface CalculatorData {
   mainWeapon: WeaponData     // メイン武器
   subWeapon: WeaponData      // サブ武器
   crystals: CrystalData[]    // クリスタル配置
-  equipment: EquipmentData[] // 装備品
+  equipment: EquipmentData[] // 装備品（11スロット: 従来8 + 自由入力3）
   foods: FoodData[]          // 料理
   buffs: BuffData[]          // バフ
   enemy: EnemyData           // 敵情報
@@ -114,7 +114,7 @@ interface AllBonuses {
 ### 2. 補正値統合
 
 #### 2.1 装備品補正値計算
-- 8スロット装備品の補正値を統合
+- 11スロット装備品の補正値を統合（従来8スロット + 自由入力3スロット）
 - プロパティ効果の適用
 - 精錬値による補正
 
@@ -134,7 +134,7 @@ interface AllBonuses {
 #### 3.1 計算順序
 1. 基本ステータス取得
 2. 武器データ統合
-3. 装備プロパティ統合
+3. 装備プロパティ統合（11スロット装備品プロパティ）
 4. クリスタル効果統合
 5. バフ効果統合
 6. 最終計算処理
