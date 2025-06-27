@@ -121,7 +121,17 @@ export function getPresetEnemyById(id: string): PresetEnemy | undefined {
  * 全敵情報を取得（プリセット + ユーザーカスタム）- 新システム
  */
 export function getAllEnemies(): Enemy[] {
-	const presetEnemies = getLocalStorageEnemies()
+	// src/data/enemies.ts から直接プリセットデータを取得
+	const presetEnemiesFromTS: Enemy[] = getPresetEnemies().map((enemy) => ({
+		...enemy,
+		isPreset: true as const,
+		isCustom: false as const,
+		isFavorite: false,
+		isModified: false,
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+	}))
+	
 	const userEnemies = getUserEnemies()
 
 	// カスタム敵情報をCustomEnemy形式に変換
@@ -135,7 +145,7 @@ export function getAllEnemies(): Enemy[] {
 		updatedAt: enemy.updatedAt || new Date().toISOString(),
 	}))
 
-	return [...presetEnemies, ...formattedUserEnemies]
+	return [...presetEnemiesFromTS, ...formattedUserEnemies]
 }
 
 /**
