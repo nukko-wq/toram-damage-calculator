@@ -529,7 +529,7 @@ export interface TotalElementAdvantageCalculationSteps {
 export interface WeaponType {
 	id: string
 	name: string
-	statusATKFormula: (baseStats: BaseStats) => number
+	statusATKFormula: (adjustedStats: AdjustedStatsCalculation) => number
 	statusASPDFormula: (adjustedStats: AdjustedStatsCalculation) => number
 	statusStabilityFormula: (adjustedStats: AdjustedStatsCalculation) => number
 	aspdCorrection: number
@@ -641,6 +641,7 @@ export function calculateATK(
 		stability: number
 		refinement: number
 	},
+	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
 ): ATKCalculationSteps {
 	// 1. 総武器ATK計算
@@ -657,10 +658,10 @@ export function calculateATK(
 	const totalWeaponATK =
 		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
 
-	// 2. ステータスATK計算（武器種別対応）
+	// 2. ステータスATK計算（武器種別対応、補正後ステータスを使用）
 	const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
 	const weaponType = WEAPON_TYPES[weaponTypeKey] || WEAPON_TYPES.halberd
-	const statusATK = weaponType.statusATKFormula(stats)
+	const statusATK = weaponType.statusATKFormula(adjustedStats)
 
 	// 3. ATKアップ・ダウン計算
 	const atkUpSTR = Math.floor((stats.STR * (bonuses.ATK_STR_Rate || 0)) / 100)
@@ -691,8 +692,8 @@ export function calculateATK(
 		weaponATKPercentBonus,
 		weaponATKFixedBonus,
 		totalWeaponATK,
-		baseSTR: stats.STR,
-		baseAGI: stats.AGI,
+		baseSTR: adjustedStats.STR, // 補正後ステータス（ステータスATK用）
+		baseAGI: adjustedStats.AGI, // 補正後ステータス（ステータスATK用）
 		statusATK,
 		atkUpSTR,
 		atkUpAGI,

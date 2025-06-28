@@ -48,6 +48,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	const atkCalculation = calculateATK(
 		data.baseStats,
 		data.mainWeapon,
+		adjustedStats,
 		dummyBonuses,
 	)
 

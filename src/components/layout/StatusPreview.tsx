@@ -224,7 +224,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			hpCalculation: calculateHP(baseStats, allBonuses),
 			mpCalculation: calculateMP(baseStats, allBonuses),
-			atkCalculation: calculateATK(baseStats, data.mainWeapon, allBonuses),
+			atkCalculation: calculateATK(baseStats, data.mainWeapon, adjustedStatsCalculation, allBonuses),
 			subATKCalculation: calculateSubATK(
 				baseStats,
 				data.mainWeapon,
