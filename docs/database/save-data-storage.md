@@ -27,7 +27,7 @@ interface SaveData {
     baseStats: BaseStatsFormData    // キャラクターベースステータス
     weapons: WeaponFormData         // 武器設定（選択された装備IDの参照）
     crystals: CrystalFormData       // クリスタル設定（選択されたクリスタルIDの参照）
-    equipments: EquipmentFormData   // 装備設定（選択された装備IDの参照）
+    equipments: EquipmentFormData   // 装備設定（選択された装備IDの参照、体装備armorType含む）
     food: FoodFormData             // 料理設定
     enemy: EnemyFormData           // 敵設定
     buffSkills: BuffSkillFormData   // バフスキル設定
@@ -100,6 +100,64 @@ function getBuffItemById(id: string): BuffItem | null {
 }
 ```
 
+## 体装備の防具の改造（ArmorType）保存仕様
+
+### データ保存場所
+```typescript
+// 各装備データ内に保存（プリセット・カスタム共通）
+PresetEquipment.armorType: 'normal' | 'heavy' | 'light'
+CustomEquipment.armorType: 'normal' | 'heavy' | 'light'
+```
+
+### 保存タイミング
+- **即座保存**: ユーザーが防具の改造選択ボタンをクリックした際に装備データを直接更新
+- **編集セッション不使用**: 他のプロパティと異なり、編集セッション機能は使用せず直接保存
+- **グローバル共有**: 装備データに保存されるため、全セーブデータ間で共有される
+- **装備固有設定**: 同じ装備を選択すれば、どのセーブデータでも同じarmorTypeが適用される
+
+### デフォルト値管理
+- **新規装備データ**: 新規作成時にarmorType: 'normal'を設定
+- **プリセット装備**: システム提供プリセットのarmorTypeは初期状態で'normal'
+- **既存データマイグレーション**: armorTypeプロパティが存在しない装備は'normal'として扱う
+- **後方互換性**: 古い装備データでもエラーなく動作するよう配慮
+
+### データ構造例
+```typescript
+// プリセット装備データ（equipments.ts）
+{
+  id: "iron_armor",
+  name: "アイアンアーマー", 
+  type: "armor",
+  category: ["body"],
+  baseStats: { DEF: 100 },
+  properties: {},
+  armorType: "heavy"  // この装備の防具の改造設定
+}
+
+// ユーザーカスタム装備データ（LocalStorage）
+{
+  id: "custom_armor_1",
+  name: "カスタムアーマー1",
+  category: "body", 
+  properties: { DEF: 150 },
+  armorType: "light",  // この装備の防具の改造設定
+  isCustom: true
+}
+
+// セーブデータでは装備IDのみ参照
+{
+  id: "save1", 
+  name: "テストデータ",
+  data: {
+    equipments: {
+      body: {
+        id: "iron_armor"  // 装備IDを参照、armorTypeは装備データから取得
+      }
+    }
+  }
+}
+```
+
 ## メインデータのデフォルト値
 
 ```typescript
@@ -114,7 +172,7 @@ const DEFAULT_MAIN_DATA: DefaultSaveData = {
     baseStats: getDefaultBaseStats(),      // レベル1、全ステータス最小値
     weapons: getDefaultWeapons(),          // 武器未選択状態
     crystals: getDefaultCrystals(),        // クリスタル未選択状態
-    equipments: getDefaultEquipments(),    // 装備未選択状態
+    equipments: getDefaultEquipments(),    // 装備未選択状態（体装備armorType: 'normal'）
     food: getDefaultFood(),               // 料理未選択状態（全スロット「なし」）
     enemy: getDefaultEnemy(),              // 敵の基本設定
     buffSkills: getDefaultBuffSkills(),     // バフスキル未選択状態（全スキルOFF）

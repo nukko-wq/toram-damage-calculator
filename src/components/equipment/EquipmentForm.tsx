@@ -7,6 +7,7 @@ import type {
 	EquipmentSlots,
 	EquipmentProperties,
 	EquipmentCategory,
+	ArmorType,
 } from '@/types/calculator'
 import {
 	getCombinedEquipmentById,
@@ -17,6 +18,7 @@ import DeleteConfirmModal from './DeleteConfirmModal'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
 import RenameEquipmentModal from './RenameEquipmentModal'
 import { RegisterForm } from './RegisterForm'
+import ArmorTypeSelect from '@/components/ui/ArmorTypeSelect'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -47,6 +49,9 @@ export default function EquipmentForm({
 	)
 	const updateCustomEquipmentProperties = useCalculatorStore(
 		(state) => state.updateCustomEquipmentProperties,
+	)
+	const updateEquipmentArmorType = useCalculatorStore(
+		(state) => state.updateEquipmentArmorType,
 	)
 
 	// Zustandストアの値を使用（完全移行）
@@ -690,6 +695,14 @@ export default function EquipmentForm({
 		})
 	}
 
+	// ArmorType変更のハンドラー
+	const handleArmorTypeChange = (newArmorType: ArmorType) => {
+		const currentEquipment = effectiveEquipment.body
+		if (!currentEquipment?.id) return
+
+		updateEquipmentArmorType(currentEquipment.id, newArmorType)
+	}
+
 	const renderPropertyInputs = (
 		item: Equipment,
 		slotKey: keyof EquipmentSlots,
@@ -992,6 +1005,19 @@ export default function EquipmentForm({
 								</>
 							)}
 					</div>
+
+					{/* 体装備の防具の改造選択UI */}
+					{activeTab === 'body' && effectiveEquipment.body?.id && (
+						<div className="mt-4">
+							<ArmorTypeSelect
+								selectedType={
+									getCombinedEquipmentById(effectiveEquipment.body.id)?.armorType || 'normal'
+								}
+								onChange={handleArmorTypeChange}
+								className="max-w-md"
+							/>
+						</div>
+					)}
 
 					{effectiveEquipment[activeTab] &&
 						renderPropertyInputs(

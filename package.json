@@ -9,9 +9,7 @@
 		"lint": "npx @biomejs/biome lint",
 		"lint:fix": "npx @biomejs/biome lint --write",
 		"format": "npx @biomejs/biome format --write",
-		"upgrade-interactive": "ncu --interactive --format group",
-		"sync-data": "node scripts/sync-data.js",
-		"check-data": "node scripts/check-data.js"
+		"upgrade-interactive": "ncu --interactive --format group"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.1.1",

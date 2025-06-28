@@ -14,6 +14,7 @@ import type {
 	BuffItemFormData,
 	RegisterFormData,
 	SaveData,
+	ArmorType,
 } from './calculator'
 import type { CalculationResults } from './calculationResult'
 
@@ -104,6 +105,10 @@ export interface CalculatorStore {
 	updateCustomEquipmentProperties: (
 		equipmentId: string,
 		properties: Partial<EquipmentProperties>,
+	) => Promise<boolean>
+	updateEquipmentArmorType: (
+		equipmentId: string,
+		armorType: ArmorType,
 	) => Promise<boolean>
 	cleanupTemporaryData: () => void
 	getUnsavedDataStatus: () => {

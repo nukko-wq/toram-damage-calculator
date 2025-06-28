@@ -24,6 +24,9 @@ export type SubWeaponType =
 	| '抜刀剣'
 	| 'なし'
 
+// 防具の改造タイプ（体装備専用）
+export type ArmorType = 'normal' | 'heavy' | 'light'
+
 // 基本ステータス
 export interface BaseStats {
 	STR: number
@@ -241,6 +244,7 @@ export interface PresetEquipment {
 	properties: Partial<EquipmentProperties>
 	description?: string
 	source?: string // 入手方法
+	armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
 }
 
 // クリスタル種別
@@ -407,6 +411,7 @@ export interface UserEquipment {
 		slot1?: string
 		slot2?: string
 	}
+	armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
 	createdAt: string
 	updatedAt: string
 	isFavorite: boolean

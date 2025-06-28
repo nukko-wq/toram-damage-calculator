@@ -5,7 +5,7 @@
  * 詳細な計算式は docs/calculations/basic-stats.md を参照
  */
 
-import type { BaseStats, WeaponType as WeaponTypeEnum } from '@/types/calculator'
+import type { BaseStats, WeaponType as WeaponTypeEnum, ArmorType } from '@/types/calculator'
 import { getWeaponTypeKey } from '@/utils/weaponTypeMapping'
 
 // 全補正値（装備・クリスタ・料理・バフアイテムの合計）
@@ -170,6 +170,15 @@ export interface MPCalculationSteps {
 	baseMP: number // MP基本値
 	mpAfterPercent: number // MP%適用後
 	finalMP: number // 最終MP
+}
+
+// 安定率計算の中間結果
+export interface StabilityCalculationSteps {
+	weaponStability: number // メイン武器の安定率
+	statusStability: number // ステータス安定率
+	stabilityPercent: number // 安定率%補正
+	stabilityBeforeLimit: number // 制限適用前の安定率
+	finalStability: number // 最終安定率（0-100制限適用後）
 }
 
 /**
@@ -388,7 +397,9 @@ export interface ASPDCalculationSteps {
 	statusASPD: number // ステータスASPD（武器種別計算）
 	weaponTypeCorrection: number // 武器種補正値
 	aspdBeforePercent: number // ASPD%適用前
-	aspdPercent: number // ASPD%補正値
+	aspdPercent: number // ASPD%補正値（装備等）
+	armorTypeBonus: number // ArmorType補正値（内部計算のみ）
+	effectiveASPDPercent: number // 実効ASPD%（ASPD% + ArmorType補正）
 	aspdAfterPercent: number // ASPD%適用後
 	aspdFixed: number // ASPD固定値
 	finalASPD: number // 最終ASPD
@@ -473,6 +484,7 @@ export interface WeaponType {
 	name: string
 	statusATKFormula: (baseStats: BaseStats) => number
 	statusASPDFormula: (adjustedStats: AdjustedStatsCalculation) => number
+	statusStabilityFormula: (adjustedStats: AdjustedStatsCalculation) => number
 	aspdCorrection: number
 }
 
@@ -483,6 +495,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '旋風槍',
 		statusATKFormula: (stats) => stats.STR * 2.5 + stats.AGI * 1.5,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 3.5,
+		statusStabilityFormula: (stats) => stats.STR * 0.05 + stats.DEX * 0.05,
 		aspdCorrection: 25,
 	},
 	'1hsword': {
@@ -490,6 +503,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '片手剣',
 		statusATKFormula: (stats) => stats.STR * 2.0 + stats.DEX * 2.0,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 4.2,
+		statusStabilityFormula: (stats) => stats.STR * 0.025 + stats.DEX * 0.075,
 		aspdCorrection: 100,
 	},
 	'2hsword': {
@@ -497,6 +511,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '両手剣',
 		statusATKFormula: (stats) => stats.STR * 3.0 + stats.DEX * 1.0,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 2.1,
+		statusStabilityFormula: (stats) => stats.DEX * 0.1,
 		aspdCorrection: 50,
 	},
 	bow: {
@@ -504,6 +519,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '弓',
 		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 3.0,
 		statusASPDFormula: (stats) => stats.DEX * 0.2 + stats.AGI * 3.1,
+		statusStabilityFormula: (stats) => stats.STR * 0.05 + stats.DEX * 0.05,
 		aspdCorrection: 75,
 	},
 	bowgun: {
@@ -511,6 +527,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '自動弓',
 		statusATKFormula: (stats) => stats.DEX * 4.0,
 		statusASPDFormula: (stats) => stats.DEX * 0.2 + stats.AGI * 2.2,
+		statusStabilityFormula: (stats) => stats.STR * 0.05,
 		aspdCorrection: 30,
 	},
 	staff: {
@@ -518,6 +535,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '杖',
 		statusATKFormula: (stats) => stats.STR * 3.0 + stats.INT * 1.0,
 		statusASPDFormula: (stats) => stats.AGI * 1.8 + stats.INT * 0.2,
+		statusStabilityFormula: (stats) => stats.STR * 0.05,
 		aspdCorrection: 60,
 	},
 	'magic-device': {
@@ -525,6 +543,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '魔導具',
 		statusATKFormula: (stats) => stats.AGI * 2.0 + stats.INT * 2.0,
 		statusASPDFormula: (stats) => stats.AGI * 4.0 + stats.INT * 0.2,
+		statusStabilityFormula: (stats) => stats.DEX * 0.1,
 		aspdCorrection: 900,
 	},
 	knuckle: {
@@ -532,6 +551,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '手甲',
 		statusATKFormula: (stats) => stats.DEX * 0.5 + stats.AGI * 2.0,
 		statusASPDFormula: (stats) => stats.STR * 0.1 + stats.DEX * 0.1 + stats.AGI * 4.6,
+		statusStabilityFormula: (stats) => stats.DEX * 0.025,
 		aspdCorrection: 120,
 	},
 	katana: {
@@ -539,6 +559,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '抜刀剣',
 		statusATKFormula: (stats) => stats.STR * 1.5 + stats.DEX * 2.5,
 		statusASPDFormula: (stats) => stats.STR * 0.3 + stats.AGI * 3.9,
+		statusStabilityFormula: (stats) => stats.STR * 0.075 + stats.DEX * 0.025,
 		aspdCorrection: 200,
 	},
 	'dual-sword': {
@@ -546,6 +567,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '双剣',
 		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 2.0 + stats.AGI * 1.0,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 4.2,
+		statusStabilityFormula: (stats) => 0, // 特殊計算（保留）
 		aspdCorrection: 100,
 	},
 	barehand: {
@@ -553,6 +575,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		name: '素手',
 		statusATKFormula: (stats) => stats.STR * 1.0,
 		statusASPDFormula: (stats) => stats.AGI * 9.6,
+		statusStabilityFormula: (stats) => stats.DEX * 0.35,
 		aspdCorrection: 1000,
 	},
 }
@@ -859,14 +882,16 @@ export function calculateSubATK(
 }
 
 /**
- * ASPD計算（武器種別対応）
- * ASPD = INT((Lv + ステータスASPD + 武器種補正値) × (1 + ASPD%/100)) + ASPD固定値
+ * ASPD計算（武器種別対応、ArmorType補正対応）
+ * ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorType補正)/100)) + ASPD固定値
+ * ArmorType補正: 通常=0%, 軽量化=+50%, 重量化=-50%（内部計算のみ）
  */
 export function calculateASPD(
 	stats: BaseStats,
 	weapon: { weaponType: WeaponTypeEnum },
 	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
+	armorType: ArmorType = 'normal',
 ): ASPDCalculationSteps {
 	// 1. 武器種別ステータスASPD計算
 	const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
@@ -879,13 +904,17 @@ export function calculateASPD(
 	// 3. ASPD%適用前の値計算
 	const aspdBeforePercent = stats.level + statusASPD + weaponTypeCorrection
 
-	// 4. ASPD%補正適用
+	// 4. ASPD%補正値とArmorType補正計算
 	const aspdPercent = bonuses.AttackSpeed_Rate || 0
+	const armorTypeBonus = getArmorTypeASPDBonus(armorType)
+	const effectiveASPDPercent = aspdPercent + armorTypeBonus
+
+	// 5. 実効ASPD%補正適用
 	const aspdAfterPercent = Math.floor(
-		aspdBeforePercent * (1 + aspdPercent / 100),
+		aspdBeforePercent * (1 + effectiveASPDPercent / 100),
 	)
 
-	// 5. ASPD固定値加算
+	// 6. ASPD固定値加算
 	const aspdFixed = bonuses.AttackSpeed || 0
 	const finalASPD = aspdAfterPercent + aspdFixed
 
@@ -895,6 +924,8 @@ export function calculateASPD(
 		weaponTypeCorrection,
 		aspdBeforePercent,
 		aspdPercent,
+		armorTypeBonus,
+		effectiveASPDPercent,
 		aspdAfterPercent,
 		aspdFixed,
 		finalASPD,
@@ -919,6 +950,137 @@ export function calculateAilmentResistance(
 	const finalAilmentResistance = menBaseResistance + ailmentResistancePercent
 	
 	return finalAilmentResistance
+}
+
+/**
+ * FLEE計算ステップの詳細情報
+ */
+export interface FLEECalculationSteps {
+	level: number
+	adjustedAGI: number
+	hasBodyEquipment: boolean
+	armorType: ArmorType
+	baseFLEE: number
+	dodgePercent: number
+	fleeAfterPercent: number
+	dodgeFixed: number
+	finalFLEE: number
+}
+
+/**
+ * 体装備の状態とArmorTypeを判定
+ * @param bodyEquipment 体装備データ
+ * @returns 体装備状態とArmorType
+ */
+export function getBodyEquipmentStatus(bodyEquipment: any): {
+	hasBodyEquipment: boolean
+	armorType: ArmorType
+} {
+	if (!bodyEquipment || !bodyEquipment.id) {
+		return { hasBodyEquipment: false, armorType: 'normal' }
+	}
+	
+	return { 
+		hasBodyEquipment: true, 
+		armorType: bodyEquipment.armorType || 'normal' 
+	}
+}
+
+/**
+ * FLEE（回避率）計算
+ * FLEE = INT(基礎FLEE × (1 + 回避%/100)) + 回避固定値
+ * 
+ * 基礎FLEE計算（体装備状態とArmorTypeに依存）：
+ * - 体装備なし: INT(75 + Lv × 3/2 + 補正後AGI × 2)
+ * - 体装備あり（通常）: INT(Lv + 補正後AGI)
+ * - 体装備あり（軽量化）: INT(30 + Lv × 5/4 + 補正後AGI × 7/4)
+ * - 体装備あり（重量化）: INT(-15 + Lv/2 + 補正後AGI × 3/4)
+ */
+export function calculateFLEE(
+	level: number,
+	adjustedAGI: number,
+	bodyEquipment: any,
+	bonuses: AllBonuses = {},
+): FLEECalculationSteps {
+	// 1. 体装備状態の判定
+	const { hasBodyEquipment, armorType } = getBodyEquipmentStatus(bodyEquipment)
+	
+	// 2. 基礎FLEE計算（4パターン）
+	let baseFLEE: number
+	
+	if (!hasBodyEquipment) {
+		// 体装備なし
+		baseFLEE = Math.floor(75 + level * 3/2 + adjustedAGI * 2)
+	} else {
+		// 体装備あり（ArmorTypeに応じて分岐）
+		switch (armorType) {
+			case 'light':
+				// 軽量化
+				baseFLEE = Math.floor(30 + level * 5/4 + adjustedAGI * 7/4)
+				break
+			case 'heavy':
+				// 重量化
+				baseFLEE = Math.floor(-15 + level/2 + adjustedAGI * 3/4)
+				break
+			case 'normal':
+			default:
+				// 通常
+				baseFLEE = Math.floor(level + adjustedAGI)
+				break
+		}
+	}
+	
+	// 3. 回避%適用（装備+クリスタ+バフアイテム、料理除外）
+	const dodgePercent = bonuses.Dodge_Rate || 0
+	const fleeAfterPercent = Math.floor(baseFLEE * (1 + dodgePercent / 100))
+	
+	// 4. 回避固定値加算（装備+クリスタ+バフアイテム、料理除外）
+	const dodgeFixed = bonuses.Dodge || 0
+	const finalFLEE = fleeAfterPercent + dodgeFixed
+	
+	return {
+		level,
+		adjustedAGI,
+		hasBodyEquipment,
+		armorType,
+		baseFLEE,
+		dodgePercent,
+		fleeAfterPercent,
+		dodgeFixed,
+		finalFLEE,
+	}
+}
+
+/**
+ * ArmorType補正値を計算
+ * @param armorType 体装備の防具の改造
+ * @returns ASPD%補正値（内部計算のみ）
+ */
+export function getArmorTypeASPDBonus(armorType: ArmorType): number {
+	switch (armorType) {
+		case 'light': return 50   // 軽量化: +50%
+		case 'heavy': return -50  // 重量化: -50%
+		case 'normal':
+		default: return 0         // 通常: +0%
+	}
+}
+
+/**
+ * 体装備からArmorTypeを取得
+ * @param bodyEquipment 体装備データ
+ * @returns ArmorType（デフォルト: 'normal'）
+ */
+export function getBodyArmorType(bodyEquipment: any): ArmorType {
+	// 体装備が設定されていない場合はデフォルト
+	if (!bodyEquipment?.id) {
+		return 'normal'
+	}
+
+	// 体装備のArmorTypeを取得（装備データから）
+	const { getCombinedEquipmentById } = require('./equipmentDatabase')
+	const equipment = getCombinedEquipmentById(bodyEquipment.id)
+	
+	return equipment?.armorType || 'normal'
 }
 
 /**
@@ -1134,5 +1296,46 @@ export function calculateTotalElementAdvantage(
 	return {
 		elementAdvantageRate,
 		finalTotalElementAdvantage,
+	}
+}
+
+/**
+ * 安定率計算
+ * 
+ * 計算式: MAX(0, MIN(100, メイン武器の安定率 + ステータス安定率 + 安定率%))
+ * ステータス安定率は武器種によって異なる計算式を使用
+ * 
+ * @param weaponStability メイン武器の安定率
+ * @param weaponType 武器種別
+ * @param adjustedStats 補正後ステータス
+ * @param bonuses 全補正値（装備・クリスタ・料理・バフアイテム統合済み）
+ * @returns 安定率計算の詳細ステップ
+ */
+export function calculateStability(
+	weaponStability: number,
+	weaponType: WeaponTypeEnum,
+	adjustedStats: AdjustedStatsCalculation,
+	bonuses: AllBonuses = {},
+): StabilityCalculationSteps {
+	// 1. 武器種別によるステータス安定率計算
+	const weaponTypeKey = getWeaponTypeKey(weaponType)
+	const weaponTypeData = WEAPON_TYPES[weaponTypeKey] || WEAPON_TYPES.halberd
+	const statusStability = weaponTypeData.statusStabilityFormula(adjustedStats)
+	
+	// 2. 安定率%補正取得（3データソース：装備・クリスタ・バフアイテム）
+	const stabilityPercent = bonuses.Stability_Rate || 0
+	
+	// 3. 制限適用前の安定率計算
+	const stabilityBeforeLimit = weaponStability + statusStability + stabilityPercent
+	
+	// 4. 0-100%制限適用と小数点切り捨て
+	const finalStability = Math.floor(Math.max(0, Math.min(100, stabilityBeforeLimit)))
+	
+	return {
+		weaponStability,
+		statusStability,
+		stabilityPercent,
+		stabilityBeforeLimit,
+		finalStability,
 	}
 }

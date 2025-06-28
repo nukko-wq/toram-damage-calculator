@@ -5,7 +5,7 @@
  * EquipmentPropertiesインターフェースによる厳密な型チェック
  */
 
-import type { EquipmentProperties } from '@/types/calculator'
+import type { EquipmentProperties, ArmorType } from '@/types/calculator'
 
 // 装備アイテムの型定義（JSONデータ構造に合わせて簡略化）
 interface EquipmentItem {
@@ -21,6 +21,7 @@ interface EquipmentItem {
 		slot1?: string | null
 		slot2?: string | null
 	}
+	armorType?: ArmorType // 防具の改造タイプ（体装備のみ使用）
 }
 
 // 装備カテゴリの型定義
@@ -80,7 +81,8 @@ export const equipmentsData: EquipmentsData = {
 					MagicalPenetration_Rate: -7,
 					Accuracy: -14,
 					Accuracy_Rate: -6
-				}
+				},
+				armorType: 'normal'
 			},
 			{
 				id: "cd287974-decd-4fbe-8c20-52d6801159f8",
@@ -90,7 +92,8 @@ export const equipmentsData: EquipmentsData = {
 					CriticalDamage: 22,
 					CriticalDamage_Rate: 10,
 					Critical_Rate: 27
-				}
+				},
+				armorType: 'normal'
 			}
 		],
 		additional: [

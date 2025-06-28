@@ -6,6 +6,7 @@ import type {
 	EquipmentType,
 	EquipmentCategory,
 	EquipmentProperties,
+	ArmorType,
 } from '@/types/calculator'
 import { equipmentsData } from '@/data/equipments'
 import {
@@ -469,6 +470,8 @@ export function createCustomEquipment(
 					slot2: undefined,
 				}
 			: undefined,
+		// 体装備の場合はarmorTypeにデフォルト値を設定
+		armorType: equipmentCategory === 'body' ? 'normal' : undefined,
 		createdAt: now,
 		updatedAt: now,
 		isFavorite: false,
@@ -545,6 +548,7 @@ export function getCombinedEquipmentsByCategory(
 			category: [equipment.category] as EquipmentCategory[],
 			baseStats: equipment.weaponStats || {},
 			properties: equipment.properties,
+			armorType: equipment.armorType,
 			isPreset: false,
 			isCustom: true,
 			isFavorite: equipment.isFavorite,
@@ -667,6 +671,7 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 			category: [customEquipment.category],
 			baseStats: customEquipment.weaponStats || {},
 			properties: customEquipment.properties,
+			armorType: customEquipment.armorType,
 			isPreset: false,
 			isCustom: true,
 			isFavorite: customEquipment.isFavorite,
@@ -771,4 +776,37 @@ export function renameCustomEquipment(id: string, newName: string): boolean {
 	}
 
 	return updated
+}
+
+// ArmorTypeを更新（プリセット・カスタム装備対応）
+export function updateEquipmentArmorType(id: string, armorType: ArmorType): boolean {
+	console.log('updateEquipmentArmorType called:', { id, armorType })
+	
+	// カスタム装備の場合を先に確認
+	const customEquipment = getCustomEquipmentById(id)
+	if (customEquipment) {
+		console.log('Found custom equipment:', customEquipment.name)
+		try {
+			const { updateUserEquipment } = require('./customEquipmentManager')
+			updateUserEquipment(id, { armorType })
+			console.log('Custom equipment armorType updated successfully')
+			return true
+		} catch (error) {
+			console.error('Failed to update custom equipment armor type:', error)
+			return false
+		}
+	}
+
+	// プリセット装備の場合（equipments.tsのデータを直接更新）
+	const presetEquipment = getEquipmentById(id)
+	if (presetEquipment) {
+		console.log('Found preset equipment:', presetEquipment.name)
+		// プリセット装備データを直接更新（メモリ上の変更）
+		presetEquipment.armorType = armorType
+		console.log('Preset equipment armorType updated successfully')
+		return true
+	}
+
+	console.log('No equipment found with id:', id)
+	return false
 }

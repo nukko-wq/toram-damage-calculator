@@ -38,6 +38,7 @@ interface CalculatorStore {
   renameCustomEquipment: (equipmentId: string, newName: string) => Promise<boolean>  // 全装備スロット対応
   deleteCustomEquipment: (equipmentId: string) => Promise<void>  // 全装備スロット対応
   updateCustomEquipmentProperties: (equipmentId: string, properties: Partial<EquipmentProperties>) => Promise<void>  // 全装備スロット対応
+  updateEquipmentArmorType: (equipmentId: string, armorType: ArmorType) => Promise<boolean>  // ArmorType即座反映対応
   cleanupTemporaryData: () => void
   updateFood: (food: FoodFormData) => void
   updateEnemy: (enemy: EnemyFormData) => void
@@ -352,7 +353,83 @@ const EquipmentForm = () => {
 - 全セーブデータ間でのカスタム装備共有
 - プロパティリセット機能
 
-## 7. データクリーンアップ
+## 7. ArmorType即座反映システム
+
+### 7.1 ArmorType更新の特殊処理
+
+**目的**: 体装備のArmorType変更時に、ASPD計算へ即座に反映
+
+**問題**: ArmorType変更がデータベースレベルでのみ実行され、Zustandストアの状態が更新されないため、StatusPreviewのASPD計算が即座に反映されない
+
+**解決策**: `updateEquipmentArmorType`メソッドでの強制的ストア状態更新
+
+```typescript
+updateEquipmentArmorType: async (equipmentId, armorType) => {
+  try {
+    const success = updateEquipmentArmorType(equipmentId, armorType)
+    if (success) {
+      // ArmorType変更を即座に反映するためにストア状態を強制更新
+      set((state) => {
+        const newState = { ...state, hasUnsavedChanges: true }
+        // 体装備のIDが一致する場合、ストアの装備データを更新
+        if (state.data.equipment.body?.id === equipmentId) {
+          newState.data = {
+            ...state.data,
+            equipment: {
+              ...state.data.equipment,
+              body: {
+                ...state.data.equipment.body,
+                armorType,
+              },
+            },
+          }
+        }
+        return newState
+      }, false, 'updateEquipmentArmorType')
+    }
+    return success
+  } catch (error) {
+    console.error('ArmorType更新エラー:', error)
+    throw error
+  }
+}
+```
+
+### 7.2 ArmorType変更フロー
+
+**変更フロー**:
+```
+[ArmorType変更] → ArmorTypeSelect.onChange → EquipmentForm.handleArmorTypeChange → CalculatorStore.updateEquipmentArmorType → データベース更新 + ストア状態強制更新 → StatusPreview自動再計算 → ASPD即座反映
+```
+
+**重要な特徴**:
+- データベースレベルとストアレベルの両方を同期更新
+- 体装備以外のArmorType変更は影響なし（IDチェックにより安全）
+- 未保存変更フラグの自動設定
+- エラーハンドリングによる安全な操作
+
+### 7.3 ASPD計算連動
+
+**計算フロー**:
+```typescript
+// StatusPreviewでの自動計算
+const bodyArmorType = getBodyArmorType(data.equipment.body)
+const aspdCalculation = calculateASPD(
+  baseStats,
+  data.mainWeapon,
+  adjustedStatsCalculation,
+  allBonuses,
+  bodyArmorType,  // ストア状態から取得したArmorTypeを使用
+)
+```
+
+**連動の特徴**:
+- ストア状態変更により自動的にStatusPreviewが再レンダリング
+- ArmorType補正（軽量化 +50%, 重量化 -50%）が内部的にASPD%計算に適用
+- 装備品補正値には表示されない（内部計算のみ）
+- リアルタイムでのASPD値更新
+
+## 8. データクリーンアップ
 
 ### 7.1 自動クリーンアップ機能
 

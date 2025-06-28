@@ -22,8 +22,6 @@ npm run lint        # Run Biome linter
 npm run lint:fix     # Fix linting issues automatically
 npm run format      # Format code with Biome
 npx tsc --noEmit     # Type check without emitting files
-npm run sync-data    # Synchronize preset data (runs pre-build)
-npm run check-data   # Validate data integrity
 ```
 
 ## Architecture Overview
@@ -46,12 +44,12 @@ The application consists of interconnected forms that feed into a damage calcula
 - **Real-time Updates**: React Hook Form `watch()` → Zustand store updates → calculation triggers
 - **Memory Management**: Automatic cleanup of temporary equipment edits and session data
 
-### Hybrid Data System
-- **Three-Tier Architecture**: Preset JSON → User Custom (LocalStorage) → Runtime (memory)
-- **Preset Data**: Static JSON files (`src/data/crystals.json`, `equipments.json`, `buffItems.json`)
+### Simplified Data System
+- **Two-Tier Architecture**: Preset TypeScript → User Custom (LocalStorage)
+- **Preset Data**: TypeScript files (`src/data/crystals.ts`, `equipments.ts`, `enemies.ts`, `buffItems.ts`)
 - **User Custom Data**: LocalStorage with CRUD operations, timestamps, and export/import
 - **Data Access Layer**: Unified APIs in `*Database.ts` files merge all data sources
-- **Type Safety**: Zod validation + TypeScript interfaces ensure data integrity
+- **Type Safety**: Full TypeScript integration with compile-time validation
 
 ### Equipment System Complexity
 Equipment supports 70+ properties including:

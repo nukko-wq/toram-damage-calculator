@@ -5,7 +5,7 @@ import type {
 	DamageCalculationResult,
 	CalculationSettings,
 } from '@/types/stores'
-import type { EquipmentSlots } from '@/types/calculator'
+import type { EquipmentSlots, ArmorType } from '@/types/calculator'
 import { createInitialCalculatorData } from '@/utils/initialData'
 import {
 	saveCurrentData,
@@ -25,6 +25,7 @@ import {
 	hasTemporaryEquipments,
 	hasEditSessions,
 	renameCustomEquipment,
+	updateEquipmentArmorType,
 } from '@/utils/equipmentDatabase'
 import {
 	createTemporaryCustomEquipment,
@@ -522,6 +523,40 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					}
 				} catch (error) {
 					console.error('カスタム装備削除エラー:', error)
+					throw error
+				}
+			},
+
+			updateEquipmentArmorType: async (equipmentId, armorType) => {
+				try {
+					const success = updateEquipmentArmorType(equipmentId, armorType)
+					if (success) {
+						// ArmorType変更を即座に反映するためにストア状態を強制更新
+						set(
+							(state) => {
+								const newState = { ...state, hasUnsavedChanges: true }
+								// 体装備のIDが一致する場合、ストアの装備データを更新
+								if (state.data.equipment.body?.id === equipmentId) {
+									newState.data = {
+										...state.data,
+										equipment: {
+											...state.data.equipment,
+											body: {
+												...state.data.equipment.body,
+												armorType,
+											},
+										},
+									}
+								}
+								return newState
+							},
+							false,
+							'updateEquipmentArmorType',
+						)
+					}
+					return success
+				} catch (error) {
+					console.error('ArmorType更新エラー:', error)
 					throw error
 				}
 			},

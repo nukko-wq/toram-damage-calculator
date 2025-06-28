@@ -15,8 +15,11 @@ import {
 	calculateArmorBreak,
 	calculateAnticipate,
 	calculateCSPD,
+	calculateFLEE,
 	calculateTotalElementAdvantage,
+	calculateStability,
 	aggregateAllBonuses,
+	getBodyArmorType,
 	type AllBonuses,
 } from './basicStatsCalculation'
 
@@ -42,8 +45,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 4. ATK計算
 	const atkCalculation = calculateATK(data.baseStats, data.mainWeapon, dummyBonuses)
 	
-	// 5. ASPD計算
-	const aspdCalculation = calculateASPD(data.baseStats, data.mainWeapon, adjustedStats, dummyBonuses)
+	// 5. ASPD計算（体装備のArmorTypeを取得）
+	const bodyArmorType = getBodyArmorType(data.equipment.body)
+	const aspdCalculation = calculateASPD(data.baseStats, data.mainWeapon, adjustedStats, dummyBonuses, bodyArmorType)
 	
 	// 6. 行動速度計算
 	const motionSpeedCalculation = calculateMotionSpeed(aspdCalculation.finalASPD, dummyBonuses)
@@ -57,23 +61,29 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 9. HIT計算
 	const hitCalculation = calculateHIT(data.baseStats.level, adjustedStats.DEX, dummyBonuses)
 
-	// 10. 物理耐性計算
+	// 10. FLEE計算
+	const fleeCalculation = calculateFLEE(data.baseStats.level, adjustedStats.AGI, data.equipment.body, dummyBonuses)
+
+	// 11. 物理耐性計算
 	const physicalResistanceCalculation = calculatePhysicalResistance(dummyBonuses)
 
-	// 11. 魔法耐性計算
+	// 12. 魔法耐性計算
 	const magicalResistanceCalculation = calculateMagicalResistance(dummyBonuses)
 
-	// 12. 防御崩し計算
+	// 13. 防御崩し計算
 	const armorBreakCalculation = calculateArmorBreak(dummyBonuses)
 
-	// 13. 先読み計算
+	// 14. 先読み計算
 	const anticipateCalculation = calculateAnticipate(dummyBonuses)
 
-	// 14. CSPD計算
+	// 15. CSPD計算
 	const cspdCalculation = calculateCSPD(data.baseStats.level, adjustedStats.DEX, adjustedStats.AGI, dummyBonuses)
 
-	// 15. 総属性有利計算
+	// 16. 総属性有利計算
 	const totalElementAdvantageCalculation = calculateTotalElementAdvantage(dummyBonuses)
+
+	// 17. 安定率計算
+	const stabilityCalculation = calculateStability(data.mainWeapon.stability, data.mainWeapon.weaponType, adjustedStats, dummyBonuses)
 
 	return {
 		basicStats: {
@@ -85,7 +95,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			bringerAM: 0, // 暫定
 			MATK: 0, // 暫定
 			baseMATK: 0, // 暫定
-			stabilityRate: data.mainWeapon.stability,
+			stabilityRate: stabilityCalculation.finalStability,
 			subStabilityRate: data.subWeapon.stability,
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: 0, // 暫定
@@ -96,7 +106,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			ASPD: aspdCalculation.finalASPD,
 			CSPD: cspdCalculation.finalCSPD,
 			HIT: hitCalculation.finalHIT,
-			FLEE: 0, // 暫定
+			FLEE: fleeCalculation.finalFLEE,
 			physicalResistance: physicalResistanceCalculation.finalPhysicalResistance,
 			magicalResistance: magicalResistanceCalculation.finalMagicalResistance,
 			ailmentResistance,
