@@ -337,6 +337,218 @@ CRT基礎クリティカル率 = INT(25 + CRT/3.4)
 1. **整数計算**: 2段階のINT()関数による切り捨て処理が重要
 2. **料理の特殊性**: 料理にはクリティカル率%補正はないが、クリティカル率固定値補正は存在する
 
+## クリティカルダメージ計算
+
+### 基本計算式
+```
+クリティカルダメージ = INT((150+MAX(補正後STR/5,(補正後STR+補正後AGI)/10))×(1+CD%/100))+CD固定値
+```
+
+**重要な制限事項**: 300を超えた場合、300以降の数値は半減し、小数点以下は切り捨てられる。
+- 例：計算結果が301 → CDは300
+- 例：計算結果が304 → CDは302
+
+### 詳細計算
+
+#### 1. 基礎クリティカルダメージ計算
+```
+基礎CD = 150 + MAX(補正後STR/5, (補正後STR+補正後AGI)/10)
+```
+
+**構成要素:**
+- **基本値150**: 全キャラクター共通のベースクリティカルダメージ
+- **補正後STR**: 装備・クリスタ・バフアイテム・料理補正を含む最終STR値
+- **補正後AGI**: 装備・クリスタ・バフアイテム・料理補正を含む最終AGI値
+- **MAX関数**: STR重視(STR/5)とSTR+AGI重視((STR+AGI)/10)の高い方を採用
+
+#### 2. クリティカルダメージ%補正適用
+```
+CD%適用後 = INT(基礎CD × (1 + CD%/100))
+```
+
+**構成要素:**
+- **CD%(CriticalDamage_Rate)**: 装備/プロパティ、クリスタ、バフアイテムのクリティカルダメージ%(CriticalDamage_Rate)の合計
+- **除外**: 料理にはクリティカルダメージ%補正はありません
+
+#### 3. クリティカルダメージ固定値加算
+```
+最終CD = CD%適用後 + CD固定値
+```
+
+**構成要素:**
+- **CD固定値(CriticalDamage)**: 装備/プロパティ、クリスタ、バフアイテムのクリティカルダメージ固定値(CriticalDamage)の合計
+
+#### 4. 300超過時の半減処理
+300を超えた場合の特殊計算：
+```
+if (最終CD > 300) {
+  超過分 = 最終CD - 300
+  半減後超過分 = INT(超過分 / 2)
+  最終CD = 300 + 半減後超過分
+}
+```
+
+### 計算例
+
+#### 例1: 標準的なケース（300以下）
+**入力値:**
+- 補正後STR: 200
+- 補正後AGI: 150
+- CD%: 25% (装備+クリスタ+バフアイテム)
+- CD固定値: 20 (装備+クリスタ+バフアイテム)
+
+**計算手順:**
+1. MAX判定: MAX(200/5, (200+150)/10) = MAX(40, 35) = 40
+2. 基礎CD = 150 + 40 = 190
+3. CD%適用後 = INT(190 × (1 + 25/100)) = INT(190 × 1.25) = INT(237.5) = 237
+4. 最終CD = 237 + 20 = 257
+5. 300以下のため半減処理なし
+6. **最終クリティカルダメージ = 257**
+
+#### 例2: 高AGIケース（300以下）
+**入力値:**
+- 補正後STR: 150
+- 補正後AGI: 350
+- CD%: 30%
+- CD固定値: 25
+
+**計算手順:**
+1. MAX判定: MAX(150/5, (150+350)/10) = MAX(30, 50) = 50
+2. 基礎CD = 150 + 50 = 200
+3. CD%適用後 = INT(200 × (1 + 30/100)) = INT(200 × 1.30) = INT(260) = 260
+4. 最終CD = 260 + 25 = 285
+5. 300以下のため半減処理なし
+6. **最終クリティカルダメージ = 285**
+
+#### 例3: 高数値ケース（300超過・半減適用）
+**入力値:**
+- 補正後STR: 300
+- 補正後AGI: 250
+- CD%: 40%
+- CD固定値: 30
+
+**計算手順:**
+1. MAX判定: MAX(300/5, (300+250)/10) = MAX(60, 55) = 60
+2. 基礎CD = 150 + 60 = 210
+3. CD%適用後 = INT(210 × (1 + 40/100)) = INT(210 × 1.40) = INT(294) = 294
+4. 固定値加算後 = 294 + 30 = 324
+5. 300超過のため半減処理: 超過分 = 324 - 300 = 24
+6. 半減後超過分 = INT(24 / 2) = INT(12) = 12
+7. **最終クリティカルダメージ = 300 + 12 = 312**
+
+#### 例4: 極端な高数値ケース（300超過・半減適用）
+**入力値:**
+- 補正後STR: 510
+- 補正後AGI: 300
+- CD%: 50%
+- CD固定値: 40
+
+**計算手順:**
+1. MAX判定: MAX(510/5, (510+300)/10) = MAX(102, 81) = 102
+2. 基礎CD = 150 + 102 = 252
+3. CD%適用後 = INT(252 × (1 + 50/100)) = INT(252 × 1.50) = INT(378) = 378
+4. 固定値加算後 = 378 + 40 = 418
+5. 300超過のため半減処理: 超過分 = 418 - 300 = 118
+6. 半減後超過分 = INT(118 / 2) = INT(59) = 59
+7. **最終クリティカルダメージ = 300 + 59 = 359**
+
+### 構成要素
+
+**クリティカルダメージ%(CriticalDamage_Rate)の構成:**
+- 装備/プロパティのクリティカルダメージ%(CriticalDamage_Rate)補正
+- クリスタのクリティカルダメージ%(CriticalDamage_Rate)補正
+- バフアイテムのクリティカルダメージ%(CriticalDamage_Rate)補正
+- **除外**: 料理にはクリティカルダメージ%補正はありません
+
+**クリティカルダメージ固定値(CriticalDamage)の構成:**
+- 装備/プロパティのクリティカルダメージ固定値(CriticalDamage)補正
+- クリスタのクリティカルダメージ固定値(CriticalDamage)補正
+- バフアイテムのクリティカルダメージ固定値(CriticalDamage)補正
+- **除外**: 料理にはクリティカルダメージ固定値補正はありません
+
+### TypeScript実装例
+
+```typescript
+interface CriticalDamageCalculationSteps {
+  adjustedSTR: number
+  adjustedAGI: number
+  strDivision: number
+  strAgiDivision: number
+  maxValue: number
+  baseCriticalDamage: number
+  cdPercent: number
+  cdAfterPercent: number
+  cdFixed: number
+  cdBeforeLimit: number
+  isOver300: boolean
+  excessAmount?: number
+  halvedExcess?: number
+  finalCriticalDamage: number
+}
+
+function calculateCriticalDamage(
+  adjustedSTR: number,
+  adjustedAGI: number,
+  allBonuses: AllBonuses = {}
+): CriticalDamageCalculationSteps {
+  // 1. MAX計算
+  const strDivision = adjustedSTR / 5
+  const strAgiDivision = (adjustedSTR + adjustedAGI) / 10
+  const maxValue = Math.max(strDivision, strAgiDivision)
+  
+  // 2. 基礎クリティカルダメージ
+  const baseCriticalDamage = 150 + maxValue
+  
+  // 3. CD%適用
+  const cdPercent = allBonuses.CriticalDamage_Rate || 0
+  const cdAfterPercent = Math.floor(baseCriticalDamage * (1 + cdPercent / 100))
+  
+  // 4. CD固定値加算
+  const cdFixed = allBonuses.CriticalDamage || 0
+  const cdBeforeLimit = cdAfterPercent + cdFixed
+  
+  // 5. 300超過時の半減処理
+  let finalCriticalDamage: number
+  let isOver300 = false
+  let excessAmount: number | undefined
+  let halvedExcess: number | undefined
+  
+  if (cdBeforeLimit > 300) {
+    isOver300 = true
+    excessAmount = cdBeforeLimit - 300
+    halvedExcess = Math.floor(excessAmount / 2)
+    finalCriticalDamage = 300 + halvedExcess
+  } else {
+    finalCriticalDamage = cdBeforeLimit
+  }
+  
+  return {
+    adjustedSTR,
+    adjustedAGI,
+    strDivision,
+    strAgiDivision,
+    maxValue,
+    baseCriticalDamage,
+    cdPercent,
+    cdAfterPercent,
+    cdFixed,
+    cdBeforeLimit,
+    isOver300,
+    excessAmount,
+    halvedExcess,
+    finalCriticalDamage,
+  }
+}
+```
+
+### 重要な制限事項
+
+1. **MAX関数**: STR/5と(STR+AGI)/10の高い方を採用する複合計算
+2. **300超過半減**: 300を超えた部分は半減される特殊制限
+3. **INT()関数**: %適用時と半減処理時に小数点以下切り捨て
+4. **料理除外**: 料理にはクリティカルダメージ補正（%・固定値とも）は存在しない
+5. **補正後ステータス使用**: 基礎STR・AGIではなく、全補正適用後の値を使用
+
 ## HIT（命中）計算
 
 ### 基本計算式
@@ -812,6 +1024,7 @@ HIT = INT((Lv+総DEX)×(1+命中%/100))+命中固定値
 | 2024-06-23 | HP計算式を正確な式に修正 | INT()関数使用、補正後VIT導入、2段階計算に変更 |
 | 2024-06-23 | MP計算式を正確な式に修正 | INT()関数使用、TECとINT活用、2段階計算に変更 |
 | 2024-06-25 | クリティカル率計算式を追加 | INT()関数使用、CRT依存、2段階計算、料理固定値対応 |
+| 2025-06-28 | クリティカルダメージ計算式を追加 | MAX関数使用、補正後STR・AGI依存、300超過時半減処理、INT関数使用、料理除外 |
 | 2024-06-25 | HIT（命中）計算式を追加 | INT()関数使用、Lv+補正後DEX依存、料理固定値対応 |
 | 2025-06-28 | FLEE（回避率）計算式を追加 | 体装備状態とArmorType依存、4種類の基礎FLEE計算式、INT関数使用、2段階計算、料理除外 |
 | 2024-06-26 | 物理耐性計算式を追加 | 4データソース統合、単純加算方式、料理対応 |
