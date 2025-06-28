@@ -411,6 +411,7 @@ export interface UserEquipment {
 		slot1?: string
 		slot2?: string
 	}
+	armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
 	createdAt: string
 	updatedAt: string
 	isFavorite: boolean

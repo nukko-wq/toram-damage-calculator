@@ -25,6 +25,7 @@ import {
 	hasTemporaryEquipments,
 	hasEditSessions,
 	renameCustomEquipment,
+	updateEquipmentArmorType,
 } from '@/utils/equipmentDatabase'
 import {
 	createTemporaryCustomEquipment,
@@ -522,6 +523,24 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					}
 				} catch (error) {
 					console.error('カスタム装備削除エラー:', error)
+					throw error
+				}
+			},
+
+			updateEquipmentArmorType: async (equipmentId, armorType) => {
+				try {
+					const success = updateEquipmentArmorType(equipmentId, armorType)
+					if (success) {
+						// 変更状態を反映させるために強制的に未保存フラグを設定
+						set(
+							(state) => ({ ...state, hasUnsavedChanges: true }),
+							false,
+							'updateEquipmentArmorType',
+						)
+					}
+					return success
+				} catch (error) {
+					console.error('ArmorType更新エラー:', error)
 					throw error
 				}
 			},
