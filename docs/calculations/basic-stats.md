@@ -549,6 +549,229 @@ function calculateCriticalDamage(
 4. **料理除外**: 料理にはクリティカルダメージ補正（%・固定値とも）は存在しない
 5. **補正後ステータス使用**: 基礎STR・AGIではなく、全補正適用後の値を使用
 
+## MATK（魔法攻撃力）計算
+
+### 基本計算式
+```
+MATK = INT((自Lv+総武器MATK+ステータスMATK+MATKアップ(ｽﾃｰﾀｽ%)-MATKダウン(ｽﾃｰﾀｽ%))×(1+MATK%/100))+MATK固定値
+```
+
+### 詳細計算
+
+#### 総武器MATK
+```
+総武器MATK = INT(武器ATK×(1+(精錬値^2)/100)+精錬値)+INT(武器ATK×武器ATK%)+武器ATK固定値
+```
+
+**適用条件:**
+- **杖・魔導具装備時**: 総武器MATKが適用される
+- **手甲装備時**: 総武器ATK/2が総武器MATKとして適用される（この時点では小数点以下の切り捨ては行われず、MATK計算に使われる）
+- **その他の武器**: 武器のATKが基礎MATKに適用されることはない
+
+#### ステータスMATK
+武器種別によってステータスMATKの計算式が異なります：
+
+- **片手剣**: INT × 3 + DEX × 1
+- **両手剣**: INT × 3 + DEX × 1
+- **弓**: INT × 3 + DEX × 1
+- **自動弓**: INT × 3 + DEX × 1
+- **杖**: INT × 4 + DEX × 1
+- **魔道具**: INT × 4 + DEX × 1
+- **手甲**: INT × 4 + DEX × 1
+- **旋風槍**: INT × 2 + DEX × 1 + AGI × 1
+- **抜刀剣**: INT × 1.5 + DEX × 1
+- **素手**: INT × 3 + DEX × 1
+
+※この時点では切り捨てが行われず、MATK計算に使われる（抜刀剣で小数点以下が発生した場合、MATK%計算時まで保持される）
+
+#### MATKアップ(ｽﾃｰﾀｽ%)・MATKダウン(ｽﾃｰﾀｽ%)（ステータス連動攻撃力）
+基礎ステータスのプロパティ数値%だけMATKが増加または減少します。小数点以下は切り捨てられます。
+
+**プロパティ:**
+- MATK_STR_Rate: MATK+(STR)%
+- MATK_INT_Rate: MATK+(INT)%
+- MATK_VIT_Rate: MATK+(VIT)%
+- MATK_AGI_Rate: MATK+(AGI)%
+- MATK_DEX_Rate: MATK+(DEX)%
+
+**計算式:**
+```
+MATKアップ合計 = INT(基礎STR × MATK_STR_Rate/100) + INT(基礎INT × MATK_INT_Rate/100) + 
+                INT(基礎VIT × MATK_VIT_Rate/100) + INT(基礎AGI × MATK_AGI_Rate/100) + 
+                INT(基礎DEX × MATK_DEX_Rate/100)
+```
+
+#### 構成要素
+- **自Lv**: ステータスのレベル
+- **総武器MATK**: 武器種別に応じた武器攻撃力（上記参照）
+- **ステータスMATK**: 武器種別に応じたステータス攻撃力（上記参照）
+- **MATKアップ**: ステータス連動攻撃力の増加分
+- **MATKダウン**: ステータス連動攻撃力の減少分
+- **MATK%**: 装備/プロパティ、クリスタ、バフアイテムのMATK%(MATK_Rate)の合計
+- **MATK固定値**: 装備/プロパティ、クリスタ、料理、バフアイテムのMATK固定値(MATK)の合計
+
+#### 計算手順
+1. **総武器MATK計算**: 武器種別に応じて計算
+2. **ステータスMATK計算**: 武器種別×ステータス値で計算
+3. **MATKアップ・ダウン計算**: 各ステータス連動分を合計
+4. **基礎MATK計算**: Lv + 総武器MATK + ステータスMATK + MATKアップ - MATKダウン
+5. **MATK%適用**: INT(基礎MATK × (1 + MATK%/100))
+6. **MATK固定値加算**: %適用後 + MATK固定値
+
+### 計算例
+
+#### 例1: 杖装備ケース
+**入力値:**
+- Lv: 150
+- 武器ATK: 200, 精錬値: 10, 武器ATK%: 30%, 武器ATK固定値: 50
+- 基礎INT: 300, 基礎DEX: 180
+- MATKアップ(INT25%): 基礎INT300 → 75増加
+- MATK%: 40%
+- MATK固定値: 80
+
+**計算手順:**
+1. 総武器MATK = INT(200×(1+(10^2)/100)+10) + INT(200×30/100) + 50 = INT(200×2.0+10) + 60 + 50 = 410 + 60 + 50 = 520
+2. ステータスMATK = 300×4 + 180×1 = 1200 + 180 = 1380
+3. MATKアップ = INT(300×25/100) = 75, MATKダウン = 0
+4. 基礎MATK = 150 + 520 + 1380 + 75 - 0 = 2125
+5. MATK%適用後 = INT(2125×(1+40/100)) = INT(2125×1.40) = INT(2975) = 2975
+6. 最終MATK = 2975 + 80 = 3055
+
+#### 例2: 手甲装備ケース
+**入力値:**
+- Lv: 120
+- 総武器ATK: 800（計算済み）
+- 基礎INT: 250, 基礎DEX: 200
+- MATKアップなし
+- MATK%: 25%
+- MATK固定値: 40
+
+**計算手順:**
+1. 総武器MATK = 800/2 = 400（小数点なし）
+2. ステータスMATK = 250×4 + 200×1 = 1000 + 200 = 1200
+3. MATKアップ = 0, MATKダウン = 0
+4. 基礎MATK = 120 + 400 + 1200 + 0 - 0 = 1720
+5. MATK%適用後 = INT(1720×(1+25/100)) = INT(1720×1.25) = INT(2150) = 2150
+6. 最終MATK = 2150 + 40 = 2190
+
+#### 例3: 抜刀剣装備ケース（小数点発生）
+**入力値:**
+- Lv: 180
+- 総武器MATK: 0（抜刀剣は武器MATKなし）
+- 基礎INT: 333, 基礎DEX: 150
+- MATKアップなし
+- MATK%: 50%
+- MATK固定値: 60
+
+**計算手順:**
+1. 総武器MATK = 0
+2. ステータスMATK = 333×1.5 + 150×1 = 499.5 + 150 = 649.5（小数点保持）
+3. MATKアップ = 0, MATKダウン = 0
+4. 基礎MATK = 180 + 0 + 649.5 + 0 - 0 = 829.5
+5. MATK%適用後 = INT(829.5×(1+50/100)) = INT(829.5×1.50) = INT(1244.25) = 1244
+6. 最終MATK = 1244 + 60 = 1304
+
+### TypeScript実装例
+
+```typescript
+export interface MATKCalculationSteps {
+	level: number
+	weaponATK: number
+	weaponMATK: number
+	statusMATK: number
+	matkUpTotal: number
+	matkDownTotal: number
+	baseMATK: number
+	matkPercent: number
+	matkAfterPercent: number
+	matkFixed: number
+	finalMATK: number
+}
+
+export const calculateMATK = (
+	level: number,
+	weaponType: WeaponType,
+	weaponATK: number,
+	refinementLevel: number,
+	baseStats: BaseStats,
+	bonuses: AllBonuses,
+): MATKCalculationSteps => {
+	// 総武器MATK計算
+	let weaponMATK = 0
+	if (weaponType === 'staff' || weaponType === 'magicDevice') {
+		// 杖・魔導具: 総武器MATKを適用
+		const weaponATKPercent = bonuses.WeaponATK_Rate || 0
+		const weaponATKFixed = bonuses.WeaponATK || 0
+		weaponMATK = Math.floor(weaponATK * (1 + (refinementLevel ** 2) / 100) + refinementLevel) +
+		            Math.floor(weaponATK * weaponATKPercent / 100) + weaponATKFixed
+	} else if (weaponType === 'knuckle') {
+		// 手甲: 総武器ATK/2（小数点保持）
+		// 注: 実装時は総武器ATKの計算結果を2で割る
+		weaponMATK = 0 // 暫定: 総武器ATK計算後に設定
+	}
+	// その他の武器種は weaponMATK = 0
+
+	// ステータスMATK計算
+	const { INT, DEX, AGI } = baseStats
+	let statusMATK = 0
+	switch (weaponType) {
+		case 'oneHandSword':
+		case 'twoHandSword':
+		case 'bow':
+		case 'bowgun':
+		case 'bareHand':
+			statusMATK = INT * 3 + DEX * 1
+			break
+		case 'staff':
+		case 'magicDevice':
+		case 'knuckle':
+			statusMATK = INT * 4 + DEX * 1
+			break
+		case 'halberd':
+			statusMATK = INT * 2 + DEX * 1 + AGI * 1
+			break
+		case 'katana':
+			statusMATK = INT * 1.5 + DEX * 1 // 小数点保持
+			break
+	}
+
+	// MATKアップ・ダウン計算
+	const matkUpSTR = Math.floor(baseStats.STR * (bonuses.MATK_STR_Rate || 0) / 100)
+	const matkUpINT = Math.floor(baseStats.INT * (bonuses.MATK_INT_Rate || 0) / 100)
+	const matkUpVIT = Math.floor(baseStats.VIT * (bonuses.MATK_VIT_Rate || 0) / 100)
+	const matkUpAGI = Math.floor(baseStats.AGI * (bonuses.MATK_AGI_Rate || 0) / 100)
+	const matkUpDEX = Math.floor(baseStats.DEX * (bonuses.MATK_DEX_Rate || 0) / 100)
+	
+	const matkUpTotal = matkUpSTR + matkUpINT + matkUpVIT + matkUpAGI + matkUpDEX
+	const matkDownTotal = 0 // 必要に応じて実装
+
+	// 基礎MATK計算
+	const baseMATK = level + weaponMATK + statusMATK + matkUpTotal - matkDownTotal
+
+	// MATK%適用
+	const matkPercent = bonuses.MATK_Rate || 0
+	const matkAfterPercent = Math.floor(baseMATK * (1 + matkPercent / 100))
+
+	// MATK固定値加算
+	const matkFixed = bonuses.MATK || 0
+	const finalMATK = matkAfterPercent + matkFixed
+
+	return {
+		level,
+		weaponATK,
+		weaponMATK,
+		statusMATK,
+		matkUpTotal,
+		matkDownTotal,
+		baseMATK,
+		matkPercent,
+		matkAfterPercent,
+		matkFixed,
+		finalMATK,
+	}
+}
+```
+
 ## HIT（命中）計算
 
 ### 基本計算式

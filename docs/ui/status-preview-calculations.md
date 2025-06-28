@@ -18,6 +18,31 @@ StatusPreviewコンポーネントで表示される各ステータスの計算�
 
 **計算詳細**: [ATK計算式設計書](../calculations/atk-calculation.md)を参照
 
+### MATK計算仕様
+- **計算式**: `INT((自Lv+総武器MATK+ステータスMATK+MATKアップ(ｽﾃｰﾀｽ%)-MATKダウン(ｽﾃｰﾀｽ%))×(1+MATK%/100))+MATK固定値`
+- **総武器MATK**: 武器種別に応じて適用条件が異なる
+  - **杖・魔導具**: `INT(武器ATK×(1+(精錬値^2)/100)+精錬値)+INT(武器ATK×武器ATK%)+武器ATK固定値`
+  - **手甲**: `総武器ATK/2`（小数点保持でMATK計算に使用）
+  - **その他**: 武器ATKは基礎MATKに適用されない（0）
+- **ステータスMATK**: 武器種別に応じた計算式
+  - **片手剣・両手剣・弓・自動弓・素手**: `INT × 3 + DEX × 1`
+  - **杖・魔導具・手甲**: `INT × 4 + DEX × 1`
+  - **旋風槍**: `INT × 2 + DEX × 1 + AGI × 1`
+  - **抜刀剣**: `INT × 1.5 + DEX × 1`（小数点保持）
+- **MATKアップ(ｽﾃｰﾀｽ%)**: 基礎ステータス値に連動する攻撃力補正
+  - **MATK_STR_Rate**: `INT(基礎STR × MATK_STR_Rate/100)`
+  - **MATK_INT_Rate**: `INT(基礎INT × MATK_INT_Rate/100)`
+  - **MATK_VIT_Rate**: `INT(基礎VIT × MATK_VIT_Rate/100)`
+  - **MATK_AGI_Rate**: `INT(基礎AGI × MATK_AGI_Rate/100)`
+  - **MATK_DEX_Rate**: `INT(基礎DEX × MATK_DEX_Rate/100)`
+- **MATK%**: 装備/プロパティ、クリスタ、バフアイテムのMATK_Rate補正の合計
+- **MATK固定値**: 装備/プロパティ、クリスタ、料理、バフアイテムのMATK固定値の合計
+- **計算特性**: 抜刀剣のステータスMATKのみ小数点保持、他は各段階でINT()適用
+- **データソース**: メイン武器の種別、基礎ステータス値、各種補正値を使用
+- **重要な注意**: 手甲装備時は総武器ATK計算結果を2で割るため、ATK計算との連動が必要
+
+**計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#matk計算)を参照
+
 ### ASPD計算仕様
 - **計算式**: `INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorType補正)/100)) + ASPD固定値`
 - **ステータスASPD**: 武器種別に応じた計算式（例：片手剣 `STR × 0.2 + AGI × 4.2`、素手 `AGI × 9.6`）
