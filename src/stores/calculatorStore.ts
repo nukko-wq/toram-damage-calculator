@@ -408,11 +408,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						properties,
 					)
 					if (success) {
-						set(
-							(state) => ({ ...state, hasUnsavedChanges: true }),
-							false,
-							'updateCustomEquipmentProperties',
-						)
+						// データベースレイヤーでの変更を検知するため、差分チェックを強制実行
+						const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+						dataUpdate({}, 'updateCustomEquipmentProperties')
 					}
 					return success
 				} catch (error) {
@@ -523,28 +521,25 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				try {
 					const success = updateEquipmentArmorType(equipmentId, armorType)
 					if (success) {
-						// ArmorType変更を即座に反映するためにストア状態を強制更新
-						set(
-							(state) => {
-								const newState = { ...state, hasUnsavedChanges: true }
-								// 体装備のIDが一致する場合、ストアの装備データを更新
-								if (state.data.equipment.body?.id === equipmentId) {
-									newState.data = {
-										...state.data,
-										equipment: {
-											...state.data.equipment,
-											body: {
-												...state.data.equipment.body,
-												armorType,
-											},
-										},
-									}
-								}
-								return newState
-							},
-							false,
-							'updateEquipmentArmorType',
-						)
+						const { data } = get()
+						// 体装備のIDが一致する場合、ストアの装備データを更新
+						if (data.equipment.body?.id === equipmentId) {
+							const updatedEquipment = {
+								...data.equipment,
+								body: {
+									...data.equipment.body,
+									armorType,
+								},
+							}
+							// 差分検知システムを使用してデータを更新
+							const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+							dataUpdate({ equipment: updatedEquipment }, 'updateEquipmentArmorType')
+						} else {
+							// 体装備以外やカスタム装備の場合も差分チェックを強制実行
+							// データベースレイヤーでの変更を検知するため、空の更新をトリガー
+							const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+							dataUpdate({}, 'updateEquipmentArmorType')
+						}
 					}
 					return success
 				} catch (error) {
