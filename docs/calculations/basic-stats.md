@@ -271,6 +271,136 @@ MP%適用後 = INT(MP基本値 × (1 + MP%/100))
 1. MEN基礎計算 = INT(100/3.4) = INT(29.41) = 29
 2. 最終異常耐性 = 29 + 15 = 44%
 
+## FLEE（回避率）計算
+
+### 基本計算式
+```
+FLEE = INT(基礎FLEE × (1 + 回避%/100)) + 回避固定値
+```
+
+### 基礎FLEE計算（体装備とArmorTypeに依存）
+
+体装備の状態とArmorTypeによって基礎FLEE計算式が変わります：
+
+#### 体装備なし
+```
+基礎FLEE = INT(75 + Lv × 3/2 + 補正後AGI × 2)
+```
+
+#### 体装備あり（通常）
+```
+基礎FLEE = INT(Lv + 補正後AGI)
+```
+
+#### 体装備あり（軽量化）
+```
+基礎FLEE = INT(30 + Lv × 5/4 + 補正後AGI × 7/4)
+```
+
+#### 体装備あり（重量化）
+```
+基礎FLEE = INT(-15 + Lv/2 + 補正後AGI × 3/4)
+```
+
+### 詳細計算
+
+#### 構成要素
+- **基礎FLEE**: 体装備の状態とArmorTypeに応じた計算式で算出
+- **補正後AGI**: `INT(基礎AGI × (1 + AGI%/100)) + AGI固定値`
+- **回避%**: 装備/プロパティ、クリスタ、バフアイテムのDodge_Rate補正の合計
+- **回避固定値**: 装備/プロパティ、クリスタ、バフアイテムのDodge補正の合計
+
+**注意点**: 料理からの回避補正は存在しません。
+
+#### 計算例1（体装備なし）
+**入力値:**
+- レベル: 200
+- 補正後AGI: 300
+- 回避%: 20% (装備+クリスタ+バフアイテム)
+- 回避固定値: 50 (装備+クリスタ+バフアイテム)
+
+**計算手順:**
+1. 基礎FLEE = INT(75 + 200 × 3/2 + 300 × 2) = INT(75 + 300 + 600) = INT(975) = 975
+2. 回避%適用後 = INT(975 × (1 + 20/100)) = INT(975 × 1.2) = INT(1170) = 1170
+3. 最終FLEE = 1170 + 50 = 1220
+
+#### 計算例2（体装備あり・軽量化）
+**入力値:**
+- レベル: 200
+- 補正後AGI: 300
+- 回避%: 15% (装備+クリスタ+バフアイテム)
+- 回避固定値: 30 (装備+クリスタ+バフアイテム)
+
+**計算手順:**
+1. 基礎FLEE = INT(30 + 200 × 5/4 + 300 × 7/4) = INT(30 + 250 + 525) = INT(805) = 805
+2. 回避%適用後 = INT(805 × (1 + 15/100)) = INT(805 × 1.15) = INT(925.75) = 925
+3. 最終FLEE = 925 + 30 = 955
+
+### TypeScript実装例
+
+```typescript
+interface FLEECalculationSteps {
+  level: number
+  adjustedAGI: number
+  baseFLEE: number
+  dodgePercent: number
+  fleeAfterPercent: number
+  dodgeFixed: number
+  finalFLEE: number
+}
+
+function calculateFLEE(
+  level: number,
+  adjustedAGI: number,
+  hasBodyEquipment: boolean,
+  armorType: ArmorType = 'normal',
+  allBonuses: AllBonuses = {}
+): FLEECalculationSteps {
+  // 1. 基礎FLEE計算（体装備状態とArmorTypeに依存）
+  let baseFLEE: number
+  
+  if (!hasBodyEquipment) {
+    // 体装備なし
+    baseFLEE = Math.floor(75 + level * 3/2 + adjustedAGI * 2)
+  } else {
+    // 体装備あり
+    switch (armorType) {
+      case 'light':
+        // 軽量化
+        baseFLEE = Math.floor(30 + level * 5/4 + adjustedAGI * 7/4)
+        break
+      case 'heavy':
+        // 重量化
+        baseFLEE = Math.floor(-15 + level/2 + adjustedAGI * 3/4)
+        break
+      case 'normal':
+      default:
+        // 通常
+        baseFLEE = Math.floor(level + adjustedAGI)
+        break
+    }
+  }
+  
+  // 2. 回避%適用
+  const dodgePercent = allBonuses.Dodge_Rate || 0
+  const fleeAfterPercent = Math.floor(baseFLEE * (1 + dodgePercent / 100))
+  
+  // 3. 回避固定値加算
+  const dodgeFixed = allBonuses.Dodge || 0
+  const finalFLEE = fleeAfterPercent + dodgeFixed
+  
+  return {
+    level,
+    adjustedAGI,
+    baseFLEE,
+    dodgePercent,
+    fleeAfterPercent,
+    dodgeFixed,
+    finalFLEE,
+  }
+}
+```
+
 ## ASPD（アタックスピード）計算
 
 ### 基本計算式
@@ -1358,6 +1488,7 @@ CSPD%適用後 = INT(ベースCSPD × (1 + CSPD%/100))
 | 2024-06-25 | クリティカル率計算式を追加 | INT()関数使用、CRT依存、2段階計算、料理固定値対応 |
 | 2024-06-25 | HIT（命中）計算式を追加 | INT()関数使用、Lv+補正後DEX依存、料理固定値対応 |
 | 2025-06-28 | ASPD計算式にArmorType補正を追加 | 軽量化+50%、重量化-50%、内部計算のみでUI表示に影響しない |
+| 2025-06-28 | FLEE（回避率）計算式を追加 | 体装備状態とArmorType依存、4種類の基礎FLEE計算式、INT関数使用、2段階計算、料理除外 |
 | 2024-06-26 | 物理耐性計算式を追加 | 4データソース統合、単純加算方式、料理対応 |
 | 2024-06-26 | 魔法耐性計算式を追加 | 4データソース統合、単純加算方式、フィッシュバーガー対応 |
 | 2024-06-26 | 防御崩し計算式を追加 | 3データソース統合、単純加算方式、料理除外 |

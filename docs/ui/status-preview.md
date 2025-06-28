@@ -110,6 +110,22 @@
 
 **計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#hit（命中）計算)を参照
 
+**FLEE計算仕様**:
+- **計算式**: `INT(基礎FLEE × (1 + 回避%/100)) + 回避固定値`
+- **基礎FLEE算出**: 体装備の状態とArmorTypeに応じて計算式が変化
+  - **体装備なし**: `INT(75 + Lv × 3/2 + 補正後AGI × 2)`
+  - **体装備あり（通常）**: `INT(Lv + 補正後AGI)`
+  - **体装備あり（軽量化）**: `INT(30 + Lv × 5/4 + 補正後AGI × 7/4)`
+  - **体装備あり（重量化）**: `INT(-15 + Lv/2 + 補正後AGI × 3/4)`
+- **補正後AGI**: 装備・クリスタ・バフアイテム・料理補正を含むAGI値
+- **回避%**: 装備/プロパティ、クリスタ、バフアイテムのDodge_Rate補正の合計
+- **回避固定値**: 装備/プロパティ、クリスタ、バフアイテムのDodge固定値の合計
+- **料理除外**: 料理からの回避補正は存在しない
+- **ArmorType連動**: 体装備のArmorType変更により基礎FLEE計算式が自動切り替え
+- **データソース**: ステータスのレベル、補正後AGI値、体装備状態、ArmorType設定、各種補正値を使用
+
+**計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#flee（回避率）計算)を参照
+
 **クリティカル率計算仕様**:
 - **計算式**: `INT(INT(25+CRT/3.4)×(1+クリティカル率%/100))+クリティカル率固定値`
 - **基本クリティカル率**: INT(25+CRT/3.4)で算出（CRTは基本ステータスの値）
@@ -388,7 +404,7 @@ interface CalculationResults {
     ASPD: number                        // 攻撃速度（武器種別計算結果）
     CSPD: number                        // 詠唱速度（計算結果）
     HIT: number                         // 命中（計算結果）
-    FLEE: number                        // 回避（暫定値）
+    FLEE: number                        // 回避（体装備状態・ArmorType依存計算結果）
     physicalResistance: number          // 物理耐性（計算結果）
     magicalResistance: number           // 魔法耐性（暫定値）
     ailmentResistance: number           // 異常耐性（暫定値）
@@ -1108,6 +1124,140 @@ export function aggregateAllBonuses(
 }
 ```
 
+## FLEE計算実装ガイダンス
+
+### 実装要件
+
+#### 1. 基礎FLEE計算の体装備状態判定
+
+```typescript
+// 体装備の状態とArmorTypeを判定する関数
+function getBodyEquipmentStatus(bodyEquipment: Equipment | null): {
+  hasBodyEquipment: boolean
+  armorType: ArmorType
+} {
+  if (!bodyEquipment || !bodyEquipment.id) {
+    return { hasBodyEquipment: false, armorType: 'normal' }
+  }
+  
+  return { 
+    hasBodyEquipment: true, 
+    armorType: bodyEquipment.armorType || 'normal' 
+  }
+}
+```
+
+#### 2. FLEE計算関数の実装
+
+```typescript
+interface FLEECalculationSteps {
+  level: number
+  adjustedAGI: number
+  hasBodyEquipment: boolean
+  armorType: ArmorType
+  baseFLEE: number
+  dodgePercent: number
+  fleeAfterPercent: number
+  dodgeFixed: number
+  finalFLEE: number
+}
+
+function calculateFLEE(
+  level: number,
+  adjustedAGI: number,
+  bodyEquipment: Equipment | null,
+  allBonuses: AllBonuses = {}
+): FLEECalculationSteps {
+  // 1. 体装備状態の判定
+  const { hasBodyEquipment, armorType } = getBodyEquipmentStatus(bodyEquipment)
+  
+  // 2. 基礎FLEE計算（4パターン）
+  let baseFLEE: number
+  
+  if (!hasBodyEquipment) {
+    // 体装備なし
+    baseFLEE = Math.floor(75 + level * 3/2 + adjustedAGI * 2)
+  } else {
+    // 体装備あり（ArmorTypeに応じて分岐）
+    switch (armorType) {
+      case 'light':
+        // 軽量化
+        baseFLEE = Math.floor(30 + level * 5/4 + adjustedAGI * 7/4)
+        break
+      case 'heavy':
+        // 重量化
+        baseFLEE = Math.floor(-15 + level/2 + adjustedAGI * 3/4)
+        break
+      case 'normal':
+      default:
+        // 通常
+        baseFLEE = Math.floor(level + adjustedAGI)
+        break
+    }
+  }
+  
+  // 3. 回避%適用（装備+クリスタ+バフアイテム、料理除外）
+  const dodgePercent = allBonuses.Dodge_Rate || 0
+  const fleeAfterPercent = Math.floor(baseFLEE * (1 + dodgePercent / 100))
+  
+  // 4. 回避固定値加算（装備+クリスタ+バフアイテム、料理除外）
+  const dodgeFixed = allBonuses.Dodge || 0
+  const finalFLEE = fleeAfterPercent + dodgeFixed
+  
+  return {
+    level,
+    adjustedAGI,
+    hasBodyEquipment,
+    armorType,
+    baseFLEE,
+    dodgePercent,
+    fleeAfterPercent,
+    dodgeFixed,
+    finalFLEE,
+  }
+}
+```
+
+#### 3. StatusPreviewでの統合
+
+```typescript
+// StatusPreviewコンポーネント内でのFLEE計算統合
+const fleeCalculation = useMemo(() => {
+  return calculateFLEE(
+    baseStats.level,
+    adjustedStatsCalculation.AGI,
+    data.equipment.body,  // 体装備データ
+    allBonuses
+  )
+}, [baseStats.level, adjustedStatsCalculation.AGI, data.equipment.body, allBonuses])
+
+// 基本ステータス表示データに含める
+const basicStatsResult = {
+  // ... 他のステータス
+  FLEE: fleeCalculation.finalFLEE,
+  // ... 他のステータス
+}
+```
+
+#### 4. ArmorType変更時の自動更新
+
+FLEE計算は以下の要素が変更された時に自動的に再計算されます：
+
+- **レベル変更**: BaseStatsForm → baseStats.level
+- **AGI変更**: BaseStatsForm → adjustedStats.AGI（装備・クリスタ・料理・バフアイテム補正込み）
+- **体装備変更**: EquipmentForm → data.equipment.body
+- **ArmorType変更**: ArmorTypeSelect → data.equipment.body.armorType
+- **回避%変更**: 装備・クリスタ・バフアイテムのプロパティ変更
+- **回避固定値変更**: 装備・クリスタ・バフアイテムのプロパティ変更
+
+#### 5. 重要な実装注意点
+
+1. **INT()関数の使用**: 各計算段階でMath.floor()を使用して切り捨て処理を行う
+2. **料理除外**: 料理からの回避補正は存在しないため、AllBonusesの計算時に料理データを除外
+3. **ArmorType連動**: 体装備のArmorType変更時にFLEE値が即座に更新される
+4. **体装備なし処理**: 体装備が選択されていない場合の特別な計算式を適用
+5. **負数対応**: 重量化時の基礎FLEE計算で負数が発生する可能性があるため適切に処理
+
 ## 更新履歴
 
 | 日付 | 更新内容 | 備考 |
@@ -1129,6 +1279,7 @@ export function aggregateAllBonuses(
 | 2024-06-26 | CSPD（詠唱速度）計算仕様を追加 | INT関数2段階処理、Lv+補正後DEX・AGI依存計算仕様を記述 |
 | 2024-06-26 | 総属性有利計算仕様を追加 | 4データソース統合による総属性有利計算仕様を記述 |
 | 2025-06-28 | ASPD計算にArmorType補正を追加 | 軽量化+50%、重量化-50%、内部計算のみでUI表示に影響しない仕様を追加 |
+| 2025-06-28 | FLEE計算仕様と実装ガイダンスを追加 | 体装備状態・ArmorType依存の4パターン基礎FLEE計算、実装コード例、自動更新仕様を追加 |
 
 ## 関連ドキュメント
 - [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細
