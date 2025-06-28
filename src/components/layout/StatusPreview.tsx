@@ -8,6 +8,7 @@ import {
 	calculateASPD,
 	calculateMotionSpeed,
 	calculateCriticalRate,
+	calculateCriticalDamage,
 	calculateHIT,
 	calculatePhysicalResistance,
 	calculateMagicalResistance,
@@ -248,6 +249,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				return calculateMotionSpeed(aspd, allBonuses)
 			})(),
 			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonuses),
+			criticalDamageCalculation: calculateCriticalDamage(
+				adjustedStatsCalculation.STR,
+				adjustedStatsCalculation.AGI,
+				allBonuses,
+			),
 			hitCalculation: calculateHIT(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
@@ -303,6 +309,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		aspdCalculation,
 		motionSpeedCalculation,
 		criticalRateCalculation,
+		criticalDamageCalculation,
 		hitCalculation,
 		fleeCalculation,
 		physicalResistanceCalculation,
@@ -317,6 +324,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	} = calculationResults
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
 		calculatedEquipmentBonuses
+
 
 	// デバッグ: equipmentBonus1の各プロパティを確認
 	console.log('equipmentBonus1 プロパティ:', {
@@ -418,7 +426,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
 		subStabilityRate: data.subWeapon.stability, // サブ武器安定率
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
-		criticalDamage: 150, // TODO: クリティカルダメージ計算
+		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
 		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
 		totalElementAdvantage:

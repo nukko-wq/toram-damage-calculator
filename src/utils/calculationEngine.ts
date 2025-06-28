@@ -9,6 +9,7 @@ import {
 	calculateAilmentResistance,
 	calculateATK,
 	calculateCriticalRate,
+	calculateCriticalDamage,
 	calculateHIT,
 	calculatePhysicalResistance,
 	calculateMagicalResistance,
@@ -77,6 +78,13 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		dummyBonuses,
 	)
 
+	// 8-2. クリティカルダメージ計算
+	const criticalDamageCalculation = calculateCriticalDamage(
+		adjustedStats.STR,
+		adjustedStats.AGI,
+		dummyBonuses,
+	)
+
 	// 9. HIT計算
 	const hitCalculation = calculateHIT(
 		data.baseStats.level,
@@ -138,7 +146,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			stabilityRate: stabilityCalculation.finalStability,
 			subStabilityRate: data.subWeapon.stability,
 			criticalRate: criticalRateCalculation.finalCriticalRate,
-			criticalDamage: 0, // 暫定
+			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
 			magicCriticalRate: 0, // 暫定
 			magicCriticalDamage: 0, // 暫定
 			totalElementAdvantage:

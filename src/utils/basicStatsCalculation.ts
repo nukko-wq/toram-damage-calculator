@@ -429,6 +429,24 @@ export interface CriticalRateCalculationSteps {
 	finalCriticalRate: number // 最終クリティカル率
 }
 
+// クリティカルダメージ計算の詳細ステップ
+export interface CriticalDamageCalculationSteps {
+	adjustedSTR: number // 補正後STR
+	adjustedAGI: number // 補正後AGI
+	strDivision: number // STR/5
+	strAgiDivision: number // (STR+AGI)/10
+	maxValue: number // MAX(STR/5, (STR+AGI)/10)
+	baseCriticalDamage: number // 基礎クリティカルダメージ = 150 + maxValue
+	cdPercent: number // クリティカルダメージ%補正
+	cdAfterPercent: number // CD%適用後 = INT(基礎CD × (1 + CD%/100))
+	cdFixed: number // クリティカルダメージ固定値補正
+	cdBeforeLimit: number // 制限前CD = CD%適用後 + CD固定値
+	isOver300: boolean // 300超過フラグ
+	excessAmount?: number // 超過分（300超過時のみ）
+	halvedExcess?: number // 半減後超過分（300超過時のみ）
+	finalCriticalDamage: number // 最終クリティカルダメージ
+}
+
 // HIT計算の詳細ステップ
 export interface HITCalculationSteps {
 	level: number // ステータスのレベル
@@ -1169,6 +1187,65 @@ export function calculateCriticalRate(
 		criticalRateAfterPercent,
 		criticalRateFixed,
 		finalCriticalRate,
+	}
+}
+
+/**
+ * クリティカルダメージ計算
+ * クリティカルダメージ = INT((150+MAX(補正後STR/5,(補正後STR+補正後AGI)/10))×(1+CD%/100))+CD固定値
+ * ※300を超えた場合、300以降の数値は半減し、小数点以下は切り捨てられる
+ */
+export function calculateCriticalDamage(
+	adjustedSTR: number,
+	adjustedAGI: number,
+	bonuses: AllBonuses = {},
+): CriticalDamageCalculationSteps {
+	// 1. MAX計算
+	const strDivision = adjustedSTR / 5
+	const strAgiDivision = (adjustedSTR + adjustedAGI) / 10
+	const maxValue = Math.max(strDivision, strAgiDivision)
+
+	// 2. 基礎クリティカルダメージ
+	const baseCriticalDamage = 150 + maxValue
+
+	// 3. CD%適用
+	const cdPercent = bonuses.CriticalDamage_Rate || 0
+	const cdAfterPercent = Math.floor(baseCriticalDamage * (1 + cdPercent / 100))
+
+	// 4. CD固定値加算
+	const cdFixed = bonuses.CriticalDamage || 0
+	const cdBeforeLimit = cdAfterPercent + cdFixed
+
+	// 5. 300超過時の半減処理
+	let finalCriticalDamage: number
+	let isOver300 = false
+	let excessAmount: number | undefined
+	let halvedExcess: number | undefined
+
+	if (cdBeforeLimit > 300) {
+		isOver300 = true
+		excessAmount = cdBeforeLimit - 300
+		halvedExcess = Math.floor(excessAmount / 2)
+		finalCriticalDamage = 300 + halvedExcess
+	} else {
+		finalCriticalDamage = cdBeforeLimit
+	}
+
+	return {
+		adjustedSTR,
+		adjustedAGI,
+		strDivision,
+		strAgiDivision,
+		maxValue,
+		baseCriticalDamage,
+		cdPercent,
+		cdAfterPercent,
+		cdFixed,
+		cdBeforeLimit,
+		isOver300,
+		excessAmount,
+		halvedExcess,
+		finalCriticalDamage,
 	}
 }
 
