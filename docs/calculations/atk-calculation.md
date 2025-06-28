@@ -80,42 +80,43 @@ ATK = INT(基礎ATK × (1 + ATK%/100)) + ATK固定値
 
 ### 旋風槍（Halberd）
 ```
-ステータスATK = 基礎STR × 2.5 + 基礎AGI × 1.5
+ステータスATK = 補正後STR × 2.5 + 補正後AGI × 1.5
 ```
 
 **注意事項:**
+- **補正後ステータス**を使用（基礎ステータスではない）
 - この段階では切り捨てが行われない
 - ATK%計算時まで小数点以下を保持
 - 手甲・槍・抜刀剣でも同様の小数点保持
 
 **計算例:**
-- 基礎STR: 200
-- 基礎AGI: 150
+- 補正後STR: 200
+- 補正後AGI: 150
 - ステータスATK = 200 × 2.5 + 150 × 1.5 = 500 + 225 = 725
 
 ### 片手剣（One-Handed Sword）
 ```
-ステータスATK = 基礎STR × 2.0 + 基礎DEX × 2.0
+ステータスATK = 補正後STR × 2.0 + 補正後DEX × 2.0
 ```
 
 ### 両手剣（Two-Handed Sword）
 ```
-ステータスATK = 基礎STR × 3.0 + 基礎DEX × 1.0
+ステータスATK = 補正後STR × 3.0 + 補正後DEX × 1.0
 ```
 
 ### その他の武器種（将来実装予定）
 ```
 // 弓系  
-ステータスATK = 基礎DEX × 3.5 + 基礎STR × 1.0
+ステータスATK = 補正後DEX × 3.5 + 補正後STR × 1.0
 
 // 杖系
-ステータスATK = 基礎INT × 3.0 + 基礎DEX × 1.5
+ステータスATK = 補正後INT × 3.0 + 補正後DEX × 1.5
 
 // 手甲系
-ステータスATK = 基礎AGI × 2.5 + 基礎STR × 2.0
+ステータスATK = 補正後AGI × 2.5 + 補正後STR × 2.0
 
 // 抜刀剣系
-ステータスATK = 基礎STR × 2.5 + 基礎AGI × 2.0
+ステータスATK = 補正後STR × 2.5 + 補正後AGI × 2.0
 
 // 他の武器種も同様の形式で定義
 ```
@@ -188,7 +189,7 @@ ATK固定値 = 装備ATK固定値 + クリスタATK固定値 + 料理ATK固定�
 
 #### 2. ステータスATK計算（旋風槍）
 ```
-ステータスATK = 200 × 2.5 + 150 × 1.5 = 500 + 225 = 725
+ステータスATK = 補正後STR × 2.5 + 補正後AGI × 1.5 = 200 × 2.5 + 150 × 1.5 = 500 + 225 = 725
 ```
 
 #### 3. ATKアップ・ダウン計算
@@ -312,6 +313,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 export function calculateATK(
   stats: BaseStats,
   weapon: WeaponData,
+  adjustedStats: AdjustedStatsCalculation,
   bonuses: AllBonuses = {}
 ): ATKCalculationSteps {
   // 1. 総武器ATK計算
@@ -325,9 +327,9 @@ export function calculateATK(
   const weaponATKFixedBonus = bonuses.weaponATK || 0
   const totalWeaponATK = refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
   
-  // 2. ステータスATK計算（旋風槍の場合）
+  // 2. ステータスATK計算（旋風槍の場合、補正後ステータスを使用）
   const weaponType = WEAPON_TYPES[weapon.type] || WEAPON_TYPES.halberd
-  const statusATK = weaponType.statusATKFormula(stats)
+  const statusATK = weaponType.statusATKFormula(adjustedStats)
   
   // 3. ATKアップ・ダウン計算
   const atkUpSTR = Math.floor(stats.STR * (bonuses.ATK_STR_Rate || 0) / 100)
@@ -415,6 +417,7 @@ export function calculateATK(
 
 | 日付 | 更新内容 | 備考 |
 |------|----------|------|
+| 2025-06-28 | ステータスATK計算を補正後ステータス使用に修正 | 基礎ステータスから補正後ステータスに変更、全武器種対応 |
 | 2024-06-24 | ATK計算式設計書を新規作成 | 旋風槍のATK計算式を実装 |
 | 2024-06-24 | 武器種別を整理・更新 | 片手剣・両手剣を追加、剣・槍・忍刀を削除 |
 | 2024-06-24 | 武器種別マッピング機能を実装 | 日本語武器種と英語キーの対応付けでATK計算を修正 |
@@ -542,7 +545,7 @@ function calculateSubATK(
   const subWeaponATKFixedBonus = bonuses.weaponATK || 0
   const subTotalWeaponATK = subRefinedWeaponATK + subWeaponATKPercentBonus + subWeaponATKFixedBonus
 
-  // サブステータスATK計算（双剣専用計算式）
+  // サブステータスATK計算（双剣専用計算式、補正後ステータスを使用）
   const subStatusATK = adjustedStats.STR * 1.0 + adjustedStats.AGI * 3.0
 
   // サブ基礎ATK計算（ATKアップ・ATKダウンは含まない）
