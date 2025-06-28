@@ -5,7 +5,7 @@ import type {
 	DamageCalculationResult,
 	CalculationSettings,
 } from '@/types/stores'
-import type { EquipmentSlots } from '@/types/calculator'
+import type { EquipmentSlots, ArmorType } from '@/types/calculator'
 import { createInitialCalculatorData } from '@/utils/initialData'
 import {
 	saveCurrentData,
@@ -531,9 +531,25 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				try {
 					const success = updateEquipmentArmorType(equipmentId, armorType)
 					if (success) {
-						// 変更状態を反映させるために強制的に未保存フラグを設定
+						// ArmorType変更を即座に反映するためにストア状態を強制更新
 						set(
-							(state) => ({ ...state, hasUnsavedChanges: true }),
+							(state) => {
+								const newState = { ...state, hasUnsavedChanges: true }
+								// 体装備のIDが一致する場合、ストアの装備データを更新
+								if (state.data.equipment.body?.id === equipmentId) {
+									newState.data = {
+										...state.data,
+										equipment: {
+											...state.data.equipment,
+											body: {
+												...state.data.equipment.body,
+												armorType,
+											},
+										},
+									}
+								}
+								return newState
+							},
 							false,
 							'updateEquipmentArmorType',
 						)

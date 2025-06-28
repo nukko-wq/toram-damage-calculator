@@ -291,6 +291,12 @@ ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorTy
 - ArmorType補正は内部計算のみで使用され、StatusPreviewの装備品補正値には表示されません
 - 最終的なASPD計算にのみ影響し、表示上のASPD%には加算されません
 
+**ArmorType変更時の即座反映:**
+- ArmorType変更時に`CalculatorStore.updateEquipmentArmorType`が呼び出される
+- データベースレベル更新と同時にZustandストアの状態も強制更新される
+- StatusPreviewのASPD計算が自動的に再実行され、新しいArmorType補正が即座に反映される
+- 体装備以外のArmorType変更には影響しない（安全性確保）
+
 
 ### ステータスASPD計算
 
