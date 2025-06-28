@@ -14,6 +14,7 @@ import {
 	calculateArmorBreak,
 	calculateAnticipate,
 	calculateCSPD,
+	calculateFLEE,
 	calculateTotalElementAdvantage,
 	calculateStability,
 	calculateAdjustedStats,
@@ -252,6 +253,12 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.DEX,
 				allBonuses,
 			),
+			fleeCalculation: calculateFLEE(
+				baseStats.level,
+				adjustedStatsCalculation.AGI,
+				data.equipment.body,
+				allBonuses,
+			),
 			physicalResistanceCalculation: calculatePhysicalResistance(allBonuses),
 			magicalResistanceCalculation: calculateMagicalResistance(allBonuses),
 			armorBreakCalculation: calculateArmorBreak(allBonuses),
@@ -283,6 +290,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		baseStats,
 		data.mainWeapon,
 		data.subWeapon,
+		data.equipment.body,
 	])
 
 	const {
@@ -295,6 +303,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		motionSpeedCalculation,
 		criticalRateCalculation,
 		hitCalculation,
+		fleeCalculation,
 		physicalResistanceCalculation,
 		magicalResistanceCalculation,
 		armorBreakCalculation,
@@ -416,7 +425,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
 		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果
 		HIT: hitCalculation.finalHIT, // HIT計算結果
-		FLEE: 0, // TODO: 回避計算
+		FLEE: fleeCalculation.finalFLEE, // FLEE計算結果
 		physicalResistance: physicalResistanceCalculation.finalPhysicalResistance, // 物理耐性計算結果
 		magicalResistance: magicalResistanceCalculation.finalMagicalResistance, // 魔法耐性計算結果
 		ailmentResistance: ailmentResistanceCalculation, // 異常耐性計算結果

@@ -15,6 +15,7 @@ import {
 	calculateArmorBreak,
 	calculateAnticipate,
 	calculateCSPD,
+	calculateFLEE,
 	calculateTotalElementAdvantage,
 	calculateStability,
 	aggregateAllBonuses,
@@ -60,25 +61,28 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 9. HIT計算
 	const hitCalculation = calculateHIT(data.baseStats.level, adjustedStats.DEX, dummyBonuses)
 
-	// 10. 物理耐性計算
+	// 10. FLEE計算
+	const fleeCalculation = calculateFLEE(data.baseStats.level, adjustedStats.AGI, data.equipment.body, dummyBonuses)
+
+	// 11. 物理耐性計算
 	const physicalResistanceCalculation = calculatePhysicalResistance(dummyBonuses)
 
-	// 11. 魔法耐性計算
+	// 12. 魔法耐性計算
 	const magicalResistanceCalculation = calculateMagicalResistance(dummyBonuses)
 
-	// 12. 防御崩し計算
+	// 13. 防御崩し計算
 	const armorBreakCalculation = calculateArmorBreak(dummyBonuses)
 
-	// 13. 先読み計算
+	// 14. 先読み計算
 	const anticipateCalculation = calculateAnticipate(dummyBonuses)
 
-	// 14. CSPD計算
+	// 15. CSPD計算
 	const cspdCalculation = calculateCSPD(data.baseStats.level, adjustedStats.DEX, adjustedStats.AGI, dummyBonuses)
 
-	// 15. 総属性有利計算
+	// 16. 総属性有利計算
 	const totalElementAdvantageCalculation = calculateTotalElementAdvantage(dummyBonuses)
 
-	// 16. 安定率計算
+	// 17. 安定率計算
 	const stabilityCalculation = calculateStability(data.mainWeapon.stability, data.mainWeapon.weaponType, adjustedStats, dummyBonuses)
 
 	return {
@@ -102,7 +106,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			ASPD: aspdCalculation.finalASPD,
 			CSPD: cspdCalculation.finalCSPD,
 			HIT: hitCalculation.finalHIT,
-			FLEE: 0, // 暫定
+			FLEE: fleeCalculation.finalFLEE,
 			physicalResistance: physicalResistanceCalculation.finalPhysicalResistance,
 			magicalResistance: magicalResistanceCalculation.finalMagicalResistance,
 			ailmentResistance,

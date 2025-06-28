@@ -953,6 +953,105 @@ export function calculateAilmentResistance(
 }
 
 /**
+ * FLEE計算ステップの詳細情報
+ */
+export interface FLEECalculationSteps {
+	level: number
+	adjustedAGI: number
+	hasBodyEquipment: boolean
+	armorType: ArmorType
+	baseFLEE: number
+	dodgePercent: number
+	fleeAfterPercent: number
+	dodgeFixed: number
+	finalFLEE: number
+}
+
+/**
+ * 体装備の状態とArmorTypeを判定
+ * @param bodyEquipment 体装備データ
+ * @returns 体装備状態とArmorType
+ */
+export function getBodyEquipmentStatus(bodyEquipment: any): {
+	hasBodyEquipment: boolean
+	armorType: ArmorType
+} {
+	if (!bodyEquipment || !bodyEquipment.id) {
+		return { hasBodyEquipment: false, armorType: 'normal' }
+	}
+	
+	return { 
+		hasBodyEquipment: true, 
+		armorType: bodyEquipment.armorType || 'normal' 
+	}
+}
+
+/**
+ * FLEE（回避率）計算
+ * FLEE = INT(基礎FLEE × (1 + 回避%/100)) + 回避固定値
+ * 
+ * 基礎FLEE計算（体装備状態とArmorTypeに依存）：
+ * - 体装備なし: INT(75 + Lv × 3/2 + 補正後AGI × 2)
+ * - 体装備あり（通常）: INT(Lv + 補正後AGI)
+ * - 体装備あり（軽量化）: INT(30 + Lv × 5/4 + 補正後AGI × 7/4)
+ * - 体装備あり（重量化）: INT(-15 + Lv/2 + 補正後AGI × 3/4)
+ */
+export function calculateFLEE(
+	level: number,
+	adjustedAGI: number,
+	bodyEquipment: any,
+	bonuses: AllBonuses = {},
+): FLEECalculationSteps {
+	// 1. 体装備状態の判定
+	const { hasBodyEquipment, armorType } = getBodyEquipmentStatus(bodyEquipment)
+	
+	// 2. 基礎FLEE計算（4パターン）
+	let baseFLEE: number
+	
+	if (!hasBodyEquipment) {
+		// 体装備なし
+		baseFLEE = Math.floor(75 + level * 3/2 + adjustedAGI * 2)
+	} else {
+		// 体装備あり（ArmorTypeに応じて分岐）
+		switch (armorType) {
+			case 'light':
+				// 軽量化
+				baseFLEE = Math.floor(30 + level * 5/4 + adjustedAGI * 7/4)
+				break
+			case 'heavy':
+				// 重量化
+				baseFLEE = Math.floor(-15 + level/2 + adjustedAGI * 3/4)
+				break
+			case 'normal':
+			default:
+				// 通常
+				baseFLEE = Math.floor(level + adjustedAGI)
+				break
+		}
+	}
+	
+	// 3. 回避%適用（装備+クリスタ+バフアイテム、料理除外）
+	const dodgePercent = bonuses.Dodge_Rate || 0
+	const fleeAfterPercent = Math.floor(baseFLEE * (1 + dodgePercent / 100))
+	
+	// 4. 回避固定値加算（装備+クリスタ+バフアイテム、料理除外）
+	const dodgeFixed = bonuses.Dodge || 0
+	const finalFLEE = fleeAfterPercent + dodgeFixed
+	
+	return {
+		level,
+		adjustedAGI,
+		hasBodyEquipment,
+		armorType,
+		baseFLEE,
+		dodgePercent,
+		fleeAfterPercent,
+		dodgeFixed,
+		finalFLEE,
+	}
+}
+
+/**
  * ArmorType補正値を計算
  * @param armorType 体装備の防具の改造
  * @returns ASPD%補正値（内部計算のみ）
