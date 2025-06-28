@@ -20,6 +20,7 @@ import {
 	aggregateAllBonuses,
 	calculateEquipmentBonuses,
 	calculateAilmentResistance,
+	getBodyArmorType,
 } from '@/utils/basicStatsCalculation'
 import {
 	getEquipmentBonuses,
@@ -207,6 +208,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			allBonuses,
 		)
 
+		// 体装備のArmorTypeを取得
+		const bodyArmorType = getBodyArmorType(data.equipment.body)
+
 		return {
 			allBonuses,
 			equipmentBonuses: calculateEquipmentBonuses(
@@ -230,6 +234,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				data.mainWeapon,
 				adjustedStatsCalculation,
 				allBonuses,
+				bodyArmorType,
 			),
 			motionSpeedCalculation: (() => {
 				const aspd = calculateASPD(
@@ -237,6 +242,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					data.mainWeapon,
 					adjustedStatsCalculation,
 					allBonuses,
+					bodyArmorType,
 				).finalASPD
 				return calculateMotionSpeed(aspd, allBonuses)
 			})(),

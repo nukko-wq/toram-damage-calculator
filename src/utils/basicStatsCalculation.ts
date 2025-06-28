@@ -5,7 +5,7 @@
  * 詳細な計算式は docs/calculations/basic-stats.md を参照
  */
 
-import type { BaseStats, WeaponType as WeaponTypeEnum } from '@/types/calculator'
+import type { BaseStats, WeaponType as WeaponTypeEnum, ArmorType } from '@/types/calculator'
 import { getWeaponTypeKey } from '@/utils/weaponTypeMapping'
 
 // 全補正値（装備・クリスタ・料理・バフアイテムの合計）
@@ -397,7 +397,9 @@ export interface ASPDCalculationSteps {
 	statusASPD: number // ステータスASPD（武器種別計算）
 	weaponTypeCorrection: number // 武器種補正値
 	aspdBeforePercent: number // ASPD%適用前
-	aspdPercent: number // ASPD%補正値
+	aspdPercent: number // ASPD%補正値（装備等）
+	armorTypeBonus: number // ArmorType補正値（内部計算のみ）
+	effectiveASPDPercent: number // 実効ASPD%（ASPD% + ArmorType補正）
 	aspdAfterPercent: number // ASPD%適用後
 	aspdFixed: number // ASPD固定値
 	finalASPD: number // 最終ASPD
@@ -880,14 +882,16 @@ export function calculateSubATK(
 }
 
 /**
- * ASPD計算（武器種別対応）
- * ASPD = INT((Lv + ステータスASPD + 武器種補正値) × (1 + ASPD%/100)) + ASPD固定値
+ * ASPD計算（武器種別対応、ArmorType補正対応）
+ * ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorType補正)/100)) + ASPD固定値
+ * ArmorType補正: 通常=0%, 軽量化=+50%, 重量化=-50%（内部計算のみ）
  */
 export function calculateASPD(
 	stats: BaseStats,
 	weapon: { weaponType: WeaponTypeEnum },
 	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
+	armorType: ArmorType = 'normal',
 ): ASPDCalculationSteps {
 	// 1. 武器種別ステータスASPD計算
 	const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
@@ -900,13 +904,17 @@ export function calculateASPD(
 	// 3. ASPD%適用前の値計算
 	const aspdBeforePercent = stats.level + statusASPD + weaponTypeCorrection
 
-	// 4. ASPD%補正適用
+	// 4. ASPD%補正値とArmorType補正計算
 	const aspdPercent = bonuses.AttackSpeed_Rate || 0
+	const armorTypeBonus = getArmorTypeASPDBonus(armorType)
+	const effectiveASPDPercent = aspdPercent + armorTypeBonus
+
+	// 5. 実効ASPD%補正適用
 	const aspdAfterPercent = Math.floor(
-		aspdBeforePercent * (1 + aspdPercent / 100),
+		aspdBeforePercent * (1 + effectiveASPDPercent / 100),
 	)
 
-	// 5. ASPD固定値加算
+	// 6. ASPD固定値加算
 	const aspdFixed = bonuses.AttackSpeed || 0
 	const finalASPD = aspdAfterPercent + aspdFixed
 
@@ -916,6 +924,8 @@ export function calculateASPD(
 		weaponTypeCorrection,
 		aspdBeforePercent,
 		aspdPercent,
+		armorTypeBonus,
+		effectiveASPDPercent,
 		aspdAfterPercent,
 		aspdFixed,
 		finalASPD,
@@ -940,6 +950,38 @@ export function calculateAilmentResistance(
 	const finalAilmentResistance = menBaseResistance + ailmentResistancePercent
 	
 	return finalAilmentResistance
+}
+
+/**
+ * ArmorType補正値を計算
+ * @param armorType 体装備の防具の改造
+ * @returns ASPD%補正値（内部計算のみ）
+ */
+export function getArmorTypeASPDBonus(armorType: ArmorType): number {
+	switch (armorType) {
+		case 'light': return 50   // 軽量化: +50%
+		case 'heavy': return -50  // 重量化: -50%
+		case 'normal':
+		default: return 0         // 通常: +0%
+	}
+}
+
+/**
+ * 体装備からArmorTypeを取得
+ * @param bodyEquipment 体装備データ
+ * @returns ArmorType（デフォルト: 'normal'）
+ */
+export function getBodyArmorType(bodyEquipment: any): ArmorType {
+	// 体装備が設定されていない場合はデフォルト
+	if (!bodyEquipment?.id) {
+		return 'normal'
+	}
+
+	// 体装備のArmorTypeを取得（装備データから）
+	const { getCombinedEquipmentById } = require('./equipmentDatabase')
+	const equipment = getCombinedEquipmentById(bodyEquipment.id)
+	
+	return equipment?.armorType || 'normal'
 }
 
 /**

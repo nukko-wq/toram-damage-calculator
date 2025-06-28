@@ -18,6 +18,7 @@ import {
 	calculateTotalElementAdvantage,
 	calculateStability,
 	aggregateAllBonuses,
+	getBodyArmorType,
 	type AllBonuses,
 } from './basicStatsCalculation'
 
@@ -43,8 +44,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 4. ATK計算
 	const atkCalculation = calculateATK(data.baseStats, data.mainWeapon, dummyBonuses)
 	
-	// 5. ASPD計算
-	const aspdCalculation = calculateASPD(data.baseStats, data.mainWeapon, adjustedStats, dummyBonuses)
+	// 5. ASPD計算（体装備のArmorTypeを取得）
+	const bodyArmorType = getBodyArmorType(data.equipment.body)
+	const aspdCalculation = calculateASPD(data.baseStats, data.mainWeapon, adjustedStats, dummyBonuses, bodyArmorType)
 	
 	// 6. 行動速度計算
 	const motionSpeedCalculation = calculateMotionSpeed(aspdCalculation.finalASPD, dummyBonuses)

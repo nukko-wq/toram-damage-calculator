@@ -71,10 +71,12 @@
 
 **ASPD計算仕様**:
 - **武器種別**: 選択された武器種に応じた計算式を適用
-- **ASPD計算式**: `INT((Lv + ステータスASPD + 武器種補正値) × (1 + ASPD%/100)) + ASPD固定値`
+- **ASPD計算式**: `INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorType補正)/100)) + ASPD固定値`
 - **ステータスASPD**: 武器種別に応じた計算式（例：片手剣 `STR × 0.2 + AGI × 4.2`、素手 `AGI × 9.6`）
-- **武器種補正値**: 武器種固有の基本ASPD値（例：片手剣 100、魔道具 900）
-- **データソース**: メイン武器の種別に基づいて計算式を自動選択
+- **武器補正値**: 武器種固有の基本ASPD値（例：片手剣 100、魔道具 900）
+- **ArmorType補正**: 体装備の防具の改造による内部ASPD%補正（通常: 0%、軽量化: +50%、重量化: -50%）
+- **重要な注意**: ArmorType補正は内部計算のみで使用され、装備品補正値のASPD%には表示されない
+- **データソース**: メイン武器の種別、体装備のArmorType設定に基づいて計算式を自動選択
 - **対応武器種**: 全11種の武器種
 
 **計算詳細**: [基本ステータス計算式](../calculations/basic-stats.md#aspd（アタックスピード）計算)を参照
@@ -495,9 +497,10 @@ interface AllBonuses {
   HP_Rate?: number        // HP%の合計
   MP?: number             // MP固定値の合計
   MP_Rate?: number        // MP%の合計
-  ASPD?: number           // ASPD固定値の合計
-  ASPD_Rate?: number      // ASPD%の合計
+  AttackSpeed?: number    // ASPD固定値の合計
+  AttackSpeed_Rate?: number // ASPD%の合計（ArmorType補正は含まない）
   MotionSpeed_Rate?: number  // 行動速度%の合計（装備+クリスタ+バフアイテム、料理除外）
+  // 注意: ArmorType補正は内部計算のみで、AllBonusesには含まれない
 }
 ```
 
@@ -698,7 +701,7 @@ const baseStats = data.baseStats
 2. **HP計算**: calculateHP()
 3. **MP計算**: calculateMP()
 4. **ATK計算**: calculateATK() - 武器種別対応
-5. **ASPD計算**: calculateASPD() - 武器種別対応（実装予定）
+5. **ASPD計算**: calculateASPD() - 武器種別対応、ArmorType補正対応
 6. **行動速度計算**: calculateMotionSpeed() - ASPD依存計算
 
 ### 表示データ
@@ -745,35 +748,62 @@ const calculatedStats = useMemo(() => ({
 
 ### ASPD実装指針
 ```typescript
-// ASPD計算関数の実装（予定）
+// ASPD計算関数の実装（ArmorType補正対応）
 function calculateASPD(
   stats: BaseStats,
   weapon: { weaponType: WeaponTypeEnum },
   adjustedStats: AdjustedStatsCalculation,
-  bonuses: AllBonuses
+  bonuses: AllBonuses,
+  armorType: ArmorType = 'normal'
 ): ASPDCalculationSteps {
   // 1. 武器種別ステータスASPD計算
   const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
   const weaponType = WEAPON_TYPES[weaponTypeKey]
   const statusASPD = weaponType.statusASPDFormula(adjustedStats)
   
-  // 2. 武器種補正値取得
-  const weaponTypeCorrection = weaponType.aspdCorrection
+  // 2. 武器補正値取得
+  const weaponBaseCorrection = weaponType.aspdCorrection
   
-  // 3. ASPD計算
-  const aspdBeforePercent = stats.level + statusASPD + weaponTypeCorrection
-  const aspdPercent = bonuses.ASPD_Rate || 0
-  const aspdAfterPercent = Math.floor(aspdBeforePercent * (1 + aspdPercent / 100))
-  const aspdFixed = bonuses.ASPD || 0
+  // 3. ArmorType補正計算（内部計算のみ）
+  const armorTypeBonus = getArmorTypeASPDBonus(armorType)
+  
+  // 4. 実効ASPD%計算
+  const aspdPercent = bonuses.AttackSpeed_Rate || 0
+  const effectiveASPDPercent = aspdPercent + armorTypeBonus
+  
+  // 5. ASPD計算
+  const aspdBeforePercent = stats.level + statusASPD + weaponBaseCorrection
+  const aspdAfterPercent = Math.floor(aspdBeforePercent * (1 + effectiveASPDPercent / 100))
+  const aspdFixed = bonuses.AttackSpeed || 0
   const finalASPD = aspdAfterPercent + aspdFixed
   
-  return { statusASPD, weaponTypeCorrection, finalASPD, /* ... */ }
+  return { 
+    statusASPD, 
+    weaponBaseCorrection, 
+    armorTypeBonus,
+    effectiveASPDPercent,
+    finalASPD 
+  }
+}
+
+// ArmorType補正値取得関数
+function getArmorTypeASPDBonus(armorType: ArmorType): number {
+  switch (armorType) {
+    case 'light': return 50   // 軽量化: +50%
+    case 'heavy': return -50  // 重量化: -50%
+    case 'normal':
+    default: return 0         // 通常: +0%
+  }
 }
 ```
 
 **武器種設定への追加項目:**
 - `statusASPDFormula`: ステータスASPD計算関数
 - `aspdCorrection`: 武器種補正値
+
+**ArmorType設定への追加項目:**
+- `armorType`: 体装備の防具の改造設定（'normal' | 'light' | 'heavy'）
+- ArmorType補正は内部計算のみで使用され、UI表示には影響しない
 
 ## インタラクション設計
 
@@ -1097,6 +1127,7 @@ export function aggregateAllBonuses(
 | 2024-06-26 | 先読み計算仕様を追加 | 3データソース統合による先読み計算仕様を記述 |
 | 2024-06-26 | CSPD（詠唱速度）計算仕様を追加 | INT関数2段階処理、Lv+補正後DEX・AGI依存計算仕様を記述 |
 | 2024-06-26 | 総属性有利計算仕様を追加 | 4データソース統合による総属性有利計算仕様を記述 |
+| 2025-06-28 | ASPD計算にArmorType補正を追加 | 軽量化+50%、重量化-50%、内部計算のみでUI表示に影響しない仕様を追加 |
 
 ## 関連ドキュメント
 - [StatusPreview機能要件](../requirements/10_status-preview-requirements.md) - 機能仕様の詳細
