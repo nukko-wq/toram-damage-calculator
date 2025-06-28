@@ -10,6 +10,7 @@ import {
 	calculateATK,
 	calculateCriticalRate,
 	calculateCriticalDamage,
+	calculateMATK,
 	calculateHIT,
 	calculatePhysicalResistance,
 	calculateMagicalResistance,
@@ -85,6 +86,18 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		dummyBonuses,
 	)
 
+	// 8-3. MATK計算
+	const matkCalculation = calculateMATK(
+		data.baseStats.level,
+		data.mainWeapon.weaponType,
+		data.mainWeapon.ATK,
+		data.mainWeapon.refinement,
+		atkCalculation.totalWeaponATK, // 手甲用の総武器ATK
+		data.baseStats, // 基礎ステータス（MATKアップ用）
+		adjustedStats, // 補正後ステータス（ステータスMATK用）
+		dummyBonuses,
+	)
+
 	// 9. HIT計算
 	const hitCalculation = calculateHIT(
 		data.baseStats.level,
@@ -141,8 +154,8 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			subBaseATK: data.subWeapon.ATK, // 暫定：サブ武器ATKをそのまま表示
 			totalATK: atkCalculation.finalATK + data.subWeapon.ATK, // 暫定
 			bringerAM: 0, // 暫定
-			MATK: 0, // 暫定
-			baseMATK: 0, // 暫定
+			MATK: matkCalculation.finalMATK,
+			baseMATK: matkCalculation.baseMATK,
 			stabilityRate: stabilityCalculation.finalStability,
 			subStabilityRate: data.subWeapon.stability,
 			criticalRate: criticalRateCalculation.finalCriticalRate,

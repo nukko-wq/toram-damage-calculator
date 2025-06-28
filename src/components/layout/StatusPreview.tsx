@@ -9,6 +9,7 @@ import {
 	calculateMotionSpeed,
 	calculateCriticalRate,
 	calculateCriticalDamage,
+	calculateMATK,
 	calculateHIT,
 	calculatePhysicalResistance,
 	calculateMagicalResistance,
@@ -325,6 +326,23 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
 		calculatedEquipmentBonuses
 
+	// MATK計算（ATK計算結果が必要なため、useMemoの外で実行）
+	const allBonuses = aggregateAllBonuses(
+		equipmentBonuses,
+		crystalBonuses,
+		foodBonuses,
+		buffBonuses,
+	)
+	const matkCalculation = calculateMATK(
+		baseStats.level,
+		data.mainWeapon.weaponType,
+		data.mainWeapon.ATK,
+		data.mainWeapon.refinement,
+		atkCalculation.totalWeaponATK, // 手甲用の総武器ATK
+		baseStats, // 基礎ステータス（MATKアップ用）
+		adjustedStatsCalculation, // 補正後ステータス（ステータスMATK用）
+		allBonuses,
+	)
 
 	// デバッグ: equipmentBonus1の各プロパティを確認
 	console.log('equipmentBonus1 プロパティ:', {
@@ -421,8 +439,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			: 0, // 双剣時は計算値、その他は0
 		totalATK: 0, // TODO: 総ATK計算
 		bringerAM: 0, // TODO: ブリンガーAM計算
-		MATK: 0, // TODO: MATK計算
-		baseMATK: 0, // TODO: 基本MATK計算
+		MATK: matkCalculation.finalMATK, // MATK計算結果
+		baseMATK: matkCalculation.baseMATK, // 基本MATK計算結果
 		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
 		subStabilityRate: data.subWeapon.stability, // サブ武器安定率
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果

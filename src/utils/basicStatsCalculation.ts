@@ -447,6 +447,31 @@ export interface CriticalDamageCalculationSteps {
 	finalCriticalDamage: number // 最終クリティカルダメージ
 }
 
+// MATK計算の詳細ステップ
+export interface MATKCalculationSteps {
+	level: number // キャラクターレベル
+	weaponType: string // 武器種別
+	weaponATK: number // 武器ATK
+	refinementLevel: number // 精錬値
+	weaponMATK: number // 総武器MATK
+	baseINT: number // 基礎INT
+	baseDEX: number // 基礎DEX
+	baseAGI: number // 基礎AGI（旋風槍用）
+	statusMATK: number // ステータスMATK
+	matkUpSTR: number // MATKアップ(STR)
+	matkUpINT: number // MATKアップ(INT)
+	matkUpVIT: number // MATKアップ(VIT)
+	matkUpAGI: number // MATKアップ(AGI)
+	matkUpDEX: number // MATKアップ(DEX)
+	matkUpTotal: number // MATKアップ合計
+	matkDownTotal: number // MATKダウン合計
+	baseMATK: number // 基礎MATK
+	matkPercent: number // MATK%補正
+	matkAfterPercent: number // MATK%適用後
+	matkFixed: number // MATK固定値
+	finalMATK: number // 最終MATK
+}
+
 // HIT計算の詳細ステップ
 export interface HITCalculationSteps {
 	level: number // ステータスのレベル
@@ -1246,6 +1271,121 @@ export function calculateCriticalDamage(
 		excessAmount,
 		halvedExcess,
 		finalCriticalDamage,
+	}
+}
+
+/**
+ * MATK計算
+ * MATK = INT((自Lv+総武器MATK+ステータスMATK+MATKアップ-MATKダウン)×(1+MATK%/100))+MATK固定値
+ * 
+ * @param level キャラクターレベル
+ * @param weaponType 武器種別
+ * @param weaponATK 武器ATK
+ * @param refinementLevel 精錬値
+ * @param totalWeaponATK 総武器ATK（手甲用）
+ * @param baseStats 基礎ステータス（MATKアップ計算用）
+ * @param adjustedStats 補正後ステータス（ステータスMATK計算用）
+ * @param bonuses 全補正値（装備・クリスタ・バフアイテム・料理の合計）
+ * @returns MATK計算結果
+ */
+export const calculateMATK = (
+	level: number,
+	weaponType: string,
+	weaponATK: number,
+	refinementLevel: number,
+	totalWeaponATK: number,
+	baseStats: BaseStats,
+	adjustedStats: AdjustedStatsCalculation,
+	bonuses: AllBonuses,
+): MATKCalculationSteps => {
+	// 1. 総武器MATK計算
+	let weaponMATK = 0
+	if (weaponType === '杖' || weaponType === '魔導具') {
+		// 杖・魔導具: 総武器MATKを適用
+		const weaponATKPercent = bonuses.WeaponATK_Rate || 0
+		const weaponATKFixed = bonuses.WeaponATK || 0
+		weaponMATK = Math.floor(weaponATK * (1 + (refinementLevel ** 2) / 100) + refinementLevel) +
+		            Math.floor(weaponATK * weaponATKPercent / 100) + weaponATKFixed
+	} else if (weaponType === '手甲') {
+		// 手甲: 総武器ATK/2（小数点保持）
+		weaponMATK = totalWeaponATK / 2
+	}
+	// その他の武器種は weaponMATK = 0
+
+	// 2. ステータスMATK計算（補正後ステータスを使用）
+	const { INT, DEX, AGI } = adjustedStats
+	let statusMATK = 0
+	switch (weaponType) {
+		case '片手剣':
+		case '両手剣':
+		case '弓':
+		case '自動弓':
+		case '素手':
+			statusMATK = INT * 3 + DEX * 1
+			break
+		case '杖':
+		case '魔導具':
+		case '手甲':
+			statusMATK = INT * 4 + DEX * 1
+			break
+		case '旋風槍':
+			statusMATK = INT * 2 + DEX * 1 + AGI * 1
+			break
+		case '抜刀剣':
+			statusMATK = INT * 1.5 + DEX * 1 // 小数点保持
+			break
+		case '双剣':
+			// TODO: 双剣の計算式は後で追加
+			statusMATK = INT * 3 + DEX * 1 // 暫定
+			break
+		default:
+			statusMATK = INT * 3 + DEX * 1 // デフォルト
+			break
+	}
+
+	// 3. MATKアップ・ダウン計算（基礎ステータスを使用）
+	const matkUpSTR = Math.floor(baseStats.STR * (bonuses.MATK_STR_Rate || 0) / 100)
+	const matkUpINT = Math.floor(baseStats.INT * (bonuses.MATK_INT_Rate || 0) / 100)
+	const matkUpVIT = Math.floor(baseStats.VIT * (bonuses.MATK_VIT_Rate || 0) / 100)
+	const matkUpAGI = Math.floor(baseStats.AGI * (bonuses.MATK_AGI_Rate || 0) / 100)
+	const matkUpDEX = Math.floor(baseStats.DEX * (bonuses.MATK_DEX_Rate || 0) / 100)
+	
+	const matkUpTotal = matkUpSTR + matkUpINT + matkUpVIT + matkUpAGI + matkUpDEX
+	const matkDownTotal = 0 // 必要に応じて実装
+
+	// 4. 基本MATK計算
+	const baseMATK = level + weaponMATK + statusMATK + matkUpTotal - matkDownTotal
+
+	// 5. MATK%適用
+	const matkPercent = bonuses.MATK_Rate || 0
+	const matkAfterPercent = Math.floor(baseMATK * (1 + matkPercent / 100))
+
+	// 6. MATK固定値加算
+	const matkFixed = bonuses.MATK || 0
+	const finalMATK = matkAfterPercent + matkFixed
+
+	return {
+		level,
+		weaponType,
+		weaponATK,
+		refinementLevel,
+		weaponMATK,
+		baseINT: INT, // 補正後ステータスのINT
+		baseDEX: DEX, // 補正後ステータスのDEX
+		baseAGI: AGI, // 補正後ステータスのAGI
+		statusMATK,
+		matkUpSTR,
+		matkUpINT,
+		matkUpVIT,
+		matkUpAGI,
+		matkUpDEX,
+		matkUpTotal,
+		matkDownTotal,
+		baseMATK,
+		matkPercent,
+		matkAfterPercent,
+		matkFixed,
+		finalMATK,
 	}
 }
 
