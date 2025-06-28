@@ -21,7 +21,7 @@ const ArmorTypeButton: React.FC<ArmorTypeButtonProps> = ({
 			type="button"
 			onClick={() => onChange(armorType)}
 			className={`
-				px-3 py-2 text-sm rounded border transition-colors
+				px-3 py-2 text-sm rounded border transition-colors cursor-pointer
 				${
 					isSelected
 						? 'bg-blue-500 text-white border-blue-500'
