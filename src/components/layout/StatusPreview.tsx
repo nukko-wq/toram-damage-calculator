@@ -269,7 +269,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.AGI,
 				allBonuses,
 			),
-			totalElementAdvantageCalculation: calculateTotalElementAdvantage(allBonuses),
+			totalElementAdvantageCalculation:
+				calculateTotalElementAdvantage(allBonuses),
 			stabilityCalculation: calculateStability(
 				data.mainWeapon.stability,
 				data.mainWeapon.weaponType,
@@ -420,7 +421,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		criticalDamage: 150, // TODO: クリティカルダメージ計算
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
 		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
-		totalElementAdvantage: totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
+		totalElementAdvantage:
+			totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
 		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果

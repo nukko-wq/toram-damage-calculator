@@ -52,6 +52,10 @@ export interface CalculatorStore {
 	isLoading: boolean
 	isInitialized: boolean
 
+	// ===== 差分検知システム =====
+	lastSavedData: CalculatorData | null
+	hasRealChanges: boolean
+
 	// ===== 将来の計算結果 =====
 	calculationResult: DamageCalculationResult | null
 	isCalculating: boolean
@@ -67,6 +71,11 @@ export interface CalculatorStore {
 	resetUnsavedChanges: () => void
 	setHasUnsavedChanges: (value: boolean) => void
 	setIsLoading: (value: boolean) => void
+
+	// ===== 差分検知メソッド =====
+	updateLastSavedData: (data: CalculatorData) => void
+	checkForRealChanges: () => boolean
+	setHasRealChanges: (value: boolean) => void
 
 	// ===== セーブデータ管理 =====
 	loadSaveData: (data: CalculatorData) => Promise<void>

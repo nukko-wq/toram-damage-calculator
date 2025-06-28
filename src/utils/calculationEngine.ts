@@ -32,40 +32,69 @@ import {
 export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 現在は簡単な実装。将来的に装備・クリスタ・料理・バフからの補正値を統合
 	const dummyBonuses: AllBonuses = {}
-	
+
 	// 1. 補正後ステータス計算
 	const adjustedStats = calculateAdjustedStats(data.baseStats, dummyBonuses)
-	
+
 	// 2. HP計算
 	const hpCalculation = calculateHP(data.baseStats, dummyBonuses)
-	
+
 	// 3. MP計算
 	const mpCalculation = calculateMP(data.baseStats, dummyBonuses)
-	
+
 	// 4. ATK計算
-	const atkCalculation = calculateATK(data.baseStats, data.mainWeapon, dummyBonuses)
-	
+	const atkCalculation = calculateATK(
+		data.baseStats,
+		data.mainWeapon,
+		dummyBonuses,
+	)
+
 	// 5. ASPD計算（体装備のArmorTypeを取得）
 	const bodyArmorType = getBodyArmorType(data.equipment.body)
-	const aspdCalculation = calculateASPD(data.baseStats, data.mainWeapon, adjustedStats, dummyBonuses, bodyArmorType)
-	
+	const aspdCalculation = calculateASPD(
+		data.baseStats,
+		data.mainWeapon,
+		adjustedStats,
+		dummyBonuses,
+		bodyArmorType,
+	)
+
 	// 6. 行動速度計算
-	const motionSpeedCalculation = calculateMotionSpeed(aspdCalculation.finalASPD, dummyBonuses)
-	
+	const motionSpeedCalculation = calculateMotionSpeed(
+		aspdCalculation.finalASPD,
+		dummyBonuses,
+	)
+
 	// 7. 異常耐性計算
-	const ailmentResistance = calculateAilmentResistance(data.baseStats, dummyBonuses)
+	const ailmentResistance = calculateAilmentResistance(
+		data.baseStats,
+		dummyBonuses,
+	)
 
 	// 8. クリティカル率計算
-	const criticalRateCalculation = calculateCriticalRate(data.baseStats.CRT, dummyBonuses)
+	const criticalRateCalculation = calculateCriticalRate(
+		data.baseStats.CRT,
+		dummyBonuses,
+	)
 
 	// 9. HIT計算
-	const hitCalculation = calculateHIT(data.baseStats.level, adjustedStats.DEX, dummyBonuses)
+	const hitCalculation = calculateHIT(
+		data.baseStats.level,
+		adjustedStats.DEX,
+		dummyBonuses,
+	)
 
 	// 10. FLEE計算
-	const fleeCalculation = calculateFLEE(data.baseStats.level, adjustedStats.AGI, data.equipment.body, dummyBonuses)
+	const fleeCalculation = calculateFLEE(
+		data.baseStats.level,
+		adjustedStats.AGI,
+		data.equipment.body,
+		dummyBonuses,
+	)
 
 	// 11. 物理耐性計算
-	const physicalResistanceCalculation = calculatePhysicalResistance(dummyBonuses)
+	const physicalResistanceCalculation =
+		calculatePhysicalResistance(dummyBonuses)
 
 	// 12. 魔法耐性計算
 	const magicalResistanceCalculation = calculateMagicalResistance(dummyBonuses)
@@ -77,13 +106,24 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	const anticipateCalculation = calculateAnticipate(dummyBonuses)
 
 	// 15. CSPD計算
-	const cspdCalculation = calculateCSPD(data.baseStats.level, adjustedStats.DEX, adjustedStats.AGI, dummyBonuses)
+	const cspdCalculation = calculateCSPD(
+		data.baseStats.level,
+		adjustedStats.DEX,
+		adjustedStats.AGI,
+		dummyBonuses,
+	)
 
 	// 16. 総属性有利計算
-	const totalElementAdvantageCalculation = calculateTotalElementAdvantage(dummyBonuses)
+	const totalElementAdvantageCalculation =
+		calculateTotalElementAdvantage(dummyBonuses)
 
 	// 17. 安定率計算
-	const stabilityCalculation = calculateStability(data.mainWeapon.stability, data.mainWeapon.weaponType, adjustedStats, dummyBonuses)
+	const stabilityCalculation = calculateStability(
+		data.mainWeapon.stability,
+		data.mainWeapon.weaponType,
+		adjustedStats,
+		dummyBonuses,
+	)
 
 	return {
 		basicStats: {
@@ -101,7 +141,8 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			criticalDamage: 0, // 暫定
 			magicCriticalRate: 0, // 暫定
 			magicCriticalDamage: 0, // 暫定
-			totalElementAdvantage: totalElementAdvantageCalculation.finalTotalElementAdvantage,
+			totalElementAdvantage:
+				totalElementAdvantageCalculation.finalTotalElementAdvantage,
 			elementAwakeningAdvantage: 0, // 暫定
 			ASPD: aspdCalculation.finalASPD,
 			CSPD: cspdCalculation.finalCSPD,

@@ -7,7 +7,7 @@ interface SaveDataActionsProps {
 }
 
 export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
-	const { saveCurrentData, hasUnsavedChanges, getUnsavedDataStatus } =
+	const { saveCurrentData, hasRealChanges, getUnsavedDataStatus } =
 		useCalculatorStore()
 
 	// 現在のデータを保存
@@ -29,20 +29,20 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 				<button
 					type="button"
 					onClick={handleSaveCurrentData}
-					disabled={!hasUnsavedChanges}
+					disabled={!hasRealChanges}
 					className={`
 						flex-1 inline-flex items-center justify-center px-3 py-2 
 						border border-transparent text-sm font-medium rounded-md 
 						transition-colors duration-200
 						${
-							hasUnsavedChanges
+							hasRealChanges
 								? 'text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer'
 								: 'text-gray-400 bg-gray-200'
 						}
 					`}
-					title={hasUnsavedChanges ? '現在のデータを保存' : '変更がありません'}
+					title={hasRealChanges ? '現在のデータを保存' : '変更がありません'}
 				>
-					{hasUnsavedChanges && (
+					{hasRealChanges && (
 						<svg
 							className="w-4 h-4 mr-2"
 							fill="none"

@@ -6,21 +6,13 @@ import MenuPanel from './MenuPanel'
 import { useFloatingMenu } from './hooks/useFloatingMenu'
 
 export default function FloatingMenuSystem() {
-	const {
-		isOpen,
-		activeSection,
-		toggleMenu,
-		closeMenu,
-		setActiveSection,
-	} = useFloatingMenu()
+	const { isOpen, activeSection, toggleMenu, closeMenu, setActiveSection } =
+		useFloatingMenu()
 
 	return (
 		<>
 			{/* フローティングメニューボタン */}
-			<FloatingMenuButton
-				isOpen={isOpen}
-				onClick={toggleMenu}
-			/>
+			<FloatingMenuButton isOpen={isOpen} onClick={toggleMenu} />
 
 			{/* メニューパネル */}
 			<MenuPanel

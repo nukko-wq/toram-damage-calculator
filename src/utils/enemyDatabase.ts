@@ -131,7 +131,7 @@ export function getAllEnemies(): Enemy[] {
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
 	}))
-	
+
 	const userEnemies = getUserEnemies()
 
 	// カスタム敵情報をCustomEnemy形式に変換

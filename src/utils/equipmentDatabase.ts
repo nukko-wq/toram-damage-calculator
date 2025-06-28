@@ -779,9 +779,12 @@ export function renameCustomEquipment(id: string, newName: string): boolean {
 }
 
 // ArmorTypeを更新（プリセット・カスタム装備対応）
-export function updateEquipmentArmorType(id: string, armorType: ArmorType): boolean {
+export function updateEquipmentArmorType(
+	id: string,
+	armorType: ArmorType,
+): boolean {
 	console.log('updateEquipmentArmorType called:', { id, armorType })
-	
+
 	// カスタム装備の場合を先に確認
 	const customEquipment = getCustomEquipmentById(id)
 	if (customEquipment) {

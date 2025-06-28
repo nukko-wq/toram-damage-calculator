@@ -228,7 +228,7 @@ export const getAllCrystals = (): Crystal[] => {
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
 	}))
-	
+
 	const customCrystals = getUserCrystals()
 
 	// カスタムクリスタルをCustomCrystal形式に変換

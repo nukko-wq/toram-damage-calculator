@@ -21,8 +21,9 @@ export default function SaveDataList({
 
 	// 更新日時降順でソート（最新が上）
 	const sortedSaveDataList = useMemo(() => {
-		return [...saveDataList].sort((a, b) =>
-			new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+		return [...saveDataList].sort(
+			(a, b) =>
+				new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
 		)
 	}, [saveDataList])
 
