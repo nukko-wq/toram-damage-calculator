@@ -1624,7 +1624,14 @@ export function calculateStability(
 
 	// 3. 弓+矢の場合の矢の安定率取得
 	const isBowArrowCombo = (weaponType === '弓' || weaponType === '自動弓') && subWeapon?.weaponType === '矢'
-	const arrowStability = isBowArrowCombo ? subWeapon.stability : 0
+	let arrowStability = 0
+	if (isBowArrowCombo) {
+		if (weaponType === '弓') {
+			arrowStability = subWeapon.stability // 弓の場合はそのまま
+		} else if (weaponType === '自動弓') {
+			arrowStability = Math.floor(subWeapon.stability / 2) // 自動弓の場合は半分（INT適用）
+		}
+	}
 
 	// 4. 制限適用前の安定率計算
 	const stabilityBeforeLimit =
