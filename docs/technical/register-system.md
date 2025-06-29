@@ -940,6 +940,102 @@ onConfirm(
 )
 ```
 
+## ギルド料理効果
+
+### おいしい食材取引（deliciousIngredientTrade）
+
+#### 基本仕様
+- **効果**: キャラクターの最大HPを増加させる
+- **計算方法**: `レジスタレベル × 100` を装備品補正値1のHP(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+#### 実装方式
+おいしい食材取引効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: ギルド料理効果を`finalBonuses`に追加
+2. **基本ステータス計算**: HP計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+#### 計算例
+**入力値:**
+- deliciousIngredientTradeレベル: 5 (有効)
+- 既存の装備品補正値1のHP(+): 800 (装備+クリスタ+料理+バフアイテム+レジスタ)
+
+**計算手順:**
+1. deliciousIngredientTrade効果: 5 × 100 = 500
+2. **装備品補正値1のHP(+)合計**: 800 + 500 = 1300
+
+#### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const deliciousIngredientTradeEffect = data.register.effects.find(effect => 
+  effect.type === 'deliciousIngredientTrade' && effect.isEnabled
+)
+if (deliciousIngredientTradeEffect) {
+  finalBonuses.HP = (finalBonuses.HP || 0) + (deliciousIngredientTradeEffect.level * 100)
+}
+```
+
+### 新鮮な果物取引（freshFruitTrade）
+
+#### 基本仕様
+- **効果**: キャラクターの最大MPを増加させる
+- **計算方法**: `レジスタレベル × 10` を装備品補正値1のMP(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+#### 実装方式
+新鮮な果物取引効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: ギルド料理効果を`finalBonuses`に追加
+2. **基本ステータス計算**: MP計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+#### 計算例
+**入力値:**
+- freshFruitTradeレベル: 8 (有効)
+- 既存の装備品補正値1のMP(+): 200 (装備+クリスタ+料理+バフアイテム+レジスタ)
+
+**計算手順:**
+1. freshFruitTrade効果: 8 × 10 = 80
+2. **装備品補正値1のMP(+)合計**: 200 + 80 = 280
+
+#### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const freshFruitTradeEffect = data.register.effects.find(effect => 
+  effect.type === 'freshFruitTrade' && effect.isEnabled
+)
+if (freshFruitTradeEffect) {
+  finalBonuses.MP = (finalBonuses.MP || 0) + (freshFruitTradeEffect.level * 10)
+}
+```
+
+### ギルド料理効果統合の全体例
+```typescript
+// StatusPreview.tsx内でのギルド料理効果統合
+if (data.register?.effects) {
+  // レジスタ効果の処理...（既存のレジスタ効果）
+
+  // おいしい食材取引
+  const deliciousIngredientTradeEffect = data.register.effects.find(effect => 
+    effect.type === 'deliciousIngredientTrade' && effect.isEnabled
+  )
+  if (deliciousIngredientTradeEffect) {
+    finalBonuses.HP = (finalBonuses.HP || 0) + (deliciousIngredientTradeEffect.level * 100)
+  }
+
+  // 新鮮な果物取引
+  const freshFruitTradeEffect = data.register.effects.find(effect => 
+    effect.type === 'freshFruitTrade' && effect.isEnabled
+  )
+  if (freshFruitTradeEffect) {
+    finalBonuses.MP = (finalBonuses.MP || 0) + (freshFruitTradeEffect.level * 10)
+  }
+}
+```
+
 ## レジスタレット効果一覧
 
 1. **物理攻撃アップ(physicalAttackUp)** - 物理攻撃力向上（装備品補正値1のATK(+)に加算）
@@ -961,5 +1057,5 @@ onConfirm(
 
 ## ギルド料理効果一覧
 
-1. **おいしい食材取引** - ギルド経済効果
-2. **新鮮果実取引** - ギルド経済効果
+1. **おいしい食材取引(deliciousIngredientTrade)** - HP上限値向上（装備品補正値1のHP(+)に加算、レベル×100）
+2. **新鮮な果物取引(freshFruitTrade)** - MP上限値向上（装備品補正値1のMP(+)に加算、レベル×10）

@@ -7,7 +7,7 @@ import type {
 } from '@/types/stores'
 import type { CalculatorData } from '@/types/calculator'
 import type { EquipmentSlots } from '@/types/calculator'
-import { createInitialCalculatorData } from '@/utils/initialData'
+import { createInitialCalculatorData, migrateRegisterEffects } from '@/utils/initialData'
 import {
 	saveCurrentData,
 	getCurrentSaveData,
@@ -158,7 +158,14 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 				// データ整合性チェック
 				const validData = isValidCalculatorData(data)
-					? data
+					? (() => {
+							// 既存データのレジスタ効果を移行（新効果があれば追加）
+							const migratedData = { ...data }
+							if (migratedData.register) {
+								migratedData.register = migrateRegisterEffects(migratedData.register)
+							}
+							return migratedData
+						})()
 					: (() => {
 							console.warn(
 								'読み込みデータが無効です。デフォルトデータを使用します。',
@@ -640,10 +647,16 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					const { useSaveDataStore } = await import('./saveDataStore')
 					await useSaveDataStore.getState().loadSaveDataList()
 
+					// レジスタ効果の移行（新効果があれば追加）
+					const migratedData = { ...currentSave.data }
+					if (migratedData.register) {
+						migratedData.register = migrateRegisterEffects(migratedData.register)
+					}
+
 					// 初期化時に差分検知状態も設定
-					const snapshot = createDataSnapshot(currentSave.data)
+					const snapshot = createDataSnapshot(migratedData)
 					set({
-						data: currentSave.data,
+						data: migratedData,
 						lastSavedData: snapshot,
 						hasUnsavedChanges: false,
 						hasRealChanges: false,

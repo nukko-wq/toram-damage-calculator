@@ -18,7 +18,7 @@ export const registerEffectTypeSchema = z.enum([
 	'resonancePower',
 	'resonanceAcceleration',
 	'resonanceConcentration',
-	'deliciousFoodTrade',
+	'deliciousIngredientTrade',
 	'freshFruitTrade',
 ])
 

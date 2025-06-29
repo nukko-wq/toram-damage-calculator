@@ -155,9 +155,24 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
 				finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
 			}
+
+			// ギルド料理効果
+			const deliciousIngredientTradeEffect = data.register.effects.find(effect => 
+				effect.type === 'deliciousIngredientTrade' && effect.isEnabled
+			)
+			if (deliciousIngredientTradeEffect) {
+				finalBonuses.HP = (finalBonuses.HP || 0) + (deliciousIngredientTradeEffect.level * 100)
+			}
+
+			const freshFruitTradeEffect = data.register.effects.find(effect => 
+				effect.type === 'freshFruitTrade' && effect.isEnabled
+			)
+			if (freshFruitTradeEffect) {
+				finalBonuses.MP = (finalBonuses.MP || 0) + (freshFruitTradeEffect.level * 10)
+			}
 		}
 
-		// TODO: 将来的にギルド料理効果、バフスキル効果もここに統合
+		// TODO: 将来的にバフスキル効果もここに統合
 
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
 		console.log('ステータスデバッグ:', {
