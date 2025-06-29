@@ -2,7 +2,7 @@
 
 ## React Hook Form統合
 
-### 4.1 統合パターン
+### 4.1 統合パターン（差分検知対応版）
 
 各フォームコンポーネントでZustandストアとReact Hook Formを双方向バインディング:
 
@@ -19,16 +19,78 @@ const {
   mode: 'onChange',
 })
 
-// 変更検知とストア更新
+// 変更検知とストア更新（差分検知対応）
 useEffect(() => {
   const subscription = watch((value, { name, type }) => {
     if (!isInitialized || !name || !value || type !== 'change') {
       return
     }
+    
+    // ストア更新（内部で差分チェックが自動実行される）
     updateStore(value as FormData)
+    
+    // 注意: hasUnsavedChangesの手動設定は不要
+    // CalculatorStoreの更新メソッド内で自動的に差分チェックが実行される
   })
   return () => subscription.unsubscribe()
 }, [watch, isInitialized, updateStore])
+```
+
+### 4.1.1 差分検知との統合
+
+```typescript
+// useSaveDataManagerでの差分検知統合
+export const useSaveDataManager = () => {
+  const hasUnsavedChanges = useCalculatorStore(state => state.hasUnsavedChanges)
+  const hasRealChanges = useCalculatorStore(state => state.hasRealChanges)
+  const checkForRealChanges = useCalculatorStore(state => state.checkForRealChanges)
+  const setHasRealChanges = useCalculatorStore(state => state.setHasRealChanges)
+  
+  // デバウンス付きの差分チェック
+  const debouncedChangeCheck = useMemo(
+    () => debounce(() => {
+      const hasChanges = checkForRealChanges()
+      setHasRealChanges(hasChanges)
+    }, 500),
+    [checkForRealChanges, setHasRealChanges]
+  )
+  
+  // フォーム変更時の差分チェック
+  useEffect(() => {
+    if (hasUnsavedChanges) {
+      debouncedChangeCheck()
+    }
+  }, [hasUnsavedChanges, debouncedChangeCheck])
+  
+  return {
+    hasUnsavedChanges,
+    hasRealChanges,              // 実際の差分があるかどうか
+    shouldShowSaveButton: hasRealChanges,  // 保存ボタン表示制御
+    saveCurrentData,
+    // ... 他のメソッド
+  }
+}
+
+// フォーム内での保存ボタン表示制御
+const BaseStatsForm = () => {
+  const { hasRealChanges, saveCurrentData } = useSaveDataManager()
+  
+  return (
+    <form>
+      {/* フォーム要素 */}
+      
+      {/* 差分がある場合のみ保存ボタンを表示 */}
+      {hasRealChanges && (
+        <button
+          onClick={saveCurrentData}
+          className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md"
+        >
+          現在のデータを保存
+        </button>
+      )}
+    </form>
+  )
+}
 ```
 
 ### 4.3 バフスキル統合の特殊パターン

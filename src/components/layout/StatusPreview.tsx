@@ -8,6 +8,8 @@ import {
 	calculateASPD,
 	calculateMotionSpeed,
 	calculateCriticalRate,
+	calculateCriticalDamage,
+	calculateMATK,
 	calculateHIT,
 	calculatePhysicalResistance,
 	calculateMagicalResistance,
@@ -222,7 +224,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			hpCalculation: calculateHP(baseStats, allBonuses),
 			mpCalculation: calculateMP(baseStats, allBonuses),
-			atkCalculation: calculateATK(baseStats, data.mainWeapon, allBonuses),
+			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, allBonuses),
 			subATKCalculation: calculateSubATK(
 				baseStats,
 				data.mainWeapon,
@@ -248,6 +250,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				return calculateMotionSpeed(aspd, allBonuses)
 			})(),
 			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonuses),
+			criticalDamageCalculation: calculateCriticalDamage(
+				adjustedStatsCalculation.STR,
+				adjustedStatsCalculation.AGI,
+				allBonuses,
+			),
 			hitCalculation: calculateHIT(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
@@ -269,7 +276,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.AGI,
 				allBonuses,
 			),
-			totalElementAdvantageCalculation: calculateTotalElementAdvantage(allBonuses),
+			totalElementAdvantageCalculation:
+				calculateTotalElementAdvantage(allBonuses),
 			stabilityCalculation: calculateStability(
 				data.mainWeapon.stability,
 				data.mainWeapon.weaponType,
@@ -302,6 +310,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		aspdCalculation,
 		motionSpeedCalculation,
 		criticalRateCalculation,
+		criticalDamageCalculation,
 		hitCalculation,
 		fleeCalculation,
 		physicalResistanceCalculation,
@@ -316,6 +325,24 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	} = calculationResults
 	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
 		calculatedEquipmentBonuses
+
+	// MATK計算（ATK計算結果が必要なため、useMemoの外で実行）
+	const allBonuses = aggregateAllBonuses(
+		equipmentBonuses,
+		crystalBonuses,
+		foodBonuses,
+		buffBonuses,
+	)
+	const matkCalculation = calculateMATK(
+		baseStats.level,
+		data.mainWeapon.weaponType,
+		data.mainWeapon.ATK,
+		data.mainWeapon.refinement,
+		atkCalculation.totalWeaponATK, // 手甲用の総武器ATK
+		baseStats, // 基礎ステータス（MATKアップ用）
+		adjustedStatsCalculation, // 補正後ステータス（ステータスMATK用）
+		allBonuses,
+	)
 
 	// デバッグ: equipmentBonus1の各プロパティを確認
 	console.log('equipmentBonus1 プロパティ:', {
@@ -404,23 +431,28 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		MP: mpCalculation.finalMP,
 		ATK: atkCalculation.finalATK, // 武器種別ATK計算結果
 		baseATK: Math.floor(atkCalculation.baseATK), // 基礎ATK（表示時のみ小数点以下切り捨て）
-		subATK: subATKCalculation
-			? subATKCalculation.subFinalATK
-			: data.subWeapon.ATK, // 双剣時は計算値、その他は武器ATK
-		subBaseATK: subATKCalculation
-			? Math.floor(subATKCalculation.subBaseATK)
-			: 0, // 双剣時は計算値、その他は0
+		// サブATKとサブ基礎ATKは双剣の場合のみ計算、他は null で - 表示
+		subATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation
+			? subATKCalculation.subFinalATK // 双剣時は計算値
+			: null, // 非双剣時は null で - 表示
+		subBaseATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation
+			? Math.floor(subATKCalculation.subBaseATK) // 双剣時は計算値
+			: null, // 非双剣時は null で - 表示
 		totalATK: 0, // TODO: 総ATK計算
 		bringerAM: 0, // TODO: ブリンガーAM計算
-		MATK: 0, // TODO: MATK計算
-		baseMATK: 0, // TODO: 基本MATK計算
+		MATK: matkCalculation.finalMATK, // MATK計算結果
+		baseMATK: matkCalculation.baseMATK, // 基本MATK計算結果
 		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
-		subStabilityRate: data.subWeapon.stability, // サブ武器安定率
+		// サブ安定率は常時表示（双剣以外は null で - 表示）
+		subStabilityRate: data.mainWeapon.weaponType === '双剣' && subATKCalculation
+			? subATKCalculation.subStability // サブ安定率（計算後）
+			: null, // 非双剣時は null で - 表示
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
-		criticalDamage: 150, // TODO: クリティカルダメージ計算
+		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
 		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
-		totalElementAdvantage: totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
+		totalElementAdvantage:
+			totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
 		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果
@@ -522,14 +554,14 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								MP: 'MP',
 								ATK: 'ATK',
 								baseATK: '基礎ATK',
-								subATK: 'サブATK',
-								subBaseATK: 'サブ基礎ATK',
+								subATK: 'サブATK', // 常時表示（ラベル位置統一のため）
+								subBaseATK: 'サブ基礎ATK', // 常時表示（ラベル位置統一のため）
 								totalATK: '総ATK',
 								bringerAM: 'ブリンガーAM',
 								MATK: 'MATK',
 								baseMATK: '基本MATK',
 								stabilityRate: '安定率',
-								subStabilityRate: 'サブ安定率',
+								subStabilityRate: 'サブ安定率', // 常時表示（ラベル位置統一のため）
 								criticalRate: 'ｸﾘﾃｨｶﾙ率',
 								criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
 								magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',

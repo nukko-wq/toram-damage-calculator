@@ -29,8 +29,8 @@ function validatePropertyValue(value: number, propertyId: string): number {
 		// %系は-100〜1000の範囲
 		return Math.max(-100, Math.min(1000, value))
 	}
-		// 固定値系は-9999〜9999の範囲
-		return Math.max(-9999, Math.min(9999, value))
+	// 固定値系は-9999〜9999の範囲
+	return Math.max(-9999, Math.min(9999, value))
 }
 
 /**
@@ -42,21 +42,21 @@ function normalizePropertyKey(propertyKey: string): string {
 	// 特殊な変換が必要なプロパティのみマッピング
 	const propertyMapping: Record<string, string> = {
 		// 料理プロパティ名の変換
-		'elementAdvantage': 'ElementAdvantage_Rate',
-		'weaponATK': 'WeaponATK',
-		'criticalRate': 'Critical',
-		'attackMPRecovery': 'AttackMPRecovery',
-		'accuracy': 'Accuracy', // 命中の正規化を追加
-		'aggroPlus': 'Aggro', // 正の値として処理
-		'aggroMinus': 'Aggro', // 負の値として処理
-		'physicalResistance': 'PhysicalResistance_Rate',
-		'magicalResistance': 'MagicalResistance_Rate',
-		
+		elementAdvantage: 'ElementAdvantage_Rate',
+		weaponATK: 'WeaponATK',
+		criticalRate: 'Critical',
+		attackMPRecovery: 'AttackMPRecovery',
+		accuracy: 'Accuracy', // 命中の正規化を追加
+		aggroPlus: 'Aggro', // 正の値として処理
+		aggroMinus: 'Aggro', // 負の値として処理
+		physicalResistance: 'PhysicalResistance_Rate',
+		magicalResistance: 'MagicalResistance_Rate',
+
 		// レガシー名称の変換
-		'AbsoluteEvasion': 'AbsoluteDodge_Rate',
-		'AbsoluteEvasion_Rate': 'AbsoluteDodge_Rate',
-		'ItemSpeed': 'ItemCooldown',
-		'ToolSpeed': 'ItemCooldown',
+		AbsoluteEvasion: 'AbsoluteDodge_Rate',
+		AbsoluteEvasion_Rate: 'AbsoluteDodge_Rate',
+		ItemSpeed: 'ItemCooldown',
+		ToolSpeed: 'ItemCooldown',
 	}
 
 	return propertyMapping[propertyKey] || propertyKey
@@ -89,7 +89,6 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 			equipmentData.freeInput3,
 		].filter(Boolean)
 
-
 		for (const slot of allSlots) {
 			if (!slot?.properties) {
 				continue
@@ -100,13 +99,17 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 				if (typeof value !== 'number' || value === 0) continue
 
 				const validatedValue = validatePropertyValue(value, propertyKey)
-				
+
 				// Aggro値の特殊処理（料理の aggroPlus/aggroMinus → Aggro統合）
 				if (propertyKey === 'aggroPlus' || propertyKey === 'aggroMinus') {
 					const normalizedKey = 'Aggro'
 					const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
-					const adjustedValue = propertyKey === 'aggroMinus' ? -Math.abs(validatedValue) : validatedValue
-					bonuses[normalizedKey as keyof AllBonuses] = previousValue + adjustedValue
+					const adjustedValue =
+						propertyKey === 'aggroMinus'
+							? -Math.abs(validatedValue)
+							: validatedValue
+					bonuses[normalizedKey as keyof AllBonuses] =
+						previousValue + adjustedValue
 				} else {
 					const normalizedKey = normalizePropertyKey(propertyKey)
 					const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
@@ -115,7 +118,6 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 				}
 			}
 		}
-
 
 		return bonuses
 	} catch (error) {
@@ -157,13 +159,12 @@ export function getCrystalBonuses(crystalData: any): Partial<AllBonuses> {
 				if (typeof value !== 'number' || value === 0) continue
 
 				const validatedValue = validatePropertyValue(value, propertyKey)
-				
+
 				const normalizedKey = normalizePropertyKey(propertyKey)
 				bonuses[normalizedKey as keyof AllBonuses] =
 					(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
 			}
 		}
-
 
 		return bonuses
 	} catch (error) {
@@ -193,12 +194,19 @@ export function getFoodBonuses(foodData: any): Partial<AllBonuses> {
 
 		for (const slot of slots) {
 			// 「なし」やレベル0はスキップ
-			if (!slot?.selectedFood || slot.selectedFood === 'none' || slot.level <= 0) {
+			if (
+				!slot?.selectedFood ||
+				slot.selectedFood === 'none' ||
+				slot.level <= 0
+			) {
 				continue
 			}
 
 			// 料理IDとレベルから効果値を取得
-			const foodEffect = getFoodEffectByIdAndLevel(slot.selectedFood, slot.level)
+			const foodEffect = getFoodEffectByIdAndLevel(
+				slot.selectedFood,
+				slot.level,
+			)
 			if (!foodEffect) continue
 
 			const validatedValue = validatePropertyValue(
@@ -214,9 +222,7 @@ export function getFoodBonuses(foodData: any): Partial<AllBonuses> {
 
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + validatedValue
-
 		}
-
 
 		return bonuses
 	} catch (error) {
@@ -228,129 +234,135 @@ export function getFoodBonuses(foodData: any): Partial<AllBonuses> {
 /**
  * 料理IDとレベルから効果データを取得
  */
-function getFoodEffectByIdAndLevel(foodId: string, level: number): {
+function getFoodEffectByIdAndLevel(
+	foodId: string,
+	level: number,
+): {
 	propertyType: string
 	value: number
 	isPercentage: boolean
 } | null {
 	// 料理データマッピング（設計書に基づく）
-	const foodEffects: Record<string, {
-		propertyType: string
-		isPercentage: boolean
-		values: number[] // Lv1-10の効果値配列
-	}> = {
+	const foodEffects: Record<
+		string,
+		{
+			propertyType: string
+			isPercentage: boolean
+			values: number[] // Lv1-10の効果値配列
+		}
+	> = {
 		// HP系料理
-		'golden_fried_rice': {
+		golden_fried_rice: {
 			propertyType: 'HP',
 			isPercentage: false,
-			values: [400, 800, 1200, 1600, 2000, 2600, 3200, 3800, 4400, 5000]
+			values: [400, 800, 1200, 1600, 2000, 2600, 3200, 3800, 4400, 5000],
 		},
-		
+
 		// MP系料理
-		'ankake_fried_rice': {
+		ankake_fried_rice: {
 			propertyType: 'MP',
 			isPercentage: false,
-			values: [60, 120, 180, 240, 300, 440, 580, 720, 860, 1000]
+			values: [60, 120, 180, 240, 300, 440, 580, 720, 860, 1000],
 		},
-		
+
 		// クリ率系料理
-		'takoyaki': {
+		takoyaki: {
 			propertyType: 'criticalRate',
 			isPercentage: false,
-			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30]
+			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30],
 		},
-		
+
 		// 攻撃MP回復系料理
-		'yakisoba': {
+		yakisoba: {
 			propertyType: 'attackMPRecovery',
 			isPercentage: false,
-			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30]
+			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30],
 		},
-		
+
 		// 武器ATK系料理
-		'margherita_pizza': {
+		margherita_pizza: {
 			propertyType: 'weaponATK',
 			isPercentage: false,
-			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100]
+			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100],
 		},
-		
+
 		// ATK系料理
-		'diabola_pizza': {
+		diabola_pizza: {
 			propertyType: 'ATK',
 			isPercentage: false,
-			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100]
+			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100],
 		},
-		
+
 		// おにぎり系（ステータス）
-		'okaka_onigiri': {
+		okaka_onigiri: {
 			propertyType: 'STR',
 			isPercentage: false,
-			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30]
+			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30],
 		},
-		'sake_onigiri': {
+		sake_onigiri: {
 			propertyType: 'DEX',
 			isPercentage: false,
-			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30]
+			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30],
 		},
-		'umeboshi_onigiri': {
+		umeboshi_onigiri: {
 			propertyType: 'INT',
 			isPercentage: false,
-			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30]
+			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30],
 		},
-		'mentaiko_onigiri': {
+		mentaiko_onigiri: {
 			propertyType: 'AGI',
 			isPercentage: false,
-			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30]
+			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30],
 		},
-		'tuna_mayo_onigiri': {
+		tuna_mayo_onigiri: {
 			propertyType: 'VIT',
 			isPercentage: false,
-			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30]
+			values: [2, 4, 6, 8, 10, 14, 18, 22, 26, 30],
 		},
-		
+
 		// ラーメン系
-		'shoyu_ramen': {
+		shoyu_ramen: {
 			propertyType: 'accuracy',
 			isPercentage: false,
-			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100]
+			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100],
 		},
-		
+
 		// パスタ系
-		'zokusei_pasta': {
+		zokusei_pasta: {
 			propertyType: 'elementAdvantage',
 			isPercentage: false,
-			values: [1, 2, 3, 4, 5, 7, 9, 11, 13, 15]
+			values: [1, 2, 3, 4, 5, 7, 9, 11, 13, 15],
 		},
-		
+
 		// ピザ系（その他）
-		'seafood_pizza': {
+		seafood_pizza: {
 			propertyType: 'MATK',
 			isPercentage: false,
-			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100]
+			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100],
 		},
-		
+
 		// シチュー系
-		'beef_stew': {
+		beef_stew: {
 			propertyType: 'aggroPlus',
 			isPercentage: false,
-			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100]
+			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100],
 		},
-		'white_stew': {
+		white_stew: {
 			propertyType: 'aggroMinus',
 			isPercentage: false,
-			values: [-6, -12, -18, -24, -30, -44, -58, -72, -86, -100]
+			values: [-6, -12, -18, -24, -30, -44, -58, -72, -86, -100],
 		},
-		
+
 		// バーガー系
-		'beef_burger': {
+		beef_burger: {
 			propertyType: 'physicalResistance',
 			isPercentage: false,
-			values: [4, 8, 12, 16, 20, 26, 32, 38, 44, 50]
+			values: [4, 8, 12, 16, 20, 26, 32, 38, 44, 50],
 		},
-		'fish_burger': {
+		fish_burger: {
 			propertyType: 'magicalResistance',
 			isPercentage: false,
-			values: [4, 8, 12, 16, 20, 26, 32, 38, 44, 50]
+			values: [4, 8, 12, 16, 20, 26, 32, 38, 44, 50],
 		},
 	}
 
@@ -360,7 +372,7 @@ function getFoodEffectByIdAndLevel(foodId: string, level: number): {
 	return {
 		propertyType: effect.propertyType,
 		value: effect.values[level - 1], // 配列は0ベースなのでlevel-1
-		isPercentage: effect.isPercentage
+		isPercentage: effect.isPercentage,
 	}
 }
 
@@ -376,9 +388,18 @@ export function getBuffBonuses(buffData: any): Partial<AllBonuses> {
 
 		// 12カテゴリのバフアイテムを確認
 		const categories = [
-			'physicalPower', 'magicalPower', 'physicalDefense', 'magicalDefense',
-			'elementalAttack', 'elementalDefense', 'speed', 'casting',
-			'mp', 'hp', 'accuracy', 'evasion'
+			'physicalPower',
+			'magicalPower',
+			'physicalDefense',
+			'magicalDefense',
+			'elementalAttack',
+			'elementalDefense',
+			'speed',
+			'casting',
+			'mp',
+			'hp',
+			'accuracy',
+			'evasion',
 		]
 
 		for (const category of categories) {
@@ -411,17 +432,19 @@ export function getBuffBonuses(buffData: any): Partial<AllBonuses> {
 /**
  * バフアイテムIDからアイテムデータを取得
  */
-function getBuffItemById(id: string): { properties: Record<string, number> } | null {
+function getBuffItemById(
+	id: string,
+): { properties: Record<string, number> } | null {
 	// buffItemDatabase.tsのgetBuffItemById関数を使用
 	try {
 		const buffItem = getBuffItemFromDB(id)
-		
+
 		if (!buffItem?.properties) {
 			return null
 		}
 
 		return {
-			properties: buffItem.properties
+			properties: buffItem.properties,
 		}
 	} catch (error) {
 		console.error('Error loading buff item:', error)

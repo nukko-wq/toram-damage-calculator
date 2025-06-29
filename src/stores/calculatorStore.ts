@@ -5,7 +5,8 @@ import type {
 	DamageCalculationResult,
 	CalculationSettings,
 } from '@/types/stores'
-import type { EquipmentSlots, ArmorType } from '@/types/calculator'
+import type { CalculatorData } from '@/types/calculator'
+import type { EquipmentSlots } from '@/types/calculator'
 import { createInitialCalculatorData } from '@/utils/initialData'
 import {
 	saveCurrentData,
@@ -18,7 +19,11 @@ import {
 	type CalculationResultSettings,
 } from '@/types/calculationResult'
 import {
-	createCustomEquipment,
+	hasDataDifferences,
+	createDataSnapshot,
+	isValidCalculatorData,
+} from '@/utils/differenceDetection'
+import {
 	saveCustomEquipment,
 	deleteCustomEquipment,
 	updateCustomEquipmentProperties,
@@ -32,14 +37,11 @@ import {
 	cleanupAllTemporaryEquipments,
 	getAllTemporaryEquipments,
 	convertTemporaryEquipmentToPersistent,
-	isTemporaryEquipment,
 } from '@/utils/temporaryEquipmentManager'
 import {
 	cleanupAllEditSessions,
 	cleanupCurrentEditSessions,
 	getAllEditSessionEquipments,
-	convertAllEditSessionsToPersistent,
-	setCurrentSaveDataId,
 } from '@/utils/editSessionManager'
 import { createInitialEquipment } from '@/utils/initialData'
 
@@ -48,6 +50,26 @@ const initialCalculationSettings: CalculationSettings = {
 	includeBuffs: true,
 	useAverageDamage: false,
 	calculateCritical: true,
+}
+
+// 差分検知付きデータ更新ヘルパー
+const createDataUpdateWithDifferenceCheck = (set: any, get: any) => {
+	return (dataUpdates: Partial<CalculatorData>, actionName: string) => {
+		set(
+			(state: CalculatorStore) => {
+				const newData = { ...state.data, ...dataUpdates }
+				const hasChanges = hasDataDifferences(newData, state.lastSavedData)
+
+				return {
+					data: newData,
+					hasUnsavedChanges: hasChanges, // 実際に差分がある場合のみtrueに設定
+					hasRealChanges: hasChanges,
+				}
+			},
+			false,
+			actionName,
+		)
+	}
 }
 
 export const useCalculatorStore = create<CalculatorStore>()(
@@ -61,6 +83,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			calculationResult: null,
 			isCalculating: false,
 			calculationSettings: initialCalculationSettings,
+
+			// ===== 差分検知システム =====
+			lastSavedData: null,
+			hasRealChanges: false,
 
 			// ===== ステータス計算結果表示 =====
 			calculationResults: null,
@@ -94,6 +120,34 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				set({ isLoading: value }, false, 'setIsLoading')
 			},
 
+			// ===== 差分検知メソッド =====
+			updateLastSavedData: (data) => {
+				const snapshot = createDataSnapshot(data)
+				set(
+					{
+						lastSavedData: snapshot,
+						hasRealChanges: false,
+					},
+					false,
+					'updateLastSavedData',
+				)
+			},
+
+			checkForRealChanges: () => {
+				const { data, lastSavedData } = get()
+				try {
+					return hasDataDifferences(data, lastSavedData)
+				} catch (error) {
+					console.error('差分チェックエラー:', error)
+					// エラー時は安全側に倒して差分ありとみなす
+					return true
+				}
+			},
+
+			setHasRealChanges: (value) => {
+				set({ hasRealChanges: value }, false, 'setHasRealChanges')
+			},
+
 			// ===== セーブデータ管理 =====
 			loadSaveData: async (data) => {
 				// セーブデータ切り替え時に仮データをクリーンアップ
@@ -102,10 +156,23 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				// 編集セッションは全てクリーンアップ（セーブデータ切り替え時は編集状態をリセット）
 				cleanupAllEditSessions()
 
-				// isLoadingを使わずに直接データを更新（ちらつき防止）
+				// データ整合性チェック
+				const validData = isValidCalculatorData(data)
+					? data
+					: (() => {
+							console.warn(
+								'読み込みデータが無効です。デフォルトデータを使用します。',
+							)
+							return createInitialCalculatorData()
+						})()
+
+				// データを設定し、差分状態をリセット
+				const snapshot = createDataSnapshot(validData)
 				set({
-					data,
+					data: validData,
+					lastSavedData: snapshot,
 					hasUnsavedChanges: false,
+					hasRealChanges: false,
 				})
 
 				// フォームの変更検知を同期的に無効化（遅延によるちらつきを防止）
@@ -120,7 +187,14 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 					const { data } = get()
 					await saveCurrentData(data)
-					set({ hasUnsavedChanges: false })
+
+					// 保存完了後、lastSavedDataを更新し差分状態をリセット
+					const snapshot = createDataSnapshot(data)
+					set({
+						lastSavedData: snapshot,
+						hasUnsavedChanges: false,
+						hasRealChanges: false,
+					})
 				} catch (error) {
 					console.error('データ保存エラー:', error)
 					throw error
@@ -129,182 +203,99 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			// ===== 個別フォーム更新 =====
 			updateBaseStats: (stats) => {
-				set(
-					(state) => ({
-						data: { ...state.data, baseStats: stats },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateBaseStats',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ baseStats: stats }, 'updateBaseStats')
 			},
 
 			updateMainWeapon: (weapon) => {
-				set(
-					(state) => ({
-						data: { ...state.data, mainWeapon: weapon },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateMainWeapon',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ mainWeapon: weapon }, 'updateMainWeapon')
 			},
 
 			updateSubWeapon: (weapon) => {
-				set(
-					(state) => ({
-						data: { ...state.data, subWeapon: weapon },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateSubWeapon',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ subWeapon: weapon }, 'updateSubWeapon')
 			},
 
 			updateCrystals: (crystals) => {
-				set(
-					(state) => ({
-						data: { ...state.data, crystals },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateCrystals',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ crystals }, 'updateCrystals')
 			},
 
 			updateEquipment: (equipment) => {
-				set(
-					(state) => ({
-						data: { ...state.data, equipment },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateEquipment',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ equipment }, 'updateEquipment')
 			},
 
 			updateFood: (food) => {
-				set(
-					(state) => ({
-						data: { ...state.data, food },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateFood',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ food }, 'updateFood')
 			},
 
 			updateEnemy: (enemy) => {
-				set(
-					(state) => ({
-						data: { ...state.data, enemy },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateEnemy',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ enemy }, 'updateEnemy')
 			},
 
 			updateBuffSkills: (buffSkills) => {
-				set(
-					(state) => ({
-						data: { ...state.data, buffSkills },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateBuffSkills',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ buffSkills }, 'updateBuffSkills')
 			},
 
 			updateBuffItems: (buffItems) => {
-				set(
-					(state) => ({
-						data: { ...state.data, buffItems },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateBuffItems',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ buffItems }, 'updateBuffItems')
 			},
 
 			updateRegister: (register) => {
-				set(
-					(state) => ({
-						data: { ...state.data, register },
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateRegister',
-				)
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ register }, 'updateRegister')
 			},
 
 			updateRegisterEffect: (effectId, enabled) => {
-				set(
-					(state) => ({
-						data: {
-							...state.data,
-							register: {
-								...state.data.register,
-								effects: state.data.register.effects.map((effect) =>
-									effect.id === effectId
-										? { ...effect, isEnabled: enabled }
-										: effect,
-								),
-							},
-						},
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateRegisterEffect',
-				)
+				const { data } = get()
+				const updatedRegister = {
+					...data.register,
+					effects: data.register.effects.map((effect) =>
+						effect.id === effectId ? { ...effect, isEnabled: enabled } : effect,
+					),
+				}
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ register: updatedRegister }, 'updateRegisterEffect')
 			},
 
 			updateRegisterLevel: (effectId, level, partyMembers) => {
-				set(
-					(state) => ({
-						data: {
-							...state.data,
-							register: {
-								...state.data.register,
-								effects: state.data.register.effects.map((effect) =>
-									effect.id === effectId
-										? {
-												...effect,
-												level,
-												...(partyMembers !== undefined && { partyMembers }),
-											}
-										: effect,
-								),
-							},
-						},
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'updateRegisterLevel',
-				)
+				const { data } = get()
+				const updatedRegister = {
+					...data.register,
+					effects: data.register.effects.map((effect) =>
+						effect.id === effectId
+							? {
+									...effect,
+									level,
+									...(partyMembers !== undefined && { partyMembers }),
+								}
+							: effect,
+					),
+				}
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ register: updatedRegister }, 'updateRegisterLevel')
 			},
 
 			resetRegisterData: () => {
-				set(
-					(state) => ({
-						data: {
-							...state.data,
-							register: {
-								effects: state.data.register.effects.map((effect) => ({
-									...effect,
-									isEnabled: false,
-									level: 1,
-									...(effect.type === 'fateCompanionship' && {
-										partyMembers: 3,
-									}),
-								})),
-							},
-						},
-						hasUnsavedChanges: true,
-					}),
-					false,
-					'resetRegisterData',
-				)
+				const { data } = get()
+				const resetRegister = {
+					effects: data.register.effects.map((effect) => ({
+						...effect,
+						isEnabled: false,
+						level: 1,
+						...(effect.type === 'fateCompanionship' && {
+							partyMembers: 3,
+						}),
+					})),
+				}
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ register: resetRegister }, 'resetRegisterData')
 			},
 
 			// ===== カスタム装備管理 =====
@@ -417,11 +408,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						properties,
 					)
 					if (success) {
-						set(
-							(state) => ({ ...state, hasUnsavedChanges: true }),
-							false,
-							'updateCustomEquipmentProperties',
-						)
+						// データベースレイヤーでの変更を検知するため、差分チェックを強制実行
+						const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+						dataUpdate({}, 'updateCustomEquipmentProperties')
 					}
 					return success
 				} catch (error) {
@@ -440,6 +429,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			getUnsavedDataStatus: () => {
 				return {
 					hasUnsavedChanges: get().hasUnsavedChanges,
+					hasRealChanges: get().hasRealChanges,
 					hasTemporaryEquipments: hasTemporaryEquipments(),
 					hasEditSessions: hasEditSessions(),
 				}
@@ -531,28 +521,25 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				try {
 					const success = updateEquipmentArmorType(equipmentId, armorType)
 					if (success) {
-						// ArmorType変更を即座に反映するためにストア状態を強制更新
-						set(
-							(state) => {
-								const newState = { ...state, hasUnsavedChanges: true }
-								// 体装備のIDが一致する場合、ストアの装備データを更新
-								if (state.data.equipment.body?.id === equipmentId) {
-									newState.data = {
-										...state.data,
-										equipment: {
-											...state.data.equipment,
-											body: {
-												...state.data.equipment.body,
-												armorType,
-											},
-										},
-									}
-								}
-								return newState
-							},
-							false,
-							'updateEquipmentArmorType',
-						)
+						const { data } = get()
+						// 体装備のIDが一致する場合、ストアの装備データを更新
+						if (data.equipment.body?.id === equipmentId) {
+							const updatedEquipment = {
+								...data.equipment,
+								body: {
+									...data.equipment.body,
+									armorType,
+								},
+							}
+							// 差分検知システムを使用してデータを更新
+							const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+							dataUpdate({ equipment: updatedEquipment }, 'updateEquipmentArmorType')
+						} else {
+							// 体装備以外やカスタム装備の場合も差分チェックを強制実行
+							// データベースレイヤーでの変更を検知するため、空の更新をトリガー
+							const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+							dataUpdate({}, 'updateEquipmentArmorType')
+						}
 					}
 					return success
 				} catch (error) {
@@ -653,9 +640,13 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					const { useSaveDataStore } = await import('./saveDataStore')
 					await useSaveDataStore.getState().loadSaveDataList()
 
+					// 初期化時に差分検知状態も設定
+					const snapshot = createDataSnapshot(currentSave.data)
 					set({
 						data: currentSave.data,
+						lastSavedData: snapshot,
 						hasUnsavedChanges: false,
+						hasRealChanges: false,
 						isInitialized: true,
 						isLoading: false,
 					})

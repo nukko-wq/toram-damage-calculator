@@ -5,7 +5,11 @@
  * 詳細な計算式は docs/calculations/basic-stats.md を参照
  */
 
-import type { BaseStats, WeaponType as WeaponTypeEnum, ArmorType } from '@/types/calculator'
+import type {
+	BaseStats,
+	WeaponType as WeaponTypeEnum,
+	ArmorType,
+} from '@/types/calculator'
 import { getWeaponTypeKey } from '@/utils/weaponTypeMapping'
 
 // 全補正値（装備・クリスタ・料理・バフアイテムの合計）
@@ -342,7 +346,9 @@ export function calculateAdjustedStats(
 // ATK計算の中間結果
 export interface ATKCalculationSteps {
 	// 総武器ATK関連
-	baseWeaponATK: number // 武器の基本ATK
+	baseWeaponATK: number // 武器の基本ATK（弓＋矢の場合は加算後）
+	arrowATK?: number // 矢のATK（弓装備時のみ）
+	isBowArrowCombo: boolean // 弓＋矢の組み合わせかどうか
 	refinementLevel: number // 精錬値
 	refinedWeaponATK: number // 精錬補正後武器ATK
 	weaponATKPercentBonus: number // 武器ATK%補正
@@ -385,10 +391,17 @@ export interface SubATKCalculationSteps {
 	// サブステータスATK関連
 	subStatusATK: number // サブステータスATK（STR×1 + AGI×3）
 
-	// サブATK最終計算
-	subBaseATK: number // サブ基礎ATK
-	subATKBeforePercent: number // サブATK%適用前
+	// サブ基礎ATK計算
+	subBaseATKBeforePercent: number // サブATK%適用前
 	subATKAfterPercent: number // サブATK%適用後
+	subBaseATK: number // サブ基礎ATK（ATK固定値適用後）
+
+	// サブATK最終計算（安定率適用）
+	subWeaponStability: number // サブ武器の安定率
+	subWeaponStatusStability: number // 双剣のサブ武器ステータス安定率
+	stabilityPercent: number // 安定率%補正
+	stabilityBase: number // 安定率とステータス安定率をもとに計算
+	subStability: number // サブ安定率（計算後）
 	subFinalATK: number // サブ最終ATK
 }
 
@@ -423,6 +436,49 @@ export interface CriticalRateCalculationSteps {
 	criticalRateAfterPercent: number // クリティカル率%適用後 = INT(基礎 × (1 + %/100))
 	criticalRateFixed: number // クリティカル率固定値補正
 	finalCriticalRate: number // 最終クリティカル率
+}
+
+// クリティカルダメージ計算の詳細ステップ
+export interface CriticalDamageCalculationSteps {
+	adjustedSTR: number // 補正後STR
+	adjustedAGI: number // 補正後AGI
+	strDivision: number // STR/5
+	strAgiDivision: number // (STR+AGI)/10
+	maxValue: number // MAX(STR/5, (STR+AGI)/10)
+	baseCriticalDamage: number // 基礎クリティカルダメージ = 150 + maxValue
+	cdPercent: number // クリティカルダメージ%補正
+	cdAfterPercent: number // CD%適用後 = INT(基礎CD × (1 + CD%/100))
+	cdFixed: number // クリティカルダメージ固定値補正
+	cdBeforeLimit: number // 制限前CD = CD%適用後 + CD固定値
+	isOver300: boolean // 300超過フラグ
+	excessAmount?: number // 超過分（300超過時のみ）
+	halvedExcess?: number // 半減後超過分（300超過時のみ）
+	finalCriticalDamage: number // 最終クリティカルダメージ
+}
+
+// MATK計算の詳細ステップ
+export interface MATKCalculationSteps {
+	level: number // キャラクターレベル
+	weaponType: string // 武器種別
+	weaponATK: number // 武器ATK
+	refinementLevel: number // 精錬値
+	weaponMATK: number // 総武器MATK
+	baseINT: number // 基礎INT
+	baseDEX: number // 基礎DEX
+	baseAGI: number // 基礎AGI（旋風槍用）
+	statusMATK: number // ステータスMATK
+	matkUpSTR: number // MATKアップ(STR)
+	matkUpINT: number // MATKアップ(INT)
+	matkUpVIT: number // MATKアップ(VIT)
+	matkUpAGI: number // MATKアップ(AGI)
+	matkUpDEX: number // MATKアップ(DEX)
+	matkUpTotal: number // MATKアップ合計
+	matkDownTotal: number // MATKダウン合計
+	baseMATK: number // 基礎MATK
+	matkPercent: number // MATK%補正
+	matkAfterPercent: number // MATK%適用後
+	matkFixed: number // MATK固定値
+	finalMATK: number // 最終MATK
 }
 
 // HIT計算の詳細ステップ
@@ -482,7 +538,7 @@ export interface TotalElementAdvantageCalculationSteps {
 export interface WeaponType {
 	id: string
 	name: string
-	statusATKFormula: (baseStats: BaseStats) => number
+	statusATKFormula: (adjustedStats: AdjustedStatsCalculation) => number
 	statusASPDFormula: (adjustedStats: AdjustedStatsCalculation) => number
 	statusStabilityFormula: (adjustedStats: AdjustedStatsCalculation) => number
 	aspdCorrection: number
@@ -550,7 +606,8 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		id: 'knuckle',
 		name: '手甲',
 		statusATKFormula: (stats) => stats.DEX * 0.5 + stats.AGI * 2.0,
-		statusASPDFormula: (stats) => stats.STR * 0.1 + stats.DEX * 0.1 + stats.AGI * 4.6,
+		statusASPDFormula: (stats) =>
+			stats.STR * 0.1 + stats.DEX * 0.1 + stats.AGI * 4.6,
 		statusStabilityFormula: (stats) => stats.DEX * 0.025,
 		aspdCorrection: 120,
 	},
@@ -565,7 +622,8 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 	'dual-sword': {
 		id: 'dual-sword',
 		name: '双剣',
-		statusATKFormula: (stats) => stats.STR * 1.0 + stats.DEX * 2.0 + stats.AGI * 1.0,
+		statusATKFormula: (stats) =>
+			stats.STR * 1.0 + stats.DEX * 2.0 + stats.AGI * 1.0,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 4.2,
 		statusStabilityFormula: (stats) => 0, // 特殊計算（保留）
 		aspdCorrection: 100,
@@ -586,27 +644,53 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
  */
 export function calculateATK(
 	stats: BaseStats,
-	weapon: { weaponType: WeaponTypeEnum; ATK: number; stability: number; refinement: number },
+	mainWeapon: {
+		weaponType: WeaponTypeEnum
+		ATK: number
+		stability: number
+		refinement: number
+	},
+	subWeapon: {
+		weaponType: string
+		ATK: number
+		stability: number
+		refinement: number
+	},
+	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
 ): ATKCalculationSteps {
-	// 1. 総武器ATK計算
+	// 0. 弓＋矢の判定
+	const isBowArrowCombo = (mainWeapon.weaponType === '弓' || mainWeapon.weaponType === '自動弓') && subWeapon?.weaponType === '矢'
+	
+	// 弓の場合は矢のATKをそのまま、自動弓の場合は矢のATK/2（INT適用）を加算
+	let arrowATK = 0
+	if (isBowArrowCombo) {
+		if (mainWeapon.weaponType === '弓') {
+			arrowATK = subWeapon.ATK
+		} else if (mainWeapon.weaponType === '自動弓') {
+			arrowATK = Math.floor(subWeapon.ATK / 2)
+		}
+	}
+
+	// 1. 総武器ATK計算（メイン武器のATKのみに補正適用）
 	const refinedWeaponATK = Math.floor(
-		weapon.ATK * (1 + weapon.refinement ** 2 / 100) + weapon.refinement,
+		mainWeapon.ATK * (1 + mainWeapon.refinement ** 2 / 100) + mainWeapon.refinement,
 	)
 
 	const weaponATKPercent = bonuses.WeaponATK_Rate || 0
 	const weaponATKPercentBonus = Math.floor(
-		(weapon.ATK * weaponATKPercent) / 100,
+		(mainWeapon.ATK * weaponATKPercent) / 100,
 	)
 
 	const weaponATKFixedBonus = bonuses.WeaponATK || 0
+	// 矢のATKは武器ATK固定値として最後に加算
 	const totalWeaponATK =
-		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
+		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus + arrowATK
 
-	// 2. ステータスATK計算（武器種別対応）
-	const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
+	// 2. ステータスATK計算（武器種別対応、補正後ステータスを使用）
+	const weaponTypeKey = getWeaponTypeKey(mainWeapon.weaponType)
 	const weaponType = WEAPON_TYPES[weaponTypeKey] || WEAPON_TYPES.halberd
-	const statusATK = weaponType.statusATKFormula(stats)
+	const statusATK = weaponType.statusATKFormula(adjustedStats)
 
 	// 3. ATKアップ・ダウン計算
 	const atkUpSTR = Math.floor((stats.STR * (bonuses.ATK_STR_Rate || 0)) / 100)
@@ -620,26 +704,27 @@ export function calculateATK(
 	const atkDownTotal = 0
 
 	// 4. 基礎ATK計算（ATK%適用前の値、小数点処理なし）
-	const baseATK = stats.level + totalWeaponATK + statusATK + atkUpTotal - atkDownTotal
-	
+	const baseATK =
+		stats.level + totalWeaponATK + statusATK + atkUpTotal - atkDownTotal
+
 	// 5. 最終ATK計算
 	const atkBeforePercent = baseATK
 	const atkPercent = bonuses.ATK_Rate || 0
-	const atkAfterPercent = Math.floor(
-		atkBeforePercent * (1 + atkPercent / 100),
-	)
+	const atkAfterPercent = Math.floor(atkBeforePercent * (1 + atkPercent / 100))
 	const atkFixed = bonuses.ATK || 0
 	const finalATK = atkAfterPercent + atkFixed
 
 	return {
-		baseWeaponATK: weapon.ATK,
-		refinementLevel: weapon.refinement,
+		baseWeaponATK: mainWeapon.ATK,
+		arrowATK,
+		isBowArrowCombo,
+		refinementLevel: mainWeapon.refinement,
 		refinedWeaponATK,
 		weaponATKPercentBonus,
 		weaponATKFixedBonus,
 		totalWeaponATK,
-		baseSTR: stats.STR,
-		baseAGI: stats.AGI,
+		baseSTR: adjustedStats.STR, // 補正後ステータス（ステータスATK用）
+		baseAGI: adjustedStats.AGI, // 補正後ステータス（ステータスATK用）
 		statusATK,
 		atkUpSTR,
 		atkUpAGI,
@@ -833,8 +918,18 @@ export function calculateEquipmentBonuses(
  */
 export function calculateSubATK(
 	stats: BaseStats,
-	mainWeapon: { weaponType: WeaponTypeEnum; ATK: number; stability: number; refinement: number },
-	subWeapon: { weaponType: string; ATK: number; stability: number; refinement: number },
+	mainWeapon: {
+		weaponType: WeaponTypeEnum
+		ATK: number
+		stability: number
+		refinement: number
+	},
+	subWeapon: {
+		weaponType: string
+		ATK: number
+		stability: number
+		refinement: number
+	},
 	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
 ): SubATKCalculationSteps | null {
@@ -845,26 +940,46 @@ export function calculateSubATK(
 
 	// 1. サブ総武器ATK計算（精錬補正は /200）
 	const subRefinedWeaponATK = Math.floor(
-		subWeapon.ATK * (1 + subWeapon.refinement ** 2 / 200) + subWeapon.refinement,
+		subWeapon.ATK * (1 + subWeapon.refinement ** 2 / 200) +
+			subWeapon.refinement,
 	)
-	const subWeaponATKPercentBonus = Math.floor(subWeapon.ATK * (bonuses.WeaponATK_Rate || 0))
+	const subWeaponATKPercentBonus = Math.floor(
+		subWeapon.ATK * (bonuses.WeaponATK_Rate || 0) / 100,
+	)
 	const subWeaponATKFixedBonus = bonuses.WeaponATK || 0
-	const subTotalWeaponATK = subRefinedWeaponATK + subWeaponATKPercentBonus + subWeaponATKFixedBonus
+	const subTotalWeaponATK =
+		subRefinedWeaponATK + subWeaponATKPercentBonus + subWeaponATKFixedBonus
 
 	// 2. サブステータスATK計算（双剣専用計算式: STR × 1.0 + AGI × 3.0）
 	const subStatusATK = adjustedStats.STR * 1.0 + adjustedStats.AGI * 3.0
 
 	// 3. サブ基礎ATK計算（ATKアップ・ATKダウンは含まない）
-	const subBaseATK = stats.level + subTotalWeaponATK + subStatusATK
+	const subBaseATKBeforePercent = stats.level + subTotalWeaponATK + subStatusATK
 
-	// 4. サブ最終ATK計算
-	const subATKBeforePercent = subBaseATK
+	// 4. サブATK%適用（メイン武器と同じATK%を使用）
 	const atkPercent = bonuses.ATK_Rate || 0
 	const subATKAfterPercent = Math.floor(
-		subATKBeforePercent * (1 + atkPercent / 100),
+		subBaseATKBeforePercent * (1 + atkPercent / 100),
 	)
+
+	// 5. サブATK固定値適用（メイン武器と同じATK固定値を使用）
 	const atkFixed = bonuses.ATK || 0
-	const subFinalATK = subATKAfterPercent + atkFixed
+	const subBaseATK = subATKAfterPercent + atkFixed
+
+	// 6. サブ安定率計算（複雑な計算式）
+	const stabilityPercent = bonuses.Stability_Rate || 0
+	// 双剣のサブ武器のステータス安定率 = STR × 0.06 + AGI × 0.04
+	const subWeaponStatusStability = stats.STR * 0.06 + stats.AGI * 0.04
+	// サブ武器の安定率とサブ武器のステータス安定率をもとに計算 = MAX(0, MIN(100, サブ武器の安定率/2 + ステータス安定率 + 安定率%))
+	const stabilityBase = Math.max(
+		0,
+		Math.min(100, subWeapon.stability / 2 + subWeaponStatusStability + stabilityPercent),
+	)
+	// サブ安定率 = INT(サブ武器の安定率とサブ武器のステータス安定率をもとに計算) + 安定率%
+	const subStability = Math.floor(stabilityBase) + stabilityPercent
+
+	// 7. サブATK計算（サブ安定率適用）
+	const subFinalATK = Math.floor(subBaseATK * subStability / 100)
 
 	return {
 		subBaseWeaponATK: subWeapon.ATK,
@@ -874,9 +989,14 @@ export function calculateSubATK(
 		subWeaponATKFixedBonus,
 		subTotalWeaponATK,
 		subStatusATK,
-		subBaseATK,
-		subATKBeforePercent,
+		subBaseATKBeforePercent,
 		subATKAfterPercent,
+		subBaseATK,
+		subWeaponStability: subWeapon.stability,
+		subWeaponStatusStability,
+		stabilityPercent,
+		stabilityBase,
+		subStability,
 		subFinalATK,
 	}
 }
@@ -942,13 +1062,13 @@ export function calculateAilmentResistance(
 ): number {
 	// MEN基礎計算
 	const menBaseResistance = Math.floor(stats.MEN / 3.4)
-	
+
 	// 異常耐性%補正
 	const ailmentResistancePercent = bonuses.AilmentResistance_Rate || 0
-	
+
 	// 最終異常耐性
 	const finalAilmentResistance = menBaseResistance + ailmentResistancePercent
-	
+
 	return finalAilmentResistance
 }
 
@@ -979,17 +1099,17 @@ export function getBodyEquipmentStatus(bodyEquipment: any): {
 	if (!bodyEquipment || !bodyEquipment.id) {
 		return { hasBodyEquipment: false, armorType: 'normal' }
 	}
-	
-	return { 
-		hasBodyEquipment: true, 
-		armorType: bodyEquipment.armorType || 'normal' 
+
+	return {
+		hasBodyEquipment: true,
+		armorType: bodyEquipment.armorType || 'normal',
 	}
 }
 
 /**
  * FLEE（回避率）計算
  * FLEE = INT(基礎FLEE × (1 + 回避%/100)) + 回避固定値
- * 
+ *
  * 基礎FLEE計算（体装備状態とArmorTypeに依存）：
  * - 体装備なし: INT(75 + Lv × 3/2 + 補正後AGI × 2)
  * - 体装備あり（通常）: INT(Lv + 補正後AGI)
@@ -1004,23 +1124,23 @@ export function calculateFLEE(
 ): FLEECalculationSteps {
 	// 1. 体装備状態の判定
 	const { hasBodyEquipment, armorType } = getBodyEquipmentStatus(bodyEquipment)
-	
+
 	// 2. 基礎FLEE計算（4パターン）
 	let baseFLEE: number
-	
+
 	if (!hasBodyEquipment) {
 		// 体装備なし
-		baseFLEE = Math.floor(75 + level * 3/2 + adjustedAGI * 2)
+		baseFLEE = Math.floor(75 + (level * 3) / 2 + adjustedAGI * 2)
 	} else {
 		// 体装備あり（ArmorTypeに応じて分岐）
 		switch (armorType) {
 			case 'light':
 				// 軽量化
-				baseFLEE = Math.floor(30 + level * 5/4 + adjustedAGI * 7/4)
+				baseFLEE = Math.floor(30 + (level * 5) / 4 + (adjustedAGI * 7) / 4)
 				break
 			case 'heavy':
 				// 重量化
-				baseFLEE = Math.floor(-15 + level/2 + adjustedAGI * 3/4)
+				baseFLEE = Math.floor(-15 + level / 2 + (adjustedAGI * 3) / 4)
 				break
 			case 'normal':
 			default:
@@ -1029,15 +1149,15 @@ export function calculateFLEE(
 				break
 		}
 	}
-	
+
 	// 3. 回避%適用（装備+クリスタ+バフアイテム、料理除外）
 	const dodgePercent = bonuses.Dodge_Rate || 0
 	const fleeAfterPercent = Math.floor(baseFLEE * (1 + dodgePercent / 100))
-	
+
 	// 4. 回避固定値加算（装備+クリスタ+バフアイテム、料理除外）
 	const dodgeFixed = bonuses.Dodge || 0
 	const finalFLEE = fleeAfterPercent + dodgeFixed
-	
+
 	return {
 		level,
 		adjustedAGI,
@@ -1058,10 +1178,13 @@ export function calculateFLEE(
  */
 export function getArmorTypeASPDBonus(armorType: ArmorType): number {
 	switch (armorType) {
-		case 'light': return 50   // 軽量化: +50%
-		case 'heavy': return -50  // 重量化: -50%
+		case 'light':
+			return 50 // 軽量化: +50%
+		case 'heavy':
+			return -50 // 重量化: -50%
 		case 'normal':
-		default: return 0         // 通常: +0%
+		default:
+			return 0 // 通常: +0%
 	}
 }
 
@@ -1079,7 +1202,7 @@ export function getBodyArmorType(bodyEquipment: any): ArmorType {
 	// 体装備のArmorTypeを取得（装備データから）
 	const { getCombinedEquipmentById } = require('./equipmentDatabase')
 	const equipment = getCombinedEquipmentById(bodyEquipment.id)
-	
+
 	return equipment?.armorType || 'normal'
 }
 
@@ -1093,17 +1216,17 @@ export function calculateMotionSpeed(
 ): MotionSpeedCalculationSteps {
 	// 1. ASPDベース行動速度計算
 	const aspdBase = Math.floor((aspd - 1000) / 180)
-	
+
 	// 2. 下限制限適用（0未満を0に制限）
 	const aspdBaseClamped = Math.max(0, aspdBase)
-	
+
 	// 3. 行動速度%補正適用
 	const motionSpeedPercent = bonuses.MotionSpeed_Rate || 0
 	const motionSpeedAfterPercent = aspdBaseClamped + motionSpeedPercent
-	
+
 	// 4. 上限制限適用（50%上限）
 	const finalMotionSpeed = Math.min(50, motionSpeedAfterPercent)
-	
+
 	return {
 		aspd,
 		aspdBase,
@@ -1124,17 +1247,17 @@ export function calculateCriticalRate(
 ): CriticalRateCalculationSteps {
 	// 1. CRT基礎クリティカル率計算
 	const crtBaseCriticalRate = Math.floor(25 + crt / 3.4)
-	
+
 	// 2. クリティカル率%補正適用
 	const criticalRatePercent = bonuses.Critical_Rate || 0
 	const criticalRateAfterPercent = Math.floor(
 		crtBaseCriticalRate * (1 + criticalRatePercent / 100),
 	)
-	
+
 	// 3. クリティカル率固定値加算
 	const criticalRateFixed = bonuses.Critical || 0
 	const finalCriticalRate = criticalRateAfterPercent + criticalRateFixed
-	
+
 	return {
 		crt,
 		crtBaseCriticalRate,
@@ -1142,6 +1265,180 @@ export function calculateCriticalRate(
 		criticalRateAfterPercent,
 		criticalRateFixed,
 		finalCriticalRate,
+	}
+}
+
+/**
+ * クリティカルダメージ計算
+ * クリティカルダメージ = INT((150+MAX(補正後STR/5,(補正後STR+補正後AGI)/10))×(1+CD%/100))+CD固定値
+ * ※300を超えた場合、300以降の数値は半減し、小数点以下は切り捨てられる
+ */
+export function calculateCriticalDamage(
+	adjustedSTR: number,
+	adjustedAGI: number,
+	bonuses: AllBonuses = {},
+): CriticalDamageCalculationSteps {
+	// 1. MAX計算
+	const strDivision = adjustedSTR / 5
+	const strAgiDivision = (adjustedSTR + adjustedAGI) / 10
+	const maxValue = Math.max(strDivision, strAgiDivision)
+
+	// 2. 基礎クリティカルダメージ
+	const baseCriticalDamage = 150 + maxValue
+
+	// 3. CD%適用
+	const cdPercent = bonuses.CriticalDamage_Rate || 0
+	const cdAfterPercent = Math.floor(baseCriticalDamage * (1 + cdPercent / 100))
+
+	// 4. CD固定値加算
+	const cdFixed = bonuses.CriticalDamage || 0
+	const cdBeforeLimit = cdAfterPercent + cdFixed
+
+	// 5. 300超過時の半減処理
+	let finalCriticalDamage: number
+	let isOver300 = false
+	let excessAmount: number | undefined
+	let halvedExcess: number | undefined
+
+	if (cdBeforeLimit > 300) {
+		isOver300 = true
+		excessAmount = cdBeforeLimit - 300
+		halvedExcess = Math.floor(excessAmount / 2)
+		finalCriticalDamage = 300 + halvedExcess
+	} else {
+		finalCriticalDamage = cdBeforeLimit
+	}
+
+	return {
+		adjustedSTR,
+		adjustedAGI,
+		strDivision,
+		strAgiDivision,
+		maxValue,
+		baseCriticalDamage,
+		cdPercent,
+		cdAfterPercent,
+		cdFixed,
+		cdBeforeLimit,
+		isOver300,
+		excessAmount,
+		halvedExcess,
+		finalCriticalDamage,
+	}
+}
+
+/**
+ * MATK計算
+ * MATK = INT((自Lv+総武器MATK+ステータスMATK+MATKアップ-MATKダウン)×(1+MATK%/100))+MATK固定値
+ * 
+ * @param level キャラクターレベル
+ * @param weaponType 武器種別
+ * @param weaponATK 武器ATK
+ * @param refinementLevel 精錬値
+ * @param totalWeaponATK 総武器ATK（手甲用）
+ * @param baseStats 基礎ステータス（MATKアップ計算用）
+ * @param adjustedStats 補正後ステータス（ステータスMATK計算用）
+ * @param bonuses 全補正値（装備・クリスタ・バフアイテム・料理の合計）
+ * @returns MATK計算結果
+ */
+export const calculateMATK = (
+	level: number,
+	weaponType: string,
+	weaponATK: number,
+	refinementLevel: number,
+	totalWeaponATK: number,
+	baseStats: BaseStats,
+	adjustedStats: AdjustedStatsCalculation,
+	bonuses: AllBonuses,
+): MATKCalculationSteps => {
+	// 1. 総武器MATK計算
+	let weaponMATK = 0
+	if (weaponType === '杖' || weaponType === '魔導具') {
+		// 杖・魔導具: 総武器MATKを適用
+		const weaponATKPercent = bonuses.WeaponATK_Rate || 0
+		const weaponATKFixed = bonuses.WeaponATK || 0
+		weaponMATK = Math.floor(weaponATK * (1 + (refinementLevel ** 2) / 100) + refinementLevel) +
+		            Math.floor(weaponATK * weaponATKPercent / 100) + weaponATKFixed
+	} else if (weaponType === '手甲') {
+		// 手甲: 総武器ATK/2（小数点保持）
+		weaponMATK = totalWeaponATK / 2
+	}
+	// その他の武器種は weaponMATK = 0
+
+	// 2. ステータスMATK計算（補正後ステータスを使用）
+	const { INT, DEX, AGI } = adjustedStats
+	let statusMATK = 0
+	switch (weaponType) {
+		case '片手剣':
+		case '両手剣':
+		case '弓':
+		case '自動弓':
+		case '素手':
+			statusMATK = INT * 3 + DEX * 1
+			break
+		case '杖':
+		case '魔導具':
+		case '手甲':
+			statusMATK = INT * 4 + DEX * 1
+			break
+		case '旋風槍':
+			statusMATK = INT * 2 + DEX * 1 + AGI * 1
+			break
+		case '抜刀剣':
+			statusMATK = INT * 1.5 + DEX * 1 // 小数点保持
+			break
+		case '双剣':
+			// TODO: 双剣の計算式は後で追加
+			statusMATK = INT * 3 + DEX * 1 // 暫定
+			break
+		default:
+			statusMATK = INT * 3 + DEX * 1 // デフォルト
+			break
+	}
+
+	// 3. MATKアップ・ダウン計算（基礎ステータスを使用）
+	const matkUpSTR = Math.floor(baseStats.STR * (bonuses.MATK_STR_Rate || 0) / 100)
+	const matkUpINT = Math.floor(baseStats.INT * (bonuses.MATK_INT_Rate || 0) / 100)
+	const matkUpVIT = Math.floor(baseStats.VIT * (bonuses.MATK_VIT_Rate || 0) / 100)
+	const matkUpAGI = Math.floor(baseStats.AGI * (bonuses.MATK_AGI_Rate || 0) / 100)
+	const matkUpDEX = Math.floor(baseStats.DEX * (bonuses.MATK_DEX_Rate || 0) / 100)
+	
+	const matkUpTotal = matkUpSTR + matkUpINT + matkUpVIT + matkUpAGI + matkUpDEX
+	const matkDownTotal = 0 // 必要に応じて実装
+
+	// 4. 基本MATK計算
+	const baseMATK = level + weaponMATK + statusMATK + matkUpTotal - matkDownTotal
+
+	// 5. MATK%適用
+	const matkPercent = bonuses.MATK_Rate || 0
+	const matkAfterPercent = Math.floor(baseMATK * (1 + matkPercent / 100))
+
+	// 6. MATK固定値加算
+	const matkFixed = bonuses.MATK || 0
+	const finalMATK = matkAfterPercent + matkFixed
+
+	return {
+		level,
+		weaponType,
+		weaponATK,
+		refinementLevel,
+		weaponMATK,
+		baseINT: INT, // 補正後ステータスのINT
+		baseDEX: DEX, // 補正後ステータスのDEX
+		baseAGI: AGI, // 補正後ステータスのAGI
+		statusMATK,
+		matkUpSTR,
+		matkUpINT,
+		matkUpVIT,
+		matkUpAGI,
+		matkUpDEX,
+		matkUpTotal,
+		matkDownTotal,
+		baseMATK,
+		matkPercent,
+		matkAfterPercent,
+		matkFixed,
+		finalMATK,
 	}
 }
 
@@ -1156,17 +1453,15 @@ export function calculateHIT(
 ): HITCalculationSteps {
 	// 1. ベースHIT計算（レベル + 補正後DEX）
 	const baseHIT = level + adjustedDEX
-	
+
 	// 2. 命中%補正適用
 	const accuracyPercent = bonuses.Accuracy_Rate || 0
-	const hitAfterPercent = Math.floor(
-		baseHIT * (1 + accuracyPercent / 100),
-	)
-	
+	const hitAfterPercent = Math.floor(baseHIT * (1 + accuracyPercent / 100))
+
 	// 3. 命中固定値加算
 	const accuracyFixed = bonuses.Accuracy || 0
 	const finalHIT = hitAfterPercent + accuracyFixed
-	
+
 	return {
 		level,
 		adjustedDEX,
@@ -1187,7 +1482,7 @@ export function calculatePhysicalResistance(
 ): PhysicalResistanceCalculationSteps {
 	// 物理耐性%の合計値（4つのデータソースから統合済み）
 	const physicalResistanceRate = bonuses.PhysicalResistance_Rate || 0
-	
+
 	return {
 		physicalResistanceRate,
 		finalPhysicalResistance: physicalResistanceRate,
@@ -1203,7 +1498,7 @@ export function calculateMagicalResistance(
 ): MagicalResistanceCalculationSteps {
 	// 魔法耐性%の合計値（4つのデータソースから統合済み）
 	const magicalResistanceRate = bonuses.MagicalResistance_Rate || 0
-	
+
 	return {
 		magicalResistanceRate,
 		finalMagicalResistance: magicalResistanceRate,
@@ -1219,7 +1514,7 @@ export function calculateArmorBreak(
 ): ArmorBreakCalculationSteps {
 	// 防御崩し%の合計値（3つのデータソースから統合済み、料理除外）
 	const armorBreakRate = bonuses.ArmorBreak_Rate || 0
-	
+
 	return {
 		armorBreakRate,
 		finalArmorBreak: armorBreakRate,
@@ -1235,7 +1530,7 @@ export function calculateAnticipate(
 ): AnticipateCalculationSteps {
 	// 先読み%の合計値（3つのデータソースから統合済み、料理除外）
 	const anticipateRate = bonuses.Anticipate_Rate || 0
-	
+
 	return {
 		anticipateRate,
 		finalAnticipate: anticipateRate,
@@ -1254,15 +1549,15 @@ export function calculateCSPD(
 ): CSPDCalculationSteps {
 	// 1. ベースCSPD計算
 	const baseCSPD = Math.floor(level + adjustedDEX * 2.94 + adjustedAGI * 1.16)
-	
+
 	// 2. CSPD%補正適用
 	const cspd_Rate = bonuses.CastingSpeed_Rate || 0
 	const cspdAfterPercent = Math.floor(baseCSPD * (1 + cspd_Rate / 100))
-	
+
 	// 3. CSPD固定値加算
 	const cspdFixed = bonuses.CastingSpeed || 0
 	const finalCSPD = cspdAfterPercent + cspdFixed
-	
+
 	return {
 		level,
 		adjustedDEX,
@@ -1289,10 +1584,10 @@ export function calculateTotalElementAdvantage(
 ): TotalElementAdvantageCalculationSteps {
 	// 属性有利%補正を取得（4データソース統合済み）
 	const elementAdvantageRate = bonuses.ElementAdvantage_Rate || 0
-	
+
 	// 総属性有利は単純な%補正のみ（固定値補正は存在しない）
 	const finalTotalElementAdvantage = elementAdvantageRate
-	
+
 	return {
 		elementAdvantageRate,
 		finalTotalElementAdvantage,
@@ -1301,10 +1596,10 @@ export function calculateTotalElementAdvantage(
 
 /**
  * 安定率計算
- * 
+ *
  * 計算式: MAX(0, MIN(100, メイン武器の安定率 + ステータス安定率 + 安定率%))
  * ステータス安定率は武器種によって異なる計算式を使用
- * 
+ *
  * @param weaponStability メイン武器の安定率
  * @param weaponType 武器種別
  * @param adjustedStats 補正後ステータス
@@ -1321,16 +1616,19 @@ export function calculateStability(
 	const weaponTypeKey = getWeaponTypeKey(weaponType)
 	const weaponTypeData = WEAPON_TYPES[weaponTypeKey] || WEAPON_TYPES.halberd
 	const statusStability = weaponTypeData.statusStabilityFormula(adjustedStats)
-	
+
 	// 2. 安定率%補正取得（3データソース：装備・クリスタ・バフアイテム）
 	const stabilityPercent = bonuses.Stability_Rate || 0
-	
+
 	// 3. 制限適用前の安定率計算
-	const stabilityBeforeLimit = weaponStability + statusStability + stabilityPercent
-	
+	const stabilityBeforeLimit =
+		weaponStability + statusStability + stabilityPercent
+
 	// 4. 0-100%制限適用と小数点切り捨て
-	const finalStability = Math.floor(Math.max(0, Math.min(100, stabilityBeforeLimit)))
-	
+	const finalStability = Math.floor(
+		Math.max(0, Math.min(100, stabilityBeforeLimit)),
+	)
+
 	return {
 		weaponStability,
 		statusStability,

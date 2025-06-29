@@ -14,10 +14,11 @@ interface UseFloatingMenuReturn {
 }
 
 export function useFloatingMenu(
-	initialSection: MenuSection = 'top'
+	initialSection: MenuSection = 'top',
 ): UseFloatingMenuReturn {
 	const [isOpen, setIsOpen] = useState(false)
-	const [activeSection, setActiveSection] = useState<MenuSection>(initialSection)
+	const [activeSection, setActiveSection] =
+		useState<MenuSection>(initialSection)
 
 	const openMenu = useCallback(() => {
 		setIsOpen(true)
@@ -28,7 +29,7 @@ export function useFloatingMenu(
 	}, [])
 
 	const toggleMenu = useCallback(() => {
-		setIsOpen(prev => !prev)
+		setIsOpen((prev) => !prev)
 	}, [])
 
 	// ESCキーでメニューを閉じる

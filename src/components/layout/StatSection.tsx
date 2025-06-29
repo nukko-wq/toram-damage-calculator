@@ -9,7 +9,7 @@ import type { PropertyDisplayData } from './PropertyDoubleDisplay'
 
 interface StatSectionProps {
 	title: string
-	stats: Record<string, number>
+	stats: Record<string, number | null>
 	labels: Record<string, string>
 	className?: string
 	displayMode?: 'normal' | 'property' | 'property-double'

@@ -25,10 +25,12 @@ export default function MenuPanel({
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as Node
-			
+
 			// FloatingMenuButtonをクリックした場合は何もしない
-			const isFloatingMenuButton = (target as Element)?.closest?.('[aria-controls="floating-menu-panel"]')
-			
+			const isFloatingMenuButton = (target as Element)?.closest?.(
+				'[aria-controls="floating-menu-panel"]',
+			)
+
 			if (
 				isOpen &&
 				panelRef.current &&

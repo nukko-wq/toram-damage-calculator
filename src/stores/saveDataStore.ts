@@ -20,7 +20,7 @@ const getInitialCurrentSaveId = () => {
 	if (typeof window === 'undefined') {
 		return 'default'
 	}
-	
+
 	try {
 		return getCurrentSaveData().id
 	} catch {
@@ -99,10 +99,10 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			createSaveData: async (name, data) => {
 				try {
 					const newSaveData = await createSaveDataUtil(name, data)
-					
+
 					// saveDataListに新しいアイテムを追加（リロードせずに）
 					set((state) => ({
-						saveDataList: [...state.saveDataList, newSaveData]
+						saveDataList: [...state.saveDataList, newSaveData],
 					}))
 
 					// 作成したセーブデータに自動切り替え
@@ -121,9 +121,11 @@ export const useSaveDataStore = create<SaveDataStore>()(
 				try {
 					const currentState = get()
 					await deleteSaveDataUtil(saveId)
-					
+
 					// saveDataListから削除したアイテムを除去（リロードせずに）
-					const updatedList = currentState.saveDataList.filter(data => data.id !== saveId)
+					const updatedList = currentState.saveDataList.filter(
+						(data) => data.id !== saveId,
+					)
 					set({ saveDataList: updatedList })
 
 					// 全ユーザーデータが削除された場合、メインデータに自動切り替え
@@ -148,14 +150,18 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			renameSaveData: async (saveId, newName) => {
 				try {
 					await renameSaveDataUtil(saveId, newName)
-					
+
 					// saveDataListの該当アイテムの名前を更新（リロードせずに）
 					set((state) => ({
-						saveDataList: state.saveDataList.map(saveData => 
-							saveData.id === saveId 
-								? { ...saveData, name: newName, updatedAt: new Date().toISOString() }
-								: saveData
-						)
+						saveDataList: state.saveDataList.map((saveData) =>
+							saveData.id === saveId
+								? {
+										...saveData,
+										name: newName,
+										updatedAt: new Date().toISOString(),
+									}
+								: saveData,
+						),
 					}))
 				} catch (err) {
 					console.error('セーブデータの名前変更に失敗しました:', err)
@@ -168,10 +174,12 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			reorderSaveData: async (newOrder) => {
 				try {
 					await reorderSaveDataUtil(newOrder)
-					
+
 					// 並び替え後の完全なセーブデータリストを取得
 					const allSaveData = getAllSaveData()
-					const userSaveData = allSaveData.filter(data => data.id !== 'default')
+					const userSaveData = allSaveData.filter(
+						(data) => data.id !== 'default',
+					)
 					set({ saveDataList: userSaveData })
 				} catch (err) {
 					console.error('セーブデータの並び替えに失敗しました:', err)

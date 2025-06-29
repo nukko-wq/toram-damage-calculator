@@ -18,7 +18,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 	// Zustandストアからデータを取得
 	const {
 		data: currentData,
-		hasUnsavedChanges,
+		hasRealChanges,
 		loadSaveData,
 		saveCurrentData,
 		getUnsavedDataStatus,
@@ -53,7 +53,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 	// セーブデータの切り替え
 	const handleSaveDataSelect = async (saveId: string) => {
 		// 未保存の変更がある場合は確認ダイアログを表示
-		if (hasUnsavedChanges && saveId !== currentSaveId) {
+		if (hasRealChanges && saveId !== currentSaveId) {
 			setPendingSaveId(saveId)
 			setShowUnsavedChangesModal(true)
 			return
@@ -179,7 +179,7 @@ export default function SaveDataManager({}: SaveDataManagerProps) {
 	// 未保存状態の詳細を取得
 	const unsavedStatus = getUnsavedDataStatus()
 	const hasAnyUnsavedData =
-		unsavedStatus.hasUnsavedChanges ||
+		hasRealChanges ||
 		unsavedStatus.hasTemporaryEquipments ||
 		unsavedStatus.hasEditSessions
 
