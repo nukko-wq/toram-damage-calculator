@@ -661,7 +661,16 @@ export function calculateATK(
 ): ATKCalculationSteps {
 	// 0. 弓＋矢の判定
 	const isBowArrowCombo = (mainWeapon.weaponType === '弓' || mainWeapon.weaponType === '自動弓') && subWeapon?.weaponType === '矢'
-	const arrowATK = isBowArrowCombo ? subWeapon.ATK : 0
+	
+	// 弓の場合は矢のATKをそのまま、自動弓の場合は矢のATK/2（INT適用）を加算
+	let arrowATK = 0
+	if (isBowArrowCombo) {
+		if (mainWeapon.weaponType === '弓') {
+			arrowATK = subWeapon.ATK
+		} else if (mainWeapon.weaponType === '自動弓') {
+			arrowATK = Math.floor(subWeapon.ATK / 2)
+		}
+	}
 
 	// 1. 総武器ATK計算（メイン武器のATKのみに補正適用）
 	const refinedWeaponATK = Math.floor(
