@@ -102,6 +102,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			if (maxMpUpEffect) {
 				allBonusesWithRegister.MP = (allBonusesWithRegister.MP || 0) + (maxMpUpEffect.level * 1)
 			}
+
+			const physicalAttackUpEffect = data.register.effects.find(effect => 
+				effect.type === 'physicalAttackUp' && effect.isEnabled
+			)
+			if (physicalAttackUpEffect) {
+				allBonusesWithRegister.ATK = (allBonusesWithRegister.ATK || 0) + (physicalAttackUpEffect.level * 1)
+			}
 		}
 
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認

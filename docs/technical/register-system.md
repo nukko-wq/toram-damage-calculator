@@ -463,9 +463,66 @@ equipmentBonuses: calculateEquipmentBonuses(
 - 他の装備・クリスタ・料理・バフアイテムのMP補正と同等に扱われる
 - 装備品補正値1の計算順序は既存システムに従う
 
+### 物理攻撃アップ（physicalAttackUp）
+
+#### 基本仕様
+- **効果**: キャラクターの物理攻撃力を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のATK(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+#### 実装方式
+物理攻撃アップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`allBonusesWithRegister`に追加
+2. **基本ステータス計算**: ATK計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+#### 計算例
+**入力値:**
+- physicalAttackUpレベル: 15 (有効)
+- 既存の装備品補正値1のATK(+): 300 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. physicalAttackUp効果: 15 × 1 = 15
+2. **装備品補正値1のATK(+)合計**: 300 + 15 = 315
+
+#### ATK計算への統合
+物理攻撃アップ効果は装備品補正値1のATK固定値として適用され、基本ステータスのATK計算に反映されます。
+
+レジスタ効果はStatusPreviewで`allBonusesWithRegister`として統合され、ATK計算に適用されます。
+
+#### 実装詳細
+StatusPreview.tsxで以下のような統合処理が行われます：
+
+```typescript
+// レジスタ効果を含むボーナス値を作成
+const allBonusesWithRegister = { ...allBonuses }
+if (data.register?.effects) {
+  const physicalAttackUpEffect = data.register.effects.find(effect => 
+    effect.type === 'physicalAttackUp' && effect.isEnabled
+  )
+  if (physicalAttackUpEffect) {
+    allBonusesWithRegister.ATK = (allBonusesWithRegister.ATK || 0) + (physicalAttackUpEffect.level * 1)
+  }
+}
+
+// 装備品補正値もレジスタ効果込みのボーナスから生成
+equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister)
+```
+
+#### StatusPreviewでの表示
+- **基本ステータス**: ATK値にレジスタ効果が自動的に反映される
+- **装備品補正値1**: ATK(+)項目にレジスタ効果が含まれた値が表示される
+
+#### 重要な注意点
+- レジスタが無効の場合、効果は0として計算される
+- 他の装備・クリスタ・料理・バフアイテムのATK補正と同等に扱われる
+- 装備品補正値1の計算順序は既存システムに従う
+
 ## レジスタレット効果一覧
 
-1. **物理攻撃アップ** - 物理攻撃力向上
+1. **物理攻撃アップ(physicalAttackUp)** - 物理攻撃力向上（装備品補正値1のATK(+)に加算）
 2. **魔法攻撃アップ** - 魔法攻撃力向上
 3. **最大HPアップ(maxHpUp)** - HP上限値向上（装備品補正値1のHP(+)に加算）
 4. **最大MPアップ(maxMpUp)** - MP上限値向上（装備品補正値1のMP(+)に加算）
