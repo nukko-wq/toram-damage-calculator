@@ -234,13 +234,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 		return {
 			allBonuses: allBonusesWithRegister,
-			equipmentBonuses: calculateEquipmentBonuses(
-				equipmentBonuses,
-				crystalBonuses,
-				foodBonuses,
-				buffBonuses,
-				data.register, // レジスタデータを渡す
-			),
+			equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister),
 			hpCalculation: calculateHP(baseStats, allBonusesWithRegister),
 			mpCalculation: calculateMP(baseStats, allBonusesWithRegister),
 			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, allBonusesWithRegister),

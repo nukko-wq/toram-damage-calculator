@@ -744,42 +744,15 @@ export function calculateATK(
 }
 
 /**
- * 装備品補正値を装備・クリスタ・料理・バフから計算
+ * 装備品補正値1〜3を計算する関数
  * StatusPreviewで使用される装備品補正値1〜3の計算
  *
- * @param equipment 装備補正値
- * @param crystals クリスタ補正値
- * @param foods 料理補正値
- * @param buffs バフアイテム補正値
+ * @param allBonuses レジスタ効果を含む統合済みのAllBonuses
  */
 export function calculateEquipmentBonuses(
-	equipment: Partial<AllBonuses> = {},
-	crystals: Partial<AllBonuses> = {},
-	foods: Partial<AllBonuses> = {},
-	buffs: Partial<AllBonuses> = {},
-	registerData?: any, // RegisterFormData型（型循環参照を避けるためany）
+	allBonuses: AllBonuses, // レジスタ効果込みのAllBonusesを直接受け取る
 ) {
-	// 全ソースを統合
-	const allBonuses = aggregateAllBonuses(equipment, crystals, foods, buffs)
-	
-	// レジスタ効果をプロパティに変換（簡易実装）
-	let registerHPBonus = 0
-	let registerMPBonus = 0
-	if (registerData?.effects) {
-		const maxHpUpEffect = registerData.effects.find((effect: any) => 
-			effect.type === 'maxHpUp' && effect.isEnabled
-		)
-		if (maxHpUpEffect) {
-			registerHPBonus = maxHpUpEffect.level * 10
-		}
-
-		const maxMpUpEffect = registerData.effects.find((effect: any) => 
-			effect.type === 'maxMpUp' && effect.isEnabled
-		)
-		if (maxMpUpEffect) {
-			registerMPBonus = maxMpUpEffect.level * 1
-		}
-	}
+	// allBonusesはStatusPreviewで統合済み（レジスタ効果含む）
 
 	// 装備品補正値1 (31項目) - %と固定値の両方を含む
 	const equipmentBonus1 = {
@@ -827,11 +800,11 @@ export function calculateEquipmentBonuses(
 		accuracy_Rate: allBonuses.Accuracy_Rate || 0,
 		dodge: allBonuses.Dodge || 0,
 		dodge_Rate: allBonuses.Dodge_Rate || 0,
-		MP: (allBonuses.MP || 0) + registerMPBonus, // レジスタのmaxMpUp効果を加算
+		MP: allBonuses.MP || 0,
 		MP_Rate: allBonuses.MP_Rate || 0,
 		attackMPRecovery: allBonuses.AttackMPRecovery || 0,
 		attackMPRecovery_Rate: allBonuses.AttackMPRecovery_Rate || 0,
-		HP: (allBonuses.HP || 0) + registerHPBonus, // レジスタのmaxHPUp効果を加算
+		HP: allBonuses.HP || 0,
 		HP_Rate: allBonuses.HP_Rate || 0,
 		ailmentResistance: allBonuses.AilmentResistance_Rate || 0,
 		ailmentResistance_Rate: allBonuses.AilmentResistance_Rate || 0,

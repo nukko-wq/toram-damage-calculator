@@ -279,11 +279,11 @@ interface CalculatorStore {
 - **レベル範囲**: 1-30（想定）
 
 #### 実装方式
-最大HPアップ効果は装備品補正値1システムに統合され、以下の流れで適用されます：
+最大HPアップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
 
-1. **プロパティ変換**: レジスタ効果を`EquipmentProperties.HP`として変換
-2. **装備品補正値1統合**: 他の装備・クリスタ・料理・バフアイテムのHP補正と合算
-3. **HP計算適用**: 既存のHP計算式でHP固定値として使用
+1. **StatusPreviewでの統合**: レジスタ効果を`allBonusesWithRegister`に追加
+2. **基本ステータス計算**: HP計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
 
 #### 計算例
 **入力値:**
@@ -318,6 +318,11 @@ if (data.register?.effects) {
 
 // HP計算でレジスタ効果込みのボーナスを使用
 hpCalculation: calculateHP(baseStats, allBonusesWithRegister)
+
+// 装備品補正値もレジスタ効果込みのボーナスから生成
+equipmentBonuses: calculateEquipmentBonuses(
+  equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses
+) // allBonusesWithRegisterを基に計算される
 ```
 
 #### StatusPreviewでの表示
@@ -403,11 +408,11 @@ export const createInitialRegisterData = (): RegisterFormData => ({
 - **レベル範囲**: 1-100（想定）
 
 #### 実装方式
-最大MPアップ効果は装備品補正値1システムに統合され、以下の流れで適用されます：
+最大MPアップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
 
-1. **プロパティ変換**: レジスタ効果を`EquipmentProperties.MP`として変換
-2. **装備品補正値1統合**: 他の装備・クリスタ・料理・バフアイテムのMP補正と合算
-3. **MP計算適用**: 既存のMP計算式でMP固定値として使用
+1. **StatusPreviewでの統合**: レジスタ効果を`allBonusesWithRegister`に追加
+2. **基本ステータス計算**: MP計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
 
 #### 計算例
 **入力値:**
@@ -442,6 +447,11 @@ if (data.register?.effects) {
 
 // MP計算でレジスタ効果込みのボーナスを使用
 mpCalculation: calculateMP(baseStats, allBonusesWithRegister)
+
+// 装備品補正値もレジスタ効果込みのボーナスから生成
+equipmentBonuses: calculateEquipmentBonuses(
+  equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses
+) // allBonusesWithRegisterを基に計算される
 ```
 
 #### StatusPreviewでの表示
