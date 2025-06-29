@@ -224,7 +224,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			hpCalculation: calculateHP(baseStats, allBonuses),
 			mpCalculation: calculateMP(baseStats, allBonuses),
-			atkCalculation: calculateATK(baseStats, data.mainWeapon, adjustedStatsCalculation, allBonuses),
+			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, allBonuses),
 			subATKCalculation: calculateSubATK(
 				baseStats,
 				data.mainWeapon,
@@ -442,10 +442,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		MATK: matkCalculation.finalMATK, // MATK計算結果
 		baseMATK: matkCalculation.baseMATK, // 基本MATK計算結果
 		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
-		// サブ安定率は双剣の場合のみ表示
-		...(data.mainWeapon.weaponType === '双剣' && subATKCalculation
-			? { subStabilityRate: subATKCalculation.subStability } // サブ安定率（計算後）
-			: {}),
+		// サブ安定率は常時表示（双剣以外は null で - 表示）
+		subStabilityRate: data.mainWeapon.weaponType === '双剣' && subATKCalculation
+			? subATKCalculation.subStability // サブ安定率（計算後）
+			: null, // 非双剣時は null で - 表示
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
 		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
@@ -560,10 +560,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								MATK: 'MATK',
 								baseMATK: '基本MATK',
 								stabilityRate: '安定率',
-								// サブ安定率は双剣の場合のみ表示
-								...(data.mainWeapon.weaponType === '双剣' && subATKCalculation
-									? { subStabilityRate: 'サブ安定率' }
-									: {}),
+								subStabilityRate: 'サブ安定率', // 常時表示（ラベル位置統一のため）
 								criticalRate: 'ｸﾘﾃｨｶﾙ率',
 								criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
 								magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',

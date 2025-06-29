@@ -346,7 +346,9 @@ export function calculateAdjustedStats(
 // ATK計算の中間結果
 export interface ATKCalculationSteps {
 	// 総武器ATK関連
-	baseWeaponATK: number // 武器の基本ATK
+	baseWeaponATK: number // 武器の基本ATK（弓＋矢の場合は加算後）
+	arrowATK?: number // 矢のATK（弓装備時のみ）
+	isBowArrowCombo: boolean // 弓＋矢の組み合わせかどうか
 	refinementLevel: number // 精錬値
 	refinedWeaponATK: number // 精錬補正後武器ATK
 	weaponATKPercentBonus: number // 武器ATK%補正
@@ -642,8 +644,14 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
  */
 export function calculateATK(
 	stats: BaseStats,
-	weapon: {
+	mainWeapon: {
 		weaponType: WeaponTypeEnum
+		ATK: number
+		stability: number
+		refinement: number
+	},
+	subWeapon: {
+		weaponType: string
 		ATK: number
 		stability: number
 		refinement: number
@@ -651,22 +659,27 @@ export function calculateATK(
 	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
 ): ATKCalculationSteps {
-	// 1. 総武器ATK計算
+	// 0. 弓＋矢の判定
+	const isBowArrowCombo = (mainWeapon.weaponType === '弓' || mainWeapon.weaponType === '自動弓') && subWeapon?.weaponType === '矢'
+	const arrowATK = isBowArrowCombo ? subWeapon.ATK : 0
+
+	// 1. 総武器ATK計算（メイン武器のATKのみに補正適用）
 	const refinedWeaponATK = Math.floor(
-		weapon.ATK * (1 + weapon.refinement ** 2 / 100) + weapon.refinement,
+		mainWeapon.ATK * (1 + mainWeapon.refinement ** 2 / 100) + mainWeapon.refinement,
 	)
 
 	const weaponATKPercent = bonuses.WeaponATK_Rate || 0
 	const weaponATKPercentBonus = Math.floor(
-		(weapon.ATK * weaponATKPercent) / 100,
+		(mainWeapon.ATK * weaponATKPercent) / 100,
 	)
 
 	const weaponATKFixedBonus = bonuses.WeaponATK || 0
+	// 矢のATKは武器ATK固定値として最後に加算
 	const totalWeaponATK =
-		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
+		refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus + arrowATK
 
 	// 2. ステータスATK計算（武器種別対応、補正後ステータスを使用）
-	const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
+	const weaponTypeKey = getWeaponTypeKey(mainWeapon.weaponType)
 	const weaponType = WEAPON_TYPES[weaponTypeKey] || WEAPON_TYPES.halberd
 	const statusATK = weaponType.statusATKFormula(adjustedStats)
 
@@ -693,8 +706,10 @@ export function calculateATK(
 	const finalATK = atkAfterPercent + atkFixed
 
 	return {
-		baseWeaponATK: weapon.ATK,
-		refinementLevel: weapon.refinement,
+		baseWeaponATK: mainWeapon.ATK,
+		arrowATK,
+		isBowArrowCombo,
+		refinementLevel: mainWeapon.refinement,
 		refinedWeaponATK,
 		weaponATKPercentBonus,
 		weaponATKFixedBonus,

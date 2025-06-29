@@ -1,6 +1,6 @@
 interface StatRowProps {
-	leftStat?: { name: string; value: number }
-	rightStat?: { name: string; value: number }
+	leftStat?: { name: string; value: number | null }
+	rightStat?: { name: string; value: number | null }
 	className?: string
 }
 
@@ -9,12 +9,15 @@ export default function StatRow({
 	rightStat,
 	className = '',
 }: StatRowProps) {
-	// 数値のフォーマット（3桁区切り）
-	const formatValue = (num: number): string => {
+	// 数値のフォーマット（3桁区切り、0値や null の場合は「-」表示）
+	const formatValue = (num: number | null): string => {
+		if (num === null || num === undefined || num === 0) {
+			return '-'
+		}
 		return num.toLocaleString('ja-JP')
 	}
 
-	const renderStat = (stat: { name: string; value: number } | undefined) => {
+	const renderStat = (stat: { name: string; value: number | null } | undefined) => {
 		if (!stat) {
 			return <div className="flex-1" />
 		}

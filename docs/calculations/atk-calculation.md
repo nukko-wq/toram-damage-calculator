@@ -30,7 +30,27 @@ ATK = INT(基礎ATK × (1 + ATK%/100)) + ATK固定値
 総武器ATK = INT(武器のATK × (1 + (精錬値^2)/100) + 精錬値) + INT(武器のATK × 武器ATK%/100) + 武器ATK固定値
 ```
 
+### 弓装備時の特殊計算（矢装備時）
+**適用条件**: メイン武器が「弓」かつサブ武器が「矢」の場合
+```
+総武器ATK = INT(メイン武器のATK × (1 + (精錬値^2)/100) + 精錬値) + INT(メイン武器のATK × 武器ATK%/100) + 武器ATK固定値 + 矢のATK
+```
+
+**注意事項:**
+- 矢のATKは武器ATK固定値として最後に加算される
+- 精錬補正や武器ATK%補正は矢のATKには適用されない
+- 自動弓の場合も同様の計算が適用される
+
 ### 計算手順
+
+#### 0. 弓＋矢の場合の特殊処理
+**適用条件**: 
+- メイン武器の種別が「弓」または「自動弓」
+- サブ武器の種別が「矢」
+
+**処理方法**:
+- 精錬補正・武器ATK%補正はメイン武器のATKのみに適用
+- 矢のATKは武器ATK固定値として最後に加算
 
 #### 1. 精錬補正後武器ATK
 ```
@@ -38,16 +58,16 @@ ATK = INT(基礎ATK × (1 + ATK%/100)) + ATK固定値
 ```
 
 **構成要素:**
-- **武器のATK**: 装備している武器の基本ATK値
+- **武器のATK**: 装備している武器の基本ATK値（弓＋矢の場合はメイン武器のATKのみ）
 - **精錬値**: 武器の精錬レベル（0-15）
 
-**計算例:**
-- 武器のATK: 1000
-- 精錬値: 15
-- 精錬補正後武器ATK = INT(1000 × (1 + (15^2)/100) + 15)
-- 精錬補正後武器ATK = INT(1000 × (1 + 225/100) + 15)
-- 精錬補正後武器ATK = INT(1000 × 3.25 + 15)
-- 精錬補正後武器ATK = INT(3250 + 15) = 3265
+**計算例（弓＋矢の場合）:**
+- メイン武器（弓）のATK: 800
+- 精錬値: 10
+- 精錬補正後武器ATK = INT(800 × (1 + (10^2)/100) + 10)
+- 精錬補正後武器ATK = INT(800 × (1 + 100/100) + 10)
+- 精錬補正後武器ATK = INT(800 × 2.0 + 10)
+- 精錬補正後武器ATK = INT(1600 + 10) = 1610
 
 #### 2. 武器ATK%補正
 ```
@@ -57,24 +77,26 @@ ATK = INT(基礎ATK × (1 + ATK%/100)) + ATK固定値
 **構成要素:**
 - **武器ATK%**: 装備・クリスタ・料理・バフアイテムの武器ATK%の合計
 
-**計算例:**
-- 武器のATK: 1000
-- 武器ATK%: 25% (装備+クリスタ+バフアイテム)
-- 武器ATK%補正 = INT(1000 × 25/100) = INT(250) = 250
+**計算例（弓＋矢の場合）:**
+- メイン武器（弓）のATK: 800
+- 武器ATK%: 20% (装備+クリスタ+バフアイテム)
+- 武器ATK%補正 = INT(800 × 20/100) = INT(160) = 160
 
 #### 3. 総武器ATK算出
 ```
-総武器ATK = 精錬補正後武器ATK + 武器ATK%補正 + 武器ATK固定値
+総武器ATK = 精錬補正後武器ATK + 武器ATK%補正 + 武器ATK固定値 + (矢のATK ※弓＋矢の場合のみ)
 ```
 
 **構成要素:**
 - **武器ATK固定値**: 装備・クリスタ・料理・バフアイテムの武器ATK固定値の合計
+- **矢のATK**: 弓＋矢の組み合わせの場合のみ加算
 
-**計算例:**
-- 精錬補正後武器ATK: 3265
-- 武器ATK%補正: 250  
-- 武器ATK固定値: 100 (装備+クリスタ+バフアイテム)
-- 総武器ATK = 3265 + 250 + 100 = 3615
+**計算例（弓＋矢の場合）:**
+- 精錬補正後武器ATK: 1610
+- 武器ATK%補正: 160  
+- 武器ATK固定値: 80 (装備+クリスタ+バフアイテム)
+- 矢のATK: 200
+- 総武器ATK = 1610 + 160 + 80 + 200 = 2050
 
 ## ステータスATK計算（武器種別）
 
@@ -166,7 +188,48 @@ ATK%補正 = (1 + ATK%/100)
 ATK固定値 = 装備ATK固定値 + クリスタATK固定値 + 料理ATK固定値 + バフATK固定値
 ```
 
-## 完全計算例（旋風槍）
+## 完全計算例
+
+### 弓＋矢の場合
+
+#### 入力値
+- **キャラクター**: Lv 150
+- **メイン武器（弓）**: ATK 800、精錬値 10
+- **サブ武器（矢）**: ATK 200
+- **基礎ステータス**: STR 180, DEX 220
+- **武器ATK%**: 20%
+- **武器ATK固定値**: 80
+- **ATK%**: 25%
+- **ATK固定値**: 150
+
+#### 計算手順
+
+##### 1. 総武器ATK計算（弓＋矢特殊計算）
+```
+精錬補正後武器ATK = INT(800 × (1 + (10^2)/100) + 10) = INT(1610) = 1610
+武器ATK%補正 = INT(800 × 20/100) = 160
+総武器ATK = 1610 + 160 + 80 + 200 = 2050
+```
+**注意**: 矢のATK（200）は武器ATK固定値として最後に加算
+
+##### 3. ステータスATK計算（弓）
+```
+ステータスATK = 補正後STR × 1.0 + 補正後DEX × 3.0
+ステータスATK = 180 × 1.0 + 220 × 3.0 = 180 + 660 = 840
+```
+
+##### 4. 基礎ATK計算
+```
+基礎ATK = 150 + 2050 + 840 = 3040
+```
+
+##### 5. 最終ATK計算
+```
+ATK = INT(3040 × (1 + 25/100)) + 150
+ATK = INT(3040 × 1.25) + 150 = INT(3800) + 150 = 3950
+```
+
+### 旋風槍の場合
 
 ### 入力値
 - **キャラクター**: Lv 150
@@ -229,7 +292,9 @@ ATK = 5999 + 200 = 6199
 ```typescript
 interface ATKCalculationSteps {
   // 総武器ATK関連
-  baseWeaponATK: number           // 武器の基本ATK
+  baseWeaponATK: number           // 武器の基本ATK（弓＋矢の場合は加算後）
+  arrowATK?: number               // 矢のATK（弓装備時のみ）
+  isBowArrowCombo: boolean        // 弓＋矢の組み合わせかどうか
   refinementLevel: number         // 精錬値
   refinedWeaponATK: number        // 精錬補正後武器ATK
   weaponATKPercentBonus: number   // 武器ATK%補正
@@ -307,25 +372,32 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 ### 計算関数実装
 ```typescript
 /**
- * ATK計算（旋風槍専用）
+ * ATK計算（全武器種対応、弓＋矢の特殊計算を含む）
  * ATK = INT((自Lv + 総武器ATK + ステータスATK + ATKアップ - ATKダウン) × (1 + ATK%/100)) + ATK固定値
  */
 export function calculateATK(
   stats: BaseStats,
-  weapon: WeaponData,
+  mainWeapon: WeaponData,
+  subWeapon: WeaponData,
   adjustedStats: AdjustedStatsCalculation,
   bonuses: AllBonuses = {}
 ): ATKCalculationSteps {
-  // 1. 総武器ATK計算
+  // 0. 弓＋矢の判定
+  const isBowArrowCombo = (mainWeapon.weaponType === '弓' || mainWeapon.weaponType === '自動弓') 
+                         && subWeapon.weaponType === '矢'
+
+  // 1. 総武器ATK計算（メイン武器のATKのみに補正適用）
   const refinedWeaponATK = Math.floor(
-    weapon.ATK * (1 + Math.pow(weapon.refinement, 2) / 100) + weapon.refinement
+    mainWeapon.ATK * (1 + Math.pow(mainWeapon.refinement, 2) / 100) + mainWeapon.refinement
   )
   
   const weaponATKPercent = bonuses.weaponATK_Rate || 0
-  const weaponATKPercentBonus = Math.floor(weapon.ATK * weaponATKPercent / 100)
+  const weaponATKPercentBonus = Math.floor(mainWeapon.ATK * weaponATKPercent / 100)
   
+  // 矢のATKは武器ATK固定値として加算
   const weaponATKFixedBonus = bonuses.weaponATK || 0
-  const totalWeaponATK = refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus
+  const arrowATK = isBowArrowCombo ? subWeapon.ATK : 0
+  const totalWeaponATK = refinedWeaponATK + weaponATKPercentBonus + weaponATKFixedBonus + arrowATK
   
   // 2. ステータスATK計算（旋風槍の場合、補正後ステータスを使用）
   const weaponType = WEAPON_TYPES[weapon.type] || WEAPON_TYPES.halberd
@@ -419,6 +491,8 @@ export function calculateATK(
 |------|----------|------|
 | 2025-06-28 | 双剣サブATK安定率計算を修正 | ステータス安定率係数を修正（STR×0.06+AGI×0.04） |
 | 2025-06-28 | 双剣サブATK安定率計算を修正 | サブ安定率の計算式を追加、正しい2段階計算に修正 |
+| 2025-06-29 | 弓＋矢の特殊ATK計算を追加 | 弓・自動弓装備時の矢ATK加算計算、TypeScript実装例、計算例を追加 |
+| 2025-06-29 | 弓＋矢のATK計算仕様を修正 | 矢のATKを武器ATK固定値として加算する正しい計算式に修正 |
 | 2025-06-28 | 双剣サブATK計算式を修正 | 安定率による計算方式に変更、サブ基礎ATK定義も修正 |
 | 2025-06-28 | ステータスATK計算を補正後ステータス使用に修正 | 基礎ステータスから補正後ステータスに変更、全武器種対応 |
 | 2024-06-24 | ATK計算式設計書を新規作成 | 旋風槍のATK計算式を実装 |
