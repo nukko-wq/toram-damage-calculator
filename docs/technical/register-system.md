@@ -520,6 +520,141 @@ equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister)
 - 他の装備・クリスタ・料理・バフアイテムのATK補正と同等に扱われる
 - 装備品補正値1の計算順序は既存システムに従う
 
+## 魔法攻撃アップ（magicalAttackUp）
+
+### 基本仕様
+- **効果**: キャラクターの魔法攻撃力を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のMATK(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+魔法攻撃アップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`allBonusesWithRegister`に追加
+2. **基本ステータス計算**: MATK計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- magicalAttackUpレベル: 12 (有効)
+- 既存の装備品補正値1のMATK(+): 250 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. magicalAttackUp効果: 12 × 1 = 12
+2. **装備品補正値1のMATK(+)合計**: 250 + 12 = 262
+
+### MATK計算への統合
+魔法攻撃アップ効果は装備品補正値1のMATK固定値として適用され、基本ステータスのMATK計算に反映されます。
+
+**重要**: MATK計算には`allBonusesWithRegister`（レジスタ効果込み）を渡す必要があります。
+
+**修正前の問題**: `calculateMATK`関数に`allBonuses`（レジスタ効果なし）が渡されていたため、魔法攻撃アップ効果が基本ステータスのMATKに反映されませんでした。
+
+**修正後**: `calculateMATK`関数に`allBonusesWithRegister`を渡すことで、レジスタ効果がMATK固定値として正しく適用されます。
+
+### 問題解決の実装詳細
+
+#### 修正前の構造
+```typescript
+// useMemo内
+const calculationResults = useMemo(() => {
+  const allBonuses = aggregateAllBonuses(...)
+  const allBonusesWithRegister = { ...allBonuses }
+  // レジスタ効果を allBonusesWithRegister に追加
+  return { /* allBonusesWithRegister含まず */ }
+}, [...])
+
+// useMemo外
+const matkCalculation = calculateMATK(..., allBonuses) // レジスタ効果なし
+```
+
+#### 修正後の構造
+```typescript
+// useMemo内
+const calculationResults = useMemo(() => {
+  const allBonuses = aggregateAllBonuses(...)
+  const allBonusesWithRegister = { ...allBonuses }
+  // レジスタ効果を allBonusesWithRegister に追加
+  return { 
+    allBonuses: allBonusesWithRegister, // レジスタ効果込み
+    // その他の計算結果も allBonusesWithRegister を使用
+  }
+}, [...])
+
+// useMemo外
+const { allBonuses: allBonusesWithRegister } = calculationResults
+const matkCalculation = calculateMATK(..., allBonusesWithRegister) // レジスタ効果込み
+```
+
+これによりMATK計算式の「MATK固定値」部分にレジスタの魔法攻撃アップ効果が正しく反映され、基本ステータスのMATKに変化が現れるようになりました。
+
+### 実装詳細
+StatusPreview.tsxで以下のような統合処理が行われます：
+
+```typescript
+// レジスタ効果を含むボーナス値を作成
+const allBonusesWithRegister = { ...allBonuses }
+if (data.register?.effects) {
+  const magicalAttackUpEffect = data.register.effects.find(effect => 
+    effect.type === 'magicalAttackUp' && effect.isEnabled
+  )
+  if (magicalAttackUpEffect) {
+    allBonusesWithRegister.MATK = (allBonusesWithRegister.MATK || 0) + (magicalAttackUpEffect.level * 1)
+  }
+}
+
+// 装備品補正値もレジスタ効果込みのボーナスから生成
+equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister)
+```
+
+### StatusPreviewでの表示
+- **基本ステータス**: MATK値にレジスタ効果が自動的に反映される
+- **装備品補正値1**: MATK(+)項目にレジスタ効果が含まれた値が表示される
+
+### 重要な注意点
+- レジスタが無効の場合、効果は0として計算される
+- 他の装備・クリスタ・料理・バフアイテムのMATK補正と同等に扱われる
+- 装備品補正値1の計算順序は既存システムに従う
+
+### レジスタ効果統合の全体例
+```typescript
+// StatusPreview.tsx内でのレジスタ効果統合
+if (data.register?.effects) {
+  // 最大HPアップ
+  const maxHpUpEffect = data.register.effects.find(effect => 
+    effect.type === 'maxHpUp' && effect.isEnabled
+  )
+  if (maxHpUpEffect) {
+    allBonusesWithRegister.HP = (allBonusesWithRegister.HP || 0) + (maxHpUpEffect.level * 10)
+  }
+
+  // 最大MPアップ
+  const maxMpUpEffect = data.register.effects.find(effect => 
+    effect.type === 'maxMpUp' && effect.isEnabled
+  )
+  if (maxMpUpEffect) {
+    allBonusesWithRegister.MP = (allBonusesWithRegister.MP || 0) + (maxMpUpEffect.level * 1)
+  }
+
+  // 物理攻撃アップ
+  const physicalAttackUpEffect = data.register.effects.find(effect => 
+    effect.type === 'physicalAttackUp' && effect.isEnabled
+  )
+  if (physicalAttackUpEffect) {
+    allBonusesWithRegister.ATK = (allBonusesWithRegister.ATK || 0) + (physicalAttackUpEffect.level * 1)
+  }
+
+  // 魔法攻撃アップ
+  const magicalAttackUpEffect = data.register.effects.find(effect => 
+    effect.type === 'magicalAttackUp' && effect.isEnabled
+  )
+  if (magicalAttackUpEffect) {
+    allBonusesWithRegister.MATK = (allBonusesWithRegister.MATK || 0) + (magicalAttackUpEffect.level * 1)
+  }
+}
+```
+
 ## レジスタレット効果一覧
 
 1. **物理攻撃アップ(physicalAttackUp)** - 物理攻撃力向上（装備品補正値1のATK(+)に加算）

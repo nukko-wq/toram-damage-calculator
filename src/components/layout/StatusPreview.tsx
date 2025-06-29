@@ -109,6 +109,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			if (physicalAttackUpEffect) {
 				allBonusesWithRegister.ATK = (allBonusesWithRegister.ATK || 0) + (physicalAttackUpEffect.level * 1)
 			}
+
+			const magicAttackUpEffect = data.register.effects.find(effect => 
+				effect.type === 'magicalAttackUp' && effect.isEnabled
+			)
+			if (magicAttackUpEffect) {
+				allBonusesWithRegister.MATK = (allBonusesWithRegister.MATK || 0) + (magicAttackUpEffect.level * 1)
+			}
 		}
 
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
@@ -324,6 +331,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	])
 
 	const {
+		allBonuses: allBonusesWithRegister,
 		equipmentBonuses: calculatedEquipmentBonuses,
 		hpCalculation,
 		mpCalculation,
@@ -349,12 +357,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		calculatedEquipmentBonuses
 
 	// MATK計算（ATK計算結果が必要なため、useMemoの外で実行）
-	const allBonuses = aggregateAllBonuses(
-		equipmentBonuses,
-		crystalBonuses,
-		foodBonuses,
-		buffBonuses,
-	)
 	const matkCalculation = calculateMATK(
 		baseStats.level,
 		data.mainWeapon.weaponType,
@@ -363,7 +365,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		atkCalculation.totalWeaponATK, // 手甲用の総武器ATK
 		baseStats, // 基礎ステータス（MATKアップ用）
 		adjustedStatsCalculation, // 補正後ステータス（ステータスMATK用）
-		allBonuses,
+		allBonusesWithRegister, // レジスタ効果込みのボーナスを使用
 	)
 
 	// デバッグ: equipmentBonus1の各プロパティを確認
