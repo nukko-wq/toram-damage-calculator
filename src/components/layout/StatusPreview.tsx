@@ -86,37 +86,41 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			buffBonuses,
 		)
 
-		// レジスタ効果を含むボーナス値を作成
-		const allBonusesWithRegister = { ...allBonuses }
+		// 全ての効果を統合した最終ボーナス値を作成
+		const finalBonuses = { ...allBonuses }
+		
+		// レジスタ効果を統合
 		if (data.register?.effects) {
 			const maxHpUpEffect = data.register.effects.find(effect => 
 				effect.type === 'maxHpUp' && effect.isEnabled
 			)
 			if (maxHpUpEffect) {
-				allBonusesWithRegister.HP = (allBonusesWithRegister.HP || 0) + (maxHpUpEffect.level * 10)
+				finalBonuses.HP = (finalBonuses.HP || 0) + (maxHpUpEffect.level * 10)
 			}
 
 			const maxMpUpEffect = data.register.effects.find(effect => 
 				effect.type === 'maxMpUp' && effect.isEnabled
 			)
 			if (maxMpUpEffect) {
-				allBonusesWithRegister.MP = (allBonusesWithRegister.MP || 0) + (maxMpUpEffect.level * 1)
+				finalBonuses.MP = (finalBonuses.MP || 0) + (maxMpUpEffect.level * 1)
 			}
 
 			const physicalAttackUpEffect = data.register.effects.find(effect => 
 				effect.type === 'physicalAttackUp' && effect.isEnabled
 			)
 			if (physicalAttackUpEffect) {
-				allBonusesWithRegister.ATK = (allBonusesWithRegister.ATK || 0) + (physicalAttackUpEffect.level * 1)
+				finalBonuses.ATK = (finalBonuses.ATK || 0) + (physicalAttackUpEffect.level * 1)
 			}
 
 			const magicAttackUpEffect = data.register.effects.find(effect => 
 				effect.type === 'magicalAttackUp' && effect.isEnabled
 			)
 			if (magicAttackUpEffect) {
-				allBonusesWithRegister.MATK = (allBonusesWithRegister.MATK || 0) + (magicAttackUpEffect.level * 1)
+				finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicAttackUpEffect.level * 1)
 			}
 		}
+
+		// TODO: 将来的にギルド料理効果、バフスキル効果もここに統合
 
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
 		console.log('ステータスデバッグ:', {
@@ -240,30 +244,30 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 		const adjustedStatsCalculation = calculateAdjustedStats(
 			baseStats,
-			allBonusesWithRegister,
+			finalBonuses,
 		)
 
 		// 体装備のArmorTypeを取得
 		const bodyArmorType = getBodyArmorType(data.equipment.body)
 
 		return {
-			allBonuses: allBonusesWithRegister,
-			equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister),
-			hpCalculation: calculateHP(baseStats, allBonusesWithRegister),
-			mpCalculation: calculateMP(baseStats, allBonusesWithRegister),
-			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, allBonusesWithRegister),
+			allBonuses: finalBonuses,
+			equipmentBonuses: calculateEquipmentBonuses(finalBonuses),
+			hpCalculation: calculateHP(baseStats, finalBonuses),
+			mpCalculation: calculateMP(baseStats, finalBonuses),
+			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, finalBonuses),
 			subATKCalculation: calculateSubATK(
 				baseStats,
 				data.mainWeapon,
 				data.subWeapon,
 				adjustedStatsCalculation,
-				allBonusesWithRegister,
+				finalBonuses,
 			),
 			aspdCalculation: calculateASPD(
 				baseStats,
 				data.mainWeapon,
 				adjustedStatsCalculation,
-				allBonusesWithRegister,
+				finalBonuses,
 				bodyArmorType,
 			),
 			motionSpeedCalculation: (() => {
@@ -271,50 +275,50 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					baseStats,
 					data.mainWeapon,
 					adjustedStatsCalculation,
-					allBonusesWithRegister,
+					finalBonuses,
 					bodyArmorType,
 				).finalASPD
-				return calculateMotionSpeed(aspd, allBonusesWithRegister)
+				return calculateMotionSpeed(aspd, finalBonuses)
 			})(),
-			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonusesWithRegister),
+			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, finalBonuses),
 			criticalDamageCalculation: calculateCriticalDamage(
 				adjustedStatsCalculation.STR,
 				adjustedStatsCalculation.AGI,
-				allBonusesWithRegister,
+				finalBonuses,
 			),
 			hitCalculation: calculateHIT(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
-				allBonusesWithRegister,
+				finalBonuses,
 			),
 			fleeCalculation: calculateFLEE(
 				baseStats.level,
 				adjustedStatsCalculation.AGI,
 				data.equipment.body,
-				allBonusesWithRegister,
+				finalBonuses,
 			),
-			physicalResistanceCalculation: calculatePhysicalResistance(allBonusesWithRegister),
-			magicalResistanceCalculation: calculateMagicalResistance(allBonusesWithRegister),
-			armorBreakCalculation: calculateArmorBreak(allBonusesWithRegister),
-			anticipateCalculation: calculateAnticipate(allBonusesWithRegister),
+			physicalResistanceCalculation: calculatePhysicalResistance(finalBonuses),
+			magicalResistanceCalculation: calculateMagicalResistance(finalBonuses),
+			armorBreakCalculation: calculateArmorBreak(finalBonuses),
+			anticipateCalculation: calculateAnticipate(finalBonuses),
 			cspdCalculation: calculateCSPD(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
 				adjustedStatsCalculation.AGI,
-				allBonusesWithRegister,
+				finalBonuses,
 			),
 			totalElementAdvantageCalculation:
-				calculateTotalElementAdvantage(allBonusesWithRegister),
+				calculateTotalElementAdvantage(finalBonuses),
 			stabilityCalculation: calculateStability(
 				data.mainWeapon.stability,
 				data.mainWeapon.weaponType,
 				adjustedStatsCalculation,
-				allBonusesWithRegister,
+				finalBonuses,
 				data.subWeapon,
 			),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
-				allBonusesWithRegister,
+				finalBonuses,
 			),
 			adjustedStatsCalculation,
 		}
@@ -331,7 +335,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	])
 
 	const {
-		allBonuses: allBonusesWithRegister,
+		allBonuses: finalBonuses,
 		equipmentBonuses: calculatedEquipmentBonuses,
 		hpCalculation,
 		mpCalculation,
@@ -365,7 +369,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		atkCalculation.totalWeaponATK, // 手甲用の総武器ATK
 		baseStats, // 基礎ステータス（MATKアップ用）
 		adjustedStatsCalculation, // 補正後ステータス（ステータスMATK用）
-		allBonusesWithRegister, // レジスタ効果込みのボーナスを使用
+		finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
 	)
 
 	// デバッグ: equipmentBonus1の各プロパティを確認

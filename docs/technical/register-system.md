@@ -281,7 +281,7 @@ interface CalculatorStore {
 #### 実装方式
 最大HPアップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
 
-1. **StatusPreviewでの統合**: レジスタ効果を`allBonusesWithRegister`に追加
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
 2. **基本ステータス計算**: HP計算で統合済みのボーナス値を使用
 3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
 
@@ -299,30 +299,30 @@ interface CalculatorStore {
 HP = INT(INT(93+(補正後VIT+22.41)*Lv/3)*(1+HP%/100))+HP固定値
 ```
 
-レジスタ効果はStatusPreviewで`allBonusesWithRegister`として統合され、HP計算に適用されます。
+レジスタ効果はStatusPreviewで`finalBonuses`として統合され、HP計算に適用されます。
 
 #### 実装詳細
 StatusPreview.tsxで以下のような統合処理が行われます：
 
 ```typescript
 // レジスタ効果を含むボーナス値を作成
-const allBonusesWithRegister = { ...allBonuses }
+const finalBonuses = { ...allBonuses }
 if (data.register?.effects) {
   const maxHpUpEffect = data.register.effects.find(effect => 
     effect.type === 'maxHpUp' && effect.isEnabled
   )
   if (maxHpUpEffect) {
-    allBonusesWithRegister.HP = (allBonusesWithRegister.HP || 0) + (maxHpUpEffect.level * 10)
+    finalBonuses.HP = (finalBonuses.HP || 0) + (maxHpUpEffect.level * 10)
   }
 }
 
 // HP計算でレジスタ効果込みのボーナスを使用
-hpCalculation: calculateHP(baseStats, allBonusesWithRegister)
+hpCalculation: calculateHP(baseStats, finalBonuses)
 
 // 装備品補正値もレジスタ効果込みのボーナスから生成
 equipmentBonuses: calculateEquipmentBonuses(
   equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses
-) // allBonusesWithRegisterを基に計算される
+) // finalBonusesを基に計算される
 ```
 
 #### StatusPreviewでの表示
@@ -410,7 +410,7 @@ export const createInitialRegisterData = (): RegisterFormData => ({
 #### 実装方式
 最大MPアップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
 
-1. **StatusPreviewでの統合**: レジスタ効果を`allBonusesWithRegister`に追加
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
 2. **基本ステータス計算**: MP計算で統合済みのボーナス値を使用
 3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
 
@@ -428,30 +428,30 @@ export const createInitialRegisterData = (): RegisterFormData => ({
 MP = INT(INT(Lv+99+TEC+補正後INT/10)*(1+MP%/100))+MP固定値
 ```
 
-レジスタ効果はStatusPreviewで`allBonusesWithRegister`として統合され、MP計算に適用されます。
+レジスタ効果はStatusPreviewで`finalBonuses`として統合され、MP計算に適用されます。
 
 #### 実装詳細
 StatusPreview.tsxで以下のような統合処理が行われます：
 
 ```typescript
 // レジスタ効果を含むボーナス値を作成
-const allBonusesWithRegister = { ...allBonuses }
+const finalBonuses = { ...allBonuses }
 if (data.register?.effects) {
   const maxMpUpEffect = data.register.effects.find(effect => 
     effect.type === 'maxMpUp' && effect.isEnabled
   )
   if (maxMpUpEffect) {
-    allBonusesWithRegister.MP = (allBonusesWithRegister.MP || 0) + (maxMpUpEffect.level * 1)
+    finalBonuses.MP = (finalBonuses.MP || 0) + (maxMpUpEffect.level * 1)
   }
 }
 
 // MP計算でレジスタ効果込みのボーナスを使用
-mpCalculation: calculateMP(baseStats, allBonusesWithRegister)
+mpCalculation: calculateMP(baseStats, finalBonuses)
 
 // 装備品補正値もレジスタ効果込みのボーナスから生成
 equipmentBonuses: calculateEquipmentBonuses(
   equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses
-) // allBonusesWithRegisterを基に計算される
+) // finalBonusesを基に計算される
 ```
 
 #### StatusPreviewでの表示
@@ -474,7 +474,7 @@ equipmentBonuses: calculateEquipmentBonuses(
 #### 実装方式
 物理攻撃アップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
 
-1. **StatusPreviewでの統合**: レジスタ効果を`allBonusesWithRegister`に追加
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
 2. **基本ステータス計算**: ATK計算で統合済みのボーナス値を使用
 3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
 
@@ -490,25 +490,25 @@ equipmentBonuses: calculateEquipmentBonuses(
 #### ATK計算への統合
 物理攻撃アップ効果は装備品補正値1のATK固定値として適用され、基本ステータスのATK計算に反映されます。
 
-レジスタ効果はStatusPreviewで`allBonusesWithRegister`として統合され、ATK計算に適用されます。
+レジスタ効果はStatusPreviewで`finalBonuses`として統合され、ATK計算に適用されます。
 
 #### 実装詳細
 StatusPreview.tsxで以下のような統合処理が行われます：
 
 ```typescript
 // レジスタ効果を含むボーナス値を作成
-const allBonusesWithRegister = { ...allBonuses }
+const finalBonuses = { ...allBonuses }
 if (data.register?.effects) {
   const physicalAttackUpEffect = data.register.effects.find(effect => 
     effect.type === 'physicalAttackUp' && effect.isEnabled
   )
   if (physicalAttackUpEffect) {
-    allBonusesWithRegister.ATK = (allBonusesWithRegister.ATK || 0) + (physicalAttackUpEffect.level * 1)
+    finalBonuses.ATK = (finalBonuses.ATK || 0) + (physicalAttackUpEffect.level * 1)
   }
 }
 
 // 装備品補正値もレジスタ効果込みのボーナスから生成
-equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister)
+equipmentBonuses: calculateEquipmentBonuses(finalBonuses)
 ```
 
 #### StatusPreviewでの表示
@@ -531,7 +531,7 @@ equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister)
 ### 実装方式
 魔法攻撃アップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
 
-1. **StatusPreviewでの統合**: レジスタ効果を`allBonusesWithRegister`に追加
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
 2. **基本ステータス計算**: MATK計算で統合済みのボーナス値を使用
 3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
 
@@ -547,11 +547,11 @@ equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister)
 ### MATK計算への統合
 魔法攻撃アップ効果は装備品補正値1のMATK固定値として適用され、基本ステータスのMATK計算に反映されます。
 
-**重要**: MATK計算には`allBonusesWithRegister`（レジスタ効果込み）を渡す必要があります。
+**重要**: MATK計算には`finalBonuses`（全ての効果を統合した最終ボーナス値）を渡す必要があります。
 
-**修正前の問題**: `calculateMATK`関数に`allBonuses`（レジスタ効果なし）が渡されていたため、魔法攻撃アップ効果が基本ステータスのMATKに反映されませんでした。
+**修正前の問題**: `calculateMATK`関数に`allBonuses`（基本ボーナスのみ）が渡されていたため、魔法攻撃アップ効果が基本ステータスのMATKに反映されませんでした。
 
-**修正後**: `calculateMATK`関数に`allBonusesWithRegister`を渡すことで、レジスタ効果がMATK固定値として正しく適用されます。
+**修正後**: `calculateMATK`関数に`finalBonuses`を渡すことで、レジスタ効果がMATK固定値として正しく適用されます。
 
 ### 問題解決の実装詳細
 
@@ -560,13 +560,13 @@ equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister)
 // useMemo内
 const calculationResults = useMemo(() => {
   const allBonuses = aggregateAllBonuses(...)
-  const allBonusesWithRegister = { ...allBonuses }
-  // レジスタ効果を allBonusesWithRegister に追加
-  return { /* allBonusesWithRegister含まず */ }
+  const finalBonuses = { ...allBonuses }
+  // レジスタ効果を finalBonuses に追加
+  return { /* finalBonuses含まず */ }
 }, [...])
 
 // useMemo外
-const matkCalculation = calculateMATK(..., allBonuses) // レジスタ効果なし
+const matkCalculation = calculateMATK(..., allBonuses) // 基本ボーナスのみ
 ```
 
 #### 修正後の構造
@@ -574,38 +574,49 @@ const matkCalculation = calculateMATK(..., allBonuses) // レジスタ効果な�
 // useMemo内
 const calculationResults = useMemo(() => {
   const allBonuses = aggregateAllBonuses(...)
-  const allBonusesWithRegister = { ...allBonuses }
-  // レジスタ効果を allBonusesWithRegister に追加
+  const finalBonuses = { ...allBonuses }
+  // レジスタ効果を finalBonuses に追加
   return { 
-    allBonuses: allBonusesWithRegister, // レジスタ効果込み
-    // その他の計算結果も allBonusesWithRegister を使用
+    allBonuses: finalBonuses, // 全ての効果を統合した最終ボーナス値
+    // その他の計算結果も finalBonuses を使用
   }
 }, [...])
 
 // useMemo外
-const { allBonuses: allBonusesWithRegister } = calculationResults
-const matkCalculation = calculateMATK(..., allBonusesWithRegister) // レジスタ効果込み
+const { allBonuses: finalBonuses } = calculationResults
+const matkCalculation = calculateMATK(..., finalBonuses) // 全ての効果込み
 ```
 
 これによりMATK計算式の「MATK固定値」部分にレジスタの魔法攻撃アップ効果が正しく反映され、基本ステータスのMATKに変化が現れるようになりました。
+
+### 命名の変更について
+
+`finalBonuses`という名前は将来的な拡張性を考慮して選択されました：
+
+- **レジスタ効果**: 現在実装済み
+- **ギルド料理効果**: 将来実装予定
+- **バフスキル効果**: 将来実装予定  
+- **その他の効果**: 将来実装予定
+
+この命名により、どのような効果が追加されても一貫した構造を維持できます。
 
 ### 実装詳細
 StatusPreview.tsxで以下のような統合処理が行われます：
 
 ```typescript
 // レジスタ効果を含むボーナス値を作成
-const allBonusesWithRegister = { ...allBonuses }
+const finalBonuses = { ...allBonuses }
 if (data.register?.effects) {
   const magicalAttackUpEffect = data.register.effects.find(effect => 
     effect.type === 'magicalAttackUp' && effect.isEnabled
   )
   if (magicalAttackUpEffect) {
-    allBonusesWithRegister.MATK = (allBonusesWithRegister.MATK || 0) + (magicalAttackUpEffect.level * 1)
+    finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicalAttackUpEffect.level * 1)
   }
 }
 
 // 装備品補正値もレジスタ効果込みのボーナスから生成
-equipmentBonuses: calculateEquipmentBonuses(allBonusesWithRegister)
+equipmentBonuses: calculateEquipmentBonuses(finalBonuses)
 ```
 
 ### StatusPreviewでの表示
@@ -626,7 +637,7 @@ if (data.register?.effects) {
     effect.type === 'maxHpUp' && effect.isEnabled
   )
   if (maxHpUpEffect) {
-    allBonusesWithRegister.HP = (allBonusesWithRegister.HP || 0) + (maxHpUpEffect.level * 10)
+    finalBonuses.HP = (finalBonuses.HP || 0) + (maxHpUpEffect.level * 10)
   }
 
   // 最大MPアップ
@@ -634,7 +645,7 @@ if (data.register?.effects) {
     effect.type === 'maxMpUp' && effect.isEnabled
   )
   if (maxMpUpEffect) {
-    allBonusesWithRegister.MP = (allBonusesWithRegister.MP || 0) + (maxMpUpEffect.level * 1)
+    finalBonuses.MP = (finalBonuses.MP || 0) + (maxMpUpEffect.level * 1)
   }
 
   // 物理攻撃アップ
@@ -642,7 +653,7 @@ if (data.register?.effects) {
     effect.type === 'physicalAttackUp' && effect.isEnabled
   )
   if (physicalAttackUpEffect) {
-    allBonusesWithRegister.ATK = (allBonusesWithRegister.ATK || 0) + (physicalAttackUpEffect.level * 1)
+    finalBonuses.ATK = (finalBonuses.ATK || 0) + (physicalAttackUpEffect.level * 1)
   }
 
   // 魔法攻撃アップ
@@ -650,7 +661,7 @@ if (data.register?.effects) {
     effect.type === 'magicalAttackUp' && effect.isEnabled
   )
   if (magicalAttackUpEffect) {
-    allBonusesWithRegister.MATK = (allBonusesWithRegister.MATK || 0) + (magicalAttackUpEffect.level * 1)
+    finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicalAttackUpEffect.level * 1)
   }
 }
 ```
