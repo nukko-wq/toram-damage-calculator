@@ -283,6 +283,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				data.mainWeapon.weaponType,
 				adjustedStatsCalculation,
 				allBonuses,
+				data.subWeapon,
 			),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
@@ -443,10 +444,16 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		MATK: matkCalculation.finalMATK, // MATK計算結果
 		baseMATK: matkCalculation.baseMATK, // 基本MATK計算結果
 		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
-		// サブ安定率は常時表示（双剣以外は null で - 表示）
-		subStabilityRate: data.mainWeapon.weaponType === '双剣' && subATKCalculation
-			? subATKCalculation.subStability // サブ安定率（計算後）
-			: null, // 非双剣時は null で - 表示
+		// サブ安定率は常時表示（双剣・弓+矢以外は null で - 表示）
+		subStabilityRate: (() => {
+			if (data.mainWeapon.weaponType === '双剣' && subATKCalculation) {
+				return subATKCalculation.subStability // サブ安定率（計算後）
+			}
+			if ((data.mainWeapon.weaponType === '弓' || data.mainWeapon.weaponType === '自動弓') && data.subWeapon.weaponType === '矢') {
+				return data.subWeapon.stability // 矢の安定率をそのまま表示
+			}
+			return null // その他は null で - 表示
+		})(),
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
 		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率

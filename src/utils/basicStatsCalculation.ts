@@ -181,6 +181,7 @@ export interface StabilityCalculationSteps {
 	weaponStability: number // メイン武器の安定率
 	statusStability: number // ステータス安定率
 	stabilityPercent: number // 安定率%補正
+	arrowStability: number // 矢の安定率（弓+矢時のみ）
 	stabilityBeforeLimit: number // 制限適用前の安定率
 	finalStability: number // 最終安定率（0-100制限適用後）
 }
@@ -1611,6 +1612,7 @@ export function calculateStability(
 	weaponType: WeaponTypeEnum,
 	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
+	subWeapon?: { weaponType: string; stability: number },
 ): StabilityCalculationSteps {
 	// 1. 武器種別によるステータス安定率計算
 	const weaponTypeKey = getWeaponTypeKey(weaponType)
@@ -1620,11 +1622,15 @@ export function calculateStability(
 	// 2. 安定率%補正取得（3データソース：装備・クリスタ・バフアイテム）
 	const stabilityPercent = bonuses.Stability_Rate || 0
 
-	// 3. 制限適用前の安定率計算
-	const stabilityBeforeLimit =
-		weaponStability + statusStability + stabilityPercent
+	// 3. 弓+矢の場合の矢の安定率取得
+	const isBowArrowCombo = (weaponType === '弓' || weaponType === '自動弓') && subWeapon?.weaponType === '矢'
+	const arrowStability = isBowArrowCombo ? subWeapon.stability : 0
 
-	// 4. 0-100%制限適用と小数点切り捨て
+	// 4. 制限適用前の安定率計算
+	const stabilityBeforeLimit =
+		weaponStability + statusStability + stabilityPercent + arrowStability
+
+	// 5. 0-100%制限適用と小数点切り捨て
 	const finalStability = Math.floor(
 		Math.max(0, Math.min(100, stabilityBeforeLimit)),
 	)
@@ -1633,6 +1639,7 @@ export function calculateStability(
 		weaponStability,
 		statusStability,
 		stabilityPercent,
+		arrowStability,
 		stabilityBeforeLimit,
 		finalStability,
 	}
