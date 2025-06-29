@@ -1059,3 +1059,67 @@ if (data.register?.effects) {
 
 1. **おいしい食材取引(deliciousIngredientTrade)** - HP上限値向上（装備品補正値1のHP(+)に加算、レベル×100）
 2. **新鮮な果物取引(freshFruitTrade)** - MP上限値向上（装備品補正値1のMP(+)に加算、レベル×10）
+
+## データ移行システム
+
+### 移行の必要性
+レジスタシステムに新しい効果（特にギルド料理効果）が追加された際、既存ユーザーのセーブデータには新効果が含まれていないため、UIで表示されない問題が発生する。
+
+### 移行機能の実装
+
+#### migrateRegisterEffects関数
+```typescript
+// レジスタ効果の移行用関数（既存セーブデータに新効果を追加）
+export const migrateRegisterEffects = (existingData: RegisterFormData): RegisterFormData => {
+  const currentEffects = createInitialRegisterFormData().effects
+  const existingEffects = existingData.effects || []
+  
+  // 既存効果をIDでマップ化
+  const existingEffectMap = new Map(existingEffects.map(effect => [effect.id, effect]))
+  
+  // 新しい効果配列を作成（既存効果を保持し、不足分を補完）
+  const migratedEffects = currentEffects.map(currentEffect => {
+    // 既存データにある場合はそれを使用、ない場合は新規効果を追加
+    return existingEffectMap.get(currentEffect.id) || currentEffect
+  })
+  
+  return { effects: migratedEffects }
+}
+```
+
+#### 移行実行タイミング
+1. **アプリ初期化時** (`calculatorStore.initialize()`)
+   ```typescript
+   // レジスタ効果の移行（新効果があれば追加）
+   const migratedData = { ...currentSave.data }
+   if (migratedData.register) {
+     migratedData.register = migrateRegisterEffects(migratedData.register)
+   }
+   ```
+
+2. **セーブデータ読み込み時** (`calculatorStore.loadSaveData()`)
+   ```typescript
+   const validData = isValidCalculatorData(data)
+     ? (() => {
+         // 既存データのレジスタ効果を移行（新効果があれば追加）
+         const migratedData = { ...data }
+         if (migratedData.register) {
+           migratedData.register = migrateRegisterEffects(migratedData.register)
+         }
+         return migratedData
+       })()
+     : createInitialCalculatorData()
+   ```
+
+### 移行の動作仕様
+- **既存効果の保持**: ユーザーが設定した既存のレジスタ効果（レベル、有効/無効状態）は完全に保持
+- **新効果の追加**: 不足している新しい効果はデフォルト値（無効状態、標準レベル）で自動追加
+- **透明な実行**: ユーザーからは見えない形でバックグラウンドで実行
+- **冪等性**: 複数回実行しても同じ結果になる安全な設計
+
+### 移行対象効果
+現在の移行システムで自動追加される効果：
+- `deliciousIngredientTrade` (おいしい食材取引)
+- `freshFruitTrade` (新鮮な果物取引)
+
+今後新しいレジスタ効果が追加された場合も、`createInitialRegisterFormData()`に定義するだけで自動的に移行対象となる。
