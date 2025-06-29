@@ -118,6 +118,34 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			if (magicAttackUpEffect) {
 				finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicAttackUpEffect.level * 1)
 			}
+
+			const accuracyUpEffect = data.register.effects.find(effect => 
+				effect.type === 'accuracyUp' && effect.isEnabled
+			)
+			if (accuracyUpEffect) {
+				finalBonuses.Accuracy = (finalBonuses.Accuracy || 0) + (accuracyUpEffect.level * 1)
+			}
+
+			const evasionUpEffect = data.register.effects.find(effect => 
+				effect.type === 'evasionUp' && effect.isEnabled
+			)
+			if (evasionUpEffect) {
+				finalBonuses.Dodge = (finalBonuses.Dodge || 0) + (evasionUpEffect.level * 1)
+			}
+
+			const attackSpeedUpEffect = data.register.effects.find(effect => 
+				effect.type === 'attackSpeedUp' && effect.isEnabled
+			)
+			if (attackSpeedUpEffect) {
+				finalBonuses.AttackSpeed = (finalBonuses.AttackSpeed || 0) + (attackSpeedUpEffect.level * 1)
+			}
+
+			const magicalSpeedUpEffect = data.register.effects.find(effect => 
+				effect.type === 'magicalSpeedUp' && effect.isEnabled
+			)
+			if (magicalSpeedUpEffect) {
+				finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
+			}
 		}
 
 		// TODO: 将来的にギルド料理効果、バフスキル効果もここに統合

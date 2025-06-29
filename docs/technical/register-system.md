@@ -628,6 +628,146 @@ equipmentBonuses: calculateEquipmentBonuses(finalBonuses)
 - 他の装備・クリスタ・料理・バフアイテムのMATK補正と同等に扱われる
 - 装備品補正値1の計算順序は既存システムに従う
 
+## 命中アップ（accuracyUp）
+
+### 基本仕様
+- **効果**: キャラクターの命中率を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1の命中(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+命中アップ効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: HIT計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- accuracyUpレベル: 20 (有効)
+- 既存の装備品補正値1の命中(+): 150 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. accuracyUp効果: 20 × 1 = 20
+2. **装備品補正値1の命中(+)合計**: 150 + 20 = 170
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const accuracyUpEffect = data.register.effects.find(effect => 
+  effect.type === 'accuracyUp' && effect.isEnabled
+)
+if (accuracyUpEffect) {
+  finalBonuses.Accuracy = (finalBonuses.Accuracy || 0) + (accuracyUpEffect.level * 1)
+}
+```
+
+## 回避アップ（evasionUp）
+
+### 基本仕様
+- **効果**: キャラクターの回避率を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1の回避(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+回避アップ効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: FLEE計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- evasionUpレベル: 18 (有効)
+- 既存の装備品補正値1の回避(+): 100 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. evasionUp効果: 18 × 1 = 18
+2. **装備品補正値1の回避(+)合計**: 100 + 18 = 118
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const evasionUpEffect = data.register.effects.find(effect => 
+  effect.type === 'evasionUp' && effect.isEnabled
+)
+if (evasionUpEffect) {
+  finalBonuses.Dodge = (finalBonuses.Dodge || 0) + (evasionUpEffect.level * 1)
+}
+```
+
+## 攻撃速度アップ（attackSpeedUp）
+
+### 基本仕様
+- **効果**: キャラクターの攻撃速度を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のASPD(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+攻撃速度アップ効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: ASPD計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- attackSpeedUpレベル: 25 (有効)
+- 既存の装備品補正値1のASPD(+): 80 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. attackSpeedUp効果: 25 × 1 = 25
+2. **装備品補正値1のASPD(+)合計**: 80 + 25 = 105
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const attackSpeedUpEffect = data.register.effects.find(effect => 
+  effect.type === 'attackSpeedUp' && effect.isEnabled
+)
+if (attackSpeedUpEffect) {
+  finalBonuses.AttackSpeed = (finalBonuses.AttackSpeed || 0) + (attackSpeedUpEffect.level * 1)
+}
+```
+
+## 魔法速度アップ（magicalSpeedUp）
+
+### 基本仕様
+- **効果**: キャラクターの詠唱速度を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のCSPD(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+魔法速度アップ効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: CSPD計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- magicalSpeedUpレベル: 22 (有効)
+- 既存の装備品補正値1のCSPD(+): 60 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. magicalSpeedUp効果: 22 × 1 = 22
+2. **装備品補正値1のCSPD(+)合計**: 60 + 22 = 82
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const magicalSpeedUpEffect = data.register.effects.find(effect => 
+  effect.type === 'magicalSpeedUp' && effect.isEnabled
+)
+if (magicalSpeedUpEffect) {
+  finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
+}
+```
+
 ### レジスタ効果統合の全体例
 ```typescript
 // StatusPreview.tsx内でのレジスタ効果統合
@@ -663,19 +803,51 @@ if (data.register?.effects) {
   if (magicalAttackUpEffect) {
     finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicalAttackUpEffect.level * 1)
   }
+
+  // 命中アップ
+  const accuracyUpEffect = data.register.effects.find(effect => 
+    effect.type === 'accuracyUp' && effect.isEnabled
+  )
+  if (accuracyUpEffect) {
+    finalBonuses.Accuracy = (finalBonuses.Accuracy || 0) + (accuracyUpEffect.level * 1)
+  }
+
+  // 回避アップ
+  const evasionUpEffect = data.register.effects.find(effect => 
+    effect.type === 'evasionUp' && effect.isEnabled
+  )
+  if (evasionUpEffect) {
+    finalBonuses.Dodge = (finalBonuses.Dodge || 0) + (evasionUpEffect.level * 1)
+  }
+
+  // 攻撃速度アップ
+  const attackSpeedUpEffect = data.register.effects.find(effect => 
+    effect.type === 'attackSpeedUp' && effect.isEnabled
+  )
+  if (attackSpeedUpEffect) {
+    finalBonuses.AttackSpeed = (finalBonuses.AttackSpeed || 0) + (attackSpeedUpEffect.level * 1)
+  }
+
+  // 魔法速度アップ
+  const magicalSpeedUpEffect = data.register.effects.find(effect => 
+    effect.type === 'magicalSpeedUp' && effect.isEnabled
+  )
+  if (magicalSpeedUpEffect) {
+    finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
+  }
 }
 ```
 
 ## レジスタレット効果一覧
 
 1. **物理攻撃アップ(physicalAttackUp)** - 物理攻撃力向上（装備品補正値1のATK(+)に加算）
-2. **魔法攻撃アップ** - 魔法攻撃力向上
+2. **魔法攻撃アップ(magicalAttackUp)** - 魔法攻撃力向上（装備品補正値1のMATK(+)に加算）
 3. **最大HPアップ(maxHpUp)** - HP上限値向上（装備品補正値1のHP(+)に加算）
 4. **最大MPアップ(maxMpUp)** - MP上限値向上（装備品補正値1のMP(+)に加算）
-5. **命中アップ** - 命中率向上
-6. **回避アップ** - 回避率向上
-7. **攻撃速度アップ** - 攻撃速度向上
-8. **魔法速度アップ** - 詠唱速度向上
+5. **命中アップ(accuracyUp)** - 命中率向上（装備品補正値1の命中(+)に加算）
+6. **回避アップ(evasionUp)** - 回避率向上（装備品補正値1の回避(+)に加算）
+7. **攻撃速度アップ(attackSpeedUp)** - 攻撃速度向上（装備品補正値1のASPD(+)に加算）
+8. **魔法速度アップ(magicalSpeedUp)** - 詠唱速度向上（装備品補正値1のCSPD(+)に加算）
 9. **運命共同体** - パーティメンバー数に応じた特殊効果
 10. **虚無の構え** - 特殊戦闘効果
 11. **魔矢の追跡** - 魔法矢系効果
