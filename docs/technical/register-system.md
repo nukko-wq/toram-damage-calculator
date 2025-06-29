@@ -394,12 +394,71 @@ export const createInitialRegisterData = (): RegisterFormData => ({
 })
 ```
 
+### 最大MPアップ（maxMpUp）
+
+#### 基本仕様
+- **効果**: キャラクターの最大MPを増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のMP(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-100（想定）
+
+#### 実装方式
+最大MPアップ効果は装備品補正値1システムに統合され、以下の流れで適用されます：
+
+1. **プロパティ変換**: レジスタ効果を`EquipmentProperties.MP`として変換
+2. **装備品補正値1統合**: 他の装備・クリスタ・料理・バフアイテムのMP補正と合算
+3. **MP計算適用**: 既存のMP計算式でMP固定値として使用
+
+#### 計算例
+**入力値:**
+- maxMpUpレベル: 50 (有効)
+- 既存の装備品補正値1のMP(+): 200 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. maxMpUp効果: 50 × 1 = 50
+2. **装備品補正値1のMP(+)合計**: 200 + 50 = 250
+
+#### MP計算への統合
+```
+MP = INT(INT(Lv+99+TEC+補正後INT/10)*(1+MP%/100))+MP固定値
+```
+
+レジスタ効果はStatusPreviewで`allBonusesWithRegister`として統合され、MP計算に適用されます。
+
+#### 実装詳細
+StatusPreview.tsxで以下のような統合処理が行われます：
+
+```typescript
+// レジスタ効果を含むボーナス値を作成
+const allBonusesWithRegister = { ...allBonuses }
+if (data.register?.effects) {
+  const maxMpUpEffect = data.register.effects.find(effect => 
+    effect.type === 'maxMpUp' && effect.isEnabled
+  )
+  if (maxMpUpEffect) {
+    allBonusesWithRegister.MP = (allBonusesWithRegister.MP || 0) + (maxMpUpEffect.level * 1)
+  }
+}
+
+// MP計算でレジスタ効果込みのボーナスを使用
+mpCalculation: calculateMP(baseStats, allBonusesWithRegister)
+```
+
+#### StatusPreviewでの表示
+- **基本ステータス**: MP値にレジスタ効果が自動的に反映される
+- **装備品補正値1**: MP(+)項目にレジスタ効果が含まれた値が表示される
+
+#### 重要な注意点
+- レジスタが無効の場合、効果は0として計算される
+- 他の装備・クリスタ・料理・バフアイテムのMP補正と同等に扱われる
+- 装備品補正値1の計算順序は既存システムに従う
+
 ## レジスタレット効果一覧
 
 1. **物理攻撃アップ** - 物理攻撃力向上
 2. **魔法攻撃アップ** - 魔法攻撃力向上
-3. **最大HPアップ(maxHPUp)** - HP上限値向上（装備品補正値1のHP(+)に加算）
-4. **最大MP増加** - MP上限値向上
+3. **最大HPアップ(maxHpUp)** - HP上限値向上（装備品補正値1のHP(+)に加算）
+4. **最大MPアップ(maxMpUp)** - MP上限値向上（装備品補正値1のMP(+)に加算）
 5. **命中アップ** - 命中率向上
 6. **回避アップ** - 回避率向上
 7. **攻撃速度アップ** - 攻撃速度向上

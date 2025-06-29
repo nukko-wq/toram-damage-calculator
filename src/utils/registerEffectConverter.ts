@@ -25,8 +25,8 @@ export function convertRegisterEffectsToProperties(
 				break
 			
 			case 'maxMpUp':
-				// 最大MPアップ: レベル × 5 を MP固定値に加算
-				properties.MP = (properties.MP || 0) + (effect.level * 5)
+				// 最大MPアップ: レベル × 1 を MP固定値に加算
+				properties.MP = (properties.MP || 0) + (effect.level * 1)
 				break
 			
 			case 'physicalAttackUp':
@@ -98,7 +98,7 @@ export function getRegisterEffectValue(
 		case 'maxHpUp':
 			return effect.level * 10
 		case 'maxMpUp':
-			return effect.level * 5
+			return effect.level * 1
 		case 'physicalAttackUp':
 		case 'magicalAttackUp':
 		case 'accuracyUp':

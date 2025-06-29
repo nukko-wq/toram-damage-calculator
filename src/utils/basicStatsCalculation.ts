@@ -764,12 +764,20 @@ export function calculateEquipmentBonuses(
 	
 	// レジスタ効果をプロパティに変換（簡易実装）
 	let registerHPBonus = 0
-	if (registerData && registerData.effects) {
+	let registerMPBonus = 0
+	if (registerData?.effects) {
 		const maxHpUpEffect = registerData.effects.find((effect: any) => 
 			effect.type === 'maxHpUp' && effect.isEnabled
 		)
 		if (maxHpUpEffect) {
 			registerHPBonus = maxHpUpEffect.level * 10
+		}
+
+		const maxMpUpEffect = registerData.effects.find((effect: any) => 
+			effect.type === 'maxMpUp' && effect.isEnabled
+		)
+		if (maxMpUpEffect) {
+			registerMPBonus = maxMpUpEffect.level * 1
 		}
 	}
 
@@ -819,7 +827,7 @@ export function calculateEquipmentBonuses(
 		accuracy_Rate: allBonuses.Accuracy_Rate || 0,
 		dodge: allBonuses.Dodge || 0,
 		dodge_Rate: allBonuses.Dodge_Rate || 0,
-		MP: allBonuses.MP || 0,
+		MP: (allBonuses.MP || 0) + registerMPBonus, // レジスタのmaxMpUp効果を加算
 		MP_Rate: allBonuses.MP_Rate || 0,
 		attackMPRecovery: allBonuses.AttackMPRecovery || 0,
 		attackMPRecovery_Rate: allBonuses.AttackMPRecovery_Rate || 0,

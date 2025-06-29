@@ -95,6 +95,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			if (maxHpUpEffect) {
 				allBonusesWithRegister.HP = (allBonusesWithRegister.HP || 0) + (maxHpUpEffect.level * 10)
 			}
+
+			const maxMpUpEffect = data.register.effects.find(effect => 
+				effect.type === 'maxMpUp' && effect.isEnabled
+			)
+			if (maxMpUpEffect) {
+				allBonusesWithRegister.MP = (allBonusesWithRegister.MP || 0) + (maxMpUpEffect.level * 1)
+			}
 		}
 
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
