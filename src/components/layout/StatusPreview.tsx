@@ -431,12 +431,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		MP: mpCalculation.finalMP,
 		ATK: atkCalculation.finalATK, // 武器種別ATK計算結果
 		baseATK: Math.floor(atkCalculation.baseATK), // 基礎ATK（表示時のみ小数点以下切り捨て）
-		subATK: subATKCalculation
-			? subATKCalculation.subFinalATK
-			: data.subWeapon.ATK, // 双剣時は計算値、その他は武器ATK
-		subBaseATK: subATKCalculation
-			? Math.floor(subATKCalculation.subBaseATK)
-			: 0, // 双剣時は計算値、その他は0
+		// サブATKとサブ基礎ATKは双剣の場合のみ計算、他は null で - 表示
+		subATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation
+			? subATKCalculation.subFinalATK // 双剣時は計算値
+			: null, // 非双剣時は null で - 表示
+		subBaseATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation
+			? Math.floor(subATKCalculation.subBaseATK) // 双剣時は計算値
+			: null, // 非双剣時は null で - 表示
 		totalATK: 0, // TODO: 総ATK計算
 		bringerAM: 0, // TODO: ブリンガーAM計算
 		MATK: matkCalculation.finalMATK, // MATK計算結果
@@ -553,8 +554,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								MP: 'MP',
 								ATK: 'ATK',
 								baseATK: '基礎ATK',
-								subATK: 'サブATK',
-								subBaseATK: 'サブ基礎ATK',
+								subATK: 'サブATK', // 常時表示（ラベル位置統一のため）
+								subBaseATK: 'サブ基礎ATK', // 常時表示（ラベル位置統一のため）
 								totalATK: '総ATK',
 								bringerAM: 'ブリンガーAM',
 								MATK: 'MATK',
