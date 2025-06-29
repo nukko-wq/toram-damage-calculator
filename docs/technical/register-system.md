@@ -198,22 +198,24 @@ export default function RegisterLevelModal({
   return (
     <Modal isOpen={isOpen} onClose={onCancel}>
       <div className="p-6 space-y-4">
-        <h3 className="text-lg font-medium">{effect?.name} - レベル設定</h3>
+        <h3 className="text-lg font-medium">{effect?.name}</h3>
         
-        {/* レベル入力 */}
-        <div>
-          <label className="block text-sm font-medium mb-1">レベル</label>
-          <input
-            type="number"
-            min="1"
-            max={effect?.maxLevel || 30}
-            value={level}
-            onChange={(e) => setLevel(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
+        {/* レベル入力（運命共同体以外のみ表示） */}
+        {!isFatefulCompanionship && (
+          <div>
+            <label className="block text-sm font-medium mb-1">レベル</label>
+            <input
+              type="number"
+              min="1"
+              max={effect?.maxLevel || 30}
+              value={level}
+              onChange={(e) => setLevel(Number(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
+        )}
         
-        {/* 運命共同体専用：パーティメンバー数 */}
+        {/* 運命共同体専用：パーティメンバー数のみ */}
         {isFatefulCompanionship && (
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -239,7 +241,10 @@ export default function RegisterLevelModal({
             キャンセル
           </button>
           <button 
-            onClick={() => onConfirm(level, isFatefulCompanionship ? partyMembers : undefined)}
+            onClick={() => onConfirm(
+              isFatefulCompanionship ? 1 : level, // 運命共同体は常にレベル1
+              isFatefulCompanionship ? partyMembers : undefined
+            )}
             className="px-4 py-2 bg-blue-500 text-white rounded-md"
           >
             確定
@@ -835,7 +840,104 @@ if (data.register?.effects) {
   if (magicalSpeedUpEffect) {
     finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
   }
+
+  // 運命共同体
+  const fateCompanionshipEffect = data.register.effects.find(effect => 
+    effect.type === 'fateCompanionship' && effect.isEnabled
+  )
+  if (fateCompanionshipEffect) {
+    const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
+    finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
+    finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
+  }
 }
+```
+
+## 運命共同体（fateCompanionship）
+
+### 基本仕様
+- **効果**: パーティメンバー数に応じてATK%とMATK%を増加させる
+- **計算方法**: `パーティメンバー数（1-3） × 1` を装備品補正値1のATK(%)とMATK(%)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル**: 1で固定（レベル入力フォーム不要）
+- **パーティメンバー数**: 1-3人（自分以外のパーティメンバー数）
+
+### 実装方式
+運命共同体効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: ATK%とMATK%として統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- fateCompanionshipが有効
+- パーティメンバー数: 3人
+- 既存の装備品補正値1のATK(%): 20% (装備+クリスタ+料理+バフアイテム)
+- 既存の装備品補正値1のMATK(%): 15% (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. fateCompanionship効果: 3 × 1 = 3%
+2. **装備品補正値1のATK(%)合計**: 20% + 3% = 23%
+3. **装備品補正値1のMATK(%)合計**: 15% + 3% = 18%
+
+### 特殊な仕様
+- **レベル固定**: 運命共同体のレベルは常に1（入力不要）
+- **パーティメンバー数**: 1-3人の範囲で設定可能
+- **双方同時適用**: ATK%とMATK%の両方に同じ値が加算される
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const fateCompanionshipEffect = data.register.effects.find(effect => 
+  effect.type === 'fateCompanionship' && effect.isEnabled
+)
+if (fateCompanionshipEffect) {
+  const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
+  finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
+  finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
+}
+```
+
+### データ構造
+```typescript
+interface RegisterEffect {
+  id: string
+  name: string
+  type: 'fateCompanionship'
+  isEnabled: boolean
+  level: 1 // 常に1で固定
+  maxLevel: 1 // 常に1で固定
+  partyMembers: number // 1-3の範囲
+  maxPartyMembers: 3 // 最大3人
+}
+```
+
+### UI仕様
+- **モーダルタイトル**: レジスタ名のみ（例: "運命共同体"）
+- **レベル入力フィールド**: 非表示（他のレジスタ効果のみ表示）
+- **パーティメンバー数入力**: 1-3の数値入力フィールド
+- **確定ボタン**: 常にレベル1で送信
+- **表示**: "運命共同体 (パーティメンバー数: 3人)" のような形式
+
+### モーダルの条件分岐
+```typescript
+// モーダル内での条件分岐
+const isFatefulCompanionship = effect?.id === 'fatefulCompanionship'
+
+// タイトルはレジスタ名のみ
+<h3 className="text-lg font-medium">{effect?.name}</h3>
+
+// レベル入力フィールド分岐
+{!isFatefulCompanionship && (
+  // レベル入力フィールド
+)}
+
+// 確定時の値分岐
+onConfirm(
+  isFatefulCompanionship ? 1 : level, // 運命共同体は常にレベル1
+  isFatefulCompanionship ? partyMembers : undefined
+)
 ```
 
 ## レジスタレット効果一覧
@@ -848,7 +950,7 @@ if (data.register?.effects) {
 6. **回避アップ(evasionUp)** - 回避率向上（装備品補正値1の回避(+)に加算）
 7. **攻撃速度アップ(attackSpeedUp)** - 攻撃速度向上（装備品補正値1のASPD(+)に加算）
 8. **魔法速度アップ(magicalSpeedUp)** - 詠唱速度向上（装備品補正値1のCSPD(+)に加算）
-9. **運命共同体** - パーティメンバー数に応じた特殊効果
+9. **運命共同体(fateCompanionship)** - パーティメンバー数×1%をATK%とMATK%に加算（レベル1固定）
 10. **虚無の構え** - 特殊戦闘効果
 11. **魔矢の追跡** - 魔法矢系効果
 12. **エアスライド圧縮** - エアスライド系効果

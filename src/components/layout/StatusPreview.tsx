@@ -146,6 +146,15 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			if (magicalSpeedUpEffect) {
 				finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
 			}
+
+			const fateCompanionshipEffect = data.register.effects.find(effect => 
+				effect.type === 'fateCompanionship' && effect.isEnabled
+			)
+			if (fateCompanionshipEffect) {
+				const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
+				finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
+				finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
+			}
 		}
 
 		// TODO: 将来的にギルド料理効果、バフスキル効果もここに統合
