@@ -335,9 +335,9 @@ export const createInitialRegisterFormData = (): RegisterFormData => {
 		},
 		// ギルド料理効果
 		{
-			id: 'deliciousFoodTrade',
+			id: 'deliciousIngredientTrade',
 			name: 'おいしい食材取引',
-			type: 'deliciousFoodTrade',
+			type: 'deliciousIngredientTrade',
 			isEnabled: false,
 			level: 10,
 			maxLevel: 10,
@@ -353,6 +353,23 @@ export const createInitialRegisterFormData = (): RegisterFormData => {
 	]
 
 	return { effects }
+}
+
+// レジスタ効果の移行用関数（既存セーブデータに新効果を追加）
+export const migrateRegisterEffects = (existingData: RegisterFormData): RegisterFormData => {
+	const currentEffects = createInitialRegisterFormData().effects
+	const existingEffects = existingData.effects || []
+	
+	// 既存効果をIDでマップ化
+	const existingEffectMap = new Map(existingEffects.map(effect => [effect.id, effect]))
+	
+	// 新しい効果配列を作成（既存効果を保持し、不足分を補完）
+	const migratedEffects = currentEffects.map(currentEffect => {
+		// 既存データにある場合はそれを使用、ない場合は新規効果を追加
+		return existingEffectMap.get(currentEffect.id) || currentEffect
+	})
+	
+	return { effects: migratedEffects }
 }
 
 export const createInitialCalculatorData = (): CalculatorData => ({

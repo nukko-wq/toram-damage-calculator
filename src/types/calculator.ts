@@ -707,7 +707,7 @@ export type RegisterEffectType =
 	| 'resonancePower' // レゾナンス・火力
 	| 'resonanceAcceleration' // レゾナンス・加速
 	| 'resonanceConcentration' // レゾナンス・集中
-	| 'deliciousFoodTrade' // おいしい食材取引
+	| 'deliciousIngredientTrade' // おいしい食材取引
 	| 'freshFruitTrade' // 新鮮な果物取引
 
 // レジスタ効果データ

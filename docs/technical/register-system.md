@@ -198,22 +198,24 @@ export default function RegisterLevelModal({
   return (
     <Modal isOpen={isOpen} onClose={onCancel}>
       <div className="p-6 space-y-4">
-        <h3 className="text-lg font-medium">{effect?.name} - レベル設定</h3>
+        <h3 className="text-lg font-medium">{effect?.name}</h3>
         
-        {/* レベル入力 */}
-        <div>
-          <label className="block text-sm font-medium mb-1">レベル</label>
-          <input
-            type="number"
-            min="1"
-            max={effect?.maxLevel || 30}
-            value={level}
-            onChange={(e) => setLevel(Number(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
+        {/* レベル入力（運命共同体以外のみ表示） */}
+        {!isFatefulCompanionship && (
+          <div>
+            <label className="block text-sm font-medium mb-1">レベル</label>
+            <input
+              type="number"
+              min="1"
+              max={effect?.maxLevel || 30}
+              value={level}
+              onChange={(e) => setLevel(Number(e.target.value))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
+        )}
         
-        {/* 運命共同体専用：パーティメンバー数 */}
+        {/* 運命共同体専用：パーティメンバー数のみ */}
         {isFatefulCompanionship && (
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -239,7 +241,10 @@ export default function RegisterLevelModal({
             キャンセル
           </button>
           <button 
-            onClick={() => onConfirm(level, isFatefulCompanionship ? partyMembers : undefined)}
+            onClick={() => onConfirm(
+              isFatefulCompanionship ? 1 : level, // 運命共同体は常にレベル1
+              isFatefulCompanionship ? partyMembers : undefined
+            )}
             className="px-4 py-2 bg-blue-500 text-white rounded-md"
           >
             確定
@@ -268,6 +273,72 @@ interface CalculatorStore {
 }
 ```
 
+## レジスタ効果の詳細仕様
+
+### 最大HPアップ（maxHPUp）
+
+#### 基本仕様
+- **効果**: キャラクターの最大HPを増加させる
+- **計算方法**: `レジスタレベル × 10` を装備品補正値1のHP(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+#### 実装方式
+最大HPアップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: HP計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+#### 計算例
+**入力値:**
+- maxHPUpレベル: 5 (有効)
+- 既存の装備品補正値1のHP(+): 500 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. maxHPUp効果: 5 × 10 = 50
+2. **装備品補正値1のHP(+)合計**: 500 + 50 = 550
+
+#### HP計算への統合
+```
+HP = INT(INT(93+(補正後VIT+22.41)*Lv/3)*(1+HP%/100))+HP固定値
+```
+
+レジスタ効果はStatusPreviewで`finalBonuses`として統合され、HP計算に適用されます。
+
+#### 実装詳細
+StatusPreview.tsxで以下のような統合処理が行われます：
+
+```typescript
+// レジスタ効果を含むボーナス値を作成
+const finalBonuses = { ...allBonuses }
+if (data.register?.effects) {
+  const maxHpUpEffect = data.register.effects.find(effect => 
+    effect.type === 'maxHpUp' && effect.isEnabled
+  )
+  if (maxHpUpEffect) {
+    finalBonuses.HP = (finalBonuses.HP || 0) + (maxHpUpEffect.level * 10)
+  }
+}
+
+// HP計算でレジスタ効果込みのボーナスを使用
+hpCalculation: calculateHP(baseStats, finalBonuses)
+
+// 装備品補正値もレジスタ効果込みのボーナスから生成
+equipmentBonuses: calculateEquipmentBonuses(
+  equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses
+) // finalBonusesを基に計算される
+```
+
+#### StatusPreviewでの表示
+- **基本ステータス**: HP値にレジスタ効果が自動的に反映される
+- **装備品補正値1**: HP(+)項目にレジスタ効果が含まれた値が表示される
+
+#### 重要な注意点
+- レジスタが無効の場合、効果は0として計算される
+- 他の装備・クリスタ・料理・バフアイテムのHP補正と同等に扱われる
+- 装備品補正値1の計算順序は既存システムに従う
+
 ## プロパティ変換システム
 
 ### 効果からプロパティへの変換
@@ -286,6 +357,11 @@ export function convertRegisterEffectsToProperties(
   // 魔法攻撃アップ  
   if (registerData.magicalAttackUp.enabled) {
     properties.MATK = (properties.MATK || 0) + registerData.magicalAttackUp.level
+  }
+  
+  // 最大HPアップ（装備品補正値1のHP(+)に加算）
+  if (registerData.maxHPUp.enabled) {
+    properties.HP = (properties.HP || 0) + (registerData.maxHPUp.level * 10)
   }
   
   // 運命共同体（特殊計算）
@@ -328,17 +404,649 @@ export const createInitialRegisterData = (): RegisterFormData => ({
 })
 ```
 
+### 最大MPアップ（maxMpUp）
+
+#### 基本仕様
+- **効果**: キャラクターの最大MPを増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のMP(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-100（想定）
+
+#### 実装方式
+最大MPアップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: MP計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+#### 計算例
+**入力値:**
+- maxMpUpレベル: 50 (有効)
+- 既存の装備品補正値1のMP(+): 200 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. maxMpUp効果: 50 × 1 = 50
+2. **装備品補正値1のMP(+)合計**: 200 + 50 = 250
+
+#### MP計算への統合
+```
+MP = INT(INT(Lv+99+TEC+補正後INT/10)*(1+MP%/100))+MP固定値
+```
+
+レジスタ効果はStatusPreviewで`finalBonuses`として統合され、MP計算に適用されます。
+
+#### 実装詳細
+StatusPreview.tsxで以下のような統合処理が行われます：
+
+```typescript
+// レジスタ効果を含むボーナス値を作成
+const finalBonuses = { ...allBonuses }
+if (data.register?.effects) {
+  const maxMpUpEffect = data.register.effects.find(effect => 
+    effect.type === 'maxMpUp' && effect.isEnabled
+  )
+  if (maxMpUpEffect) {
+    finalBonuses.MP = (finalBonuses.MP || 0) + (maxMpUpEffect.level * 1)
+  }
+}
+
+// MP計算でレジスタ効果込みのボーナスを使用
+mpCalculation: calculateMP(baseStats, finalBonuses)
+
+// 装備品補正値もレジスタ効果込みのボーナスから生成
+equipmentBonuses: calculateEquipmentBonuses(
+  equipmentBonuses, crystalBonuses, foodBonuses, buffBonuses
+) // finalBonusesを基に計算される
+```
+
+#### StatusPreviewでの表示
+- **基本ステータス**: MP値にレジスタ効果が自動的に反映される
+- **装備品補正値1**: MP(+)項目にレジスタ効果が含まれた値が表示される
+
+#### 重要な注意点
+- レジスタが無効の場合、効果は0として計算される
+- 他の装備・クリスタ・料理・バフアイテムのMP補正と同等に扱われる
+- 装備品補正値1の計算順序は既存システムに従う
+
+### 物理攻撃アップ（physicalAttackUp）
+
+#### 基本仕様
+- **効果**: キャラクターの物理攻撃力を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のATK(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+#### 実装方式
+物理攻撃アップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: ATK計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+#### 計算例
+**入力値:**
+- physicalAttackUpレベル: 15 (有効)
+- 既存の装備品補正値1のATK(+): 300 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. physicalAttackUp効果: 15 × 1 = 15
+2. **装備品補正値1のATK(+)合計**: 300 + 15 = 315
+
+#### ATK計算への統合
+物理攻撃アップ効果は装備品補正値1のATK固定値として適用され、基本ステータスのATK計算に反映されます。
+
+レジスタ効果はStatusPreviewで`finalBonuses`として統合され、ATK計算に適用されます。
+
+#### 実装詳細
+StatusPreview.tsxで以下のような統合処理が行われます：
+
+```typescript
+// レジスタ効果を含むボーナス値を作成
+const finalBonuses = { ...allBonuses }
+if (data.register?.effects) {
+  const physicalAttackUpEffect = data.register.effects.find(effect => 
+    effect.type === 'physicalAttackUp' && effect.isEnabled
+  )
+  if (physicalAttackUpEffect) {
+    finalBonuses.ATK = (finalBonuses.ATK || 0) + (physicalAttackUpEffect.level * 1)
+  }
+}
+
+// 装備品補正値もレジスタ効果込みのボーナスから生成
+equipmentBonuses: calculateEquipmentBonuses(finalBonuses)
+```
+
+#### StatusPreviewでの表示
+- **基本ステータス**: ATK値にレジスタ効果が自動的に反映される
+- **装備品補正値1**: ATK(+)項目にレジスタ効果が含まれた値が表示される
+
+#### 重要な注意点
+- レジスタが無効の場合、効果は0として計算される
+- 他の装備・クリスタ・料理・バフアイテムのATK補正と同等に扱われる
+- 装備品補正値1の計算順序は既存システムに従う
+
+## 魔法攻撃アップ（magicalAttackUp）
+
+### 基本仕様
+- **効果**: キャラクターの魔法攻撃力を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のMATK(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+魔法攻撃アップ効果は`AllBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: MATK計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- magicalAttackUpレベル: 12 (有効)
+- 既存の装備品補正値1のMATK(+): 250 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. magicalAttackUp効果: 12 × 1 = 12
+2. **装備品補正値1のMATK(+)合計**: 250 + 12 = 262
+
+### MATK計算への統合
+魔法攻撃アップ効果は装備品補正値1のMATK固定値として適用され、基本ステータスのMATK計算に反映されます。
+
+**重要**: MATK計算には`finalBonuses`（全ての効果を統合した最終ボーナス値）を渡す必要があります。
+
+**修正前の問題**: `calculateMATK`関数に`allBonuses`（基本ボーナスのみ）が渡されていたため、魔法攻撃アップ効果が基本ステータスのMATKに反映されませんでした。
+
+**修正後**: `calculateMATK`関数に`finalBonuses`を渡すことで、レジスタ効果がMATK固定値として正しく適用されます。
+
+### 問題解決の実装詳細
+
+#### 修正前の構造
+```typescript
+// useMemo内
+const calculationResults = useMemo(() => {
+  const allBonuses = aggregateAllBonuses(...)
+  const finalBonuses = { ...allBonuses }
+  // レジスタ効果を finalBonuses に追加
+  return { /* finalBonuses含まず */ }
+}, [...])
+
+// useMemo外
+const matkCalculation = calculateMATK(..., allBonuses) // 基本ボーナスのみ
+```
+
+#### 修正後の構造
+```typescript
+// useMemo内
+const calculationResults = useMemo(() => {
+  const allBonuses = aggregateAllBonuses(...)
+  const finalBonuses = { ...allBonuses }
+  // レジスタ効果を finalBonuses に追加
+  return { 
+    allBonuses: finalBonuses, // 全ての効果を統合した最終ボーナス値
+    // その他の計算結果も finalBonuses を使用
+  }
+}, [...])
+
+// useMemo外
+const { allBonuses: finalBonuses } = calculationResults
+const matkCalculation = calculateMATK(..., finalBonuses) // 全ての効果込み
+```
+
+これによりMATK計算式の「MATK固定値」部分にレジスタの魔法攻撃アップ効果が正しく反映され、基本ステータスのMATKに変化が現れるようになりました。
+
+### 命名の変更について
+
+`finalBonuses`という名前は将来的な拡張性を考慮して選択されました：
+
+- **レジスタ効果**: 現在実装済み
+- **ギルド料理効果**: 将来実装予定
+- **バフスキル効果**: 将来実装予定  
+- **その他の効果**: 将来実装予定
+
+この命名により、どのような効果が追加されても一貫した構造を維持できます。
+
+### 実装詳細
+StatusPreview.tsxで以下のような統合処理が行われます：
+
+```typescript
+// レジスタ効果を含むボーナス値を作成
+const finalBonuses = { ...allBonuses }
+if (data.register?.effects) {
+  const magicalAttackUpEffect = data.register.effects.find(effect => 
+    effect.type === 'magicalAttackUp' && effect.isEnabled
+  )
+  if (magicalAttackUpEffect) {
+    finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicalAttackUpEffect.level * 1)
+  }
+}
+
+// 装備品補正値もレジスタ効果込みのボーナスから生成
+equipmentBonuses: calculateEquipmentBonuses(finalBonuses)
+```
+
+### StatusPreviewでの表示
+- **基本ステータス**: MATK値にレジスタ効果が自動的に反映される
+- **装備品補正値1**: MATK(+)項目にレジスタ効果が含まれた値が表示される
+
+### 重要な注意点
+- レジスタが無効の場合、効果は0として計算される
+- 他の装備・クリスタ・料理・バフアイテムのMATK補正と同等に扱われる
+- 装備品補正値1の計算順序は既存システムに従う
+
+## 命中アップ（accuracyUp）
+
+### 基本仕様
+- **効果**: キャラクターの命中率を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1の命中(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+命中アップ効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: HIT計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- accuracyUpレベル: 20 (有効)
+- 既存の装備品補正値1の命中(+): 150 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. accuracyUp効果: 20 × 1 = 20
+2. **装備品補正値1の命中(+)合計**: 150 + 20 = 170
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const accuracyUpEffect = data.register.effects.find(effect => 
+  effect.type === 'accuracyUp' && effect.isEnabled
+)
+if (accuracyUpEffect) {
+  finalBonuses.Accuracy = (finalBonuses.Accuracy || 0) + (accuracyUpEffect.level * 1)
+}
+```
+
+## 回避アップ（evasionUp）
+
+### 基本仕様
+- **効果**: キャラクターの回避率を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1の回避(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+回避アップ効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: FLEE計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- evasionUpレベル: 18 (有効)
+- 既存の装備品補正値1の回避(+): 100 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. evasionUp効果: 18 × 1 = 18
+2. **装備品補正値1の回避(+)合計**: 100 + 18 = 118
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const evasionUpEffect = data.register.effects.find(effect => 
+  effect.type === 'evasionUp' && effect.isEnabled
+)
+if (evasionUpEffect) {
+  finalBonuses.Dodge = (finalBonuses.Dodge || 0) + (evasionUpEffect.level * 1)
+}
+```
+
+## 攻撃速度アップ（attackSpeedUp）
+
+### 基本仕様
+- **効果**: キャラクターの攻撃速度を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のASPD(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+攻撃速度アップ効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: ASPD計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- attackSpeedUpレベル: 25 (有効)
+- 既存の装備品補正値1のASPD(+): 80 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. attackSpeedUp効果: 25 × 1 = 25
+2. **装備品補正値1のASPD(+)合計**: 80 + 25 = 105
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const attackSpeedUpEffect = data.register.effects.find(effect => 
+  effect.type === 'attackSpeedUp' && effect.isEnabled
+)
+if (attackSpeedUpEffect) {
+  finalBonuses.AttackSpeed = (finalBonuses.AttackSpeed || 0) + (attackSpeedUpEffect.level * 1)
+}
+```
+
+## 魔法速度アップ（magicalSpeedUp）
+
+### 基本仕様
+- **効果**: キャラクターの詠唱速度を増加させる
+- **計算方法**: `レジスタレベル × 1` を装備品補正値1のCSPD(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+### 実装方式
+魔法速度アップ効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: CSPD計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- magicalSpeedUpレベル: 22 (有効)
+- 既存の装備品補正値1のCSPD(+): 60 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. magicalSpeedUp効果: 22 × 1 = 22
+2. **装備品補正値1のCSPD(+)合計**: 60 + 22 = 82
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const magicalSpeedUpEffect = data.register.effects.find(effect => 
+  effect.type === 'magicalSpeedUp' && effect.isEnabled
+)
+if (magicalSpeedUpEffect) {
+  finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
+}
+```
+
+### レジスタ効果統合の全体例
+```typescript
+// StatusPreview.tsx内でのレジスタ効果統合
+if (data.register?.effects) {
+  // 最大HPアップ
+  const maxHpUpEffect = data.register.effects.find(effect => 
+    effect.type === 'maxHpUp' && effect.isEnabled
+  )
+  if (maxHpUpEffect) {
+    finalBonuses.HP = (finalBonuses.HP || 0) + (maxHpUpEffect.level * 10)
+  }
+
+  // 最大MPアップ
+  const maxMpUpEffect = data.register.effects.find(effect => 
+    effect.type === 'maxMpUp' && effect.isEnabled
+  )
+  if (maxMpUpEffect) {
+    finalBonuses.MP = (finalBonuses.MP || 0) + (maxMpUpEffect.level * 1)
+  }
+
+  // 物理攻撃アップ
+  const physicalAttackUpEffect = data.register.effects.find(effect => 
+    effect.type === 'physicalAttackUp' && effect.isEnabled
+  )
+  if (physicalAttackUpEffect) {
+    finalBonuses.ATK = (finalBonuses.ATK || 0) + (physicalAttackUpEffect.level * 1)
+  }
+
+  // 魔法攻撃アップ
+  const magicalAttackUpEffect = data.register.effects.find(effect => 
+    effect.type === 'magicalAttackUp' && effect.isEnabled
+  )
+  if (magicalAttackUpEffect) {
+    finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicalAttackUpEffect.level * 1)
+  }
+
+  // 命中アップ
+  const accuracyUpEffect = data.register.effects.find(effect => 
+    effect.type === 'accuracyUp' && effect.isEnabled
+  )
+  if (accuracyUpEffect) {
+    finalBonuses.Accuracy = (finalBonuses.Accuracy || 0) + (accuracyUpEffect.level * 1)
+  }
+
+  // 回避アップ
+  const evasionUpEffect = data.register.effects.find(effect => 
+    effect.type === 'evasionUp' && effect.isEnabled
+  )
+  if (evasionUpEffect) {
+    finalBonuses.Dodge = (finalBonuses.Dodge || 0) + (evasionUpEffect.level * 1)
+  }
+
+  // 攻撃速度アップ
+  const attackSpeedUpEffect = data.register.effects.find(effect => 
+    effect.type === 'attackSpeedUp' && effect.isEnabled
+  )
+  if (attackSpeedUpEffect) {
+    finalBonuses.AttackSpeed = (finalBonuses.AttackSpeed || 0) + (attackSpeedUpEffect.level * 1)
+  }
+
+  // 魔法速度アップ
+  const magicalSpeedUpEffect = data.register.effects.find(effect => 
+    effect.type === 'magicalSpeedUp' && effect.isEnabled
+  )
+  if (magicalSpeedUpEffect) {
+    finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
+  }
+
+  // 運命共同体
+  const fateCompanionshipEffect = data.register.effects.find(effect => 
+    effect.type === 'fateCompanionship' && effect.isEnabled
+  )
+  if (fateCompanionshipEffect) {
+    const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
+    finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
+    finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
+  }
+}
+```
+
+## 運命共同体（fateCompanionship）
+
+### 基本仕様
+- **効果**: パーティメンバー数に応じてATK%とMATK%を増加させる
+- **計算方法**: `パーティメンバー数（1-3） × 1` を装備品補正値1のATK(%)とMATK(%)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル**: 1で固定（レベル入力フォーム不要）
+- **パーティメンバー数**: 1-3人（自分以外のパーティメンバー数）
+
+### 実装方式
+運命共同体効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: レジスタ効果を`finalBonuses`に追加
+2. **基本ステータス計算**: ATK%とMATK%として統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+### 計算例
+**入力値:**
+- fateCompanionshipが有効
+- パーティメンバー数: 3人
+- 既存の装備品補正値1のATK(%): 20% (装備+クリスタ+料理+バフアイテム)
+- 既存の装備品補正値1のMATK(%): 15% (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. fateCompanionship効果: 3 × 1 = 3%
+2. **装備品補正値1のATK(%)合計**: 20% + 3% = 23%
+3. **装備品補正値1のMATK(%)合計**: 15% + 3% = 18%
+
+### 特殊な仕様
+- **レベル固定**: 運命共同体のレベルは常に1（入力不要）
+- **パーティメンバー数**: 1-3人の範囲で設定可能
+- **双方同時適用**: ATK%とMATK%の両方に同じ値が加算される
+
+### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const fateCompanionshipEffect = data.register.effects.find(effect => 
+  effect.type === 'fateCompanionship' && effect.isEnabled
+)
+if (fateCompanionshipEffect) {
+  const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
+  finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
+  finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
+}
+```
+
+### データ構造
+```typescript
+interface RegisterEffect {
+  id: string
+  name: string
+  type: 'fateCompanionship'
+  isEnabled: boolean
+  level: 1 // 常に1で固定
+  maxLevel: 1 // 常に1で固定
+  partyMembers: number // 1-3の範囲
+  maxPartyMembers: 3 // 最大3人
+}
+```
+
+### UI仕様
+- **モーダルタイトル**: レジスタ名のみ（例: "運命共同体"）
+- **レベル入力フィールド**: 非表示（他のレジスタ効果のみ表示）
+- **パーティメンバー数入力**: 1-3の数値入力フィールド
+- **確定ボタン**: 常にレベル1で送信
+- **表示**: "運命共同体 (パーティメンバー数: 3人)" のような形式
+
+### モーダルの条件分岐
+```typescript
+// モーダル内での条件分岐
+const isFatefulCompanionship = effect?.id === 'fatefulCompanionship'
+
+// タイトルはレジスタ名のみ
+<h3 className="text-lg font-medium">{effect?.name}</h3>
+
+// レベル入力フィールド分岐
+{!isFatefulCompanionship && (
+  // レベル入力フィールド
+)}
+
+// 確定時の値分岐
+onConfirm(
+  isFatefulCompanionship ? 1 : level, // 運命共同体は常にレベル1
+  isFatefulCompanionship ? partyMembers : undefined
+)
+```
+
+## ギルド料理効果
+
+### おいしい食材取引（deliciousIngredientTrade）
+
+#### 基本仕様
+- **効果**: キャラクターの最大HPを増加させる
+- **計算方法**: `レジスタレベル × 100` を装備品補正値1のHP(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+#### 実装方式
+おいしい食材取引効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: ギルド料理効果を`finalBonuses`に追加
+2. **基本ステータス計算**: HP計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+#### 計算例
+**入力値:**
+- deliciousIngredientTradeレベル: 5 (有効)
+- 既存の装備品補正値1のHP(+): 800 (装備+クリスタ+料理+バフアイテム+レジスタ)
+
+**計算手順:**
+1. deliciousIngredientTrade効果: 5 × 100 = 500
+2. **装備品補正値1のHP(+)合計**: 800 + 500 = 1300
+
+#### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const deliciousIngredientTradeEffect = data.register.effects.find(effect => 
+  effect.type === 'deliciousIngredientTrade' && effect.isEnabled
+)
+if (deliciousIngredientTradeEffect) {
+  finalBonuses.HP = (finalBonuses.HP || 0) + (deliciousIngredientTradeEffect.level * 100)
+}
+```
+
+### 新鮮な果物取引（freshFruitTrade）
+
+#### 基本仕様
+- **効果**: キャラクターの最大MPを増加させる
+- **計算方法**: `レジスタレベル × 10` を装備品補正値1のMP(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+#### 実装方式
+新鮮な果物取引効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
+
+1. **StatusPreviewでの統合**: ギルド料理効果を`finalBonuses`に追加
+2. **基本ステータス計算**: MP計算で統合済みのボーナス値を使用
+3. **装備品補正値表示**: 同じ統合済みボーナス値から装備品補正値1〜3を生成
+
+#### 計算例
+**入力値:**
+- freshFruitTradeレベル: 8 (有効)
+- 既存の装備品補正値1のMP(+): 200 (装備+クリスタ+料理+バフアイテム+レジスタ)
+
+**計算手順:**
+1. freshFruitTrade効果: 8 × 10 = 80
+2. **装備品補正値1のMP(+)合計**: 200 + 80 = 280
+
+#### 実装詳細
+```typescript
+// StatusPreview.tsx内
+const freshFruitTradeEffect = data.register.effects.find(effect => 
+  effect.type === 'freshFruitTrade' && effect.isEnabled
+)
+if (freshFruitTradeEffect) {
+  finalBonuses.MP = (finalBonuses.MP || 0) + (freshFruitTradeEffect.level * 10)
+}
+```
+
+### ギルド料理効果統合の全体例
+```typescript
+// StatusPreview.tsx内でのギルド料理効果統合
+if (data.register?.effects) {
+  // レジスタ効果の処理...（既存のレジスタ効果）
+
+  // おいしい食材取引
+  const deliciousIngredientTradeEffect = data.register.effects.find(effect => 
+    effect.type === 'deliciousIngredientTrade' && effect.isEnabled
+  )
+  if (deliciousIngredientTradeEffect) {
+    finalBonuses.HP = (finalBonuses.HP || 0) + (deliciousIngredientTradeEffect.level * 100)
+  }
+
+  // 新鮮な果物取引
+  const freshFruitTradeEffect = data.register.effects.find(effect => 
+    effect.type === 'freshFruitTrade' && effect.isEnabled
+  )
+  if (freshFruitTradeEffect) {
+    finalBonuses.MP = (finalBonuses.MP || 0) + (freshFruitTradeEffect.level * 10)
+  }
+}
+```
+
 ## レジスタレット効果一覧
 
-1. **物理攻撃アップ** - 物理攻撃力向上
-2. **魔法攻撃アップ** - 魔法攻撃力向上
-3. **最大HP増加** - HP上限値向上
-4. **最大MP増加** - MP上限値向上
-5. **命中アップ** - 命中率向上
-6. **回避アップ** - 回避率向上
-7. **攻撃速度アップ** - 攻撃速度向上
-8. **魔法速度アップ** - 詠唱速度向上
-9. **運命共同体** - パーティメンバー数に応じた特殊効果
+1. **物理攻撃アップ(physicalAttackUp)** - 物理攻撃力向上（装備品補正値1のATK(+)に加算）
+2. **魔法攻撃アップ(magicalAttackUp)** - 魔法攻撃力向上（装備品補正値1のMATK(+)に加算）
+3. **最大HPアップ(maxHpUp)** - HP上限値向上（装備品補正値1のHP(+)に加算）
+4. **最大MPアップ(maxMpUp)** - MP上限値向上（装備品補正値1のMP(+)に加算）
+5. **命中アップ(accuracyUp)** - 命中率向上（装備品補正値1の命中(+)に加算）
+6. **回避アップ(evasionUp)** - 回避率向上（装備品補正値1の回避(+)に加算）
+7. **攻撃速度アップ(attackSpeedUp)** - 攻撃速度向上（装備品補正値1のASPD(+)に加算）
+8. **魔法速度アップ(magicalSpeedUp)** - 詠唱速度向上（装備品補正値1のCSPD(+)に加算）
+9. **運命共同体(fateCompanionship)** - パーティメンバー数×1%をATK%とMATK%に加算（レベル1固定）
 10. **虚無の構え** - 特殊戦闘効果
 11. **魔矢の追跡** - 魔法矢系効果
 12. **エアスライド圧縮** - エアスライド系効果
@@ -349,5 +1057,69 @@ export const createInitialRegisterData = (): RegisterFormData => ({
 
 ## ギルド料理効果一覧
 
-1. **おいしい食材取引** - ギルド経済効果
-2. **新鮮果実取引** - ギルド経済効果
+1. **おいしい食材取引(deliciousIngredientTrade)** - HP上限値向上（装備品補正値1のHP(+)に加算、レベル×100）
+2. **新鮮な果物取引(freshFruitTrade)** - MP上限値向上（装備品補正値1のMP(+)に加算、レベル×10）
+
+## データ移行システム
+
+### 移行の必要性
+レジスタシステムに新しい効果（特にギルド料理効果）が追加された際、既存ユーザーのセーブデータには新効果が含まれていないため、UIで表示されない問題が発生する。
+
+### 移行機能の実装
+
+#### migrateRegisterEffects関数
+```typescript
+// レジスタ効果の移行用関数（既存セーブデータに新効果を追加）
+export const migrateRegisterEffects = (existingData: RegisterFormData): RegisterFormData => {
+  const currentEffects = createInitialRegisterFormData().effects
+  const existingEffects = existingData.effects || []
+  
+  // 既存効果をIDでマップ化
+  const existingEffectMap = new Map(existingEffects.map(effect => [effect.id, effect]))
+  
+  // 新しい効果配列を作成（既存効果を保持し、不足分を補完）
+  const migratedEffects = currentEffects.map(currentEffect => {
+    // 既存データにある場合はそれを使用、ない場合は新規効果を追加
+    return existingEffectMap.get(currentEffect.id) || currentEffect
+  })
+  
+  return { effects: migratedEffects }
+}
+```
+
+#### 移行実行タイミング
+1. **アプリ初期化時** (`calculatorStore.initialize()`)
+   ```typescript
+   // レジスタ効果の移行（新効果があれば追加）
+   const migratedData = { ...currentSave.data }
+   if (migratedData.register) {
+     migratedData.register = migrateRegisterEffects(migratedData.register)
+   }
+   ```
+
+2. **セーブデータ読み込み時** (`calculatorStore.loadSaveData()`)
+   ```typescript
+   const validData = isValidCalculatorData(data)
+     ? (() => {
+         // 既存データのレジスタ効果を移行（新効果があれば追加）
+         const migratedData = { ...data }
+         if (migratedData.register) {
+           migratedData.register = migrateRegisterEffects(migratedData.register)
+         }
+         return migratedData
+       })()
+     : createInitialCalculatorData()
+   ```
+
+### 移行の動作仕様
+- **既存効果の保持**: ユーザーが設定した既存のレジスタ効果（レベル、有効/無効状態）は完全に保持
+- **新効果の追加**: 不足している新しい効果はデフォルト値（無効状態、標準レベル）で自動追加
+- **透明な実行**: ユーザーからは見えない形でバックグラウンドで実行
+- **冪等性**: 複数回実行しても同じ結果になる安全な設計
+
+### 移行対象効果
+現在の移行システムで自動追加される効果：
+- `deliciousIngredientTrade` (おいしい食材取引)
+- `freshFruitTrade` (新鮮な果物取引)
+
+今後新しいレジスタ効果が追加された場合も、`createInitialRegisterFormData()`に定義するだけで自動的に移行対象となる。

@@ -86,6 +86,94 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			buffBonuses,
 		)
 
+		// 全ての効果を統合した最終ボーナス値を作成
+		const finalBonuses = { ...allBonuses }
+		
+		// レジスタ効果を統合
+		if (data.register?.effects) {
+			const maxHpUpEffect = data.register.effects.find(effect => 
+				effect.type === 'maxHpUp' && effect.isEnabled
+			)
+			if (maxHpUpEffect) {
+				finalBonuses.HP = (finalBonuses.HP || 0) + (maxHpUpEffect.level * 10)
+			}
+
+			const maxMpUpEffect = data.register.effects.find(effect => 
+				effect.type === 'maxMpUp' && effect.isEnabled
+			)
+			if (maxMpUpEffect) {
+				finalBonuses.MP = (finalBonuses.MP || 0) + (maxMpUpEffect.level * 1)
+			}
+
+			const physicalAttackUpEffect = data.register.effects.find(effect => 
+				effect.type === 'physicalAttackUp' && effect.isEnabled
+			)
+			if (physicalAttackUpEffect) {
+				finalBonuses.ATK = (finalBonuses.ATK || 0) + (physicalAttackUpEffect.level * 1)
+			}
+
+			const magicAttackUpEffect = data.register.effects.find(effect => 
+				effect.type === 'magicalAttackUp' && effect.isEnabled
+			)
+			if (magicAttackUpEffect) {
+				finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicAttackUpEffect.level * 1)
+			}
+
+			const accuracyUpEffect = data.register.effects.find(effect => 
+				effect.type === 'accuracyUp' && effect.isEnabled
+			)
+			if (accuracyUpEffect) {
+				finalBonuses.Accuracy = (finalBonuses.Accuracy || 0) + (accuracyUpEffect.level * 1)
+			}
+
+			const evasionUpEffect = data.register.effects.find(effect => 
+				effect.type === 'evasionUp' && effect.isEnabled
+			)
+			if (evasionUpEffect) {
+				finalBonuses.Dodge = (finalBonuses.Dodge || 0) + (evasionUpEffect.level * 1)
+			}
+
+			const attackSpeedUpEffect = data.register.effects.find(effect => 
+				effect.type === 'attackSpeedUp' && effect.isEnabled
+			)
+			if (attackSpeedUpEffect) {
+				finalBonuses.AttackSpeed = (finalBonuses.AttackSpeed || 0) + (attackSpeedUpEffect.level * 1)
+			}
+
+			const magicalSpeedUpEffect = data.register.effects.find(effect => 
+				effect.type === 'magicalSpeedUp' && effect.isEnabled
+			)
+			if (magicalSpeedUpEffect) {
+				finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
+			}
+
+			const fateCompanionshipEffect = data.register.effects.find(effect => 
+				effect.type === 'fateCompanionship' && effect.isEnabled
+			)
+			if (fateCompanionshipEffect) {
+				const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
+				finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
+				finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
+			}
+
+			// ギルド料理効果
+			const deliciousIngredientTradeEffect = data.register.effects.find(effect => 
+				effect.type === 'deliciousIngredientTrade' && effect.isEnabled
+			)
+			if (deliciousIngredientTradeEffect) {
+				finalBonuses.HP = (finalBonuses.HP || 0) + (deliciousIngredientTradeEffect.level * 100)
+			}
+
+			const freshFruitTradeEffect = data.register.effects.find(effect => 
+				effect.type === 'freshFruitTrade' && effect.isEnabled
+			)
+			if (freshFruitTradeEffect) {
+				finalBonuses.MP = (finalBonuses.MP || 0) + (freshFruitTradeEffect.level * 10)
+			}
+		}
+
+		// TODO: 将来的にバフスキル効果もここに統合
+
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
 		console.log('ステータスデバッグ:', {
 			attackMP: {
@@ -208,35 +296,30 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 		const adjustedStatsCalculation = calculateAdjustedStats(
 			baseStats,
-			allBonuses,
+			finalBonuses,
 		)
 
 		// 体装備のArmorTypeを取得
 		const bodyArmorType = getBodyArmorType(data.equipment.body)
 
 		return {
-			allBonuses,
-			equipmentBonuses: calculateEquipmentBonuses(
-				equipmentBonuses,
-				crystalBonuses,
-				foodBonuses,
-				buffBonuses,
-			),
-			hpCalculation: calculateHP(baseStats, allBonuses),
-			mpCalculation: calculateMP(baseStats, allBonuses),
-			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, allBonuses),
+			allBonuses: finalBonuses,
+			equipmentBonuses: calculateEquipmentBonuses(finalBonuses),
+			hpCalculation: calculateHP(baseStats, finalBonuses),
+			mpCalculation: calculateMP(baseStats, finalBonuses),
+			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, finalBonuses),
 			subATKCalculation: calculateSubATK(
 				baseStats,
 				data.mainWeapon,
 				data.subWeapon,
 				adjustedStatsCalculation,
-				allBonuses,
+				finalBonuses,
 			),
 			aspdCalculation: calculateASPD(
 				baseStats,
 				data.mainWeapon,
 				adjustedStatsCalculation,
-				allBonuses,
+				finalBonuses,
 				bodyArmorType,
 			),
 			motionSpeedCalculation: (() => {
@@ -244,49 +327,50 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					baseStats,
 					data.mainWeapon,
 					adjustedStatsCalculation,
-					allBonuses,
+					finalBonuses,
 					bodyArmorType,
 				).finalASPD
-				return calculateMotionSpeed(aspd, allBonuses)
+				return calculateMotionSpeed(aspd, finalBonuses)
 			})(),
-			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonuses),
+			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, finalBonuses),
 			criticalDamageCalculation: calculateCriticalDamage(
 				adjustedStatsCalculation.STR,
 				adjustedStatsCalculation.AGI,
-				allBonuses,
+				finalBonuses,
 			),
 			hitCalculation: calculateHIT(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
-				allBonuses,
+				finalBonuses,
 			),
 			fleeCalculation: calculateFLEE(
 				baseStats.level,
 				adjustedStatsCalculation.AGI,
 				data.equipment.body,
-				allBonuses,
+				finalBonuses,
 			),
-			physicalResistanceCalculation: calculatePhysicalResistance(allBonuses),
-			magicalResistanceCalculation: calculateMagicalResistance(allBonuses),
-			armorBreakCalculation: calculateArmorBreak(allBonuses),
-			anticipateCalculation: calculateAnticipate(allBonuses),
+			physicalResistanceCalculation: calculatePhysicalResistance(finalBonuses),
+			magicalResistanceCalculation: calculateMagicalResistance(finalBonuses),
+			armorBreakCalculation: calculateArmorBreak(finalBonuses),
+			anticipateCalculation: calculateAnticipate(finalBonuses),
 			cspdCalculation: calculateCSPD(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
 				adjustedStatsCalculation.AGI,
-				allBonuses,
+				finalBonuses,
 			),
 			totalElementAdvantageCalculation:
-				calculateTotalElementAdvantage(allBonuses),
+				calculateTotalElementAdvantage(finalBonuses),
 			stabilityCalculation: calculateStability(
 				data.mainWeapon.stability,
 				data.mainWeapon.weaponType,
 				adjustedStatsCalculation,
-				allBonuses,
+				finalBonuses,
+				data.subWeapon,
 			),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
-				allBonuses,
+				finalBonuses,
 			),
 			adjustedStatsCalculation,
 		}
@@ -299,9 +383,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		data.mainWeapon,
 		data.subWeapon,
 		data.equipment.body,
+		data.register, // レジスタデータを依存関係に追加
 	])
 
 	const {
+		allBonuses: finalBonuses,
 		equipmentBonuses: calculatedEquipmentBonuses,
 		hpCalculation,
 		mpCalculation,
@@ -327,12 +413,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		calculatedEquipmentBonuses
 
 	// MATK計算（ATK計算結果が必要なため、useMemoの外で実行）
-	const allBonuses = aggregateAllBonuses(
-		equipmentBonuses,
-		crystalBonuses,
-		foodBonuses,
-		buffBonuses,
-	)
 	const matkCalculation = calculateMATK(
 		baseStats.level,
 		data.mainWeapon.weaponType,
@@ -341,7 +421,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		atkCalculation.totalWeaponATK, // 手甲用の総武器ATK
 		baseStats, // 基礎ステータス（MATKアップ用）
 		adjustedStatsCalculation, // 補正後ステータス（ステータスMATK用）
-		allBonuses,
+		finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
 	)
 
 	// デバッグ: equipmentBonus1の各プロパティを確認
@@ -443,10 +523,16 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		MATK: matkCalculation.finalMATK, // MATK計算結果
 		baseMATK: matkCalculation.baseMATK, // 基本MATK計算結果
 		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
-		// サブ安定率は常時表示（双剣以外は null で - 表示）
-		subStabilityRate: data.mainWeapon.weaponType === '双剣' && subATKCalculation
-			? subATKCalculation.subStability // サブ安定率（計算後）
-			: null, // 非双剣時は null で - 表示
+		// サブ安定率は常時表示（双剣・弓+矢以外は null で - 表示）
+		subStabilityRate: (() => {
+			if (data.mainWeapon.weaponType === '双剣' && subATKCalculation) {
+				return subATKCalculation.subStability // サブ安定率（計算後）
+			}
+			if ((data.mainWeapon.weaponType === '弓' || data.mainWeapon.weaponType === '自動弓') && data.subWeapon.weaponType === '矢') {
+				return data.subWeapon.stability // 矢の安定率をそのまま表示
+			}
+			return null // その他は null で - 表示
+		})(),
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
 		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
@@ -560,24 +646,24 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								bringerAM: 'ブリンガーAM',
 								MATK: 'MATK',
 								baseMATK: '基本MATK',
-								stabilityRate: '安定率',
-								subStabilityRate: 'サブ安定率', // 常時表示（ラベル位置統一のため）
+								stabilityRate: '安定率(%)',
+								subStabilityRate: 'サブ安定率(%)', // 常時表示（ラベル位置統一のため）
 								criticalRate: 'ｸﾘﾃｨｶﾙ率',
 								criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
 								magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',
 								magicCriticalDamage: '魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
-								totalElementAdvantage: '総属性有利',
-								elementAwakeningAdvantage: '属性覚醒有利',
+								totalElementAdvantage: '総属性有利(%)',
+								elementAwakeningAdvantage: '属性覚醒有利(%)',
 								ASPD: 'ASPD',
 								CSPD: 'CSPD',
 								HIT: 'HIT',
 								FLEE: 'FLEE',
-								physicalResistance: '物理耐性',
-								magicalResistance: '魔法耐性',
+								physicalResistance: '物理耐性(%)',
+								magicalResistance: '魔法耐性(%)',
 								ailmentResistance: '異常耐性(%)',
-								motionSpeed: '行動速度',
-								armorBreak: '防御崩し',
-								anticipate: '先読み',
+								motionSpeed: '行動速度(%)',
+								armorBreak: '防御崩し(%)',
+								anticipate: '先読み(%)',
 							}}
 							className=""
 						/>

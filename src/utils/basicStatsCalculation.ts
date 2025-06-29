@@ -181,6 +181,7 @@ export interface StabilityCalculationSteps {
 	weaponStability: number // メイン武器の安定率
 	statusStability: number // ステータス安定率
 	stabilityPercent: number // 安定率%補正
+	arrowStability: number // 矢の安定率（弓+矢時のみ）
 	stabilityBeforeLimit: number // 制限適用前の安定率
 	finalStability: number // 最終安定率（0-100制限適用後）
 }
@@ -743,22 +744,15 @@ export function calculateATK(
 }
 
 /**
- * 装備品補正値を装備・クリスタ・料理・バフから計算
+ * 装備品補正値1〜3を計算する関数
  * StatusPreviewで使用される装備品補正値1〜3の計算
  *
- * @param equipment 装備補正値
- * @param crystals クリスタ補正値
- * @param foods 料理補正値
- * @param buffs バフアイテム補正値
+ * @param allBonuses レジスタ効果を含む統合済みのAllBonuses
  */
 export function calculateEquipmentBonuses(
-	equipment: Partial<AllBonuses> = {},
-	crystals: Partial<AllBonuses> = {},
-	foods: Partial<AllBonuses> = {},
-	buffs: Partial<AllBonuses> = {},
+	allBonuses: AllBonuses, // レジスタ効果込みのAllBonusesを直接受け取る
 ) {
-	// 全ソースを統合
-	const allBonuses = aggregateAllBonuses(equipment, crystals, foods, buffs)
+	// allBonusesはStatusPreviewで統合済み（レジスタ効果含む）
 
 	// 装備品補正値1 (31項目) - %と固定値の両方を含む
 	const equipmentBonus1 = {
@@ -1611,6 +1605,7 @@ export function calculateStability(
 	weaponType: WeaponTypeEnum,
 	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
+	subWeapon?: { weaponType: string; stability: number },
 ): StabilityCalculationSteps {
 	// 1. 武器種別によるステータス安定率計算
 	const weaponTypeKey = getWeaponTypeKey(weaponType)
@@ -1620,11 +1615,22 @@ export function calculateStability(
 	// 2. 安定率%補正取得（3データソース：装備・クリスタ・バフアイテム）
 	const stabilityPercent = bonuses.Stability_Rate || 0
 
-	// 3. 制限適用前の安定率計算
-	const stabilityBeforeLimit =
-		weaponStability + statusStability + stabilityPercent
+	// 3. 弓+矢の場合の矢の安定率取得
+	const isBowArrowCombo = (weaponType === '弓' || weaponType === '自動弓') && subWeapon?.weaponType === '矢'
+	let arrowStability = 0
+	if (isBowArrowCombo) {
+		if (weaponType === '弓') {
+			arrowStability = subWeapon.stability // 弓の場合はそのまま
+		} else if (weaponType === '自動弓') {
+			arrowStability = Math.floor(subWeapon.stability / 2) // 自動弓の場合は半分（INT適用）
+		}
+	}
 
-	// 4. 0-100%制限適用と小数点切り捨て
+	// 4. 制限適用前の安定率計算
+	const stabilityBeforeLimit =
+		weaponStability + statusStability + stabilityPercent + arrowStability
+
+	// 5. 0-100%制限適用と小数点切り捨て
 	const finalStability = Math.floor(
 		Math.max(0, Math.min(100, stabilityBeforeLimit)),
 	)
@@ -1633,6 +1639,7 @@ export function calculateStability(
 		weaponStability,
 		statusStability,
 		stabilityPercent,
+		arrowStability,
 		stabilityBeforeLimit,
 		finalStability,
 	}
