@@ -268,6 +268,67 @@ interface CalculatorStore {
 }
 ```
 
+## レジスタ効果の詳細仕様
+
+### 最大HPアップ（maxHPUp）
+
+#### 基本仕様
+- **効果**: キャラクターの最大HPを増加させる
+- **計算方法**: `レジスタレベル × 10` を装備品補正値1のHP(+)に加算
+- **適用条件**: レジスタが有効に設定されている場合のみ
+- **レベル範囲**: 1-30（想定）
+
+#### 実装方式
+最大HPアップ効果は装備品補正値1システムに統合され、以下の流れで適用されます：
+
+1. **プロパティ変換**: レジスタ効果を`EquipmentProperties.HP`として変換
+2. **装備品補正値1統合**: 他の装備・クリスタ・料理・バフアイテムのHP補正と合算
+3. **HP計算適用**: 既存のHP計算式でHP固定値として使用
+
+#### 計算例
+**入力値:**
+- maxHPUpレベル: 5 (有効)
+- 既存の装備品補正値1のHP(+): 500 (装備+クリスタ+料理+バフアイテム)
+
+**計算手順:**
+1. maxHPUp効果: 5 × 10 = 50
+2. **装備品補正値1のHP(+)合計**: 500 + 50 = 550
+
+#### HP計算への統合
+```
+HP = INT(INT(93+(補正後VIT+22.41)*Lv/3)*(1+HP%/100))+HP固定値
+```
+
+レジスタ効果はStatusPreviewで`allBonusesWithRegister`として統合され、HP計算に適用されます。
+
+#### 実装詳細
+StatusPreview.tsxで以下のような統合処理が行われます：
+
+```typescript
+// レジスタ効果を含むボーナス値を作成
+const allBonusesWithRegister = { ...allBonuses }
+if (data.register?.effects) {
+  const maxHpUpEffect = data.register.effects.find(effect => 
+    effect.type === 'maxHpUp' && effect.isEnabled
+  )
+  if (maxHpUpEffect) {
+    allBonusesWithRegister.HP = (allBonusesWithRegister.HP || 0) + (maxHpUpEffect.level * 10)
+  }
+}
+
+// HP計算でレジスタ効果込みのボーナスを使用
+hpCalculation: calculateHP(baseStats, allBonusesWithRegister)
+```
+
+#### StatusPreviewでの表示
+- **基本ステータス**: HP値にレジスタ効果が自動的に反映される
+- **装備品補正値1**: HP(+)項目にレジスタ効果が含まれた値が表示される
+
+#### 重要な注意点
+- レジスタが無効の場合、効果は0として計算される
+- 他の装備・クリスタ・料理・バフアイテムのHP補正と同等に扱われる
+- 装備品補正値1の計算順序は既存システムに従う
+
 ## プロパティ変換システム
 
 ### 効果からプロパティへの変換
@@ -286,6 +347,11 @@ export function convertRegisterEffectsToProperties(
   // 魔法攻撃アップ  
   if (registerData.magicalAttackUp.enabled) {
     properties.MATK = (properties.MATK || 0) + registerData.magicalAttackUp.level
+  }
+  
+  // 最大HPアップ（装備品補正値1のHP(+)に加算）
+  if (registerData.maxHPUp.enabled) {
+    properties.HP = (properties.HP || 0) + (registerData.maxHPUp.level * 10)
   }
   
   // 運命共同体（特殊計算）
@@ -332,7 +398,7 @@ export const createInitialRegisterData = (): RegisterFormData => ({
 
 1. **物理攻撃アップ** - 物理攻撃力向上
 2. **魔法攻撃アップ** - 魔法攻撃力向上
-3. **最大HP増加** - HP上限値向上
+3. **最大HPアップ(maxHPUp)** - HP上限値向上（装備品補正値1のHP(+)に加算）
 4. **最大MP増加** - MP上限値向上
 5. **命中アップ** - 命中率向上
 6. **回避アップ** - 回避率向上

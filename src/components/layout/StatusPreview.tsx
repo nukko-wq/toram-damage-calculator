@@ -86,6 +86,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			buffBonuses,
 		)
 
+		// レジスタ効果を含むボーナス値を作成
+		const allBonusesWithRegister = { ...allBonuses }
+		if (data.register?.effects) {
+			const maxHpUpEffect = data.register.effects.find(effect => 
+				effect.type === 'maxHpUp' && effect.isEnabled
+			)
+			if (maxHpUpEffect) {
+				allBonusesWithRegister.HP = (allBonusesWithRegister.HP || 0) + (maxHpUpEffect.level * 10)
+			}
+		}
+
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
 		console.log('ステータスデバッグ:', {
 			attackMP: {
@@ -208,35 +219,36 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 		const adjustedStatsCalculation = calculateAdjustedStats(
 			baseStats,
-			allBonuses,
+			allBonusesWithRegister,
 		)
 
 		// 体装備のArmorTypeを取得
 		const bodyArmorType = getBodyArmorType(data.equipment.body)
 
 		return {
-			allBonuses,
+			allBonuses: allBonusesWithRegister,
 			equipmentBonuses: calculateEquipmentBonuses(
 				equipmentBonuses,
 				crystalBonuses,
 				foodBonuses,
 				buffBonuses,
+				data.register, // レジスタデータを渡す
 			),
-			hpCalculation: calculateHP(baseStats, allBonuses),
-			mpCalculation: calculateMP(baseStats, allBonuses),
-			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, allBonuses),
+			hpCalculation: calculateHP(baseStats, allBonusesWithRegister),
+			mpCalculation: calculateMP(baseStats, allBonusesWithRegister),
+			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, allBonusesWithRegister),
 			subATKCalculation: calculateSubATK(
 				baseStats,
 				data.mainWeapon,
 				data.subWeapon,
 				adjustedStatsCalculation,
-				allBonuses,
+				allBonusesWithRegister,
 			),
 			aspdCalculation: calculateASPD(
 				baseStats,
 				data.mainWeapon,
 				adjustedStatsCalculation,
-				allBonuses,
+				allBonusesWithRegister,
 				bodyArmorType,
 			),
 			motionSpeedCalculation: (() => {
@@ -244,50 +256,50 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					baseStats,
 					data.mainWeapon,
 					adjustedStatsCalculation,
-					allBonuses,
+					allBonusesWithRegister,
 					bodyArmorType,
 				).finalASPD
-				return calculateMotionSpeed(aspd, allBonuses)
+				return calculateMotionSpeed(aspd, allBonusesWithRegister)
 			})(),
-			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonuses),
+			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, allBonusesWithRegister),
 			criticalDamageCalculation: calculateCriticalDamage(
 				adjustedStatsCalculation.STR,
 				adjustedStatsCalculation.AGI,
-				allBonuses,
+				allBonusesWithRegister,
 			),
 			hitCalculation: calculateHIT(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
-				allBonuses,
+				allBonusesWithRegister,
 			),
 			fleeCalculation: calculateFLEE(
 				baseStats.level,
 				adjustedStatsCalculation.AGI,
 				data.equipment.body,
-				allBonuses,
+				allBonusesWithRegister,
 			),
-			physicalResistanceCalculation: calculatePhysicalResistance(allBonuses),
-			magicalResistanceCalculation: calculateMagicalResistance(allBonuses),
-			armorBreakCalculation: calculateArmorBreak(allBonuses),
-			anticipateCalculation: calculateAnticipate(allBonuses),
+			physicalResistanceCalculation: calculatePhysicalResistance(allBonusesWithRegister),
+			magicalResistanceCalculation: calculateMagicalResistance(allBonusesWithRegister),
+			armorBreakCalculation: calculateArmorBreak(allBonusesWithRegister),
+			anticipateCalculation: calculateAnticipate(allBonusesWithRegister),
 			cspdCalculation: calculateCSPD(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
 				adjustedStatsCalculation.AGI,
-				allBonuses,
+				allBonusesWithRegister,
 			),
 			totalElementAdvantageCalculation:
-				calculateTotalElementAdvantage(allBonuses),
+				calculateTotalElementAdvantage(allBonusesWithRegister),
 			stabilityCalculation: calculateStability(
 				data.mainWeapon.stability,
 				data.mainWeapon.weaponType,
 				adjustedStatsCalculation,
-				allBonuses,
+				allBonusesWithRegister,
 				data.subWeapon,
 			),
 			ailmentResistanceCalculation: calculateAilmentResistance(
 				baseStats,
-				allBonuses,
+				allBonusesWithRegister,
 			),
 			adjustedStatsCalculation,
 		}
@@ -300,6 +312,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		data.mainWeapon,
 		data.subWeapon,
 		data.equipment.body,
+		data.register, // レジスタデータを依存関係に追加
 	])
 
 	const {
@@ -567,24 +580,24 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								bringerAM: 'ブリンガーAM',
 								MATK: 'MATK',
 								baseMATK: '基本MATK',
-								stabilityRate: '安定率',
-								subStabilityRate: 'サブ安定率', // 常時表示（ラベル位置統一のため）
+								stabilityRate: '安定率(%)',
+								subStabilityRate: 'サブ安定率(%)', // 常時表示（ラベル位置統一のため）
 								criticalRate: 'ｸﾘﾃｨｶﾙ率',
 								criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
 								magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',
 								magicCriticalDamage: '魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
-								totalElementAdvantage: '総属性有利',
-								elementAwakeningAdvantage: '属性覚醒有利',
+								totalElementAdvantage: '総属性有利(%)',
+								elementAwakeningAdvantage: '属性覚醒有利(%)',
 								ASPD: 'ASPD',
 								CSPD: 'CSPD',
 								HIT: 'HIT',
 								FLEE: 'FLEE',
-								physicalResistance: '物理耐性',
-								magicalResistance: '魔法耐性',
+								physicalResistance: '物理耐性(%)',
+								magicalResistance: '魔法耐性(%)',
 								ailmentResistance: '異常耐性(%)',
-								motionSpeed: '行動速度',
-								armorBreak: '防御崩し',
-								anticipate: '先読み',
+								motionSpeed: '行動速度(%)',
+								armorBreak: '防御崩し(%)',
+								anticipate: '先読み(%)',
 							}}
 							className=""
 						/>

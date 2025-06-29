@@ -757,9 +757,21 @@ export function calculateEquipmentBonuses(
 	crystals: Partial<AllBonuses> = {},
 	foods: Partial<AllBonuses> = {},
 	buffs: Partial<AllBonuses> = {},
+	registerData?: any, // RegisterFormData型（型循環参照を避けるためany）
 ) {
 	// 全ソースを統合
 	const allBonuses = aggregateAllBonuses(equipment, crystals, foods, buffs)
+	
+	// レジスタ効果をプロパティに変換（簡易実装）
+	let registerHPBonus = 0
+	if (registerData && registerData.effects) {
+		const maxHpUpEffect = registerData.effects.find((effect: any) => 
+			effect.type === 'maxHpUp' && effect.isEnabled
+		)
+		if (maxHpUpEffect) {
+			registerHPBonus = maxHpUpEffect.level * 10
+		}
+	}
 
 	// 装備品補正値1 (31項目) - %と固定値の両方を含む
 	const equipmentBonus1 = {
@@ -811,7 +823,7 @@ export function calculateEquipmentBonuses(
 		MP_Rate: allBonuses.MP_Rate || 0,
 		attackMPRecovery: allBonuses.AttackMPRecovery || 0,
 		attackMPRecovery_Rate: allBonuses.AttackMPRecovery_Rate || 0,
-		HP: allBonuses.HP || 0,
+		HP: (allBonuses.HP || 0) + registerHPBonus, // レジスタのmaxHPUp効果を加算
 		HP_Rate: allBonuses.HP_Rate || 0,
 		ailmentResistance: allBonuses.AilmentResistance_Rate || 0,
 		ailmentResistance_Rate: allBonuses.AilmentResistance_Rate || 0,
