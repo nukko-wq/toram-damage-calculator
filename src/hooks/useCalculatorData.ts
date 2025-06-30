@@ -22,6 +22,9 @@ export const useCalculatorData = () => {
 		updateEquipment: store.updateEquipment,
 		updateFood: store.updateFood,
 		updateEnemy: store.updateEnemy,
+		updateBuffSkills: store.updateBuffSkills,
+		updateBuffItems: store.updateBuffItems,
+		updateRegister: store.updateRegister,
 
 		// 基本アクション
 		setHasUnsavedChanges: store.setHasUnsavedChanges,

@@ -249,6 +249,47 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				dataUpdate({ buffSkills }, 'updateBuffSkills')
 			},
 
+			updateBuffSkillState: (skillId, state) => {
+				const { data } = get()
+				const currentSkills = data.buffSkills.skills
+				const updatedSkills = {
+					...currentSkills,
+					[skillId]: state
+				}
+				
+				const updatedBuffSkills = {
+					...data.buffSkills,
+					skills: updatedSkills
+				}
+				
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ buffSkills: updatedBuffSkills }, `updateBuffSkillState:${skillId}`)
+			},
+
+			updateSkillParameter: (skillId, paramType, value) => {
+				const { data } = get()
+				const currentSkills = data.buffSkills.skills
+				const currentSkillState = currentSkills[skillId] || { isEnabled: false }
+				
+				const updatedSkillState = {
+					...currentSkillState,
+					[paramType]: value
+				}
+				
+				const updatedSkills = {
+					...currentSkills,
+					[skillId]: updatedSkillState
+				}
+				
+				const updatedBuffSkills = {
+					...data.buffSkills,
+					skills: updatedSkills
+				}
+				
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ buffSkills: updatedBuffSkills }, `updateSkillParameter:${skillId}:${paramType}`)
+			},
+
 			updateBuffItems: (buffItems) => {
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
 				dataUpdate({ buffItems }, 'updateBuffItems')

@@ -1,0 +1,81 @@
+Magic Tool + Scroll Sub-weapon Configuration Skills (53 total):
+
+1. マジックマスタリ
+2. ウォークライ
+3. バーサーク
+4. 武士弓術
+5. ロングレンジ
+6. チェインキャスト
+7. 急速チャージ
+8. クイックオーラ
+9. 神速の捌手
+10. 武士道
+11. 明鏡止水
+12. 両手持ち
+13. 怪力乱神
+14. 神速の軌跡
+15. フィロエクレール
+16. エンハンス
+17. スタビリス
+18. プリエール
+19. 魔術の導
+20. キャストマスタリ
+21. ファミリア
+22. オーバーリミット
+23. エターナルナイトメア
+24. プロテクション
+25. イージス
+26. ナイトプレッジ
+27. カムフラージュ
+28. 暗殺の極意
+29. 忍道
+30. 忍術
+31. 忍術鍛錬Ⅰ
+32. 忍術鍛錬Ⅱ
+33. 風遁の術 (NEW - appears only with scroll sub-weapon)
+34. ブレイブオーラ
+35. ハイサイクル
+36. クイックモーション
+37. マナリチャージ
+38. MPブースト
+39. スペルバースト
+40. クリティカルup
+41. HPブースト
+42. 攻撃力up
+43. 驚異の威力
+44. 魔法力up
+45. 更なる魔力
+46. 命中UP
+47. 回避UP
+48. ブレイブアップ
+49. マインドアップ
+50. カットアップ
+51. クリティカルアップ
+52. 熱情の歌
+53. 前線維持Ⅱ
+
+ANALYSIS:
+The magic tool + scroll configuration has 53 skills vs 49 skills in the basic magic tool configuration.
+
+ADDITIONAL SKILLS (4 new skills with scroll sub-weapon):
+1. 風遁の術 (Wind Escape Technique) - A ninja skill that appears to be a movement/speed enhancement
+2. ブレイブアップ (Brave Up) - Pet skill that boosts ATK
+3. マインドアップ (Mind Up) - Pet skill that boosts MATK
+4. カットアップ (Cut Up) - Pet skill that boosts critical rate
+5. クリティカルアップ (Critical Up) - Pet skill that boosts critical damage
+
+Wait, that's 5 skills. Let me recount...
+
+Actually, looking more carefully:
+- The basic magic tool has 49 skills
+- The magic tool + scroll has 53 skills visible in the HTML
+- The difference is 4 additional skills
+
+The 4 additional skills that appear only with scroll sub-weapon are:
+1. 風遁の術 (Wind Escape Technique) - Ninja skill
+2. ブレイブアップ (Brave Up) - Pet skill
+3. マインドアップ (Mind Up) - Pet skill  
+4. カットアップ (Cut Up) - Pet skill
+5. クリティカルアップ (Critical Up) - Pet skill
+
+This gives us 5 additional skills, meaning the total should be 54, not 53. Let me recheck the count...

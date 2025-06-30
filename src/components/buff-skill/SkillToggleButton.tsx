@@ -1,48 +1,31 @@
 'use client'
 
-interface SkillToggleButtonsProps {
+interface SkillToggleButtonProps {
 	isEnabled: boolean
 	onToggle: (enabled: boolean) => void
-	className?: string
 }
 
-export default function SkillToggleButtons({
+export default function SkillToggleButton({
 	isEnabled,
 	onToggle,
-	className = '',
-}: SkillToggleButtonsProps) {
+}: SkillToggleButtonProps) {
 	return (
-		<div className={`flex ${className}`}>
-			{/* 有効ボタン */}
-			<button
-				type="button"
-				onClick={() => onToggle(true)}
+		<button
+			type="button"
+			onClick={() => onToggle(!isEnabled)}
+			className={`
+				relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none cursor-pointer
+				${isEnabled ? 'bg-blue-500/90' : 'bg-gray-200'}
+			`}
+			role="switch"
+			aria-checked={isEnabled}
+		>
+			<span
 				className={`
-					px-2 py-1 text-[13px] font-medium rounded-md transition-colors duration-200 outline-none
-					${
-						isEnabled
-							? 'bg-rose-200 text-gray-700 shadow-md hover:bg-rose-200/80 transition-colors duration-200'
-							: 'text-gray-600 hover:bg-rose-100 transition-colors duration-200'
-					}
+					inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+					${isEnabled ? 'translate-x-6' : 'translate-x-1'}
 				`}
-			>
-				有効
-			</button>
-			{/* 無効ボタン */}
-			<button
-				type="button"
-				onClick={() => onToggle(false)}
-				className={`
-					px-2 py-1 text-[13px] font-medium rounded-md transition-colors duration-200 outline-none
-					${
-						!isEnabled
-							? 'bg-gray-200 text-gray-700 shadow-md hover:bg-gray-200/80 transition-colors duration-200'
-							: 'bg-white text-gray-600 hover:bg-rose-100 transition-colors duration-200'
-					}
-				`}
-			>
-				無効
-			</button>
-		</div>
+			/>
+		</button>
 	)
 }

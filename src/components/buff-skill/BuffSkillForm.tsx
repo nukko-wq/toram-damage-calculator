@@ -1,161 +1,134 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useCalculatorStore } from '@/stores/calculatorStore'
+import { useMemo } from 'react'
 import {
-	categoryNameMap,
-	getDefaultParametersForSkill,
-	weaponTypeToMasterySkills,
-	weaponTypeToSpecialSkills,
-	weaponSpecificSkillIds,
-} from '@/utils/buffSkillDefaults'
+	getAvailableSkills,
+	sortSkills,
+	mergeSkillStates,
+} from '@/utils/buffSkillUtils'
+import type { BuffSkillDefinition } from '@/types/buffSkill'
+import { useCalculatorData } from '@/hooks/useCalculatorData'
+import type {
+	MainWeaponType,
+	SubWeaponType,
+} from '@/types/buffSkill'
+import type { WeaponType, SubWeaponType as CalculatorSubWeaponType } from '@/types/calculator'
 import SkillCard from './SkillCard'
-import type { WeaponType } from '@/types/calculator'
 
-export default function BuffSkillForm() {
-	const storeBuffSkills = useCalculatorStore((state) => state.data.buffSkills)
-	const mainWeaponType = useCalculatorStore(
-		(state) => state.data.mainWeapon.weaponType,
-	)
-	const updateBuffSkills = useCalculatorStore((state) => state.updateBuffSkills)
-	const isInitialized = useCalculatorStore((state) => state.isInitialized)
+// 武器種変換関数
+function convertWeaponType(weaponType: WeaponType): MainWeaponType | null {
+	const weaponMap: Record<WeaponType, MainWeaponType> = {
+		'片手剣': 'oneHandSword',
+		'双剣': 'dualSword',
+		'両手剣': 'twoHandSword',
+		'手甲': 'knuckle',
+		'旋風槍': 'halberd',
+		'抜刀剣': 'katana',
+		'弓': 'bow',
+		'自動弓': 'bowgun',
+		'杖': 'staff',
+		'魔導具': 'magicDevice',
+		'素手': 'bareHands',
+	}
+	return weaponMap[weaponType] || null
+}
 
-	const [localInitialized, setLocalInitialized] = useState(false)
-	const prevWeaponType = useRef<WeaponType>(mainWeaponType)
+function convertSubWeaponType(subWeaponType: CalculatorSubWeaponType): SubWeaponType | null {
+	const subWeaponMap: Record<CalculatorSubWeaponType, SubWeaponType> = {
+		'なし': 'none',
+		'ナイフ': 'knife',
+		'矢': 'arrow',
+		'盾': 'shield',
+		'手甲': 'knuckle',
+		'魔道具': 'magicDevice',
+		'巻物': 'scroll',
+		'片手剣': 'knife', // 片手剣サブ武器はknife扱い
+		'抜刀剣': 'knife', // 抜刀剣サブ武器もknife扱いに修正
+	}
+	return subWeaponMap[subWeaponType] || null
+}
 
-	// セーブデータ切り替え時のちらつき防止
-	useEffect(() => {
-		setLocalInitialized(false)
-		const timer = setTimeout(() => setLocalInitialized(true), 30)
-		return () => clearTimeout(timer)
-	}, [storeBuffSkills.skills.length])
-
-	// 武器種に応じたマスタリスキルフィルタリング
-	const getVisibleMasterySkills = useCallback((weaponType: WeaponType) => {
-		return weaponTypeToMasterySkills[weaponType] || []
-	}, [])
-
-	// 武器種に応じた専用スキルフィルタリング
-	const getVisibleSpecialSkills = useCallback((weaponType: WeaponType) => {
-		return weaponTypeToSpecialSkills[weaponType] || []
-	}, [])
-
-	// 武器種変更時のマスタリスキル・専用スキルリセット処理
-	const resetWeaponDependentSkillsOnWeaponChange = useCallback(() => {
-		if (!isInitialized || !localInitialized) return
-
-		const updatedSkills = storeBuffSkills.skills.map((skill) => {
-			if (
-				skill.category === 'mastery' ||
-				weaponSpecificSkillIds.includes(skill.id)
-			) {
-				return {
-					...skill,
-					isEnabled: false,
-					parameters: getDefaultParametersForSkill(skill.id),
-				}
+// 新しいBuffSkillFormデータを旧形式に変換
+function convertToLegacyFormat(
+	newData: BuffSkillFormData, 
+	availableSkills: BuffSkillDefinition[]
+): import('@/types/calculator').BuffSkillFormData {
+	const skills: import('@/types/calculator').BuffSkill[] = []
+	
+	// 有効なスキルのみを配列形式に変換
+	for (const [skillId, state] of Object.entries(newData.skills)) {
+		if (state.isEnabled) {
+			const skillDef = availableSkills.find(s => s.id === skillId)
+			if (skillDef) {
+				skills.push({
+					id: skillId,
+					name: skillDef.name,
+					category: skillDef.category,
+					isEnabled: true,
+					parameters: {
+						skillLevel: state.level || 1,
+						stackCount: state.stackCount || 1,
+						playerCount: state.specialParam || 0,
+					}
+				})
 			}
-			return skill
-		})
-		updateBuffSkills({ skills: updatedSkills })
-	}, [
-		storeBuffSkills.skills,
-		updateBuffSkills,
-		isInitialized,
-		localInitialized,
-	])
-
-	// 武器種変更を検知してマスタリスキル・専用スキルをリセット
-	useEffect(() => {
-		if (prevWeaponType.current !== mainWeaponType) {
-			resetWeaponDependentSkillsOnWeaponChange()
-			prevWeaponType.current = mainWeaponType
 		}
-	}, [mainWeaponType, resetWeaponDependentSkillsOnWeaponChange])
-
-	// スキルを平坦なリストに変換（マスタリ・専用スキルフィルタリング付き）
-	const flatSkillsList = useMemo(() => {
-		const visibleMasterySkills = getVisibleMasterySkills(mainWeaponType)
-		const visibleSpecialSkills = getVisibleSpecialSkills(mainWeaponType)
-
-		return storeBuffSkills.skills
-			.filter((skill) => {
-				// マスタリスキルの場合は武器種に応じてフィルタリング
-				if (skill.category === 'mastery') {
-					if (visibleMasterySkills.length === 0) {
-						// 抜刀剣等：マスタリスキル系統全体を非表示
-						return false
-					}
-					if (!visibleMasterySkills.includes(skill.id)) {
-						// 該当しないマスタリスキルは非表示
-						return false
-					}
-				}
-
-				// 武器種専用スキルの場合は武器種に応じてフィルタリング
-				if (weaponSpecificSkillIds.includes(skill.id)) {
-					if (!visibleSpecialSkills.includes(skill.id)) {
-						// 該当しない専用スキルは非表示
-						return false
-					}
-				}
-
-				return true
-			})
-			.map((skill) => ({
-				...skill,
-				categoryLabel: categoryNameMap[skill.category],
-			}))
-	}, [
-		storeBuffSkills.skills,
-		mainWeaponType,
-		getVisibleMasterySkills,
-		getVisibleSpecialSkills,
-	])
-
-	// スキルのオン/オフ切り替え
-	const handleSkillToggle = (skillId: string, enabled: boolean) => {
-		if (!isInitialized || !localInitialized) return
-
-		const updatedSkills = storeBuffSkills.skills.map((skill) =>
-			skill.id === skillId ? { ...skill, isEnabled: enabled } : skill,
-		)
-		updateBuffSkills({ skills: updatedSkills })
 	}
+	
+	return { skills }
+}
 
-	// スキルパラメータの更新（ポップオーバー用）
-	const handleParameterChange = (
-		skillId: string,
-		parameters: import('@/types/calculator').BuffSkillParameters,
-	) => {
-		if (!isInitialized || !localInitialized) return
+// バフスキルフォームコンポーネント
+export default function BuffSkillForm() {
+	// データと更新関数を取得
+	const { data, updateBuffSkills } = useCalculatorData()
+	
+	// 武器種を BuffSkill システム用の型に変換
+	const mainWeapon = convertWeaponType(data.mainWeapon.weaponType)
+	const subWeapon = convertSubWeaponType(data.subWeapon.weaponType)
+	
+	// 武器に応じたスキルを取得してソート
+	const availableSkills = useMemo(() => {
+		const skills = getAvailableSkills(mainWeapon, subWeapon)
+		return sortSkills(skills)
+	}, [mainWeapon, subWeapon])
 
-		const updatedSkills = storeBuffSkills.skills.map((skill) =>
-			skill.id === skillId
-				? {
-						...skill,
-						parameters,
-					}
-				: skill,
-		)
-		updateBuffSkills({ skills: updatedSkills })
-	}
+
+
 
 	return (
 		<div className="space-y-4 md:col-start-1 md:col-end-9 md:row-start-5 md:row-end-6 xl:col-start-1 xl:col-end-4 xl:row-start-4 xl:row-end-5 bg-white p-4 rounded-lg shadow-md">
-			<h2 className="text-xl font-bold text-gray-800">バフスキル設定</h2>
+			<div className="mb-6">
+				<h2 className="text-xl font-bold text-gray-900 mb-2">バフスキル</h2>
+				<p className="text-sm text-gray-600">
+					利用可能スキル数: {availableSkills.length}
+				</p>
+			</div>
 
 			<div className="grid grid-cols-2 gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3">
-				{flatSkillsList.map((skill) => (
-					<SkillCard
-						key={skill.id}
-						skill={skill}
-						categoryLabel={skill.categoryLabel}
-						onToggle={handleSkillToggle}
-						onParameterChange={handleParameterChange}
+				{availableSkills.map(skill => (
+					<SkillCard 
+						key={skill.id} 
+						skill={skill} 
 					/>
 				))}
 			</div>
 		</div>
 	)
+}
+
+// 旧形式から新形式への変換
+function convertLegacyToNewFormat(legacyData: import('@/types/calculator').BuffSkillFormData): Record<string, import('@/types/buffSkill').BuffSkillState> {
+	const newFormat: Record<string, import('@/types/buffSkill').BuffSkillState> = {}
+	
+	for (const skill of legacyData.skills) {
+		newFormat[skill.id] = {
+			isEnabled: skill.isEnabled,
+			level: skill.parameters.skillLevel,
+			stackCount: skill.parameters.stackCount,
+			specialParam: skill.parameters.playerCount,
+		}
+	}
+	
+	return newFormat
 }
