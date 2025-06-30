@@ -1,4 +1,5 @@
-import type { BuffSkill, BuffSkillFormData } from '@/types/calculator'
+import type { BuffSkill } from '@/types/calculator'
+import type { BuffSkillFormData } from '@/types/buffSkill'
 
 // バフスキルのデフォルトデータ
 export const getDefaultBuffSkills = (): BuffSkill[] => [
@@ -433,9 +434,9 @@ export const getDefaultBuffSkills = (): BuffSkill[] => [
 	},
 ]
 
-// デフォルトバフスキルフォームデータを生成
+// デフォルトバフスキルフォームデータを生成（新形式: Record<string, BuffSkillState>）
 export const getDefaultBuffSkillFormData = (): BuffSkillFormData => ({
-	skills: getDefaultBuffSkills(),
+	skills: {}, // 空のRecordから開始（スキルは動的に有効化される）
 })
 
 // 武器種からマスタリスキルIDを取得するマッピング
@@ -485,7 +486,7 @@ export const getDefaultParametersForSkill = (skillId: string) => {
 	const eternalDefaults = { skillLevel: 10, spUsed: 25 }
 	const braveDefaults = { isCaster: 0 }
 
-	const skillDefaults: Record<string, any> = {
+	const skillDefaults: Record<string, Record<string, unknown>> = {
 		// マスタリスキル
 		halberd_mastery: masteryDefaults,
 		blade_mastery: masteryDefaults,

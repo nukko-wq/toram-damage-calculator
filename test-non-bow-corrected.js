@@ -25,7 +25,7 @@ const isBowArrowCombo = (testData.mainWeapon.weaponType === '弓' || testData.ma
 const arrowATK = isBowArrowCombo ? testData.subWeapon.ATK : 0;
 
 const refinedWeaponATK = Math.floor(
-  testData.mainWeapon.ATK * (1 + Math.pow(testData.mainWeapon.refinement, 2) / 100) + testData.mainWeapon.refinement
+  testData.mainWeapon.ATK * (1 + testData.mainWeapon.refinement ** 2 / 100) + testData.mainWeapon.refinement
 );
 
 const weaponATKPercentBonus = Math.floor(testData.mainWeapon.ATK * testData.bonuses.WeaponATK_Rate / 100);

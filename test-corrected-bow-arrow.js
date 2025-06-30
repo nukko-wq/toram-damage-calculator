@@ -50,7 +50,7 @@ console.log('1. Is Bow + Arrow combo:', isBowArrowCombo);
 
 // 1. Refined weapon ATK (main weapon only)
 const refinedWeaponATK = Math.floor(
-  testData.mainWeapon.ATK * (1 + Math.pow(testData.mainWeapon.refinement, 2) / 100) + testData.mainWeapon.refinement
+  testData.mainWeapon.ATK * (1 + testData.mainWeapon.refinement ** 2 / 100) + testData.mainWeapon.refinement
 );
 console.log('2. Refined Weapon ATK (main weapon only):', refinedWeaponATK);
 

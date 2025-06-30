@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import {
 	getAvailableSkills,
 	sortSkills,
-	mergeSkillStates,
 } from '@/utils/buffSkillUtils'
 import type { BuffSkillDefinition } from '@/types/buffSkill'
 import { useCalculatorData } from '@/hooks/useCalculatorData'
@@ -48,40 +47,11 @@ function convertSubWeaponType(subWeaponType: CalculatorSubWeaponType): SubWeapon
 	return subWeaponMap[subWeaponType] || null
 }
 
-// 新しいBuffSkillFormデータを旧形式に変換
-function convertToLegacyFormat(
-	newData: BuffSkillFormData, 
-	availableSkills: BuffSkillDefinition[]
-): import('@/types/calculator').BuffSkillFormData {
-	const skills: import('@/types/calculator').BuffSkill[] = []
-	
-	// 有効なスキルのみを配列形式に変換
-	for (const [skillId, state] of Object.entries(newData.skills)) {
-		if (state.isEnabled) {
-			const skillDef = availableSkills.find(s => s.id === skillId)
-			if (skillDef) {
-				skills.push({
-					id: skillId,
-					name: skillDef.name,
-					category: skillDef.category,
-					isEnabled: true,
-					parameters: {
-						skillLevel: state.level || 1,
-						stackCount: state.stackCount || 1,
-						playerCount: state.specialParam || 0,
-					}
-				})
-			}
-		}
-	}
-	
-	return { skills }
-}
 
 // バフスキルフォームコンポーネント
 export default function BuffSkillForm() {
-	// データと更新関数を取得
-	const { data, updateBuffSkills } = useCalculatorData()
+	// データを取得
+	const { data } = useCalculatorData()
 	
 	// 武器種を BuffSkill システム用の型に変換
 	const mainWeapon = convertWeaponType(data.mainWeapon.weaponType)
@@ -115,20 +85,4 @@ export default function BuffSkillForm() {
 			</div>
 		</div>
 	)
-}
-
-// 旧形式から新形式への変換
-function convertLegacyToNewFormat(legacyData: import('@/types/calculator').BuffSkillFormData): Record<string, import('@/types/buffSkill').BuffSkillState> {
-	const newFormat: Record<string, import('@/types/buffSkill').BuffSkillState> = {}
-	
-	for (const skill of legacyData.skills) {
-		newFormat[skill.id] = {
-			isEnabled: skill.isEnabled,
-			level: skill.parameters.skillLevel,
-			stackCount: skill.parameters.stackCount,
-			specialParam: skill.parameters.playerCount,
-		}
-	}
-	
-	return newFormat
 }
