@@ -28,7 +28,7 @@ interface BuffSkillDefinition {
   categoryOrder?: number     // カテゴリ内順序番号（省略時はorder使用）
   maxLevel?: number          // 最大レベル（デフォルト10）
   maxStack?: number          // 最大重ねがけ数
-  description?: string       // 説明文
+  inputHint?: string         // 入力補助テキスト（モーダル内の説明用）
   requirements?: WeaponRequirement[] // 武器要件
 }
 
@@ -634,6 +634,348 @@ const useCalculatorStore = create<CalculatorStore>((set, get) => ({
 - 不正な武器組み合わせ時の安全な状態復元
 - データ破損時のデフォルト値復元
 
+## モーダル機能設計
+
+### モーダル表示仕様
+
+スキル名をクリックすることで、スキルパラメータ入力用のモーダルが開きます。
+
+```typescript
+interface SkillParameterModalProps {
+  skill: BuffSkillDefinition
+  currentState: BuffSkillState
+  isOpen: boolean
+  onClose: () => void
+  onSave: (newState: BuffSkillState) => void
+}
+
+const SkillParameterModal: React.FC<SkillParameterModalProps> = ({
+  skill,
+  currentState,
+  isOpen,
+  onClose,
+  onSave
+}) => {
+  const [tempState, setTempState] = useState<BuffSkillState>(currentState)
+  
+  const handleSave = () => {
+    onSave(tempState)
+    onClose()
+  }
+  
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="p-6 max-w-md">
+        <h3 className="text-lg font-bold mb-4">{skill.name}</h3>
+        
+        {/* 入力補助テキスト */}
+        {skill.inputHint && (
+          <div className="mb-4 p-3 bg-blue-50 rounded">
+            <p className="text-sm text-blue-700">{skill.inputHint}</p>
+          </div>
+        )}
+        
+        {/* パラメータ入力フォーム */}
+        <div className="space-y-4">
+          {/* ON/OFF設定 */}
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium">スキル有効化</label>
+            <Switch
+              checked={tempState.isEnabled}
+              onCheckedChange={(enabled) => 
+                setTempState(prev => ({ ...prev, isEnabled: enabled }))
+              }
+            />
+          </div>
+          
+          {/* レベル設定（toggle以外） */}
+          {skill.type !== 'toggle' && tempState.isEnabled && (
+            <>
+              {skill.type === 'level' && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    スキルレベル (1-{skill.maxLevel || 10})
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={skill.maxLevel || 10}
+                    value={tempState.level || 1}
+                    onChange={(e) => setTempState(prev => ({
+                      ...prev,
+                      level: Number(e.target.value)
+                    }))}
+                    className="w-full p-2 border rounded"
+                    placeholder="スキルレベルを入力してください"
+                  />
+                </div>
+              )}
+              
+              {skill.type === 'stack' && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    重ねがけ数 (1-{skill.maxStack || 10})
+                  </label>
+                  <select
+                    value={tempState.stackCount || 1}
+                    onChange={(e) => setTempState(prev => ({
+                      ...prev,
+                      stackCount: Number(e.target.value)
+                    }))}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="" disabled>重ね掛け回数を選択してください</option>
+                    {Array.from({ length: skill.maxStack || 10 }, (_, i) => i + 1)
+                      .map(num => (
+                        <option key={num} value={num}>×{num}</option>
+                      ))
+                    }
+                  </select>
+                </div>
+              )}
+              
+              {skill.type === 'special' && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    特殊パラメータ
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={tempState.specialParam || 0}
+                    onChange={(e) => setTempState(prev => ({
+                      ...prev,
+                      specialParam: Number(e.target.value)
+                    }))}
+                    className="w-full p-2 border rounded"
+                    placeholder={skill.inputHint || "値を入力してください"}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+        
+        {/* ボタン */}
+        <div className="flex justify-end space-x-2 mt-6">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-gray-600 border rounded hover:bg-gray-50"
+          >
+            キャンセル
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            保存
+          </button>
+        </div>
+      </div>
+    </Modal>
+  )
+}
+```
+
+### モーダル開閉ロジック
+
+```typescript
+// NewSkillCard コンポーネントの更新
+export default function NewSkillCard({ skill, control, watch }: NewSkillCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const currentState = watch(`skills.${skill.id}`) as BuffSkillState || {
+    isEnabled: false,
+    level: 1,
+    stackCount: 1,
+    specialParam: 0
+  }
+  
+  const handleSkillNameClick = () => {
+    // toggle以外のスキルのみモーダルを開く
+    if (skill.type !== 'toggle') {
+      setIsModalOpen(true)
+    }
+  }
+  
+  const handleModalSave = (newState: BuffSkillState) => {
+    // React Hook Form の setValue を使用して状態を更新
+    setValue(`skills.${skill.id}`, newState)
+  }
+  
+  return (
+    <div className="border-b-2 border-blue-200">
+      {/* カテゴリラベル */}
+      <div className="text-[10px] text-gray-500">{categoryLabel}</div>
+      
+      {/* スキル名とトグルスイッチ */}
+      <div className="skill-header flex items-center justify-between mb-1">
+        <span 
+          className={`skill-name text-[13px] font-medium text-gray-700 flex-1 mr-2 leading-tight ${
+            skill.type !== 'toggle' ? 'hover:text-blue-600 cursor-pointer' : ''
+          }`}
+          onClick={handleSkillNameClick}
+        >
+          {getDisplayName()}
+        </span>
+        
+        <Controller
+          name={`skills.${skill.id}.isEnabled`}
+          control={control}
+          render={({ field }) => (
+            <NewSkillToggleButton
+              isEnabled={field.value || false}
+              onToggle={field.onChange}
+            />
+          )}
+        />
+      </div>
+      
+      {/* モーダル */}
+      <SkillParameterModal
+        skill={skill}
+        currentState={currentState}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleModalSave}
+      />
+    </div>
+  )
+}
+```
+
+### 入力補助テキストの実装方針
+
+#### デフォルトメッセージ
+スキルタイプごとにデフォルトメッセージを自動適用：
+
+```typescript
+function getDefaultInputHint(skillType: BuffSkillType): string {
+  switch (skillType) {
+    case 'level':
+      return 'スキルレベルを入力してください'
+    case 'stack':
+      return '重ね掛け回数を選択してください'
+    case 'special':
+      return '値を入力してください'
+    case 'toggle':
+    default:
+      return ''
+  }
+}
+```
+
+#### カスタム入力補助テキスト
+特殊なケースのみ個別定義：
+
+```typescript
+const CUSTOM_SKILL_INPUT_HINTS: Record<string, string> = {
+  // 特殊パラメータ系で具体的な説明が必要なもののみ
+  'ogre_slash': '消費鬼力数を入力してください',
+  'brave': '対象プレイヤー数を入力してください',
+  'knight_pledge': '精錬値を入力してください',
+  'eternal_nightmare': '消費MP数を入力してください',
+  
+  // ... 他の特殊ケースのみ
+}
+
+// スキル定義での使用例
+const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
+  {
+    id: 'LongRange',
+    name: 'ロングレンジ',
+    category: 'shoot',
+    type: 'level',      // デフォルトで「スキルレベルを入力してください」
+    maxLevel: 10,
+    order: 201
+    // inputHint省略（デフォルト使用）
+  },
+  {
+    id: 'hb4-1',
+    name: '神速の捌手',
+    category: 'halberd',
+    type: 'stack',      // デフォルトで「重ね掛け回数を選択してください」
+    maxStack: 3,
+    order: 402
+    // inputHint省略（デフォルト使用）
+  },
+  {
+    id: 'ogre_slash',
+    name: 'オーガスラッシュ',
+    category: 'blade',
+    type: 'special',
+    order: 207,
+    inputHint: CUSTOM_SKILL_INPUT_HINTS['ogre_slash'] // カスタム使用
+  }
+  // ...
+]
+```
+
+#### モーダル内での使用
+
+```typescript
+// 入力補助テキストの取得関数
+function getInputHint(skill: BuffSkillDefinition): string {
+  // カスタム設定があればそれを使用、なければデフォルト
+  return skill.inputHint || getDefaultInputHint(skill.type)
+}
+
+// モーダル内での表示
+{getInputHint(skill) && (
+  <div className="mb-4 p-3 bg-blue-50 rounded">
+    <p className="text-sm text-blue-700">{getInputHint(skill)}</p>
+  </div>
+)}
+```
+
+### モーダル表示条件
+
+```typescript
+// スキルタイプによるモーダル表示制御
+function shouldShowModal(skill: BuffSkillDefinition): boolean {
+  // toggleタイプのスキルはモーダル表示しない（ON/OFFのみ）
+  if (skill.type === 'toggle') {
+    return false
+  }
+  
+  // level, stack, specialタイプはモーダル表示
+  return ['level', 'stack', 'special'].includes(skill.type)
+}
+
+// スキル名のクリック可能性を示すUI
+function getSkillNameClassName(skill: BuffSkillDefinition): string {
+  const baseClass = 'skill-name text-[13px] font-medium text-gray-700 flex-1 mr-2 leading-tight'
+  
+  if (shouldShowModal(skill)) {
+    return `${baseClass} hover:text-blue-600 cursor-pointer`
+  }
+  
+  return baseClass
+}
+```
+
+### アクセシビリティ対応
+
+```typescript
+// スキル名にaria属性を追加
+<span 
+  className={getSkillNameClassName(skill)}
+  onClick={handleSkillNameClick}
+  role={shouldShowModal(skill) ? 'button' : undefined}
+  tabIndex={shouldShowModal(skill) ? 0 : undefined}
+  onKeyDown={(e) => {
+    if (shouldShowModal(skill) && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault()
+      handleSkillNameClick()
+    }
+  }}
+  aria-label={shouldShowModal(skill) ? `${skill.name}の詳細設定を開く` : undefined}
+>
+  {getDisplayName()}
+</span>
+```
+
 ## 今後の拡張
 
 ### 計算エンジン統合
@@ -647,3 +989,8 @@ const useCalculatorStore = create<CalculatorStore>((set, get) => ({
 ### 上級者向け機能
 - スキル効果の詳細表示
 - ビルド最適化提案
+
+### モーダル機能の拡張
+- スキル効果の数値計算結果表示
+- 関連スキルとの相性情報
+- おすすめレベル設定の提案
