@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import type { BuffSkill, BuffSkillParameters } from '@/types/calculator'
 import { Popover } from '../ui/Popover'
-import { SkillParameterForm } from './SkillParameterForm'
+// import { SkillParameterForm } from './SkillParameterForm'
 import SkillToggleButtons from './SkillToggleButton'
 
 interface SkillCardProps {
@@ -144,11 +144,12 @@ export default function SkillCard({
 						onOpenChange={setIsPopoverOpen}
 						placement="center"
 					>
-						<SkillParameterForm
+						{/* <SkillParameterForm
 							skill={skill}
 							onSave={handleParameterSave}
 							onCancel={handleParameterCancel}
-						/>
+						/> */}
+						<div>Coming Soon...</div>
 					</Popover>
 				) : (
 					<span className="skill-name text-sm font-medium text-gray-700 flex-1 mr-2 leading-tight">

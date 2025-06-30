@@ -14,11 +14,8 @@ export default function NewSkillToggleButton({
 			type="button"
 			onClick={() => onToggle(!isEnabled)}
 			className={`
-				relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-				${isEnabled 
-					? 'bg-blue-600' 
-					: 'bg-gray-200'
-				}
+				relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none
+				${isEnabled ? 'bg-blue-500/90' : 'bg-gray-200'}
 			`}
 			role="switch"
 			aria-checked={isEnabled}

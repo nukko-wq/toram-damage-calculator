@@ -8,6 +8,7 @@ import type {
 	SubWeaponType,
 	WeaponRequirement,
 	BuffSkillCategory,
+	BuffSkillType,
 } from '@/types/buffSkill'
 import {
 	COMMON_BUFF_SKILLS,
@@ -292,4 +293,57 @@ export function validateSkillState(
 	}
 
 	return true
+}
+
+// 入力補助テキスト関連の関数
+
+// スキルタイプに対応するデフォルト入力補助テキストを取得
+export function getDefaultInputHint(skillType: BuffSkillType): string {
+	switch (skillType) {
+		case 'level':
+			return 'スキルレベルを入力してください'
+		case 'stack':
+			return '重ね掛け回数を選択してください'
+		case 'special':
+			return '値を入力してください'
+		default:
+			return ''
+	}
+}
+
+// カスタム入力補助テキスト（特殊ケースのみ）
+const CUSTOM_SKILL_INPUT_HINTS: Record<string, string> = {
+	// 特殊パラメータ系で具体的な説明が必要なもののみ
+	ogre_slash: '消費鬼力数を入力してください',
+	brave: '対象プレイヤー数を入力してください',
+	knight_pledge: '精錬値を入力してください',
+	eternal_nightmare: '消費MP数を入力してください',
+}
+
+// スキルの入力補助テキストを取得（カスタム設定 || デフォルト）
+export function getInputHint(skill: BuffSkillDefinition): string {
+	// カスタム設定があればそれを使用、なければデフォルト
+	return CUSTOM_SKILL_INPUT_HINTS[skill.id] || getDefaultInputHint(skill.type)
+}
+
+// モーダル表示判定
+export function shouldShowModal(skill: BuffSkillDefinition): boolean {
+	// toggleタイプのスキルはモーダル表示しない（ON/OFFのみ）
+	if (skill.type === 'toggle') {
+		return false
+	}
+	
+	// level, stack, specialタイプはモーダル表示
+	return ['level', 'stack', 'special'].includes(skill.type)
+}
+
+// スキル名のクリック可能性を示すCSSクラス名を取得
+export function getSkillNameClassName(skill: BuffSkillDefinition): string {
+	const baseClass = 'skill-name text-[13px] font-medium text-gray-700 flex-1 mr-2 leading-tight'
+	
+	if (shouldShowModal(skill)) {
+		return `${baseClass} hover:text-blue-600 cursor-pointer`
+	}
+	
+	return baseClass
 }

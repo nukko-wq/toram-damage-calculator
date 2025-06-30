@@ -813,7 +813,7 @@ export default function NewSkillCard({ skill, control, watch }: NewSkillCardProp
       <div className="skill-header flex items-center justify-between mb-1">
         <span 
           className={`skill-name text-[13px] font-medium text-gray-700 flex-1 mr-2 leading-tight ${
-            skill.type !== 'toggle' ? 'hover:text-blue-600 cursor-pointer' : ''
+            skill.type !== 'toggle' ? 'hover:text-blue-500/90 cursor-pointer' : ''
           }`}
           onClick={handleSkillNameClick}
         >

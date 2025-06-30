@@ -8,6 +8,7 @@ import {
 	sortSkills,
 	mergeSkillStates,
 } from '@/utils/buffSkillUtils'
+import type { BuffSkillDefinition } from '@/types/buffSkill'
 import { useCalculatorData } from '@/hooks/useCalculatorData'
 import type {
 	BuffSkillFormData,
@@ -106,7 +107,7 @@ export default function BuffSkillForm() {
 		return { skills: mergedStates }
 	}, [data.buffSkills, availableSkills])
 
-	const { control, watch, reset } = useForm<BuffSkillFormData>({
+	const { control, watch, reset, setValue } = useForm<BuffSkillFormData>({
 		resolver: zodResolver(buffSkillSchema),
 		defaultValues: initialFormValues,
 	})
@@ -144,6 +145,7 @@ export default function BuffSkillForm() {
 						skill={skill} 
 						control={control} 
 						watch={watch} 
+						setValue={setValue}
 					/>
 				))}
 			</div>

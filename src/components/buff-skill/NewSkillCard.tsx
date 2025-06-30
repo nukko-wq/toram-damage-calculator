@@ -1,23 +1,50 @@
 'use client'
 
-import { Controller, type Control } from 'react-hook-form'
-import type { BuffSkillDefinition, BuffSkillFormData } from '@/types/buffSkill'
+import { useState } from 'react'
+import { Controller, type Control, type UseFormSetValue } from 'react-hook-form'
+import type { BuffSkillDefinition, BuffSkillFormData, BuffSkillState } from '@/types/buffSkill'
 import { CATEGORY_LABELS } from '@/types/buffSkill'
+import { shouldShowModal, getSkillNameClassName } from '@/utils/buffSkillUtils'
 import NewSkillToggleButton from './NewSkillToggleButton'
+import SkillParameterModal from './SkillParameterModal'
 
 interface NewSkillCardProps {
 	skill: BuffSkillDefinition
 	control: Control<BuffSkillFormData>
 	watch: (name?: string) => unknown
+	setValue: UseFormSetValue<BuffSkillFormData>
 }
 
 export default function NewSkillCard({
 	skill,
 	control,
 	watch,
+	setValue,
 }: NewSkillCardProps) {
+	const [isModalOpen, setIsModalOpen] = useState(false)
 	const categoryLabel = CATEGORY_LABELS[skill.category]
 	const isEnabled = watch(`skills.${skill.id}.isEnabled`) as boolean
+
+	// 現在のスキル状態を取得
+	const currentState = watch(`skills.${skill.id}`) as BuffSkillState || {
+		isEnabled: false,
+		level: 1,
+		stackCount: 1,
+		specialParam: 0
+	}
+
+	// モーダル開閉ハンドラー
+	const handleSkillNameClick = () => {
+		// toggle以外のスキルのみモーダルを開く
+		if (shouldShowModal(skill)) {
+			setIsModalOpen(true)
+		}
+	}
+
+	const handleModalSave = (newState: BuffSkillState) => {
+		// React Hook Form の setValue を使用して状態を更新
+		setValue(`skills.${skill.id}`, newState)
+	}
 
 	// スキル名の表示形式を決定（パラメータ値付き）
 	const getDisplayName = (): string => {
@@ -37,8 +64,6 @@ export default function NewSkillCard({
 				}
 				return skill.name
 
-			case 'toggle':
-			case 'special':
 			default:
 				return skill.name
 		}
@@ -51,7 +76,19 @@ export default function NewSkillCard({
 
 			{/* スキル名とトグルスイッチ */}
 			<div className="skill-header flex items-center justify-between mb-1">
-				<span className="skill-name text-[13px] font-medium text-gray-700 flex-1 mr-2 leading-tight">
+				<span 
+					className={getSkillNameClassName(skill)}
+					onClick={handleSkillNameClick}
+					role={shouldShowModal(skill) ? 'button' : undefined}
+					tabIndex={shouldShowModal(skill) ? 0 : undefined}
+					onKeyDown={(e) => {
+						if (shouldShowModal(skill) && (e.key === 'Enter' || e.key === ' ')) {
+							e.preventDefault()
+							handleSkillNameClick()
+						}
+					}}
+					aria-label={shouldShowModal(skill) ? `${skill.name}の詳細設定を開く` : undefined}
+				>
 					{getDisplayName()}
 				</span>
 				<Controller
@@ -136,6 +173,15 @@ export default function NewSkillCard({
 					)}
 				</div>
 			)}
+
+			{/* モーダル */}
+			<SkillParameterModal
+				skill={skill}
+				currentState={currentState}
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				onSave={handleModalSave}
+			/>
 		</div>
 	)
 }
