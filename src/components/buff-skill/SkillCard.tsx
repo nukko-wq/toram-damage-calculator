@@ -119,14 +119,6 @@ export default function SkillCard({
 				/>
 			</div>
 
-			{/* パラメータ表示（簡易版） */}
-			{currentState.isEnabled && skill.type !== 'toggle' && (
-				<div className="mt-1 text-xs text-gray-500">
-					{skill.type === 'level' && `Lv.${currentState.level || 1}`}
-					{skill.type === 'stack' && `×${currentState.stackCount || 1}`}
-					{skill.type === 'special' && `値:${currentState.specialParam || 0}`}
-				</div>
-			)}
 
 			{/* モーダル */}
 			<SkillParameterModal
