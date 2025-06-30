@@ -17,39 +17,49 @@ export default function SkillParameterModal({
 	onClose,
 }: SkillParameterModalProps) {
 	// デフォルト値をメモ化して同一オブジェクトを保証
-	const defaultState = useMemo(() => ({
-		isEnabled: false,
-		level: 10,
-		stackCount: 1,
-		specialParam: 0
-	}), [])
+	const defaultState = useMemo(
+		() => ({
+			isEnabled: false,
+			level: 10,
+			stackCount: 1,
+			specialParam: 0,
+		}),
+		[],
+	)
 
 	// Zustandから現在の状態を取得（メモ化してキャッシュ）
-	const currentState = useCalculatorStore(useCallback(state => {
-		const buffSkillsData = state.data.buffSkills.skills
-		
-		// Handle both old array format and new Record format
-		if (Array.isArray(buffSkillsData)) {
-			// Old format: array of BuffSkill objects
-			const foundSkill = buffSkillsData.find(s => s.id === skill.id)
-			if (foundSkill) {
-				return {
-					isEnabled: foundSkill.isEnabled,
-					level: foundSkill.parameters.skillLevel || 10,
-					stackCount: foundSkill.parameters.stackCount || 1,
-					specialParam: foundSkill.parameters.playerCount || 0
+	const currentState = useCalculatorStore(
+		useCallback(
+			(state) => {
+				const buffSkillsData = state.data.buffSkills.skills
+
+				// Handle both old array format and new Record format
+				if (Array.isArray(buffSkillsData)) {
+					// Old format: array of BuffSkill objects
+					const foundSkill = buffSkillsData.find((s) => s.id === skill.id)
+					if (foundSkill) {
+						return {
+							isEnabled: foundSkill.isEnabled,
+							level: foundSkill.parameters.skillLevel || 10,
+							stackCount: foundSkill.parameters.stackCount || 1,
+							specialParam: foundSkill.parameters.playerCount || 0,
+						}
+					}
+					return defaultState
 				}
-			}
-			return defaultState
-		}
-		
-		// New format: Record<string, BuffSkillState>
-		const skillState = buffSkillsData[skill.id]
-		return skillState || defaultState
-	}, [skill.id, defaultState]))
-	
+
+				// New format: Record<string, BuffSkillState>
+				const skillState = buffSkillsData[skill.id]
+				return skillState || defaultState
+			},
+			[skill.id, defaultState],
+		),
+	)
+
 	// Zustandの更新メソッド
-	const updateSkillParameter = useCalculatorStore(state => state.updateSkillParameter)
+	const updateSkillParameter = useCalculatorStore(
+		(state) => state.updateSkillParameter,
+	)
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
@@ -117,13 +127,16 @@ export default function SkillParameterModal({
 				>
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b">
-						<h3 id="skill-modal-title" className="text-lg font-bold text-gray-900">
+						<h3
+							id="skill-modal-title"
+							className="text-lg font-bold text-gray-900"
+						>
 							{skill.name}
 						</h3>
 						<button
 							type="button"
 							onClick={onClose}
-							className="text-gray-400 hover:text-gray-600 transition-colors"
+							className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
 							aria-label="モーダルを閉じる"
 						>
 							<svg
@@ -159,10 +172,7 @@ export default function SkillParameterModal({
 								<>
 									{skill.type === 'level' && (
 										<div>
-											<label className="block text-sm font-medium text-gray-700 mb-2">
-												スキルレベル (1-{skill.maxLevel || 10})
-											</label>
-											<div className="flex items-center justify-center space-x-1">
+											<div className="flex items-center justify-center space-x-3">
 												{/* -10ボタン（最小値1にセット） */}
 												<button
 													type="button"
@@ -170,45 +180,54 @@ export default function SkillParameterModal({
 														handleLevelChange(1)
 													}}
 													disabled={(currentState.level || 10) === 1}
-													className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 border rounded transition-colors"
+													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 												>
 													-10
 												</button>
-												
+
 												{/* -1ボタン */}
 												<button
 													type="button"
 													onClick={() => {
-														const newLevel = Math.max(1, (currentState.level || 10) - 1)
+														const newLevel = Math.max(
+															1,
+															(currentState.level || 10) - 1,
+														)
 														handleLevelChange(newLevel)
 													}}
-													disabled={((currentState.level || 10) - 1) < 1}
-													className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 border rounded transition-colors"
+													disabled={(currentState.level || 10) - 1 < 1}
+													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 												>
 													-1
 												</button>
-												
+
 												{/* スキルレベル表示 */}
 												<div className="px-4 py-1 bg-blue-50 border border-blue-200 rounded text-center min-w-[3rem]">
-													<span className="text-sm font-medium text-blue-700">
+													<span className="text-2xl font-bold text-blue-700">
 														{currentState.level || 10}
 													</span>
 												</div>
-												
+
 												{/* +1ボタン */}
 												<button
 													type="button"
 													onClick={() => {
 														const maxLevel = skill.maxLevel || 10
-														const newLevel = Math.min(maxLevel, (currentState.level || 10) + 1)
+														const newLevel = Math.min(
+															maxLevel,
+															(currentState.level || 10) + 1,
+														)
 														handleLevelChange(newLevel)
 													}}
-													disabled={((currentState.level || 10) + 1) > (skill.maxLevel || 10)}
-													className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 border rounded transition-colors"
+													disabled={
+														(currentState.level || 10) + 1 >
+														(skill.maxLevel || 10)
+													}
+													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 												>
 													+1
 												</button>
-												
+
 												{/* +10ボタン（最大値にセット） */}
 												<button
 													type="button"
@@ -216,8 +235,11 @@ export default function SkillParameterModal({
 														const maxLevel = skill.maxLevel || 10
 														handleLevelChange(maxLevel)
 													}}
-													disabled={(currentState.level || 10) === (skill.maxLevel || 10)}
-													className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 border rounded transition-colors"
+													disabled={
+														(currentState.level || 10) ===
+														(skill.maxLevel || 10)
+													}
+													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 												>
 													+10
 												</button>
@@ -232,7 +254,9 @@ export default function SkillParameterModal({
 											</label>
 											<select
 												value={currentState.stackCount || 1}
-												onChange={(e) => handleStackCountChange(Number(e.target.value))}
+												onChange={(e) =>
+													handleStackCountChange(Number(e.target.value))
+												}
 												className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 											>
 												{Array.from(
@@ -256,7 +280,9 @@ export default function SkillParameterModal({
 												type="number"
 												min={0}
 												value={currentState.specialParam || 0}
-												onChange={(e) => handleSpecialParamChange(Number(e.target.value))}
+												onChange={(e) =>
+													handleSpecialParamChange(Number(e.target.value))
+												}
 												className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 												placeholder={inputHintText || '値を入力してください'}
 											/>
@@ -272,7 +298,7 @@ export default function SkillParameterModal({
 						<button
 							type="button"
 							onClick={onClose}
-							className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+							className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors cursor-pointer"
 						>
 							閉じる
 						</button>

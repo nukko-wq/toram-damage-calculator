@@ -14,7 +14,7 @@ export default function SkillToggleButton({
 			type="button"
 			onClick={() => onToggle(!isEnabled)}
 			className={`
-				relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none
+				relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none cursor-pointer
 				${isEnabled ? 'bg-blue-500/90' : 'bg-gray-200'}
 			`}
 			role="switch"
