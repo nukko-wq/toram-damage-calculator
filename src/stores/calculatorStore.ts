@@ -249,6 +249,67 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				dataUpdate({ buffSkills }, 'updateBuffSkills')
 			},
 
+			updateBuffSkillState: (skillId, state) => {
+				set((storeState) => {
+					const currentSkills = storeState.data.buffSkills.skills
+					const updatedSkills = {
+						...currentSkills,
+						[skillId]: state
+					}
+					
+					const newData = {
+						...storeState.data,
+						buffSkills: {
+							...storeState.data.buffSkills,
+							skills: updatedSkills
+						}
+					}
+					
+					const dataSnapshot = createDataSnapshot(storeState.data)
+					const hasChanges = hasDataDifferences(newData, dataSnapshot)
+					
+					return {
+						...storeState,
+						data: newData,
+						hasUnsavedChanges: hasChanges
+					}
+				}, false, `updateBuffSkillState:${skillId}`)
+			},
+
+			updateSkillParameter: (skillId, paramType, value) => {
+				set((storeState) => {
+					const currentSkills = storeState.data.buffSkills.skills
+					const currentSkillState = currentSkills[skillId] || { isEnabled: false }
+					
+					const updatedSkillState = {
+						...currentSkillState,
+						[paramType]: value
+					}
+					
+					const updatedSkills = {
+						...currentSkills,
+						[skillId]: updatedSkillState
+					}
+					
+					const newData = {
+						...storeState.data,
+						buffSkills: {
+							...storeState.data.buffSkills,
+							skills: updatedSkills
+						}
+					}
+					
+					const dataSnapshot = createDataSnapshot(storeState.data)
+					const hasChanges = hasDataDifferences(newData, dataSnapshot)
+					
+					return {
+						...storeState,
+						data: newData,
+						hasUnsavedChanges: hasChanges
+					}
+				}, false, `updateSkillParameter:${skillId}:${paramType}`)
+			},
+
 			updateBuffItems: (buffItems) => {
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
 				dataUpdate({ buffItems }, 'updateBuffItems')

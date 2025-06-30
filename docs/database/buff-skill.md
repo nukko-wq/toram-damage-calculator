@@ -994,3 +994,192 @@ function getSkillNameClassName(skill: BuffSkillDefinition): string {
 - スキル効果の数値計算結果表示
 - 関連スキルとの相性情報
 - おすすめレベル設定の提案
+
+## Zustand統合設計
+
+### バフスキルのZustand統合
+
+#### 状態管理アーキテクチャ
+
+```typescript
+// CalculatorStore内のバフスキル状態管理
+interface CalculatorStore {
+  // バフスキルデータ
+  data: {
+    buffSkills: BuffSkillFormData
+    // ... 他のデータ
+  }
+  
+  // バフスキル更新メソッド
+  updateBuffSkills: (buffSkills: BuffSkillFormData) => void
+  updateBuffSkillState: (skillId: string, state: BuffSkillState) => void
+  
+  // 個別パラメータ更新（モーダル用）
+  updateSkillParameter: (skillId: string, paramType: 'level' | 'stackCount' | 'specialParam', value: number) => void
+}
+```
+
+#### SkillParameterModalのZustand統合
+
+```typescript
+// SkillParameterModalでの直接Zustand操作
+const SkillParameterModal: React.FC<SkillParameterModalProps> = ({
+  skill,
+  isOpen,
+  onClose
+}) => {
+  // Zustandから現在の状態を取得
+  const currentState = useCalculatorStore(state => 
+    state.data.buffSkills.skills[skill.id] || getDefaultSkillState(skill)
+  )
+  
+  // Zustandの更新メソッド
+  const updateSkillParameter = useCalculatorStore(state => state.updateSkillParameter)
+  
+  // ローカル状態は使わず、直接Zustand経由で更新
+  const handleLevelChange = (newLevel: number) => {
+    updateSkillParameter(skill.id, 'level', newLevel)
+  }
+  
+  const handleStackCountChange = (newStackCount: number) => {
+    updateSkillParameter(skill.id, 'stackCount', newStackCount)
+  }
+  
+  const handleSpecialParamChange = (newValue: number) => {
+    updateSkillParameter(skill.id, 'specialParam', newValue)
+  }
+  
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      {/* レベル設定UI */}
+      <div className="flex items-center justify-center space-x-1">
+        <button onClick={() => handleLevelChange(Math.max(1, currentState.level - 10))}>
+          -10
+        </button>
+        <button onClick={() => handleLevelChange(Math.max(1, currentState.level - 1))}>
+          -1
+        </button>
+        <div className="level-display">{currentState.level}</div>
+        <button onClick={() => handleLevelChange(Math.min(skill.maxLevel || 10, currentState.level + 1))}>
+          +1
+        </button>
+        <button onClick={() => handleLevelChange(Math.min(skill.maxLevel || 10, currentState.level + 10))}>
+          +10
+        </button>
+      </div>
+    </Modal>
+  )
+}
+```
+
+#### CalculatorStoreの実装
+
+```typescript
+// zustandストア内の実装
+const useCalculatorStore = create<CalculatorStore>()((set, get) => ({
+  // ... 既存の状態
+  
+  updateSkillParameter: (skillId: string, paramType: 'level' | 'stackCount' | 'specialParam', value: number) => {
+    set((state) => {
+      const currentSkills = state.data.buffSkills.skills
+      const updatedSkills = {
+        ...currentSkills,
+        [skillId]: {
+          ...currentSkills[skillId],
+          [paramType]: value
+        }
+      }
+      
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          buffSkills: {
+            ...state.data.buffSkills,
+            skills: updatedSkills
+          }
+        },
+        hasUnsavedChanges: true
+      }
+    }, false, `updateSkillParameter:${skillId}:${paramType}`)
+  },
+  
+  updateBuffSkillState: (skillId: string, newState: BuffSkillState) => {
+    set((state) => {
+      const currentSkills = state.data.buffSkills.skills
+      const updatedSkills = {
+        ...currentSkills,
+        [skillId]: newState
+      }
+      
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          buffSkills: {
+            ...state.data.buffSkills,
+            skills: updatedSkills
+          }
+        },
+        hasUnsavedChanges: true
+      }
+    }, false, `updateBuffSkillState:${skillId}`)
+  }
+}))
+```
+
+#### SkillCardとの連携
+
+```typescript
+// SkillCardでの統合
+const SkillCard: React.FC<SkillCardProps> = ({ skill }) => {
+  // Zustandから状態を直接取得
+  const currentState = useCalculatorStore(state => 
+    state.data.buffSkills.skills[skill.id] || getDefaultSkillState(skill)
+  )
+  
+  const updateSkillState = useCalculatorStore(state => state.updateBuffSkillState)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  
+  // モーダルは必要最小限のpropsのみ
+  return (
+    <div>
+      {/* スキル表示UI */}
+      <SkillParameterModal
+        skill={skill}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        // currentStateやonSaveは不要（Zustand直接操作）
+      />
+    </div>
+  )
+}
+```
+
+#### フォーム統合の排除
+
+React Hook Formは使用せず、Zustand直接操作に統一:
+
+```typescript
+// BuffSkillFormの簡素化
+const BuffSkillForm: React.FC = () => {
+  const availableSkills = useMemo(() => {
+    // 武器に応じたスキル取得
+  }, [mainWeapon, subWeapon])
+  
+  return (
+    <div>
+      {availableSkills.map(skill => (
+        <SkillCard key={skill.id} skill={skill} />
+      ))}
+    </div>
+  )
+}
+```
+
+### データフローの特徴
+
+1. **リアルタイム更新**: モーダル内のボタンクリック → Zustand即座更新 → UI自動反映
+2. **状態同期**: 複数コンポーネント間での状態の自動同期
+3. **未保存変更検知**: パラメータ変更時の自動フラグ設定
+4. **パフォーマンス**: 必要最小限の再レンダリング

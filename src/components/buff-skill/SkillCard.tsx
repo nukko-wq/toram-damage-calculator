@@ -1,37 +1,56 @@
 'use client'
 
-import { useState } from 'react'
-import { Controller, type Control, type UseFormSetValue } from 'react-hook-form'
-import type { BuffSkillDefinition, BuffSkillFormData, BuffSkillState } from '@/types/buffSkill'
+import { useState, useMemo, useCallback } from 'react'
+import type { BuffSkillDefinition } from '@/types/buffSkill'
 import { CATEGORY_LABELS } from '@/types/buffSkill'
 import { shouldShowModal, getSkillNameClassName } from '@/utils/buffSkillUtils'
+import { useCalculatorStore } from '@/stores'
 import SkillToggleButton from './SkillToggleButton'
 import SkillParameterModal from './SkillParameterModal'
 
 interface SkillCardProps {
 	skill: BuffSkillDefinition
-	control: Control<BuffSkillFormData>
-	watch: (name?: string) => unknown
-	setValue: UseFormSetValue<BuffSkillFormData>
 }
 
 export default function SkillCard({
 	skill,
-	control,
-	watch,
-	setValue,
 }: SkillCardProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const categoryLabel = CATEGORY_LABELS[skill.category]
-	const isEnabled = watch(`skills.${skill.id}.isEnabled`) as boolean
-
-	// 現在のスキル状態を取得
-	const currentState = watch(`skills.${skill.id}`) as BuffSkillState || {
+	
+	// Zustandから現在の状態を取得（メモ化）
+	const defaultState = useMemo(() => ({
 		isEnabled: false,
 		level: 1,
 		stackCount: 1,
 		specialParam: 0
-	}
+	}), [])
+
+	const currentState = useCalculatorStore(useCallback(state => {
+		const buffSkillsData = state.data.buffSkills.skills
+		
+		// Handle both old array format and new Record format
+		if (Array.isArray(buffSkillsData)) {
+			// Old format: array of BuffSkill objects
+			const foundSkill = buffSkillsData.find(s => s.id === skill.id)
+			if (foundSkill) {
+				return {
+					isEnabled: foundSkill.isEnabled,
+					level: foundSkill.parameters.skillLevel || 1,
+					stackCount: foundSkill.parameters.stackCount || 1,
+					specialParam: foundSkill.parameters.playerCount || 0
+				}
+			}
+			return defaultState
+		}
+		
+		// New format: Record<string, BuffSkillState>
+		const skillState = buffSkillsData[skill.id]
+		return skillState || defaultState
+	}, [skill.id, defaultState]))
+	
+	// Zustandの更新メソッド
+	const updateBuffSkillState = useCalculatorStore(state => state.updateBuffSkillState)
 
 	// モーダル開閉ハンドラー
 	const handleSkillNameClick = () => {
@@ -41,15 +60,10 @@ export default function SkillCard({
 		}
 	}
 
-	const handleModalSave = (newState: BuffSkillState) => {
-		// React Hook Form の setValue を使用して状態を更新
-		setValue(`skills.${skill.id}`, newState)
-	}
-
 	// スキル名の表示形式を決定（パラメータ値付き）
 	const getDisplayName = (): string => {
-		const level = watch(`skills.${skill.id}.level`) as number
-		const stackCount = watch(`skills.${skill.id}.stackCount`) as number
+		const level = currentState.level
+		const stackCount = currentState.stackCount
 
 		switch (skill.type) {
 			case 'level':
@@ -67,6 +81,14 @@ export default function SkillCard({
 			default:
 				return skill.name
 		}
+	}
+
+	// スキル有効化のトグルハンドラー
+	const handleToggle = (enabled: boolean) => {
+		updateBuffSkillState(skill.id, {
+			...currentState,
+			isEnabled: enabled
+		})
 	}
 
 	return (
@@ -91,96 +113,26 @@ export default function SkillCard({
 				>
 					{getDisplayName()}
 				</span>
-				<Controller
-					name={`skills.${skill.id}.isEnabled`}
-					control={control}
-					render={({ field }) => (
-						<SkillToggleButton
-							isEnabled={field.value || false}
-							onToggle={field.onChange}
-						/>
-					)}
+				<SkillToggleButton
+					isEnabled={currentState.isEnabled}
+					onToggle={handleToggle}
 				/>
 			</div>
 
-			{/* パラメータ設定 */}
-			{isEnabled && (
-				<div className="mt-2 space-y-2">
-					{skill.type === 'level' && (
-						<div className="flex items-center space-x-2">
-							<span className="text-xs text-gray-500">Lv:</span>
-							<Controller
-								name={`skills.${skill.id}.level`}
-								control={control}
-								render={({ field }) => (
-									<input
-										type="number"
-										min={1}
-										max={skill.maxLevel || 10}
-										value={field.value || 1}
-										onChange={e => field.onChange(Number(e.target.value))}
-										className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-									/>
-								)}
-							/>
-						</div>
-					)}
-
-					{skill.type === 'stack' && (
-						<div className="flex items-center space-x-2">
-							<span className="text-xs text-gray-500">×</span>
-							<Controller
-								name={`skills.${skill.id}.stackCount`}
-								control={control}
-								render={({ field }) => (
-									<select
-										value={field.value || 1}
-										onChange={e => field.onChange(Number(e.target.value))}
-										className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-									>
-										{Array.from(
-											{ length: skill.maxStack || 10 },
-											(_, i) => i + 1
-										).map(num => (
-											<option key={num} value={num}>
-												{num}
-											</option>
-										))}
-									</select>
-								)}
-							/>
-						</div>
-					)}
-
-					{skill.type === 'special' && (
-						<div className="flex items-center space-x-2">
-							<span className="text-xs text-gray-500">値:</span>
-							<Controller
-								name={`skills.${skill.id}.specialParam`}
-								control={control}
-								render={({ field }) => (
-									<input
-										type="number"
-										min={0}
-										value={field.value || 0}
-										onChange={e => field.onChange(Number(e.target.value))}
-										className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-										placeholder="値"
-									/>
-								)}
-							/>
-						</div>
-					)}
+			{/* パラメータ表示（簡易版） */}
+			{currentState.isEnabled && skill.type !== 'toggle' && (
+				<div className="mt-1 text-xs text-gray-500">
+					{skill.type === 'level' && `Lv.${currentState.level || 1}`}
+					{skill.type === 'stack' && `×${currentState.stackCount || 1}`}
+					{skill.type === 'special' && `値:${currentState.specialParam || 0}`}
 				</div>
 			)}
 
 			{/* モーダル */}
 			<SkillParameterModal
 				skill={skill}
-				currentState={currentState}
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
-				onSave={handleModalSave}
 			/>
 		</div>
 	)

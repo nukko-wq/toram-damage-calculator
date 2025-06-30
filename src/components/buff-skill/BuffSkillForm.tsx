@@ -1,8 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useMemo } from 'react'
 import {
 	getAvailableSkills,
 	sortSkills,
@@ -11,12 +9,10 @@ import {
 import type { BuffSkillDefinition } from '@/types/buffSkill'
 import { useCalculatorData } from '@/hooks/useCalculatorData'
 import type {
-	BuffSkillFormData,
 	MainWeaponType,
 	SubWeaponType,
 } from '@/types/buffSkill'
 import type { WeaponType, SubWeaponType as CalculatorSubWeaponType } from '@/types/calculator'
-import { buffSkillSchema } from '@/schemas/buffSkillSchema'
 import SkillCard from './SkillCard'
 
 // 武器種変換関数
@@ -98,35 +94,6 @@ export default function BuffSkillForm() {
 	}, [mainWeapon, subWeapon])
 
 
-	// 初期フォーム値を生成（武器に応じて）
-	const initialFormValues = useMemo(() => {
-		const currentStates = data.buffSkills?.skills ? 
-			convertLegacyToNewFormat(data.buffSkills) : 
-			{}
-		const mergedStates = mergeSkillStates(currentStates, availableSkills)
-		return { skills: mergedStates }
-	}, [data.buffSkills, availableSkills])
-
-	const { control, watch, reset, setValue } = useForm<BuffSkillFormData>({
-		resolver: zodResolver(buffSkillSchema),
-		defaultValues: initialFormValues,
-	})
-
-	// 武器変更時にフォームをリセット
-	useEffect(() => {
-		reset(initialFormValues)
-	}, [reset, initialFormValues])
-
-	// フォーム値の変更をストアに反映（debounce付き）
-	const formData = watch()
-	useEffect(() => {
-		const timeoutId = setTimeout(() => {
-			const legacyData = convertToLegacyFormat(formData, availableSkills)
-			updateBuffSkills(legacyData)
-		}, 200) // 200ms debounce
-		
-		return () => clearTimeout(timeoutId)
-	}, [formData, availableSkills, updateBuffSkills])
 
 
 	return (
@@ -143,9 +110,6 @@ export default function BuffSkillForm() {
 					<SkillCard 
 						key={skill.id} 
 						skill={skill} 
-						control={control} 
-						watch={watch} 
-						setValue={setValue}
 					/>
 				))}
 			</div>
