@@ -250,64 +250,44 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			updateBuffSkillState: (skillId, state) => {
-				set((storeState) => {
-					const currentSkills = storeState.data.buffSkills.skills
-					const updatedSkills = {
-						...currentSkills,
-						[skillId]: state
-					}
-					
-					const newData = {
-						...storeState.data,
-						buffSkills: {
-							...storeState.data.buffSkills,
-							skills: updatedSkills
-						}
-					}
-					
-					const dataSnapshot = createDataSnapshot(storeState.data)
-					const hasChanges = hasDataDifferences(newData, dataSnapshot)
-					
-					return {
-						...storeState,
-						data: newData,
-						hasUnsavedChanges: hasChanges
-					}
-				}, false, `updateBuffSkillState:${skillId}`)
+				const { data } = get()
+				const currentSkills = data.buffSkills.skills
+				const updatedSkills = {
+					...currentSkills,
+					[skillId]: state
+				}
+				
+				const updatedBuffSkills = {
+					...data.buffSkills,
+					skills: updatedSkills
+				}
+				
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ buffSkills: updatedBuffSkills }, `updateBuffSkillState:${skillId}`)
 			},
 
 			updateSkillParameter: (skillId, paramType, value) => {
-				set((storeState) => {
-					const currentSkills = storeState.data.buffSkills.skills
-					const currentSkillState = currentSkills[skillId] || { isEnabled: false }
-					
-					const updatedSkillState = {
-						...currentSkillState,
-						[paramType]: value
-					}
-					
-					const updatedSkills = {
-						...currentSkills,
-						[skillId]: updatedSkillState
-					}
-					
-					const newData = {
-						...storeState.data,
-						buffSkills: {
-							...storeState.data.buffSkills,
-							skills: updatedSkills
-						}
-					}
-					
-					const dataSnapshot = createDataSnapshot(storeState.data)
-					const hasChanges = hasDataDifferences(newData, dataSnapshot)
-					
-					return {
-						...storeState,
-						data: newData,
-						hasUnsavedChanges: hasChanges
-					}
-				}, false, `updateSkillParameter:${skillId}:${paramType}`)
+				const { data } = get()
+				const currentSkills = data.buffSkills.skills
+				const currentSkillState = currentSkills[skillId] || { isEnabled: false }
+				
+				const updatedSkillState = {
+					...currentSkillState,
+					[paramType]: value
+				}
+				
+				const updatedSkills = {
+					...currentSkills,
+					[skillId]: updatedSkillState
+				}
+				
+				const updatedBuffSkills = {
+					...data.buffSkills,
+					skills: updatedSkills
+				}
+				
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ buffSkills: updatedBuffSkills }, `updateSkillParameter:${skillId}:${paramType}`)
 			},
 
 			updateBuffItems: (buffItems) => {
