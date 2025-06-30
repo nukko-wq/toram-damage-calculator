@@ -7,6 +7,7 @@ import type {
 } from '@/types/stores'
 import type { CalculatorData } from '@/types/calculator'
 import type { EquipmentSlots } from '@/types/calculator'
+import type { BuffSkillFormData } from '@/types/buffSkill'
 import { createInitialCalculatorData, migrateRegisterEffects } from '@/utils/initialData'
 import {
 	saveCurrentData,
@@ -251,14 +252,40 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			updateBuffSkillState: (skillId, state) => {
 				const { data } = get()
-				const currentSkills = data.buffSkills.skills
-				const updatedSkills = {
-					...currentSkills,
-					[skillId]: state
+				const buffSkillsData = data.buffSkills.skills
+				
+				let updatedSkills: Record<string, import('@/types/buffSkill').BuffSkillState>
+				
+				// Handle both old array format and new Record format
+				if (Array.isArray(buffSkillsData)) {
+					// Convert array format to Record format
+					updatedSkills = {}
+					for (const skill of buffSkillsData) {
+						if (skill.id === skillId) {
+							updatedSkills[skillId] = state
+						} else {
+							updatedSkills[skill.id] = {
+								isEnabled: skill.isEnabled,
+								level: skill.parameters.skillLevel || 10,
+								stackCount: skill.parameters.stackCount || 1,
+								specialParam: skill.parameters.playerCount || 0
+							}
+						}
+					}
+					// Add new skill if it doesn't exist
+					if (!updatedSkills[skillId]) {
+						updatedSkills[skillId] = state
+					}
+				} else {
+					// New format: Record<string, BuffSkillState>
+					const currentSkills = buffSkillsData as Record<string, import('@/types/buffSkill').BuffSkillState>
+					updatedSkills = {
+						...currentSkills,
+						[skillId]: state
+					}
 				}
 				
-				const updatedBuffSkills = {
-					...data.buffSkills,
+				const updatedBuffSkills: BuffSkillFormData = {
 					skills: updatedSkills
 				}
 				
@@ -268,21 +295,62 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			updateSkillParameter: (skillId, paramType, value) => {
 				const { data } = get()
-				const currentSkills = data.buffSkills.skills
-				const currentSkillState = currentSkills[skillId] || { isEnabled: false }
+				const buffSkillsData = data.buffSkills.skills
 				
-				const updatedSkillState = {
-					...currentSkillState,
-					[paramType]: value
+				let updatedSkills: Record<string, import('@/types/buffSkill').BuffSkillState>
+				
+				// Handle both old array format and new Record format
+				if (Array.isArray(buffSkillsData)) {
+					// Convert array format to Record format
+					updatedSkills = {}
+					for (const skill of buffSkillsData) {
+						if (skill.id === skillId) {
+							const currentState = {
+								isEnabled: skill.isEnabled,
+								level: skill.parameters.skillLevel || 10,
+								stackCount: skill.parameters.stackCount || 1,
+								specialParam: skill.parameters.playerCount || 0
+							}
+							updatedSkills[skillId] = {
+								...currentState,
+								[paramType]: value
+							}
+						} else {
+							updatedSkills[skill.id] = {
+								isEnabled: skill.isEnabled,
+								level: skill.parameters.skillLevel || 10,
+								stackCount: skill.parameters.stackCount || 1,
+								specialParam: skill.parameters.playerCount || 0
+							}
+						}
+					}
+					// Add new skill if it doesn't exist
+					if (!updatedSkills[skillId]) {
+						updatedSkills[skillId] = {
+							isEnabled: false,
+							level: 10,
+							stackCount: 1,
+							specialParam: 0,
+							[paramType]: value
+						}
+					}
+				} else {
+					// New format: Record<string, BuffSkillState>
+					const currentSkills = buffSkillsData as Record<string, import('@/types/buffSkill').BuffSkillState>
+					const currentSkillState = currentSkills[skillId] || { isEnabled: false, level: 10, stackCount: 1, specialParam: 0 }
+					
+					const updatedSkillState = {
+						...currentSkillState,
+						[paramType]: value
+					}
+					
+					updatedSkills = {
+						...currentSkills,
+						[skillId]: updatedSkillState
+					}
 				}
 				
-				const updatedSkills = {
-					...currentSkills,
-					[skillId]: updatedSkillState
-				}
-				
-				const updatedBuffSkills = {
-					...data.buffSkills,
+				const updatedBuffSkills: BuffSkillFormData = {
 					skills: updatedSkills
 				}
 				

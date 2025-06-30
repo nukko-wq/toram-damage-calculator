@@ -10,13 +10,13 @@ import type {
 	EquipmentProperties,
 	FoodFormData,
 	EnemyFormData,
-	BuffSkillFormData,
 	BuffItemFormData,
 	RegisterFormData,
 	SaveData,
 	ArmorType,
 } from './calculator'
 import type { CalculationResults } from './calculationResult'
+import type { BuffSkillFormData } from './buffSkill'
 
 // ===== 計算結果関連（将来実装）=====
 export interface DamageCalculationResult {

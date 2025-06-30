@@ -344,7 +344,7 @@ export interface CalculatorData {
 	crystals: CrystalSlots
 	food: FoodFormData // 料理データ
 	enemy: EnemyFormData // 新しい敵情報システム
-	buffSkills: BuffSkillFormData // バフスキルデータ
+	buffSkills: import('./buffSkill').BuffSkillFormData // バフスキルデータ（新形式）
 	buffItems: BuffItemFormData // バフアイテムデータ
 	register: RegisterFormData // レジスタ他データ
 	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
