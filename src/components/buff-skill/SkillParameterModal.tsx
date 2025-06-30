@@ -19,7 +19,7 @@ export default function SkillParameterModal({
 	// デフォルト値をメモ化して同一オブジェクトを保証
 	const defaultState = useMemo(() => ({
 		isEnabled: false,
-		level: 1,
+		level: 10,
 		stackCount: 1,
 		specialParam: 0
 	}), [])
@@ -35,7 +35,7 @@ export default function SkillParameterModal({
 			if (foundSkill) {
 				return {
 					isEnabled: foundSkill.isEnabled,
-					level: foundSkill.parameters.skillLevel || 1,
+					level: foundSkill.parameters.skillLevel || 10,
 					stackCount: foundSkill.parameters.stackCount || 1,
 					specialParam: foundSkill.parameters.playerCount || 0
 				}
@@ -163,14 +163,13 @@ export default function SkillParameterModal({
 												スキルレベル (1-{skill.maxLevel || 10})
 											</label>
 											<div className="flex items-center justify-center space-x-1">
-												{/* -10ボタン */}
+												{/* -10ボタン（最小値1にセット） */}
 												<button
 													type="button"
 													onClick={() => {
-														const newLevel = Math.max(1, (currentState.level || 1) - 10)
-														handleLevelChange(newLevel)
+														handleLevelChange(1)
 													}}
-													disabled={((currentState.level || 1) - 10) < 1}
+													disabled={(currentState.level || 10) === 1}
 													className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 border rounded transition-colors"
 												>
 													-10
@@ -180,10 +179,10 @@ export default function SkillParameterModal({
 												<button
 													type="button"
 													onClick={() => {
-														const newLevel = Math.max(1, (currentState.level || 1) - 1)
+														const newLevel = Math.max(1, (currentState.level || 10) - 1)
 														handleLevelChange(newLevel)
 													}}
-													disabled={((currentState.level || 1) - 1) < 1}
+													disabled={((currentState.level || 10) - 1) < 1}
 													className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 border rounded transition-colors"
 												>
 													-1
@@ -192,7 +191,7 @@ export default function SkillParameterModal({
 												{/* スキルレベル表示 */}
 												<div className="px-4 py-1 bg-blue-50 border border-blue-200 rounded text-center min-w-[3rem]">
 													<span className="text-sm font-medium text-blue-700">
-														{currentState.level || 1}
+														{currentState.level || 10}
 													</span>
 												</div>
 												
@@ -201,24 +200,23 @@ export default function SkillParameterModal({
 													type="button"
 													onClick={() => {
 														const maxLevel = skill.maxLevel || 10
-														const newLevel = Math.min(maxLevel, (currentState.level || 1) + 1)
+														const newLevel = Math.min(maxLevel, (currentState.level || 10) + 1)
 														handleLevelChange(newLevel)
 													}}
-													disabled={((currentState.level || 1) + 1) > (skill.maxLevel || 10)}
+													disabled={((currentState.level || 10) + 1) > (skill.maxLevel || 10)}
 													className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 border rounded transition-colors"
 												>
 													+1
 												</button>
 												
-												{/* +10ボタン */}
+												{/* +10ボタン（最大値にセット） */}
 												<button
 													type="button"
 													onClick={() => {
 														const maxLevel = skill.maxLevel || 10
-														const newLevel = Math.min(maxLevel, (currentState.level || 1) + 10)
-														handleLevelChange(newLevel)
+														handleLevelChange(maxLevel)
 													}}
-													disabled={((currentState.level || 1) + 10) > (skill.maxLevel || 10)}
+													disabled={(currentState.level || 10) === (skill.maxLevel || 10)}
 													className="px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 border rounded transition-colors"
 												>
 													+10

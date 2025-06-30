@@ -21,7 +21,7 @@ export default function SkillCard({
 	// Zustandから現在の状態を取得（メモ化）
 	const defaultState = useMemo(() => ({
 		isEnabled: false,
-		level: 1,
+		level: 10,
 		stackCount: 1,
 		specialParam: 0
 	}), [])
@@ -36,7 +36,7 @@ export default function SkillCard({
 			if (foundSkill) {
 				return {
 					isEnabled: foundSkill.isEnabled,
-					level: foundSkill.parameters.skillLevel || 1,
+					level: foundSkill.parameters.skillLevel || 10,
 					stackCount: foundSkill.parameters.stackCount || 1,
 					specialParam: foundSkill.parameters.playerCount || 0
 				}
