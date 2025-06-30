@@ -1,129 +1,72 @@
 'use client'
 
 import { useState } from 'react'
-import type { BuffSkill, BuffSkillParameters } from '@/types/calculator'
-import { Popover } from '../ui/Popover'
-// import { SkillParameterForm } from './SkillParameterForm'
-import SkillToggleButtons from './SkillToggleButton'
+import { Controller, type Control, type UseFormSetValue } from 'react-hook-form'
+import type { BuffSkillDefinition, BuffSkillFormData, BuffSkillState } from '@/types/buffSkill'
+import { CATEGORY_LABELS } from '@/types/buffSkill'
+import { shouldShowModal, getSkillNameClassName } from '@/utils/buffSkillUtils'
+import SkillToggleButton from './SkillToggleButton'
+import SkillParameterModal from './SkillParameterModal'
 
 interface SkillCardProps {
-	skill: BuffSkill
-	categoryLabel: string
-	onToggle: (skillId: string, enabled: boolean) => void
-	onParameterChange: (skillId: string, parameters: BuffSkillParameters) => void
+	skill: BuffSkillDefinition
+	control: Control<BuffSkillFormData>
+	watch: (name?: string) => unknown
+	setValue: UseFormSetValue<BuffSkillFormData>
 }
 
 export default function SkillCard({
 	skill,
-	categoryLabel,
-	onToggle,
-	onParameterChange,
+	control,
+	watch,
+	setValue,
 }: SkillCardProps) {
-	const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const categoryLabel = CATEGORY_LABELS[skill.category]
+	const isEnabled = watch(`skills.${skill.id}.isEnabled`) as boolean
+
+	// 現在のスキル状態を取得
+	const currentState = watch(`skills.${skill.id}`) as BuffSkillState || {
+		isEnabled: false,
+		level: 1,
+		stackCount: 1,
+		specialParam: 0
+	}
+
+	// モーダル開閉ハンドラー
+	const handleSkillNameClick = () => {
+		// toggle以外のスキルのみモーダルを開く
+		if (shouldShowModal(skill)) {
+			setIsModalOpen(true)
+		}
+	}
+
+	const handleModalSave = (newState: BuffSkillState) => {
+		// React Hook Form の setValue を使用して状態を更新
+		setValue(`skills.${skill.id}`, newState)
+	}
 
 	// スキル名の表示形式を決定（パラメータ値付き）
 	const getDisplayName = (): string => {
-		// 特殊パラメータスキルの表示形式
-		switch (skill.id) {
-			case 'eternal_nightmare':
-				if (skill.parameters.skillLevel) {
-					return `${skill.name}/${skill.parameters.skillLevel}`
+		const level = watch(`skills.${skill.id}.level`) as number
+		const stackCount = watch(`skills.${skill.id}.stackCount`) as number
+
+		switch (skill.type) {
+			case 'level':
+				if (level && level > 1) {
+					return `${skill.name}/${level}`
 				}
 				return skill.name
 
-			case 'knight_pledge':
-				if (skill.parameters.skillLevel) {
-					return `${skill.name}/${skill.parameters.skillLevel}`
-				}
-				return skill.name
-
-			case 'brave':
-				// ブレイブは基本名のみ（isCasterは内部パラメータとして扱う）
-				return skill.name
-
-			case 'godspeed_parry':
-			case 'passion_song':
-			case 'tornado_lance':
-				// 重ねがけスキルは×記号で重ねがけ数を表示
-				if (skill.parameters.stackCount) {
-					return `${skill.name}×${skill.parameters.stackCount}`
+			case 'stack':
+				if (stackCount && stackCount > 1) {
+					return `${skill.name}×${stackCount}`
 				}
 				return skill.name
 
 			default:
-				// 通常のスキルレベル表示
-				if (skill.parameters.skillLevel) {
-					return `${skill.name}/${skill.parameters.skillLevel}`
-				}
-
-				// スタックカウント表示
-				if (skill.parameters.stackCount) {
-					return `${skill.name}(${skill.parameters.stackCount})`
-				}
-
-				// その他は基本名のみ
 				return skill.name
 		}
-	}
-
-	// パラメータが必要かどうかを判定
-	const hasParameters = (): boolean => {
-		switch (skill.id) {
-			// マスタリスキル
-			case 'halberd_mastery':
-			case 'blade_mastery':
-			case 'shoot_mastery':
-			case 'magic_mastery':
-			case 'martial_mastery':
-			case 'dual_mastery':
-			case 'shield_mastery':
-				return true
-
-			// レベル設定があるスキル
-			case 'long_range':
-			case 'quick_aura':
-			case 'bushido':
-			case 'meikyo_shisui':
-			case 'kairiki_ranshin':
-			case 'shinsoku_no_kiseki':
-			case 'philo_eclaire':
-			case 'eternal_nightmare':
-			case 'knight_pledge':
-			case 'camouflage':
-			case 'nindo':
-			case 'ninjutsu':
-			case 'ninjutsu_tanren_1':
-			case 'ninjutsu_tanren_2':
-			case 'mp_boost':
-			case 'hp_boost':
-			case 'attack_up':
-			case 'kyoi_no_iryoku':
-			case 'magic_power_up':
-			case 'sara_naru_maryoku':
-			case 'hit_up':
-			case 'dodge_up':
-			case 'zensen_iji_2':
-			// 重ねがけ系
-			case 'tornado_lance':
-			case 'passion_song':
-			case 'godspeed_parry':
-			// 特殊パラメータスキル
-			case 'brave':
-				return true
-
-			// パラメータ不要（オン/オフのみ）
-			default:
-				return false
-		}
-	}
-
-	const handleParameterSave = (parameters: BuffSkillParameters) => {
-		onParameterChange(skill.id, parameters)
-		setIsPopoverOpen(false)
-	}
-
-	const handleParameterCancel = () => {
-		setIsPopoverOpen(false)
 	}
 
 	return (
@@ -133,34 +76,112 @@ export default function SkillCard({
 
 			{/* スキル名とトグルスイッチ */}
 			<div className="skill-header flex items-center justify-between mb-1">
-				{hasParameters() ? (
-					<Popover
-						trigger={
-							<span className="skill-name text-sm font-medium text-gray-700 flex-1 mr-2 leading-tight hover:text-blue-600 cursor-pointer">
-								{getDisplayName()}
-							</span>
+				<span 
+					className={getSkillNameClassName(skill)}
+					onClick={handleSkillNameClick}
+					role={shouldShowModal(skill) ? 'button' : undefined}
+					tabIndex={shouldShowModal(skill) ? 0 : undefined}
+					onKeyDown={(e) => {
+						if (shouldShowModal(skill) && (e.key === 'Enter' || e.key === ' ')) {
+							e.preventDefault()
+							handleSkillNameClick()
 						}
-						isOpen={isPopoverOpen}
-						onOpenChange={setIsPopoverOpen}
-						placement="center"
-					>
-						{/* <SkillParameterForm
-							skill={skill}
-							onSave={handleParameterSave}
-							onCancel={handleParameterCancel}
-						/> */}
-						<div>Coming Soon...</div>
-					</Popover>
-				) : (
-					<span className="skill-name text-sm font-medium text-gray-700 flex-1 mr-2 leading-tight">
-						{getDisplayName()}
-					</span>
-				)}
-				<SkillToggleButtons
-					isEnabled={skill.isEnabled}
-					onToggle={(enabled) => onToggle(skill.id, enabled)}
+					}}
+					aria-label={shouldShowModal(skill) ? `${skill.name}の詳細設定を開く` : undefined}
+				>
+					{getDisplayName()}
+				</span>
+				<Controller
+					name={`skills.${skill.id}.isEnabled`}
+					control={control}
+					render={({ field }) => (
+						<SkillToggleButton
+							isEnabled={field.value || false}
+							onToggle={field.onChange}
+						/>
+					)}
 				/>
 			</div>
+
+			{/* パラメータ設定 */}
+			{isEnabled && (
+				<div className="mt-2 space-y-2">
+					{skill.type === 'level' && (
+						<div className="flex items-center space-x-2">
+							<span className="text-xs text-gray-500">Lv:</span>
+							<Controller
+								name={`skills.${skill.id}.level`}
+								control={control}
+								render={({ field }) => (
+									<input
+										type="number"
+										min={1}
+										max={skill.maxLevel || 10}
+										value={field.value || 1}
+										onChange={e => field.onChange(Number(e.target.value))}
+										className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+									/>
+								)}
+							/>
+						</div>
+					)}
+
+					{skill.type === 'stack' && (
+						<div className="flex items-center space-x-2">
+							<span className="text-xs text-gray-500">×</span>
+							<Controller
+								name={`skills.${skill.id}.stackCount`}
+								control={control}
+								render={({ field }) => (
+									<select
+										value={field.value || 1}
+										onChange={e => field.onChange(Number(e.target.value))}
+										className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+									>
+										{Array.from(
+											{ length: skill.maxStack || 10 },
+											(_, i) => i + 1
+										).map(num => (
+											<option key={num} value={num}>
+												{num}
+											</option>
+										))}
+									</select>
+								)}
+							/>
+						</div>
+					)}
+
+					{skill.type === 'special' && (
+						<div className="flex items-center space-x-2">
+							<span className="text-xs text-gray-500">値:</span>
+							<Controller
+								name={`skills.${skill.id}.specialParam`}
+								control={control}
+								render={({ field }) => (
+									<input
+										type="number"
+										min={0}
+										value={field.value || 0}
+										onChange={e => field.onChange(Number(e.target.value))}
+										className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+										placeholder="値"
+									/>
+								)}
+							/>
+						</div>
+					)}
+				</div>
+			)}
+
+			{/* モーダル */}
+			<SkillParameterModal
+				skill={skill}
+				currentState={currentState}
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				onSave={handleModalSave}
+			/>
 		</div>
 	)
 }

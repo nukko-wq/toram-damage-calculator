@@ -17,7 +17,7 @@ import type {
 } from '@/types/buffSkill'
 import type { WeaponType, SubWeaponType as CalculatorSubWeaponType } from '@/types/calculator'
 import { buffSkillSchema } from '@/schemas/buffSkillSchema'
-import NewSkillCard from './NewSkillCard'
+import SkillCard from './SkillCard'
 
 // 武器種変換関数
 function convertWeaponType(weaponType: WeaponType): MainWeaponType | null {
@@ -140,7 +140,7 @@ export default function BuffSkillForm() {
 
 			<div className="grid grid-cols-2 gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3">
 				{availableSkills.map(skill => (
-					<NewSkillCard 
+					<SkillCard 
 						key={skill.id} 
 						skill={skill} 
 						control={control} 
