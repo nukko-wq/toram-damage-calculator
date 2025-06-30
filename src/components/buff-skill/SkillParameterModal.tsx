@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import type { BuffSkillDefinition, BuffSkillState } from '@/types/buffSkill'
 import { getInputHint } from '@/utils/buffSkillUtils'
-import ToggleSwitch from '@/components/ui/ToggleSwitch'
 
 interface SkillParameterModalProps {
 	skill: BuffSkillDefinition
@@ -122,21 +121,8 @@ export default function SkillParameterModal({
 
 						{/* パラメータ入力フォーム */}
 						<div className="space-y-4">
-							{/* ON/OFF設定 */}
-							<div className="flex items-center justify-between">
-								<label className="text-sm font-medium text-gray-700">
-									スキル有効化
-								</label>
-								<ToggleSwitch
-									checked={tempState.isEnabled}
-									onChange={(enabled) =>
-										setTempState((prev) => ({ ...prev, isEnabled: enabled }))
-									}
-								/>
-							</div>
-
-							{/* レベル設定（toggle以外でスキルが有効な場合） */}
-							{skill.type !== 'toggle' && tempState.isEnabled && (
+							{/* レベル設定（toggle以外） */}
+							{skill.type !== 'toggle' && (
 								<>
 									{skill.type === 'level' && (
 										<div>
