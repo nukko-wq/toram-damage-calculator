@@ -123,7 +123,7 @@ export default function SkillParameterModal({
 					data-modal-content="true"
 				>
 					{/* ヘッダー */}
-					<div className="flex items-center justify-between p-6 border-b">
+					<div className="flex items-center justify-between p-6">
 						<h3
 							id="skill-modal-title"
 							className="text-lg font-bold text-gray-900"
@@ -384,7 +384,7 @@ export default function SkillParameterModal({
 					</div>
 
 					{/* フッター */}
-					<div className="flex justify-end space-x-2 p-6 border-t bg-gray-50">
+					<div className="flex justify-end space-x-2 p-6">
 						<button
 							type="button"
 							onClick={onClose}

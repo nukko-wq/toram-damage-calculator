@@ -55,7 +55,8 @@ export default function MultiParamModal({
 							level: foundSkill.parameters.skillLevel || 10,
 							stackCount: foundSkill.parameters.stackCount || defaultStackCount,
 							multiParam1: foundSkill.parameters.skillLevel || 10,
-							multiParam2: foundSkill.parameters.stackCount || defaultStackCount,
+							multiParam2:
+								foundSkill.parameters.stackCount || defaultStackCount,
 							multiParam3: foundSkill.parameters.playerCount || 0,
 							specialParam: foundSkill.parameters.playerCount || 0,
 						}
@@ -197,14 +198,7 @@ export default function MultiParamModal({
 			>
 				{/* ヘッダー */}
 				<div className="flex justify-between items-center mb-4">
-					<h2 className="text-lg font-semibold text-gray-800">
-						{skill.name} -{' '}
-						{skill.type === 'multiParam' && skill.multiParams
-							? skill.multiParams.param3
-								? `${skill.multiParams.param1.name}・${skill.multiParams.param2.name}・${skill.multiParams.param3.name}設定`
-								: `${skill.multiParams.param1.name}・${skill.multiParams.param2.name}設定`
-							: 'マルチパラメータ設定'}
-					</h2>
+					<h2 className="text-lg font-semibold text-gray-800">{skill.name}</h2>
 					<button
 						type="button"
 						onClick={onClose}
@@ -288,8 +282,8 @@ export default function MultiParamModal({
 									: skill.id === 'mg4'
 										? 'キャストマスタリを除いたウィザードスキルの習得数を入力してください。'
 										: skill.id === 'knight5-3'
-										? 'バフエリア内のプレイヤーの数を入力してください。'
-										: `${skill.multiParams.param2.name}を入力してください。`
+											? 'バフエリア内のプレイヤーの数を入力してください。'
+											: `${skill.multiParams.param2.name}を入力してください。`
 								: 'カウント数を入力してください。'}
 						</div>
 						<div className="flex items-center justify-center space-x-2">
@@ -357,8 +351,8 @@ export default function MultiParamModal({
 									{skill.id === 'mg4'
 										? 'ウィザードスキルに使用した全スキルポイントを入力してください。'
 										: skill.id === 'knight5-3'
-										? '盾の精錬値を入力してください。'
-										: `${skill.multiParams.param3.name}を入力してください。`}
+											? '盾の精錬値を入力してください。'
+											: `${skill.multiParams.param3.name}を入力してください。`}
 								</div>
 								<div className="flex items-center justify-center space-x-2">
 									{/* param3 -10ボタン */}
@@ -366,13 +360,15 @@ export default function MultiParamModal({
 										type="button"
 										onClick={() =>
 											handleParam3Change(
-												(currentState.multiParam3 || skill.multiParams?.param3?.default || 0) - 10
+												(currentState.multiParam3 ||
+													skill.multiParams?.param3?.default ||
+													0) - 10,
 											)
 										}
 										disabled={
 											(currentState.multiParam3 ||
-												skill.multiParams?.param3?.default || 0) <=
-											(skill.multiParams?.param3?.min || 0)
+												skill.multiParams?.param3?.default ||
+												0) <= (skill.multiParams?.param3?.min || 0)
 										}
 										className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 									>
@@ -429,13 +425,15 @@ export default function MultiParamModal({
 										type="button"
 										onClick={() =>
 											handleParam3Change(
-												(currentState.multiParam3 || skill.multiParams?.param3?.default || 0) + 10
+												(currentState.multiParam3 ||
+													skill.multiParams?.param3?.default ||
+													0) + 10,
 											)
 										}
 										disabled={
 											(currentState.multiParam3 ||
-												skill.multiParams?.param3?.default || 0) >=
-											(skill.multiParams?.param3?.max || 0)
+												skill.multiParams?.param3?.default ||
+												0) >= (skill.multiParams?.param3?.max || 0)
 										}
 										className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 									>
@@ -446,11 +444,13 @@ export default function MultiParamModal({
 						)}
 
 					{/* 説明 */}
-					{skill.id !== 'dp1' && skill.id !== 'mg4' && skill.id !== 'knight5-3' && (
-						<div className="text-xs text-gray-500 text-center">
-							{skill.name}はカウント数1-{skill.maxStack || 10}まで設定可能です
-						</div>
-					)}
+					{skill.id !== 'dp1' &&
+						skill.id !== 'mg4' &&
+						skill.id !== 'knight5-3' && (
+							<div className="text-xs text-gray-500 text-center">
+								{skill.name}はカウント数1-{skill.maxStack || 10}まで設定可能です
+							</div>
+						)}
 				</div>
 
 				{/* 閉じるボタン */}
