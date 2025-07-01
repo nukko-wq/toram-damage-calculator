@@ -32,7 +32,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'halberd',
 		type: 'level',
 		maxLevel: 10,
-		order: 501,
+		order: 601,
 	},
 	{
 		id: 'godspeed_parry',
@@ -40,7 +40,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'halberd',
 		type: 'stack',
 		maxStack: 3,
-		order: 502,
+		order: 602,
 	},
 
 	// モノノフスキル
@@ -76,7 +76,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'dualSword',
 		type: 'level',
 		maxLevel: 10,
-		order: 701,
+		order: 801,
 	},
 	{
 		id: 'ds1',
@@ -84,7 +84,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'dualSword',
 		type: 'level',
 		maxLevel: 10,
-		order: 702,
+		order: 802,
 	},
 
 	// スプライトスキル
@@ -93,7 +93,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		name: 'エンハンス',
 		category: 'sprite',
 		type: 'toggle',
-		order: 901,
+		order: 801,
 	},
 	{
 		id: 'IsStabilis',
@@ -455,7 +455,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '強力な追撃',
 			category: 'martial',
 			type: 'level',
-			order: 401,
+			order: 501,
 		},
 
 		// モノノフスキル
@@ -464,7 +464,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 604,
+			order: 704,
 		},
 
 		// マジックブレードスキル
@@ -569,7 +569,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '双剣の鍛錬',
 			category: 'dualSword',
 			type: 'level',
-			order: 703,
+			order: 803,
 		},
 		{
 			id: 'ds1-1',
@@ -583,7 +583,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'フィロエクレール',
 			category: 'dualSword',
 			type: 'toggle',
-			order: 705,
+			order: 805,
 		},
 		{
 			id: 'ds3',
@@ -591,7 +591,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			category: 'dualSword',
 			type: 'level',
 			maxLevel: 100,
-			order: 706,
+			order: 806,
 		},
 		{
 			id: 'ds4',
@@ -614,14 +614,14 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			type: 'levelAndStack',
 			maxLevel: 10,
 			maxStack: 100,
-			order: 709,
+			order: 809,
 		},
 		{
 			id: 'ds7',
 			name: 'アークセイバー',
 			category: 'dualSword',
 			type: 'level',
-			order: 710,
+			order: 810,
 		},
 	],
 
@@ -686,7 +686,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 604,
+			order: 704,
 		},
 
 		// マジックブレードスキル
@@ -731,21 +731,21 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '体術鍛錬',
 			category: 'martial',
 			type: 'level',
-			order: 401,
+			order: 501,
 		},
 		{
 			id: 'ma2-1',
 			name: '強力な追撃',
 			category: 'martial',
 			type: 'level',
-			order: 402,
+			order: 502,
 		},
 		{
 			id: 'ma2',
 			name: 'アシュラオーラ',
 			category: 'martial',
 			type: 'toggle',
-			order: 403,
+			order: 503,
 		},
 
 		// モノノフスキル
@@ -754,7 +754,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 604,
+			order: 704,
 		},
 
 		// クラッシャースキル
@@ -840,14 +840,14 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			category: 'halberd',
 			type: 'level',
 			maxLevel: 10,
-			order: 504,
+			order: 704,
 		},
 		{
 			id: 'hb1',
 			name: 'トールハンマー',
 			category: 'halberd',
 			type: 'toggle',
-			order: 506,
+			order: 606,
 		},
 
 		// モノノフスキル
@@ -856,7 +856,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 604,
+			order: 704,
 		},
 	],
 
@@ -876,7 +876,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '明鏡止水',
 			category: 'mononofu',
 			type: 'level',
-			order: 605,
+			order: 805,
 		},
 		{
 			id: 'mf3',
@@ -891,7 +891,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 607,
+			order: 707,
 		},
 		{
 			id: 'mf2',
@@ -899,7 +899,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			category: 'mononofu',
 			type: 'level',
 			maxLevel: 10,
-			order: 608,
+			order: 708,
 		},
 	],
 
@@ -971,7 +971,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 604,
+			order: 704,
 		},
 	],
 
@@ -1016,7 +1016,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '強力な追撃',
 			category: 'martial',
 			type: 'level',
-			order: 401,
+			order: 501,
 		},
 
 		// マジックブレードスキル
@@ -1116,15 +1116,15 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'チェインキャスト',
 			category: 'magic',
 			type: 'level',
-			order: 1301,
+			order: 401,
 		},
 		{
 			id: 'mg2',
 			name: '急速チャージ',
 			category: 'magic',
-			type: 'level',
-			maxLevel: 15,
-			order: 1302,
+			type: 'stack',
+			maxStack: 15,
+			order: 402,
 		},
 
 		// マーシャルスキル
@@ -1133,7 +1133,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '強力な追撃',
 			category: 'martial',
 			type: 'level',
-			order: 401,
+			order: 501,
 		},
 
 		// マジックブレードスキル
@@ -1224,15 +1224,15 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'チェインキャスト',
 			category: 'magic',
 			type: 'level',
-			order: 1301,
+			order: 401,
 		},
 		{
 			id: 'mg2',
 			name: '急速チャージ',
 			category: 'magic',
-			type: 'level',
-			maxLevel: 15,
-			order: 1302,
+			type: 'stack',
+			maxStack: 15,
+			order: 402,
 		},
 
 		// ウィザードスキル
@@ -1291,7 +1291,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '強力な追撃',
 			category: 'martial',
 			type: 'level',
-			order: 401,
+			order: 501,
 		},
 
 		// マジックブレードスキル
@@ -1354,7 +1354,7 @@ export const SUB_WEAPON_SKILLS: Record<string, BuffSkillDefinition[]> = {
 			category: 'magic',
 			type: 'stack',
 			maxStack: 15,
-			order: 1301,
+			order: 401,
 		},
 		{
 			id: 'mw1',

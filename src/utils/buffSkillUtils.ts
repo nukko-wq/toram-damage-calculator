@@ -208,8 +208,8 @@ export function getDefaultSkillStates(
 	const states: Record<string, BuffSkillState> = {}
 
 	for (const skill of skills) {
-		// セイバーオーラの特別なデフォルト値
-		const defaultStackCount = skill.id === 'ds6' ? 100 : 1
+		// 特別なデフォルト値
+		const defaultStackCount = skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1
 		
 		states[skill.id] = {
 			isEnabled: false,

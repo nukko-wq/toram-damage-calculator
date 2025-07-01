@@ -21,12 +21,17 @@ export default function SkillCard({
 	const categoryLabel = CATEGORY_LABELS[skill.category]
 	
 	// Zustandから現在の状態を取得（メモ化）
-	const defaultState = useMemo(() => ({
-		isEnabled: false,
-		level: 10,
-		stackCount: 1,
-		specialParam: 0
-	}), [])
+	const defaultState = useMemo(() => {
+		// 特別なデフォルト値
+		const defaultStackCount = skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1
+		
+		return {
+			isEnabled: false,
+			level: 10,
+			stackCount: defaultStackCount,
+			specialParam: 0
+		}
+	}, [skill.id])
 
 	const currentState = useCalculatorStore(useCallback(state => {
 		const buffSkillsData = state.data.buffSkills.skills
@@ -69,25 +74,13 @@ export default function SkillCard({
 
 		switch (skill.type) {
 			case 'level':
-				if (level && level > 1) {
-					return `${skill.name}/${level}`
-				}
-				return skill.name
+				return `${skill.name}/${level || 1}`
 
 			case 'stack':
-				if (stackCount && stackCount > 1) {
-					return `${skill.name}×${stackCount}`
-				}
-				return skill.name
+				return `${skill.name}×${stackCount || 1}`
 
-			case 'levelAndStack': {
-				const levelDisplay = level && level > 1 ? `/${level}` : ''
-				const stackDisplay = stackCount && stackCount > 1 ? `×${stackCount}` : ''
-				if (levelDisplay || stackDisplay) {
-					return `${skill.name}${levelDisplay}${stackDisplay}`
-				}
-				return skill.name
-			}
+			case 'levelAndStack':
+				return `${skill.name}/${level || 1}`
 
 			default:
 				return skill.name

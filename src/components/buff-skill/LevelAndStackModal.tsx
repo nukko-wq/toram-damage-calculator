@@ -20,7 +20,7 @@ export default function LevelAndStackModal({
 		() => ({
 			isEnabled: false,
 			level: 10,
-			stackCount: skill.id === 'ds6' ? 100 : 1, // セイバーオーラは100、その他は1
+			stackCount: skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1, // セイバーオーラは100、急速チャージは15、その他は1
 			specialParam: 0,
 		}),
 		[skill.id],
@@ -86,12 +86,35 @@ export default function LevelAndStackModal({
 		[skill.id, currentState, updateBuffSkillState, skill.maxStack],
 	)
 
+	// 背景クリックでモーダルを閉じる
+	const handleBackgroundClick = (e: React.MouseEvent) => {
+		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
+		const modalContent = document.querySelector('[data-modal-content="true"]')
+		const target = e.target as Element
+
+		if (modalContent && !modalContent.contains(target)) {
+			onClose()
+		}
+	}
+
+	const handleContentClick = (e: React.MouseEvent) => {
+		// モーダル内のクリックは伝播を停止
+		e.stopPropagation()
+	}
+
 	// モーダルが閉じているときは何も表示しない
 	if (!isOpen) return null
 
 	return (
-		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-			<div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+		<div 
+			className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+			onClick={handleBackgroundClick}
+		>
+			<div 
+				className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+				onClick={handleContentClick}
+				data-modal-content="true"
+			>
 				{/* ヘッダー */}
 				<div className="flex justify-between items-center mb-4">
 					<h2 className="text-lg font-semibold text-gray-800">

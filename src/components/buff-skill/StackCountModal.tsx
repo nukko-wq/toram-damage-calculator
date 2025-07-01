@@ -17,13 +17,18 @@ export default function StackCountModal({
 }: StackCountModalProps) {
 	// Zustandストアから現在のスキル状態を取得
 	const defaultState = useMemo(
-		() => ({
-			isEnabled: false,
-			level: 10,
-			stackCount: 1,
-			specialParam: 0,
-		}),
-		[],
+		() => {
+			// 特別なデフォルト値
+			const defaultStackCount = skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1
+			
+			return {
+				isEnabled: false,
+				level: 10,
+				stackCount: defaultStackCount,
+				specialParam: 0,
+			}
+		},
+		[skill.id],
 	)
 
 	const currentState = useCalculatorStore(
@@ -73,12 +78,35 @@ export default function StackCountModal({
 		[skill.id, currentState, updateBuffSkillState, skill.maxStack],
 	)
 
+	// 背景クリックでモーダルを閉じる
+	const handleBackgroundClick = (e: React.MouseEvent) => {
+		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
+		const modalContent = document.querySelector('[data-modal-content="true"]')
+		const target = e.target as Element
+
+		if (modalContent && !modalContent.contains(target)) {
+			onClose()
+		}
+	}
+
+	const handleContentClick = (e: React.MouseEvent) => {
+		// モーダル内のクリックは伝播を停止
+		e.stopPropagation()
+	}
+
 	// モーダルが閉じているときは何も表示しない
 	if (!isOpen) return null
 
 	return (
-		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-			<div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+		<div 
+			className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+			onClick={handleBackgroundClick}
+		>
+			<div 
+				className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+				onClick={handleContentClick}
+				data-modal-content="true"
+			>
 				{/* ヘッダー */}
 				<div className="flex justify-between items-center mb-4">
 					<h2 className="text-lg font-semibold text-gray-800">
