@@ -179,6 +179,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			rawFoodData: data.food,
 			foodBonuses: foodBonuses,
 			foodAggroValue: foodBonuses.Aggro || 0,
+			foodAggroRateValue: foodBonuses.Aggro_Rate || 0,
 		})
 
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
@@ -222,6 +223,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				equipment_minus_rate: Math.abs(
 					Math.min(0, equipmentBonuses.Aggro_Rate || 0),
 				),
+				food_aggro: foodBonuses.Aggro || 0,
+				food_aggro_rate: foodBonuses.Aggro_Rate || 0,
 				total_plus: Math.max(0, allBonuses.Aggro || 0),
 				total_plus_rate: Math.max(0, allBonuses.Aggro_Rate || 0),
 				total_minus: Math.abs(Math.min(0, allBonuses.Aggro || 0)),
@@ -710,8 +713,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								ailmentResistance: '異常耐性',
 								physicalResistance: '物理耐性',
 								magicalResistance: '魔法耐性',
-								aggroPlus: 'ヘイト+',
-								aggroMinus: 'ヘイト-',
+								aggro: 'ヘイト(%)',
 							}}
 							displayMode="property-double"
 							propertyOrder={[
@@ -745,8 +747,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								'ailmentResistance',
 								'physicalResistance',
 								'magicalResistance',
-								'aggroPlus',
-								'aggroMinus',
+								'aggro',
 								'',
 							]}
 							propertyConfigs={{
@@ -778,8 +779,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								ailmentResistance: { hasRate: true, hasFixed: false },
 								physicalResistance: { hasRate: true, hasFixed: false },
 								magicalResistance: { hasRate: true, hasFixed: false },
-								aggroPlus: { hasRate: true, hasFixed: true },
-								aggroMinus: { hasRate: true, hasFixed: true },
+								aggro: { hasRate: true, hasFixed: true },
 							}}
 							className=""
 						/>

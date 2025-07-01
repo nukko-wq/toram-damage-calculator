@@ -210,8 +210,8 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			ailmentResistance: 0,
 			physicalResistance: 0,
 			magicalResistance: 0,
-			aggroPlus: 0,
-			aggroMinus: 0,
+			aggro: 0,
+			aggro_Rate: 0,
 		},
 
 		equipmentBonus2: {

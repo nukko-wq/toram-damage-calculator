@@ -812,10 +812,8 @@ export function calculateEquipmentBonuses(
 		physicalResistance_Rate: allBonuses.PhysicalResistance_Rate || 0,
 		magicalResistance: allBonuses.MagicalResistance_Rate || 0,
 		magicalResistance_Rate: allBonuses.MagicalResistance_Rate || 0,
-		aggroPlus: Math.max(0, allBonuses.Aggro || 0),
-		aggroPlus_Rate: Math.max(0, allBonuses.Aggro_Rate || 0),
-		aggroMinus: Math.abs(Math.min(0, allBonuses.Aggro || 0)),
-		aggroMinus_Rate: Math.abs(Math.min(0, allBonuses.Aggro_Rate || 0)),
+		aggro: (allBonuses.Aggro || 0),
+		aggro_Rate: (allBonuses.Aggro_Rate || 0),
 	}
 
 	// 装備品補正値2 (31項目) - %と固定値の両方を含む

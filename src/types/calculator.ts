@@ -573,8 +573,8 @@ export type FoodType =
 	| 'margherita_pizza' // マルゲリータピザ(武器ATK+)
 	| 'diabola_pizza' // ディアボラピザ(ATK+)
 	| 'seafood_pizza' // シーフードピザ(MATK+)
-	| 'beef_stew' // ビーフシチュー(ヘイト+)
-	| 'white_stew' // ホワイトシチュー(ヘイト-)
+	| 'beef_stew' // ビーフシチュー(ヘイト)
+	| 'white_stew' // ホワイトシチュー(ヘイト)
 	| 'beef_burger' // ビーフバーガー(物理耐性)
 	| 'fish_burger' // フィッシュバーガー(魔法耐性)
 

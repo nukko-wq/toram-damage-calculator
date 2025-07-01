@@ -333,7 +333,7 @@ equipmentBonusValue = equipmentValue + crystalValue + foodValue + buffValue
 - **命中回避**: 命中, 回避
 - **HP/MP**: HP, MP, 攻撃MP回復
 - **耐性**: 異常耐性, 物理耐性, 魔法耐性
-- **ヘイト**: ヘイト+, ヘイト-
+- **ヘイト**: ヘイト
 
 #### 装備品補正値2 (31プロパティ)  
 - **ステータス依存攻撃**: ATK+(STR%), MATK+(STR%), ATK+(INT%), MATK+(INT%), etc.
