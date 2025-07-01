@@ -195,8 +195,8 @@ export default function SkillParameterModal({
 												</button>
 
 												{/* スキルレベル表示 */}
-												<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded min-w-[60px] text-center">
-													{currentState.level || 10}
+												<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded w-[80px] text-center">
+													Lv.{currentState.level || 10}
 												</div>
 
 												{/* +1ボタン */}
