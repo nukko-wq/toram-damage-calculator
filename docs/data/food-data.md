@@ -33,7 +33,7 @@ interface FoodEffect {
   id: string
   name: string
   category: 'HP' | 'MP' | 'ATK' | 'MATK' | 'STAT' | 'RESIST'
-  propertyType: string  // 'HP', 'MP', 'ATK', 'MATK', 'weaponATK', 'elementAdvantage', 'STR', 'INT', 'VIT', 'DEX', 'AGI', 'accuracy', 'attackMPRecovery', 'criticalRate', 'aggroPlus', 'aggroMinus', 'physicalResistance', 'magicalResistance', etc.
+  propertyType: string  // 'HP', 'MP', 'ATK', 'MATK', 'weaponATK', 'elementAdvantage', 'STR', 'INT', 'VIT', 'DEX', 'AGI', 'accuracy', 'attackMPRecovery', 'criticalRate', 'Aggro_Rate', 'physicalResistance', 'magicalResistance', etc.
   isPercentage: boolean // true: %, false: 固定値
   levels: Array<{
     level: number
@@ -410,28 +410,28 @@ const takoyaki: FoodEffect = {
 }
 ```
 
-#### ビーフシチュー(ヘイト+)
-ヘイト+固定値を増加させる料理。
+#### ビーフシチュー(ヘイト)
+ヘイト(%)を増加させる料理。
 
-| レベル | ヘイト+(+) | 効果値 |
-|--------|------------|--------|
-| Lv1    | +6         | 6      |
-| Lv2    | +12        | 12     |
-| Lv3    | +18        | 18     |
-| Lv4    | +24        | 24     |
-| Lv5    | +30        | 30     |
-| Lv6    | +44        | 44     |
-| Lv7    | +58        | 58     |
-| Lv8    | +72        | 72     |
-| Lv9    | +86        | 86     |
-| Lv10   | +100       | 100    |
+| レベル | ヘイト(%) | 効果値 |
+|--------|-----------|--------|
+| Lv1    | +6%       | 6      |
+| Lv2    | +12%      | 12     |
+| Lv3    | +18%      | 18     |
+| Lv4    | +24%      | 24     |
+| Lv5    | +30%      | 30     |
+| Lv6    | +44%      | 44     |
+| Lv7    | +58%      | 58     |
+| Lv8    | +72%      | 72     |
+| Lv9    | +86%      | 86     |
+| Lv10   | +100%     | 100    |
 
 ```typescript
 const beefStew: FoodEffect = {
   id: 'beef_stew',
-  name: 'ビーフシチュー(ヘイト+)',
+  name: 'ビーフシチュー(ヘイト)',
   category: 'STAT',
-  propertyType: 'aggroPlus',
+  propertyType: 'Aggro_Rate',
   isPercentage: false,
   levels: [
     { level: 1, value: 6 },
@@ -445,32 +445,32 @@ const beefStew: FoodEffect = {
     { level: 9, value: 86 },
     { level: 10, value: 100 }
   ],
-  description: 'ヘイト+固定値を増加させる料理'
+  description: 'ヘイト(%)を増加させる料理'
 }
 ```
 
-#### ホワイトシチュー(ヘイト-)
-ヘイト-固定値を増加させる料理。
+#### ホワイトシチュー(ヘイト)
+ヘイト(%)を減少させる料理。
 
-| レベル | ヘイト-(-) | 効果値 |
-|--------|------------|--------|
-| Lv1    | -6         | -6     |
-| Lv2    | -12        | -12    |
-| Lv3    | -18        | -18    |
-| Lv4    | -24        | -24    |
-| Lv5    | -30        | -30    |
-| Lv6    | -44        | -44    |
-| Lv7    | -58        | -58    |
-| Lv8    | -72        | -72    |
-| Lv9    | -86        | -86    |
-| Lv10   | -100       | -100   |
+| レベル | ヘイト(%) | 効果値 |
+|--------|-----------|--------|
+| Lv1    | -6%       | -6     |
+| Lv2    | -12%      | -12    |
+| Lv3    | -18%      | -18    |
+| Lv4    | -24%      | -24    |
+| Lv5    | -30%      | -30    |
+| Lv6    | -44%      | -44    |
+| Lv7    | -58%      | -58    |
+| Lv8    | -72%      | -72    |
+| Lv9    | -86%      | -86    |
+| Lv10   | -100%     | -100   |
 
 ```typescript
 const whiteStew: FoodEffect = {
   id: 'white_stew',
-  name: 'ホワイトシチュー(ヘイト-)',
+  name: 'ホワイトシチュー(ヘイト)',
   category: 'STAT',
-  propertyType: 'aggroMinus',
+  propertyType: 'Aggro_Rate',
   isPercentage: false,
   levels: [
     { level: 1, value: -6 },
@@ -484,7 +484,7 @@ const whiteStew: FoodEffect = {
     { level: 9, value: -86 },
     { level: 10, value: -100 }
   ],
-  description: 'ヘイト-固定値を増加させる料理'
+  description: 'ヘイト(%)を減少させる料理'
 }
 ```
 
@@ -843,8 +843,7 @@ export class FoodDatabase {
       'AGI': 'AGI',
       'attackMPRecovery': 'attackMPRecovery',
       'criticalRate': 'criticalRate',
-      'aggroPlus': 'aggroPlus',
-      'aggroMinus': 'aggroMinus',
+      'Aggro_Rate': 'aggro',
       'physicalResistance': 'physicalResistance',
       'magicalResistance': 'magicalResistance'
     }
@@ -915,8 +914,7 @@ export function calculateEquipmentBonuses(
 | `AGI` | `AGI` | 装備品補正値1 | 明太子おにぎり |
 | `attackMPRecovery` | `attackMPRecovery` | 装備品補正値1 | 焼きそば |
 | `criticalRate` | `criticalRate` | 装備品補正値1 | たこやき |
-| `aggroPlus` | `aggroPlus` | 装備品補正値1 | ビーフシチュー |
-| `aggroMinus` | `aggroMinus` | 装備品補正値1 | ホワイトシチュー |
+| `Aggro_Rate` | `aggro` | 装備品補正値1 | ビーフシチュー・ホワイトシチュー |
 | `physicalResistance` | `physicalResistance` | 装備品補正値2 | ビーフバーガー |
 | `magicalResistance` | `magicalResistance` | 装備品補正値2 | フィッシュバーガー |
 

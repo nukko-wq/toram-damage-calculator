@@ -92,8 +92,7 @@ interface CalculationResults {
     ailmentResistance: number
     physicalResistance: number
     magicalResistance: number
-    aggroPlus: number
-    aggroMinus: number
+    aggro: number
   }
   
   // 装備品補正値2（32項目）
@@ -348,7 +347,7 @@ export const StatSection = React.memo<StatSectionProps>(({
 - ステータス系: STR, AGI, INT, DEX, VIT
 - 速度系: ASPD, CSPD, 安定率, 行動速度
 - 戦闘系: 命中, 回避, MP, 攻撃MP回復, HP
-- 耐性系: 異常耐性, 物理耐性, 魔法耐性, ヘイト+, ヘイト-
+- 耐性系: 異常耐性, 物理耐性, 魔法耐性, ヘイト(%)
 
 ### 装備品補正値2（32項目）
 - ステータス連動: ATK+(STR/INT/VIT/AGI/DEX), MATK+(STR/INT/VIT/AGI/DEX)
