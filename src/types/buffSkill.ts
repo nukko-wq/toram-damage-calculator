@@ -22,7 +22,7 @@ export interface MultiParamConfig {
 		default: number // デフォルト値
 		unit?: string // 単位（例: "Lv", "個", "pt"）
 	}
-	param2: {
+	param2?: {
 		name: string
 		min: number
 		max: number

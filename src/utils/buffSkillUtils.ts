@@ -216,7 +216,7 @@ export function getDefaultSkillStates(
 				isEnabled: false,
 				level: skill.multiParams.param1.default,
 				multiParam1: skill.multiParams.param1.default,
-				multiParam2: skill.multiParams.param2.default,
+				multiParam2: skill.multiParams.param2?.default,
 				multiParam3: skill.multiParams.param3?.default,
 			}
 		} else {
