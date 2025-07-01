@@ -209,13 +209,23 @@ export function getDefaultSkillStates(
 
 	for (const skill of skills) {
 		// 特別なデフォルト値
-		const defaultStackCount = skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1
+		const defaultStackCount = skill.id === 'mg2' ? 15 : 1
 		
-		states[skill.id] = {
-			isEnabled: false,
-			level: (skill.type === 'level' || skill.type === 'levelAndStack') ? 10 : undefined,
-			stackCount: (skill.type === 'stack' || skill.type === 'levelAndStack') ? defaultStackCount : undefined,
-			specialParam: skill.type === 'special' ? 0 : undefined,
+		if (skill.type === 'multiParam' && skill.multiParams) {
+			states[skill.id] = {
+				isEnabled: false,
+				level: skill.multiParams.param1.default,
+				multiParam1: skill.multiParams.param1.default,
+				multiParam2: skill.multiParams.param2.default,
+				multiParam3: skill.multiParams.param3?.default,
+			}
+		} else {
+			states[skill.id] = {
+				isEnabled: false,
+				level: skill.type === 'level' ? 10 : undefined,
+				stackCount: skill.type === 'stack' ? defaultStackCount : undefined,
+				specialParam: skill.type === 'special' ? 0 : undefined,
+			}
 		}
 	}
 
@@ -305,8 +315,8 @@ export function shouldShowModal(skill: BuffSkillDefinition): boolean {
 		return false
 	}
 	
-	// level, stack, levelAndStack, specialタイプはモーダル表示
-	return ['level', 'stack', 'levelAndStack', 'special'].includes(skill.type)
+	// level, stack, multiParam, specialタイプはモーダル表示
+	return ['level', 'stack', 'multiParam', 'special'].includes(skill.type)
 }
 
 // スキル名のクリック可能性を示すCSSクラス名を取得

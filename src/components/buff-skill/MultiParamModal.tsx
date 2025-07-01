@@ -4,26 +4,40 @@ import { useCallback, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { BuffSkillDefinition } from '@/types/buffSkill'
 
-interface LevelAndStackModalProps {
+interface MultiParamModalProps {
 	skill: BuffSkillDefinition
 	isOpen: boolean
 	onClose: () => void
 }
 
-export default function LevelAndStackModal({
+export default function MultiParamModal({
 	skill,
 	isOpen,
 	onClose,
-}: LevelAndStackModalProps) {
+}: MultiParamModalProps) {
 	// Zustandストアから現在のスキル状態を取得
 	const defaultState = useMemo(
-		() => ({
-			isEnabled: false,
-			level: 10,
-			stackCount: skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1, // セイバーオーラは100、急速チャージは15、その他は1
-			specialParam: 0,
-		}),
-		[skill.id],
+		() => {
+			if (skill.type === 'multiParam' && skill.multiParams) {
+				return {
+					isEnabled: false,
+					level: skill.multiParams.param1.default,
+					stackCount: skill.multiParams.param2.default,
+					multiParam1: skill.multiParams.param1.default,
+					multiParam2: skill.multiParams.param2.default,
+					multiParam3: skill.multiParams.param3?.default || 0,
+					specialParam: 0,
+				}
+			}
+			// Fallback for other types
+			return {
+				isEnabled: false,
+				level: 10,
+				stackCount: skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1,
+				specialParam: 0,
+			}
+		},
+		[skill.id, skill.type, skill.multiParams],
 	)
 
 	const currentState = useCalculatorStore(
@@ -61,29 +75,41 @@ export default function LevelAndStackModal({
 	// レベル変更ハンドラ
 	const handleLevelChange = useCallback(
 		(newLevel: number) => {
-			const maxLevel = skill.maxLevel || 10
-			const clampedLevel = Math.max(1, Math.min(maxLevel, newLevel))
+			const maxLevel = skill.type === 'multiParam' && skill.multiParams 
+				? skill.multiParams.param1.max 
+				: skill.maxLevel || 10
+			const minLevel = skill.type === 'multiParam' && skill.multiParams 
+				? skill.multiParams.param1.min 
+				: 1
+			const clampedLevel = Math.max(minLevel, Math.min(maxLevel, newLevel))
 
 			updateBuffSkillState(skill.id, {
 				...currentState,
 				level: clampedLevel,
+				multiParam1: clampedLevel,
 			})
 		},
-		[skill.id, currentState, updateBuffSkillState, skill.maxLevel],
+		[skill.id, currentState, updateBuffSkillState, skill.type, skill.maxLevel, skill.multiParams],
 	)
 
 	// スタック数変更ハンドラ
 	const handleStackCountChange = useCallback(
 		(newStackCount: number) => {
-			const maxStack = skill.maxStack || 10
-			const clampedStackCount = Math.max(1, Math.min(maxStack, newStackCount))
+			const maxStack = skill.type === 'multiParam' && skill.multiParams 
+				? skill.multiParams.param2.max 
+				: skill.maxStack || 10
+			const minStack = skill.type === 'multiParam' && skill.multiParams 
+				? skill.multiParams.param2.min 
+				: 1
+			const clampedStackCount = Math.max(minStack, Math.min(maxStack, newStackCount))
 
 			updateBuffSkillState(skill.id, {
 				...currentState,
 				stackCount: clampedStackCount,
+				multiParam2: clampedStackCount,
 			})
 		},
-		[skill.id, currentState, updateBuffSkillState, skill.maxStack],
+		[skill.id, currentState, updateBuffSkillState, skill.type, skill.maxStack, skill.multiParams],
 	)
 
 	// 背景クリックでモーダルを閉じる
@@ -118,7 +144,10 @@ export default function LevelAndStackModal({
 				{/* ヘッダー */}
 				<div className="flex justify-between items-center mb-4">
 					<h2 className="text-lg font-semibold text-gray-800">
-						{skill.name} - レベル・重ねがけ数設定
+						{skill.name} - {skill.type === 'multiParam' && skill.multiParams 
+							? `${skill.multiParams.param1.name}・${skill.multiParams.param2.name}設定`
+							: 'マルチパラメータ設定'
+						}
 					</h2>
 					<button
 						type="button"
@@ -134,7 +163,10 @@ export default function LevelAndStackModal({
 					{/* スキルレベル設定 */}
 					<div>
 						<div className="text-sm text-gray-600 mb-3">
-							スキルレベルを入力してください。
+							{skill.type === 'multiParam' && skill.multiParams 
+								? `${skill.multiParams.param1.name}を入力してください。`
+								: 'スキルレベルを入力してください。'
+							}
 						</div>
 						<div className="flex items-center justify-center space-x-2">
 							{/* レベル -10ボタン */}
@@ -191,7 +223,10 @@ export default function LevelAndStackModal({
 					{/* 重ねがけ数設定 */}
 					<div>
 						<div className="text-sm text-gray-600 mb-3">
-							カウント数を入力してください。
+							{skill.type === 'multiParam' && skill.multiParams 
+								? `${skill.multiParams.param2.name}を入力してください。`
+								: 'カウント数を入力してください。'
+							}
 						</div>
 						<div className="flex items-center justify-center space-x-2">
 							{/* スタック -10ボタン */}

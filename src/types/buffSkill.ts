@@ -8,7 +8,34 @@ export interface BuffSkillState {
 	isEnabled: boolean // オン/オフ状態
 	level?: number // スキルレベル（1-10, 1-15, 1-100等）
 	stackCount?: number // 重ねがけ数（×3, ×10, ×15等）
+	multiParam1?: number // multiParamタイプ用（パラメータ1）
+	multiParam2?: number // multiParamタイプ用（パラメータ2）
+	multiParam3?: number // multiParamタイプ用（パラメータ3）
 	specialParam?: number // 特殊パラメータ（プレイヤー数、精錬値等）
+}
+
+export interface MultiParamConfig {
+	param1: {
+		name: string // パラメータ名（例: "スキルレベル"）
+		min: number // 最小値
+		max: number // 最大値
+		default: number // デフォルト値
+		unit?: string // 単位（例: "Lv", "個", "pt"）
+	}
+	param2: {
+		name: string
+		min: number
+		max: number
+		default: number
+		unit?: string
+	}
+	param3?: {
+		name: string
+		min: number
+		max: number
+		default: number
+		unit?: string
+	}
 }
 
 export interface BuffSkillDefinition {
@@ -20,6 +47,7 @@ export interface BuffSkillDefinition {
 	categoryOrder?: number // カテゴリ内順序番号（省略時はorder使用）
 	maxLevel?: number // 最大レベル（デフォルト10）
 	maxStack?: number // 最大重ねがけ数
+	multiParams?: MultiParamConfig // multiParamタイプ用
 	description?: string // 説明文
 	requirements?: WeaponRequirement[] // 武器要件
 }
@@ -28,7 +56,7 @@ export type BuffSkillType =
 	| 'toggle' // ON/OFF切り替えのみ
 	| 'level' // レベル設定（1-10等）
 	| 'stack' // 重ねがけ設定（×3, ×10等）
-	| 'levelAndStack' // レベル＋重ねがけ設定（セイバーオーラ等）
+	| 'multiParam' // 複数パラメータ設定（キャストマスタリ、セイバーオーラ等）
 	| 'special' // 特殊パラメータ付き
 
 export type BuffSkillCategory =

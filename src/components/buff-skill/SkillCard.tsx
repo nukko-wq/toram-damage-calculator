@@ -8,7 +8,7 @@ import { useCalculatorStore } from '@/stores'
 import SkillToggleButton from './SkillToggleButton'
 import SkillParameterModal from './SkillParameterModal'
 import StackCountModal from './StackCountModal'
-import LevelAndStackModal from './LevelAndStackModal'
+import MultiParamModal from './MultiParamModal'
 
 interface SkillCardProps {
 	skill: BuffSkillDefinition
@@ -79,7 +79,7 @@ export default function SkillCard({
 			case 'stack':
 				return `${skill.name}×${stackCount || 1}`
 
-			case 'levelAndStack':
+			case 'multiParam':
 				return `${skill.name}/${level || 1}`
 
 			default:
@@ -131,8 +131,8 @@ export default function SkillCard({
 					isOpen={isModalOpen}
 					onClose={() => setIsModalOpen(false)}
 				/>
-			) : skill.type === 'levelAndStack' ? (
-				<LevelAndStackModal
+			) : skill.type === 'multiParam' ? (
+				<MultiParamModal
 					skill={skill}
 					isOpen={isModalOpen}
 					onClose={() => setIsModalOpen(false)}

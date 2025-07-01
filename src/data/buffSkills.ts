@@ -611,9 +611,23 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			id: 'ds6',
 			name: 'セイバーオーラ',
 			category: 'dualSword',
-			type: 'levelAndStack',
-			maxLevel: 10,
-			maxStack: 100,
+			type: 'multiParam',
+			multiParams: {
+				param1: {
+					name: 'スキルレベル',
+					min: 1,
+					max: 10,
+					default: 10,
+					unit: 'Lv'
+				},
+				param2: {
+					name: 'カウント数',
+					min: 1,
+					max: 100,
+					default: 100,
+					unit: ''
+				}
+			},
 			order: 809,
 		},
 		{

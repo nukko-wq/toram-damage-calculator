@@ -54,26 +54,25 @@
 - **UI実装**: 🚧 専用モーダル（MultiParamModal）作成予定
 - **備考**: 3つのパラメータを独立して設定可能、将来的に他の複雑なスキルにも対応
 
-### 3. levelAndStackタイプ（レベル＋重ねがけ数設定）
-
 #### セイバーオーラ
 - **スキルID**: `ds6`
 - **スキル名**: セイバーオーラ
 - **カテゴリ**: dualSword（デュアルソード）
-- **スキルレベル**: 1-10
-- **カウント数**: 1-100（デフォルト: 100）
-- **UI実装**: ✅ 専用モーダル（LevelAndStackModal）作成
-- **備考**: レベルとカウント数の両方を設定可能
+- **パラメータ1**: スキルレベル（1-10、デフォルト: 10）
+- **パラメータ2**: カウント数（1-100、デフォルト: 100）
+- **UI実装**: ✅ MultiParamModal（multiParam専用モーダル）
+- **表示形式**: セイバーオーラ/10（スキルレベルのみ表示）
+- **備考**: levelAndStackタイプからmultiParamタイプに統合
 
 
-### 4. levelタイプ（スキルレベル設定）
+### 3. levelタイプ（スキルレベル設定）
 - **対象スキル数**: 約92個
 - **設定範囲**: 1-10（スキルによって最大値は異なる）
 - **UI実装**: ✅ SkillParameterModal（統一ボタンUI）
 - **表示テキスト**: 「スキルレベルを入力してください。」
 - **備考**: 最も一般的なタイプ、LevelAndStackModalと統一されたUI
 
-### 5. toggleタイプ（ON/OFF切り替えのみ）
+### 4. toggleタイプ（ON/OFF切り替えのみ）
 - **対象スキル数**: 約69個
 - **設定項目**: 有効/無効の切り替えのみ
 - **UI実装**: ✅ SkillToggleButton
@@ -84,15 +83,15 @@
 ### 完了済み
 1. **StackCountModal**: stackタイプ汎用（maxStackプロパティで動的対応）
    - 神速の捌手（1-3回）、熱情の歌（1-10カウント）、急速チャージ（1-15回、MP回復量表示）、オーガスラッシュ（1-10消費鬼力数）
-2. **LevelAndStackModal**: levelAndStackタイプ専用
-   - セイバーオーラ（レベル1-10、カウント数1-100、デフォルト100）
+2. **MultiParamModal**: multiParamタイプ専用（2-3パラメータ対応）
+   - セイバーオーラ（スキルレベル1-10、カウント数1-100、デフォルト値: 10/100）
 3. **SkillParameterModal**: level/stack/specialタイプ汎用（統一ボタンUI）
 4. **SkillToggleButton**: toggleタイプ汎用
 
 ### 実装予定
-5. **MultiParamModal**: multiParamタイプ専用（3パラメータ対応）
+5. **3パラメータ対応**: MultiParamModalの機能拡張
    - キャストマスタリ（スキルレベル1-10、ウィザードスキル習得数0-50、使用全スキルポイント0-999）
-   - 将来的に他の複数パラメータスキルにも対応可能な汎用設計
+   - 3番目のパラメータ表示・操作機能の追加
 
 ## 技術仕様
 
@@ -102,9 +101,9 @@ interface BuffSkillDefinition {
   id: string
   name: string
   category: BuffSkillCategory
-  type: 'level' | 'stack' | 'levelAndStack' | 'multiParam' | 'toggle' | 'special'
-  maxLevel?: number  // level, levelAndStack, multiParamタイプ用
-  maxStack?: number  // stack, levelAndStackタイプ用
+  type: 'level' | 'stack' | 'multiParam' | 'toggle' | 'special'
+  maxLevel?: number  // level, multiParamタイプ用
+  maxStack?: number  // stackタイプ用
   multiParams?: MultiParamConfig  // multiParamタイプ用
   order: number
 }
@@ -138,8 +137,8 @@ interface MultiParamConfig {
 ```typescript
 interface BuffSkillState {
   isEnabled: boolean
-  level?: number        // level, levelAndStack, multiParamタイプ用
-  stackCount?: number   // stack, levelAndStackタイプ用
+  level?: number        // level, multiParamタイプ用
+  stackCount?: number   // stack, multiParamタイプ用
   multiParam1?: number  // multiParamタイプ用（パラメータ1）
   multiParam2?: number  // multiParamタイプ用（パラメータ2）
   multiParam3?: number  // multiParamタイプ用（パラメータ3）
@@ -152,8 +151,6 @@ interface BuffSkillState {
 // SkillCard.tsx内の条件分岐（スキルタイプベース）
 {skill.type === 'stack' ? (
   <StackCountModal skill={skill} />
-) : skill.type === 'levelAndStack' ? (
-  <LevelAndStackModal skill={skill} />
 ) : skill.type === 'multiParam' ? (
   <MultiParamModal skill={skill} />
 ) : (
@@ -295,3 +292,5 @@ function getDisplayName(skill: BuffSkillDefinition, state: BuffSkillState): stri
 - バフスキルカテゴリ順序を変更：magic（400番台）をshoot後に移動、martial以降を100ずつシフト
 - multiParamタイプの設計追加：3つのパラメータを持つスキル用（キャストマスタリ対応）
 - MultiParamModal設計仕様追加：汎用的な複数パラメータ対応モーダル
+- levelAndStackタイプをmultiParamタイプに統合：セイバーオーラをmultiParam形式に移行
+- LevelAndStackModalをMultiParamModalに改名・拡張：動的パラメータ名表示、multiParamConfig対応
