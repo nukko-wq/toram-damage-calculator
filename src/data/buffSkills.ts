@@ -157,8 +157,30 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		id: 'knight5-3',
 		name: 'ナイトプレッジ',
 		category: 'knight',
-		type: 'level',
-		maxLevel: 10,
+		type: 'multiParam',
+		multiParams: {
+			param1: {
+				name: 'スキルレベル',
+				min: 1,
+				max: 10,
+				default: 10,
+				unit: 'Lv'
+			},
+			param2: {
+				name: 'バフエリア内のプレイヤーの数',
+				min: 0,
+				max: 4,
+				default: 4,
+				unit: '人'
+			},
+			param3: {
+				name: '盾の精錬値',
+				min: 0,
+				max: 15,
+				default: 15,
+				unit: ''
+			}
+		},
 		order: 1601,
 	},
 

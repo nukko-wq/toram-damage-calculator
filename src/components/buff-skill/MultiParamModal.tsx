@@ -287,6 +287,8 @@ export default function MultiParamModal({
 									? 'ダークパワースキルに使用した全スキルポイントを入力してください。'
 									: skill.id === 'mg4'
 										? 'キャストマスタリを除いたウィザードスキルの習得数を入力してください。'
+										: skill.id === 'knight5-3'
+										? 'バフエリア内のプレイヤーの数を入力してください。'
 										: `${skill.multiParams.param2.name}を入力してください。`
 								: 'カウント数を入力してください。'}
 						</div>
@@ -354,6 +356,8 @@ export default function MultiParamModal({
 								<div className="text-sm text-gray-600 mb-3">
 									{skill.id === 'mg4'
 										? 'ウィザードスキルに使用した全スキルポイントを入力してください。'
+										: skill.id === 'knight5-3'
+										? '盾の精錬値を入力してください。'
 										: `${skill.multiParams.param3.name}を入力してください。`}
 								</div>
 								<div className="flex items-center justify-center space-x-2">
@@ -442,7 +446,7 @@ export default function MultiParamModal({
 						)}
 
 					{/* 説明 */}
-					{skill.id !== 'dp1' && skill.id !== 'mg4' && (
+					{skill.id !== 'dp1' && skill.id !== 'mg4' && skill.id !== 'knight5-3' && (
 						<div className="text-xs text-gray-500 text-center">
 							{skill.name}はカウント数1-{skill.maxStack || 10}まで設定可能です
 						</div>
