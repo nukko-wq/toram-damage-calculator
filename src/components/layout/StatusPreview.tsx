@@ -88,67 +88,73 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 		// 全ての効果を統合した最終ボーナス値を作成
 		const finalBonuses = { ...allBonuses }
-		
+
 		// レジスタ効果を統合
 		if (data.register?.effects) {
-			const maxHpUpEffect = data.register.effects.find(effect => 
-				effect.type === 'maxHpUp' && effect.isEnabled
+			const maxHpUpEffect = data.register.effects.find(
+				(effect) => effect.type === 'maxHpUp' && effect.isEnabled,
 			)
 			if (maxHpUpEffect) {
-				finalBonuses.HP = (finalBonuses.HP || 0) + (maxHpUpEffect.level * 10)
+				finalBonuses.HP = (finalBonuses.HP || 0) + maxHpUpEffect.level * 10
 			}
 
-			const maxMpUpEffect = data.register.effects.find(effect => 
-				effect.type === 'maxMpUp' && effect.isEnabled
+			const maxMpUpEffect = data.register.effects.find(
+				(effect) => effect.type === 'maxMpUp' && effect.isEnabled,
 			)
 			if (maxMpUpEffect) {
-				finalBonuses.MP = (finalBonuses.MP || 0) + (maxMpUpEffect.level * 1)
+				finalBonuses.MP = (finalBonuses.MP || 0) + maxMpUpEffect.level * 1
 			}
 
-			const physicalAttackUpEffect = data.register.effects.find(effect => 
-				effect.type === 'physicalAttackUp' && effect.isEnabled
+			const physicalAttackUpEffect = data.register.effects.find(
+				(effect) => effect.type === 'physicalAttackUp' && effect.isEnabled,
 			)
 			if (physicalAttackUpEffect) {
-				finalBonuses.ATK = (finalBonuses.ATK || 0) + (physicalAttackUpEffect.level * 1)
+				finalBonuses.ATK =
+					(finalBonuses.ATK || 0) + physicalAttackUpEffect.level * 1
 			}
 
-			const magicAttackUpEffect = data.register.effects.find(effect => 
-				effect.type === 'magicalAttackUp' && effect.isEnabled
+			const magicAttackUpEffect = data.register.effects.find(
+				(effect) => effect.type === 'magicalAttackUp' && effect.isEnabled,
 			)
 			if (magicAttackUpEffect) {
-				finalBonuses.MATK = (finalBonuses.MATK || 0) + (magicAttackUpEffect.level * 1)
+				finalBonuses.MATK =
+					(finalBonuses.MATK || 0) + magicAttackUpEffect.level * 1
 			}
 
-			const accuracyUpEffect = data.register.effects.find(effect => 
-				effect.type === 'accuracyUp' && effect.isEnabled
+			const accuracyUpEffect = data.register.effects.find(
+				(effect) => effect.type === 'accuracyUp' && effect.isEnabled,
 			)
 			if (accuracyUpEffect) {
-				finalBonuses.Accuracy = (finalBonuses.Accuracy || 0) + (accuracyUpEffect.level * 1)
+				finalBonuses.Accuracy =
+					(finalBonuses.Accuracy || 0) + accuracyUpEffect.level * 1
 			}
 
-			const evasionUpEffect = data.register.effects.find(effect => 
-				effect.type === 'evasionUp' && effect.isEnabled
+			const evasionUpEffect = data.register.effects.find(
+				(effect) => effect.type === 'evasionUp' && effect.isEnabled,
 			)
 			if (evasionUpEffect) {
-				finalBonuses.Dodge = (finalBonuses.Dodge || 0) + (evasionUpEffect.level * 1)
+				finalBonuses.Dodge =
+					(finalBonuses.Dodge || 0) + evasionUpEffect.level * 1
 			}
 
-			const attackSpeedUpEffect = data.register.effects.find(effect => 
-				effect.type === 'attackSpeedUp' && effect.isEnabled
+			const attackSpeedUpEffect = data.register.effects.find(
+				(effect) => effect.type === 'attackSpeedUp' && effect.isEnabled,
 			)
 			if (attackSpeedUpEffect) {
-				finalBonuses.AttackSpeed = (finalBonuses.AttackSpeed || 0) + (attackSpeedUpEffect.level * 1)
+				finalBonuses.AttackSpeed =
+					(finalBonuses.AttackSpeed || 0) + attackSpeedUpEffect.level * 1
 			}
 
-			const magicalSpeedUpEffect = data.register.effects.find(effect => 
-				effect.type === 'magicalSpeedUp' && effect.isEnabled
+			const magicalSpeedUpEffect = data.register.effects.find(
+				(effect) => effect.type === 'magicalSpeedUp' && effect.isEnabled,
 			)
 			if (magicalSpeedUpEffect) {
-				finalBonuses.CastingSpeed = (finalBonuses.CastingSpeed || 0) + (magicalSpeedUpEffect.level * 1)
+				finalBonuses.CastingSpeed =
+					(finalBonuses.CastingSpeed || 0) + magicalSpeedUpEffect.level * 1
 			}
 
-			const fateCompanionshipEffect = data.register.effects.find(effect => 
-				effect.type === 'fateCompanionship' && effect.isEnabled
+			const fateCompanionshipEffect = data.register.effects.find(
+				(effect) => effect.type === 'fateCompanionship' && effect.isEnabled,
 			)
 			if (fateCompanionshipEffect) {
 				const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
@@ -157,22 +163,33 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			}
 
 			// ギルド料理効果
-			const deliciousIngredientTradeEffect = data.register.effects.find(effect => 
-				effect.type === 'deliciousIngredientTrade' && effect.isEnabled
+			const deliciousIngredientTradeEffect = data.register.effects.find(
+				(effect) =>
+					effect.type === 'deliciousIngredientTrade' && effect.isEnabled,
 			)
 			if (deliciousIngredientTradeEffect) {
-				finalBonuses.HP = (finalBonuses.HP || 0) + (deliciousIngredientTradeEffect.level * 100)
+				finalBonuses.HP =
+					(finalBonuses.HP || 0) + deliciousIngredientTradeEffect.level * 100
 			}
 
-			const freshFruitTradeEffect = data.register.effects.find(effect => 
-				effect.type === 'freshFruitTrade' && effect.isEnabled
+			const freshFruitTradeEffect = data.register.effects.find(
+				(effect) => effect.type === 'freshFruitTrade' && effect.isEnabled,
 			)
 			if (freshFruitTradeEffect) {
-				finalBonuses.MP = (finalBonuses.MP || 0) + (freshFruitTradeEffect.level * 10)
+				finalBonuses.MP =
+					(finalBonuses.MP || 0) + freshFruitTradeEffect.level * 10
 			}
 		}
 
 		// TODO: 将来的にバフスキル効果もここに統合
+
+		// 料理の効果をデバッグ
+		console.log('料理データソースデバッグ:', {
+			rawFoodData: data.food,
+			foodBonuses: foodBonuses,
+			foodAggroValue: foodBonuses.Aggro || 0,
+			foodAggroRateValue: foodBonuses.Aggro_Rate || 0,
+		})
 
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
 		console.log('ステータスデバッグ:', {
@@ -215,6 +232,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				equipment_minus_rate: Math.abs(
 					Math.min(0, equipmentBonuses.Aggro_Rate || 0),
 				),
+				food_aggro: foodBonuses.Aggro || 0,
+				food_aggro_rate: foodBonuses.Aggro_Rate || 0,
 				total_plus: Math.max(0, allBonuses.Aggro || 0),
 				total_plus_rate: Math.max(0, allBonuses.Aggro_Rate || 0),
 				total_minus: Math.abs(Math.min(0, allBonuses.Aggro || 0)),
@@ -307,7 +326,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			equipmentBonuses: calculateEquipmentBonuses(finalBonuses),
 			hpCalculation: calculateHP(baseStats, finalBonuses),
 			mpCalculation: calculateMP(baseStats, finalBonuses),
-			atkCalculation: calculateATK(baseStats, data.mainWeapon, data.subWeapon, adjustedStatsCalculation, finalBonuses),
+			atkCalculation: calculateATK(
+				baseStats,
+				data.mainWeapon,
+				data.subWeapon,
+				adjustedStatsCalculation,
+				finalBonuses,
+			),
 			subATKCalculation: calculateSubATK(
 				baseStats,
 				data.mainWeapon,
@@ -332,7 +357,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				).finalASPD
 				return calculateMotionSpeed(aspd, finalBonuses)
 			})(),
-			criticalRateCalculation: calculateCriticalRate(baseStats.CRT, finalBonuses),
+			criticalRateCalculation: calculateCriticalRate(
+				baseStats.CRT,
+				finalBonuses,
+			),
 			criticalDamageCalculation: calculateCriticalDamage(
 				adjustedStatsCalculation.STR,
 				adjustedStatsCalculation.AGI,
@@ -384,6 +412,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		data.subWeapon,
 		data.equipment.body,
 		data.register, // レジスタデータを依存関係に追加
+		data.food, // 料理データを依存関係に追加（デバッグログ用）
 	])
 
 	const {
@@ -423,29 +452,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		adjustedStatsCalculation, // 補正後ステータス（ステータスMATK用）
 		finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
 	)
-
-	// デバッグ: equipmentBonus1の各プロパティを確認
-	console.log('equipmentBonus1 プロパティ:', {
-		attackMPRecovery: equipmentBonus1.attackMPRecovery,
-		attackMPRecovery_Rate: equipmentBonus1.attackMPRecovery_Rate,
-		physicalResistance: equipmentBonus1.physicalResistance,
-		physicalResistance_Rate: equipmentBonus1.physicalResistance_Rate,
-		magicalResistance: equipmentBonus1.magicalResistance,
-		magicalResistance_Rate: equipmentBonus1.magicalResistance_Rate,
-		ailmentResistance: equipmentBonus1.ailmentResistance,
-		ailmentResistance_Rate: equipmentBonus1.ailmentResistance_Rate,
-		aggroPlus: equipmentBonus1.aggroPlus,
-		aggroPlus_Rate: equipmentBonus1.aggroPlus_Rate,
-		aggroMinus: equipmentBonus1.aggroMinus,
-		aggroMinus_Rate: equipmentBonus1.aggroMinus_Rate,
-		relevantKeys: Object.keys(equipmentBonus1).filter(
-			(key) =>
-				key.includes('Resistance') ||
-				key.includes('resistance') ||
-				key.includes('attackMP') ||
-				key.includes('aggro'),
-		),
-	})
 
 	// デバッグ: equipmentBonus3の全プロパティを確認
 	console.log('equipmentBonus3 プロパティ:', {
@@ -512,12 +518,14 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		ATK: atkCalculation.finalATK, // 武器種別ATK計算結果
 		baseATK: Math.floor(atkCalculation.baseATK), // 基礎ATK（表示時のみ小数点以下切り捨て）
 		// サブATKとサブ基礎ATKは双剣の場合のみ計算、他は null で - 表示
-		subATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation
-			? subATKCalculation.subFinalATK // 双剣時は計算値
-			: null, // 非双剣時は null で - 表示
-		subBaseATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation
-			? Math.floor(subATKCalculation.subBaseATK) // 双剣時は計算値
-			: null, // 非双剣時は null で - 表示
+		subATK:
+			data.mainWeapon.weaponType === '双剣' && subATKCalculation
+				? subATKCalculation.subFinalATK // 双剣時は計算値
+				: null, // 非双剣時は null で - 表示
+		subBaseATK:
+			data.mainWeapon.weaponType === '双剣' && subATKCalculation
+				? Math.floor(subATKCalculation.subBaseATK) // 双剣時は計算値
+				: null, // 非双剣時は null で - 表示
 		totalATK: 0, // TODO: 総ATK計算
 		bringerAM: 0, // TODO: ブリンガーAM計算
 		MATK: matkCalculation.finalMATK, // MATK計算結果
@@ -528,7 +536,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			if (data.mainWeapon.weaponType === '双剣' && subATKCalculation) {
 				return subATKCalculation.subStability // サブ安定率（計算後）
 			}
-			if ((data.mainWeapon.weaponType === '弓' || data.mainWeapon.weaponType === '自動弓') && data.subWeapon.weaponType === '矢') {
+			if (
+				(data.mainWeapon.weaponType === '弓' ||
+					data.mainWeapon.weaponType === '自動弓') &&
+				data.subWeapon.weaponType === '矢'
+			) {
 				return data.subWeapon.stability // 矢の安定率をそのまま表示
 			}
 			return null // その他は null で - 表示
@@ -692,7 +704,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					{visibleSections.equipmentBonus1 && (
 						<StatSection
 							title="装備品補正値1"
-							stats={equipmentBonus1}
+							stats={{
+								...equipmentBonus1,
+							}}
 							labels={{
 								ATK: 'ATK',
 								physicalPenetration: '物理貫通',
@@ -722,8 +736,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								ailmentResistance: '異常耐性',
 								physicalResistance: '物理耐性',
 								magicalResistance: '魔法耐性',
-								aggroPlus: 'ヘイト+',
-								aggroMinus: 'ヘイト-',
+								aggro: 'ヘイト',
 							}}
 							displayMode="property-double"
 							propertyOrder={[
@@ -757,8 +770,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								'ailmentResistance',
 								'physicalResistance',
 								'magicalResistance',
-								'aggroPlus',
-								'aggroMinus',
+								'aggro',
+								'',
 							]}
 							propertyConfigs={{
 								ATK: { hasRate: true, hasFixed: true },
@@ -789,8 +802,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								ailmentResistance: { hasRate: true, hasFixed: false },
 								physicalResistance: { hasRate: true, hasFixed: false },
 								magicalResistance: { hasRate: true, hasFixed: false },
-								aggroPlus: { hasRate: true, hasFixed: false },
-								aggroMinus: { hasRate: true, hasFixed: false },
+								aggro: { hasRate: true, hasFixed: true },
 							}}
 							className=""
 						/>

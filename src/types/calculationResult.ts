@@ -73,8 +73,8 @@ export interface CalculationResults {
 		ailmentResistance: number
 		physicalResistance: number
 		magicalResistance: number
-		aggroPlus: number
-		aggroMinus: number
+		aggro: number
+		aggro_Rate: number
 	}
 
 	// 装備品補正値2（32項目）
@@ -208,8 +208,7 @@ export const STAT_LABELS = {
 		ailmentResistance: '異常耐性',
 		physicalResistance: '物理耐性',
 		magicalResistance: '魔法耐性',
-		aggroPlus: 'ヘイト+',
-		aggroMinus: 'ヘイト-',
+		aggro: 'ヘイト(%)',
 	},
 
 	// 装備品補正値2

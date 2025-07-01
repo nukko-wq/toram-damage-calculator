@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { CrystalType, PresetCrystal } from '@/types/calculator'
+import type { CrystalType, Crystal } from '@/types/calculator'
 import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
 
@@ -23,7 +23,7 @@ export default function CrystalSelectionModal({
 	title,
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
-	const [availableCrystals, setAvailableCrystals] = useState<PresetCrystal[]>(
+	const [availableCrystals, setAvailableCrystals] = useState<Crystal[]>(
 		[],
 	)
 

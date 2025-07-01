@@ -47,8 +47,6 @@ function normalizePropertyKey(propertyKey: string): string {
 		criticalRate: 'Critical',
 		attackMPRecovery: 'AttackMPRecovery',
 		accuracy: 'Accuracy', // 命中の正規化を追加
-		aggroPlus: 'Aggro', // 正の値として処理
-		aggroMinus: 'Aggro', // 負の値として処理
 		physicalResistance: 'PhysicalResistance_Rate',
 		magicalResistance: 'MagicalResistance_Rate',
 
@@ -100,22 +98,10 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 
 				const validatedValue = validatePropertyValue(value, propertyKey)
 
-				// Aggro値の特殊処理（料理の aggroPlus/aggroMinus → Aggro統合）
-				if (propertyKey === 'aggroPlus' || propertyKey === 'aggroMinus') {
-					const normalizedKey = 'Aggro'
-					const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
-					const adjustedValue =
-						propertyKey === 'aggroMinus'
-							? -Math.abs(validatedValue)
-							: validatedValue
-					bonuses[normalizedKey as keyof AllBonuses] =
-						previousValue + adjustedValue
-				} else {
-					const normalizedKey = normalizePropertyKey(propertyKey)
-					const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
-					const newValue = previousValue + validatedValue
-					bonuses[normalizedKey as keyof AllBonuses] = newValue
-				}
+				const normalizedKey = normalizePropertyKey(propertyKey)
+				const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
+				const newValue = previousValue + validatedValue
+				bonuses[normalizedKey as keyof AllBonuses] = newValue
 			}
 		}
 
@@ -343,12 +329,12 @@ function getFoodEffectByIdAndLevel(
 
 		// シチュー系
 		beef_stew: {
-			propertyType: 'aggroPlus',
+			propertyType: 'Aggro_Rate',
 			isPercentage: false,
 			values: [6, 12, 18, 24, 30, 44, 58, 72, 86, 100],
 		},
 		white_stew: {
-			propertyType: 'aggroMinus',
+			propertyType: 'Aggro_Rate',
 			isPercentage: false,
 			values: [-6, -12, -18, -24, -30, -44, -58, -72, -86, -100],
 		},
