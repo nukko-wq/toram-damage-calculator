@@ -133,3 +133,4 @@ interface BuffSkillState {
 - オーガスラッシュのUI表示を「消費鬼力数を入力してください」に変更
 - セイバーオーラのUI表示を「スキルレベルを入力してください」「カウント数を入力してください」に変更
 - SkillParameterModalのUIをLevelAndStackModalと統一（ボタン式UI、統一テキスト）
+- 入力補助テキスト機能（inputHintText、getInputHint）を削除、UIテキストを直接記述に変更

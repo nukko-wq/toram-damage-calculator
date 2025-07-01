@@ -28,7 +28,6 @@ interface BuffSkillDefinition {
   categoryOrder?: number     // カテゴリ内順序番号（省略時はorder使用）
   maxLevel?: number          // 最大レベル（デフォルト10）
   maxStack?: number          // 最大重ねがけ数
-  inputHint?: string         // 入力補助テキスト（モーダル内の説明用）
   requirements?: WeaponRequirement[] // 武器要件
 }
 
@@ -668,12 +667,6 @@ const SkillParameterModal: React.FC<SkillParameterModalProps> = ({
       <div className="p-6 max-w-md">
         <h3 className="text-lg font-bold mb-4">{skill.name}</h3>
         
-        {/* 入力補助テキスト */}
-        {skill.inputHint && (
-          <div className="mb-4 p-3 bg-blue-50 rounded">
-            <p className="text-sm text-blue-700">{skill.inputHint}</p>
-          </div>
-        )}
         
         {/* パラメータ入力フォーム */}
         <div className="space-y-4">
@@ -748,7 +741,7 @@ const SkillParameterModal: React.FC<SkillParameterModalProps> = ({
                       specialParam: Number(e.target.value)
                     }))}
                     className="w-full p-2 border rounded"
-                    placeholder={skill.inputHint || "値を入力してください"}
+                    placeholder="値を入力してください"
                   />
                 </div>
               )}
@@ -845,89 +838,6 @@ export default function NewSkillCard({ skill, control, watch }: NewSkillCardProp
 }
 ```
 
-### 入力補助テキストの実装方針
-
-#### デフォルトメッセージ
-スキルタイプごとにデフォルトメッセージを自動適用：
-
-```typescript
-function getDefaultInputHint(skillType: BuffSkillType): string {
-  switch (skillType) {
-    case 'level':
-      return 'スキルレベルを入力してください'
-    case 'stack':
-      return '重ね掛け回数を選択してください'
-    case 'special':
-      return '値を入力してください'
-    case 'toggle':
-    default:
-      return ''
-  }
-}
-```
-
-#### カスタム入力補助テキスト
-特殊なケースのみ個別定義：
-
-```typescript
-const CUSTOM_SKILL_INPUT_HINTS: Record<string, string> = {
-  // 特殊パラメータ系で具体的な説明が必要なもののみ
-  'ogre_slash': '消費鬼力数を入力してください',
-  'brave': '対象プレイヤー数を入力してください',
-  'knight_pledge': '精錬値を入力してください',
-  'eternal_nightmare': '消費MP数を入力してください',
-  
-  // ... 他の特殊ケースのみ
-}
-
-// スキル定義での使用例
-const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
-  {
-    id: 'LongRange',
-    name: 'ロングレンジ',
-    category: 'shoot',
-    type: 'level',      // デフォルトで「スキルレベルを入力してください」
-    maxLevel: 10,
-    order: 201
-    // inputHint省略（デフォルト使用）
-  },
-  {
-    id: 'hb4-1',
-    name: '神速の捌手',
-    category: 'halberd',
-    type: 'stack',      // デフォルトで「重ね掛け回数を選択してください」
-    maxStack: 3,
-    order: 402
-    // inputHint省略（デフォルト使用）
-  },
-  {
-    id: 'ogre_slash',
-    name: 'オーガスラッシュ',
-    category: 'blade',
-    type: 'special',
-    order: 207,
-    inputHint: CUSTOM_SKILL_INPUT_HINTS['ogre_slash'] // カスタム使用
-  }
-  // ...
-]
-```
-
-#### モーダル内での使用
-
-```typescript
-// 入力補助テキストの取得関数
-function getInputHint(skill: BuffSkillDefinition): string {
-  // カスタム設定があればそれを使用、なければデフォルト
-  return skill.inputHint || getDefaultInputHint(skill.type)
-}
-
-// モーダル内での表示
-{getInputHint(skill) && (
-  <div className="mb-4 p-3 bg-blue-50 rounded">
-    <p className="text-sm text-blue-700">{getInputHint(skill)}</p>
-  </div>
-)}
-```
 
 ### モーダル表示条件
 

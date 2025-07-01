@@ -2,7 +2,6 @@
 
 import { useEffect, useCallback, useMemo } from 'react'
 import type { BuffSkillDefinition } from '@/types/buffSkill'
-import { getInputHint } from '@/utils/buffSkillUtils'
 import { useCalculatorStore } from '@/stores'
 
 interface SkillParameterModalProps {
@@ -108,8 +107,6 @@ export default function SkillParameterModal({
 	}
 
 	if (!isOpen) return null
-
-	const inputHintText = getInputHint(skill)
 
 	return (
 		<dialog
@@ -314,7 +311,7 @@ export default function SkillParameterModal({
 									{skill.type === 'special' && (
 										<div>
 											<div className="text-sm text-gray-600 mb-3">
-												{inputHintText || '特殊パラメータを入力してください。'}
+												特殊パラメータを入力してください。
 											</div>
 											<div className="flex items-center justify-center space-x-2">
 												{/* -10ボタン */}
