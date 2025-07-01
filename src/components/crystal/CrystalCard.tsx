@@ -262,9 +262,9 @@ export default function CrystalCard({
 
 			{/* メモ */}
 			{(crystal.memo1 || crystal.memo2) && (
-				<div className="text-xs text-blue-600 space-y-1">
-					{crystal.memo1 && <div className="line-clamp-1">{crystal.memo1}</div>}
-					{crystal.memo2 && <div className="line-clamp-1">{crystal.memo2}</div>}
+				<div className="text-sm text-blue-600 space-y-1">
+					{crystal.memo1 && <div className="">{crystal.memo1}</div>}
+					{crystal.memo2 && <div className="">{crystal.memo2}</div>}
 				</div>
 			)}
 		</div>

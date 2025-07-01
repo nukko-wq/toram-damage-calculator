@@ -160,6 +160,18 @@ export const crystalsData: CrystalsData = {
 					AttackSpeed: -900,
 				},
 			},
+			{
+				id: '218b5f7c-e42d-4571-af9a-e31c8c0eab7b',
+				name: 'ゴブリン・ズコット',
+				type: 'additional',
+				properties: {
+					ATK_Rate: 10,
+					PhysicalPenetration_Rate: 10,
+					HP_Rate: 24,
+					Aggro_Rate: -15,
+				},
+				memo1: '盾装備時: 行動速度+1%',
+			},
 		],
 		special: [
 			{
