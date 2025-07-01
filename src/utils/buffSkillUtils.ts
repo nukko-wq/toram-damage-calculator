@@ -209,10 +209,13 @@ export function getDefaultSkillStates(
 	const states: Record<string, BuffSkillState> = {}
 
 	for (const skill of skills) {
+		// セイバーオーラの特別なデフォルト値
+		const defaultStackCount = skill.id === 'ds6' ? 100 : 1
+		
 		states[skill.id] = {
 			isEnabled: false,
-			level: skill.type === 'level' ? 1 : undefined,
-			stackCount: skill.type === 'stack' ? 1 : undefined,
+			level: (skill.type === 'level' || skill.type === 'levelAndStack') ? 10 : undefined,
+			stackCount: (skill.type === 'stack' || skill.type === 'levelAndStack') ? defaultStackCount : undefined,
 			specialParam: skill.type === 'special' ? 0 : undefined,
 		}
 	}
@@ -333,8 +336,8 @@ export function shouldShowModal(skill: BuffSkillDefinition): boolean {
 		return false
 	}
 	
-	// level, stack, specialタイプはモーダル表示
-	return ['level', 'stack', 'special'].includes(skill.type)
+	// level, stack, levelAndStack, specialタイプはモーダル表示
+	return ['level', 'stack', 'levelAndStack', 'special'].includes(skill.type)
 }
 
 // スキル名のクリック可能性を示すCSSクラス名を取得

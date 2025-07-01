@@ -28,6 +28,7 @@ export type BuffSkillType =
 	| 'toggle' // ON/OFF切り替えのみ
 	| 'level' // レベル設定（1-10等）
 	| 'stack' // 重ねがけ設定（×3, ×10等）
+	| 'levelAndStack' // レベル＋重ねがけ設定（セイバーオーラ等）
 	| 'special' // 特殊パラメータ付き
 
 export type BuffSkillCategory =

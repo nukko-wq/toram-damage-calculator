@@ -611,8 +611,9 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			id: 'ds6',
 			name: 'セイバーオーラ',
 			category: 'dualSword',
-			type: 'stack',
-			maxStack: 10,
+			type: 'levelAndStack',
+			maxLevel: 10,
+			maxStack: 100,
 			order: 709,
 		},
 		{
@@ -674,8 +675,8 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			id: 'sm1',
 			name: 'オーガスラッシュ',
 			category: 'blade',
-			type: 'level',
-			maxLevel: 10,
+			type: 'stack',
+			maxStack: 10,
 			order: 209,
 		},
 

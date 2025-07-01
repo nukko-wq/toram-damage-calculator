@@ -60,8 +60,9 @@ export default function StackCountModal({
 	// 重ねがけ数変更ハンドラ
 	const handleStackCountChange = useCallback(
 		(newStackCount: number) => {
-			// 範囲チェック（1-3）
-			const clampedStackCount = Math.max(1, Math.min(3, newStackCount))
+			// 動的な範囲チェック（1 - skill.maxStack）
+			const maxStack = skill.maxStack || 10
+			const clampedStackCount = Math.max(1, Math.min(maxStack, newStackCount))
 
 			updateBuffSkillState(skill.id, {
 				...currentState,
@@ -69,7 +70,7 @@ export default function StackCountModal({
 				level: 10, // スキルレベルは10固定
 			})
 		},
-		[skill.id, currentState, updateBuffSkillState],
+		[skill.id, currentState, updateBuffSkillState, skill.maxStack],
 	)
 
 	// モーダルが閉じているときは何も表示しない
@@ -81,7 +82,13 @@ export default function StackCountModal({
 				{/* ヘッダー */}
 				<div className="flex justify-between items-center mb-4">
 					<h2 className="text-lg font-semibold text-gray-800">
-						{skill.name} - 重ねがけ数設定
+						{skill.name} - {
+							skill.id === 'IsHotKnows' 
+								? 'カウント数設定'
+								: skill.id === 'sm1'
+								? '消費鬼力数設定'
+								: '重ねがけ数設定'
+						}
 					</h2>
 					<button
 						type="button"
@@ -95,7 +102,12 @@ export default function StackCountModal({
 				{/* 重ねがけ数調整UI */}
 				<div className="space-y-4">
 					<div className="text-sm text-gray-600">
-						重ねがけ数を入力して下さい。
+						{skill.id === 'IsHotKnows' 
+							? 'カウント数を入力して下さい。'
+							: skill.id === 'sm1' 
+							? '消費鬼力数を入力してください。'
+							: '重ねがけ数を入力して下さい。'
+						}
 						<br />
 						※スキルレベルは10固定です。
 					</div>
@@ -135,17 +147,17 @@ export default function StackCountModal({
 							onClick={() =>
 								handleStackCountChange((currentState.stackCount || 1) + 1)
 							}
-							disabled={currentState.stackCount >= 3}
+							disabled={currentState.stackCount >= (skill.maxStack || 10)}
 							className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 						>
 							+1
 						</button>
 
-						{/* +10ボタン（最大値の3にセット） */}
+						{/* +10ボタン（最大値にセット） */}
 						<button
 							type="button"
-							onClick={() => handleStackCountChange(3)}
-							disabled={currentState.stackCount === 3}
+							onClick={() => handleStackCountChange(skill.maxStack || 10)}
+							disabled={currentState.stackCount === (skill.maxStack || 10)}
 							className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 						>
 							+10
@@ -154,7 +166,12 @@ export default function StackCountModal({
 
 					{/* 重ねがけ数の説明 */}
 					<div className="text-xs text-gray-500 text-center">
-						神速の捌手は最大3回まで重ねがけ可能です
+						{skill.id === 'IsHotKnows' 
+							? `熱情の歌は最大${skill.maxStack || 10}カウントまで重ねがけ可能です`
+							: skill.id === 'sm1'
+							? `オーガスラッシュは最大${skill.maxStack || 10}まで鬼力を消費可能です`
+							: `${skill.name}は最大${skill.maxStack || 10}回まで重ねがけ可能です`
+						}
 					</div>
 				</div>
 

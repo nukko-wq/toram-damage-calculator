@@ -8,7 +8,7 @@ import { useCalculatorStore } from '@/stores'
 import SkillToggleButton from './SkillToggleButton'
 import SkillParameterModal from './SkillParameterModal'
 import StackCountModal from './StackCountModal'
-import PassionSongModal from './PassionSongModal'
+import LevelAndStackModal from './LevelAndStackModal'
 
 interface SkillCardProps {
 	skill: BuffSkillDefinition
@@ -80,6 +80,15 @@ export default function SkillCard({
 				}
 				return skill.name
 
+			case 'levelAndStack': {
+				const levelDisplay = level && level > 1 ? `/${level}` : ''
+				const stackDisplay = stackCount && stackCount > 1 ? `×${stackCount}` : ''
+				if (levelDisplay || stackDisplay) {
+					return `${skill.name}${levelDisplay}${stackDisplay}`
+				}
+				return skill.name
+			}
+
 			default:
 				return skill.name
 		}
@@ -123,14 +132,14 @@ export default function SkillCard({
 
 
 			{/* モーダル - スキル専用またはデフォルト */}
-			{skill.id === 'godspeed_parry' ? (
+			{skill.type === 'stack' ? (
 				<StackCountModal
 					skill={skill}
 					isOpen={isModalOpen}
 					onClose={() => setIsModalOpen(false)}
 				/>
-			) : skill.id === 'IsHotKnows' ? (
-				<PassionSongModal
+			) : skill.type === 'levelAndStack' ? (
+				<LevelAndStackModal
 					skill={skill}
 					isOpen={isModalOpen}
 					onClose={() => setIsModalOpen(false)}
