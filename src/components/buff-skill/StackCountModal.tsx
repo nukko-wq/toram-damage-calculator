@@ -200,14 +200,16 @@ export default function StackCountModal({
 					</div>
 
 					{/* 重ねがけ数の説明 */}
-					<div className="text-xs text-gray-500 text-center">
-						{skill.id === 'IsHotKnows' 
-							? `熱情の歌は最大${skill.maxStack || 10}カウントまで重ねがけ可能です`
-							: skill.id === 'sm1'
-							? `オーガスラッシュは最大${skill.maxStack || 10}まで鬼力を消費可能です`
-							: `${skill.name}は最大${skill.maxStack || 10}回まで重ねがけ可能です`
-						}
-					</div>
+					{skill.id !== 'mg2' && (
+						<div className="text-xs text-gray-500 text-center">
+							{skill.id === 'IsHotKnows' 
+								? `熱情の歌は最大${skill.maxStack || 10}カウントまで重ねがけ可能です`
+								: skill.id === 'sm1'
+								? `オーガスラッシュは最大${skill.maxStack || 10}まで鬼力を消費可能です`
+								: `${skill.name}は最大${skill.maxStack || 10}回まで重ねがけ可能です`
+							}
+						</div>
+					)}
 				</div>
 
 				{/* 閉じるボタン */}
