@@ -257,9 +257,7 @@ export default function MultiParamModal({
 							{/* レベル表示 */}
 							<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded w-[80px] text-center">
 								{skill.id === 'IsBrave'
-									? (currentState.level || 2) === 1
-										? '使用者'
-										: '使用者以外'
+									? (currentState.level || 2)
 									: `Lv.${currentState.level || 10}`}
 							</div>
 

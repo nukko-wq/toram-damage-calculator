@@ -80,6 +80,9 @@ export default function SkillCard({
 				return `${skill.name}×${stackCount || 1}`
 
 			case 'multiParam':
+				if (skill.id === 'IsBrave') {
+					return `${skill.name}/${(level || 2) === 1 ? '使用者' : '使用者以外'}`
+				}
 				return `${skill.name}/${level || 1}`
 
 			default:
