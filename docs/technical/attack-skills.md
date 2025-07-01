@@ -173,16 +173,10 @@ export interface AttackSkillDefinition {
   id: string                    // スキルID (例: "Sword-1-10")
   name: string                  // スキル名 (例: "ハードヒット")
   category: AttackSkillCategory // スキル系統
-  weaponType: WeaponType[]      // 対応武器種
-  tier: number                  // 階層 (1-5)
   order: number                 // 系統内順序
   
   // UI関連
   componentName: string         // 対応するコンポーネント名
-  description?: string          // スキルの詳細説明・条件等
-  
-  // 共通ダメージ計算関連（各スキルコンポーネントで使用）
-  damageType: DamageType        // 物理/魔法/無属性
 }
 ```
 
@@ -199,7 +193,6 @@ export type AttackSkillCategory =
   | 'dualSword'    // 双剣系統
   | 'other'        // その他
 
-export type DamageType = 'physical' | 'magical' | 'neutral'
 ```
 
 
@@ -209,7 +202,20 @@ export type DamageType = 'physical' | 'magical' | 'neutral'
 ```typescript
 export interface AttackSkillFormData {
   selectedSkill: string | null    // 選択されたスキルID
-  skillParameters?: Record<string, any> // スキル固有パラメータ
+  skillParameters?: Record<string, unknown> // スキル固有パラメータ
+}
+
+// 攻撃スキル表示コンポーネントの基底インターフェース
+export interface IAttackSkillDisplayComponent {
+  renderSkillInfo(): React.JSX.Element
+  renderParameterInputs(): React.JSX.Element
+  getSkillParameters(): Record<string, unknown>
+}
+
+// 攻撃スキルコンポーネントのプロパティ
+export interface AttackSkillComponentProps {
+  skill: AttackSkillDefinition
+  onParameterChange?: (parameters: Record<string, unknown>) => void
 }
 ```
 
@@ -218,7 +224,8 @@ export interface AttackSkillFormData {
 #### 共通コンポーネント
 - **AttackSkillSelector**: スキル選択コンボボックス
 - **AttackSkillRenderer**: 選択されたスキルに応じて個別コンポーネントを動的レンダリング
-- **BaseAttackSkillComponent**: 全スキルコンポーネントの基底クラス
+- **BaseAttackSkillDisplayComponent**: 全スキル表示コンポーネントの基底クラス（表示専用）
+- **AttackSkillCalculator**: スキルダメージ計算処理を行う別コンポーネント
 
 #### 個別スキルコンポーネント
 各攻撃スキルに対応する専用コンポーネント:
@@ -246,104 +253,132 @@ export interface AttackSkillFormData {
 - **SoulHuntEditComponent** (`DarkPower-4-10-4-Edit`) - 溜めレベル入力UI
 - **TwinBusterBladeEditComponent** (`DS-5-30-2-Edit`) - 敵数入力UI
 
-## ダメージ計算への統合
+## コンポーネント設計
 
-### 計算フロー
+### 表示・データ収集フロー
 1. **スキル選択**: ユーザーがスキルを選択
-2. **コンポーネント動的レンダリング**: 選択されたスキルIDに基づいて対応コンポーネントを表示
-3. **スキル固有パラメータ設定**: 各コンポーネントが独自のUI要素でパラメータを収集
-4. **個別ダメージ計算**: 各スキルコンポーネントが独自の計算式を実行
-5. **結果表示**: 計算結果をリアルタイムで表示・更新
+2. **コンポーネント動的レンダリング**: 選択されたスキルIDに基づいて対応表示コンポーネントを表示
+3. **スキル情報表示**: 各コンポーネントがスキル固有の情報を表示
+4. **パラメータ入力**: 各コンポーネントが独自のUI要素でパラメータを収集
+5. **データ取得**: 選択されたスキルIDとパラメータを別コンポーネントに渡す
 
-### スキル個別コンポーネント設計
+### スキル個別表示コンポーネント設計
 
-#### BaseAttackSkillComponent
+#### BaseAttackSkillDisplayComponent
 ```typescript
-export abstract class BaseAttackSkillComponent {
+export abstract class BaseAttackSkillDisplayComponent {
   protected skill: AttackSkillDefinition
-  protected baseStats: any // 基本ステータス
-  protected weaponData: any // 武器データ
-  protected buffs: any // バフデータ
   
   constructor(skill: AttackSkillDefinition) {
     this.skill = skill
   }
   
   // 各スキルで実装必須
-  abstract calculateDamage(): number
-  abstract renderParameterInputs(): JSX.Element
-  abstract getSkillParameters(): Record<string, any>
+  abstract renderSkillInfo(): React.JSX.Element
+  abstract renderParameterInputs(): React.JSX.Element
+  abstract getSkillParameters(): Record<string, unknown>
   
   // 共通処理
-  protected getBaseAttackPower(): number {
-    // 武器攻撃力 + ステータス補正の共通計算
-  }
-  
-  protected applyCommonBuffs(damage: number): number {
-    // 共通バフ適用処理
+  protected onParameterChange(): void {
+    const parameters = this.getSkillParameters()
+    // 親コンポーネントに通知
+    this.props.onParameterChange?.(parameters)
   }
 }
 ```
 
-#### 個別スキル実装例
+#### 個別スキル表示実装例
 ```typescript
-// ドラゴニックチャージ(チャージ可変)の例
-export class DragonicChargeEditComponent extends BaseAttackSkillComponent {
+// ドラゴニックチャージ(チャージ可変)の表示例
+export class DragonicChargeEditDisplayComponent extends BaseAttackSkillDisplayComponent {
   private chargeLevel: number = 2 // デフォルト値
   
-  calculateDamage(): number {
-    const baseAttack = this.getBaseAttackPower()
-    
-    // ドラゴニックチャージ固有の計算式
-    let damage = baseAttack * 4.5 // 基本倍率
-    
-    // チャージレベル補正（進度による倍率変化）
-    const chargeMultiplier = {
-      0: 1.0,
-      1: 1.2,
-      2: 1.5,
-      3: 1.8,
-      4: 2.2,
-      5: 2.7
-    }
-    
-    damage *= chargeMultiplier[this.chargeLevel] || 1.0
-    
-    // 距離補正（3m固定）
-    damage *= 1.1
-    
-    return Math.floor(this.applyCommonBuffs(damage))
-  }
-  
-  renderParameterInputs(): JSX.Element {
+  renderSkillInfo(): React.JSX.Element {
     return (
-      <div className="skill-parameters">
-        <label>チャージレベル（進度）</label>
-        <select 
-          value={this.chargeLevel}
-          onChange={(e) => this.setChargeLevel(Number(e.target.value))}
-        >
-          <option value={0}>進度0</option>
-          <option value={1}>進度1</option>
-          <option value={2}>進度2（デフォルト）</option>
-          <option value={3}>進度3</option>
-          <option value={4}>進度4</option>
-          <option value={5}>進度5</option>
-        </select>
+      <div className="skill-info">
+        <h3>{this.skill.name}</h3>
+        <div className="skill-details">
+          <p>スキル系統: 槍系統</p>
+          <p>距離: 3m固定</p>
+          <p>特徴: チャージレベル（進度）により威力が変化</p>
+        </div>
       </div>
     )
   }
   
-  getSkillParameters(): Record<string, any> {
+  renderParameterInputs(): React.JSX.Element {
+    return (
+      <div className="skill-parameters">
+        <div className="parameter-group">
+          <label htmlFor="charge-level">チャージレベル（進度）:</label>
+          <select 
+            id="charge-level"
+            value={this.chargeLevel}
+            onChange={(e) => this.setChargeLevel(Number(e.target.value))}
+          >
+            <option value={0}>進度0</option>
+            <option value={1}>進度1</option>
+            <option value={2}>進度2（デフォルト）</option>
+            <option value={3}>進度3</option>
+            <option value={4}>進度4</option>
+            <option value={5}>進度5</option>
+          </select>
+        </div>
+        
+        <div className="skill-notes">
+          <p>※ 3m距離固定での計算</p>
+          <p>※ 進度が上がるほどダメージが増加</p>
+        </div>
+      </div>
+    )
+  }
+  
+  getSkillParameters(): Record<string, unknown> {
     return {
-      chargeLevel: this.chargeLevel
+      chargeLevel: this.chargeLevel,
+      skillId: this.skill.id,
+      skillName: this.skill.name
     }
   }
   
   private setChargeLevel(level: number) {
     this.chargeLevel = level
-    // リアルタイム計算更新をトリガー
+    // パラメータ変更を通知
     this.onParameterChange()
+  }
+}
+```
+
+#### シンプルスキル表示実装例
+```typescript
+// ハードヒットの表示例
+export class HardHitDisplayComponent extends BaseAttackSkillDisplayComponent {
+  
+  renderSkillInfo(): React.JSX.Element {
+    return (
+      <div className="skill-info">
+        <h3>{this.skill.name}</h3>
+        <div className="skill-details">
+          <p>スキル系統: 剣系統</p>
+          <p>特徴: シンプルな固定倍率攻撃</p>
+        </div>
+      </div>
+    )
+  }
+  
+  renderParameterInputs(): React.JSX.Element {
+    return (
+      <div className="skill-parameters">
+        <p>このスキルにはパラメータがありません</p>
+      </div>
+    )
+  }
+  
+  getSkillParameters(): Record<string, unknown> {
+    return {
+      skillId: this.skill.id,
+      skillName: this.skill.name
+    }
   }
 }
 ```
@@ -446,8 +481,10 @@ const AttackSkillRenderer: React.FC<{skillId: string}> = ({ skillId }) => {
 4. **チャージレベル検証**: チャージレベルは定義された範囲内で検証する必要がある
 5. **新仕様対応**: 一部スキルは「新仕様」として区別され、計算式が異なる場合がある
 6. **個別スキル定義**: 条件や距離等によるバリエーションは、それぞれ独立したスキルとして定義される
-7. **個別コンポーネント実装**: 各攻撃スキルは専用コンポーネントで独自の計算式とUIを持つ
-8. **動的パラメータ**: 「-Edit」サフィックス付きスキルは可変パラメータを持ち、専用入力UIを提供
-9. **段階的実装**: 154スキル全てを一度に実装するのではなく、優先度に応じて段階的に開発
+7. **表示専用コンポーネント**: 各攻撃スキルは専用表示コンポーネントでスキル情報表示とパラメータ収集のみを行う
+8. **計算処理分離**: ダメージ計算は別の専用コンポーネント（AttackSkillCalculator）で実行する
+9. **データ取得重視**: スキルコンポーネントは「何がセットされているか」の情報取得に特化
+10. **動的パラメータ**: 「-Edit」サフィックス付きスキルは可変パラメータを持ち、専用入力UIを提供
+11. **段階的実装**: 154スキル全てを一度に実装するのではなく、優先度に応じて段階的に開発
 
 この設計書に基づいて、段階的に攻撃スキルシステムを実装していく。
