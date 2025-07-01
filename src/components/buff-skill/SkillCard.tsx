@@ -7,6 +7,7 @@ import { shouldShowModal, getSkillNameClassName } from '@/utils/buffSkillUtils'
 import { useCalculatorStore } from '@/stores'
 import SkillToggleButton from './SkillToggleButton'
 import SkillParameterModal from './SkillParameterModal'
+import StackCountModal from './StackCountModal'
 
 interface SkillCardProps {
 	skill: BuffSkillDefinition
@@ -120,12 +121,20 @@ export default function SkillCard({
 			</div>
 
 
-			{/* モーダル */}
-			<SkillParameterModal
-				skill={skill}
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-			/>
+			{/* モーダル - 神速の捌手専用またはデフォルト */}
+			{skill.id === 'hb4-1' ? (
+				<StackCountModal
+					skill={skill}
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+				/>
+			) : (
+				<SkillParameterModal
+					skill={skill}
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+				/>
+			)}
 		</div>
 	)
 }
