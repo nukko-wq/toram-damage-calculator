@@ -1,7 +1,6 @@
 import type {
 	BuffSkillDefinition,
 	MainWeaponType,
-	SubWeaponType,
 } from '@/types/buffSkill'
 
 // 共通バフスキル（35個）- 全武器種で使用可能
@@ -1141,7 +1140,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 
 		// マジックスキル
 		{
-			id: 'mg4',
+			id: 'mg5',
 			name: 'チェインキャスト',
 			category: 'magic',
 			type: 'level',
@@ -1190,10 +1189,33 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			order: 1202,
 		},
 		{
-			id: 'mg2',
+			id: 'mg4',
 			name: 'キャストマスタリ',
 			category: 'wizard',
-			type: 'level',
+			type: 'multiParam',
+			multiParams: {
+				param1: {
+					name: 'スキルレベル',
+					min: 1,
+					max: 10,
+					default: 10,
+					unit: 'Lv'
+				},
+				param2: {
+					name: 'ウィザードスキル習得数',
+					min: 0,
+					max: 14,
+					default: 7,
+					unit: '個'
+				},
+				param3: {
+					name: '使用全スキルポイント',
+					min: 64,
+					max: 150,
+					default: 100,
+					unit: 'pt'
+				}
+			},
 			order: 1203,
 		},
 		{
@@ -1249,7 +1271,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 
 		// マジックスキル
 		{
-			id: 'mg4',
+			id: 'mg5',
 			name: 'チェインキャスト',
 			category: 'magic',
 			type: 'level',
@@ -1273,10 +1295,33 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			order: 1202,
 		},
 		{
-			id: 'mg2',
+			id: 'mg4',
 			name: 'キャストマスタリ',
 			category: 'wizard',
-			type: 'level',
+			type: 'multiParam',
+			multiParams: {
+				param1: {
+					name: 'スキルレベル',
+					min: 1,
+					max: 10,
+					default: 10,
+					unit: 'Lv'
+				},
+				param2: {
+					name: 'ウィザードスキル習得数',
+					min: 0,
+					max: 14,
+					default: 7,
+					unit: '個'
+				},
+				param3: {
+					name: '使用全スキルポイント',
+					min: 64,
+					max: 150,
+					default: 100,
+					unit: 'pt'
+				}
+			},
 			order: 1203,
 		},
 		{

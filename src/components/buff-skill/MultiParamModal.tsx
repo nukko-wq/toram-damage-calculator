@@ -16,29 +16,26 @@ export default function MultiParamModal({
 	onClose,
 }: MultiParamModalProps) {
 	// Zustandストアから現在のスキル状態を取得
-	const defaultState = useMemo(
-		() => {
-			if (skill.type === 'multiParam' && skill.multiParams) {
-				return {
-					isEnabled: false,
-					level: skill.multiParams.param1.default,
-					stackCount: skill.multiParams.param2.default,
-					multiParam1: skill.multiParams.param1.default,
-					multiParam2: skill.multiParams.param2.default,
-					multiParam3: skill.multiParams.param3?.default || 0,
-					specialParam: 0,
-				}
-			}
-			// Fallback for other types
+	const defaultState = useMemo(() => {
+		if (skill.type === 'multiParam' && skill.multiParams) {
 			return {
 				isEnabled: false,
-				level: 10,
-				stackCount: skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1,
+				level: skill.multiParams.param1.default,
+				stackCount: skill.multiParams.param2.default,
+				multiParam1: skill.multiParams.param1.default,
+				multiParam2: skill.multiParams.param2.default,
+				multiParam3: skill.multiParams.param3?.default || 0,
 				specialParam: 0,
 			}
-		},
-		[skill.id, skill.type, skill.multiParams],
-	)
+		}
+		// Fallback for other types
+		return {
+			isEnabled: false,
+			level: 10,
+			stackCount: skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1,
+			specialParam: 0,
+		}
+	}, [skill.id, skill.type, skill.multiParams])
 
 	const currentState = useCalculatorStore(
 		useCallback(
@@ -75,12 +72,14 @@ export default function MultiParamModal({
 	// レベル変更ハンドラ
 	const handleLevelChange = useCallback(
 		(newLevel: number) => {
-			const maxLevel = skill.type === 'multiParam' && skill.multiParams 
-				? skill.multiParams.param1.max 
-				: skill.maxLevel || 10
-			const minLevel = skill.type === 'multiParam' && skill.multiParams 
-				? skill.multiParams.param1.min 
-				: 1
+			const maxLevel =
+				skill.type === 'multiParam' && skill.multiParams
+					? skill.multiParams.param1.max
+					: skill.maxLevel || 10
+			const minLevel =
+				skill.type === 'multiParam' && skill.multiParams
+					? skill.multiParams.param1.min
+					: 1
 			const clampedLevel = Math.max(minLevel, Math.min(maxLevel, newLevel))
 
 			updateBuffSkillState(skill.id, {
@@ -89,19 +88,31 @@ export default function MultiParamModal({
 				multiParam1: clampedLevel,
 			})
 		},
-		[skill.id, currentState, updateBuffSkillState, skill.type, skill.maxLevel, skill.multiParams],
+		[
+			skill.id,
+			currentState,
+			updateBuffSkillState,
+			skill.type,
+			skill.maxLevel,
+			skill.multiParams,
+		],
 	)
 
-	// スタック数変更ハンドラ
+	// スタック数変更ハンドラ（param2用）
 	const handleStackCountChange = useCallback(
 		(newStackCount: number) => {
-			const maxStack = skill.type === 'multiParam' && skill.multiParams 
-				? skill.multiParams.param2.max 
-				: skill.maxStack || 10
-			const minStack = skill.type === 'multiParam' && skill.multiParams 
-				? skill.multiParams.param2.min 
-				: 1
-			const clampedStackCount = Math.max(minStack, Math.min(maxStack, newStackCount))
+			const maxStack =
+				skill.type === 'multiParam' && skill.multiParams
+					? skill.multiParams.param2.max
+					: skill.maxStack || 10
+			const minStack =
+				skill.type === 'multiParam' && skill.multiParams
+					? skill.multiParams.param2.min
+					: 1
+			const clampedStackCount = Math.max(
+				minStack,
+				Math.min(maxStack, newStackCount),
+			)
 
 			updateBuffSkillState(skill.id, {
 				...currentState,
@@ -109,7 +120,44 @@ export default function MultiParamModal({
 				multiParam2: clampedStackCount,
 			})
 		},
-		[skill.id, currentState, updateBuffSkillState, skill.type, skill.maxStack, skill.multiParams],
+		[
+			skill.id,
+			currentState,
+			updateBuffSkillState,
+			skill.type,
+			skill.maxStack,
+			skill.multiParams,
+		],
+	)
+
+	// param3変更ハンドラ
+	const handleParam3Change = useCallback(
+		(newParam3: number) => {
+			if (
+				skill.type === 'multiParam' &&
+				skill.multiParams &&
+				skill.multiParams.param3
+			) {
+				const maxParam3 = skill.multiParams.param3.max
+				const minParam3 = skill.multiParams.param3.min
+				const clampedParam3 = Math.max(
+					minParam3,
+					Math.min(maxParam3, newParam3),
+				)
+
+				updateBuffSkillState(skill.id, {
+					...currentState,
+					multiParam3: clampedParam3,
+				})
+			}
+		},
+		[
+			skill.id,
+			currentState,
+			updateBuffSkillState,
+			skill.type,
+			skill.multiParams,
+		],
 	)
 
 	// 背景クリックでモーダルを閉じる
@@ -132,11 +180,11 @@ export default function MultiParamModal({
 	if (!isOpen) return null
 
 	return (
-		<div 
+		<div
 			className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
 			onClick={handleBackgroundClick}
 		>
-			<div 
+			<div
 				className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
 				onClick={handleContentClick}
 				data-modal-content="true"
@@ -144,10 +192,12 @@ export default function MultiParamModal({
 				{/* ヘッダー */}
 				<div className="flex justify-between items-center mb-4">
 					<h2 className="text-lg font-semibold text-gray-800">
-						{skill.name} - {skill.type === 'multiParam' && skill.multiParams 
-							? `${skill.multiParams.param1.name}・${skill.multiParams.param2.name}設定`
-							: 'マルチパラメータ設定'
-						}
+						{skill.name} -{' '}
+						{skill.type === 'multiParam' && skill.multiParams
+							? skill.multiParams.param3
+								? `${skill.multiParams.param1.name}・${skill.multiParams.param2.name}・${skill.multiParams.param3.name}設定`
+								: `${skill.multiParams.param1.name}・${skill.multiParams.param2.name}設定`
+							: 'マルチパラメータ設定'}
 					</h2>
 					<button
 						type="button"
@@ -163,10 +213,9 @@ export default function MultiParamModal({
 					{/* スキルレベル設定 */}
 					<div>
 						<div className="text-sm text-gray-600 mb-3">
-							{skill.type === 'multiParam' && skill.multiParams 
+							{skill.type === 'multiParam' && skill.multiParams
 								? `${skill.multiParams.param1.name}を入力してください。`
-								: 'スキルレベルを入力してください。'
-							}
+								: 'スキルレベルを入力してください。'}
 						</div>
 						<div className="flex items-center justify-center space-x-2">
 							{/* レベル -10ボタン */}
@@ -223,12 +272,13 @@ export default function MultiParamModal({
 					{/* 重ねがけ数設定 */}
 					<div>
 						<div className="text-sm text-gray-600 mb-3">
-							{skill.type === 'multiParam' && skill.multiParams 
-								? skill.id === 'dp1' 
+							{skill.type === 'multiParam' && skill.multiParams
+								? skill.id === 'dp1'
 									? 'ダークパワースキルに使用した全スキルポイントを入力してください。'
-									: `${skill.multiParams.param2.name}を入力してください。`
-								: 'カウント数を入力してください。'
-							}
+									: skill.id === 'mg4'
+										? 'キャストマスタリを除いたウィザードスキルの習得数を入力してください。'
+										: `${skill.multiParams.param2.name}を入力してください。`
+								: 'カウント数を入力してください。'}
 						</div>
 						<div className="flex items-center justify-center space-x-2">
 							{/* スタック -10ボタン */}
@@ -282,8 +332,99 @@ export default function MultiParamModal({
 						</div>
 					</div>
 
+					{/* パラメータ3設定 */}
+					{skill.type === 'multiParam' &&
+						skill.multiParams &&
+						skill.multiParams.param3 && (
+							<div>
+								<div className="text-sm text-gray-600 mb-3">
+									{skill.id === 'mg4'
+										? 'ウィザードスキルに使用した全スキルポイントを入力してください。'
+										: `${skill.multiParams.param3.name}を入力してください。`}
+								</div>
+								<div className="flex items-center justify-center space-x-2">
+									{/* param3 -10ボタン */}
+									<button
+										type="button"
+										onClick={() =>
+											handleParam3Change(skill.multiParams!.param3!.min)
+										}
+										disabled={
+											(currentState.multiParam3 ||
+												skill.multiParams.param3.default) ===
+											skill.multiParams.param3.min
+										}
+										className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+									>
+										-10
+									</button>
+
+									{/* param3 -1ボタン */}
+									<button
+										type="button"
+										onClick={() =>
+											handleParam3Change(
+												(currentState.multiParam3 ||
+													skill.multiParams!.param3!.default) - 1,
+											)
+										}
+										disabled={
+											(currentState.multiParam3 ||
+												skill.multiParams.param3.default) <=
+											skill.multiParams.param3.min
+										}
+										className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+									>
+										-1
+									</button>
+
+									{/* param3表示 */}
+									<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded min-w-[60px] text-center">
+										{currentState.multiParam3 ||
+											skill.multiParams.param3.default}
+										{skill.multiParams.param3.unit}
+									</div>
+
+									{/* param3 +1ボタン */}
+									<button
+										type="button"
+										onClick={() =>
+											handleParam3Change(
+												(currentState.multiParam3 ||
+													skill.multiParams!.param3!.default) + 1,
+											)
+										}
+										disabled={
+											(currentState.multiParam3 ||
+												skill.multiParams.param3.default) >=
+											skill.multiParams.param3.max
+										}
+										className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+									>
+										+1
+									</button>
+
+									{/* param3 +10ボタン */}
+									<button
+										type="button"
+										onClick={() =>
+											handleParam3Change(skill.multiParams!.param3!.max)
+										}
+										disabled={
+											(currentState.multiParam3 ||
+												skill.multiParams.param3.default) ===
+											skill.multiParams.param3.max
+										}
+										className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+									>
+										+10
+									</button>
+								</div>
+							</div>
+						)}
+
 					{/* 説明 */}
-					{skill.id !== 'dp1' && (
+					{skill.id !== 'dp1' && skill.id !== 'mg4' && (
 						<div className="text-xs text-gray-500 text-center">
 							{skill.name}はカウント数1-{skill.maxStack || 10}まで設定可能です
 						</div>
