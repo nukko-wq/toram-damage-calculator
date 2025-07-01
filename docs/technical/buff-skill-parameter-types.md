@@ -64,6 +64,16 @@
 - **表示形式**: セイバーオーラ/10（スキルレベルのみ表示）
 - **備考**: levelAndStackタイプからmultiParamタイプに統合
 
+#### エターナルナイトメア
+- **スキルID**: `dp1`
+- **スキル名**: エターナルナイトメア
+- **カテゴリ**: darkPower（ダークパワー）
+- **パラメータ1**: スキルレベル（1-10、デフォルト: 10）
+- **パラメータ2**: スキルポイント合計（25-80、デフォルト: 50）
+- **UI実装**: ✅ MultiParamModal（multiParam専用モーダル）
+- **表示形式**: エターナルナイトメア/10（スキルレベルのみ表示）
+- **備考**: levelタイプからmultiParamタイプに変更
+
 
 ### 3. levelタイプ（スキルレベル設定）
 - **対象スキル数**: 約92個
@@ -85,6 +95,7 @@
    - 神速の捌手（1-3回）、熱情の歌（1-10カウント）、急速チャージ（1-15回、MP回復量表示）、オーガスラッシュ（1-10消費鬼力数）
 2. **MultiParamModal**: multiParamタイプ専用（2-3パラメータ対応）
    - セイバーオーラ（スキルレベル1-10、カウント数1-100、デフォルト値: 10/100）
+   - エターナルナイトメア（スキルレベル1-10、スキルポイント合計0-999、デフォルト値: 10/200）
 3. **SkillParameterModal**: level/stack/specialタイプ汎用（統一ボタンUI）
 4. **SkillToggleButton**: toggleタイプ汎用
 
@@ -294,3 +305,4 @@ function getDisplayName(skill: BuffSkillDefinition, state: BuffSkillState): stri
 - MultiParamModal設計仕様追加：汎用的な複数パラメータ対応モーダル
 - levelAndStackタイプをmultiParamタイプに統合：セイバーオーラをmultiParam形式に移行
 - LevelAndStackModalをMultiParamModalに改名・拡張：動的パラメータ名表示、multiParamConfig対応
+- エターナルナイトメアをlevelタイプからmultiParamタイプに変更：スキルレベルとスキルポイント合計の2パラメータ対応

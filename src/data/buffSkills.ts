@@ -117,8 +117,23 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		id: 'dp1',
 		name: 'エターナルナイトメア',
 		category: 'darkPower',
-		type: 'level',
-		maxLevel: 10,
+		type: 'multiParam',
+		multiParams: {
+			param1: {
+				name: 'スキルレベル',
+				min: 1,
+				max: 10,
+				default: 10,
+				unit: 'Lv'
+			},
+			param2: {
+				name: 'スキルポイント合計',
+				min: 25,
+				max: 80,
+				default: 80,
+				unit: 'pt'
+			}
+		},
 		order: 1401,
 	},
 

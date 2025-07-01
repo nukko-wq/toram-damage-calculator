@@ -224,7 +224,9 @@ export default function MultiParamModal({
 					<div>
 						<div className="text-sm text-gray-600 mb-3">
 							{skill.type === 'multiParam' && skill.multiParams 
-								? `${skill.multiParams.param2.name}を入力してください。`
+								? skill.id === 'dp1' 
+									? 'ダークパワースキルに使用した全スキルポイントを入力してください。'
+									: `${skill.multiParams.param2.name}を入力してください。`
 								: 'カウント数を入力してください。'
 							}
 						</div>
@@ -281,9 +283,11 @@ export default function MultiParamModal({
 					</div>
 
 					{/* 説明 */}
-					<div className="text-xs text-gray-500 text-center">
-						{skill.name}はカウント数1-{skill.maxStack || 10}まで設定可能です
-					</div>
+					{skill.id !== 'dp1' && (
+						<div className="text-xs text-gray-500 text-center">
+							{skill.name}はカウント数1-{skill.maxStack || 10}まで設定可能です
+						</div>
+					)}
 				</div>
 
 				{/* 閉じるボタン */}
