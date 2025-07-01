@@ -305,10 +305,17 @@ export default function MultiParamModal({
 								{/* スタック -10ボタン */}
 								<button
 									type="button"
-									onClick={() =>
-										handleStackCountChange((currentState.stackCount || 1) - 10)
+									onClick={() => {
+										const currentValue = skill.type === 'multiParam' 
+											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1)
+											: (currentState.stackCount || 1)
+										handleStackCountChange(currentValue - 10)
+									}}
+									disabled={
+										skill.type === 'multiParam'
+											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1) <= (skill.multiParams?.param2?.min || 1)
+											: (currentState.stackCount || 1) <= 1
 									}
-									disabled={currentState.stackCount <= 1}
 									className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 								>
 									-10
@@ -317,10 +324,17 @@ export default function MultiParamModal({
 								{/* スタック -1ボタン */}
 								<button
 									type="button"
-									onClick={() =>
-										handleStackCountChange((currentState.stackCount || 1) - 1)
+									onClick={() => {
+										const currentValue = skill.type === 'multiParam' 
+											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1)
+											: (currentState.stackCount || 1)
+										handleStackCountChange(currentValue - 1)
+									}}
+									disabled={
+										skill.type === 'multiParam'
+											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1) <= (skill.multiParams?.param2?.min || 1)
+											: (currentState.stackCount || 1) <= 1
 									}
-									disabled={currentState.stackCount <= 1}
 									className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 								>
 									-1
@@ -329,7 +343,7 @@ export default function MultiParamModal({
 								{/* スタック数表示 */}
 								<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded w-[80px] text-center">
 									{skill.id === 'dp1'
-										? `${currentState.stackCount || 1}pt`
+										? `${currentState.multiParam2 || skill.multiParams?.param2?.default || 1}pt`
 										: skill.id === 'IsBrave'
 											? (currentState.stackCount || 2) === 1
 												? '使用者'
@@ -340,10 +354,17 @@ export default function MultiParamModal({
 								{/* スタック +1ボタン */}
 								<button
 									type="button"
-									onClick={() =>
-										handleStackCountChange((currentState.stackCount || 1) + 1)
+									onClick={() => {
+										const currentValue = skill.type === 'multiParam' 
+											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1)
+											: (currentState.stackCount || 1)
+										handleStackCountChange(currentValue + 1)
+									}}
+									disabled={
+										skill.type === 'multiParam'
+											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1) >= (skill.multiParams?.param2?.max || 10)
+											: (currentState.stackCount || 1) >= (skill.maxStack || 10)
 									}
-									disabled={currentState.stackCount >= (skill.maxStack || 10)}
 									className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 								>
 									+1
@@ -352,10 +373,17 @@ export default function MultiParamModal({
 								{/* スタック +10ボタン */}
 								<button
 									type="button"
-									onClick={() =>
-										handleStackCountChange((currentState.stackCount || 1) + 10)
+									onClick={() => {
+										const currentValue = skill.type === 'multiParam' 
+											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1)
+											: (currentState.stackCount || 1)
+										handleStackCountChange(currentValue + 10)
+									}}
+									disabled={
+										skill.type === 'multiParam'
+											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1) >= (skill.multiParams?.param2?.max || 10)
+											: (currentState.stackCount || 1) >= (skill.maxStack || 10)
 									}
-									disabled={currentState.stackCount >= (skill.maxStack || 10)}
 									className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 								>
 									+10
