@@ -237,7 +237,7 @@ export default function MultiParamModal({
 									handleLevelChange((currentState.level || 10) - 10)
 								}
 								disabled={currentState.level <= 1}
-								className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+								className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 							>
 								-10
 							</button>
@@ -249,7 +249,7 @@ export default function MultiParamModal({
 									handleLevelChange((currentState.level || 10) - 1)
 								}
 								disabled={currentState.level <= 1}
-								className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+								className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 							>
 								-1
 							</button>
@@ -268,7 +268,7 @@ export default function MultiParamModal({
 									handleLevelChange((currentState.level || 10) + 1)
 								}
 								disabled={currentState.level >= (skill.maxLevel || 10)}
-								className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+								className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 							>
 								+1
 							</button>
@@ -280,7 +280,7 @@ export default function MultiParamModal({
 									handleLevelChange((currentState.level || 10) + 10)
 								}
 								disabled={currentState.level >= (skill.maxLevel || 10)}
-								className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+								className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 							>
 								+10
 							</button>
@@ -309,7 +309,7 @@ export default function MultiParamModal({
 										handleStackCountChange((currentState.stackCount || 1) - 10)
 									}
 									disabled={currentState.stackCount <= 1}
-									className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+									className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 								>
 									-10
 								</button>
@@ -321,7 +321,7 @@ export default function MultiParamModal({
 										handleStackCountChange((currentState.stackCount || 1) - 1)
 									}
 									disabled={currentState.stackCount <= 1}
-									className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+									className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 								>
 									-1
 								</button>
@@ -344,7 +344,7 @@ export default function MultiParamModal({
 										handleStackCountChange((currentState.stackCount || 1) + 1)
 									}
 									disabled={currentState.stackCount >= (skill.maxStack || 10)}
-									className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+									className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 								>
 									+1
 								</button>
@@ -356,7 +356,7 @@ export default function MultiParamModal({
 										handleStackCountChange((currentState.stackCount || 1) + 10)
 									}
 									disabled={currentState.stackCount >= (skill.maxStack || 10)}
-									className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+									className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 								>
 									+10
 								</button>
@@ -392,7 +392,7 @@ export default function MultiParamModal({
 												skill.multiParams?.param3?.default ||
 												0) <= (skill.multiParams?.param3?.min || 0)
 										}
-										className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+										className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 									>
 										-10
 									</button>
@@ -412,7 +412,7 @@ export default function MultiParamModal({
 												skill.multiParams?.param3?.default ||
 												0) <= (skill.multiParams?.param3?.min || 0)
 										}
-										className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+										className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 									>
 										-1
 									</button>
@@ -440,7 +440,7 @@ export default function MultiParamModal({
 												skill.multiParams?.param3?.default ||
 												0) >= (skill.multiParams?.param3?.max || 100)
 										}
-										className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+										className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 									>
 										+1
 									</button>
@@ -460,7 +460,7 @@ export default function MultiParamModal({
 												skill.multiParams?.param3?.default ||
 												0) >= (skill.multiParams?.param3?.max || 0)
 										}
-										className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
+										className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 									>
 										+10
 									</button>
