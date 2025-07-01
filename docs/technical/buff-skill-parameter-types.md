@@ -53,8 +53,9 @@
 ### 3. levelタイプ（スキルレベル設定）
 - **対象スキル数**: 約92個
 - **設定範囲**: 1-10（スキルによって最大値は異なる）
-- **UI実装**: ✅ SkillParameterModal（ボタン式UI）
-- **備考**: 最も一般的なタイプ
+- **UI実装**: ✅ SkillParameterModal（統一ボタンUI）
+- **表示テキスト**: 「スキルレベルを入力してください。」
+- **備考**: 最も一般的なタイプ、LevelAndStackModalと統一されたUI
 
 ### 4. toggleタイプ（ON/OFF切り替えのみ）
 - **対象スキル数**: 約69個
@@ -69,7 +70,7 @@
    - 神速の捌手（1-3回）、熱情の歌（1-10カウント）、急速チャージ（1-15回）、オーガスラッシュ（1-10消費鬼力数）
 2. **LevelAndStackModal**: levelAndStackタイプ専用
    - セイバーオーラ（レベル1-10、カウント数1-100、デフォルト100）
-3. **SkillParameterModal**: levelタイプ汎用（ボタンUI）
+3. **SkillParameterModal**: level/stack/specialタイプ汎用（統一ボタンUI）
 4. **SkillToggleButton**: toggleタイプ汎用
 
 ## 技術仕様
@@ -131,3 +132,4 @@ interface BuffSkillState {
 - オーガスラッシュをlevelタイプからstackタイプに変更（1-10回）
 - オーガスラッシュのUI表示を「消費鬼力数を入力してください」に変更
 - セイバーオーラのUI表示を「スキルレベルを入力してください」「カウント数を入力してください」に変更
+- SkillParameterModalのUIをLevelAndStackModalと統一（ボタン式UI、統一テキスト）

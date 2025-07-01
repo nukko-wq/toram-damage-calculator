@@ -158,13 +158,6 @@ export default function SkillParameterModal({
 
 					{/* コンテンツ */}
 					<div className="p-6">
-						{/* 入力補助テキスト */}
-						{inputHintText && (
-							<div className="mb-4 p-3 bg-blue-50 rounded">
-								<p className="text-sm text-blue-700">{inputHintText}</p>
-							</div>
-						)}
-
 						{/* パラメータ入力フォーム */}
 						<div className="space-y-4">
 							{/* レベル設定（toggle以外） */}
@@ -172,6 +165,9 @@ export default function SkillParameterModal({
 								<>
 									{skill.type === 'level' && (
 										<div>
+											<div className="text-sm text-gray-600 mb-3">
+												スキルレベルを入力してください。
+											</div>
 											<div className="flex items-center justify-center space-x-2">
 												{/* -10ボタン（最小値1にセット） */}
 												<button
@@ -247,43 +243,142 @@ export default function SkillParameterModal({
 
 									{skill.type === 'stack' && (
 										<div>
-											<label className="block text-sm font-medium text-gray-700 mb-2">
-												重ねがけ数 (1-{skill.maxStack || 10})
-											</label>
-											<select
-												value={currentState.stackCount || 1}
-												onChange={(e) =>
-													handleStackCountChange(Number(e.target.value))
-												}
-												className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-											>
-												{Array.from(
-													{ length: skill.maxStack || 10 },
-													(_, i) => i + 1,
-												).map((num) => (
-													<option key={num} value={num}>
-														×{num}
-													</option>
-												))}
-											</select>
+											<div className="text-sm text-gray-600 mb-3">
+												重ねがけ数を入力してください。
+											</div>
+											<div className="flex items-center justify-center space-x-2">
+												{/* -10ボタン（最小値1にセット） */}
+												<button
+													type="button"
+													onClick={() => handleStackCountChange(1)}
+													disabled={(currentState.stackCount || 1) === 1}
+													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+												>
+													-10
+												</button>
+
+												{/* -1ボタン */}
+												<button
+													type="button"
+													onClick={() =>
+														handleStackCountChange(
+															(currentState.stackCount || 1) - 1,
+														)
+													}
+													disabled={(currentState.stackCount || 1) <= 1}
+													className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+												>
+													-1
+												</button>
+
+												{/* スタック数表示 */}
+												<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded min-w-[60px] text-center">
+													×{currentState.stackCount || 1}
+												</div>
+
+												{/* +1ボタン */}
+												<button
+													type="button"
+													onClick={() =>
+														handleStackCountChange(
+															(currentState.stackCount || 1) + 1,
+														)
+													}
+													disabled={
+														(currentState.stackCount || 1) >=
+														(skill.maxStack || 10)
+													}
+													className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+												>
+													+1
+												</button>
+
+												{/* +10ボタン（最大値にセット） */}
+												<button
+													type="button"
+													onClick={() =>
+														handleStackCountChange(skill.maxStack || 10)
+													}
+													disabled={
+														(currentState.stackCount || 1) ===
+														(skill.maxStack || 10)
+													}
+													className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+												>
+													+10
+												</button>
+											</div>
 										</div>
 									)}
 
 									{skill.type === 'special' && (
 										<div>
-											<label className="block text-sm font-medium text-gray-700 mb-2">
-												特殊パラメータ
-											</label>
-											<input
-												type="number"
-												min={0}
-												value={currentState.specialParam || 0}
-												onChange={(e) =>
-													handleSpecialParamChange(Number(e.target.value))
-												}
-												className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-												placeholder={inputHintText || '値を入力してください'}
-											/>
+											<div className="text-sm text-gray-600 mb-3">
+												{inputHintText || '特殊パラメータを入力してください。'}
+											</div>
+											<div className="flex items-center justify-center space-x-2">
+												{/* -10ボタン */}
+												<button
+													type="button"
+													onClick={() =>
+														handleSpecialParamChange(
+															Math.max(
+																0,
+																(currentState.specialParam || 0) - 10,
+															),
+														)
+													}
+													disabled={(currentState.specialParam || 0) <= 0}
+													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+												>
+													-10
+												</button>
+
+												{/* -1ボタン */}
+												<button
+													type="button"
+													onClick={() =>
+														handleSpecialParamChange(
+															Math.max(0, (currentState.specialParam || 0) - 1),
+														)
+													}
+													disabled={(currentState.specialParam || 0) <= 0}
+													className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+												>
+													-1
+												</button>
+
+												{/* 値表示 */}
+												<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded min-w-[60px] text-center">
+													{currentState.specialParam || 0}
+												</div>
+
+												{/* +1ボタン */}
+												<button
+													type="button"
+													onClick={() =>
+														handleSpecialParamChange(
+															(currentState.specialParam || 0) + 1,
+														)
+													}
+													className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
+												>
+													+1
+												</button>
+
+												{/* +10ボタン */}
+												<button
+													type="button"
+													onClick={() =>
+														handleSpecialParamChange(
+															(currentState.specialParam || 0) + 10,
+														)
+													}
+													className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
+												>
+													+10
+												</button>
+											</div>
 										</div>
 									)}
 								</>
