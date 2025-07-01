@@ -172,7 +172,7 @@ export default function SkillParameterModal({
 								<>
 									{skill.type === 'level' && (
 										<div>
-											<div className="flex items-center justify-center space-x-3">
+											<div className="flex items-center justify-center space-x-2">
 												{/* -10ボタン（最小値1にセット） */}
 												<button
 													type="button"
@@ -180,7 +180,7 @@ export default function SkillParameterModal({
 														handleLevelChange(1)
 													}}
 													disabled={(currentState.level || 10) === 1}
-													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
+													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
 												>
 													-10
 												</button>
@@ -196,16 +196,14 @@ export default function SkillParameterModal({
 														handleLevelChange(newLevel)
 													}}
 													disabled={(currentState.level || 10) - 1 < 1}
-													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
+													className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
 												>
 													-1
 												</button>
 
 												{/* スキルレベル表示 */}
-												<div className="px-4 py-1 bg-blue-50 border border-blue-200 rounded text-center min-w-[3rem]">
-													<span className="text-2xl font-bold text-blue-700">
-														{currentState.level || 10}
-													</span>
+												<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded min-w-[60px] text-center">
+													{currentState.level || 10}
 												</div>
 
 												{/* +1ボタン */}
@@ -223,7 +221,7 @@ export default function SkillParameterModal({
 														(currentState.level || 10) + 1 >
 														(skill.maxLevel || 10)
 													}
-													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
+													className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
 												>
 													+1
 												</button>
@@ -239,7 +237,7 @@ export default function SkillParameterModal({
 														(currentState.level || 10) ===
 														(skill.maxLevel || 10)
 													}
-													className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
+													className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
 												>
 													+10
 												</button>

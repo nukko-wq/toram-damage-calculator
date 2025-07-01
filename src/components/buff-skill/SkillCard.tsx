@@ -8,6 +8,7 @@ import { useCalculatorStore } from '@/stores'
 import SkillToggleButton from './SkillToggleButton'
 import SkillParameterModal from './SkillParameterModal'
 import StackCountModal from './StackCountModal'
+import PassionSongModal from './PassionSongModal'
 
 interface SkillCardProps {
 	skill: BuffSkillDefinition
@@ -121,9 +122,15 @@ export default function SkillCard({
 			</div>
 
 
-			{/* モーダル - 神速の捌手専用またはデフォルト */}
+			{/* モーダル - スキル専用またはデフォルト */}
 			{skill.id === 'hb4-1' ? (
 				<StackCountModal
+					skill={skill}
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+				/>
+			) : skill.id === 'IsHotKnows' ? (
+				<PassionSongModal
 					skill={skill}
 					isOpen={isModalOpen}
 					onClose={() => setIsModalOpen(false)}

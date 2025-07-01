@@ -4,17 +4,17 @@ import { useCallback, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { BuffSkillDefinition } from '@/types/buffSkill'
 
-interface StackCountModalProps {
+interface PassionSongModalProps {
 	skill: BuffSkillDefinition
 	isOpen: boolean
 	onClose: () => void
 }
 
-export default function StackCountModal({
+export default function PassionSongModal({
 	skill,
 	isOpen,
 	onClose,
-}: StackCountModalProps) {
+}: PassionSongModalProps) {
 	// Zustandストアから現在のスキル状態を取得
 	const defaultState = useMemo(
 		() => ({
@@ -57,15 +57,15 @@ export default function StackCountModal({
 		(state) => state.updateBuffSkillState,
 	)
 
-	// 重ねがけ数変更ハンドラ
-	const handleStackCountChange = useCallback(
-		(newStackCount: number) => {
-			// 範囲チェック（1-3）
-			const clampedStackCount = Math.max(1, Math.min(3, newStackCount))
+	// カウント数変更ハンドラ
+	const handleCountChange = useCallback(
+		(newCount: number) => {
+			// 範囲チェック（1-10）
+			const clampedCount = Math.max(1, Math.min(10, newCount))
 
 			updateBuffSkillState(skill.id, {
 				...currentState,
-				stackCount: clampedStackCount,
+				stackCount: clampedCount,
 				level: 10, // スキルレベルは10固定
 			})
 		},
@@ -81,7 +81,7 @@ export default function StackCountModal({
 				{/* ヘッダー */}
 				<div className="flex justify-between items-center mb-4">
 					<h2 className="text-lg font-semibold text-gray-800">
-						{skill.name} - 重ねがけ数設定
+						{skill.name} - カウント数設定
 					</h2>
 					<button
 						type="button"
@@ -92,22 +92,22 @@ export default function StackCountModal({
 					</button>
 				</div>
 
-				{/* 重ねがけ数調整UI */}
+				{/* カウント数調整UI */}
 				<div className="space-y-4">
 					<div className="text-sm text-gray-600">
-						重ねがけ数を入力して下さい。
+						カウント数を入力して下さい。
 						<br />
 						※スキルレベルは10固定です。
 					</div>
 
-					{/* 重ねがけ数調整ボタン */}
+					{/* カウント数調整ボタン */}
 					<div className="flex items-center justify-center space-x-2">
 						{/* -10ボタン（最小値の1にセット） */}
 						<button
 							type="button"
-							onClick={() => handleStackCountChange(1)}
+							onClick={() => handleCountChange(1)}
 							disabled={currentState.stackCount === 1}
-							className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+							className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
 						>
 							-10
 						</button>
@@ -116,15 +116,15 @@ export default function StackCountModal({
 						<button
 							type="button"
 							onClick={() =>
-								handleStackCountChange((currentState.stackCount || 1) - 1)
+								handleCountChange((currentState.stackCount || 1) - 1)
 							}
 							disabled={currentState.stackCount <= 1}
-							className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+							className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
 						>
 							-1
 						</button>
 
-						{/* 重ねがけ数表示 */}
+						{/* カウント数表示 */}
 						<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded min-w-[60px] text-center">
 							{currentState.stackCount || 1}
 						</div>
@@ -133,28 +133,28 @@ export default function StackCountModal({
 						<button
 							type="button"
 							onClick={() =>
-								handleStackCountChange((currentState.stackCount || 1) + 1)
+								handleCountChange((currentState.stackCount || 1) + 1)
 							}
-							disabled={currentState.stackCount >= 3}
-							className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+							disabled={currentState.stackCount >= 10}
+							className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
 						>
 							+1
 						</button>
 
-						{/* +10ボタン（最大値の3にセット） */}
+						{/* +10ボタン（最大値の10にセット） */}
 						<button
 							type="button"
-							onClick={() => handleStackCountChange(3)}
-							disabled={currentState.stackCount === 3}
-							className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
+							onClick={() => handleCountChange(10)}
+							disabled={currentState.stackCount === 10}
+							className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-default"
 						>
 							+10
 						</button>
 					</div>
 
-					{/* 重ねがけ数の説明 */}
+					{/* カウント数の説明 */}
 					<div className="text-xs text-gray-500 text-center">
-						神速の捌手は最大3回まで重ねがけ可能です
+						熱情の歌は最大10カウントまで重ねがけ可能です
 					</div>
 				</div>
 
