@@ -35,7 +35,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		order: 501,
 	},
 	{
-		id: 'hb4-1',
+		id: 'godspeed_parry',
 		name: '神速の捌手',
 		category: 'halberd',
 		type: 'stack',
@@ -840,14 +840,6 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			type: 'level',
 			maxLevel: 10,
 			order: 504,
-		},
-		{
-			id: 'hb4-2',
-			name: '神速の捌手',
-			category: 'halberd',
-			type: 'stack',
-			maxStack: 3,
-			order: 505,
 		},
 		{
 			id: 'hb1',

@@ -123,7 +123,7 @@ export default function SkillCard({
 
 
 			{/* モーダル - スキル専用またはデフォルト */}
-			{skill.id === 'hb4-1' ? (
+			{skill.id === 'godspeed_parry' ? (
 				<StackCountModal
 					skill={skill}
 					isOpen={isModalOpen}
