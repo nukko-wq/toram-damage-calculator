@@ -33,6 +33,9 @@ export default function MultiParamModal({
 			isEnabled: false,
 			level: 10,
 			stackCount: skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1,
+			multiParam1: 10,
+			multiParam2: skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1,
+			multiParam3: 0,
 			specialParam: 0,
 		}
 	}, [skill.id, skill.type, skill.multiParams])
@@ -51,6 +54,9 @@ export default function MultiParamModal({
 							isEnabled: foundSkill.isEnabled,
 							level: foundSkill.parameters.skillLevel || 10,
 							stackCount: foundSkill.parameters.stackCount || defaultStackCount,
+							multiParam1: foundSkill.parameters.skillLevel || 10,
+							multiParam2: foundSkill.parameters.stackCount || defaultStackCount,
+							multiParam3: foundSkill.parameters.playerCount || 0,
 							specialParam: foundSkill.parameters.playerCount || 0,
 						}
 					}
@@ -221,8 +227,10 @@ export default function MultiParamModal({
 							{/* レベル -10ボタン */}
 							<button
 								type="button"
-								onClick={() => handleLevelChange(1)}
-								disabled={currentState.level === 1}
+								onClick={() =>
+									handleLevelChange((currentState.level || 10) - 10)
+								}
+								disabled={currentState.level <= 1}
 								className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 							>
 								-10
@@ -260,8 +268,10 @@ export default function MultiParamModal({
 							{/* レベル +10ボタン */}
 							<button
 								type="button"
-								onClick={() => handleLevelChange(skill.maxLevel || 10)}
-								disabled={currentState.level === (skill.maxLevel || 10)}
+								onClick={() =>
+									handleLevelChange((currentState.level || 10) + 10)
+								}
+								disabled={currentState.level >= (skill.maxLevel || 10)}
 								className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 							>
 								+10
@@ -284,8 +294,10 @@ export default function MultiParamModal({
 							{/* スタック -10ボタン */}
 							<button
 								type="button"
-								onClick={() => handleStackCountChange(1)}
-								disabled={currentState.stackCount === 1}
+								onClick={() =>
+									handleStackCountChange((currentState.stackCount || 1) - 10)
+								}
+								disabled={currentState.stackCount <= 1}
 								className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 							>
 								-10
@@ -323,8 +335,10 @@ export default function MultiParamModal({
 							{/* スタック +10ボタン */}
 							<button
 								type="button"
-								onClick={() => handleStackCountChange(skill.maxStack || 10)}
-								disabled={currentState.stackCount === (skill.maxStack || 10)}
+								onClick={() =>
+									handleStackCountChange((currentState.stackCount || 1) + 10)
+								}
+								disabled={currentState.stackCount >= (skill.maxStack || 10)}
 								className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 							>
 								+10
@@ -347,12 +361,14 @@ export default function MultiParamModal({
 									<button
 										type="button"
 										onClick={() =>
-											handleParam3Change(skill.multiParams!.param3!.min)
+											handleParam3Change(
+												(currentState.multiParam3 || skill.multiParams?.param3?.default || 0) - 10
+											)
 										}
 										disabled={
 											(currentState.multiParam3 ||
-												skill.multiParams.param3.default) ===
-											skill.multiParams.param3.min
+												skill.multiParams?.param3?.default || 0) <=
+											(skill.multiParams?.param3?.min || 0)
 										}
 										className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 									>
@@ -408,12 +424,14 @@ export default function MultiParamModal({
 									<button
 										type="button"
 										onClick={() =>
-											handleParam3Change(skill.multiParams!.param3!.max)
+											handleParam3Change(
+												(currentState.multiParam3 || skill.multiParams?.param3?.default || 0) + 10
+											)
 										}
 										disabled={
 											(currentState.multiParam3 ||
-												skill.multiParams.param3.default) ===
-											skill.multiParams.param3.max
+												skill.multiParams?.param3?.default || 0) >=
+											(skill.multiParams?.param3?.max || 0)
 										}
 										className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed"
 									>

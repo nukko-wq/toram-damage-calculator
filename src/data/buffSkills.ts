@@ -1205,14 +1205,14 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 					name: 'ウィザードスキル習得数',
 					min: 0,
 					max: 14,
-					default: 7,
+					default: 14,
 					unit: '個'
 				},
 				param3: {
 					name: '使用全スキルポイント',
 					min: 64,
 					max: 150,
-					default: 100,
+					default: 150,
 					unit: 'pt'
 				}
 			},
@@ -1311,14 +1311,14 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 					name: 'ウィザードスキル習得数',
 					min: 0,
 					max: 14,
-					default: 7,
+					default: 14,
 					unit: '個'
 				},
 				param3: {
 					name: '使用全スキルポイント',
 					min: 64,
 					max: 150,
-					default: 100,
+					default: 150,
 					unit: 'pt'
 				}
 			},
