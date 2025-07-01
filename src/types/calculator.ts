@@ -262,6 +262,8 @@ export interface PresetCrystal {
 	type: CrystalType
 	properties: Partial<EquipmentProperties>
 	description?: string
+	memo1?: string
+	memo2?: string
 }
 
 // 装備スロット
@@ -510,6 +512,8 @@ export interface LocalStorageCrystal
 	extends PresetCrystal,
 		LocalStoragePresetItemBase {
 	description?: string
+	memo1?: string
+	memo2?: string
 }
 
 // ローカルストレージ敵情報（プリセット由来）

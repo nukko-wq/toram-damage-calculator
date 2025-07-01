@@ -1,9 +1,9 @@
 'use client'
 
-import type { PresetCrystal } from '@/types/calculator'
+import type { Crystal } from '@/types/calculator'
 
 interface CrystalCardProps {
-	crystal: PresetCrystal
+	crystal: Crystal
 	isSelected: boolean
 	onClick: () => void
 }
@@ -73,7 +73,7 @@ export default function CrystalCard({
 			UnsheatheAttack_Rate: '抜刀威力',
 			UnsheatheAttack: '抜刀威力',
 			ShortRangeDamage_Rate: '近距離威力',
-			LongRangeDamage_Rate: '遠距離威力',
+			LongRangeDamage_Rate: '遠距離の威力',
 
 			// クリティカル系
 			CriticalDamage_Rate: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
@@ -208,16 +208,9 @@ export default function CrystalCard({
 
 				return `${propName}${value > 0 ? '+' : ''}${value}${suffix}`
 			})
-			.slice(0, 4) // 最大4つまで表示
+			.slice(0, 8) // 最大8つまで表示
 
-		// 2つずつのグループに分ける
-		const rows: string[] = []
-		for (let i = 0; i < props.length; i += 2) {
-			const row = props.slice(i, i + 2).join(', ')
-			rows.push(row)
-		}
-
-		return rows
+		return props
 	}
 
 	return (
@@ -265,19 +258,18 @@ export default function CrystalCard({
 
 			{/* プロパティ */}
 			{formatProperties().length > 0 && (
-				<div className="text-sm text-gray-600 mb-2 min-h-[1.25rem]">
-					{formatProperties().map((row) => (
-						<div key={row} className="flex flex-wrap gap-x-3">
-							{row}
-						</div>
+				<div className="text-sm text-gray-600 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1">
+					{formatProperties().map((prop) => (
+						<span key={prop}>{prop}</span>
 					))}
 				</div>
 			)}
 
-			{/* 説明 */}
-			{crystal.description && (
-				<div className="text-xs text-gray-500 line-clamp-2">
-					{crystal.description}
+			{/* メモ */}
+			{(crystal.memo1 || crystal.memo2) && (
+				<div className="text-xs text-blue-600 space-y-1">
+					{crystal.memo1 && <div className="line-clamp-1">{crystal.memo1}</div>}
+					{crystal.memo2 && <div className="line-clamp-1">{crystal.memo2}</div>}
 				</div>
 			)}
 		</div>

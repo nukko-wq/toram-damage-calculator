@@ -38,6 +38,8 @@ export const crystalsData: CrystalsData = {
 					INT_Rate: 3,
 					LongRangeDamage_Rate: -6,
 				},
+				memo1: '盾装備時: ヘイト-50%',
+				memo2: '短剣装備時: クリティカルダメージ+1%',
 			},
 			{
 				id: 'a88d8016-d3a8-4e31-9a21-99eaf6fe107b',
