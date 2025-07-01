@@ -10,7 +10,7 @@ DamagePreviewコンポーネントは、計算されたダメージ値と安定�
 - ダメージ値と安定率のリアルタイム表示
 - 最小・最大・平均ダメージの計算表示
 - ダメージデータのキャプチャ機能（過去1回分のみ保存）
-- キャプチャしたデータとの比較表示
+- キャプチャしたダメージとの比較表示
 - LocalStorageによるキャプチャデータの永続化（全セーブデータ共通）
 
 ## レイアウト設計
@@ -31,12 +31,8 @@ DamagePreviewコンポーネントは、計算されたダメージ値と安定�
 │ │平均     │56,000   │95%    │ │ │平均         │57,000   │95%    │ │
 │ └─────────┴─────────┴───────┘ │ └─────────────┴─────────┴───────┘ │
 │                            │                                  │
-│                            │ ┌─────────────────────────────────┐ │
-│                            │ │キャプチャ情報                    │ │
-│                            │ │設定名: [編集可能]               │ │
-│                            │ │作成日時: 2024-12-25 14:30      │ │
-│                            │ │[クリア] ボタン                  │ │
-│                            │ └─────────────────────────────────┘ │
+│                            │ ※キャプチャデータがない場合は     │
+│                            │   「データなし」を表示            │
 └─────────────────────────────┴───────────────────────────────────┘
 ```
 
@@ -52,9 +48,7 @@ DamagePreviewコンポーネントは、計算されたダメージ値と安定�
 src/components/damage-preview/
 ├── DamagePreview.tsx              # メインコンポーネント
 ├── DamageCalculationDisplay.tsx   # 現在の計算結果表示
-├── DamageCapturePanel.tsx         # キャプチャ機能パネル
-├── DamageComparisonTable.tsx      # キャプチャデータ比較表示
-├── DamageCaptureInfo.tsx          # キャプチャ情報表示・編集
+├── DamageCaptureDisplay.tsx       # キャプチャダメージ表示
 └── DamageCaptureButton.tsx        # キャプチャボタンコンポーネント
 ```
 
@@ -82,21 +76,8 @@ interface DamageCalculationResult {
 ### キャプチャデータ
 ```typescript
 interface DamageCaptureData {
-  name: string                         // 設定名（編集可能）
-  capturedAt: string                   // キャプチャ時刻
   damageResult: DamageCalculationResult // ダメージ計算結果
-  settings: {
-    baseStats: BaseStats              // 基本ステータス
-    mainWeapon: MainWeapon            // メイン武器
-    subWeapon: SubWeapon              // サブ武器
-    equipment: EquipmentSlots         // 装備
-    crystals: CrystalSlots            // クリスタル
-    food: FoodFormData                // 料理
-    buffSkills: BuffSkillFormData     // バフスキル
-    buffItems: BuffItemFormData       // バフアイテム
-    register: RegisterFormData        // レジスタ
-    enemy: EnemyFormData              // 敵情報
-  }
+  capturedAt: string                   // キャプチャ時刻（内部管理用）
 }
 
 // LocalStorageキー（全セーブデータ共通）
@@ -116,10 +97,10 @@ const DAMAGE_CAPTURE_KEY = 'damageCaptureData'
 - **アイコン**: カメラアイコン
 - **状態**: 通常・ホバー・無効化
 
-### キャプチャ情報
-- **設定名**: インライン編集可能
-- **作成日時**: 読み取り専用
-- **操作**: クリアボタンでキャプチャデータを削除
+### キャプチャデータ表示
+- **ダメージ値**: 最小・最大・平均ダメージ
+- **安定率**: 各ダメージに対応する安定率
+- **比較表示**: 現在の計算結果との差分
 
 ## アニメーション・UX仕様
 
@@ -271,7 +252,7 @@ export const clearCaptureData = (): void => {
 - **スコープ**: 全セーブデータ共通（ユーザー全体で1つ）
 - **保存件数**: 1件のみ（最新のキャプチャで上書き）
 - **データ利用**: どのセーブデータからでもアクセス可能
-- **設定名編集**: リアルタイムでLocalStorageに反映
+- **保存内容**: ダメージ値と安定率のみ（シンプルな比較用データ）
 
 ## 更新履歴
 
