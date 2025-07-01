@@ -115,6 +115,8 @@ export default function StackCountModal({
 								? 'カウント数設定'
 								: skill.id === 'sm1'
 								? '消費鬼力数設定'
+								: skill.id === 'mg2'
+								? 'MP回復量設定'
 								: '重ねがけ数設定'
 						}
 					</h2>
@@ -134,10 +136,15 @@ export default function StackCountModal({
 							? 'カウント数を入力して下さい。'
 							: skill.id === 'sm1' 
 							? '消費鬼力数を入力してください。'
+							: skill.id === 'mg2'
+							? 'MP回復量を入力してください。'
 							: '重ねがけ数を入力して下さい。'
 						}
 						<br />
-						※スキルレベルは10固定です。
+						{skill.id === 'mg2' 
+							? `(${currentState.stackCount || 15}→回復量${(currentState.stackCount || 15) * 100})`
+							: '※スキルレベルは10固定です。'
+						}
 					</div>
 
 					{/* 重ねがけ数調整ボタン */}
