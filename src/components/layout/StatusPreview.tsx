@@ -174,6 +174,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 		// TODO: 将来的にバフスキル効果もここに統合
 
+		// 料理の効果をデバッグ
+		console.log('料理データソースデバッグ:', {
+			rawFoodData: data.food,
+			foodBonuses: foodBonuses,
+			foodAggroValue: foodBonuses.Aggro || 0,
+		})
+
 		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
 		console.log('ステータスデバッグ:', {
 			attackMP: {
@@ -384,6 +391,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		data.subWeapon,
 		data.equipment.body,
 		data.register, // レジスタデータを依存関係に追加
+		data.food, // 料理データを依存関係に追加（デバッグログ用）
 	])
 
 	const {
@@ -424,28 +432,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
 	)
 
-	// デバッグ: equipmentBonus1の各プロパティを確認
-	console.log('equipmentBonus1 プロパティ:', {
-		attackMPRecovery: equipmentBonus1.attackMPRecovery,
-		attackMPRecovery_Rate: equipmentBonus1.attackMPRecovery_Rate,
-		physicalResistance: equipmentBonus1.physicalResistance,
-		physicalResistance_Rate: equipmentBonus1.physicalResistance_Rate,
-		magicalResistance: equipmentBonus1.magicalResistance,
-		magicalResistance_Rate: equipmentBonus1.magicalResistance_Rate,
-		ailmentResistance: equipmentBonus1.ailmentResistance,
-		ailmentResistance_Rate: equipmentBonus1.ailmentResistance_Rate,
-		aggroPlus: equipmentBonus1.aggroPlus,
-		aggroPlus_Rate: equipmentBonus1.aggroPlus_Rate,
-		aggroMinus: equipmentBonus1.aggroMinus,
-		aggroMinus_Rate: equipmentBonus1.aggroMinus_Rate,
-		relevantKeys: Object.keys(equipmentBonus1).filter(
-			(key) =>
-				key.includes('Resistance') ||
-				key.includes('resistance') ||
-				key.includes('attackMP') ||
-				key.includes('aggro'),
-		),
-	})
 
 	// デバッグ: equipmentBonus3の全プロパティを確認
 	console.log('equipmentBonus3 プロパティ:', {
@@ -692,7 +678,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					{visibleSections.equipmentBonus1 && (
 						<StatSection
 							title="装備品補正値1"
-							stats={equipmentBonus1}
+							stats={{
+								...equipmentBonus1,
+							}}
 							labels={{
 								ATK: 'ATK',
 								physicalPenetration: '物理貫通',
@@ -759,6 +747,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								'magicalResistance',
 								'aggroPlus',
 								'aggroMinus',
+								'',
 							]}
 							propertyConfigs={{
 								ATK: { hasRate: true, hasFixed: true },
@@ -789,8 +778,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								ailmentResistance: { hasRate: true, hasFixed: false },
 								physicalResistance: { hasRate: true, hasFixed: false },
 								magicalResistance: { hasRate: true, hasFixed: false },
-								aggroPlus: { hasRate: true, hasFixed: false },
-								aggroMinus: { hasRate: true, hasFixed: false },
+								aggroPlus: { hasRate: true, hasFixed: true },
+								aggroMinus: { hasRate: true, hasFixed: true },
 							}}
 							className=""
 						/>

@@ -214,14 +214,26 @@ export function getFoodBonuses(foodData: any): Partial<AllBonuses> {
 				foodEffect.propertyType,
 			)
 
-			// プロパティ名を正規化
-			const normalizedKey = normalizePropertyKey(foodEffect.propertyType)
-			const key = foodEffect.isPercentage
-				? `${normalizedKey}_Rate`
-				: normalizedKey
+			// Aggro値の特殊処理（料理の aggroPlus/aggroMinus → Aggro統合）
+			if (foodEffect.propertyType === 'aggroPlus' || foodEffect.propertyType === 'aggroMinus') {
+				const normalizedKey = 'Aggro'
+				const previousValue = bonuses[normalizedKey as keyof AllBonuses] || 0
+				const adjustedValue =
+					foodEffect.propertyType === 'aggroMinus'
+						? -Math.abs(validatedValue)
+						: validatedValue
+				bonuses[normalizedKey as keyof AllBonuses] =
+					previousValue + adjustedValue
+			} else {
+				// プロパティ名を正規化
+				const normalizedKey = normalizePropertyKey(foodEffect.propertyType)
+				const key = foodEffect.isPercentage
+					? `${normalizedKey}_Rate`
+					: normalizedKey
 
-			bonuses[key as keyof AllBonuses] =
-				(bonuses[key as keyof AllBonuses] || 0) + validatedValue
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + validatedValue
+			}
 		}
 
 		return bonuses
