@@ -8,7 +8,34 @@ export interface BuffSkillState {
 	isEnabled: boolean // オン/オフ状態
 	level?: number // スキルレベル（1-10, 1-15, 1-100等）
 	stackCount?: number // 重ねがけ数（×3, ×10, ×15等）
+	multiParam1?: number // multiParamタイプ用（パラメータ1）
+	multiParam2?: number // multiParamタイプ用（パラメータ2）
+	multiParam3?: number // multiParamタイプ用（パラメータ3）
 	specialParam?: number // 特殊パラメータ（プレイヤー数、精錬値等）
+}
+
+export interface MultiParamConfig {
+	param1: {
+		name: string // パラメータ名（例: "スキルレベル"）
+		min: number // 最小値
+		max: number // 最大値
+		default: number // デフォルト値
+		unit?: string // 単位（例: "Lv", "個", "pt"）
+	}
+	param2?: {
+		name: string
+		min: number
+		max: number
+		default: number
+		unit?: string
+	}
+	param3?: {
+		name: string
+		min: number
+		max: number
+		default: number
+		unit?: string
+	}
 }
 
 export interface BuffSkillDefinition {
@@ -20,6 +47,7 @@ export interface BuffSkillDefinition {
 	categoryOrder?: number // カテゴリ内順序番号（省略時はorder使用）
 	maxLevel?: number // 最大レベル（デフォルト10）
 	maxStack?: number // 最大重ねがけ数
+	multiParams?: MultiParamConfig // multiParamタイプ用
 	description?: string // 説明文
 	requirements?: WeaponRequirement[] // 武器要件
 }
@@ -28,6 +56,7 @@ export type BuffSkillType =
 	| 'toggle' // ON/OFF切り替えのみ
 	| 'level' // レベル設定（1-10等）
 	| 'stack' // 重ねがけ設定（×3, ×10等）
+	| 'multiParam' // 複数パラメータ設定（キャストマスタリ、セイバーオーラ等）
 	| 'special' // 特殊パラメータ付き
 
 export type BuffSkillCategory =
@@ -93,16 +122,16 @@ export const CATEGORY_ORDER_RANGES = {
 	mastery: 100, // 100-199: マスタリスキル
 	blade: 200, // 200-299: ブレードスキル
 	shoot: 300, // 300-399: シュートスキル
-	martial: 400, // 400-499: マーシャルスキル
-	halberd: 500, // 500-599: ハルバードスキル
-	mononofu: 600, // 600-699: モノノフスキル
-	dualSword: 700, // 700-799: デュアルソードスキル
-	crusher: 800, // 800-899: クラッシャースキル
-	sprite: 900, // 900-999: スプライトスキル
-	magicBlade: 1000, // 1000-1099: マジックブレードスキル
-	priest: 1100, // 1100-1199: プリーストスキル
-	wizard: 1200, // 1200-1299: ウィザードスキル
-	magic: 1300, // 1300-1399: マジックスキル
+	magic: 400, // 400-499: マジックスキル
+	martial: 500, // 500-599: マーシャルスキル
+	halberd: 600, // 600-699: ハルバードスキル
+	mononofu: 700, // 700-799: モノノフスキル
+	dualSword: 800, // 800-899: デュアルソードスキル
+	crusher: 900, // 900-999: クラッシャースキル
+	sprite: 1000, // 1000-1099: スプライトスキル
+	magicBlade: 1100, // 1100-1199: マジックブレードスキル
+	priest: 1200, // 1200-1299: プリーストスキル
+	wizard: 1300, // 1300-1399: ウィザードスキル
 	darkPower: 1400, // 1400-1499: ダークパワースキル
 	shield: 1500, // 1500-1599: シールドスキル
 	knight: 1600, // 1600-1699: ナイトスキル

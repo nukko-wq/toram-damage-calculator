@@ -1,5 +1,11 @@
 // バフスキル関連のユーティリティ関数
 
+import {
+	COMMON_BUFF_SKILLS,
+	NEARLY_COMMON_SKILLS,
+	WEAPON_SPECIFIC_SKILLS,
+	SUB_WEAPON_SKILLS,
+} from '@/data/buffSkills'
 import type {
 	BuffSkillDefinition,
 	BuffSkillState,
@@ -8,14 +14,7 @@ import type {
 	SubWeaponType,
 	WeaponRequirement,
 	BuffSkillCategory,
-	BuffSkillType,
 } from '@/types/buffSkill'
-import {
-	COMMON_BUFF_SKILLS,
-	NEARLY_COMMON_SKILLS,
-	WEAPON_SPECIFIC_SKILLS,
-	SUB_WEAPON_SKILLS,
-} from '@/data/buffSkills'
 import { CATEGORY_ORDER_RANGES } from '@/types/buffSkill'
 
 // 武器組み合わせに応じた利用可能スキルを取得
@@ -209,11 +208,24 @@ export function getDefaultSkillStates(
 	const states: Record<string, BuffSkillState> = {}
 
 	for (const skill of skills) {
-		states[skill.id] = {
-			isEnabled: false,
-			level: skill.type === 'level' ? 1 : undefined,
-			stackCount: skill.type === 'stack' ? 1 : undefined,
-			specialParam: skill.type === 'special' ? 0 : undefined,
+		// 特別なデフォルト値
+		const defaultStackCount = skill.id === 'mg2' ? 15 : 1
+		
+		if (skill.type === 'multiParam' && skill.multiParams) {
+			states[skill.id] = {
+				isEnabled: false,
+				level: skill.multiParams.param1.default,
+				multiParam1: skill.multiParams.param1.default,
+				multiParam2: skill.multiParams.param2?.default,
+				multiParam3: skill.multiParams.param3?.default,
+			}
+		} else {
+			states[skill.id] = {
+				isEnabled: false,
+				level: skill.type === 'level' ? 10 : undefined,
+				stackCount: skill.type === 'stack' ? defaultStackCount : undefined,
+				specialParam: skill.type === 'special' ? 0 : undefined,
+			}
 		}
 	}
 
@@ -295,36 +307,6 @@ export function validateSkillState(
 	return true
 }
 
-// 入力補助テキスト関連の関数
-
-// スキルタイプに対応するデフォルト入力補助テキストを取得
-export function getDefaultInputHint(skillType: BuffSkillType): string {
-	switch (skillType) {
-		case 'level':
-			return 'スキルレベルを入力してください'
-		case 'stack':
-			return '重ね掛け回数を選択してください'
-		case 'special':
-			return '値を入力してください'
-		default:
-			return ''
-	}
-}
-
-// カスタム入力補助テキスト（特殊ケースのみ）
-const CUSTOM_SKILL_INPUT_HINTS: Record<string, string> = {
-	// 特殊パラメータ系で具体的な説明が必要なもののみ
-	ogre_slash: '消費鬼力数を入力してください',
-	brave: '対象プレイヤー数を入力してください',
-	knight_pledge: '精錬値を入力してください',
-	eternal_nightmare: '消費MP数を入力してください',
-}
-
-// スキルの入力補助テキストを取得（カスタム設定 || デフォルト）
-export function getInputHint(skill: BuffSkillDefinition): string {
-	// カスタム設定があればそれを使用、なければデフォルト
-	return CUSTOM_SKILL_INPUT_HINTS[skill.id] || getDefaultInputHint(skill.type)
-}
 
 // モーダル表示判定
 export function shouldShowModal(skill: BuffSkillDefinition): boolean {
@@ -333,8 +315,8 @@ export function shouldShowModal(skill: BuffSkillDefinition): boolean {
 		return false
 	}
 	
-	// level, stack, specialタイプはモーダル表示
-	return ['level', 'stack', 'special'].includes(skill.type)
+	// level, stack, multiParam, specialタイプはモーダル表示
+	return ['level', 'stack', 'multiParam', 'special'].includes(skill.type)
 }
 
 // スキル名のクリック可能性を示すCSSクラス名を取得

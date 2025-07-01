@@ -7,6 +7,8 @@ import { shouldShowModal, getSkillNameClassName } from '@/utils/buffSkillUtils'
 import { useCalculatorStore } from '@/stores'
 import SkillToggleButton from './SkillToggleButton'
 import SkillParameterModal from './SkillParameterModal'
+import StackCountModal from './StackCountModal'
+import MultiParamModal from './MultiParamModal'
 
 interface SkillCardProps {
 	skill: BuffSkillDefinition
@@ -19,12 +21,17 @@ export default function SkillCard({
 	const categoryLabel = CATEGORY_LABELS[skill.category]
 	
 	// Zustandから現在の状態を取得（メモ化）
-	const defaultState = useMemo(() => ({
-		isEnabled: false,
-		level: 10,
-		stackCount: 1,
-		specialParam: 0
-	}), [])
+	const defaultState = useMemo(() => {
+		// 特別なデフォルト値
+		const defaultStackCount = skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1
+		
+		return {
+			isEnabled: false,
+			level: 10,
+			stackCount: defaultStackCount,
+			specialParam: 0
+		}
+	}, [skill.id])
 
 	const currentState = useCalculatorStore(useCallback(state => {
 		const buffSkillsData = state.data.buffSkills.skills
@@ -67,16 +74,16 @@ export default function SkillCard({
 
 		switch (skill.type) {
 			case 'level':
-				if (level && level > 1) {
-					return `${skill.name}/${level}`
-				}
-				return skill.name
+				return `${skill.name}/${level || 1}`
 
 			case 'stack':
-				if (stackCount && stackCount > 1) {
-					return `${skill.name}×${stackCount}`
+				return `${skill.name}×${stackCount || 1}`
+
+			case 'multiParam':
+				if (skill.id === 'IsBrave') {
+					return `${skill.name}/${(level || 2) === 1 ? '使用者' : '使用者以外'}`
 				}
-				return skill.name
+				return `${skill.name}/${level || 1}`
 
 			default:
 				return skill.name
@@ -120,12 +127,26 @@ export default function SkillCard({
 			</div>
 
 
-			{/* モーダル */}
-			<SkillParameterModal
-				skill={skill}
-				isOpen={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
-			/>
+			{/* モーダル - スキル専用またはデフォルト */}
+			{skill.type === 'stack' ? (
+				<StackCountModal
+					skill={skill}
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+				/>
+			) : skill.type === 'multiParam' ? (
+				<MultiParamModal
+					skill={skill}
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+				/>
+			) : (
+				<SkillParameterModal
+					skill={skill}
+					isOpen={isModalOpen}
+					onClose={() => setIsModalOpen(false)}
+				/>
+			)}
 		</div>
 	)
 }
