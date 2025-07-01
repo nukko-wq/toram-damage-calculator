@@ -46,7 +46,7 @@ The application consists of interconnected forms that feed into a damage calcula
 
 ### Simplified Data System
 - **Two-Tier Architecture**: Preset TypeScript → User Custom (LocalStorage)
-- **Preset Data**: TypeScript files (`src/data/crystals.ts`, `equipments.ts`, `enemies.ts`, `buffItems.ts`)
+- **Preset Data**: TypeScript files (`src/data/crystals.ts`, `equipments.ts`, `enemies.ts`, `buffItems.ts`, `buffSkills.ts`)
 - **User Custom Data**: LocalStorage with CRUD operations, timestamps, and export/import
 - **Data Access Layer**: Unified APIs in `*Database.ts` files merge all data sources
 - **Type Safety**: Full TypeScript integration with compile-time validation
@@ -90,7 +90,7 @@ Equipment supports 70+ properties including:
 
 ## Key Files and Structure
 - `src/types/calculator.ts`: Central type definitions for all game data
-- `src/data/*.json`: Preset game data (crystals, equipment, buffItems, enemies)
+- `src/data/*.ts`: Preset game data (crystals, equipment, buffItems, enemies, buffSkills)
 - `src/utils/*Database.ts`: Data access layer merging preset and user data
 - `src/schemas/`: Zod validation schemas for all forms
 - `src/stores/`: Zustand stores (calculator, saveData, ui)
