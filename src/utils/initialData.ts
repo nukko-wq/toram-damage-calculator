@@ -359,6 +359,13 @@ export const migrateRegisterEffects = (existingData: RegisterFormData): Register
 	return { effects: migratedEffects }
 }
 
+// 攻撃スキル初期データ作成
+export const createInitialAttackSkillFormData = (): import('@/types/calculator').AttackSkillFormData => ({
+	selectedSkillId: null,
+	calculatedData: null,
+	lastCalculatedAt: undefined,
+})
+
 export const createInitialCalculatorData = (): CalculatorData => ({
 	baseStats: createInitialBaseStats(),
 	mainWeapon: createInitialMainWeapon(),
@@ -370,4 +377,5 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	buffSkills: getDefaultBuffSkillFormData(), // バフスキルシステム
 	buffItems: getDefaultBuffItems(), // バフアイテムシステム
 	register: createInitialRegisterFormData(), // レジスタ他システム
+	attackSkill: createInitialAttackSkillFormData(), // 攻撃スキルシステム
 })

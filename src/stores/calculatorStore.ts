@@ -254,6 +254,11 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				}, 'updateEnemy')
 			},
 
+			updateAttackSkill: (attackSkill) => {
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ attackSkill }, 'updateAttackSkill')
+			},
+
 			updateBuffSkills: (buffSkills) => {
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
 				dataUpdate({ buffSkills }, 'updateBuffSkills')
