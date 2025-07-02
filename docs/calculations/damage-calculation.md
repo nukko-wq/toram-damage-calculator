@@ -261,7 +261,12 @@ export interface DamageCalculationInput {
   enemy: {
     DEF: number
     MDEF: number
+    level: number
+    category: 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
+    difficulty?: 'normal' | 'hard' | 'lunatic' | 'ultimate' // boss カテゴリのみ
+    raidBossLevel?: number // raidBoss カテゴリのみ
     hasDestruction: boolean // 破壊状態異常
+    guaranteedCritical: number // 確定クリティカル (0-999)
   }
   
   // 貫通・固定値
@@ -300,7 +305,7 @@ export interface DamageCalculationInput {
   // UI制御値
   userSettings: {
     familiarity: number // 慣れ(50-250%)
-    currentDistance: 'short' | 'long' // 現在の距離判定
+    currentDistance: 'short' | 'long' | 'disabled' // 現在の距離判定
   }
   
   // バフスキル情報（エターナルナイトメア用）
@@ -484,8 +489,11 @@ function processEnemyDefense(defense: number, input: DamageCalculationInput): nu
     processed = Math.ceil(processed / 2)
   }
   
-  // 2. エターナルナイトメア減算（未実装）
-  // TODO: エターナルナイトメアの実装
+  // 2. エターナルナイトメア減算
+  if (input.buffSkills.eternalNightmare.isEnabled) {
+    const eternalReduction = input.buffSkills.eternalNightmare.level * input.buffSkills.totalDarkPowerLevel * 0.5
+    processed = Math.max(0, processed - eternalReduction)
+  }
   
   // 3. 貫通による低下（小数点以下切り捨て）
   const penetration = input.attackSkill.type === 'physical' 
@@ -509,9 +517,12 @@ function processEnemyDefense(defense: number, input: DamageCalculationInput): nu
 
 ### フェーズ2: UI連携（優先度: 中）
 - [ ] DamagePreview.tsxとの連携
+- [ ] 敵カテゴリ別UI表示（ボス難易度選択、レイドボスレベル調整）
 - [ ] 属性攻撃有効/無効の選択
 - [ ] 慣れスライダー（50-250%）
+- [ ] 距離判定選択（近距離/遠距離/無効）
 - [ ] コンボ強打有効/無効の選択
+- [ ] 確定クリティカル設定（0-999）
 
 ### フェーズ3: 高度な機能（優先度: 低）
 - [ ] パッシブ倍率システム
@@ -579,8 +590,55 @@ function processEnemyDefense(defense: number, input: DamageCalculationInput): nu
 | 日付 | 更新内容 | 備考 |
 |------|----------|------|
 | 2025-07-02 | ダメージ計算式設計書を完全リライト | トーラムオンラインの正確な計算式に基づく全面刷新 |
+| 2025-07-02 | 敵情報システム対応を追加 | ボス難易度、レイドボスレベル調整、確定クリティカル機能 |
+
+## 敵情報システム連携
+
+### ボス難易度システム
+**適用対象**: `boss` カテゴリのみ
+
+```typescript
+// ボス難易度別ステータス調整
+function adjustBossStats(baseStats: EnemyStats, difficulty: BossDifficulty) {
+  const levelBonus = getDifficultyLevelBonus(difficulty) // normal:0, hard:10, lunatic:20, ultimate:40
+  const defMultiplier = getDifficultyDefMultiplier(difficulty) // normal:1, hard:2, lunatic:4, ultimate:6
+  
+  return {
+    level: baseStats.level + levelBonus,
+    DEF: Math.floor(baseStats.DEF * defMultiplier),
+    MDEF: Math.floor(baseStats.MDEF * defMultiplier),
+    // 耐性は変更なし
+    physicalResistance: baseStats.physicalResistance,
+    magicalResistance: baseStats.magicalResistance
+  }
+}
+```
+
+### レイドボス レベル調整システム
+**適用対象**: `raidBoss` カテゴリのみ
+
+```typescript
+// レイドボス別計算式
+function calculateRaidBossStats(raidBossId: string, level: number): EnemyStats {
+  switch (raidBossId) {
+    case 'ca10a211-71b5-4683-811e-3e09457edbe3': // 竜骨の魔人
+      return {
+        DEF: Math.floor(level * 3 / 4),
+        MDEF: Math.floor(level * 3 / 2),
+        physicalResistance: Math.floor(level / 10),
+        magicalResistance: Math.floor(25 + level / 10),
+        // ...他のステータス
+      }
+    // 他のレイドボスも同様
+  }
+}
+```
+
+### 確定クリティカル
+全敵カテゴリで設定可能（0-999）。ボスの状態やゲージに応じてユーザーが調整。
 
 ## 関連ドキュメント
 - [DamagePreview UI設計書](../ui/damage-preview.md) - UI表示の詳細仕様
 - [基本ステータス計算式](./basic-stats.md) - 基盤となる計算式
 - [装備品補正値計算](./equipment-bonuses.md) - 補正値計算の詳細
+- [敵情報データベース設計](../database/enemy.md) - 敵情報システムの詳細
