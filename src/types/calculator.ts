@@ -298,13 +298,16 @@ export interface CrystalSlots {
 // 敵のカテゴリ
 export type EnemyCategory = 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
 
+// ボス戦難易度
+export type BossDifficulty = 'normal' | 'hard' | 'lunatic' | 'ultimate'
+
 // 敵の基本ステータス
 export interface EnemyStats {
 	DEF: number // 物理防御力 (0-9999)
 	MDEF: number // 魔法防御力 (0-9999)
 	physicalResistance: number // 物理耐性% (-100-100)
 	magicalResistance: number // 魔法耐性% (-100-100)
-	resistCritical: number // クリティカル耐性 (0-999) ※プリセットでは0、ユーザーが調整可能
+	resistCritical: number // 確定クリティカル (0-999) ※プリセットでは0、全敵カテゴリでユーザーが調整可能
 	requiredHIT: number // 必要HIT (0-9999) ※プリセットでは0、ユーザーが調整可能
 }
 
@@ -321,10 +324,14 @@ export interface PresetEnemy {
 export interface EnemyFormData {
 	selectedId: string | null // プリセット敵情報ID or カスタム敵情報ID
 	type: 'preset' | 'custom' | null // データソースの識別
-	// 手動入力値（プリセット・カスタム選択後のresistCriticalとrequiredHIT調整用）
+	// ボス難易度設定（boss カテゴリのみ）
+	difficulty?: BossDifficulty
+	// レイドボス レベル調整（raidBoss カテゴリのみ）
+	raidBossLevel?: number
+	// 手動入力値（プリセット・カスタム選択後の調整用）
 	manualOverrides?: {
-		resistCritical?: number // プリセット値(0)からの調整値
-		requiredHIT?: number // プリセット値(0)からの調整値
+		resistCritical?: number // 確定クリティカル調整値
+		requiredHIT?: number // 必要HIT調整値（レイドボス以外 or 赫灼のセルディテのFLEE値）
 	}
 }
 
