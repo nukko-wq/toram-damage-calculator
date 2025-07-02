@@ -1,486 +1,586 @@
-# ダメージ計算ロジック設計書
+# ダメージ計算式設計書
 
 ## 概要
 
-トーラムオンラインのダメージ計算システムを正確に再現するための計算ロジック仕様書。物理・魔法攻撃の基本ダメージから、クリティカル・属性・スキル補正まで包括的にカバーします。
+トーラムオンラインの正確なダメージ計算式を実装するための設計書。複雑な多段階計算と各種補正を正確に再現します。
 
 ## 基本ダメージ計算式
 
-### 物理攻撃ダメージ
+### 完全計算式
 ```
-基本物理ダメージ = INT(ATK × 安定率) - 敵DEF + 物理貫通
-最終ダメージ = INT(基本物理ダメージ × (1 + 物理耐性軽減率))
-```
-
-### 魔法攻撃ダメージ  
-```
-基本魔法ダメージ = INT(MATK × 安定率) - 敵MDEF + 魔法貫通
-最終ダメージ = INT(基本魔法ダメージ × (1 + 魔法耐性軽減率))
+ダメージ = INT(INT(INT(INT(INT(INT(INT(INT((INT((自Lv+参照ステータス-敵Lv)×(1-物魔耐性/100)×(1-武器耐性/100)-計算後敵(M)DEF)+抜刀固定値+スキル固定値)×(1+有利/100))×スキル倍率/100)×(1+抜刀%/100))×慣れ/100)×(1+距離/100))×コンボ/100)×(1+パッシブ倍率/100))×(1+ブレイブ倍率/100))
 ```
 
-## ダメージ計算データ構造
+### 計算ステップ分解
 
-### TypeScript インターフェース
+#### ステップ1: 基礎ダメージ計算
+```
+基礎ダメージ = INT((自Lv + 参照ステータス - 敵Lv) × (1 - 物魔耐性/100) × (1 - 武器耐性/100) - 計算後敵(M)DEF)
+```
+
+#### ステップ2: 固定値加算
+```
+固定値適用後 = INT(基礎ダメージ + 抜刀固定値 + スキル固定値)
+```
+
+#### ステップ3: 属性有利補正
+```
+有利適用後 = INT(固定値適用後 × (1 + 有利/100))
+```
+
+#### ステップ4: スキル倍率補正
+```
+スキル倍率適用後 = INT(有利適用後 × スキル倍率/100)
+```
+
+#### ステップ5: 抜刀%補正
+```
+抜刀%適用後 = INT(スキル倍率適用後 × (1 + 抜刀%/100))
+```
+
+#### ステップ6: 慣れ補正
+```
+慣れ適用後 = INT(抜刀%適用後 × 慣れ/100)
+```
+
+#### ステップ7: 距離補正
+```
+距離適用後 = INT(慣れ適用後 × (1 + 距離/100))
+```
+
+#### ステップ8: コンボ補正
+```
+コンボ適用後 = INT(距離適用後 × コンボ/100)
+```
+
+#### ステップ9: パッシブ倍率補正
+```
+パッシブ適用後 = INT(コンボ適用後 × (1 + パッシブ倍率/100))
+```
+
+#### ステップ10: ブレイブ倍率補正（最終）
+```
+最終ダメージ = INT(パッシブ適用後 × (1 + ブレイブ倍率/100))
+```
+
+## 構成要素詳細
+
+### 基本パラメータ
+
+#### 自Lv
+- **説明**: 基本ステータスのレベル
+- **データソース**: `data.baseStats.level`
+- **値の範囲**: 1-400
+
+#### 参照ステータス
+- **説明**: 攻撃スキルによって決まる参照ステータス
+- **種類**:
+  - **物理スキル**: 基本ステータスの総ATK
+  - **魔法スキル**: 基本ステータスのMATK
+  - **その他**: スキル固有の参照ステータス
+- **データソース**: `basicStats.totalATK` または `basicStats.MATK`
+
+#### 敵Lv
+- **説明**: 敵情報にセットされている敵レベル
+- **データソース**: `data.enemy.level`
+- **値の範囲**: 1-999
+
+### 耐性システム
+
+#### 物魔耐性
+- **物理耐性**: 基本ステータスの物理耐性(%)
+- **魔法耐性**: 基本ステータスの魔法耐性(%)
+- **選択基準**: 使用する攻撃スキルのタイプによって決定
+- **データソース**: `basicStats.physicalResistance` または `basicStats.magicalResistance`
+
+#### 武器耐性
+- **現在の実装**: 考慮しない（値は0）
+- **将来実装**: 敵ごとの武器種別耐性
+- **計算**: `(1 - 武器耐性/100)` ※現在は `(1 - 0/100) = 1`
+
+### 敵防御力システム
+
+#### 計算後敵(M)DEF
+複数の段階的処理を経て最終的な敵防御力を算出：
+
+##### 1. 破壊状態異常による半減
+```typescript
+// 敵が破壊状態異常中の場合
+let processedDEF = enemy.DEF // または enemy.MDEF
+if (enemy.hasDestruction) {
+  processedDEF = Math.ceil(processedDEF / 2) // 小数点以下切り上げ
+}
+```
+**実装状況**: 未実装（状態異常システム未実装）
+
+##### 2. エターナルナイトメア減算
+```typescript
+// バフスキルのエターナルナイトメア使用中
+if (buffSkills.eternalNightmare.isEnabled) {
+  const eternalNightmareReduction = calculateEternalNightmareReduction(
+    buffSkills.eternalNightmare.level,
+    buffSkills.getTotalDarkPowerLevel()
+  )
+  processedDEF = processedDEF - eternalNightmareReduction
+}
+
+function calculateEternalNightmareReduction(
+  eternalNightmareLevel: number,
+  totalDarkPowerLevel: number
+): number {
+  return eternalNightmareLevel * totalDarkPowerLevel * 0.5
+}
+```
+**計算例**: エターナルナイトメアLv10 × ダークパワー合計Lv80 × 0.5 = 400  
+**実装状況**: 仕様確定、実装予定
+
+##### 3. 貫通による低下
+```typescript
+// 物理攻撃の場合は物理貫通、魔法攻撃の場合は魔法貫通
+const penetration = isPhysical ? basicStats.physicalPenetration : basicStats.magicalPenetration
+const finalDEF = Math.floor(Math.max(0, processedDEF - penetration))
+```
+**注意**: ステップ2の処理後の値をもとにステップ3を計算
+
+### 固定値補正
+
+#### 抜刀固定値
+- **説明**: 装備品補正値1の抜刀威力(+)
+- **データソース**: `equipmentBonus1.unsheatheAttack`（固定値）
+- **適用条件**: 抜刀攻撃時のみ
+
+#### スキル固定値
+- **説明**: 攻撃スキルごとに設定される固定ダメージ
+- **データソース**: 攻撃スキルデータの`fixedDamage`プロパティ
+- **値の例**: スキルによって0-1000など
+
+### 倍率補正システム
+
+#### 有利（属性有利）
+```typescript
+const totalAdvantage = basicStats.totalElementAdvantage + elementAwakeningAdvantage
+```
+- **総属性有利**: 基本ステータスの総属性有利
+- **属性覚醒有利**: 25%固定（実装予定）
+- **計算方式**: 加算（総属性有利 + 属性覚醒有利）
+- **選択制御**: DamagePreview.tsxで属性攻撃が有効かどうか選択可能
+
+#### スキル倍率
+- **説明**: 攻撃スキルごとに設定される倍率
+- **データソース**: 攻撃スキルデータの`multiplier`プロパティ
+- **値の例**: 100-500%など（スキルによって異なる）
+
+#### 抜刀%
+- **説明**: 装備品補正値1の抜刀威力(%)
+- **データソース**: `equipmentBonus1.unsheatheAttack_Rate`
+- **適用条件**: 抜刀攻撃時のみ
+
+#### 慣れ
+- **デフォルト値**: 100%
+- **値の範囲**: 50-250%
+- **UI制御**: DamagePreview.tsxでスライダーで調整可能（将来実装）
+
+#### 距離
+- **説明**: 装備品補正値1の近距離威力(%) または 遠距離威力(%)
+- **データソース**: 
+  - 近距離時: `equipmentBonus1.shortRangeDamage_Rate`
+  - 遠距離時: `equipmentBonus1.longRangeDamage_Rate`
+- **適用条件**: 
+  - 攻撃スキルが距離補正に対応している
+  - かつ、ユーザーが選択した距離と一致している
+  - 「無効」選択時は距離補正を適用しない
+- **UI制御**: DamagePreview.tsxで距離判定（近距離/遠距離/無効）を選択可能
+
+#### コンボ
+- **デフォルト値**: 100%
+- **強打有効時**: 150%
+- **UI制御**: DamagePreview.tsxで強打有効/無効を選択可能（将来実装）
+
+#### パッシブ倍率
+**構成スキル**:
+- 匠の剣術
+- ロングレンジ（攻撃スキルによって有効/無効）
+- 体術鍛錬
+- 強打（バフスキルの強打、コンボの強打とは別）
+- 集中
+
+**計算方式**: 複数バフ有効時は加算してから適用（要検証）
+```typescript
+const passiveMultiplier = buffEffect1 + buffEffect2 + buffEffect3 + ...
+// 例: 匠の剣術10% + 体術鍛錬15% = 25%として適用
+```
+
+**実装状況**: 仕様確定、実装予定
+
+#### ブレイブ倍率
+**構成スキル**:
+1. ブレイブオーラ
+2. マナリチャージ
+3. 獅子奮闘・極
+4. オーラブレード
+5. アシュラオーラ
+6. エンハンス
+
+**計算方式**: 複数バフ有効時は加算してから適用（要検証）
+```typescript
+const braveMultiplier = braveAura + manaRecharge + lionFury + ...
+// 例: ブレイブオーラ20% + マナリチャージ15% = 35%として適用
+```
+
+**実装状況**: 仕様確定、実装予定
+
+## TypeScript実装インターフェース
+
+### 基本データ構造
 
 ```typescript
 // ダメージ計算の入力データ
-interface DamageCalculationInput {
-  // 攻撃者ステータス
-  attacker: {
-    ATK: number                    // 最終ATK
-    MATK: number                   // 最終MATK
-    stability: number              // 安定率(%)
-    criticalRate: number           // クリティカル率
-    criticalDamage: number         // クリティカルダメージ
-    physicalPenetration: number    // 物理貫通
-    magicalPenetration: number     // 魔法貫通
-    elementAdvantage: number       // 属性有利
-    weaponATK: number             // 武器ATK
-    unsheatheAttack: number       // 抜刀威力
-    shortRangeDamage: number      // 近距離威力
-    longRangeDamage: number       // 遠距離威力
+export interface DamageCalculationInput {
+  // 基本情報
+  playerLevel: number
+  enemyLevel: number
+  referenceStatType: 'totalATK' | 'MATK' | 'custom'
+  referenceStat: number
+  
+  // 攻撃スキル情報
+  attackSkill: {
+    type: 'physical' | 'magical'
+    multiplier: number // スキル倍率(%)
+    fixedDamage: number // スキル固定値
+    supportedDistances: ('short' | 'long')[] // 対応距離（距離補正有効な距離）
+    canUseLongRange: boolean // ロングレンジバフの適用可否
   }
   
-  // 防御者（敵）ステータス
-  defender: {
-    DEF: number                   // 物理防御力
-    MDEF: number                  // 魔法防御力
-    physicalResistance: number    // 物理耐性(%)
-    magicalResistance: number     // 魔法耐性(%)
-    resistCritical: number        // クリティカル耐性
+  // 耐性・防御力
+  resistance: {
+    physical: number // 物理耐性(%)
+    magical: number // 魔法耐性(%)
+    weapon: number // 武器耐性(%) ※現在は0固定
   }
   
-  // 攻撃設定
-  attackType: 'physical' | 'magical'  // 攻撃タイプ
-  attackRange: 'short' | 'long'       // 攻撃距離
-  isUnsheathe: boolean                 // 抜刀攻撃フラグ
-  skillMultiplier?: number             // スキル倍率
+  enemy: {
+    DEF: number
+    MDEF: number
+    hasDestruction: boolean // 破壊状態異常
+  }
+  
+  // 貫通・固定値
+  penetration: {
+    physical: number // 物理貫通
+    magical: number // 魔法貫通
+  }
+  
+  unsheathe: {
+    fixedDamage: number // 抜刀固定値
+    rateBonus: number // 抜刀%(%)
+    isActive: boolean // 抜刀攻撃かどうか
+  }
+  
+  // 属性・距離・コンボ
+  elementAdvantage: {
+    total: number // 総属性有利(%)
+    awakening: number // 属性覚醒有利(%)
+    isActive: boolean // 属性攻撃有効かどうか
+  }
+  
+  distance: {
+    shortRange: number // 近距離威力(%)
+    longRange: number // 遠距離威力(%)
+  }
+  
+  combo: {
+    isActive: boolean // コンボ強打有効
+    multiplier: number // コンボ倍率（150%など）
+  }
+  
+  // バフ倍率
+  passiveMultiplier: number // パッシブ倍率の合計(%)
+  braveMultiplier: number // ブレイブ倍率の合計(%)
+  
+  // UI制御値
+  userSettings: {
+    familiarity: number // 慣れ(50-250%)
+    currentDistance: 'short' | 'long' // 現在の距離判定
+  }
+  
+  // バフスキル情報（エターナルナイトメア用）
+  buffSkills: {
+    eternalNightmare: {
+      isEnabled: boolean
+      level: number // 1-10
+    }
+    totalDarkPowerLevel: number // ダークパワースキル合計レベル
+  }
 }
 
 // ダメージ計算の出力結果
-interface DamageCalculationResult {
-  minimum: DamageValues    // 最小ダメージ（安定率最小時）
-  maximum: DamageValues    // 最大ダメージ（安定率最大時）
-  average: DamageValues    // 平均ダメージ
-  calculationSteps: CalculationSteps // 計算過程の詳細
+export interface DamageCalculationResult {
+  finalDamage: number
+  calculationSteps: DamageCalculationSteps
 }
 
-interface DamageValues {
-  damage: number          // ダメージ値
-  stability: number       // 安定率(%)
-  isCritical: boolean    // クリティカル判定
-}
-
-interface CalculationSteps {
-  baseATK: number                    // 基礎ATK
-  stabilityMultiplier: number        // 安定率乗数
-  stabilizedATK: number             // 安定率適用後ATK
-  defenseReduction: number          // 防御力減算
-  penetrationBonus: number          // 貫通ボーナス
-  baseDamage: number               // 基本ダメージ
-  rangeMultiplier: number          // 距離補正
-  unsheatheMultiplier: number      // 抜刀補正
-  skillMultiplier: number          // スキル補正
-  elementMultiplier: number        // 属性補正
-  criticalMultiplier: number       // クリティカル補正
-  resistanceMultiplier: number     // 耐性補正
-  finalDamage: number             // 最終ダメージ
-}
-```
-
-## 安定率システム
-
-### 安定率の計算範囲
-```typescript
-interface StabilityRange {
-  minimum: number    // 最小安定率（装備安定率の値）
-  maximum: number    // 最大安定率（常に100%）
-  average: number    // 平均安定率（(最小+最大)/2）
-}
-
-const calculateStabilityRange = (equipmentStability: number): StabilityRange => {
-  const minimum = Math.max(0, Math.min(100, equipmentStability))
-  const maximum = 100
-  const average = (minimum + maximum) / 2
+// 計算過程の詳細
+export interface DamageCalculationSteps {
+  // ステップ1: 基礎ダメージ
+  step1_baseDamage: {
+    playerLevel: number
+    referenceStat: number
+    enemyLevel: number
+    beforeResistance: number // (自Lv + 参照ステータス - 敵Lv)
+    physicalResistanceRate: number
+    magicalResistanceRate: number
+    weaponResistanceRate: number
+    afterResistance: number
+    enemyDEF: number
+    result: number
+  }
   
-  return { minimum, maximum, average }
-}
-```
-
-### 安定率適用計算
-```typescript
-const applyStability = (baseATK: number, stabilityPercent: number): number => {
-  return Math.floor(baseATK * (stabilityPercent / 100))
-}
-```
-
-## クリティカル計算
-
-### クリティカル判定
-```typescript
-const calculateCriticalHit = (
-  criticalRate: number,
-  resistCritical: number
-): boolean => {
-  const effectiveCriticalRate = Math.max(0, criticalRate - resistCritical)
-  return Math.random() * 100 < effectiveCriticalRate
-}
-```
-
-### クリティカルダメージ補正
-```typescript
-const applyCriticalDamage = (
-  baseDamage: number,
-  criticalDamage: number,
-  isCritical: boolean
-): number => {
-  if (!isCritical) return baseDamage
-  return Math.floor(baseDamage * (1 + criticalDamage / 100))
-}
-```
-
-## 距離・威力補正
-
-### 距離補正システム
-```typescript
-interface RangeModifier {
-  short: number      // 近距離補正(%)
-  long: number       // 遠距離補正(%)
-}
-
-const applyRangeModifier = (
-  baseDamage: number,
-  range: 'short' | 'long',
-  modifiers: RangeModifier
-): number => {
-  const modifier = range === 'short' ? modifiers.short : modifiers.long
-  return Math.floor(baseDamage * (1 + modifier / 100))
-}
-```
-
-### 抜刀威力補正
-```typescript
-const applyUnsheatheModifier = (
-  baseDamage: number,
-  unsheatheAttack: number,
-  isUnsheathe: boolean
-): number => {
-  if (!isUnsheathe) return baseDamage
-  return Math.floor(baseDamage * (1 + unsheatheAttack / 100))
-}
-```
-
-## 属性システム
-
-### 属性有利計算
-```typescript
-interface ElementAdvantage {
-  totalAdvantage: number      // 総属性有利(%)
-  elementPower: number        // 属性威力
-  awakeningBonus: number      // 属性覚醒ボーナス
-}
-
-const applyElementAdvantage = (
-  baseDamage: number,
-  elementAdvantage: ElementAdvantage
-): number => {
-  const totalBonus = elementAdvantage.totalAdvantage + 
-                    elementAdvantage.elementPower + 
-                    elementAdvantage.awakeningBonus
-  return Math.floor(baseDamage * (1 + totalBonus / 100))
-}
-```
-
-## 防御・耐性システム
-
-### 防御力計算
-```typescript
-const applyDefense = (
-  damage: number,
-  defense: number,
-  penetration: number
-): number => {
-  const effectiveDefense = Math.max(0, defense - penetration)
-  return Math.max(1, damage - effectiveDefense)  // 最低1ダメージ保証
-}
-```
-
-### 耐性計算
-```typescript
-const applyResistance = (
-  damage: number,
-  resistancePercent: number
-): number => {
-  const resistanceMultiplier = 1 - (resistancePercent / 100)
-  return Math.floor(damage * Math.max(0, resistanceMultiplier))
-}
-```
-
-## メイン計算エンジン
-
-### 総合ダメージ計算関数
-```typescript
-export const calculateDamage = (
-  input: DamageCalculationInput
-): DamageCalculationResult => {
-  const stabilityRange = calculateStabilityRange(input.attacker.stability)
+  // ステップ2: 固定値加算
+  step2_fixedValues: {
+    baseDamage: number
+    unsheatheFixed: number
+    skillFixed: number
+    result: number
+  }
   
-  // 最小・最大・平均の3パターンを計算
-  const results = [
-    { stability: stabilityRange.minimum, type: 'minimum' },
-    { stability: stabilityRange.maximum, type: 'maximum' },
-    { stability: stabilityRange.average, type: 'average' }
-  ].map(({ stability, type }) => {
-    return calculateSingleDamage(input, stability, type)
-  })
+  // ステップ3: 属性有利
+  step3_elementAdvantage: {
+    beforeAdvantage: number
+    advantageRate: number
+    result: number
+  }
+  
+  // ステップ4: スキル倍率
+  step4_skillMultiplier: {
+    beforeSkill: number
+    skillRate: number
+    result: number
+  }
+  
+  // ステップ5: 抜刀%
+  step5_unsheatheRate: {
+    beforeUnsheathe: number
+    unsheatheRate: number
+    result: number
+  }
+  
+  // ステップ6: 慣れ
+  step6_familiarity: {
+    beforeFamiliarity: number
+    familiarityRate: number
+    result: number
+  }
+  
+  // ステップ7: 距離
+  step7_distance: {
+    beforeDistance: number
+    distanceRate: number
+    result: number
+  }
+  
+  // ステップ8: コンボ
+  step8_combo: {
+    beforeCombo: number
+    comboRate: number
+    result: number
+  }
+  
+  // ステップ9: パッシブ倍率
+  step9_passive: {
+    beforePassive: number
+    passiveRate: number
+    result: number
+  }
+  
+  // ステップ10: ブレイブ倍率
+  step10_brave: {
+    beforeBrave: number
+    braveRate: number
+    result: number
+  }
+}
+```
+
+### 計算関数の実装例
+
+```typescript
+/**
+ * メインダメージ計算関数
+ */
+export function calculateDamage(input: DamageCalculationInput): DamageCalculationResult {
+  const steps = {} as DamageCalculationSteps
+  
+  // ステップ1: 基礎ダメージ計算
+  const step1Result = calculateBaseDamage(input, steps)
+  
+  // ステップ2: 固定値加算
+  const step2Result = applyFixedValues(step1Result, input, steps)
+  
+  // ステップ3-10: 各種倍率適用
+  let currentDamage = step2Result
+  currentDamage = applyElementAdvantage(currentDamage, input, steps)
+  currentDamage = applySkillMultiplier(currentDamage, input, steps)
+  currentDamage = applyUnsheatheRate(currentDamage, input, steps)
+  currentDamage = applyFamiliarity(currentDamage, input, steps)
+  currentDamage = applyDistance(currentDamage, input, steps)
+  currentDamage = applyCombo(currentDamage, input, steps)
+  currentDamage = applyPassiveMultiplier(currentDamage, input, steps)
+  const finalDamage = applyBraveMultiplier(currentDamage, input, steps)
   
   return {
-    minimum: results[0],
-    maximum: results[1], 
-    average: results[2],
-    calculationSteps: results[2].steps  // 平均時の計算過程を返す
+    finalDamage,
+    calculationSteps: steps
   }
 }
 
-const calculateSingleDamage = (
-  input: DamageCalculationInput,
-  stabilityPercent: number,
-  type: string
-): DamageValues & { steps: CalculationSteps } => {
-  const { attacker, defender, attackType, attackRange, isUnsheathe, skillMultiplier = 1 } = input
+/**
+ * ステップ1: 基礎ダメージ計算
+ */
+function calculateBaseDamage(input: DamageCalculationInput, steps: DamageCalculationSteps): number {
+  const beforeResistance = input.playerLevel + input.referenceStat - input.enemyLevel
   
-  // 1. 基礎攻撃力取得
-  const baseATK = attackType === 'physical' ? attacker.ATK : attacker.MATK
+  // 耐性適用
+  const physicalResistanceMultiplier = 1 - input.resistance.physical / 100
+  const magicalResistanceMultiplier = 1 - input.resistance.magical / 100
+  const weaponResistanceMultiplier = 1 - input.resistance.weapon / 100
   
-  // 2. 安定率適用
-  const stabilizedATK = applyStability(baseATK, stabilityPercent)
+  const resistanceMultiplier = input.attackSkill.type === 'physical' 
+    ? physicalResistanceMultiplier 
+    : magicalResistanceMultiplier
   
-  // 3. 防御力減算
-  const defense = attackType === 'physical' ? defender.DEF : defender.MDEF
-  const penetration = attackType === 'physical' ? attacker.physicalPenetration : attacker.magicalPenetration
-  const afterDefense = applyDefense(stabilizedATK, defense, penetration)
+  const afterResistance = beforeResistance * resistanceMultiplier * weaponResistanceMultiplier
   
-  // 4. 距離補正
-  const rangeModifiers = {
-    short: attacker.shortRangeDamage,
-    long: attacker.longRangeDamage
-  }
-  const afterRange = applyRangeModifier(afterDefense, attackRange, rangeModifiers)
+  // 敵防御力処理
+  const enemyDefense = input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF
+  const processedDefense = processEnemyDefense(enemyDefense, input)
   
-  // 5. 抜刀補正
-  const afterUnsheathe = applyUnsheatheModifier(afterRange, attacker.unsheatheAttack, isUnsheathe)
+  const result = Math.floor(afterResistance - processedDefense)
   
-  // 6. スキル倍率
-  const afterSkill = Math.floor(afterUnsheathe * skillMultiplier)
-  
-  // 7. 属性補正
-  const elementAdvantage = {
-    totalAdvantage: attacker.elementAdvantage,
-    elementPower: 0,  // TODO: 属性威力の実装
-    awakeningBonus: 0 // TODO: 属性覚醒の実装
-  }
-  const afterElement = applyElementAdvantage(afterSkill, elementAdvantage)
-  
-  // 8. クリティカル判定・補正
-  const isCritical = calculateCriticalHit(attacker.criticalRate, defender.resistCritical)
-  const afterCritical = applyCriticalDamage(afterElement, attacker.criticalDamage, isCritical)
-  
-  // 9. 耐性補正
-  const resistance = attackType === 'physical' ? defender.physicalResistance : defender.magicalResistance
-  const finalDamage = applyResistance(afterCritical, resistance)
-  
-  // 計算過程の記録
-  const steps: CalculationSteps = {
-    baseATK,
-    stabilityMultiplier: stabilityPercent / 100,
-    stabilizedATK,
-    defenseReduction: defense - penetration,
-    penetrationBonus: penetration,
-    baseDamage: afterDefense,
-    rangeMultiplier: attackRange === 'short' ? attacker.shortRangeDamage : attacker.longRangeDamage,
-    unsheatheMultiplier: isUnsheathe ? attacker.unsheatheAttack : 0,
-    skillMultiplier,
-    elementMultiplier: elementAdvantage.totalAdvantage,
-    criticalMultiplier: isCritical ? attacker.criticalDamage : 0,
-    resistanceMultiplier: resistance,
-    finalDamage
+  // 計算過程を記録
+  steps.step1_baseDamage = {
+    playerLevel: input.playerLevel,
+    referenceStat: input.referenceStat,
+    enemyLevel: input.enemyLevel,
+    beforeResistance,
+    physicalResistanceRate: input.resistance.physical,
+    magicalResistanceRate: input.resistance.magical,
+    weaponResistanceRate: input.resistance.weapon,
+    afterResistance,
+    enemyDEF: processedDefense,
+    result
   }
   
-  return {
-    damage: finalDamage,
-    stability: stabilityPercent,
-    isCritical,
-    steps
+  return Math.max(1, result) // 最低1ダメージ保証
+}
+
+/**
+ * 敵防御力の処理（破壊・エターナルナイトメア・貫通）
+ */
+function processEnemyDefense(defense: number, input: DamageCalculationInput): number {
+  let processed = defense
+  
+  // 1. 破壊状態異常による半減（小数点以下切り上げ）
+  if (input.enemy.hasDestruction) {
+    processed = Math.ceil(processed / 2)
   }
-}
-```
-
-## スキル系ダメージ計算
-
-### スキル倍率システム
-```typescript
-interface SkillDamageModifier {
-  baseMultiplier: number       // 基本倍率
-  levelMultiplier: number      // レベル補正
-  masteryBonus: number         // マスタリーボーナス
-  comboMultiplier: number      // コンボ補正
-}
-
-const calculateSkillDamage = (
-  baseDamage: number,
-  skill: SkillDamageModifier
-): number => {
-  const totalMultiplier = skill.baseMultiplier * 
-                         (1 + skill.levelMultiplier / 100) *
-                         (1 + skill.masteryBonus / 100) *
-                         skill.comboMultiplier
-  return Math.floor(baseDamage * totalMultiplier)
-}
-```
-
-## 特殊ダメージ計算
-
-### 追撃ダメージ
-```typescript
-interface FollowupDamage {
-  physicalFollowup: number     // 物理追撃(%)
-  magicalFollowup: number      // 魔法追撃(%)
-  triggerRate: number          // 発動率(%)
-}
-
-const calculateFollowupDamage = (
-  baseDamage: number,
-  followup: FollowupDamage,
-  attackType: 'physical' | 'magical'
-): number => {
-  const followupRate = attackType === 'physical' ? followup.physicalFollowup : followup.magicalFollowup
-  const isTriggered = Math.random() * 100 < followup.triggerRate
   
-  if (!isTriggered) return 0
-  return Math.floor(baseDamage * (followupRate / 100))
-}
-```
-
-### 貫通ダメージ
-```typescript
-const calculatePenetrationDamage = (
-  baseATK: number,
-  penetrationRate: number,
-  defenseIgnoreRate: number
-): number => {
-  const penetrationDamage = Math.floor(baseATK * (penetrationRate / 100))
-  const ignoredDefense = Math.floor(penetrationDamage * (defenseIgnoreRate / 100))
-  return penetrationDamage + ignoredDefense
-}
-```
-
-## 計算最適化
-
-### キャッシュ戦略
-```typescript
-interface DamageCalculationCache {
-  inputHash: string
-  result: DamageCalculationResult
-  timestamp: number
-}
-
-const CACHE_DURATION = 5000 // 5秒
-
-const getCachedResult = (input: DamageCalculationInput): DamageCalculationResult | null => {
-  const hash = generateInputHash(input)
-  const cached = damageCache.get(hash)
+  // 2. エターナルナイトメア減算（未実装）
+  // TODO: エターナルナイトメアの実装
   
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.result
-  }
-  return null
-}
-```
-
-### バッチ計算
-```typescript
-const calculateMultipleDamageScenarios = (
-  baseInput: DamageCalculationInput,
-  scenarios: Partial<DamageCalculationInput>[]
-): DamageCalculationResult[] => {
-  return scenarios.map(scenario => {
-    const input = { ...baseInput, ...scenario }
-    return calculateDamage(input)
-  })
-}
-```
-
-## エラーハンドリング
-
-### 入力値検証
-```typescript
-const validateDamageInput = (input: DamageCalculationInput): string[] => {
-  const errors: string[] = []
+  // 3. 貫通による低下（小数点以下切り捨て）
+  const penetration = input.attackSkill.type === 'physical' 
+    ? input.penetration.physical 
+    : input.penetration.magical
   
-  if (input.attacker.ATK < 0) errors.push('ATKは0以上である必要があります')
-  if (input.attacker.stability < 0 || input.attacker.stability > 100) {
-    errors.push('安定率は0-100%の範囲である必要があります')
-  }
-  if (input.defender.DEF < 0) errors.push('DEFは0以上である必要があります')
+  processed = Math.floor(Math.max(0, processed - penetration))
   
-  return errors
+  return processed
 }
+
+// 他のステップ関数も同様に実装...
 ```
 
-### 計算例外処理
-```typescript
-const safeCalculateDamage = (input: DamageCalculationInput): DamageCalculationResult => {
-  try {
-    const errors = validateDamageInput(input)
-    if (errors.length > 0) {
-      throw new Error(`入力値エラー: ${errors.join(', ')}`)
-    }
-    
-    return calculateDamage(input)
-  } catch (error) {
-    console.error('ダメージ計算エラー:', error)
-    return getDefaultDamageResult()
-  }
-}
-```
+## 実装フェーズ
 
-## テスト仕様
+### フェーズ1: 基本計算エンジン（優先度: 高）
+- [x] 基本ダメージ計算（ステップ1-2）
+- [ ] 属性有利・スキル倍率（ステップ3-4）
+- [ ] 抜刀・慣れ・距離補正（ステップ5-7）
 
-### 単体テスト
-```typescript
-describe('ダメージ計算', () => {
-  test('基本物理ダメージ計算', () => {
-    const input: DamageCalculationInput = {
-      attacker: { ATK: 1000, stability: 85, /* ... */ },
-      defender: { DEF: 200, physicalResistance: 0, /* ... */ },
-      attackType: 'physical',
-      attackRange: 'short',
-      isUnsheathe: false
-    }
-    
-    const result = calculateDamage(input)
-    expect(result.minimum.damage).toBeGreaterThan(0)
-    expect(result.maximum.damage).toBeGreaterThan(result.minimum.damage)
-  })
-  
-  // 他のテストケース...
-})
-```
+### フェーズ2: UI連携（優先度: 中）
+- [ ] DamagePreview.tsxとの連携
+- [ ] 属性攻撃有効/無効の選択
+- [ ] 慣れスライダー（50-250%）
+- [ ] コンボ強打有効/無効の選択
 
-## パフォーマンス指標
+### フェーズ3: 高度な機能（優先度: 低）
+- [ ] パッシブ倍率システム
+- [ ] ブレイブ倍率システム
+- [ ] エターナルナイトメア実装
+- [ ] 状態異常システム（破壊）
 
-### 計算速度目標
-- **単一計算**: < 1ms
-- **バッチ計算**: < 10ms (10シナリオ)
-- **UI更新**: < 100ms (デバウンス込み)
+## 計算例
+
+### 例1: 基本的な物理攻撃
+**入力条件**:
+- 自Lv: 150
+- 総ATK: 2,500
+- 敵Lv: 100
+- 物理耐性: 15%
+- 敵DEF: 300
+- 物理貫通: 50
+
+**計算過程**:
+1. 基礎ダメージ = INT((150 + 2500 - 100) × (1 - 15/100) × (1 - 0/100) - (300 - 50))
+   = INT(2550 × 0.85 × 1 - 250)
+   = INT(2167.5 - 250)
+   = INT(1917.5) = 1917
+
+### 例2: 魔法攻撃（属性有利あり）
+**入力条件**:
+- 自Lv: 120
+- MATK: 3,200
+- 敵Lv: 80
+- 魔法耐性: 10%
+- 敵MDEF: 400
+- 魔法貫通: 100
+- 総属性有利: 25%
+- スキル倍率: 150%
+
+**計算過程**:
+1. 基礎ダメージ = INT((120 + 3200 - 80) × (1 - 10/100) - (400 - 100))
+   = INT(3240 × 0.9 - 300)
+   = INT(2916 - 300) = 2616
+
+2. 属性有利適用 = INT(2616 × (1 + 25/100))
+   = INT(2616 × 1.25) = INT(3270) = 3270
+
+3. スキル倍率適用 = INT(3270 × 150/100)
+   = INT(3270 × 1.5) = INT(4905) = 4905
+
+## 重要な注意事項
+
+### INT()関数の適用
+- 各計算ステップで必ずINT()（小数点以下切り捨て）を適用
+- JavaScriptでは`Math.floor()`を使用
+- 負数の場合も元の数値より小さい整数に切り捨て
+
+### 最低ダメージ保証
+- 基礎ダメージ計算で1未満になった場合は1に補正
+- 各ステップでの中間結果は1未満でも可（最終結果のみ保証）
+
+### データ依存関係
+- 基本ステータス計算結果に依存
+- 装備品補正値に依存
+- バフスキル状態に依存（将来実装）
 
 ## 更新履歴
 
 | 日付 | 更新内容 | 備考 |
 |------|----------|------|
-| 2024-12-25 | ダメージ計算ロジック設計書作成 | 初版作成 |
+| 2025-07-02 | ダメージ計算式設計書を完全リライト | トーラムオンラインの正確な計算式に基づく全面刷新 |
 
 ## 関連ドキュメント
 - [DamagePreview UI設計書](../ui/damage-preview.md) - UI表示の詳細仕様
 - [基本ステータス計算式](./basic-stats.md) - 基盤となる計算式
-- [StatusPreview 計算仕様](../ui/status-preview-calculations.md) - 関連計算ロジック
+- [装備品補正値計算](./equipment-bonuses.md) - 補正値計算の詳細
