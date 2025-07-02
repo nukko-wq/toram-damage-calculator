@@ -29,8 +29,6 @@ export default function AttackSkillForm({
 		(state) => state.updateAttackSkill,
 	)
 
-	// 詳細情報の表示状態
-	const [showDetailedInfo, setShowDetailedInfo] = useState(false)
 	// 選択中の撃目（タブ）
 	const [selectedHitIndex, setSelectedHitIndex] = useState(0)
 
@@ -62,9 +60,9 @@ export default function AttackSkillForm({
 		return {
 			selectedSkill: selectedSkill || null,
 			calculatedHits,
-			showDetailedInfo,
+			showDetailedInfo: false,
 		}
-	}, [selectedSkill, showDetailedInfo])
+	}, [selectedSkill])
 
 	// スキル選択処理
 	const handleSkillSelect = (skillId: string) => {
@@ -114,6 +112,8 @@ export default function AttackSkillForm({
 
 	return (
 		<div className="space-y-4 p-4 border border-gray-300 rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8">
+			<h2 className="text-lg font-bold text-gray-800 mb-3">攻撃スキル</h2>
+
 			{/* スキル選択セクション */}
 			<div className="flex gap-2">
 				<select
@@ -141,28 +141,43 @@ export default function AttackSkillForm({
 				<div className="space-y-4 p-4 bg-gray-50 rounded-lg">
 					{/* スキル威力値 */}
 					<div className="space-y-2">
-						<div className="grid grid-cols-2 gap-4 text-sm">
-							<div>
-								<span className="text-gray-600">スキル威力値:</span>{' '}
-								{selectedSkill.hits.map((hit, index) => (
-									<span key={hit.hitNumber}>
-										{hit.multiplier}%
-										{index < selectedSkill.hits.length - 1 && ' / '}
-									</span>
-								))}
+						<div className="flex flex-col">
+							<div className="flex">
+								<span className="text-gray-700 w-[7rem]">スキル威力値:</span>{' '}
+								<span className="flex items-center gap-3">
+									{selectedSkill.hits.map((hit, index) => (
+										<span
+											key={hit.hitNumber}
+											className="flex items-center w-[4rem] gap-2 text-gray-700"
+										>
+											{hit.multiplier}%
+											{index < selectedSkill.hits.length - 1 && (
+												<span className="text-gray-700">/</span>
+											)}
+										</span>
+									))}
+								</span>
 							</div>
-							<div>
-								<span className="text-gray-600">スキル固定値:</span>{' '}
-								{selectedSkill.hits.map((hit, index) => (
-									<span key={hit.hitNumber}>
-										{hit.fixedDamage}
-										{index < selectedSkill.hits.length - 1 && ' / '}
-									</span>
-								))}
+							<div className="flex">
+								<span className="text-gray-700 w-[7rem]">スキル固定値:</span>{' '}
+								<span className="flex items-center gap-3">
+									{selectedSkill.hits.map((hit, index) => (
+										<span
+											key={hit.hitNumber}
+											className="flex items-center w-[4rem] gap-8 text-gray-700"
+										>
+											{hit.fixedDamage}
+											{index < selectedSkill.hits.length - 1 && (
+												<span className="text-gray-700">/</span>
+											)}
+										</span>
+									))}
+								</span>
 							</div>
-						</div>
-						<div className="text-sm">
-							<span className="text-gray-600">消費MP:</span> {selectedSkill.mpCost}
+							<div className="flex">
+								<span className="text-gray-700 w-[7rem]">消費MP:</span>{' '}
+								<span className="text-gray-700">{selectedSkill.mpCost}</span>
+							</div>
 						</div>
 					</div>
 
@@ -187,120 +202,112 @@ export default function AttackSkillForm({
 
 					{/* 選択された撃の詳細情報 */}
 					{(() => {
-						const currentHit = selectedSkill.hits[selectedHitIndex] || selectedSkill.hits[0]
+						const currentHit =
+							selectedSkill.hits[selectedHitIndex] || selectedSkill.hits[0]
 						return (
 							<div className="space-y-3">
-								{/* 基本情報 */}
-								<div className="grid grid-cols-3 gap-4 text-sm">
-									<div>
-										{currentHit.attackType === 'physical' ? '物理スキル' : '魔法スキル'}
+								{/* テーブル風の詳細情報 */}
+								<div className="border border-gray-300 rounded text-sm">
+									{/* 1行目: 3列表示 (スキルタイプ、慣れ参照、慣れ付与) */}
+									<div className="border-b border-gray-300 grid grid-cols-3">
+										<div className="px-3 py-2 border-r border-gray-300">
+											<span className="text-gray-700">
+												{currentHit.attackType === 'physical'
+													? '物理スキル'
+													: '魔法スキル'}
+											</span>
+										</div>
+										<div className="px-3 py-2 border-r border-gray-300">
+											<span className="text-gray-700">慣れ参照:</span>{' '}
+											<span className="text-gray-700">
+												{getFamiliarityDisplayText(currentHit.familiarity)}
+											</span>
+										</div>
+										<div className="px-3 py-2">
+											<span className="text-gray-700">慣れ付与:</span>{' '}
+											<span className="text-gray-700">
+												{getFamiliarityDisplayText(currentHit.familiarityGrant)}
+											</span>
+										</div>
 									</div>
-									<div>
-										<span className="text-gray-600">慣れ参照:</span>{' '}
-										{getFamiliarityDisplayText(currentHit.familiarity)}
-									</div>
-									<div>
-										<span className="text-gray-600">慣れ付与:</span>{' '}
-										{getFamiliarityDisplayText(currentHit.familiarityGrant)}
-									</div>
-								</div>
 
-								<div className="grid grid-cols-2 gap-4 text-sm">
-									<div>
-										<span className="text-gray-600">参照防御力:</span> {currentHit.referenceDefense}
+									{/* 2行目: 2列表示 (参照防御力、参照耐性) */}
+									<div className="border-b border-gray-300 grid grid-cols-2">
+										<div className="px-3 py-2 border-r border-gray-300">
+											<span className="text-gray-700">参照防御力:</span>{' '}
+											<span className="text-gray-700">
+												{currentHit.referenceDefense}
+											</span>
+										</div>
+										<div className="px-3 py-2">
+											<span className="text-gray-600">参照耐性:</span>{' '}
+											<span className="text-gray-700">
+												{currentHit.referenceResistance === 'physical'
+													? '物理耐性'
+													: '魔法耐性'}
+											</span>
+										</div>
 									</div>
-									<div>
-										<span className="text-gray-600">参照耐性:</span>{' '}
-										{currentHit.referenceResistance === 'physical' ? '物理耐性' : '魔法耐性'}
-									</div>
-								</div>
 
-								<div className="grid grid-cols-3 gap-4 text-sm">
-									<div>
-										<span className="text-gray-600">距離威力:</span> 近距離○
+									{/* 3行目: 3列表示 (距離威力、抜刀威力、ロングレンジ) */}
+									<div className="border-b border-gray-300 grid grid-cols-3">
+										<div className="px-3 py-2 border-r border-gray-300">
+											<span className="text-gray-600">距離威力:</span>{' '}
+											<span className="text-gray-700">近距離○</span>
+										</div>
+										<div className="px-3 py-2 border-r border-gray-300">
+											<span className="text-gray-600">抜刀威力:</span>{' '}
+											<span className="text-gray-700">
+												{currentHit.canUseUnsheathePower ? '○' : '×'}
+											</span>
+										</div>
+										<div className="px-3 py-2">
+											<span className="text-gray-600">ロングレンジ:</span>{' '}
+											<span className="text-gray-700">
+												{currentHit.canUseLongRange ? '○' : '×'}
+											</span>
+										</div>
 									</div>
-									<div>
-										<span className="text-gray-600">抜刀威力:</span>{' '}
-										{currentHit.canUseUnsheathePower ? '○' : '×'}
-									</div>
-									<div>
-										<span className="text-gray-600">ロングレンジ:</span>{' '}
-										{currentHit.canUseLongRange ? '○' : '×'}
-									</div>
-								</div>
 
-								<div className="text-sm">
-									<span className="text-gray-600">威力参照/攻撃力:</span>{' '}
-									{getPowerReferenceDisplayText(currentHit.powerReference)}
+									{/* 4行目: 1列表示 (威力参照) */}
+									<div className="px-3 py-2">
+										<span className="text-gray-700">威力参照/攻撃力:</span>{' '}
+										<span className="text-gray-700">
+											{getPowerReferenceDisplayText(currentHit.powerReference)}
+										</span>
+									</div>
 								</div>
 
 								{/* 特殊計算式表示（2撃目等で特殊な場合） */}
-								{currentHit.multiplierFormula && currentHit.multiplierFormula !== `${currentHit.multiplier}%` && (
-									<div className="space-y-2 p-3 bg-white rounded border">
-										<div className="text-sm">
-											<span className="text-gray-600">威力+</span>
-											{currentHit.multiplierFormula}
+								{currentHit.multiplierFormula &&
+									currentHit.multiplierFormula !==
+										`${currentHit.multiplier}%` && (
+										<div className="space-y-2 p-3 bg-white rounded border">
+											<div className="text-sm">
+												<span className="text-gray-600">威力+</span>
+												<span className="text-gray-600">
+													{currentHit.multiplierFormula}
+												</span>
+											</div>
 										</div>
-									</div>
-								)}
+									)}
 
-								{currentHit.fixedDamageFormula && currentHit.fixedDamageFormula !== '0' && currentHit.fixedDamageFormula !== `${currentHit.fixedDamage}` && (
-									<div className="space-y-2 p-3 bg-white rounded border">
-										<div className="text-sm">
-											<span className="text-gray-600">固定値+</span>
-											{currentHit.fixedDamageFormula}
+								{currentHit.fixedDamageFormula &&
+									currentHit.fixedDamageFormula !== '0' &&
+									currentHit.fixedDamageFormula !==
+										`${currentHit.fixedDamage}` && (
+										<div className="space-y-2 p-3 bg-white rounded border">
+											<div className="text-sm">
+												<span className="text-gray-600">固定値+</span>
+												<span className="text-gray-600">
+													{currentHit.fixedDamageFormula}
+												</span>
+											</div>
 										</div>
-									</div>
-								)}
+									)}
 							</div>
 						)
 					})()}
-
-					{/* 詳細情報（展開可能） */}
-					<div className="space-y-2">
-						<button
-							onClick={() => setShowDetailedInfo(!showDetailedInfo)}
-							className="flex items-center gap-2 text-gray-800 font-semibold hover:text-blue-600"
-						>
-							📋 詳細情報 {showDetailedInfo ? '▲' : '▼'}
-						</button>
-
-						{showDetailedInfo && (
-							<div className="space-y-2 text-sm pl-4">
-								{selectedSkill.weaponTypeRequirements && (
-									<div>
-										<span className="text-gray-600">必要武器:</span>{' '}
-										{selectedSkill.weaponTypeRequirements.join(', ')}
-									</div>
-								)}
-								{selectedSkill.prerequisites && (
-									<div>
-										<span className="text-gray-600">前提スキル:</span>{' '}
-										{selectedSkill.prerequisites.join(', ')}
-									</div>
-								)}
-								{selectedSkill.specialEffects &&
-									selectedSkill.specialEffects.length > 0 && (
-										<div>
-											<span className="text-gray-600">特殊効果:</span>{' '}
-											{selectedSkill.specialEffects.join(', ')}
-										</div>
-									)}
-								{selectedSkill.description && (
-									<div>
-										<span className="text-gray-600">説明:</span>{' '}
-										{selectedSkill.description}
-									</div>
-								)}
-								{selectedSkill.notes && (
-									<div>
-										<span className="text-gray-600">備考:</span>{' '}
-										{selectedSkill.notes}
-									</div>
-								)}
-							</div>
-						)}
-					</div>
 				</div>
 			)}
 		</div>

@@ -14,25 +14,25 @@ export const attackSkillsData: AttackSkill[] = [
 		mpCost: 8,
 		multiplierFormula: '125%',
 		fixedDamageFormula: '0',
-		specialEffects: [
-			'物理貫通ボーナス: +20%'
+		specialEffects: ['物理貫通ボーナス: +20%'],
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 125, // 表示用の値
+				fixedDamage: 0, // 表示用の値
+				multiplierFormula: '125%',
+				fixedDamageFormula: '0',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: true,
+				canUseLongRange: false,
+			},
 		],
-		hits: [{
-			hitNumber: 1,
-			attackType: 'physical',
-			referenceDefense: 'DEF',
-			referenceResistance: 'physical',
-			powerReference: 'totalATK',
-			multiplier: 125,  // 表示用の値
-			fixedDamage: 0,   // 表示用の値
-			multiplierFormula: '125%',
-			fixedDamageFormula: '0',
-			familiarity: 'physical',
-			familiarityGrant: 'physical',
-			canUseUnsheathePower: true,
-			canUseLongRange: false
-		}],
-		description: '基本的な攻撃スキル'
+		description: '基本的な攻撃スキル',
 	},
 
 	// ムーンスラッシュ（特殊計算の例）
@@ -44,11 +44,7 @@ export const attackSkillsData: AttackSkill[] = [
 		mpCost: 400,
 		multiplierFormula: '特殊計算',
 		fixedDamageFormula: '特殊計算',
-		specialEffects: [
-			'距離威力: ○',
-			'抜刀威力: ×',
-			'ロングレンジ: ×'
-		],
+		specialEffects: ['距離威力: ○', '抜刀威力: ×', 'ロングレンジ: ×'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -56,14 +52,14 @@ export const attackSkillsData: AttackSkill[] = [
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
 				powerReference: 'totalATK',
-				multiplier: 1000,  // 表示用（実際の計算は外部）
-				fixedDamage: 400,  // 表示用（実際の計算は外部）
+				multiplier: 1000, // 表示用（実際の計算は外部）
+				fixedDamage: 400, // 表示用（実際の計算は外部）
 				multiplierFormula: '1000%',
 				fixedDamageFormula: '400',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
-				canUseLongRange: false
+				canUseLongRange: false,
 			},
 			{
 				hitNumber: 2,
@@ -71,17 +67,17 @@ export const attackSkillsData: AttackSkill[] = [
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
 				powerReference: 'totalATK',
-				multiplier: 0,     // 表示用（|補正後STR|%は外部計算）
-				fixedDamage: 0,    // 表示用（基礎INT/2は外部計算）
-				multiplierFormula: '|補正後STR|%',
+				multiplier: 0, // 表示用（|補正後STR|%は外部計算）
+				fixedDamage: 0, // 表示用（基礎INT/2は外部計算）
+				multiplierFormula: '補正後STR%',
 				fixedDamageFormula: '基礎INT/2',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
-				canUseLongRange: false
-			}
+				canUseLongRange: false,
+			},
 		],
-		description: '特殊な計算式を持つ多段攻撃スキル'
+		description: '特殊な計算式を持つ多段攻撃スキル',
 	},
 
 	// 杖スキル
@@ -93,22 +89,24 @@ export const attackSkillsData: AttackSkill[] = [
 		mpCost: 5,
 		multiplierFormula: '100%',
 		fixedDamageFormula: '0',
-		hits: [{
-			hitNumber: 1,
-			attackType: 'magical',
-			referenceDefense: 'MDEF',
-			referenceResistance: 'magical',
-			powerReference: 'MATK',
-			multiplier: 100,
-			fixedDamage: 0,
-			multiplierFormula: '100%',
-			fixedDamageFormula: '0',
-			familiarity: 'magical',
-			familiarityGrant: 'magical',
-			canUseUnsheathePower: false,
-			canUseLongRange: true
-		}],
-		description: '基本的な魔法攻撃スキル'
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'magical',
+				referenceDefense: 'MDEF',
+				referenceResistance: 'magical',
+				powerReference: 'MATK',
+				multiplier: 100,
+				fixedDamage: 0,
+				multiplierFormula: '100%',
+				fixedDamageFormula: '0',
+				familiarity: 'magical',
+				familiarityGrant: 'magical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+			},
+		],
+		description: '基本的な魔法攻撃スキル',
 	},
 
 	// 弓スキル
@@ -120,25 +118,25 @@ export const attackSkillsData: AttackSkill[] = [
 		mpCost: 10,
 		multiplierFormula: '150%',
 		fixedDamageFormula: '0',
-		specialEffects: [
-			'ロングレンジ対応'
+		specialEffects: ['ロングレンジ対応'],
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 150,
+				fixedDamage: 0,
+				multiplierFormula: '150%',
+				fixedDamageFormula: '0',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: true,
+				canUseLongRange: true,
+			},
 		],
-		hits: [{
-			hitNumber: 1,
-			attackType: 'physical',
-			referenceDefense: 'DEF',
-			referenceResistance: 'physical',
-			powerReference: 'totalATK',
-			multiplier: 150,
-			fixedDamage: 0,
-			multiplierFormula: '150%',
-			fixedDamageFormula: '0',
-			familiarity: 'physical',
-			familiarityGrant: 'physical',
-			canUseUnsheathePower: true,
-			canUseLongRange: true
-		}],
-		description: '威力を高めた射撃攻撃'
+		description: '威力を高めた射撃攻撃',
 	},
 
 	// 双剣スキル（多段攻撃の例）
@@ -150,10 +148,7 @@ export const attackSkillsData: AttackSkill[] = [
 		mpCost: 15,
 		multiplierFormula: '各撃で異なる',
 		fixedDamageFormula: '0',
-		specialEffects: [
-			'連続攻撃',
-			'クリティカル率+5%'
-		],
+		specialEffects: ['連続攻撃', 'クリティカル率+5%'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -168,7 +163,7 @@ export const attackSkillsData: AttackSkill[] = [
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: true,
-				canUseLongRange: false
+				canUseLongRange: false,
 			},
 			{
 				hitNumber: 2,
@@ -183,44 +178,54 @@ export const attackSkillsData: AttackSkill[] = [
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
-				canUseLongRange: false
-			}
+				canUseLongRange: false,
+			},
 		],
-		description: '連続で攻撃する双剣スキル'
-	}
+		description: '連続で攻撃する双剣スキル',
+	},
 ]
 
 /**
  * スキルIDからスキルデータを取得
  */
 export function getAttackSkillById(id: string): AttackSkill | undefined {
-	return attackSkillsData.find(skill => skill.id === id)
+	return attackSkillsData.find((skill) => skill.id === id)
 }
 
 /**
  * カテゴリ別にスキルを取得
  */
-export function getAttackSkillsByCategory(category: AttackSkill['category']): AttackSkill[] {
-	return attackSkillsData.filter(skill => skill.category === category)
+export function getAttackSkillsByCategory(
+	category: AttackSkill['category'],
+): AttackSkill[] {
+	return attackSkillsData.filter((skill) => skill.category === category)
 }
 
 /**
  * 武器種に対応したスキルを取得
  */
-export function getAttackSkillsByWeaponType(weaponType: WeaponType): AttackSkill[] {
-	return attackSkillsData.filter(skill => 
-		!skill.weaponTypeRequirements || 
-		skill.weaponTypeRequirements.includes(weaponType)
+export function getAttackSkillsByWeaponType(
+	weaponType: WeaponType,
+): AttackSkill[] {
+	return attackSkillsData.filter(
+		(skill) =>
+			!skill.weaponTypeRequirements ||
+			skill.weaponTypeRequirements.includes(weaponType),
 	)
 }
 
 /**
  * 威力参照タイプの表示名を取得
  */
-export function getPowerReferenceDisplayText(powerRef: AttackSkill['hits'][0]['powerReference']): string {
+export function getPowerReferenceDisplayText(
+	powerRef: AttackSkill['hits'][0]['powerReference'],
+): string {
 	switch (powerRef) {
-		case 'totalATK': return '総ATK'
-		case 'MATK': return 'MATK'
-		default: return powerRef
+		case 'totalATK':
+			return '総ATK'
+		case 'MATK':
+			return 'MATK'
+		default:
+			return powerRef
 	}
 }
