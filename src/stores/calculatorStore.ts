@@ -246,42 +246,28 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			updateEnemy: (enemy) => {
-				// 新形式の場合：設定は共通状態、選択は個別データに保存
-				if (enemy.selectedId !== undefined) {
-					// 共通設定を更新
-					if (enemy.difficulty) {
-						setBossDifficulty(enemy.difficulty)
-					}
-					
-					if (enemy.raidBossLevel !== undefined) {
-						setRaidBossLevel(enemy.raidBossLevel)
-					}
-					
-					if (enemy.manualOverrides) {
-						setManualOverrides(enemy.manualOverrides)
-					}
-					
-					// 個別データには敵選択情報のみ保存
-					const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
-					dataUpdate({ 
-						enemy: { 
-							selectedEnemyId: enemy.selectedId,
-							enemyType: enemy.type,
-							lastSelectedAt: enemy.selectedId ? new Date().toISOString() : undefined
-						} 
-					}, 'updateEnemy')
-				} else {
-					// 旧形式の場合：後方互換性を保持
-					const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
-					dataUpdate({ 
-						legacyEnemyFormData: enemy,
-						enemy: { 
-							selectedEnemyId: enemy.selectedId,
-							enemyType: enemy.type,
-							lastSelectedAt: enemy.selectedId ? new Date().toISOString() : undefined
-						} 
-					}, 'updateEnemy')
+				// 共通設定を更新
+				if (enemy.difficulty) {
+					setBossDifficulty(enemy.difficulty)
 				}
+				
+				if (enemy.raidBossLevel !== undefined) {
+					setRaidBossLevel(enemy.raidBossLevel)
+				}
+				
+				if (enemy.manualOverrides) {
+					setManualOverrides(enemy.manualOverrides)
+				}
+				
+				// 個別データには敵選択情報のみ保存
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ 
+					enemy: { 
+						selectedEnemyId: enemy.selectedId,
+						enemyType: enemy.type,
+						lastSelectedAt: enemy.selectedId ? new Date().toISOString() : undefined
+					} 
+				}, 'updateEnemy')
 			},
 
 			updateBuffSkills: (buffSkills) => {

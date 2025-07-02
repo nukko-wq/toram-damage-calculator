@@ -341,23 +341,7 @@ export interface SaveDataEnemyInfo {
 	lastSelectedAt?: string // 最終選択日時 (ISO string)
 }
 
-// 旧インターフェース（後方互換性のため残存）
-export interface EnemySelectionState {
-	selectedId: string | null // 選択中の敵ID
-	type: 'preset' | 'custom' | null // データソースの識別
-	// ボス難易度設定（boss カテゴリのみ）
-	difficulty?: BossDifficulty
-	// レイドボス レベル調整（raidBoss カテゴリのみ）
-	raidBossLevel?: number
-	// 手動調整値（プリセット・カスタム選択後の調整用）
-	manualOverrides?: {
-		resistCritical?: number // 確定クリティカル調整値
-		requiredHIT?: number // 必要HIT調整値（レイドボス以外 or 赫灼のセルディテのFLEE値）
-	}
-	lastUpdated: string // 最終更新日時 (ISO string)
-}
-
-// 敵フォームデータ（後方互換性のため残す、将来的に削除予定）
+// 敵フォームデータ（UIコンポーネント用の統合型）
 export interface EnemyFormData {
 	selectedId: string | null // プリセット敵情報ID or カスタム敵情報ID
 	type: 'preset' | 'custom' | null // データソースの識別
@@ -372,16 +356,7 @@ export interface EnemyFormData {
 	}
 }
 
-// 従来のEnemyInfo（後方互換性のため残す、将来的に削除予定）
-export interface EnemyInfo {
-	DEF: number
-	MDEF: number
-	level: number
-	guaranteedCritical: number
-	freeValue: number
-}
-
-// 計算機の全データ（新しい敵情報システム対応）
+// 計算機の全データ
 export interface CalculatorData {
 	baseStats: BaseStats
 	mainWeapon: MainWeapon
@@ -390,12 +365,9 @@ export interface CalculatorData {
 	crystals: CrystalSlots
 	food: FoodFormData // 料理データ
 	enemy: SaveDataEnemyInfo // 敵情報（個別セーブデータ用）
-	buffSkills: import('./buffSkill').BuffSkillFormData // バフスキルデータ（新形式）
+	buffSkills: import('./buffSkill').BuffSkillFormData // バフスキルデータ
 	buffItems: BuffItemFormData // バフアイテムデータ
 	register: RegisterFormData // レジスタ他データ
-	// 後方互換性のため旧形式も保持（将来的に削除予定）
-	legacyEnemy?: EnemyInfo
-	legacyEnemyFormData?: EnemyFormData
 }
 
 // 計算結果

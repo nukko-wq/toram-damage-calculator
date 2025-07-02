@@ -6,11 +6,7 @@ import type {
 	EquipmentSlots,
 	CrystalSlots,
 	FoodFormData,
-	EnemyInfo,
-	EnemyFormData,
 	SaveDataEnemyInfo,
-	BuffSkillFormData,
-	BuffItemFormData,
 	RegisterFormData,
 	RegisterEffect,
 	CalculatorData,
@@ -174,13 +170,6 @@ export const createInitialCrystalSlots = (): CrystalSlots => ({
 	special2: null,
 })
 
-export const createInitialEnemyInfo = (): EnemyInfo => ({
-	DEF: 0,
-	MDEF: 0,
-	level: 1,
-	guaranteedCritical: 0,
-	freeValue: 0,
-})
 
 // 料理システムの初期値
 export const createInitialFoodFormData = (): FoodFormData => ({
@@ -191,17 +180,7 @@ export const createInitialFoodFormData = (): FoodFormData => ({
 	slot5: { selectedFood: 'none', level: 0 },
 })
 
-// 新しい敵情報システムの初期値（旧形式・後方互換性用）
-export const createInitialEnemyFormData = (): EnemyFormData => ({
-	selectedId: null,
-	type: null,
-	manualOverrides: {
-		resistCritical: 0,
-		requiredHIT: 0,
-	},
-})
-
-// 新しい敵情報システムの初期値（個別セーブデータ用）
+// 敵情報システムの初期値（個別セーブデータ用）
 export const createInitialSaveDataEnemyInfo = (): SaveDataEnemyInfo => ({
 	selectedEnemyId: null,
 	enemyType: null,
@@ -391,5 +370,4 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	buffSkills: getDefaultBuffSkillFormData(), // バフスキルシステム
 	buffItems: getDefaultBuffItems(), // バフアイテムシステム
 	register: createInitialRegisterFormData(), // レジスタ他システム
-	legacyEnemy: createInitialEnemyInfo(), // 後方互換性
 })
