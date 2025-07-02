@@ -320,7 +320,44 @@ export interface PresetEnemy {
 	category: EnemyCategory // 敵カテゴリ
 }
 
-// 敵フォームデータ（セーブデータ用）
+// 共通敵設定状態（全セーブデータ共通 - 設定値のみ）
+export interface EnemySettingsState {
+	// ボス難易度設定（boss カテゴリのみ）
+	difficulty?: BossDifficulty
+	// レイドボス レベル調整（raidBoss カテゴリのみ）
+	raidBossLevel?: number
+	// 手動調整値（プリセット・カスタム選択後の調整用）
+	manualOverrides?: {
+		resistCritical?: number // 確定クリティカル調整値
+		requiredHIT?: number // 必要HIT調整値（レイドボス以外 or 赫灼のセルディテのFLEE値）
+	}
+	lastUpdated: string // 最終更新日時 (ISO string)
+}
+
+// セーブデータ内の敵情報（個別セーブデータ用 - 選択している敵）
+export interface SaveDataEnemyInfo {
+	selectedEnemyId: string | null // 選択中の敵ID
+	enemyType: 'preset' | 'custom' | null // データソースの識別
+	lastSelectedAt?: string // 最終選択日時 (ISO string)
+}
+
+// 旧インターフェース（後方互換性のため残存）
+export interface EnemySelectionState {
+	selectedId: string | null // 選択中の敵ID
+	type: 'preset' | 'custom' | null // データソースの識別
+	// ボス難易度設定（boss カテゴリのみ）
+	difficulty?: BossDifficulty
+	// レイドボス レベル調整（raidBoss カテゴリのみ）
+	raidBossLevel?: number
+	// 手動調整値（プリセット・カスタム選択後の調整用）
+	manualOverrides?: {
+		resistCritical?: number // 確定クリティカル調整値
+		requiredHIT?: number // 必要HIT調整値（レイドボス以外 or 赫灼のセルディテのFLEE値）
+	}
+	lastUpdated: string // 最終更新日時 (ISO string)
+}
+
+// 敵フォームデータ（後方互換性のため残す、将来的に削除予定）
 export interface EnemyFormData {
 	selectedId: string | null // プリセット敵情報ID or カスタム敵情報ID
 	type: 'preset' | 'custom' | null // データソースの識別
@@ -352,12 +389,13 @@ export interface CalculatorData {
 	equipment: EquipmentSlots
 	crystals: CrystalSlots
 	food: FoodFormData // 料理データ
-	enemy: EnemyFormData // 新しい敵情報システム
+	enemy: SaveDataEnemyInfo // 敵情報（個別セーブデータ用）
 	buffSkills: import('./buffSkill').BuffSkillFormData // バフスキルデータ（新形式）
 	buffItems: BuffItemFormData // バフアイテムデータ
 	register: RegisterFormData // レジスタ他データ
-	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
+	// 後方互換性のため旧形式も保持（将来的に削除予定）
 	legacyEnemy?: EnemyInfo
+	legacyEnemyFormData?: EnemyFormData
 }
 
 // 計算結果

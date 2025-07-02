@@ -5,32 +5,26 @@ import { useCalculatorStore } from '@/stores'
 import type { EnemyFormData, BossDifficulty } from '@/types/calculator'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import { calculateRaidBossStats, isSelditeFLEEUnknown } from '@/utils/raidBossCalculation'
+import { useEnemyData } from '@/hooks/useEnemyData'
+import { 
+	setRaidBossLevel, 
+	setManualOverrides 
+} from '@/utils/enemySettingsState'
 import EnemySelectionModal from './EnemySelectionModal'
 
 interface EnemyFormProps {
-	// Zustand移行後は不要（後方互換性のため残存）
-	enemyData?: EnemyFormData
+	// 後方互換性のため残存（新システムでは不要）
 	onChange?: (enemyData: EnemyFormData) => void
 }
 
-// デフォルト値の定義
-const getDefaultEnemyFormData = (): EnemyFormData => ({
-	selectedId: null,
-	type: null,
-	raidBossLevel: 288,
-	manualOverrides: {
-		resistCritical: 0,
-		requiredHIT: 0,
-	},
-})
 
-export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
-	// Zustandストアから敵データを取得
-	const storeEnemyData = useCalculatorStore((state) => state.data.enemy)
+export default function EnemyForm({ onChange }: EnemyFormProps) {
+	// 新しい敵データ取得システムを使用
+	const { enemyFormData } = useEnemyData()
 	const updateEnemy = useCalculatorStore((state) => state.updateEnemy)
 
-	// Zustandストアの値を使用（完全移行）
-	const effectiveEnemyData = storeEnemyData
+	// 実際のデータは新システムから取得
+	const effectiveEnemyData = enemyFormData
 
 	// モーダル状態管理
 	const [modalState, setModalState] = useState<{
@@ -65,9 +59,12 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 	// 敵選択の処理
 	const handleEnemySelect = (enemyId: string | null) => {
 		if (enemyId === null) {
-			// 未選択の場合
-			const newData = getDefaultEnemyFormData()
-			// Zustandストアを更新
+			// 未選択の場合：個別データのみクリア（共通設定は保持）
+			const newData: EnemyFormData = {
+				...effectiveEnemyData,
+				selectedId: null,
+				type: null,
+			}
 			updateEnemy(newData)
 
 			// 後方互換性のため従来のonChangeも呼び出し
@@ -80,14 +77,11 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 		const enemy = getPresetEnemyById(enemyId)
 		if (!enemy) return
 
+		// 敵選択時は現在の共通設定を保持
 		const newData: EnemyFormData = {
+			...effectiveEnemyData,
 			selectedId: enemyId,
 			type: 'preset',
-			raidBossLevel: 288,
-			manualOverrides: {
-				resistCritical: 0, // プリセットは0から開始
-				requiredHIT: 0, // プリセットは0から開始
-			},
 		}
 
 		// Zustandストアを更新
@@ -105,12 +99,18 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 		value: string,
 	) => {
 		const numValue = value === '' ? 0 : Number(value)
+		
+		// 共通状態を更新
+		const currentOverrides = effectiveEnemyData.manualOverrides || {}
+		const newOverrides = {
+			...currentOverrides,
+			[field]: numValue,
+		}
+		setManualOverrides(newOverrides)
+		
 		const newData: EnemyFormData = {
 			...effectiveEnemyData,
-			manualOverrides: {
-				...effectiveEnemyData.manualOverrides,
-				[field]: numValue,
-			},
+			manualOverrides: newOverrides,
 		}
 
 		// Zustandストアを更新
@@ -153,6 +153,9 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 	const handleRaidBossLevelChange = (level: string) => {
 		// 空文字の場合はそのまま保持（入力中の状態）
 		if (level === '') {
+			// 共通状態は288にリセット（undefinedは許可されないため）
+			setRaidBossLevel(288)
+			
 			const newData: EnemyFormData = {
 				...effectiveEnemyData,
 				raidBossLevel: undefined,
@@ -163,6 +166,10 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 		}
 		
 		const numLevel = Math.max(1, Math.min(999, Number(level) || 1))
+		
+		// 共通状態を更新
+		setRaidBossLevel(numLevel)
+		
 		const newData: EnemyFormData = {
 			...effectiveEnemyData,
 			raidBossLevel: numLevel,

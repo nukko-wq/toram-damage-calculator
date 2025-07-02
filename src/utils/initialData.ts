@@ -8,6 +8,7 @@ import type {
 	FoodFormData,
 	EnemyInfo,
 	EnemyFormData,
+	SaveDataEnemyInfo,
 	BuffSkillFormData,
 	BuffItemFormData,
 	RegisterFormData,
@@ -190,7 +191,7 @@ export const createInitialFoodFormData = (): FoodFormData => ({
 	slot5: { selectedFood: 'none', level: 0 },
 })
 
-// 新しい敵情報システムの初期値
+// 新しい敵情報システムの初期値（旧形式・後方互換性用）
 export const createInitialEnemyFormData = (): EnemyFormData => ({
 	selectedId: null,
 	type: null,
@@ -198,6 +199,13 @@ export const createInitialEnemyFormData = (): EnemyFormData => ({
 		resistCritical: 0,
 		requiredHIT: 0,
 	},
+})
+
+// 新しい敵情報システムの初期値（個別セーブデータ用）
+export const createInitialSaveDataEnemyInfo = (): SaveDataEnemyInfo => ({
+	selectedEnemyId: null,
+	enemyType: null,
+	lastSelectedAt: undefined,
 })
 
 // レジスタ他システムの初期値
@@ -379,7 +387,7 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	equipment: createInitialEquipmentSlots(),
 	crystals: createInitialCrystalSlots(),
 	food: createInitialFoodFormData(), // 料理システム
-	enemy: createInitialEnemyFormData(), // 新しい敵情報システム
+	enemy: createInitialSaveDataEnemyInfo(), // 新しい敵情報システム
 	buffSkills: getDefaultBuffSkillFormData(), // バフスキルシステム
 	buffItems: getDefaultBuffItems(), // バフアイテムシステム
 	register: createInitialRegisterFormData(), // レジスタ他システム
