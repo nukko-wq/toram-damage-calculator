@@ -83,6 +83,69 @@ export const attackSkillsData: AttackSkill[] = [
 		description: '特殊な計算式を持つ多段攻撃スキル',
 	},
 
+	// 旋風槍スキル
+	{
+		id: 'strike_stab',
+		name: 'ストライクスタブ',
+		category: 'halberd',
+		weaponTypeRequirements: ['旋風槍'],
+		mpCost: 200,
+		multiplierFormula: '|200+補正後STR/5|%',
+		fixedDamageFormula: '100 (旋風槍装備時+100)',
+		specialEffects: ['距離威力: ○', '抜刀威力: ×', 'ロングレンジ: ×'],
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 200, // 表示用（実際の計算は外部）
+				fixedDamage: 100, // 表示用（実際の計算は外部）
+				multiplierFormula: '|200+補正後STR/5|%',
+				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseDistancePower: true,
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 200, // 表示用（実際の計算は外部）
+				fixedDamage: 100, // 表示用（実際の計算は外部）
+				multiplierFormula: '|200+補正後STR/5|%',
+				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseDistancePower: true,
+			},
+			{
+				hitNumber: 3,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 200, // 表示用（実際の計算は外部）
+				fixedDamage: 100, // 表示用（実際の計算は外部）
+				multiplierFormula: '|200+補正後STR/5|%',
+				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseDistancePower: true,
+			},
+		],
+		description: '旋風槍の基本攻撃スキル。装備武器により固定値にボーナス',
+	},
+
 	// 杖スキル
 	{
 		id: 'magic_arrow',
