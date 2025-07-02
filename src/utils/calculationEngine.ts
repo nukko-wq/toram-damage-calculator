@@ -11,6 +11,7 @@ import {
 	calculateCriticalRate,
 	calculateCriticalDamage,
 	calculateMagicalCriticalDamage,
+	calculateTotalATK,
 	calculateMATK,
 	calculateHIT,
 	calculatePhysicalResistance,
@@ -52,6 +53,13 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		data.subWeapon,
 		adjustedStats,
 		dummyBonuses,
+	)
+
+	// 4-1. 総ATK計算
+	const totalATKCalculation = calculateTotalATK(
+		data.mainWeapon.weaponType,
+		atkCalculation.finalATK,
+		0, // TODO: サブATK計算結果を取得
 	)
 
 	// 5. ASPD計算（体装備のArmorTypeを取得）
@@ -165,7 +173,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			MP: mpCalculation.finalMP,
 			ATK: atkCalculation.finalATK,
 			subBaseATK: data.subWeapon.ATK, // 暫定：サブ武器ATKをそのまま表示
-			totalATK: atkCalculation.finalATK + data.subWeapon.ATK, // 暫定
+			totalATK: totalATKCalculation.totalATK, // 総ATK計算結果
 			bringerAM: 0, // 暫定
 			MATK: matkCalculation.finalMATK,
 			baseMATK: matkCalculation.baseMATK,
