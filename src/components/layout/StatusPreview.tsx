@@ -9,6 +9,7 @@ import {
 	calculateMotionSpeed,
 	calculateCriticalRate,
 	calculateCriticalDamage,
+	calculateMagicalCriticalDamage,
 	calculateMATK,
 	calculateHIT,
 	calculatePhysicalResistance,
@@ -366,6 +367,22 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.AGI,
 				finalBonuses,
 			),
+			magicalCriticalDamageCalculation: (() => {
+				// まず物理クリティカルダメージを計算
+				const physicalCD = calculateCriticalDamage(
+					adjustedStatsCalculation.STR,
+					adjustedStatsCalculation.AGI,
+					finalBonuses,
+				)
+				// バフスキルからスペルバーストの状態を取得
+				// スペルバーストはtoggleタイプで、有効時はレベル10として扱う
+				const spellBurstSkill = data.buffSkills.skills.sf1
+				const spellBurstLevel = spellBurstSkill?.isEnabled ? 10 : 0
+				return calculateMagicalCriticalDamage(
+					physicalCD.finalCriticalDamage,
+					spellBurstLevel,
+				)
+			})(),
 			hitCalculation: calculateHIT(
 				baseStats.level,
 				adjustedStatsCalculation.DEX,
@@ -413,6 +430,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		data.equipment.body,
 		data.register, // レジスタデータを依存関係に追加
 		data.food, // 料理データを依存関係に追加（デバッグログ用）
+		data.buffSkills, // バフスキルデータを依存関係に追加
 	])
 
 	const {
@@ -426,6 +444,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		motionSpeedCalculation,
 		criticalRateCalculation,
 		criticalDamageCalculation,
+		magicalCriticalDamageCalculation,
 		hitCalculation,
 		fleeCalculation,
 		physicalResistanceCalculation,
@@ -548,7 +567,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
 		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
-		magicCriticalDamage: 130, // TODO: 魔法クリティカルダメージ
+		magicCriticalDamage: magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
 		totalElementAdvantage:
 			totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
