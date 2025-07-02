@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { useCalculatorStore } from '@/stores'
-import type { EnemyFormData, EnemyCategory } from '@/types/calculator'
+import type { EnemyFormData, BossDifficulty } from '@/types/calculator'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
+import { calculateRaidBossStats, isSelditeFLEEUnknown } from '@/utils/raidBossCalculation'
 import EnemySelectionModal from './EnemySelectionModal'
 
 interface EnemyFormProps {
@@ -16,6 +17,7 @@ interface EnemyFormProps {
 const getDefaultEnemyFormData = (): EnemyFormData => ({
 	selectedId: null,
 	type: null,
+	raidBossLevel: 288,
 	manualOverrides: {
 		resistCritical: 0,
 		requiredHIT: 0,
@@ -81,6 +83,7 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 		const newData: EnemyFormData = {
 			selectedId: enemyId,
 			type: 'preset',
+			raidBossLevel: 288,
 			manualOverrides: {
 				resistCritical: 0, // プリセットは0から開始
 				requiredHIT: 0, // プリセットは0から開始
@@ -119,25 +122,53 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 		}
 	}
 
-	// 最終的な計算値を取得（プリセット値 + 調整値）
-	const getFinalValue = (baseValue: number, overrideValue?: number): number => {
-		return baseValue + (overrideValue || 0)
+
+	// レイドボスステータス計算
+	const getRaidBossStats = (level: number) => {
+		if (!selectedEnemy || selectedEnemy.category !== 'raidBoss') return null
+		return calculateRaidBossStats(selectedEnemy.id, level)
 	}
 
-	// カテゴリ表示名の取得
-	const getCategoryDisplayName = (category: EnemyCategory): string => {
-		switch (category) {
-			case 'mob':
-				return 'モブ'
-			case 'fieldBoss':
-				return 'フィールドボス'
-			case 'boss':
-				return 'ボス'
-			case 'raidBoss':
-				return 'レイドボス'
-			default:
-				return category
+	// 難易度別ステータス計算（表示専用）
+	const getBossDifficultyStats = (difficulty: BossDifficulty) => {
+		if (!selectedEnemy || selectedEnemy.category !== 'boss') return null
+		
+		const levelBonus = difficulty === 'normal' ? 0 : 
+						  difficulty === 'hard' ? 10 : 
+						  difficulty === 'lunatic' ? 20 : 40
+		
+		const defMultiplier = difficulty === 'normal' ? 1 : 
+							  difficulty === 'hard' ? 2 : 
+							  difficulty === 'lunatic' ? 4 : 6
+		
+		return {
+			level: selectedEnemy.level + levelBonus,
+			DEF: Math.floor(selectedEnemy.stats.DEF * defMultiplier),
+			MDEF: Math.floor(selectedEnemy.stats.MDEF * defMultiplier)
 		}
+	}
+
+
+	// レイドボスレベル変更処理
+	const handleRaidBossLevelChange = (level: string) => {
+		// 空文字の場合はそのまま保持（入力中の状態）
+		if (level === '') {
+			const newData: EnemyFormData = {
+				...effectiveEnemyData,
+				raidBossLevel: undefined,
+			}
+			updateEnemy(newData)
+			if (onChange) onChange(newData)
+			return
+		}
+		
+		const numLevel = Math.max(1, Math.min(999, Number(level) || 1))
+		const newData: EnemyFormData = {
+			...effectiveEnemyData,
+			raidBossLevel: numLevel,
+		}
+		updateEnemy(newData)
+		if (onChange) onChange(newData)
 	}
 
 	// 選択済み敵の名前を取得
@@ -210,100 +241,189 @@ export default function EnemyForm({ enemyData, onChange }: EnemyFormProps) {
 					</button>
 				</div>
 
-				{/* 選択された敵の基本情報表示 */}
+				{/* 選択された敵の詳細情報表示 */}
 				{selectedEnemy && (
-					<table>
-						<tbody>
-							<tr>
-								<td colSpan={2} />
-								<td colSpan={2}>
-									物理耐性: {selectedEnemy.stats.physicalResistance}%
-								</td>
-								<td colSpan={2}>
-									魔法耐性: {selectedEnemy.stats.magicalResistance}%
-								</td>
-							</tr>
-							<tr>
-								<th />
-								<th>Normal</th>
-								<th>Hard</th>
-								<th>Lunatic</th>
-								<th>Ultimate</th>
-							</tr>
-							<tr>
-								<th>レベル</th>
-								<td>{selectedEnemy.level}</td>
-								<td />
-								<td />
-								<td />
-							</tr>
-							<tr>
-								<th>DEF</th>
-								<td>{selectedEnemy.stats.DEF}</td>
-								<td />
-								<td />
-								<td />
-							</tr>
-							<tr>
-								<th>MDEF</th>
-								<td>{selectedEnemy.stats.MDEF}</td>
-								<td />
-								<td />
-								<td />
-							</tr>
-						</tbody>
-					</table>
+					<div className="bg-gray-50 rounded-lg p-4 space-y-4">
+						{/* 基本情報表示 */}
+						<div className="grid grid-cols-2 gap-4 text-sm">
+							<div>
+								<span className="font-medium text-gray-700">物理耐性:</span>
+								<span className="ml-2 text-gray-900">{selectedEnemy.stats.physicalResistance}%</span>
+							</div>
+							<div>
+								<span className="font-medium text-gray-700">魔法耐性:</span>
+								<span className="ml-2 text-gray-900">{selectedEnemy.stats.magicalResistance}%</span>
+							</div>
+						</div>
+
+
+						{/* レイドボスレベル調整 */}
+						{selectedEnemy.category === 'raidBoss' && (
+							<div className="space-y-3">
+								<h4 className="text-sm font-medium text-gray-800">レベル調整</h4>
+								<div className="flex items-center gap-2">
+									<label className="text-sm text-gray-700">レベル:</label>
+									<input
+										type="number"
+										value={effectiveEnemyData.raidBossLevel ?? ''}
+										onChange={(e) => handleRaidBossLevelChange(e.target.value)}
+										className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+										min="1"
+										max="999"
+										placeholder="288"
+									/>
+								</div>
+							</div>
+						)}
+
+						{/* ステータステーブル */}
+						<div className="overflow-x-auto">
+							<table className="w-full text-xs border-collapse">
+								<thead>
+									<tr className="bg-gray-100">
+										<th className="border border-gray-300 px-2 py-1 text-left font-medium">ステータス</th>
+										{selectedEnemy.category === 'boss' ? (
+											<>
+												<th className="border border-gray-300 px-2 py-1 text-center font-medium">Normal</th>
+												<th className="border border-gray-300 px-2 py-1 text-center font-medium">Hard</th>
+												<th className="border border-gray-300 px-2 py-1 text-center font-medium">Lunatic</th>
+												<th className="border border-gray-300 px-2 py-1 text-center font-medium">Ultimate</th>
+											</>
+										) : selectedEnemy.category === 'raidBoss' ? (
+											<th className="border border-gray-300 px-2 py-1 text-center font-medium">計算値</th>
+										) : (
+											<th className="border border-gray-300 px-2 py-1 text-center font-medium">値</th>
+										)}
+									</tr>
+								</thead>
+								<tbody>
+									{/* レベル行 */}
+									<tr>
+										<td className="border border-gray-300 px-2 py-1 font-medium bg-gray-50">レベル</td>
+										{selectedEnemy.category === 'boss' ? (
+											<>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('normal')?.level}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('hard')?.level}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('lunatic')?.level}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('ultimate')?.level}</td>
+											</>
+										) : selectedEnemy.category === 'raidBoss' ? (
+											<td className="border border-gray-300 px-2 py-1 text-center">{effectiveEnemyData.raidBossLevel ?? 288}</td>
+										) : (
+											<td className="border border-gray-300 px-2 py-1 text-center">{selectedEnemy.level}</td>
+										)}
+									</tr>
+									{/* DEF行 */}
+									<tr>
+										<td className="border border-gray-300 px-2 py-1 font-medium bg-gray-50">DEF</td>
+										{selectedEnemy.category === 'boss' ? (
+											<>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('normal')?.DEF}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('hard')?.DEF}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('lunatic')?.DEF}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('ultimate')?.DEF}</td>
+											</>
+										) : selectedEnemy.category === 'raidBoss' ? (
+											<td className="border border-gray-300 px-2 py-1 text-center">
+												{getRaidBossStats(effectiveEnemyData.raidBossLevel ?? 288)?.DEF || 0}
+											</td>
+										) : (
+											<td className="border border-gray-300 px-2 py-1 text-center">{selectedEnemy.stats.DEF}</td>
+										)}
+									</tr>
+									{/* MDEF行 */}
+									<tr>
+										<td className="border border-gray-300 px-2 py-1 font-medium bg-gray-50">MDEF</td>
+										{selectedEnemy.category === 'boss' ? (
+											<>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('normal')?.MDEF}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('hard')?.MDEF}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('lunatic')?.MDEF}</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">{getBossDifficultyStats('ultimate')?.MDEF}</td>
+											</>
+										) : selectedEnemy.category === 'raidBoss' ? (
+											<td className="border border-gray-300 px-2 py-1 text-center">
+												{getRaidBossStats(effectiveEnemyData.raidBossLevel ?? 288)?.MDEF || 0}
+											</td>
+										) : (
+											<td className="border border-gray-300 px-2 py-1 text-center">{selectedEnemy.stats.MDEF}</td>
+										)}
+									</tr>
+									{/* レイドボス専用：物理耐性、魔法耐性 */}
+									{selectedEnemy.category === 'raidBoss' && (
+										<>
+											<tr>
+												<td className="border border-gray-300 px-2 py-1 font-medium bg-gray-50">物理耐性</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">
+													{getRaidBossStats(effectiveEnemyData.raidBossLevel ?? 288)?.physicalResistance || 0}%
+												</td>
+											</tr>
+											<tr>
+												<td className="border border-gray-300 px-2 py-1 font-medium bg-gray-50">魔法耐性</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">
+													{getRaidBossStats(effectiveEnemyData.raidBossLevel ?? 288)?.magicalResistance || 0}%
+												</td>
+											</tr>
+											<tr>
+												<td className="border border-gray-300 px-2 py-1 font-medium bg-gray-50">必要HIT</td>
+												<td className="border border-gray-300 px-2 py-1 text-center">
+													{getRaidBossStats(effectiveEnemyData.raidBossLevel ?? 288)?.requiredHIT || 0}
+												</td>
+											</tr>
+										</>
+									)}
+								</tbody>
+							</table>
+						</div>
+					</div>
 				)}
 
 				{/* 手動調整値入力 */}
 				{selectedEnemy && (
-					<div className="space-y-2">
-						<div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+					<div className="bg-white rounded-lg border border-gray-200 p-4">
+						<h4 className="text-sm font-medium text-gray-800 mb-3">手動調整</h4>
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+							{/* 確定クリティカル */}
 							<div className="flex flex-col gap-2">
+								<label className="text-sm font-medium text-gray-700">
+									確定クリティカル
+								</label>
 								<div className="flex items-center gap-2">
-									<label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">
-										確定クリティカル:
-									</label>
-									<div className="flex-1 flex items-center gap-1 text-sm">
-										<input
-											type="number"
-											value={
-												effectiveEnemyData.manualOverrides?.resistCritical || 0
-											}
-											onChange={(e) =>
-												handleManualOverrideChange(
-													'resistCritical',
-													e.target.value,
-												)
-											}
-											className="w-16 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-											min="0"
-											max="999"
-										/>
-									</div>
+									<input
+										type="number"
+										value={effectiveEnemyData.manualOverrides?.resistCritical || 0}
+										onChange={(e) =>
+											handleManualOverrideChange('resistCritical', e.target.value)
+										}
+										className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+										min="0"
+										max="999"
+									/>
+									<span className="text-xs text-gray-500">(0-999)</span>
 								</div>
+							</div>
 
+							{/* 必要HIT */}
+							<div className="flex flex-col gap-2">
+								<label className="text-sm font-medium text-gray-700">
+									必要HIT
+									{selectedEnemy.category === 'raidBoss' && 
+										isSelditeFLEEUnknown(selectedEnemy.id) && 
+										<span className="ml-1 text-xs text-orange-600">(FLEE値不明)</span>
+									}
+								</label>
 								<div className="flex items-center gap-2">
-									<label className="text-sm font-medium text-gray-700 w-32 flex-shrink-0">
-										必要HIT:
-									</label>
-									<div className="flex-1 flex items-center gap-1 text-sm">
-										<input
-											type="number"
-											value={
-												effectiveEnemyData.manualOverrides?.requiredHIT || 0
-											}
-											onChange={(e) =>
-												handleManualOverrideChange(
-													'requiredHIT',
-													e.target.value,
-												)
-											}
-											className="w-16 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-											min="0"
-											max="9999"
-										/>
-									</div>
+									<input
+										type="number"
+										value={effectiveEnemyData.manualOverrides?.requiredHIT || 0}
+										onChange={(e) =>
+											handleManualOverrideChange('requiredHIT', e.target.value)
+										}
+										className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+										min="0"
+										max="9999"
+									/>
+									<span className="text-xs text-gray-500">(0-9999)</span>
 								</div>
 							</div>
 						</div>

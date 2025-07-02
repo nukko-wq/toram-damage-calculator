@@ -137,7 +137,7 @@ export const enemiesData: EnemiesData = {
 			{
 				id: 'ca10a211-71b5-4683-811e-3e09457edbe3',
 				name: '竜骨の魔人',
-				level: 100, // デフォルトレベル（ユーザーが調整可能）
+				level: 288, // デフォルトレベル（ユーザーが調整可能）
 				stats: {
 					DEF: 0, // レベル調整時に自動計算
 					MDEF: 0, // レベル調整時に自動計算
@@ -151,7 +151,7 @@ export const enemiesData: EnemiesData = {
 			{
 				id: '1a1674ab-7118-4667-b457-903841462889',
 				name: '赫灼のセルディテ',
-				level: 100, // デフォルトレベル（ユーザーが調整可能）
+				level: 288, // デフォルトレベル（ユーザーが調整可能）
 				stats: {
 					DEF: 0, // レベル調整時に自動計算
 					MDEF: 0, // レベル調整時に自動計算
@@ -165,7 +165,7 @@ export const enemiesData: EnemiesData = {
 			{
 				id: 'ice-bison-uuid', // TODO: 実際のUUIDに置き換える
 				name: '氷岩のバイソン',
-				level: 100,
+				level: 288,
 				stats: {
 					DEF: 0, // レベル調整時に自動計算
 					MDEF: 0, // レベル調整時に自動計算
@@ -179,7 +179,7 @@ export const enemiesData: EnemiesData = {
 			{
 				id: 'thunder-nguruma-uuid', // TODO: 実際のUUIDに置き換える
 				name: '轟雷のングルマ',
-				level: 100,
+				level: 288,
 				stats: {
 					DEF: 0, // レベル調整時に自動計算
 					MDEF: 0, // レベル調整時に自動計算
@@ -193,7 +193,7 @@ export const enemiesData: EnemiesData = {
 			{
 				id: 'earthquake-chimera-uuid', // TODO: 実際のUUIDに置き換える
 				name: '震巌のキマイラ',
-				level: 100,
+				level: 288,
 				stats: {
 					DEF: 0, // レベル調整時に自動計算
 					MDEF: 0, // レベル調整時に自動計算

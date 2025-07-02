@@ -18,6 +18,7 @@
 **ローカルストレージキー**:
 - **プリセット敵情報（コピー済み）**: LocalStorage (`preset_enemies`)
 - **ユーザーカスタムデータ**: LocalStorage (`custom_enemies`)
+- **敵選択状態（共通）**: LocalStorage (`enemy_selection_state`)
 - **統合アクセス**: 両方のデータを統一的に管理
 
 ## TypeScriptデータ構造
@@ -78,6 +79,47 @@ type EnemyCategory = 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
 type BossDifficulty = 'normal' | 'hard' | 'lunatic' | 'ultimate'
 ```
 
+## セーブデータ分離設計
+
+### 共通敵選択状態（全セーブデータ共通）
+```typescript
+interface EnemySelectionState {
+  selectedId: string | null           // 選択中の敵ID
+  type: 'preset' | 'custom' | null    // データソースの識別
+  // ボス難易度設定（boss カテゴリのみ）
+  difficulty?: BossDifficulty
+  // レイドボス レベル調整（raidBoss カテゴリのみ）
+  raidBossLevel?: number
+  // 手動調整値（プリセット・カスタム選択後の調整用）
+  manualOverrides?: {
+    resistCritical?: number           // 確定クリティカル調整値
+    requiredHIT?: number              // 必要HIT調整値
+  }
+  lastUpdated: string                 // 最終更新日時 (ISO string)
+}
+```
+
+### セーブデータ内の敵情報（個別セーブデータ用）
+```typescript
+interface SaveDataEnemyInfo {
+  selectedEnemyId: string | null      // 選択中の敵ID（参照のみ）
+  lastSelectedAt?: string             // 最終選択日時 (ISO string)
+}
+```
+
+### データフロー設計
+```
+1. 敵選択・設定変更
+   ↓
+2. EnemySelectionState（共通）に保存
+   ↓
+3. SaveDataEnemyInfo（個別）に敵IDのみ記録
+   ↓
+4. セーブデータ切り替え時
+   ↓
+5. 共通状態から該当敵の設定を読み込み表示
+```
+
 ## ボス戦難易度システム
 
 ### 難易度設定
@@ -123,8 +165,8 @@ function getDifficultyDefMultiplier(difficulty: BossDifficulty): number {
 ```
 
 **UI表示**:
-- `boss`選択時のみ難易度選択UI表示
-- `mob`, `fieldBoss`, `raidBoss`では難易度選択は非表示
+- EnemyForm: ボス系敵の難易度別ステータス表示（選択不可）
+- DamagePreview: ボス難易度選択UI（計算で使用）
 - 選択された難易度は敵名の後に表示（例：「ピヌグールガ (Hard)」）
 
 ## レイドボス レベル調整システム
@@ -247,11 +289,47 @@ function calculateRaidBossStats(raidBossId: string, level: number): EnemyStats {
 
 **UI表示**:
 - `raidBoss`選択時のみレベル入力フィールド表示
-- レベル範囲: 1-999
+- レベル範囲: 1-999、デフォルト値: 288
 - レベル変更時に全ステータス（DEF、MDEF、耐性、必要HIT）が自動更新
 - レイドボス毎に異なる計算式を適用
 - **FLEE値の手動入力**: 赫灼のセルディテ選択時は必要HIT（FLEE値）の手動入力フィールドを表示
 - **確定クリティカル設定**: 全敵カテゴリ（mob, fieldBoss, boss, raidBoss）で確定クリティカル値（0-999）をユーザーが設定可能
+
+## ストレージ管理の実装方針
+
+### 従来の問題点
+- セーブデータごとに敵情報の詳細設定を保存
+- セーブデータ間で敵の設定が独立してしまう
+- 同じ敵に対する設定の重複保存
+
+### 新しい設計の利点
+1. **共通設定の一元管理**:
+   - レイドボスレベル、ボス難易度、手動調整値を共通化
+   - 一度設定すれば全セーブデータで共有
+
+2. **セーブデータの軽量化**:
+   - 各セーブデータには敵IDのみ保存
+   - 詳細設定は共通ストレージから参照
+
+3. **設定の一貫性**:
+   - 同じ敵を選択すれば常に同じ設定値
+   - セーブデータ切り替え時の設定ロスト防止
+
+### 実装上の考慮点
+- 共通設定の変更は即座に全セーブデータに反映
+- セーブデータ削除時も共通設定は保持
+- 共通設定のバックアップ・復元機能
+
+### マイグレーション計画
+```typescript
+// 既存データから新形式への移行
+interface MigrationPlan {
+  1. 既存のEnemyFormDataからEnemySelectionStateを抽出
+  2. 共通ストレージ（enemy_selection_state）に保存
+  3. 各セーブデータのenemyフィールドをSaveDataEnemyInfoに変換
+  4. 旧形式のクリーンアップ
+}
+```
 
 ## mainWeapon装備の武器ステータス仕様
 
