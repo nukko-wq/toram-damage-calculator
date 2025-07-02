@@ -10,6 +10,7 @@ import {
 	calculateATK,
 	calculateCriticalRate,
 	calculateCriticalDamage,
+	calculateMagicalCriticalDamage,
 	calculateMATK,
 	calculateHIT,
 	calculatePhysicalResistance,
@@ -88,6 +89,16 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		dummyBonuses,
 	)
 
+	// 8-3. 魔法クリティカルダメージ計算
+	// バフスキルからスペルバーストの状態を取得
+	// スペルバーストはtoggleタイプで、有効時はレベル10として扱う
+	const spellBurstSkill = data.buffSkills.skills.sf1
+	const spellBurstLevel = spellBurstSkill?.isEnabled ? 10 : 0
+	const magicalCriticalDamageCalculation = calculateMagicalCriticalDamage(
+		criticalDamageCalculation.finalCriticalDamage,
+		spellBurstLevel,
+	)
+
 	// 8-3. MATK計算
 	const matkCalculation = calculateMATK(
 		data.baseStats.level,
@@ -163,7 +174,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
 			magicCriticalRate: 0, // 暫定
-			magicCriticalDamage: 0, // 暫定
+			magicCriticalDamage: magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
 			totalElementAdvantage:
 				totalElementAdvantageCalculation.finalTotalElementAdvantage,
 			elementAwakeningAdvantage: 0, // 暫定

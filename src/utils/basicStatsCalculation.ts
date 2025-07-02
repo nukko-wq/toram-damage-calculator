@@ -457,6 +457,15 @@ export interface CriticalDamageCalculationSteps {
 	finalCriticalDamage: number // 最終クリティカルダメージ
 }
 
+// 魔法クリティカルダメージ計算の詳細ステップ
+export interface MagicalCriticalDamageCalculationSteps {
+	physicalCriticalDamage: number // 物理クリティカルダメージ（半減処理適用済み）
+	spellBurstLevel: number // スペルバーストスキルレベル（0-10）
+	baseMagicalCD: number // 魔法クリティカルダメージのベース値（100）
+	increaseAmount: number // 増加量計算結果
+	finalMagicalCriticalDamage: number // 最終魔法クリティカルダメージ
+}
+
 // MATK計算の詳細ステップ
 export interface MATKCalculationSteps {
 	level: number // キャラクターレベル
@@ -1583,6 +1592,36 @@ export function calculateTotalElementAdvantage(
 	return {
 		elementAdvantageRate,
 		finalTotalElementAdvantage,
+	}
+}
+
+/**
+ * 魔法クリティカルダメージ計算
+ * 魔法クリティカルダメージ = INT(100 + (クリティカルダメージ - 100) × (20 + スペルバーストslv) / 40)
+ * 
+ * @param physicalCriticalDamage 物理クリティカルダメージの最終計算結果（300超過時の半減処理適用済み）
+ * @param spellBurstLevel バフスキルのスペルバースト(sf1)のスキルレベル（0-10）
+ * @returns 魔法クリティカルダメージ計算結果
+ */
+export function calculateMagicalCriticalDamage(
+	physicalCriticalDamage: number,
+	spellBurstLevel = 0,
+): MagicalCriticalDamageCalculationSteps {
+	// 1. ベース値
+	const baseMagicalCD = 100
+
+	// 2. 増加量計算
+	const increaseAmount = (physicalCriticalDamage - 100) * (20 + spellBurstLevel) / 40
+
+	// 3. 最終値算出（INT関数適用）
+	const finalMagicalCriticalDamage = Math.floor(baseMagicalCD + increaseAmount)
+
+	return {
+		physicalCriticalDamage,
+		spellBurstLevel,
+		baseMagicalCD,
+		increaseAmount,
+		finalMagicalCriticalDamage,
 	}
 }
 
