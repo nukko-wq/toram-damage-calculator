@@ -9,11 +9,7 @@ import type { CalculatorData, EnemyFormData } from '@/types/calculator'
 import type { EquipmentSlots } from '@/types/calculator'
 import type { BuffSkillFormData } from '@/types/buffSkill'
 import { createInitialCalculatorData, migrateRegisterEffects } from '@/utils/initialData'
-import { 
-	setBossDifficulty,
-	setRaidBossLevel,
-	setManualOverrides
-} from '@/utils/enemySettingsState'
+// 敵設定はenemySettingsStoreで管理するため、このインポートは削除
 import {
 	saveCurrentData,
 	getCurrentSaveData,
@@ -246,20 +242,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			updateEnemy: (enemy) => {
-				// 共通設定を更新
-				if (enemy.difficulty) {
-					setBossDifficulty(enemy.difficulty)
-				}
-				
-				if (enemy.raidBossLevel !== undefined) {
-					setRaidBossLevel(enemy.raidBossLevel)
-				}
-				
-				if (enemy.manualOverrides) {
-					setManualOverrides(enemy.manualOverrides)
-				}
-				
-				// 個別データには敵選択情報のみ保存
+				// 敵設定はEnemyFormコンポーネント側でenemySettingsStoreに直接保存される
+				// ここでは個別データ（敵選択情報）のみ保存
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
 				dataUpdate({ 
 					enemy: { 
@@ -780,6 +764,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					// saveDataStoreの初期化も実行
 					const { useSaveDataStore } = await import('./saveDataStore')
 					await useSaveDataStore.getState().loadSaveDataList()
+
+					// 敵設定ストアの初期化
+					const { useEnemySettingsStore } = await import('./enemySettingsStore')
+					useEnemySettingsStore.getState().loadFromLocalStorage()
 
 					// レジスタ効果の移行（新効果があれば追加）
 					const migratedData = { ...currentSave.data }

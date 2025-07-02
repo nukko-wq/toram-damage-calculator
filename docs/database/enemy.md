@@ -18,7 +18,7 @@
 **ローカルストレージキー**:
 - **プリセット敵情報（コピー済み）**: LocalStorage (`preset_enemies`)
 - **ユーザーカスタムデータ**: LocalStorage (`custom_enemies`)
-- **敵選択状態（共通）**: LocalStorage (`enemy_selection_state`)
+- **敵設定（敵ID別）**: LocalStorage (`enemy_settings_per_enemy`) + Zustandストア
 - **統合アクセス**: 両方のデータを統一的に管理
 
 ## TypeScriptデータ構造
@@ -79,23 +79,23 @@ type EnemyCategory = 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
 type BossDifficulty = 'normal' | 'hard' | 'lunatic' | 'ultimate'
 ```
 
-## セーブデータ分離設計
+## 敵設定管理システム
 
-### 共通敵選択状態（全セーブデータ共通）
+### 敵設定の個別保存（Zustandベース）
 ```typescript
-interface EnemySelectionState {
-  selectedId: string | null           // 選択中の敵ID
-  type: 'preset' | 'custom' | null    // データソースの識別
-  // ボス難易度設定（boss カテゴリのみ）
-  difficulty?: BossDifficulty
-  // レイドボス レベル調整（raidBoss カテゴリのみ）
-  raidBossLevel?: number
-  // 手動調整値（プリセット・カスタム選択後の調整用）
+interface EnemySettings {
+  enemyId: string                     // 敵ID（キー）
+  difficulty?: BossDifficulty         // ボス難易度設定（boss カテゴリのみ）
+  raidBossLevel?: number              // レイドボス レベル調整（raidBoss カテゴリのみ）
   manualOverrides?: {
     resistCritical?: number           // 確定クリティカル調整値
     requiredHIT?: number              // 必要HIT調整値
   }
   lastUpdated: string                 // 最終更新日時 (ISO string)
+}
+
+interface EnemySettingsMap {
+  [enemyId: string]: EnemySettings    // 敵IDをキーとした設定マップ
 }
 ```
 
@@ -103,21 +103,24 @@ interface EnemySelectionState {
 ```typescript
 interface SaveDataEnemyInfo {
   selectedEnemyId: string | null      // 選択中の敵ID（参照のみ）
+  enemyType?: 'preset' | 'custom'     // データソースの識別
   lastSelectedAt?: string             // 最終選択日時 (ISO string)
 }
 ```
 
 ### データフロー設計
 ```
-1. 敵選択・設定変更
+1. 敵選択
    ↓
-2. EnemySelectionState（共通）に保存
+2. SaveDataEnemyInfo（個別セーブデータ）に敵IDを保存
    ↓
-3. SaveDataEnemyInfo（個別）に敵IDのみ記録
+3. 敵設定変更
    ↓
-4. セーブデータ切り替え時
+4. EnemySettingsStore（Zustand）に敵ID別で設定保存
    ↓
-5. 共通状態から該当敵の設定を読み込み表示
+5. セーブデータ切り替え時
+   ↓
+6. 選択された敵IDに対応する設定をEnemySettingsStoreから読み込み
 ```
 
 ## ボス戦難易度システム
@@ -299,36 +302,67 @@ function calculateRaidBossStats(raidBossId: string, level: number): EnemyStats {
 
 ### 従来の問題点
 - セーブデータごとに敵情報の詳細設定を保存
-- セーブデータ間で敵の設定が独立してしまう
-- 同じ敵に対する設定の重複保存
+- 設定が他の敵に影響する（memoization問題）
+- 敵切り替え時の設定リセット不具合
 
 ### 新しい設計の利点
-1. **共通設定の一元管理**:
-   - レイドボスレベル、ボス難易度、手動調整値を共通化
-   - 一度設定すれば全セーブデータで共有
+1. **敵別設定の分離管理**:
+   - 各敵が独立した設定を持つ
+   - 敵切り替え時に他の敵の設定に影響しない
+   - 設定の混在やリークを防止
 
-2. **セーブデータの軽量化**:
-   - 各セーブデータには敵IDのみ保存
-   - 詳細設定は共通ストレージから参照
+2. **Zustandによる状態管理**:
+   - リアルタイムな状態更新とReact連携
+   - LocalStorageとの自動同期
+   - 適切なmemoizationとdependency管理
 
-3. **設定の一貫性**:
-   - 同じ敵を選択すれば常に同じ設定値
-   - セーブデータ切り替え時の設定ロスト防止
+3. **設定の独立性**:
+   - 敵Aで確定クリティカル100設定→敵Bは0（デフォルト）
+   - セーブデータ間では敵選択のみ独立、設定は敵別で共有
+   - 設定ロスト防止と適切な初期化
 
 ### 実装上の考慮点
-- 共通設定の変更は即座に全セーブデータに反映
-- セーブデータ削除時も共通設定は保持
-- 共通設定のバックアップ・復元機能
+- 敵別設定はZustandストアとLocalStorageで二重管理
+- セーブデータ削除時も敵設定は保持
+- デフォルト値の適切な提供（確定クリティカル: 0、レイドボスレベル: 288）
 
-### マイグレーション計画
+### Zustandストア実装詳細
 ```typescript
-// 既存データから新形式への移行
-interface MigrationPlan {
-  1. 既存のEnemyFormDataからEnemySelectionStateを抽出
-  2. 共通ストレージ（enemy_selection_state）に保存
-  3. 各セーブデータのenemyフィールドをSaveDataEnemyInfoに変換
-  4. 旧形式のクリーンアップ
-}
+// src/stores/enemySettingsStore.ts
+export const useEnemySettingsStore = create<EnemySettingsStore>()()
+  devtools(
+    (set, get) => ({
+      settingsMap: {},
+      
+      // 敵設定取得（デフォルト値自動提供）
+      getEnemySettings: (enemyId: string) => {
+        const { settingsMap } = get()
+        return settingsMap[enemyId] || getDefaultEnemySettings(enemyId)
+      },
+      
+      // 敵設定更新（LocalStorageと同期）
+      updateEnemySettings: (enemyId: string, updates) => {
+        set((state) => {
+          const newSettings = {
+            ...state.settingsMap[enemyId],
+            ...updates,
+            enemyId,
+            lastUpdated: new Date().toISOString()
+          }
+          const newMap = { ...state.settingsMap, [enemyId]: newSettings }
+          // LocalStorageに保存
+          localStorage.setItem('enemy_settings_per_enemy', JSON.stringify(newMap))
+          return { settingsMap: newMap }
+        })
+      },
+      
+      // 各種設定用ヘルパー関数
+      setBossDifficulty: (enemyId, difficulty) => { /* 実装 */ },
+      setRaidBossLevel: (enemyId, level) => { /* 実装 */ },
+      setManualOverrides: (enemyId, overrides) => { /* 実装 */ }
+    })
+  )
+)
 ```
 
 ## mainWeapon装備の武器ステータス仕様

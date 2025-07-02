@@ -320,8 +320,9 @@ export interface PresetEnemy {
 	category: EnemyCategory // 敵カテゴリ
 }
 
-// 共通敵設定状態（全セーブデータ共通 - 設定値のみ）
-export interface EnemySettingsState {
+// 個別敵設定（敵ごとの設定値）
+export interface EnemySettings {
+	enemyId: string // 敵のID
 	// ボス難易度設定（boss カテゴリのみ）
 	difficulty?: BossDifficulty
 	// レイドボス レベル調整（raidBoss カテゴリのみ）
@@ -332,6 +333,11 @@ export interface EnemySettingsState {
 		requiredHIT?: number // 必要HIT調整値（レイドボス以外 or 赫灼のセルディテのFLEE値）
 	}
 	lastUpdated: string // 最終更新日時 (ISO string)
+}
+
+// 敵設定管理状態（全敵の設定を格納）
+export interface EnemySettingsMap {
+	[enemyId: string]: EnemySettings
 }
 
 // セーブデータ内の敵情報（個別セーブデータ用 - 選択している敵）
