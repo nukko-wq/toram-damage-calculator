@@ -853,6 +853,9 @@ export interface CalculatedHit {
 	canUseUnsheathePower: boolean
 	canUseLongRange: boolean
 	canUseDistancePower: boolean
+	
+	// 計算過程（特殊計算の場合）
+	calculationProcess?: string
 }
 
 // AttackSkillForm表示用データ

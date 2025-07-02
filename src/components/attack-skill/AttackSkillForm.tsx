@@ -8,6 +8,7 @@ import {
 	getAttackSkillById,
 	getPowerReferenceDisplayText,
 } from '@/data/attackSkills'
+import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 
 interface AttackSkillFormProps {
 	onSkillChange?: (skillData: AttackSkillDisplayData) => void
@@ -38,45 +39,131 @@ export default function AttackSkillForm({
 		return getAttackSkillById(attackSkillData.selectedSkillId)
 	}, [attackSkillData.selectedSkillId])
 
+	// 全体のデータを取得（計算に使用）
+	const calculatorData = useCalculatorStore((state) => state.data)
+
 	// 表示用の計算データ
 	const displayData = useMemo((): AttackSkillDisplayData => {
-		const calculatedHits: CalculatedHit[] =
-			selectedSkill?.hits.map((hit) => ({
-				hitNumber: hit.hitNumber,
-				attackType: hit.attackType,
-				powerReference: getPowerReferenceDisplayText(hit.powerReference),
-				referenceDefense: hit.referenceDefense,
-				referenceResistance: hit.referenceResistance,
-				multiplier: hit.multiplier,
-				fixedDamage: hit.fixedDamage,
-				multiplierFormula: hit.multiplierFormula,
-				fixedDamageFormula: hit.fixedDamageFormula,
-				familiarityReference: hit.familiarity,
-				familiarityGrant: hit.familiarityGrant,
-				canUseUnsheathePower: hit.canUseUnsheathePower,
-				canUseLongRange: hit.canUseLongRange,
-				canUseDistancePower: hit.canUseDistancePower,
-			})) || []
+		if (!selectedSkill) {
+			return {
+				selectedSkill: null,
+				calculatedHits: [],
+				showDetailedInfo: false,
+			}
+		}
+
+		// 計算モジュールを使用して実際の計算を実行
+		const calculationResult = attackSkillCalculation.calculateSkill(
+			selectedSkill.id,
+			calculatorData,
+		)
+
+		const calculatedHits: CalculatedHit[] = calculationResult.hits.map(
+			(calculatedHit) => {
+				const originalHit = selectedSkill.hits.find(
+					(hit) => hit.hitNumber === calculatedHit.hitNumber,
+				)
+				if (!originalHit) {
+					throw new Error(
+						`Original hit data not found for hit ${calculatedHit.hitNumber}`,
+					)
+				}
+
+				return {
+					hitNumber: calculatedHit.hitNumber,
+					attackType: originalHit.attackType,
+					powerReference: getPowerReferenceDisplayText(
+						originalHit.powerReference,
+					),
+					referenceDefense: originalHit.referenceDefense,
+					referenceResistance: originalHit.referenceResistance,
+					multiplier: calculatedHit.calculatedMultiplier,
+					fixedDamage: calculatedHit.calculatedFixedDamage,
+					multiplierFormula: originalHit.multiplierFormula,
+					fixedDamageFormula: originalHit.fixedDamageFormula,
+					familiarityReference: originalHit.familiarity,
+					familiarityGrant: originalHit.familiarityGrant,
+					canUseUnsheathePower: originalHit.canUseUnsheathePower,
+					canUseLongRange: originalHit.canUseLongRange,
+					canUseDistancePower: originalHit.canUseDistancePower,
+					calculationProcess: calculatedHit.calculationProcess,
+				}
+			},
+		)
 
 		return {
-			selectedSkill: selectedSkill || null,
+			selectedSkill,
 			calculatedHits,
 			showDetailedInfo: false,
 		}
-	}, [selectedSkill])
+	}, [selectedSkill, calculatorData])
 
 	// スキル選択処理
 	const handleSkillSelect = (skillId: string) => {
 		const newSkillId = skillId === '' ? null : skillId
+		
+		// スキルが選択された場合は計算を実行
+		let calculatedData = null
+		let displayDataForCallback = {
+			selectedSkill: null,
+			calculatedHits: [],
+			showDetailedInfo: false,
+		} as AttackSkillDisplayData
+
+		if (newSkillId) {
+			const skill = getAttackSkillById(newSkillId)
+			if (skill) {
+				const calculationResult = attackSkillCalculation.calculateSkill(
+					newSkillId,
+					calculatorData,
+				)
+				calculatedData = calculationResult.hits.map((calculatedHit) => {
+					const originalHit = skill.hits.find(
+						(hit) => hit.hitNumber === calculatedHit.hitNumber,
+					)
+					if (!originalHit) {
+						throw new Error(
+							`Original hit data not found for hit ${calculatedHit.hitNumber}`,
+						)
+					}
+					return {
+						hitNumber: calculatedHit.hitNumber,
+						attackType: originalHit.attackType,
+						powerReference: getPowerReferenceDisplayText(
+							originalHit.powerReference,
+						),
+						referenceDefense: originalHit.referenceDefense,
+						referenceResistance: originalHit.referenceResistance,
+						multiplier: calculatedHit.calculatedMultiplier,
+						fixedDamage: calculatedHit.calculatedFixedDamage,
+						multiplierFormula: originalHit.multiplierFormula,
+						fixedDamageFormula: originalHit.fixedDamageFormula,
+						familiarityReference: originalHit.familiarity,
+						familiarityGrant: originalHit.familiarityGrant,
+						canUseUnsheathePower: originalHit.canUseUnsheathePower,
+						canUseLongRange: originalHit.canUseLongRange,
+						canUseDistancePower: originalHit.canUseDistancePower,
+						calculationProcess: calculatedHit.calculationProcess,
+					}
+				})
+				
+				displayDataForCallback = {
+					selectedSkill: skill,
+					calculatedHits: calculatedData,
+					showDetailedInfo: false,
+				}
+			}
+		}
+
 		updateAttackSkill({
 			selectedSkillId: newSkillId,
-			calculatedData: newSkillId ? displayData.calculatedHits : null,
+			calculatedData,
 			lastCalculatedAt: new Date().toISOString(),
 		})
 
 		// 親コンポーネントに通知
 		if (onSkillChange) {
-			onSkillChange(displayData)
+			onSkillChange(displayDataForCallback)
 		}
 	}
 
@@ -146,13 +233,13 @@ export default function AttackSkillForm({
 							<div className="flex">
 								<span className="text-gray-700 w-[7rem]">スキル威力値:</span>{' '}
 								<span className="flex items-center gap-3">
-									{selectedSkill.hits.map((hit, index) => (
+									{displayData.calculatedHits.map((hit, index) => (
 										<span
 											key={hit.hitNumber}
 											className="flex items-center w-[4rem] gap-2 text-gray-700"
 										>
 											{hit.multiplier}%
-											{index < selectedSkill.hits.length - 1 && (
+											{index < displayData.calculatedHits.length - 1 && (
 												<span className="text-gray-700">/</span>
 											)}
 										</span>
@@ -162,13 +249,13 @@ export default function AttackSkillForm({
 							<div className="flex">
 								<span className="text-gray-700 w-[7rem]">スキル固定値:</span>{' '}
 								<span className="flex items-center gap-3">
-									{selectedSkill.hits.map((hit, index) => (
+									{displayData.calculatedHits.map((hit, index) => (
 										<span
 											key={hit.hitNumber}
 											className="flex items-center w-[4rem] gap-8 text-gray-700"
 										>
 											{hit.fixedDamage}
-											{index < selectedSkill.hits.length - 1 && (
+											{index < displayData.calculatedHits.length - 1 && (
 												<span className="text-gray-700">/</span>
 											)}
 										</span>
@@ -204,7 +291,8 @@ export default function AttackSkillForm({
 					{/* 選択された撃の詳細情報 */}
 					{(() => {
 						const currentHit =
-							selectedSkill.hits[selectedHitIndex] || selectedSkill.hits[0]
+							displayData.calculatedHits[selectedHitIndex] ||
+							displayData.calculatedHits[0]
 						return (
 							<div className="space-y-3">
 								{/* テーブル風の詳細情報 */}
@@ -221,7 +309,7 @@ export default function AttackSkillForm({
 										<div className="px-3 py-2 border-r border-gray-300">
 											<span className="text-gray-700">慣れ参照:</span>{' '}
 											<span className="text-gray-700">
-												{getFamiliarityDisplayText(currentHit.familiarity)}
+												{getFamiliarityDisplayText(currentHit.familiarityReference)}
 											</span>
 										</div>
 										<div className="px-3 py-2">
@@ -276,38 +364,22 @@ export default function AttackSkillForm({
 									<div className="px-3 py-2">
 										<span className="text-gray-700">威力参照/攻撃力:</span>{' '}
 										<span className="text-gray-700">
-											{getPowerReferenceDisplayText(currentHit.powerReference)}
+											{currentHit.powerReference}
 										</span>
 									</div>
 								</div>
 
-								{/* 特殊計算式表示（2撃目等で特殊な場合） */}
-								{currentHit.multiplierFormula &&
-									currentHit.multiplierFormula !==
-										`${currentHit.multiplier}%` && (
-										<div className="space-y-2 p-3 rounded border border-gray-300">
-											<div className="text-sm">
-												<span className="text-gray-600">威力+</span>
-												<span className="text-gray-600">
-													{currentHit.multiplierFormula}
-												</span>
+								{/* 計算過程表示（特殊計算がある場合） */}
+								{currentHit.calculationProcess && (
+									<div className="space-y-2 p-3 rounded border border-gray-300 bg-blue-50">
+										<div className="text-sm">
+											<span className="text-gray-600">計算過程:</span>
+											<div className="text-gray-700 font-mono mt-1">
+												{currentHit.calculationProcess}
 											</div>
 										</div>
-									)}
-
-								{currentHit.fixedDamageFormula &&
-									currentHit.fixedDamageFormula !== '0' &&
-									currentHit.fixedDamageFormula !==
-										`${currentHit.fixedDamage}` && (
-										<div className="space-y-2 p-3 rounded border border-gray-300">
-											<div className="text-sm">
-												<span className="text-gray-600">固定値+</span>
-												<span className="text-gray-600">
-													{currentHit.fixedDamageFormula}
-												</span>
-											</div>
-										</div>
-									)}
+									</div>
+								)}
 							</div>
 						)
 					})()}
