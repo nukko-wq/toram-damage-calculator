@@ -55,6 +55,7 @@ export default function AttackSkillForm({
 				familiarityGrant: hit.familiarityGrant,
 				canUseUnsheathePower: hit.canUseUnsheathePower,
 				canUseLongRange: hit.canUseLongRange,
+				canUseDistancePower: hit.canUseDistancePower,
 			})) || []
 
 		return {
@@ -253,7 +254,9 @@ export default function AttackSkillForm({
 									<div className="border-b border-gray-300 grid grid-cols-3">
 										<div className="px-3 py-2 border-r border-gray-300">
 											<span className="text-gray-600">距離威力:</span>{' '}
-											<span className="text-gray-700">近距離○</span>
+											<span className="text-gray-700">
+												{currentHit.canUseDistancePower ? '○' : '×'}
+											</span>
 										</div>
 										<div className="px-3 py-2 border-r border-gray-300">
 											<span className="text-gray-600">抜刀威力:</span>{' '}
@@ -282,7 +285,7 @@ export default function AttackSkillForm({
 								{currentHit.multiplierFormula &&
 									currentHit.multiplierFormula !==
 										`${currentHit.multiplier}%` && (
-										<div className="space-y-2 p-3 bg-white rounded border">
+										<div className="space-y-2 p-3 rounded border border-gray-300">
 											<div className="text-sm">
 												<span className="text-gray-600">威力+</span>
 												<span className="text-gray-600">
@@ -296,7 +299,7 @@ export default function AttackSkillForm({
 									currentHit.fixedDamageFormula !== '0' &&
 									currentHit.fixedDamageFormula !==
 										`${currentHit.fixedDamage}` && (
-										<div className="space-y-2 p-3 bg-white rounded border">
+										<div className="space-y-2 p-3 rounded border border-gray-300">
 											<div className="text-sm">
 												<span className="text-gray-600">固定値+</span>
 												<span className="text-gray-600">

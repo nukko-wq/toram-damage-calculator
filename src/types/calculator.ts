@@ -797,6 +797,7 @@ export interface AttackHit {
 	familiarityGrant: FamiliarityType    // 慣れ付与
 	canUseUnsheathePower: boolean        // 抜刀威力適用可否
 	canUseLongRange: boolean             // ロングレンジ適用可否
+	canUseDistancePower: boolean         // 距離威力適用可否
 	
 	// 特殊設定
 	notes?: string                       // 備考
@@ -851,6 +852,7 @@ export interface CalculatedHit {
 	// 補正適用
 	canUseUnsheathePower: boolean
 	canUseLongRange: boolean
+	canUseDistancePower: boolean
 }
 
 // AttackSkillForm表示用データ

@@ -116,6 +116,7 @@ interface AttackHit {
   familiarityGrant: FamiliarityType    // 慣れ付与
   canUseUnsheathePower: boolean        // 抜刀威力適用可否
   canUseLongRange: boolean             // ロングレンジ適用可否
+  canUseDistancePower: boolean         // 距離威力適用可否
   
   // 特殊設定
   notes?: string                       // 備考
@@ -169,6 +170,7 @@ interface CalculatedHit {
   // 補正適用
   canUseUnsheathePower: boolean
   canUseLongRange: boolean
+  canUseDistancePower: boolean
   
   // 計算過程（詳細表示用）
   calculationDetails?: CalculationDetails
@@ -200,7 +202,7 @@ interface CalculationDetails {
 │ │ 　　威力参照: 総ATK | タイプ: 物理スキル         │ │
 │ │ 　　慣れ参照: 物理 | 慣れ付与: 物理              │ │
 │ │ 　　参照防御力: DEF | 参照耐性: 物理             │ │
-│ │ 　　抜刀威力: ○ | ロングレンジ: ×              │ │
+│ │ 　　距離威力: ○ | 抜刀威力: ○ | ロングレンジ: × │ │
 │ │                                                │ │
 │ │ 🎯 スキル威力値                                  │ │
 │ │ 　　倍率: 125% | 固定値: 0                     │ │
@@ -270,6 +272,7 @@ interface SkillInfoSection {
     referenceResistance: 'physical' | 'magical' // 参照耐性
     canUseUnsheathePower: boolean
     canUseLongRange: boolean
+    canUseDistancePower: boolean
   }
   
   powerInfo: {
@@ -329,7 +332,8 @@ function getSkillDisplayData(skill: AttackSkill): CalculatedHit[] {
     familiarityReference: hit.familiarity,
     familiarityGrant: hit.familiarityGrant,
     canUseUnsheathePower: hit.canUseUnsheathePower,
-    canUseLongRange: hit.canUseLongRange
+    canUseLongRange: hit.canUseLongRange,
+    canUseDistancePower: hit.canUseDistancePower
   }))
 }
 
@@ -393,7 +397,8 @@ export const attackSkillsData: AttackSkill[] = [
       familiarity: 'physical',
       familiarityGrant: 'physical',
       canUseUnsheathePower: true,
-      canUseLongRange: false
+      canUseLongRange: false,
+      canUseDistancePower: true
     }]
   },
   
@@ -424,7 +429,8 @@ export const attackSkillsData: AttackSkill[] = [
         familiarity: 'physical',
         familiarityGrant: 'physical',
         canUseUnsheathePower: false,
-        canUseLongRange: false
+        canUseLongRange: false,
+        canUseDistancePower: true
       },
       {
         hitNumber: 2,
@@ -439,7 +445,8 @@ export const attackSkillsData: AttackSkill[] = [
         familiarity: 'physical',
         familiarityGrant: 'physical',
         canUseUnsheathePower: false,
-        canUseLongRange: false
+        canUseLongRange: false,
+        canUseDistancePower: true
       }
     ]
   }
