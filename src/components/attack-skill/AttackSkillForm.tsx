@@ -31,6 +31,8 @@ export default function AttackSkillForm({
 
 	// 詳細情報の表示状態
 	const [showDetailedInfo, setShowDetailedInfo] = useState(false)
+	// 選択中の撃目（タブ）
+	const [selectedHitIndex, setSelectedHitIndex] = useState(0)
 
 	// 選択中のスキル
 	const selectedSkill = useMemo(() => {
@@ -113,161 +115,146 @@ export default function AttackSkillForm({
 	return (
 		<div className="space-y-4 p-4 border border-gray-300 rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8">
 			{/* スキル選択セクション */}
-			<div className="space-y-2">
-				<h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-					⚔️ 攻撃スキル選択
-				</h3>
-				<div className="flex gap-2">
-					<select
-						value={attackSkillData.selectedSkillId || ''}
-						onChange={(e) => handleSkillSelect(e.target.value)}
-						className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-					>
-						<option value="">攻撃スキルを選択してください</option>
-						{attackSkillsData.map((skill) => (
-							<option key={skill.id} value={skill.id}>
-								{skill.name} ({skill.category})
-							</option>
-						))}
-					</select>
-					<button
-						onClick={handleSkillReset}
-						className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
-					>
-						リセット
-					</button>
-				</div>
+			<div className="flex gap-2">
+				<select
+					value={attackSkillData.selectedSkillId || ''}
+					onChange={(e) => handleSkillSelect(e.target.value)}
+					className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+				>
+					<option value="">⚔️ 攻撃スキルを選択してください</option>
+					{attackSkillsData.map((skill) => (
+						<option key={skill.id} value={skill.id}>
+							{skill.name}
+						</option>
+					))}
+				</select>
+				<button
+					onClick={handleSkillReset}
+					className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+				>
+					リセット
+				</button>
 			</div>
 
 			{/* スキル情報表示セクション */}
 			{selectedSkill && (
 				<div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-					<h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-						📊 {selectedSkill.name}
-					</h4>
-
-					{/* 基本情報 */}
-					<div className="grid grid-cols-2 gap-4 text-sm">
-						<div>
-							<span className="text-gray-600">カテゴリ:</span>{' '}
-							{selectedSkill.category}
-						</div>
-						<div>
-							<span className="text-gray-600">消費MP:</span>{' '}
-							{selectedSkill.mpCost}
-						</div>
-						<div>
-							<span className="text-gray-600">威力参照:</span>{' '}
-							{getPowerReferenceDisplayText(
-								selectedSkill.hits[0]?.powerReference || 'totalATK',
-							)}
-						</div>
-						<div>
-							<span className="text-gray-600">タイプ:</span>{' '}
-							{selectedSkill.hits[0]?.attackType === 'physical'
-								? '物理スキル'
-								: '魔法スキル'}
-						</div>
-						<div>
-							<span className="text-gray-600">慣れ参照:</span>{' '}
-							{getFamiliarityDisplayText(
-								selectedSkill.hits[0]?.familiarity || 'physical',
-							)}
-						</div>
-						<div>
-							<span className="text-gray-600">慣れ付与:</span>{' '}
-							{getFamiliarityDisplayText(
-								selectedSkill.hits[0]?.familiarityGrant || 'physical',
-							)}
-						</div>
-						<div>
-							<span className="text-gray-600">参照防御力:</span>{' '}
-							{selectedSkill.hits[0]?.referenceDefense}
-						</div>
-						<div>
-							<span className="text-gray-600">参照耐性:</span>{' '}
-							{selectedSkill.hits[0]?.referenceResistance === 'physical'
-								? '物理耐性'
-								: '魔法耐性'}
-						</div>
-						<div>
-							<span className="text-gray-600">抜刀威力:</span>{' '}
-							{selectedSkill.hits[0]?.canUseUnsheathePower ? '○' : '×'}
-						</div>
-						<div>
-							<span className="text-gray-600">ロングレンジ:</span>{' '}
-							{selectedSkill.hits[0]?.canUseLongRange ? '○' : '×'}
-						</div>
-					</div>
-
 					{/* スキル威力値 */}
 					<div className="space-y-2">
-						<h5 className="font-semibold text-gray-800 flex items-center gap-2">
-							🎯 スキル威力値
-						</h5>
 						<div className="grid grid-cols-2 gap-4 text-sm">
 							<div>
-								<span className="text-gray-600">倍率:</span>{' '}
-								{selectedSkill.hits[0]?.multiplier}%
-							</div>
-							<div>
-								<span className="text-gray-600">固定値:</span>{' '}
-								{selectedSkill.hits[0]?.fixedDamage}
-							</div>
-						</div>
-						{selectedSkill.hits[0]?.multiplierFormula && (
-							<div className="text-sm">
-								<span className="text-gray-600">計算式:</span>{' '}
-								{selectedSkill.hits[0].multiplierFormula}
-								{selectedSkill.hits[0].fixedDamageFormula &&
-									selectedSkill.hits[0].fixedDamageFormula !== '0' &&
-									` + ${selectedSkill.hits[0].fixedDamageFormula}`}
-							</div>
-						)}
-					</div>
-
-					{/* 多段攻撃情報 */}
-					{selectedSkill.hits.length > 1 && (
-						<div className="space-y-2">
-							<h5 className="font-semibold text-gray-800 flex items-center gap-2">
-								🗡️ 多段攻撃情報
-							</h5>
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-								{selectedSkill.hits.map((hit) => (
-									<div
-										key={hit.hitNumber}
-										className="p-3 bg-white border border-gray-200 rounded-md"
-									>
-										<div className="font-medium text-sm mb-2">
-											{hit.hitNumber}撃目
-										</div>
-										<div className="text-xs space-y-1">
-											<div>
-												{hit.attackType === 'physical' ? '物理' : '魔法'} |{' '}
-												{hit.referenceDefense}
-											</div>
-											<div>
-												{hit.referenceResistance === 'physical'
-													? '物理耐性'
-													: '魔法耐性'}
-											</div>
-											<div>{hit.multiplier}%</div>
-											<div>固定: {hit.fixedDamage}</div>
-											{hit.multiplierFormula &&
-												hit.multiplierFormula !== `${hit.multiplier}%` && (
-													<div className="text-gray-600">
-														式: {hit.multiplierFormula}
-													</div>
-												)}
-										</div>
-									</div>
+								<span className="text-gray-600">スキル威力値:</span>{' '}
+								{selectedSkill.hits.map((hit, index) => (
+									<span key={hit.hitNumber}>
+										{hit.multiplier}%
+										{index < selectedSkill.hits.length - 1 && ' / '}
+									</span>
 								))}
 							</div>
-							<div className="text-sm text-gray-600">
-								全体消費MP: {selectedSkill.mpCost}
+							<div>
+								<span className="text-gray-600">スキル固定値:</span>{' '}
+								{selectedSkill.hits.map((hit, index) => (
+									<span key={hit.hitNumber}>
+										{hit.fixedDamage}
+										{index < selectedSkill.hits.length - 1 && ' / '}
+									</span>
+								))}
 							</div>
 						</div>
+						<div className="text-sm">
+							<span className="text-gray-600">消費MP:</span> {selectedSkill.mpCost}
+						</div>
+					</div>
+
+					{/* タブメニュー */}
+					{selectedSkill.hits.length > 1 && (
+						<div className="flex border-b border-gray-300">
+							{selectedSkill.hits.map((hit, index) => (
+								<button
+									key={hit.hitNumber}
+									onClick={() => setSelectedHitIndex(index)}
+									className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+										selectedHitIndex === index
+											? 'border-blue-500 text-blue-600'
+											: 'border-transparent text-gray-600 hover:text-gray-800'
+									}`}
+								>
+									{hit.hitNumber}撃目
+								</button>
+							))}
+						</div>
 					)}
+
+					{/* 選択された撃の詳細情報 */}
+					{(() => {
+						const currentHit = selectedSkill.hits[selectedHitIndex] || selectedSkill.hits[0]
+						return (
+							<div className="space-y-3">
+								{/* 基本情報 */}
+								<div className="grid grid-cols-3 gap-4 text-sm">
+									<div>
+										{currentHit.attackType === 'physical' ? '物理スキル' : '魔法スキル'}
+									</div>
+									<div>
+										<span className="text-gray-600">慣れ参照:</span>{' '}
+										{getFamiliarityDisplayText(currentHit.familiarity)}
+									</div>
+									<div>
+										<span className="text-gray-600">慣れ付与:</span>{' '}
+										{getFamiliarityDisplayText(currentHit.familiarityGrant)}
+									</div>
+								</div>
+
+								<div className="grid grid-cols-2 gap-4 text-sm">
+									<div>
+										<span className="text-gray-600">参照防御力:</span> {currentHit.referenceDefense}
+									</div>
+									<div>
+										<span className="text-gray-600">参照耐性:</span>{' '}
+										{currentHit.referenceResistance === 'physical' ? '物理耐性' : '魔法耐性'}
+									</div>
+								</div>
+
+								<div className="grid grid-cols-3 gap-4 text-sm">
+									<div>
+										<span className="text-gray-600">距離威力:</span> 近距離○
+									</div>
+									<div>
+										<span className="text-gray-600">抜刀威力:</span>{' '}
+										{currentHit.canUseUnsheathePower ? '○' : '×'}
+									</div>
+									<div>
+										<span className="text-gray-600">ロングレンジ:</span>{' '}
+										{currentHit.canUseLongRange ? '○' : '×'}
+									</div>
+								</div>
+
+								<div className="text-sm">
+									<span className="text-gray-600">威力参照/攻撃力:</span>{' '}
+									{getPowerReferenceDisplayText(currentHit.powerReference)}
+								</div>
+
+								{/* 特殊計算式表示（2撃目等で特殊な場合） */}
+								{currentHit.multiplierFormula && currentHit.multiplierFormula !== `${currentHit.multiplier}%` && (
+									<div className="space-y-2 p-3 bg-white rounded border">
+										<div className="text-sm">
+											<span className="text-gray-600">威力+</span>
+											{currentHit.multiplierFormula}
+										</div>
+									</div>
+								)}
+
+								{currentHit.fixedDamageFormula && currentHit.fixedDamageFormula !== '0' && currentHit.fixedDamageFormula !== `${currentHit.fixedDamage}` && (
+									<div className="space-y-2 p-3 bg-white rounded border">
+										<div className="text-sm">
+											<span className="text-gray-600">固定値+</span>
+											{currentHit.fixedDamageFormula}
+										</div>
+									</div>
+								)}
+							</div>
+						)
+					})()}
 
 					{/* 詳細情報（展開可能） */}
 					<div className="space-y-2">
