@@ -5,6 +5,7 @@ import {
 	StandardCalculator,
 	StrikeStabCalculator,
 	StrikeStabAilmentCalculator,
+	MagicArrowCalculator,
 } from './calculators'
 import type {
 	EquipmentContext,
@@ -59,8 +60,9 @@ export class AttackSkillCalculator {
 				return new StrikeStabCalculator()
 			case 'strike_stab_ailment':
 				return new StrikeStabAilmentCalculator()
-			case 'slash':
 			case 'magic_arrow':
+				return new MagicArrowCalculator()
+			case 'slash':
 			case 'power_shot':
 			case 'dual_strike':
 				return new StandardCalculator()

@@ -102,7 +102,7 @@ export default function AttackSkillForm({
 	// スキル選択処理
 	const handleSkillSelect = (skillId: string) => {
 		const newSkillId = skillId === '' ? null : skillId
-		
+
 		// スキルが選択された場合は計算を実行
 		let calculatedData = null
 		let displayDataForCallback = {
@@ -147,7 +147,7 @@ export default function AttackSkillForm({
 						calculationProcess: calculatedHit.calculationProcess,
 					}
 				})
-				
+
 				displayDataForCallback = {
 					selectedSkill: skill,
 					calculatedHits: calculatedData,
@@ -202,7 +202,7 @@ export default function AttackSkillForm({
 	// 系統別にスキルをグループ化
 	const skillGroups = useMemo(() => {
 		const groups: { [key: string]: typeof attackSkillsData } = {}
-		
+
 		attackSkillsData.forEach((skill) => {
 			const groupLabel = getSystemGroupLabel(skill.systemGroup)
 			if (!groups[groupLabel]) {
@@ -210,7 +210,7 @@ export default function AttackSkillForm({
 			}
 			groups[groupLabel].push(skill)
 		})
-		
+
 		return groups
 	}, [])
 
@@ -329,7 +329,9 @@ export default function AttackSkillForm({
 										<div className="px-3 py-2 border-r border-gray-300">
 											<span className="text-gray-700">慣れ参照:</span>{' '}
 											<span className="text-gray-700">
-												{getFamiliarityDisplayText(currentHit.familiarityReference)}
+												{getFamiliarityDisplayText(
+													currentHit.familiarityReference,
+												)}
 											</span>
 										</div>
 										<div className="px-3 py-2">
@@ -388,6 +390,27 @@ export default function AttackSkillForm({
 										</span>
 									</div>
 								</div>
+
+								{/* スキル威力/固定値の計算式表示 */}
+								{(currentHit.multiplierFormula ||
+									currentHit.fixedDamageFormula) && (
+									<div className="space-y-2 p-3 rounded border border-gray-300 bg-gray-50">
+										{currentHit.multiplierFormula && (
+											<div className="flex items-center text-sm">
+												<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500">
+													{currentHit.multiplierFormula}
+												</span>
+											</div>
+										)}
+										{currentHit.fixedDamageFormula && (
+											<div className="flex items-center text-sm">
+												<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500">
+													{currentHit.fixedDamageFormula}
+												</span>
+											</div>
+										)}
+									</div>
+								)}
 
 								{/* 計算過程表示（特殊計算がある場合） */}
 								{currentHit.calculationProcess && (

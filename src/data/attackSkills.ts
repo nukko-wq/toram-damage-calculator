@@ -1,4 +1,8 @@
-import type { AttackSkill, WeaponType, AttackSkillSystemGroup } from '@/types/calculator'
+import type {
+	AttackSkill,
+	WeaponType,
+	AttackSkillSystemGroup,
+} from '@/types/calculator'
 
 /**
  * 攻撃スキルマスタデータ（定義順）
@@ -58,8 +62,6 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 表示用（実際の計算は外部）
-				multiplierFormula: '1000%',
-				fixedDamageFormula: '400',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -74,8 +76,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 0, // 表示用（|補正後STR|%は外部計算）
 				fixedDamage: 0, // 表示用（基礎INT/2は外部計算）
-				multiplierFormula: '補正後STR%',
-				fixedDamageFormula: '基礎INT/2',
+				multiplierFormula: '威力+補正後STR%',
+				fixedDamageFormula: '固定値+基礎INT/2',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -216,14 +218,14 @@ const attackSkillsRawData: AttackSkill[] = [
 	// 杖スキル
 	{
 		id: 'magic_arrow',
-		name: 'マジックアロー',
+		name: '術式/アロー',
 		order: 601,
 		systemGroup: 'magic',
 		category: 'staff',
 		weaponTypeRequirements: ['杖'],
 		mpCost: 5,
-		multiplierFormula: '100%',
-		fixedDamageFormula: '0',
+		multiplierFormula: '125% (杖装備時+25%)',
+		fixedDamageFormula: '50',
 		hits: [
 			{
 				hitNumber: 1,
@@ -231,15 +233,15 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceDefense: 'MDEF',
 				referenceResistance: 'magical',
 				powerReference: 'MATK',
-				multiplier: 100,
-				fixedDamage: 0,
-				multiplierFormula: '100%',
-				fixedDamageFormula: '0',
+				multiplier: 125, // 表示用（実際の計算は外部）
+				fixedDamage: 50, // 表示用（実際の計算は外部）
+				multiplierFormula: '125% (杖装備時+25%)',
+				fixedDamageFormula: '50',
 				familiarity: 'magical',
 				familiarityGrant: 'magical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
-				canUseDistancePower: false,
+				canUseDistancePower: true,
 			},
 		],
 	},
@@ -327,10 +329,10 @@ const attackSkillsRawData: AttackSkill[] = [
 
 /**
  * 系統別番号順でソートされた攻撃スキルデータ
- * 
+ *
  * 系統別番号体系:
  * - 100番台: 剣系統
- * - 200番台: 槍系統  
+ * - 200番台: 槍系統
  * - 300番台: 魔法剣士系統
  * - 400番台: 手甲系統
  * - 500番台: 弓系統
@@ -346,17 +348,28 @@ export const attackSkillsData: AttackSkill[] = [...attackSkillsRawData].sort(
 /**
  * 系統グループからラベル名を取得
  */
-export function getSystemGroupLabel(systemGroup: AttackSkillSystemGroup): string {
+export function getSystemGroupLabel(
+	systemGroup: AttackSkillSystemGroup,
+): string {
 	switch (systemGroup) {
-		case 'sword': return '剣系統------'
-		case 'halberd': return '槍系統------'
-		case 'magicSwordsman': return '魔法剣士系統------'
-		case 'knuckle': return '手甲系統------'
-		case 'bow': return '弓系統------'
-		case 'magic': return '魔法系統------'
-		case 'katana': return '抜刀系統------'
-		case 'dualSword': return '双剣系統------'
-		case 'other': return 'その他------'
+		case 'sword':
+			return '剣系統------'
+		case 'halberd':
+			return '槍系統------'
+		case 'magicSwordsman':
+			return '魔法剣士系統------'
+		case 'knuckle':
+			return '手甲系統------'
+		case 'bow':
+			return '弓系統------'
+		case 'magic':
+			return '魔法系統------'
+		case 'katana':
+			return '抜刀系統------'
+		case 'dualSword':
+			return '双剣系統------'
+		case 'other':
+			return 'その他------'
 	}
 }
 
