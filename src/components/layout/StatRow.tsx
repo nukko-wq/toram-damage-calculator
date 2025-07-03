@@ -17,7 +17,9 @@ export default function StatRow({
 		return num.toLocaleString('ja-JP')
 	}
 
-	const renderStat = (stat: { name: string; value: number | null } | undefined) => {
+	const renderStat = (
+		stat: { name: string; value: number | null } | undefined,
+	) => {
 		if (!stat) {
 			return <div className="flex-1" />
 		}
@@ -27,7 +29,7 @@ export default function StatRow({
 				<span className="font-semibold text-[12px] md:text-[13px] text-gray-700 min-w-[110px]">
 					{stat.name}
 				</span>
-				<span className="font-semibold text-[12px] md:text-[13px] text-gray-900 tabular-nums">
+				<span className="font-semibold text-[12px] md:text-[13px] text-gray-900 tabular-nums font-roboto">
 					{formatValue(stat.value)}
 				</span>
 			</div>

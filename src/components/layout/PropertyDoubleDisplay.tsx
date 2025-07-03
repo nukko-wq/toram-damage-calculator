@@ -41,7 +41,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 				<div className="text-center">
 					{property.propertyConfig.hasRate ? (
 						<span
-							className={`font-semibold text-[13px] px-1 py-0.5 rounded ${
+							className={`font-semibold text-[13px] px-1 py-0.5 rounded font-roboto ${
 								property.rateValue !== null && property.rateValue !== 0
 									? property.rateValue > 0
 										? 'text-gray-900'
@@ -62,7 +62,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 				<div className="text-center">
 					{property.propertyConfig.hasFixed ? (
 						<span
-							className={`font-semibold text-[13px] tabular-nums px-1 py-0.5 rounded ${
+							className={`font-semibold text-[13px] tabular-nums px-1 py-0.5 rounded font-roboto ${
 								property.fixedValue !== null && property.fixedValue !== 0
 									? property.fixedValue > 0
 										? 'text-gray-900'

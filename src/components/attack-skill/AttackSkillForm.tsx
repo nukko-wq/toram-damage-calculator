@@ -168,7 +168,6 @@ export default function AttackSkillForm({
 		}
 	}
 
-
 	// 慣れタイプの表示名
 	const getFamiliarityDisplayText = (familiarity: string) => {
 		switch (familiarity) {
@@ -229,7 +228,9 @@ export default function AttackSkillForm({
 					<div className="space-y-2">
 						<div className="flex flex-col">
 							<div className="flex">
-								<span className="text-gray-700 w-[7rem]">スキル威力値:</span>{' '}
+								<span className="text-gray-700 w-[7rem] text-sm">
+									スキル威力値:
+								</span>{' '}
 								<span className="flex items-center gap-3">
 									{displayData.calculatedHits.map((hit, index) => (
 										<span
