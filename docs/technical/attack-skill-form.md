@@ -41,6 +41,7 @@ interface AttackSkill {
   id: string                           // 一意識別子
   name: string                        // スキル名
   order: number                       // 表示順序（系統別番号）
+  systemGroup: AttackSkillSystemGroup // 系統グループ
   category: AttackSkillCategory        // スキルカテゴリ
   weaponTypeRequirements?: WeaponType[] // 必要武器種（指定なしは全武器対応）
   
@@ -62,6 +63,18 @@ interface AttackSkill {
   // メタ情報
   notes?: string                     // 実装・使用上の注意
 }
+
+// 系統グループ
+type AttackSkillSystemGroup = 
+  | 'sword'          // 剣系統
+  | 'halberd'        // 槍系統
+  | 'magicSwordsman' // 魔法剣士系統
+  | 'knuckle'        // 手甲系統
+  | 'bow'            // 弓系統
+  | 'magic'          // 魔法系統
+  | 'katana'         // 抜刀系統
+  | 'dualSword'      // 双剣系統
+  | 'other'          // その他
 
 // スキルカテゴリ
 type AttackSkillCategory = 
@@ -391,6 +404,7 @@ export const attackSkillsData: AttackSkill[] = [
     id: 'slash',
     name: 'スラッシュ',
     order: 101,
+    systemGroup: 'sword',
     category: 'sword',
     mpCost: 8,
     multiplierFormula: "125%",
@@ -421,6 +435,7 @@ export const attackSkillsData: AttackSkill[] = [
     id: 'moon_slash',
     name: 'ムーンスラッシュ',
     order: 102,
+    systemGroup: 'sword',
     category: 'sword',
     mpCost: 400,
     multiplierFormula: "特殊計算",

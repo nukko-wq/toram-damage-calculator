@@ -757,6 +757,18 @@ export interface RegisterFormData {
 // 攻撃スキルシステム
 
 // 攻撃スキルカテゴリ
+// 攻撃スキル系統グループ
+export type AttackSkillSystemGroup =
+	| 'sword' // 剣系統
+	| 'halberd' // 槍系統
+	| 'magicSwordsman' // 魔法剣士系統
+	| 'knuckle' // 手甲系統
+	| 'bow' // 弓系統
+	| 'magic' // 魔法系統
+	| 'katana' // 抜刀系統
+	| 'dualSword' // 双剣系統
+	| 'other' // その他
+
 export type AttackSkillCategory = 
 	| 'sword'      // 片手剣
 	| 'twohandSword' // 両手剣
@@ -809,6 +821,7 @@ export interface AttackSkill {
 	id: string                           // 一意識別子
 	name: string                        // スキル名
 	order: number                       // 表示順序（系統別番号）
+	systemGroup: AttackSkillSystemGroup // 系統グループ
 	category: AttackSkillCategory        // スキルカテゴリ
 	weaponTypeRequirements?: WeaponType[] // 必要武器種（指定なしは全武器対応）
 	

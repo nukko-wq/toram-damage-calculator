@@ -1,4 +1,4 @@
-import type { AttackSkill, WeaponType } from '@/types/calculator'
+import type { AttackSkill, WeaponType, AttackSkillSystemGroup } from '@/types/calculator'
 
 /**
  * 攻撃スキルマスタデータ（定義順）
@@ -10,6 +10,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		id: 'slash',
 		name: 'スラッシュ',
 		order: 101,
+		systemGroup: 'sword',
 		category: 'sword',
 		weaponTypeRequirements: ['片手剣'],
 		mpCost: 8,
@@ -41,6 +42,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		id: 'moon_slash',
 		name: 'ムーンスラッシュ',
 		order: 102,
+		systemGroup: 'sword',
 		category: 'sword',
 		weaponTypeRequirements: ['片手剣'],
 		mpCost: 400,
@@ -88,6 +90,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		id: 'strike_stab',
 		name: 'ストライクスタブ(通常時)',
 		order: 201,
+		systemGroup: 'halberd',
 		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'],
 		mpCost: 200,
@@ -151,6 +154,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		id: 'strike_stab_ailment',
 		name: 'ストライクスタブ(敵状態異常時)',
 		order: 202,
+		systemGroup: 'halberd',
 		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'],
 		mpCost: 200,
@@ -214,6 +218,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		id: 'magic_arrow',
 		name: 'マジックアロー',
 		order: 601,
+		systemGroup: 'magic',
 		category: 'staff',
 		weaponTypeRequirements: ['杖'],
 		mpCost: 5,
@@ -244,6 +249,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		id: 'power_shot',
 		name: 'パワーショット',
 		order: 501,
+		systemGroup: 'bow',
 		category: 'bow',
 		weaponTypeRequirements: ['弓'],
 		mpCost: 10,
@@ -275,6 +281,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		id: 'dual_strike',
 		name: 'デュアルストライク',
 		order: 801,
+		systemGroup: 'dualSword',
 		category: 'dualSword',
 		weaponTypeRequirements: ['双剣'],
 		mpCost: 15,
@@ -335,6 +342,23 @@ const attackSkillsRawData: AttackSkill[] = [
 export const attackSkillsData: AttackSkill[] = [...attackSkillsRawData].sort(
 	(a, b) => a.order - b.order,
 )
+
+/**
+ * 系統グループからラベル名を取得
+ */
+export function getSystemGroupLabel(systemGroup: AttackSkillSystemGroup): string {
+	switch (systemGroup) {
+		case 'sword': return '剣系統------'
+		case 'halberd': return '槍系統------'
+		case 'magicSwordsman': return '魔法剣士系統------'
+		case 'knuckle': return '手甲系統------'
+		case 'bow': return '弓系統------'
+		case 'magic': return '魔法系統------'
+		case 'katana': return '抜刀系統------'
+		case 'dualSword': return '双剣系統------'
+		case 'other': return 'その他------'
+	}
+}
 
 /**
  * スキルIDからスキルデータを取得

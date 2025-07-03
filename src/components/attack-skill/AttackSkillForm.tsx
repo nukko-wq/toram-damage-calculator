@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import type { CalculatedHit, AttackSkillDisplayData } from '@/types/calculator'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import {
 	attackSkillsData,
 	getAttackSkillById,
 	getPowerReferenceDisplayText,
+	getSystemGroupLabel,
 } from '@/data/attackSkills'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 
@@ -198,25 +199,12 @@ export default function AttackSkillForm({
 		}
 	}
 
-	// 系統別グループ名の取得
-	const getSystemGroupLabel = useCallback((orderRange: number): string => {
-		if (orderRange >= 100 && orderRange < 200) return '剣系統------'
-		if (orderRange >= 200 && orderRange < 300) return '槍系統------'
-		if (orderRange >= 300 && orderRange < 400) return '魔法剣士系統------'
-		if (orderRange >= 400 && orderRange < 500) return '手甲系統------'
-		if (orderRange >= 500 && orderRange < 600) return '弓系統------'
-		if (orderRange >= 600 && orderRange < 700) return '魔法系統------'
-		if (orderRange >= 700 && orderRange < 800) return '抜刀系統------'
-		if (orderRange >= 800 && orderRange < 900) return '双剣系統------'
-		return 'その他------'
-	}, [])
-
 	// 系統別にスキルをグループ化
 	const skillGroups = useMemo(() => {
 		const groups: { [key: string]: typeof attackSkillsData } = {}
 		
 		attackSkillsData.forEach((skill) => {
-			const groupLabel = getSystemGroupLabel(skill.order)
+			const groupLabel = getSystemGroupLabel(skill.systemGroup)
 			if (!groups[groupLabel]) {
 				groups[groupLabel] = []
 			}
@@ -224,7 +212,7 @@ export default function AttackSkillForm({
 		})
 		
 		return groups
-	}, [getSystemGroupLabel])
+	}, [])
 
 	return (
 		<div className="space-y-4 p-4 border border-gray-300 rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8">
