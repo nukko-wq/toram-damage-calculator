@@ -181,23 +181,30 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* 敵情報 */}
-				<div className="p-2 mb-6 flex items-center gap-2">
-					<p className="text-[13px] font-medium text-gray-700">敵：ラフィー</p>
+				<div className="p-2 flex items-center gap-2">
+					<p className="text-xs sm:text-[13px] font-medium text-gray-700">
+						敵：ラフィー
+					</p>
 				</div>
 
 				{/* 威力オプション */}
-				<div className="p-2">
-					<h3 className="text-lg font-semibold text-gray-900 mb-4">
-						威力オプション
-					</h3>
+				<div className=" sm:p-2">
+					<ul className="flex gap-2 bg-blue-100 p-1">
+						<li className="text-[10px] sm:text-xs font-semibold text-gray-900 flex-1 text-center">
+							威力オプション
+						</li>
+						<li className="text-[10px] sm:text-xs font-semibold text-gray-900 flex-1 text-center">
+							その他
+						</li>
+					</ul>
 
 					<div className="space-y-1">
 						{/* ボス戦難易度 */}
-						<div className="flex items-center gap-4 border-b-2 border-blue-200">
-							<label className="text-[13px] font-medium text-gray-700 w-24">
+						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
 								ボス戦難易度
 							</label>
-							<div className="flex gap-2">
+							<div className="flex sm:gap-2">
 								{(['normal', 'hard', 'lunatic', 'ultimate'] as const).map(
 									(difficulty) => (
 										<button
@@ -205,7 +212,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 											onClick={() =>
 												updatePowerOption('bossDifficulty', difficulty)
 											}
-											className={`px-3 py-1 text-[13px] rounded ${
+											className={`px-3 py-0.5 sm:py-1 text-xs md:text-[13px] rounded ${
 												powerOptions.bossDifficulty === difficulty
 													? 'bg-blue-400 text-white'
 													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -225,16 +232,16 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 
 						{/* スキルダメージ */}
-						<div className="flex items-center gap-4 border-b-2 border-blue-200">
-							<label className="text-[13px] font-medium text-gray-700 w-24">
+						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
 								スキルダメージ
 							</label>
-							<div className="flex gap-2">
+							<div className="flex sm:gap-2">
 								{(['all', 'hit1', 'hit2', 'hit3'] as const).map((hit) => (
 									<button
 										key={hit}
 										onClick={() => updatePowerOption('skillDamage', hit)}
-										className={`px-3 py-1 text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.skillDamage === hit
 												? 'bg-blue-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -253,18 +260,18 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 
 						{/* 属性攻撃 */}
-						<div className="flex items-center gap-4 border-b-2 border-blue-200">
-							<label className="text-[13px] font-medium text-gray-700 w-24">
+						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
 								属性攻撃
 							</label>
-							<div className="flex gap-2">
+							<div className="flex sm:gap-2">
 								{(
 									['advantageous', 'other', 'none', 'disadvantageous'] as const
 								).map((element) => (
 									<button
 										key={element}
 										onClick={() => updatePowerOption('elementAttack', element)}
-										className={`px-3 py-1 text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.elementAttack === element
 												? 'bg-pink-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -283,11 +290,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 
 						{/* コンボ:強打 */}
-						<div className="flex items-center gap-4 border-b-2 border-blue-200">
-							<label className="text-[13px] font-medium text-gray-700 w-24">
+						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
 								コンボ:強打
 							</label>
-							<div className="flex gap-2">
+							<div className="flex sm:gap-2">
 								{[
 									{ value: true, label: '有効' },
 									{ value: false, label: '無効' },
@@ -295,7 +302,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									<button
 										key={option.label}
 										onClick={() => updatePowerOption('combo', option.value)}
-										className={`px-3 py-1 text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.combo === option.value
 												? 'bg-rose-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -308,17 +315,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 
 						{/* ダメージ判定 */}
-						<div className="flex items-center gap-4 border-b-2 border-blue-200">
-							<label className="text-[13px] font-medium text-gray-700 w-24">
+						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
 								ダメージ判定
 							</label>
-							<div className="flex gap-2">
+							<div className="flex sm:gap-2">
 								{(['critical', 'graze', 'normal', 'expected'] as const).map(
 									(type) => (
 										<button
 											key={type}
 											onClick={() => updatePowerOption('damageType', type)}
-											className={`px-3 py-1 text-[13px] rounded ${
+											className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 												powerOptions.damageType === type
 													? 'bg-amber-400 text-white'
 													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -338,16 +345,16 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 
 						{/* 距離判定 */}
-						<div className="flex items-center gap-4 border-b-2 border-blue-200">
-							<label className="text-[13px] font-medium text-gray-700 w-24">
+						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
 								距離判定
 							</label>
-							<div className="flex gap-2">
+							<div className="flex sm:gap-2">
 								{(['short', 'long', 'disabled'] as const).map((distance) => (
 									<button
 										key={distance}
 										onClick={() => updatePowerOption('distance', distance)}
-										className={`px-3 py-1 text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.distance === distance
 												? 'bg-rose-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -364,11 +371,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 
 						{/* 属性威力 */}
-						<div className="flex items-center gap-4 border-b-2 border-blue-200">
-							<label className="text-[13px] font-medium text-gray-700 w-24">
+						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
 								属性威力
 							</label>
-							<div className="flex gap-2">
+							<div className="flex sm:gap-2">
 								{(
 									[
 										'enabled',
@@ -380,7 +387,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									<button
 										key={power}
 										onClick={() => updatePowerOption('elementPower', power)}
-										className={`px-3 py-1 text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.elementPower === power
 												? 'bg-rose-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -399,11 +406,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 
 						{/* 抜刀威力 */}
-						<div className="flex items-center gap-4 border-b-2 border-blue-200">
-							<label className="text-[13px] font-medium text-gray-700 w-24">
+						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
 								抜刀威力
 							</label>
-							<div className="flex gap-2">
+							<div className="flex sm:gap-2">
 								{[
 									{ value: true, label: '有効' },
 									{ value: false, label: '無効' },
@@ -411,7 +418,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									<button
 										key={option.label}
 										onClick={() => updatePowerOption('unsheathe', option.value)}
-										className={`px-3 py-1 text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.unsheathe === option.value
 												? 'bg-rose-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
