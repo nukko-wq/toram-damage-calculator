@@ -134,6 +134,11 @@ export interface CalculatorStore {
 	calculateDamage: () => Promise<void>
 	updateCalculationSettings: (settings: Partial<CalculationSettings>) => void
 
+	// ===== ステータス計算結果表示アクション =====
+	updateCalculationResults: () => void
+	toggleCalculationResultVisibility: () => void
+	initializeCalculationResultVisibility: () => void
+
 	// ===== 初期化 =====
 	initialize: () => Promise<void>
 }
