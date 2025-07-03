@@ -102,17 +102,17 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 						}クリスタ${getSlotNumber(slotKey)}を選択`,
 					)
 				}
-				className="px-1 py-1 mr-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
+				className="px-1 py-1 mr-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-0 w-full"
 			>
 				{selectedCrystal ? (
-					<div className="flex items-center">
-						<span className="text-sm truncate">{selectedCrystal.name}</span>
+					<div className="flex items-center min-w-0">
+						<span className="text-sm truncate min-w-0">{selectedCrystal.name}</span>
 					</div>
 				) : (
-					<div className="flex items-center justify-between">
+					<div className="flex items-center justify-between min-w-0">
 						<span className="text-gray-500">なし</span>
 						<svg
-							className="w-4 h-4 text-gray-400"
+							className="w-4 h-4 text-gray-400 flex-shrink-0"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"

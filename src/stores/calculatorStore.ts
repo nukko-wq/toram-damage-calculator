@@ -5,10 +5,11 @@ import type {
 	DamageCalculationResult,
 	CalculationSettings,
 } from '@/types/stores'
-import type { CalculatorData } from '@/types/calculator'
+import type { CalculatorData, EnemyFormData } from '@/types/calculator'
 import type { EquipmentSlots } from '@/types/calculator'
 import type { BuffSkillFormData } from '@/types/buffSkill'
 import { createInitialCalculatorData, migrateRegisterEffects } from '@/utils/initialData'
+// 敵設定はenemySettingsStoreで管理するため、このインポートは削除
 import {
 	saveCurrentData,
 	getCurrentSaveData,
@@ -241,8 +242,21 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			updateEnemy: (enemy) => {
+				// 敵設定はEnemyFormコンポーネント側でenemySettingsStoreに直接保存される
+				// ここでは個別データ（敵選択情報）のみ保存
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
-				dataUpdate({ enemy }, 'updateEnemy')
+				dataUpdate({ 
+					enemy: { 
+						selectedEnemyId: enemy.selectedId,
+						enemyType: enemy.type,
+						lastSelectedAt: enemy.selectedId ? new Date().toISOString() : undefined
+					} 
+				}, 'updateEnemy')
+			},
+
+			updateAttackSkill: (attackSkill) => {
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ attackSkill }, 'updateAttackSkill')
 			},
 
 			updateBuffSkills: (buffSkills) => {
@@ -755,6 +769,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					// saveDataStoreの初期化も実行
 					const { useSaveDataStore } = await import('./saveDataStore')
 					await useSaveDataStore.getState().loadSaveDataList()
+
+					// 敵設定ストアの初期化
+					const { useEnemySettingsStore } = await import('./enemySettingsStore')
+					useEnemySettingsStore.getState().loadFromLocalStorage()
 
 					// レジスタ効果の移行（新効果があれば追加）
 					const migratedData = { ...currentSave.data }

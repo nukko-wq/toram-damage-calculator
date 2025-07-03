@@ -12,6 +12,7 @@ import EnemyForm from '@/components/enemy/EnemyForm'
 import EquipmentForm from '@/components/equipment/EquipmentForm'
 import FoodForm from '@/components/food/FoodForm'
 import WeaponForm from '@/components/weapon/WeaponForm'
+import AttackSkillForm from '@/components/attack-skill/AttackSkillForm'
 
 export default function Home() {
 	// Zustandストアからデータを取得
@@ -121,6 +122,7 @@ export default function Home() {
 					<FoodForm />
 					<BuffItemForm />
 					<EnemyForm />
+					<AttackSkillForm />
 					<BuffSkillForm />
 				</div>
 			</div>

@@ -10,6 +10,7 @@ import {
 	calculateCriticalRate,
 	calculateCriticalDamage,
 	calculateMagicalCriticalDamage,
+	calculateTotalATK,
 	calculateMATK,
 	calculateHIT,
 	calculatePhysicalResistance,
@@ -472,6 +473,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
 	)
 
+	// 総ATK計算（ATK・サブATK計算結果が必要なため、useMemoの外で実行）
+	const totalATKCalculation = calculateTotalATK(
+		data.mainWeapon.weaponType,
+		atkCalculation.finalATK,
+		subATKCalculation?.subFinalATK || 0,
+	)
+
 	// デバッグ: equipmentBonus3の全プロパティを確認
 	console.log('equipmentBonus3 プロパティ:', {
 		naturalHPRecovery: equipmentBonus3.naturalHPRecovery,
@@ -545,7 +553,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			data.mainWeapon.weaponType === '双剣' && subATKCalculation
 				? Math.floor(subATKCalculation.subBaseATK) // 双剣時は計算値
 				: null, // 非双剣時は null で - 表示
-		totalATK: 0, // TODO: 総ATK計算
+		totalATK: totalATKCalculation.totalATK, // 総ATK計算結果
 		bringerAM: 0, // TODO: ブリンガーAM計算
 		MATK: matkCalculation.finalMATK, // MATK計算結果
 		baseMATK: matkCalculation.baseMATK, // 基本MATK計算結果

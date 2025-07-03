@@ -298,13 +298,16 @@ export interface CrystalSlots {
 // 敵のカテゴリ
 export type EnemyCategory = 'mob' | 'fieldBoss' | 'boss' | 'raidBoss'
 
+// ボス戦難易度
+export type BossDifficulty = 'normal' | 'hard' | 'lunatic' | 'ultimate'
+
 // 敵の基本ステータス
 export interface EnemyStats {
 	DEF: number // 物理防御力 (0-9999)
 	MDEF: number // 魔法防御力 (0-9999)
 	physicalResistance: number // 物理耐性% (-100-100)
 	magicalResistance: number // 魔法耐性% (-100-100)
-	resistCritical: number // クリティカル耐性 (0-999) ※プリセットでは0、ユーザーが調整可能
+	resistCritical: number // 確定クリティカル (0-999) ※プリセットでは0、全敵カテゴリでユーザーが調整可能
 	requiredHIT: number // 必要HIT (0-9999) ※プリセットでは0、ユーザーが調整可能
 }
 
@@ -317,27 +320,49 @@ export interface PresetEnemy {
 	category: EnemyCategory // 敵カテゴリ
 }
 
-// 敵フォームデータ（セーブデータ用）
+// 個別敵設定（敵ごとの設定値）
+export interface EnemySettings {
+	enemyId: string // 敵のID
+	// ボス難易度設定（boss カテゴリのみ）
+	difficulty?: BossDifficulty
+	// レイドボス レベル調整（raidBoss カテゴリのみ）
+	raidBossLevel?: number
+	// 手動調整値（プリセット・カスタム選択後の調整用）
+	manualOverrides?: {
+		resistCritical?: number // 確定クリティカル調整値
+		requiredHIT?: number // 必要HIT調整値（レイドボス以外 or 赫灼のセルディテのFLEE値）
+	}
+	lastUpdated: string // 最終更新日時 (ISO string)
+}
+
+// 敵設定管理状態（全敵の設定を格納）
+export interface EnemySettingsMap {
+	[enemyId: string]: EnemySettings
+}
+
+// セーブデータ内の敵情報（個別セーブデータ用 - 選択している敵）
+export interface SaveDataEnemyInfo {
+	selectedEnemyId: string | null // 選択中の敵ID
+	enemyType: 'preset' | 'custom' | null // データソースの識別
+	lastSelectedAt?: string // 最終選択日時 (ISO string)
+}
+
+// 敵フォームデータ（UIコンポーネント用の統合型）
 export interface EnemyFormData {
 	selectedId: string | null // プリセット敵情報ID or カスタム敵情報ID
 	type: 'preset' | 'custom' | null // データソースの識別
-	// 手動入力値（プリセット・カスタム選択後のresistCriticalとrequiredHIT調整用）
+	// ボス難易度設定（boss カテゴリのみ）
+	difficulty?: BossDifficulty
+	// レイドボス レベル調整（raidBoss カテゴリのみ）
+	raidBossLevel?: number
+	// 手動入力値（プリセット・カスタム選択後の調整用）
 	manualOverrides?: {
-		resistCritical?: number // プリセット値(0)からの調整値
-		requiredHIT?: number // プリセット値(0)からの調整値
+		resistCritical?: number // 確定クリティカル調整値
+		requiredHIT?: number // 必要HIT調整値（レイドボス以外 or 赫灼のセルディテのFLEE値）
 	}
 }
 
-// 従来のEnemyInfo（後方互換性のため残す、将来的に削除予定）
-export interface EnemyInfo {
-	DEF: number
-	MDEF: number
-	level: number
-	guaranteedCritical: number
-	freeValue: number
-}
-
-// 計算機の全データ（新しい敵情報システム対応）
+// 計算機の全データ
 export interface CalculatorData {
 	baseStats: BaseStats
 	mainWeapon: MainWeapon
@@ -345,12 +370,11 @@ export interface CalculatorData {
 	equipment: EquipmentSlots
 	crystals: CrystalSlots
 	food: FoodFormData // 料理データ
-	enemy: EnemyFormData // 新しい敵情報システム
-	buffSkills: import('./buffSkill').BuffSkillFormData // バフスキルデータ（新形式）
+	enemy: SaveDataEnemyInfo // 敵情報（個別セーブデータ用）
+	buffSkills: import('./buffSkill').BuffSkillFormData // バフスキルデータ
 	buffItems: BuffItemFormData // バフアイテムデータ
 	register: RegisterFormData // レジスタ他データ
-	// 後方互換性のため旧敵情報も保持（将来的に削除予定）
-	legacyEnemy?: EnemyInfo
+	attackSkill: AttackSkillFormData // 攻撃スキルデータ
 }
 
 // 計算結果
@@ -728,4 +752,140 @@ export interface RegisterEffect {
 // レジスタフォームデータ
 export interface RegisterFormData {
 	effects: RegisterEffect[]
+}
+
+// 攻撃スキルシステム
+
+// 攻撃スキルカテゴリ
+// 攻撃スキル系統グループ
+export type AttackSkillSystemGroup =
+	| 'sword' // 剣系統
+	| 'halberd' // 槍系統
+	| 'magicSwordsman' // 魔法剣士系統
+	| 'knuckle' // 手甲系統
+	| 'bow' // 弓系統
+	| 'magic' // 魔法系統
+	| 'katana' // 抜刀系統
+	| 'dualSword' // 双剣系統
+	| 'other' // その他
+
+export type AttackSkillCategory = 
+	| 'sword'      // 片手剣
+	| 'twohandSword' // 両手剣
+	| 'bow'        // 弓
+	| 'bowgun'     // 自動弓
+	| 'staff'      // 杖
+	| 'magicDevice' // 魔導具
+	| 'knuckle'    // 拳甲
+	| 'halberd'    // 旋棍
+	| 'katana'     // 刀
+	| 'dualSword'  // 双剣
+	| 'martialArts' // 格闘
+
+// 威力参照タイプ
+export type PowerReferenceType = 'totalATK' | 'MATK' // 将来拡張: 'spearMATK', 'STR', 'INT', etc.
+
+// 慣れタイプ
+export type FamiliarityType = 'physical' | 'magical' | 'normal'
+
+// 攻撃段階情報
+export interface AttackHit {
+	hitNumber: number                    // 撃目番号（1-6）
+	attackType: 'physical' | 'magical'   // 攻撃タイプ
+	referenceDefense: 'DEF' | 'MDEF'     // 参照防御力
+	referenceResistance: 'physical' | 'magical' // 参照耐性
+	powerReference: PowerReferenceType    // 威力参照
+	
+	// 倍率情報（表示用）
+	multiplier: number                   // 威力倍率%（表示値、実際の計算は別途）
+	fixedDamage: number                  // 固定ダメージ（表示値、実際の計算は別途）
+	
+	// 計算式説明（各撃ごとに設定可能）
+	multiplierFormula?: string           // 倍率の計算式説明（例: "1000%", "|補正後STR|%"）
+	fixedDamageFormula?: string          // 固定値の計算式説明（例: "400", "基礎INT/2"）
+	
+	// 補正適用
+	familiarity: FamiliarityType         // 慣れ参照
+	familiarityGrant: FamiliarityType    // 慣れ付与
+	canUseUnsheathePower: boolean        // 抜刀威力適用可否
+	canUseLongRange: boolean             // ロングレンジ適用可否
+	canUseDistancePower: boolean         // 距離威力適用可否
+	
+	// 特殊設定
+	notes?: string                       // 備考
+}
+
+// 攻撃スキル
+export interface AttackSkill {
+	// 基本情報
+	id: string                           // 一意識別子
+	name: string                        // スキル名
+	order: number                       // 表示順序（系統別番号）
+	systemGroup: AttackSkillSystemGroup // 系統グループ
+	category: AttackSkillCategory        // スキルカテゴリ
+	weaponTypeRequirements?: WeaponType[] // 必要武器種（指定なしは全武器対応）
+	
+	// 消費・条件
+	mpCost: number                      // 消費MP
+	levelRequirement?: number            // 必要スキルレベル
+	prerequisites?: string[]            // 前提スキル
+	
+	// 表示用計算式説明
+	multiplierFormula?: string           // 倍率の計算式説明（例: "1000%", "|補正後STR|%"）
+	fixedDamageFormula?: string          // 固定値の計算式説明（例: "400", "基礎INT/2"）
+	
+	// 多段攻撃設定
+	hits: AttackHit[]                   // 1〜6撃目の情報配列
+	
+	// 特殊効果
+	specialEffects?: string[] // 特殊効果の説明文配列
+	
+	// メタ情報
+	notes?: string                     // 実装・使用上の注意
+}
+
+// 計算済み攻撃段階情報（表示用）
+export interface CalculatedHit {
+	hitNumber: number
+	attackType: 'physical' | 'magical'
+	powerReference: string              // 表示用（例: "総ATK"）
+	referenceDefense: 'DEF' | 'MDEF'
+	referenceResistance: 'physical' | 'magical' // 参照耐性
+	multiplier: number                  // 表示用倍率%
+	fixedDamage: number                 // 表示用固定値
+	
+	// 計算式説明
+	multiplierFormula?: string          // 倍率の計算式説明
+	fixedDamageFormula?: string         // 固定値の計算式説明
+	
+	// 慣れ情報
+	familiarityReference: FamiliarityType
+	familiarityGrant: FamiliarityType
+	
+	// 補正適用
+	canUseUnsheathePower: boolean
+	canUseLongRange: boolean
+	canUseDistancePower: boolean
+	
+	// 計算過程（特殊計算の場合）
+	calculationProcess?: string
+}
+
+// AttackSkillForm表示用データ
+export interface AttackSkillDisplayData {
+	// 選択情報
+	selectedSkill: AttackSkill | null
+	
+	// 計算結果
+	calculatedHits: CalculatedHit[]
+	
+	// 表示設定
+	showDetailedInfo: boolean
+}
+
+// AttackSkillFormデータ（CalculatorData内で使用）
+export interface AttackSkillFormData {
+	selectedSkillId: string | null
+	calculatedData: CalculatedHit[] | null
+	lastCalculatedAt?: string
 }

@@ -56,7 +56,7 @@ export default React.memo<HeaderActionsProps>(function HeaderActions({
 
 	return (
 		<div
-			className={`flex flex-col sm:flex-row gap-2 sm:gap-3 items-center ${className}`}
+			className={`hidden sm:flex flex-col sm:flex-row gap-2 sm:gap-3 items-center ${className}`}
 		>
 			{/* 現在のセーブデータ名 */}
 			{currentSaveName && (

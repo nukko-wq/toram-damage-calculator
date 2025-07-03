@@ -368,7 +368,33 @@ async function validateStorageIntegrity(): Promise<boolean> {
  * バージョンチェック
  */
 async function checkStorageVersion(): Promise<void> {
-	// 将来的にバージョン管理を実装
+	// attackSkillフィールドの追加マイグレーション
+	const saveDataList = StorageHelper.get<SaveData[]>(STORAGE_KEYS.SAVE_DATA_LIST, [])
+	let needsUpdate = false
+
+	const updatedSaveDataList = saveDataList.map(saveData => {
+		if (!saveData.data.attackSkill) {
+			needsUpdate = true
+			return {
+				...saveData,
+				data: {
+					...saveData.data,
+					attackSkill: {
+						selectedSkillId: null,
+						calculatedData: null,
+						lastCalculatedAt: undefined
+					}
+				},
+				updatedAt: new Date().toISOString()
+			}
+		}
+		return saveData
+	})
+
+	if (needsUpdate) {
+		StorageHelper.set(STORAGE_KEYS.SAVE_DATA_LIST, updatedSaveDataList)
+		console.log('Migrated save data to include attackSkill field')
+	}
 }
 
 /**

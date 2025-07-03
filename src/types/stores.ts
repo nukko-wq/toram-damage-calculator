@@ -89,6 +89,7 @@ export interface CalculatorStore {
 	updateEquipment: (equipment: EquipmentSlots) => void
 	updateFood: (food: FoodFormData) => void
 	updateEnemy: (enemy: EnemyFormData) => void
+	updateAttackSkill: (attackSkill: import('@/types/calculator').AttackSkillFormData) => void
 	updateBuffSkills: (buffSkills: BuffSkillFormData) => void
 	updateBuffSkillState: (skillId: string, state: import('@/types/buffSkill').BuffSkillState) => void
 	updateSkillParameter: (skillId: string, paramType: 'level' | 'stackCount' | 'specialParam', value: number) => void

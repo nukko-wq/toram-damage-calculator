@@ -137,28 +137,70 @@ export const enemiesData: EnemiesData = {
 			{
 				id: 'ca10a211-71b5-4683-811e-3e09457edbe3',
 				name: '竜骨の魔人',
-				level: 0, // nullから0に変更（型安全性のため）
+				level: 288, // デフォルトレベル（ユーザーが調整可能）
 				stats: {
-					DEF: 0, // nullから0に変更（型安全性のため）
-					MDEF: 0, // nullから0に変更（型安全性のため）
-					physicalResistance: 0, // nullから0に変更（型安全性のため）
-					magicalResistance: 0, // nullから0に変更（型安全性のため）
+					DEF: 0, // レベル調整時に自動計算
+					MDEF: 0, // レベル調整時に自動計算
+					physicalResistance: 0, // レベル調整時に自動計算
+					magicalResistance: 0, // レベル調整時に自動計算
 					resistCritical: 0,
-					requiredHIT: 0,
+					requiredHIT: 0, // レベル調整時に自動計算
 				},
 				category: 'raidBoss',
 			},
 			{
 				id: '1a1674ab-7118-4667-b457-903841462889',
 				name: '赫灼のセルディテ',
-				level: 0, // nullから0に変更（型安全性のため）
+				level: 288, // デフォルトレベル（ユーザーが調整可能）
 				stats: {
-					DEF: 0, // nullから0に変更（型安全性のため）
-					MDEF: 0, // nullから0に変更（型安全性のため）
-					physicalResistance: 0, // nullから0に変更（型安全性のため）
-					magicalResistance: 0, // nullから0に変更（型安全性のため）
+					DEF: 0, // レベル調整時に自動計算
+					MDEF: 0, // レベル調整時に自動計算
+					physicalResistance: 0, // レベル調整時に自動計算
+					magicalResistance: 0, // レベル調整時に自動計算
 					resistCritical: 0,
-					requiredHIT: 0,
+					requiredHIT: 0, // FLEE値不明、ユーザー入力可能
+				},
+				category: 'raidBoss',
+			},
+			{
+				id: 'ice-bison-uuid', // TODO: 実際のUUIDに置き換える
+				name: '氷岩のバイソン',
+				level: 288,
+				stats: {
+					DEF: 0, // レベル調整時に自動計算
+					MDEF: 0, // レベル調整時に自動計算
+					physicalResistance: 0, // レベル調整時に自動計算
+					magicalResistance: 0, // レベル調整時に自動計算
+					resistCritical: 0,
+					requiredHIT: 0, // レベル調整時に自動計算
+				},
+				category: 'raidBoss',
+			},
+			{
+				id: 'thunder-nguruma-uuid', // TODO: 実際のUUIDに置き換える
+				name: '轟雷のングルマ',
+				level: 288,
+				stats: {
+					DEF: 0, // レベル調整時に自動計算
+					MDEF: 0, // レベル調整時に自動計算
+					physicalResistance: 0, // レベル調整時に自動計算
+					magicalResistance: 0, // レベル調整時に自動計算
+					resistCritical: 0,
+					requiredHIT: 0, // レベル調整時に自動計算
+				},
+				category: 'raidBoss',
+			},
+			{
+				id: 'earthquake-chimera-uuid', // TODO: 実際のUUIDに置き換える
+				name: '震巌のキマイラ',
+				level: 288,
+				stats: {
+					DEF: 0, // レベル調整時に自動計算
+					MDEF: 0, // レベル調整時に自動計算
+					physicalResistance: 0, // レベル調整時に自動計算
+					magicalResistance: 0, // レベル調整時に自動計算
+					resistCritical: 0,
+					requiredHIT: 0, // レベル調整時に自動計算
 				},
 				category: 'raidBoss',
 			},

@@ -6,10 +6,7 @@ import type {
 	EquipmentSlots,
 	CrystalSlots,
 	FoodFormData,
-	EnemyInfo,
-	EnemyFormData,
-	BuffSkillFormData,
-	BuffItemFormData,
+	SaveDataEnemyInfo,
 	RegisterFormData,
 	RegisterEffect,
 	CalculatorData,
@@ -173,13 +170,6 @@ export const createInitialCrystalSlots = (): CrystalSlots => ({
 	special2: null,
 })
 
-export const createInitialEnemyInfo = (): EnemyInfo => ({
-	DEF: 0,
-	MDEF: 0,
-	level: 1,
-	guaranteedCritical: 0,
-	freeValue: 0,
-})
 
 // 料理システムの初期値
 export const createInitialFoodFormData = (): FoodFormData => ({
@@ -190,14 +180,11 @@ export const createInitialFoodFormData = (): FoodFormData => ({
 	slot5: { selectedFood: 'none', level: 0 },
 })
 
-// 新しい敵情報システムの初期値
-export const createInitialEnemyFormData = (): EnemyFormData => ({
-	selectedId: null,
-	type: null,
-	manualOverrides: {
-		resistCritical: 0,
-		requiredHIT: 0,
-	},
+// 敵情報システムの初期値（個別セーブデータ用）
+export const createInitialSaveDataEnemyInfo = (): SaveDataEnemyInfo => ({
+	selectedEnemyId: null,
+	enemyType: null,
+	lastSelectedAt: undefined,
 })
 
 // レジスタ他システムの初期値
@@ -372,6 +359,13 @@ export const migrateRegisterEffects = (existingData: RegisterFormData): Register
 	return { effects: migratedEffects }
 }
 
+// 攻撃スキル初期データ作成
+export const createInitialAttackSkillFormData = (): import('@/types/calculator').AttackSkillFormData => ({
+	selectedSkillId: null,
+	calculatedData: null,
+	lastCalculatedAt: undefined,
+})
+
 export const createInitialCalculatorData = (): CalculatorData => ({
 	baseStats: createInitialBaseStats(),
 	mainWeapon: createInitialMainWeapon(),
@@ -379,9 +373,9 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	equipment: createInitialEquipmentSlots(),
 	crystals: createInitialCrystalSlots(),
 	food: createInitialFoodFormData(), // 料理システム
-	enemy: createInitialEnemyFormData(), // 新しい敵情報システム
+	enemy: createInitialSaveDataEnemyInfo(), // 新しい敵情報システム
 	buffSkills: getDefaultBuffSkillFormData(), // バフスキルシステム
 	buffItems: getDefaultBuffItems(), // バフアイテムシステム
 	register: createInitialRegisterFormData(), // レジスタ他システム
-	legacyEnemy: createInitialEnemyInfo(), // 後方互換性
+	attackSkill: createInitialAttackSkillFormData(), // 攻撃スキルシステム
 })

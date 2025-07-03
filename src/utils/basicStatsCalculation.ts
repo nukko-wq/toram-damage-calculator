@@ -1626,6 +1626,44 @@ export function calculateMagicalCriticalDamage(
 }
 
 /**
+ * 総ATK計算結果のインターフェース
+ */
+export interface TotalATKCalculationSteps {
+	mainATK: number
+	subATK: number
+	isDualSword: boolean
+	totalATK: number
+}
+
+/**
+ * 総ATK計算
+ * 
+ * 双剣以外: 総ATK = ATK
+ * 双剣: 総ATK = ATK + サブATK
+ * 
+ * @param mainWeaponType メイン武器種別
+ * @param mainATK メイン武器のATK計算結果
+ * @param subATK サブ武器のATK計算結果
+ * @returns 総ATK計算の詳細ステップ
+ */
+export function calculateTotalATK(
+	mainWeaponType: WeaponTypeEnum,
+	mainATK: number,
+	subATK: number,
+): TotalATKCalculationSteps {
+	const isDualSword = mainWeaponType === '双剣'
+	
+	const totalATK = isDualSword ? mainATK + subATK : mainATK
+	
+	return {
+		mainATK,
+		subATK,
+		isDualSword,
+		totalATK,
+	}
+}
+
+/**
  * 安定率計算
  *
  * 計算式: MAX(0, MIN(100, メイン武器の安定率 + ステータス安定率 + 安定率%))

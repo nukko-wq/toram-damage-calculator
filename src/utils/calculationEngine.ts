@@ -11,6 +11,7 @@ import {
 	calculateCriticalRate,
 	calculateCriticalDamage,
 	calculateMagicalCriticalDamage,
+	calculateTotalATK,
 	calculateMATK,
 	calculateHIT,
 	calculatePhysicalResistance,
@@ -25,6 +26,7 @@ import {
 	getBodyArmorType,
 	type AllBonuses,
 } from './basicStatsCalculation'
+import { getAllDataSourceBonuses } from './dataSourceIntegration'
 
 /**
  * 計算結果を生成する（実際の計算式使用）
@@ -33,17 +35,23 @@ import {
  * @returns 計算結果
  */
 export const calculateResults = (data: CalculatorData): CalculationResults => {
-	// 現在は簡単な実装。将来的に装備・クリスタ・料理・バフからの補正値を統合
-	const dummyBonuses: AllBonuses = {}
+	// 装備・クリスタ・料理・バフからの補正値を統合
+	const dataSourceBonuses = getAllDataSourceBonuses(data)
+	const allBonuses = aggregateAllBonuses(
+		dataSourceBonuses.equipment,
+		dataSourceBonuses.crystal,
+		dataSourceBonuses.food,
+		dataSourceBonuses.buff,
+	)
 
 	// 1. 補正後ステータス計算
-	const adjustedStats = calculateAdjustedStats(data.baseStats, dummyBonuses)
+	const adjustedStats = calculateAdjustedStats(data.baseStats, allBonuses)
 
 	// 2. HP計算
-	const hpCalculation = calculateHP(data.baseStats, dummyBonuses)
+	const hpCalculation = calculateHP(data.baseStats, allBonuses)
 
 	// 3. MP計算
-	const mpCalculation = calculateMP(data.baseStats, dummyBonuses)
+	const mpCalculation = calculateMP(data.baseStats, allBonuses)
 
 	// 4. ATK計算
 	const atkCalculation = calculateATK(
@@ -51,7 +59,14 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		data.mainWeapon,
 		data.subWeapon,
 		adjustedStats,
-		dummyBonuses,
+		allBonuses,
+	)
+
+	// 4-1. 総ATK計算
+	const totalATKCalculation = calculateTotalATK(
+		data.mainWeapon.weaponType,
+		atkCalculation.finalATK,
+		0, // TODO: サブATK計算結果を取得
 	)
 
 	// 5. ASPD計算（体装備のArmorTypeを取得）
@@ -60,33 +75,33 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		data.baseStats,
 		data.mainWeapon,
 		adjustedStats,
-		dummyBonuses,
+		allBonuses,
 		bodyArmorType,
 	)
 
 	// 6. 行動速度計算
 	const motionSpeedCalculation = calculateMotionSpeed(
 		aspdCalculation.finalASPD,
-		dummyBonuses,
+		allBonuses,
 	)
 
 	// 7. 異常耐性計算
 	const ailmentResistance = calculateAilmentResistance(
 		data.baseStats,
-		dummyBonuses,
+		allBonuses,
 	)
 
 	// 8. クリティカル率計算
 	const criticalRateCalculation = calculateCriticalRate(
 		data.baseStats.CRT,
-		dummyBonuses,
+		allBonuses,
 	)
 
 	// 8-2. クリティカルダメージ計算
 	const criticalDamageCalculation = calculateCriticalDamage(
 		adjustedStats.STR,
 		adjustedStats.AGI,
-		dummyBonuses,
+		allBonuses,
 	)
 
 	// 8-3. 魔法クリティカルダメージ計算
@@ -108,14 +123,14 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		atkCalculation.totalWeaponATK, // 手甲用の総武器ATK
 		data.baseStats, // 基礎ステータス（MATKアップ用）
 		adjustedStats, // 補正後ステータス（ステータスMATK用）
-		dummyBonuses,
+		allBonuses,
 	)
 
 	// 9. HIT計算
 	const hitCalculation = calculateHIT(
 		data.baseStats.level,
 		adjustedStats.DEX,
-		dummyBonuses,
+		allBonuses,
 	)
 
 	// 10. FLEE計算
@@ -123,40 +138,40 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		data.baseStats.level,
 		adjustedStats.AGI,
 		data.equipment.body,
-		dummyBonuses,
+		allBonuses,
 	)
 
 	// 11. 物理耐性計算
 	const physicalResistanceCalculation =
-		calculatePhysicalResistance(dummyBonuses)
+		calculatePhysicalResistance(allBonuses)
 
 	// 12. 魔法耐性計算
-	const magicalResistanceCalculation = calculateMagicalResistance(dummyBonuses)
+	const magicalResistanceCalculation = calculateMagicalResistance(allBonuses)
 
 	// 13. 防御崩し計算
-	const armorBreakCalculation = calculateArmorBreak(dummyBonuses)
+	const armorBreakCalculation = calculateArmorBreak(allBonuses)
 
 	// 14. 先読み計算
-	const anticipateCalculation = calculateAnticipate(dummyBonuses)
+	const anticipateCalculation = calculateAnticipate(allBonuses)
 
 	// 15. CSPD計算
 	const cspdCalculation = calculateCSPD(
 		data.baseStats.level,
 		adjustedStats.DEX,
 		adjustedStats.AGI,
-		dummyBonuses,
+		allBonuses,
 	)
 
 	// 16. 総属性有利計算
 	const totalElementAdvantageCalculation =
-		calculateTotalElementAdvantage(dummyBonuses)
+		calculateTotalElementAdvantage(allBonuses)
 
 	// 17. 安定率計算
 	const stabilityCalculation = calculateStability(
 		data.mainWeapon.stability,
 		data.mainWeapon.weaponType,
 		adjustedStats,
-		dummyBonuses,
+		allBonuses,
 	)
 
 	return {
@@ -165,7 +180,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			MP: mpCalculation.finalMP,
 			ATK: atkCalculation.finalATK,
 			subBaseATK: data.subWeapon.ATK, // 暫定：サブ武器ATKをそのまま表示
-			totalATK: atkCalculation.finalATK + data.subWeapon.ATK, // 暫定
+			totalATK: totalATKCalculation.totalATK, // 総ATK計算結果
 			bringerAM: 0, // 暫定
 			MATK: matkCalculation.finalMATK,
 			baseMATK: matkCalculation.baseMATK,
