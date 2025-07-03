@@ -106,7 +106,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			
 			// PowerOptionsに基づく属性攻撃設定
 			const getElementAdvantageTotal = () => {
-				if (powerOptions.elementAttack === 'none') return 0
+				// 属性攻撃が無効、または属性威力が無効の場合は0を返す
+				if (powerOptions.elementAttack === 'none' || powerOptions.elementPower === 'disabled') return 0
 				// 基本ステータスから総属性有利を取得（装備・クリスタ・料理・バフ統合済み）
 				const baseAdvantage = calculationResults?.basicStats?.totalElementAdvantage ?? 0
 				
@@ -116,7 +117,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 			
 			const getElementAdvantageAwakening = () => {
-				if (powerOptions.elementAttack === 'none') return 0
+				// 属性攻撃が無効、または属性威力が無効の場合は0を返す
+				if (powerOptions.elementAttack === 'none' || powerOptions.elementPower === 'disabled') return 0
 				// 実際の計算結果から属性覚醒有利を取得
 				return calculationResults?.basicStats?.elementAwakeningAdvantage ?? 0
 			}
@@ -150,7 +152,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				elementAdvantage: {
 					total: getElementAdvantageTotal(),
 					awakening: getElementAdvantageAwakening(),
-					isActive: powerOptions.elementAttack !== 'none',
+					isActive: powerOptions.elementAttack !== 'none' && powerOptions.elementPower !== 'disabled',
 				},
 				distance: distanceValues,
 				unsheathe: {

@@ -37,8 +37,8 @@ export const enemiesData: EnemiesData = {
 				stats: {
 					DEF: 143,
 					MDEF: 143,
-					physicalResistance: 0,
-					magicalResistance: 0,
+					physicalResistance: 5,
+					magicalResistance: 5,
 					resistCritical: 0,
 					requiredHIT: 0,
 				},
