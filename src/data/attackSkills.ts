@@ -52,7 +52,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 400,
 		multiplierFormula: '特殊計算',
 		fixedDamageFormula: '特殊計算',
-		specialEffects: ['距離威力: ○', '抜刀威力: ×', 'ロングレンジ: ×'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -98,7 +97,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 200,
 		multiplierFormula: '|200+補正後STR/5|%',
 		fixedDamageFormula: '100 (旋風槍装備時+100)',
-		specialEffects: ['距離威力: ○', '抜刀威力: ×', 'ロングレンジ: ×'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -108,8 +106,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
-				multiplierFormula: '|200+補正後STR/5|%',
-				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				multiplierFormula: '400+補正後STR/5%',
+				fixedDamageFormula: '槍装備時：固定値+100',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -124,8 +122,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
-				multiplierFormula: '|200+補正後STR/5|%',
-				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				multiplierFormula: '400+補正後STR/5%',
+				fixedDamageFormula: '槍装備時：固定値+100',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -140,8 +138,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
-				multiplierFormula: '|200+補正後STR/5|%',
-				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				multiplierFormula: '400+補正後STR/5%',
+				fixedDamageFormula: '槍装備時：固定値+100',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -160,7 +158,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'],
 		mpCost: 200,
-		multiplierFormula: '400+補正後STRx20%',
+		multiplierFormula: '400+補正後STR/5%',
 		fixedDamageFormula: '100 (旋風槍装備時+100)',
 		specialEffects: ['距離威力: ○', '抜刀威力: ×', 'ロングレンジ: ×'],
 		hits: [
@@ -172,8 +170,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 400, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
-				multiplierFormula: '400+補正後STRx20%',
-				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				multiplierFormula: '威力+補正後STR/5%',
+				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -188,8 +186,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 400, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
-				multiplierFormula: '400+補正後STRx20%',
-				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				multiplierFormula: '威力+補正後STR/5%',
+				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -204,8 +202,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 400, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
-				multiplierFormula: '400+補正後STRx20%',
-				fixedDamageFormula: '100 (旋風槍装備時+100)',
+				multiplierFormula: '威力+補正後STR/5%',
+				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -235,8 +233,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'MATK',
 				multiplier: 125, // 表示用（実際の計算は外部）
 				fixedDamage: 50, // 表示用（実際の計算は外部）
-				multiplierFormula: '125% (杖装備時+25%)',
-				fixedDamageFormula: '50',
+				multiplierFormula: '杖装備時：威力+25%',
 				familiarity: 'magical',
 				familiarityGrant: 'magical',
 				canUseUnsheathePower: false,

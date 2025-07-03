@@ -8,8 +8,8 @@ export class StrikeStabAilmentCalculator extends SkillHitCalculator {
 	calculate(input: SkillCalculationInput): SkillCalculationResult {
 		const { hitNumber, playerStats, equipmentContext } = input
 
-		// 倍率計算: 400+補正後STRx20%
-		const multiplierValue = 400 + playerStats.adjustedSTR * 0.2
+		// 倍率計算: 400+補正後STR/5
+		const multiplierValue = 400 + playerStats.adjustedSTR / 5
 		const multiplier = Number(multiplierValue.toFixed(2))
 
 		// 固定値計算: 100 (旋風槍装備時+100)
@@ -21,7 +21,7 @@ export class StrikeStabAilmentCalculator extends SkillHitCalculator {
 			hitNumber,
 			calculatedMultiplier: multiplier,
 			calculatedFixedDamage: fixedDamage,
-			calculationProcess: `400+${playerStats.adjustedSTR}x20% = 400+${(playerStats.adjustedSTR * 0.2).toFixed(2)} = ${multiplier}%, 100${
+			calculationProcess: `400+${playerStats.adjustedSTR}/5 = 400+${(playerStats.adjustedSTR / 5).toFixed(2)} = ${multiplier}%, 100${
 				equipmentBonus > 0 ? '+100(旋風槍)' : ''
 			} = ${fixedDamage}`,
 		}
