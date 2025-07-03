@@ -4,6 +4,7 @@ import {
 	type SkillHitCalculator,
 	StandardCalculator,
 	StrikeStabCalculator,
+	StrikeStabAilmentCalculator,
 } from './calculators'
 import type {
 	EquipmentContext,
@@ -56,6 +57,8 @@ export class AttackSkillCalculator {
 				return new MoonSlashCalculator()
 			case 'strike_stab':
 				return new StrikeStabCalculator()
+			case 'strike_stab_ailment':
+				return new StrikeStabAilmentCalculator()
 			case 'slash':
 			case 'magic_arrow':
 			case 'power_shot':

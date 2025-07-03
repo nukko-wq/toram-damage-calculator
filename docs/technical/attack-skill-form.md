@@ -46,7 +46,6 @@ interface AttackSkill {
   specialEffects?: string[] // 特殊効果の説明文配列
   
   // メタ情報
-  description?: string                // スキル説明
   notes?: string                     // 実装・使用上の注意
 }
 

@@ -6,7 +6,8 @@
 
 ### 対象スキル例
 1. **ムーンスラッシュ**: 倍率が特殊（2撃目は`|補正後STR|%`）、固定値も特殊（2撃目は`基礎INT/2`）
-2. **ストライクスタブ**: 倍率が特殊（`|200+補正後STR/5|%`）、固定値に装備ボーナス（`100 (旋風槍装備時+100)`）
+2. **ストライクスタブ(通常時)**: 倍率が特殊（`|200+補正後STR/5|%`）、固定値に装備ボーナス（`100 (旋風槍装備時+100)`）
+3. **ストライクスタブ(敵状態異常時)**: 倍率が特殊（`400+補正後STRx20%`）、固定値に装備ボーナス（`100 (旋風槍装備時+100)`）
 
 ## 設計原則
 
@@ -202,10 +203,10 @@ class MoonSlashCalculator extends SkillHitCalculator {
 }
 ```
 
-### ストライクスタブ計算器
+### ストライクスタブ(通常時)計算器
 
 ```typescript
-// ストライクスタブ専用計算
+// ストライクスタブ(通常時)専用計算
 class StrikeStabCalculator extends SkillHitCalculator {
   calculate(input: SkillCalculationInput): SkillCalculationResult {
     const { hitNumber, playerStats, equipmentContext } = input
@@ -224,6 +225,33 @@ class StrikeStabCalculator extends SkillHitCalculator {
       calculatedMultiplier: multiplier,
       calculatedFixedDamage: fixedDamage,
       calculationProcess: `|200+floor(${playerStats.adjustedSTR}/5)| = ${multiplier}%, 100${equipmentBonus > 0 ? '+100(旋風槍)' : ''} = ${fixedDamage}`
+    }
+  }
+}
+```
+
+### ストライクスタブ(敵状態異常時)計算器
+
+```typescript
+// ストライクスタブ(敵状態異常時)専用計算
+class StrikeStabAilmentCalculator extends SkillHitCalculator {
+  calculate(input: SkillCalculationInput): SkillCalculationResult {
+    const { hitNumber, playerStats, equipmentContext } = input
+    
+    // 倍率計算: 400+補正後STRx20%
+    const multiplierValue = 400 + playerStats.adjustedSTR * 0.2
+    const multiplier = Number(multiplierValue.toFixed(2))
+    
+    // 固定値計算: 100 (旋風槍装備時+100)
+    const baseFixedDamage = 100
+    const equipmentBonus = equipmentContext.hasHalberdEquipped ? 100 : 0
+    const fixedDamage = baseFixedDamage + equipmentBonus
+    
+    return {
+      hitNumber,
+      calculatedMultiplier: multiplier,
+      calculatedFixedDamage: fixedDamage,
+      calculationProcess: `400+${playerStats.adjustedSTR}x20% = 400+${(playerStats.adjustedSTR * 0.2).toFixed(2)} = ${multiplier}%, 100${equipmentBonus > 0 ? '+100(旋風槍)' : ''} = ${fixedDamage}`
     }
   }
 }
@@ -327,7 +355,8 @@ src/utils/attackSkillCalculation/
 │   ├── SkillHitCalculator.ts   // 基底クラス
 │   ├── StandardCalculator.ts   // 標準計算
 │   ├── MoonSlashCalculator.ts  // ムーンスラッシュ
-│   ├── StrikeStabCalculator.ts // ストライクスタブ
+│   ├── StrikeStabCalculator.ts // ストライクスタブ(通常時)
+│   ├── StrikeStabAilmentCalculator.ts // ストライクスタブ(敵状態異常時)
 │   └── index.ts               // 計算器エクスポート
 ├── utils.ts                   // ユーティリティ関数
 └── __tests__/                 // テストファイル
@@ -419,7 +448,7 @@ describe('MoonSlashCalculator', () => {
 
 ### フェーズ3: 特殊計算器
 - [ ] ムーンスラッシュ計算器の実装 (`MoonSlashCalculator.ts`)
-- [ ] ストライクスタブ計算器の実装 (`StrikeStabCalculator.ts`)
+- [ ] ストライクスタブ(通常時)計算器の実装 (`StrikeStabCalculator.ts`)
 - [ ] 特殊計算のテスト作成
 
 ### フェーズ4: 統合・最適化
