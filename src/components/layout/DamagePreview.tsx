@@ -328,6 +328,12 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				console.log('  耐性適用計算:', `${step1.beforeResistance} × ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate)/100} = ${step1.beforeResistance * (1 - (step1.physicalResistanceRate || step1.magicalResistanceRate)/100)}`)
 				console.log('  耐性適用後:', step1.afterResistance)
 				console.log('  敵防御力:', step1.enemyDEF)
+				console.log('  DEBUG: 元の敵DEF/MDEF:', input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF)
+				console.log('  DEBUG: 適用された貫通率(%):', input.attackSkill.type === 'physical' ? input.penetration.physical : input.penetration.magical)
+				const originalDef = input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF
+				const penetrationRate = input.attackSkill.type === 'physical' ? input.penetration.physical : input.penetration.magical
+				const penetrationMultiplier = 1 - penetrationRate / 100
+				console.log('  DEBUG: 貫通適用計算:', `${originalDef} × (1 - ${penetrationRate}/100) = ${originalDef} × ${penetrationMultiplier} = ${originalDef * penetrationMultiplier} → Math.floor = ${Math.floor(originalDef * penetrationMultiplier)}`)
 				console.log('  Math.floor前:', step1.afterResistance - step1.enemyDEF)
 				console.log('  結果:', step1.result)
 			}

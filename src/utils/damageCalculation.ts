@@ -500,18 +500,19 @@ function processEnemyDefense(
 		// Phase 3では無視
 	}
 
-	// 4. 貫通による低下（小数点以下切り捨て）
+	// 4. 貫通による低下（%計算、小数点以下切り捨て）
 	// 貫通値は参照防御力の種類に応じて適用
-	// - 物理貫通：DEF参照時のみ有効
-	// - 魔法貫通：MDEF参照時のみ有効
-	let penetration = 0
+	// - 物理貫通：DEF参照時のみ有効（%として適用）
+	// - 魔法貫通：MDEF参照時のみ有効（%として適用）
+	// 計算式：(M)DEF × (1 - 貫通%/100)
+	let penetrationRate = 0
 	if (defenseType === 'DEF') {
-		penetration = input.penetration.physical
+		penetrationRate = input.penetration.physical
 	} else if (defenseType === 'MDEF') {
-		penetration = input.penetration.magical
+		penetrationRate = input.penetration.magical
 	}
 
-	processed = Math.floor(Math.max(0, processed - penetration))
+	processed = Math.floor(processed * (1 - penetrationRate / 100))
 
 	return processed
 }

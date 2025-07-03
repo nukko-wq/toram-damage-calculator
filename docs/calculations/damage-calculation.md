@@ -174,24 +174,30 @@ function calculateEternalNightmareReduction(
 
 ##### 3. 貫通による低下
 ```typescript
-// 貫通値の適用条件：
+// 貫通値の適用条件と計算方法：
 // - 物理貫通：参照防御力がDEFの場合のみ適用
 // - 魔法貫通：参照防御力がMDEFの場合のみ適用
+// - 貫通値は%で計算：(M)DEF × (1 - 貫通%/100)
 const isPhysicalAttack = attackType === 'physical'
 const referencesPhysicalDef = isPhysicalAttack // 物理攻撃はDEF参照
 const referencesMagicalDef = !isPhysicalAttack // 魔法攻撃はMDEF参照
 
-let penetration = 0
+let penetrationRate = 0
 if (referencesPhysicalDef) {
-    penetration = basicStats.physicalPenetration
+    penetrationRate = basicStats.physicalPenetration // %値
 } else if (referencesMagicalDef) {
-    penetration = basicStats.magicalPenetration
+    penetrationRate = basicStats.magicalPenetration // %値
 }
 
-const finalDEF = Math.floor(Math.max(0, processedDEF - penetration))
+const finalDEF = Math.floor(processedDEF * (1 - penetrationRate / 100))
 ```
 
-**重要な適用条件**:
+**重要な計算方法**:
+- **貫通値は%として適用**: 例えば物理貫通15%の場合、DEF × 0.85
+- **計算式**: `(M)DEF × (1 - 貫通%/100)`
+- **例**: DEF 143、物理貫通15% → 143 × (1 - 15/100) = 143 × 0.85 = 121.55 → Math.floor(121.55) = 121
+
+**適用条件**:
 - **物理貫通**: 物理攻撃でDEFを参照する場合のみ有効
 - **魔法貫通**: 魔法攻撃でMDEFを参照する場合のみ有効
 - **混合攻撃**: 参照防御力の種類に応じて対応する貫通値のみ適用
