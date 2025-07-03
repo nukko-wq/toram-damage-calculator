@@ -2,14 +2,46 @@
 
 ## 概要
 
-トーラムオンラインの正確なダメージ計算式を実装するための設計書。複雑な多段階計算と各種補正を正確に再現します。
+トーラムオンラインの正確なダメージ計算式を実装するための設計書。複雑な多段階計算と各種補正、および安定率によるダメージ幅を正確に再現します。
 
 ## 基本ダメージ計算式
 
 ### 完全計算式
 ```
-ダメージ = INT(INT(INT(INT(INT(INT(INT(INT((INT((自Lv+参照ステータス-敵Lv)×(1-物魔耐性/100)×(1-武器耐性/100)-計算後敵(M)DEF)+抜刀固定値+スキル固定値)×(1+有利/100))×スキル倍率/100)×(1+抜刀%/100))×慣れ/100)×(1+距離/100))×コンボ/100)×(1+パッシブ倍率/100))×(1+ブレイブ倍率/100))
+基本ダメージ = INT(INT(INT(INT(INT(INT(INT(INT((INT((自Lv+参照ステータス-敵Lv)×(1-物魔耐性/100)×(1-武器耐性/100)-計算後敵(M)DEF)+抜刀固定値+スキル固定値)×(1+有利/100))×スキル倍率/100)×(1+抜刀%/100))×慣れ/100)×(1+距離/100))×コンボ/100)×(1+パッシブ倍率/100))×(1+ブレイブ倍率/100))
+
+最終ダメージ = 基本ダメージ × 安定率ランダム係数
 ```
+
+### 安定率システム
+安定率は基本ステータスで決定され、実際のダメージに幅を与えます。
+
+#### 安定率の仕組み
+- **安定率**: 基本ステータスの安定率(%)（例: 70%）
+- **ダメージ範囲**: 安定率% ～ 100% の範囲でダメージが変動
+- **計算式**: `実際のダメージ = 基本ダメージ × (安定率 + ランダム値) / 100`
+- **ランダム値**: 0 ～ (100 - 安定率) の範囲
+
+#### 安定率の計算例
+```
+基本ダメージ: 10,000
+安定率: 70%
+
+最小ダメージ = 10,000 × 70% = 7,000
+最大ダメージ = 10,000 × 100% = 10,000
+ダメージ範囲: 7,000 ～ 10,000
+
+ランダム係数 = (70 + ランダム(0-30)) / 100
+```
+
+#### 安定率別ダメージ例
+| 安定率 | 基本ダメージ | 最小ダメージ | 最大ダメージ | ダメージ幅 |
+|--------|-------------|-------------|-------------|-----------|
+| 50%    | 10,000      | 5,000       | 10,000      | 5,000     |
+| 70%    | 10,000      | 7,000       | 10,000      | 3,000     |
+| 85%    | 10,000      | 8,500       | 10,000      | 1,500     |
+| 95%    | 10,000      | 9,500       | 10,000      | 500       |
+| 100%   | 10,000      | 10,000      | 10,000      | 0         |
 
 ### 計算ステップ分解
 
@@ -30,8 +62,14 @@
 
 #### ステップ4: スキル倍率補正
 ```
-スキル倍率適用後 = INT(有利適用後 × スキル倍率/100)
+スキル倍率適用後 = INT(有利適用後 × INT(スキル倍率)/100)
 ```
+
+**重要**: スキル倍率は小数点以下を切り捨ててから使用します。
+
+例：
+- スキル倍率334.4% → INT(334.4) = 334% として計算
+- スキル倍率120.9% → INT(120.9) = 120% として計算
 
 #### ステップ5: 抜刀%補正
 ```
@@ -136,10 +174,34 @@ function calculateEternalNightmareReduction(
 
 ##### 3. 貫通による低下
 ```typescript
-// 物理攻撃の場合は物理貫通、魔法攻撃の場合は魔法貫通
-const penetration = isPhysical ? basicStats.physicalPenetration : basicStats.magicalPenetration
-const finalDEF = Math.floor(Math.max(0, processedDEF - penetration))
+// 貫通値の適用条件と計算方法：
+// - 物理貫通：参照防御力がDEFの場合のみ適用
+// - 魔法貫通：参照防御力がMDEFの場合のみ適用
+// - 貫通値は%で計算：(M)DEF × (1 - 貫通%/100)
+const isPhysicalAttack = attackType === 'physical'
+const referencesPhysicalDef = isPhysicalAttack // 物理攻撃はDEF参照
+const referencesMagicalDef = !isPhysicalAttack // 魔法攻撃はMDEF参照
+
+let penetrationRate = 0
+if (referencesPhysicalDef) {
+    penetrationRate = basicStats.physicalPenetration // %値
+} else if (referencesMagicalDef) {
+    penetrationRate = basicStats.magicalPenetration // %値
+}
+
+const finalDEF = Math.floor(processedDEF * (1 - penetrationRate / 100))
 ```
+
+**重要な計算方法**:
+- **貫通値は%として適用**: 例えば物理貫通15%の場合、DEF × 0.85
+- **計算式**: `(M)DEF × (1 - 貫通%/100)`
+- **例**: DEF 143、物理貫通15% → 143 × (1 - 15/100) = 143 × 0.85 = 121.55 → Math.floor(121.55) = 121
+
+**適用条件**:
+- **物理貫通**: 物理攻撃でDEFを参照する場合のみ有効
+- **魔法貫通**: 魔法攻撃でMDEFを参照する場合のみ有効
+- **混合攻撃**: 参照防御力の種類に応じて対応する貫通値のみ適用
+
 **注意**: ステップ2の処理後の値をもとにステップ3を計算
 
 ### 固定値補正
@@ -308,6 +370,11 @@ export interface DamageCalculationInput {
     currentDistance: 'short' | 'long' | 'disabled' // 現在の距離判定
   }
   
+  // 安定率
+  stability: {
+    rate: number // 安定率(%)（例: 70）
+  }
+  
   // バフスキル情報（エターナルナイトメア用）
   buffSkills: {
     eternalNightmare: {
@@ -320,7 +387,13 @@ export interface DamageCalculationInput {
 
 // ダメージ計算の出力結果
 export interface DamageCalculationResult {
-  finalDamage: number
+  baseDamage: number // 安定率適用前の基本ダメージ
+  stabilityResult: {
+    minDamage: number // 最小ダメージ（安定率%適用時）
+    maxDamage: number // 最大ダメージ（100%時）
+    averageDamage: number // 平均ダメージ
+    stabilityRate: number // 安定率(%)
+  }
   calculationSteps: DamageCalculationSteps
 }
 
@@ -430,10 +503,14 @@ export function calculateDamage(input: DamageCalculationInput): DamageCalculatio
   currentDamage = applyDistance(currentDamage, input, steps)
   currentDamage = applyCombo(currentDamage, input, steps)
   currentDamage = applyPassiveMultiplier(currentDamage, input, steps)
-  const finalDamage = applyBraveMultiplier(currentDamage, input, steps)
+  const baseDamage = applyBraveMultiplier(currentDamage, input, steps)
+  
+  // 安定率適用
+  const stabilityResult = calculateStabilityDamage(baseDamage, input.stability.rate)
   
   return {
-    finalDamage,
+    baseDamage,
+    stabilityResult,
     calculationSteps: steps
   }
 }
@@ -503,6 +580,44 @@ function processEnemyDefense(defense: number, input: DamageCalculationInput): nu
   processed = Math.floor(Math.max(0, processed - penetration))
   
   return processed
+}
+
+/**
+ * 安定率ダメージ計算
+ */
+function calculateStabilityDamage(baseDamage: number, stabilityRate: number): {
+  minDamage: number
+  maxDamage: number
+  averageDamage: number
+  stabilityRate: number
+} {
+  // 最小ダメージ = 基本ダメージ × 安定率%
+  const minDamage = Math.floor(baseDamage * stabilityRate / 100)
+  
+  // 最大ダメージ = 基本ダメージ × 100%
+  const maxDamage = baseDamage
+  
+  // 平均ダメージ = (最小 + 最大) / 2
+  const averageDamage = Math.floor((minDamage + maxDamage) / 2)
+  
+  return {
+    minDamage,
+    maxDamage,
+    averageDamage,
+    stabilityRate
+  }
+}
+
+/**
+ * ランダムダメージ生成（実際のダメージシミュレーション用）
+ */
+function generateRandomDamage(baseDamage: number, stabilityRate: number): number {
+  // ランダム係数: 安定率% ～ 100% の範囲
+  const randomRange = 100 - stabilityRate
+  const randomValue = Math.random() * randomRange
+  const finalRate = (stabilityRate + randomValue) / 100
+  
+  return Math.floor(baseDamage * finalRate)
 }
 
 // 他のステップ関数も同様に実装...
