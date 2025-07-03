@@ -272,18 +272,19 @@ function calculateBaseDamage(
 	const beforeResistance =
 		input.playerLevel + input.referenceStat - input.enemyLevel
 
-	// 耐性適用
-	const physicalResistanceMultiplier = 1 - input.resistance.physical / 100
-	const magicalResistanceMultiplier = 1 - input.resistance.magical / 100
-	const weaponResistanceMultiplier = 1 - input.resistance.weapon / 100
+	// 耐性適用（浮動小数点精度問題を避けるため整数演算を使用）
+	const mainResistance = input.attackSkill.type === 'physical' 
+		? input.resistance.physical 
+		: input.resistance.magical
+	const weaponResistance = input.resistance.weapon
 
-	const resistanceMultiplier =
-		input.attackSkill.type === 'physical'
-			? physicalResistanceMultiplier
-			: magicalResistanceMultiplier
+	// (1 - 主耐性/100) × (1 - 武器耐性/100) を整数演算で計算
+	// = (100 - 主耐性) × (100 - 武器耐性) / 10000
+	const mainMultiplierNumerator = 100 - mainResistance
+	const weaponMultiplierNumerator = 100 - weaponResistance
+	const combinedNumerator = mainMultiplierNumerator * weaponMultiplierNumerator
 
-	const afterResistance =
-		beforeResistance * resistanceMultiplier * weaponResistanceMultiplier
+	const afterResistance = (beforeResistance * combinedNumerator) / 10000
 
 	// 敵防御力処理
 	const enemyDefense =

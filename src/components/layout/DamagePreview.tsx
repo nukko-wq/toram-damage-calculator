@@ -321,8 +321,14 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				const step1 = attackResult.calculationSteps.step1_baseDamage
 				console.log('ステップ1 基礎ダメージ:')
 				console.log('  計算前:', step1.beforeResistance, '= (自Lv', step1.playerLevel, '+ 参照ステータス', step1.referenceStat, '- 敵Lv', step1.enemyLevel, ')')
+				console.log('  物理耐性率:', step1.physicalResistanceRate, '%')
+				console.log('  魔法耐性率:', step1.magicalResistanceRate, '%')
+				console.log('  武器耐性率:', step1.weaponResistanceRate, '%')
+				console.log('  耐性倍率計算:', `(1 - ${step1.physicalResistanceRate || step1.magicalResistanceRate}/100) = ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate)/100}`)
+				console.log('  耐性適用計算:', `${step1.beforeResistance} × ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate)/100} = ${step1.beforeResistance * (1 - (step1.physicalResistanceRate || step1.magicalResistanceRate)/100)}`)
 				console.log('  耐性適用後:', step1.afterResistance)
 				console.log('  敵防御力:', step1.enemyDEF)
+				console.log('  Math.floor前:', step1.afterResistance - step1.enemyDEF)
 				console.log('  結果:', step1.result)
 			}
 			if (attackResult.calculationSteps.step2_fixedValues) {
@@ -338,6 +344,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				console.log('ステップ3 属性有利:')
 				console.log('  適用前:', step3.beforeAdvantage)
 				console.log('  属性有利率:', step3.advantageRate, '%')
+				console.log('  計算式:', `${step3.beforeAdvantage} × (1 + ${step3.advantageRate}/100) = ${step3.beforeAdvantage} × ${1 + step3.advantageRate/100} = ${step3.beforeAdvantage * (1 + step3.advantageRate/100)}`)
+				console.log('  Math.floor前:', step3.beforeAdvantage * (1 + step3.advantageRate/100))
 				console.log('  結果:', step3.result)
 			}
 			if (attackResult.calculationSteps.step4_skillMultiplier) {
@@ -345,6 +353,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				console.log('ステップ4 スキル倍率:')
 				console.log('  適用前:', step4.beforeSkill)
 				console.log('  スキル倍率:', step4.skillRate, '%')
+				console.log('  計算式:', `${step4.beforeSkill} × ${step4.skillRate}/100 = ${step4.beforeSkill * step4.skillRate/100}`)
+				console.log('  Math.floor前:', step4.beforeSkill * step4.skillRate/100)
 				console.log('  結果:', step4.result)
 			}
 			console.log('================================')
