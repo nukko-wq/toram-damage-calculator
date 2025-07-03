@@ -602,60 +602,68 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* ダメージ表示テーブル */}
-				<div className="bg-white rounded-lg border border-gray-200 mb-6 overflow-x-auto">
+				<div className="mb-6 overflow-x-auto">
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b border-gray-200">
-								<th className="px-4 py-3 text-left text-gray-700 font-medium">
-									-
-								</th>
-								<th className="px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="sm:px-4 py-3 text-left text-gray-700 font-medium" />
+								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
 									安定率
 								</th>
-								<th className="px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
 									安定率
 								</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr className="border-b border-gray-100">
-								<td className="px-4 py-3 font-medium text-gray-700">最小</td>
-								<td className="px-4 py-3 text-center font-semibold text-gray-700">
+								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+									最小
+								</td>
+								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700">
 									{damageResults.normal.min.toLocaleString()}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-700">
+								<td className="px-1 sm:px-4 py-3 text-center text-gray-700">
 									{damageResults.normal.stability}%
 								</td>
-								<td className="px-4 py-3 text-center font-semibold text-gray-700">
+								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700">
 									{damageResults.skill.min.toLocaleString()}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-700">
+								<td className="px-1 sm:px-4 py-3 text-center text-gray-700">
 									{damageResults.skill.stability}%
 								</td>
 							</tr>
 							<tr className="border-b border-gray-100">
-								<td className="px-4 py-3 font-medium text-gray-700">最大</td>
-								<td className="px-4 py-3 text-center font-semibold text-gray-700">
+								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+									最大
+								</td>
+								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700">
 									{damageResults.normal.max.toLocaleString()}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-600">100%</td>
-								<td className="px-4 py-3 text-center font-semibold text-gray-700">
+								<td className="px-1 sm:px-4 py-3 text-center text-gray-600">
+									100%
+								</td>
+								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700">
 									{damageResults.skill.max.toLocaleString()}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-600">100%</td>
+								<td className="px-1 sm:px-4 py-3 text-center text-gray-600">
+									100%
+								</td>
 							</tr>
 							<tr>
-								<td className="px-4 py-3 font-medium text-gray-700">平均</td>
-								<td className="px-4 py-3 text-center font-bold text-gray-700">
+								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+									平均
+								</td>
+								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-bold text-gray-700">
 									{damageResults.normal.average.toLocaleString()}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-600">
+								<td className="px-1 sm:px-4 py-3 text-center text-gray-600">
 									{Math.round(
 										((damageResults.normal.min + damageResults.normal.max) /
 											2 /
@@ -664,10 +672,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									)}
 									%
 								</td>
-								<td className="px-4 py-3 text-center font-bold text-gray-700">
+								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-bold text-gray-700">
 									{damageResults.skill.average.toLocaleString()}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-600">
+								<td className="px-1 sm:px-4 py-3 text-center text-gray-600">
 									{Math.round(
 										((damageResults.skill.min + damageResults.skill.max) /
 											2 /
