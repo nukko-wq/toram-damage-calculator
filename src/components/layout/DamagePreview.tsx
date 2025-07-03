@@ -2,15 +2,15 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
-import { 
-	calculateDamage, 
+import {
+	calculateDamage,
 	createDefaultDamageInput,
-	type DamageCalculationInput 
+	type DamageCalculationInput,
 } from '@/utils/damageCalculation'
 import { getAttackSkillById } from '@/data/attackSkills'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import { getEnemyById } from '@/utils/enemyDatabase'
-import { 
+import {
 	getEquipmentBonuses,
 	getCrystalBonuses,
 	getFoodBonuses,
@@ -49,8 +49,12 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 	// Zustandストアから計算データと計算結果を取得
 	const calculatorData = useCalculatorStore((state) => state.data)
-	const calculationResults = useCalculatorStore((state) => state.calculationResults)
-	const updateCalculationResults = useCalculatorStore((state) => state.updateCalculationResults)
+	const calculationResults = useCalculatorStore(
+		(state) => state.calculationResults,
+	)
+	const updateCalculationResults = useCalculatorStore(
+		(state) => state.updateCalculationResults,
+	)
 
 	// 計算結果を更新
 	useEffect(() => {
@@ -64,11 +68,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		try {
 			// 基本的な計算入力データを作成
 			const defaultInput = createDefaultDamageInput()
-			
+
 			// 計算結果が利用可能な場合は使用、なければフォールバック値を使用
 			const totalATK = calculationResults?.basicStats.totalATK || 1000
 			const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
-			
+
 			// 敵情報を取得
 			let enemyInfo = null
 			if (calculatorData.enemy?.selectedEnemyId) {
@@ -80,7 +84,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const crystalBonuses = getCrystalBonuses(calculatorData.crystals)
 			const foodBonuses = getFoodBonuses(calculatorData.food)
 			const buffBonuses = getBuffBonuses(calculatorData.buffItems)
-			
+
 			// 全てのボーナスを統合
 			const allBonuses = aggregateAllBonuses(
 				equipmentBonuses,
@@ -88,41 +92,59 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				foodBonuses,
 				buffBonuses,
 			)
-			
+
 			// デバッグ用ログ - 実際の値を確認
 			console.log('=== DamagePreview Debug ===')
-			console.log('calculatorData.baseStats.level:', calculatorData.baseStats.level)
+			console.log(
+				'calculatorData.baseStats.level:',
+				calculatorData.baseStats.level,
+			)
 			console.log('totalATK:', totalATK)
 			console.log('stabilityRate:', stabilityRate)
-			console.log('calculationResults?.basicStats:', calculationResults?.basicStats)
+			console.log(
+				'calculationResults?.basicStats:',
+				calculationResults?.basicStats,
+			)
 			console.log('calculatorData.enemy:', calculatorData.enemy)
-			console.log('calculatorData.enemy.selectedEnemyId:', calculatorData.enemy?.selectedEnemyId)
+			console.log(
+				'calculatorData.enemy.selectedEnemyId:',
+				calculatorData.enemy?.selectedEnemyId,
+			)
 			console.log('enemyInfo:', enemyInfo)
 			if (enemyInfo) {
 				console.log('enemyInfo.stats:', enemyInfo.stats)
 				console.log('enemyInfo.stats.DEF:', enemyInfo.stats.DEF)
 				console.log('enemyInfo.stats.MDEF:', enemyInfo.stats.MDEF)
 			}
-			
+
 			// PowerOptionsに基づく属性攻撃設定
 			const getElementAdvantageTotal = () => {
 				// 属性攻撃が無効、または属性威力が無効の場合は0を返す
-				if (powerOptions.elementAttack === 'none' || powerOptions.elementPower === 'disabled') return 0
+				if (
+					powerOptions.elementAttack === 'none' ||
+					powerOptions.elementPower === 'disabled'
+				)
+					return 0
 				// 基本ステータスから総属性有利を取得（装備・クリスタ・料理・バフ統合済み）
-				const baseAdvantage = calculationResults?.basicStats?.totalElementAdvantage ?? 0
-				
+				const baseAdvantage =
+					calculationResults?.basicStats?.totalElementAdvantage ?? 0
+
 				// 属性攻撃が有効な場合は基本ステータスの総属性有利をそのまま使用
 				// PowerOptionsの設定は属性攻撃の有効/無効の判定にのみ使用
 				return baseAdvantage
 			}
-			
+
 			const getElementAdvantageAwakening = () => {
 				// 属性攻撃が無効、または属性威力が無効の場合は0を返す
-				if (powerOptions.elementAttack === 'none' || powerOptions.elementPower === 'disabled') return 0
+				if (
+					powerOptions.elementAttack === 'none' ||
+					powerOptions.elementPower === 'disabled'
+				)
+					return 0
 				// 実際の計算結果から属性覚醒有利を取得
 				return calculationResults?.basicStats?.elementAwakeningAdvantage ?? 0
 			}
-			
+
 			// PowerOptionsに基づく距離設定
 			const getDistanceValues = () => {
 				return {
@@ -130,15 +152,15 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					longRange: allBonuses.LongRangeDamage_Rate ?? 0,
 				}
 			}
-			
+
 			// Zustandストアのデータで入力を更新
 			const distanceValues = getDistanceValues()
-			
+
 			// 敵情報を明示的に作成
 			const finalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
 			const finalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
 			const finalEnemyLevel = enemyInfo?.level ?? defaultInput.enemy.level
-			
+
 			const input: DamageCalculationInput = {
 				...defaultInput,
 				playerLevel: calculatorData.baseStats.level,
@@ -152,11 +174,14 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				elementAdvantage: {
 					total: getElementAdvantageTotal(),
 					awakening: getElementAdvantageAwakening(),
-					isActive: powerOptions.elementAttack !== 'none' && powerOptions.elementPower !== 'disabled',
+					isActive:
+						powerOptions.elementAttack !== 'none' &&
+						powerOptions.elementPower !== 'disabled',
 				},
 				distance: distanceValues,
 				unsheathe: {
-					fixedDamage: allBonuses.UnsheatheAttack ?? defaultInput.unsheathe.fixedDamage,
+					fixedDamage:
+						allBonuses.UnsheatheAttack ?? defaultInput.unsheathe.fixedDamage,
 					rateBonus: allBonuses.UnsheatheAttack_Rate ?? 0,
 					isActive: powerOptions.unsheathe,
 				},
@@ -176,13 +201,21 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				// 耐性設定も実際のデータに基づいて更新
 				resistance: {
 					...defaultInput.resistance,
-					physical: enemyInfo?.stats.physicalResistance ?? defaultInput.resistance.physical,
-					magical: enemyInfo?.stats.magicalResistance ?? defaultInput.resistance.magical,
+					physical:
+						enemyInfo?.stats.physicalResistance ??
+						defaultInput.resistance.physical,
+					magical:
+						enemyInfo?.stats.magicalResistance ??
+						defaultInput.resistance.magical,
 				},
 				// 貫通値を実際の装備品ボーナスから取得
 				penetration: {
-					physical: allBonuses.PhysicalPenetration_Rate ?? defaultInput.penetration.physical,
-					magical: allBonuses.MagicalPenetration_Rate ?? defaultInput.penetration.magical,
+					physical:
+						allBonuses.PhysicalPenetration_Rate ??
+						defaultInput.penetration.physical,
+					magical:
+						allBonuses.MagicalPenetration_Rate ??
+						defaultInput.penetration.magical,
 				},
 				// コンボ設定を反映
 				combo: {
@@ -201,81 +234,116 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('================================')
 			console.log('=== DAMAGE CALCULATION DEBUG ===')
 			console.log('================================')
-			
+
 			// 1. レベル
 			console.log('1. レベル情報:')
 			console.log('  自Lv (playerLevel):', input.playerLevel)
 			console.log('  敵Lv (enemyLevel):', input.enemyLevel)
-			
+
 			// 2. 参照ステータス
 			console.log('2. 参照ステータス:')
 			console.log('  総ATK (referenceStat):', input.referenceStat)
 			console.log('  参照タイプ:', input.referenceStatType)
-			
+
 			// 3. 敵の耐性
 			console.log('3. 敵の耐性:')
 			console.log('  物理耐性 (%):', input.resistance.physical)
 			console.log('  魔法耐性 (%):', input.resistance.magical)
 			console.log('  武器耐性 (%):', input.resistance.weapon)
-			console.log('  DEBUG: enemyInfo?.stats.physicalResistance:', enemyInfo?.stats.physicalResistance)
-			console.log('  DEBUG: enemyInfo?.stats.magicalResistance:', enemyInfo?.stats.magicalResistance)
+			console.log(
+				'  DEBUG: enemyInfo?.stats.physicalResistance:',
+				enemyInfo?.stats.physicalResistance,
+			)
+			console.log(
+				'  DEBUG: enemyInfo?.stats.magicalResistance:',
+				enemyInfo?.stats.magicalResistance,
+			)
 			console.log('  DEBUG: defaultInput.resistance:', defaultInput.resistance)
-			
+
 			// 4. 敵のDEF/MDEF
 			console.log('4. 敵の防御力:')
 			console.log('  敵DEF:', input.enemy.DEF)
 			console.log('  敵MDEF:', input.enemy.MDEF)
-			
+
 			// 5. 貫通値
 			console.log('5. 貫通値:')
 			console.log('  物理貫通:', input.penetration.physical)
 			console.log('  魔法貫通:', input.penetration.magical)
-			console.log('  DEBUG: allBonuses.PhysicalPenetration_Rate:', allBonuses.PhysicalPenetration_Rate)
-			console.log('  DEBUG: allBonuses.MagicalPenetration_Rate:', allBonuses.MagicalPenetration_Rate)
+			console.log(
+				'  DEBUG: allBonuses.PhysicalPenetration_Rate:',
+				allBonuses.PhysicalPenetration_Rate,
+			)
+			console.log(
+				'  DEBUG: allBonuses.MagicalPenetration_Rate:',
+				allBonuses.MagicalPenetration_Rate,
+			)
 			console.log('  DEBUG: allBonuses:', allBonuses)
-			
+
 			// 6. 固定値
 			console.log('6. 固定値:')
 			console.log('  抜刀固定値:', input.unsheathe.fixedDamage)
 			console.log('  スキル固定値:', input.attackSkill.fixedDamage)
 			console.log('  抜刀有効:', input.unsheathe.isActive)
-			console.log('  DEBUG: allBonuses.UnsheatheAttack:', allBonuses.UnsheatheAttack)
-			console.log('  DEBUG: allBonuses.UnsheatheAttack_Rate:', allBonuses.UnsheatheAttack_Rate)
-			
+			console.log(
+				'  DEBUG: allBonuses.UnsheatheAttack:',
+				allBonuses.UnsheatheAttack,
+			)
+			console.log(
+				'  DEBUG: allBonuses.UnsheatheAttack_Rate:',
+				allBonuses.UnsheatheAttack_Rate,
+			)
+
 			// 7. 属性有利
 			console.log('7. 属性有利:')
 			console.log('  総属性有利 (%):', input.elementAdvantage.total)
 			console.log('  属性覚醒有利 (%):', input.elementAdvantage.awakening)
 			console.log('  属性攻撃有効:', input.elementAdvantage.isActive)
-			console.log('  DEBUG: calculationResults?.basicStats?.totalElementAdvantage:', calculationResults?.basicStats?.totalElementAdvantage)
-			console.log('  DEBUG: calculationResults?.basicStats?.elementAwakeningAdvantage:', calculationResults?.basicStats?.elementAwakeningAdvantage)
-			console.log('  DEBUG: allBonuses.ElementAdvantage_Rate:', allBonuses.ElementAdvantage_Rate)
-			
+			console.log(
+				'  DEBUG: calculationResults?.basicStats?.totalElementAdvantage:',
+				calculationResults?.basicStats?.totalElementAdvantage,
+			)
+			console.log(
+				'  DEBUG: calculationResults?.basicStats?.elementAwakeningAdvantage:',
+				calculationResults?.basicStats?.elementAwakeningAdvantage,
+			)
+			console.log(
+				'  DEBUG: allBonuses.ElementAdvantage_Rate:',
+				allBonuses.ElementAdvantage_Rate,
+			)
+
 			// 8. スキル倍率
 			console.log('8. スキル倍率:')
 			console.log('  スキル倍率 (%):', input.attackSkill.multiplier)
 			console.log('  攻撃タイプ:', input.attackSkill.type)
-			
+
 			// 9. 距離威力
 			console.log('9. 距離威力:')
 			console.log('  近距離威力 (%):', input.distance.shortRange)
 			console.log('  遠距離威力 (%):', input.distance.longRange)
 			console.log('  現在の距離判定:', input.userSettings.currentDistance)
-			console.log('  DEBUG: allBonuses.ShortRangeDamage_Rate:', allBonuses.ShortRangeDamage_Rate)
-			console.log('  DEBUG: allBonuses.LongRangeDamage_Rate:', allBonuses.LongRangeDamage_Rate)
-			
+			console.log(
+				'  DEBUG: allBonuses.ShortRangeDamage_Rate:',
+				allBonuses.ShortRangeDamage_Rate,
+			)
+			console.log(
+				'  DEBUG: allBonuses.LongRangeDamage_Rate:',
+				allBonuses.LongRangeDamage_Rate,
+			)
+
 			// 10. その他重要な値
 			console.log('10. その他:')
 			console.log('  安定率 (%):', input.stability.rate)
 			console.log('  抜刀% (%):', input.unsheathe.rateBonus)
 			console.log('  慣れ (%):', input.userSettings.familiarity)
-			
+
 			console.log('================================')
 
 			// 攻撃スキルが選択されている場合は、スキルの計算結果を使用
 			let finalInput = input
 			if (calculatorData.attackSkill?.selectedSkillId) {
-				const selectedSkill = getAttackSkillById(calculatorData.attackSkill.selectedSkillId)
+				const selectedSkill = getAttackSkillById(
+					calculatorData.attackSkill.selectedSkillId,
+				)
 				if (selectedSkill) {
 					// 攻撃スキル計算システムを使用してスキル情報を取得
 					const skillCalculationResult = attackSkillCalculation.calculateSkill(
@@ -287,20 +355,29 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					finalInput = {
 						...input,
 						// スキルの場合はMATKまたはtotalATKを参照
-						referenceStat: selectedSkill.hits[0].powerReference === 'MATK' 
-							? (calculationResults?.basicStats.MATK || 1500)
-							: totalATK,
+						referenceStat:
+							selectedSkill.hits[0].powerReference === 'MATK'
+								? calculationResults?.basicStats.MATK || 1500
+								: totalATK,
 						attackSkill: {
 							type: selectedSkill.hits[0].attackType,
-							multiplier: skillCalculationResult.hits[0]?.calculatedMultiplier || selectedSkill.hits[0].multiplier,
-							fixedDamage: skillCalculationResult.hits[0]?.calculatedFixedDamage || selectedSkill.hits[0].fixedDamage,
-							supportedDistances: selectedSkill.hits[0].canUseDistancePower ? ['short', 'long'] : [],
+							multiplier:
+								skillCalculationResult.hits[0]?.calculatedMultiplier ||
+								selectedSkill.hits[0].multiplier,
+							fixedDamage:
+								skillCalculationResult.hits[0]?.calculatedFixedDamage ||
+								selectedSkill.hits[0].fixedDamage,
+							supportedDistances: selectedSkill.hits[0].canUseDistancePower
+								? ['short', 'long']
+								: [],
 							canUseLongRange: selectedSkill.hits[0].canUseLongRange,
 						},
 						// スキルでも距離・抜刀・慣れ設定を適用
 						unsheathe: {
 							...input.unsheathe,
-							isActive: powerOptions.unsheathe && selectedSkill.hits[0].canUseUnsheathePower,
+							isActive:
+								powerOptions.unsheathe &&
+								selectedSkill.hits[0].canUseUnsheathePower,
 						},
 					}
 				}
@@ -308,7 +385,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 			// 最終的なダメージ計算
 			const attackResult = calculateDamage(finalInput)
-			
+
 			// 計算結果の詳細ログ
 			console.log('=== CALCULATION RESULTS ===')
 			console.log('最終ダメージ:', attackResult.baseDamage)
@@ -320,20 +397,55 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			if (attackResult.calculationSteps.step1_baseDamage) {
 				const step1 = attackResult.calculationSteps.step1_baseDamage
 				console.log('ステップ1 基礎ダメージ:')
-				console.log('  計算前:', step1.beforeResistance, '= (自Lv', step1.playerLevel, '+ 参照ステータス', step1.referenceStat, '- 敵Lv', step1.enemyLevel, ')')
+				console.log(
+					'  計算前:',
+					step1.beforeResistance,
+					'= (自Lv',
+					step1.playerLevel,
+					'+ 参照ステータス',
+					step1.referenceStat,
+					'- 敵Lv',
+					step1.enemyLevel,
+					')',
+				)
 				console.log('  物理耐性率:', step1.physicalResistanceRate, '%')
 				console.log('  魔法耐性率:', step1.magicalResistanceRate, '%')
 				console.log('  武器耐性率:', step1.weaponResistanceRate, '%')
-				console.log('  耐性倍率計算:', `(1 - ${step1.physicalResistanceRate || step1.magicalResistanceRate}/100) = ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate)/100}`)
-				console.log('  耐性適用計算:', `${step1.beforeResistance} × ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate)/100} = ${step1.beforeResistance * (1 - (step1.physicalResistanceRate || step1.magicalResistanceRate)/100)}`)
+				console.log(
+					'  耐性倍率計算:',
+					`(1 - ${step1.physicalResistanceRate || step1.magicalResistanceRate}/100) = ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100}`,
+				)
+				console.log(
+					'  耐性適用計算:',
+					`${step1.beforeResistance} × ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100} = ${step1.beforeResistance * (1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100)}`,
+				)
 				console.log('  耐性適用後:', step1.afterResistance)
 				console.log('  敵防御力:', step1.enemyDEF)
-				console.log('  DEBUG: 元の敵DEF/MDEF:', input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF)
-				console.log('  DEBUG: 適用された貫通率(%):', input.attackSkill.type === 'physical' ? input.penetration.physical : input.penetration.magical)
-				const originalDef = input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF
-				const penetrationRate = input.attackSkill.type === 'physical' ? input.penetration.physical : input.penetration.magical
+				console.log(
+					'  DEBUG: 元の敵DEF/MDEF:',
+					input.attackSkill.type === 'physical'
+						? input.enemy.DEF
+						: input.enemy.MDEF,
+				)
+				console.log(
+					'  DEBUG: 適用された貫通率(%):',
+					input.attackSkill.type === 'physical'
+						? input.penetration.physical
+						: input.penetration.magical,
+				)
+				const originalDef =
+					input.attackSkill.type === 'physical'
+						? input.enemy.DEF
+						: input.enemy.MDEF
+				const penetrationRate =
+					input.attackSkill.type === 'physical'
+						? input.penetration.physical
+						: input.penetration.magical
 				const penetrationMultiplier = 1 - penetrationRate / 100
-				console.log('  DEBUG: 貫通適用計算:', `${originalDef} × (1 - ${penetrationRate}/100) = ${originalDef} × ${penetrationMultiplier} = ${originalDef * penetrationMultiplier} → Math.floor = ${Math.floor(originalDef * penetrationMultiplier)}`)
+				console.log(
+					'  DEBUG: 貫通適用計算:',
+					`${originalDef} × (1 - ${penetrationRate}/100) = ${originalDef} × ${penetrationMultiplier} = ${originalDef * penetrationMultiplier} → Math.floor = ${Math.floor(originalDef * penetrationMultiplier)}`,
+				)
 				console.log('  Math.floor前:', step1.afterResistance - step1.enemyDEF)
 				console.log('  結果:', step1.result)
 			}
@@ -350,8 +462,14 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				console.log('ステップ3 属性有利:')
 				console.log('  適用前:', step3.beforeAdvantage)
 				console.log('  属性有利率:', step3.advantageRate, '%')
-				console.log('  計算式:', `${step3.beforeAdvantage} × (1 + ${step3.advantageRate}/100) = ${step3.beforeAdvantage} × ${1 + step3.advantageRate/100} = ${step3.beforeAdvantage * (1 + step3.advantageRate/100)}`)
-				console.log('  Math.floor前:', step3.beforeAdvantage * (1 + step3.advantageRate/100))
+				console.log(
+					'  計算式:',
+					`${step3.beforeAdvantage} × (1 + ${step3.advantageRate}/100) = ${step3.beforeAdvantage} × ${1 + step3.advantageRate / 100} = ${step3.beforeAdvantage * (1 + step3.advantageRate / 100)}`,
+				)
+				console.log(
+					'  Math.floor前:',
+					step3.beforeAdvantage * (1 + step3.advantageRate / 100),
+				)
 				console.log('  結果:', step3.result)
 			}
 			if (attackResult.calculationSteps.step4_skillMultiplier) {
@@ -359,8 +477,14 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				console.log('ステップ4 スキル倍率:')
 				console.log('  適用前:', step4.beforeSkill)
 				console.log('  スキル倍率:', step4.skillRate, '%')
-				console.log('  計算式:', `${step4.beforeSkill} × ${step4.skillRate}/100 = ${step4.beforeSkill * step4.skillRate/100}`)
-				console.log('  Math.floor前:', step4.beforeSkill * step4.skillRate/100)
+				console.log(
+					'  計算式:',
+					`${step4.beforeSkill} × ${step4.skillRate}/100 = ${(step4.beforeSkill * step4.skillRate) / 100}`,
+				)
+				console.log(
+					'  Math.floor前:',
+					(step4.beforeSkill * step4.skillRate) / 100,
+				)
 				console.log('  結果:', step4.result)
 			}
 			console.log('================================')
@@ -369,7 +493,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const getDamageByType = () => {
 				const baseDamage = attackResult.baseDamage // 白ダメ（基本ダメージ）
 				const stabilityResult = attackResult.stabilityResult
-				
+
 				switch (powerOptions.damageType) {
 					case 'white':
 						// 白ダメ：基本ダメージをそのまま表示（安定率適用なし）
@@ -412,9 +536,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						}
 				}
 			}
-			
+
 			const damageDisplay = getDamageByType()
-			
+
 			return {
 				normal: damageDisplay,
 				skill: damageDisplay, // スキル攻撃も同じ判定を適用
@@ -482,19 +606,19 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b border-gray-200">
-								<th className="px-4 py-3 text-left text-gray-600 font-medium">
+								<th className="px-4 py-3 text-left text-gray-700 font-medium">
 									-
 								</th>
-								<th className="px-4 py-3 text-center text-gray-600 font-medium">
+								<th className="px-4 py-3 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-4 py-3 text-center text-gray-600 font-medium">
+								<th className="px-4 py-3 text-center text-gray-700 font-medium">
 									安定率
 								</th>
-								<th className="px-4 py-3 text-center text-gray-600 font-medium">
+								<th className="px-4 py-3 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-4 py-3 text-center text-gray-600 font-medium">
+								<th className="px-4 py-3 text-center text-gray-700 font-medium">
 									安定率
 								</th>
 							</tr>
@@ -502,43 +626,55 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						<tbody>
 							<tr className="border-b border-gray-100">
 								<td className="px-4 py-3 font-medium text-gray-700">最小</td>
-								<td className="px-4 py-3 text-center font-semibold text-blue-600">
+								<td className="px-4 py-3 text-center font-semibold text-gray-700">
 									{damageResults.normal.min.toLocaleString()}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-600">
+								<td className="px-4 py-3 text-center text-gray-700">
 									{damageResults.normal.stability}%
 								</td>
-								<td className="px-4 py-3 text-center font-semibold text-purple-600">
+								<td className="px-4 py-3 text-center font-semibold text-gray-700">
 									{damageResults.skill.min.toLocaleString()}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-600">
+								<td className="px-4 py-3 text-center text-gray-700">
 									{damageResults.skill.stability}%
 								</td>
 							</tr>
 							<tr className="border-b border-gray-100">
 								<td className="px-4 py-3 font-medium text-gray-700">最大</td>
-								<td className="px-4 py-3 text-center font-semibold text-blue-600">
+								<td className="px-4 py-3 text-center font-semibold text-gray-700">
 									{damageResults.normal.max.toLocaleString()}
 								</td>
 								<td className="px-4 py-3 text-center text-gray-600">100%</td>
-								<td className="px-4 py-3 text-center font-semibold text-purple-600">
+								<td className="px-4 py-3 text-center font-semibold text-gray-700">
 									{damageResults.skill.max.toLocaleString()}
 								</td>
 								<td className="px-4 py-3 text-center text-gray-600">100%</td>
 							</tr>
 							<tr>
 								<td className="px-4 py-3 font-medium text-gray-700">平均</td>
-								<td className="px-4 py-3 text-center font-bold text-orange-600">
+								<td className="px-4 py-3 text-center font-bold text-gray-700">
 									{damageResults.normal.average.toLocaleString()}
 								</td>
 								<td className="px-4 py-3 text-center text-gray-600">
-									{Math.round((damageResults.normal.min + damageResults.normal.max) / 2 / damageResults.normal.max * 100)}%
+									{Math.round(
+										((damageResults.normal.min + damageResults.normal.max) /
+											2 /
+											damageResults.normal.max) *
+											100,
+									)}
+									%
 								</td>
-								<td className="px-4 py-3 text-center font-bold text-orange-600">
+								<td className="px-4 py-3 text-center font-bold text-gray-700">
 									{damageResults.skill.average.toLocaleString()}
 								</td>
 								<td className="px-4 py-3 text-center text-gray-600">
-									{Math.round((damageResults.skill.min + damageResults.skill.max) / 2 / damageResults.skill.max * 100)}%
+									{Math.round(
+										((damageResults.skill.min + damageResults.skill.max) /
+											2 /
+											damageResults.skill.max) *
+											100,
+									)}
+									%
 								</td>
 							</tr>
 						</tbody>
