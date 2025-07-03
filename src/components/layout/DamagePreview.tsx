@@ -108,16 +108,16 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						<thead>
 							<tr className="border-b border-gray-200">
 								<th className="px-4 py-3 text-left text-gray-600 font-medium">
-									ダメージ
+									-
 								</th>
 								<th className="px-4 py-3 text-center text-gray-600 font-medium">
-									通常攻撃
+									ダメージ
 								</th>
 								<th className="px-4 py-3 text-center text-gray-600 font-medium">
 									安定率
 								</th>
 								<th className="px-4 py-3 text-center text-gray-600 font-medium">
-									スキル攻撃
+									ダメージ
 								</th>
 								<th className="px-4 py-3 text-center text-gray-600 font-medium">
 									安定率
