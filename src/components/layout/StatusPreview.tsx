@@ -575,7 +575,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
 		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
 		magicCriticalRate: 0, // TODO: 魔法クリティカル率
-		magicCriticalDamage: magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
+		magicCriticalDamage:
+			magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
 		totalElementAdvantage:
 			totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
 		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
@@ -607,7 +608,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// 現在は仮値だが、将来的には calculateEquipmentBonuses の結果を使用
 
 	return (
-		<div className=" border-b border-blue-200 transition-all duration-300 ease-in-out">
+		<div className="">
 			<div className="flex flex-col items-center px-4 pt-2">
 				{/* セクション表示切り替えボタン */}
 				<div className="mb-3 flex flex-wrap gap-2">
