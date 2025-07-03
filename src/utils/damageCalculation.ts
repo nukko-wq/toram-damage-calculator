@@ -288,7 +288,8 @@ function calculateBaseDamage(
 	// 敵防御力処理
 	const enemyDefense =
 		input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF
-	const processedDefense = processEnemyDefense(enemyDefense, input)
+	const defenseType = input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF'
+	const processedDefense = processEnemyDefense(enemyDefense, input, defenseType)
 
 	const result = Math.floor(afterResistance - processedDefense)
 
@@ -473,6 +474,7 @@ function applyDistance(
 function processEnemyDefense(
 	defense: number,
 	input: DamageCalculationInput,
+	defenseType: 'DEF' | 'MDEF',
 ): number {
 	let processed = defense
 
@@ -498,10 +500,15 @@ function processEnemyDefense(
 	}
 
 	// 4. 貫通による低下（小数点以下切り捨て）
-	const penetration =
-		input.attackSkill.type === 'physical'
-			? input.penetration.physical
-			: input.penetration.magical
+	// 貫通値は参照防御力の種類に応じて適用
+	// - 物理貫通：DEF参照時のみ有効
+	// - 魔法貫通：MDEF参照時のみ有効
+	let penetration = 0
+	if (defenseType === 'DEF') {
+		penetration = input.penetration.physical
+	} else if (defenseType === 'MDEF') {
+		penetration = input.penetration.magical
+	}
 
 	processed = Math.floor(Math.max(0, processed - penetration))
 

@@ -174,10 +174,28 @@ function calculateEternalNightmareReduction(
 
 ##### 3. 貫通による低下
 ```typescript
-// 物理攻撃の場合は物理貫通、魔法攻撃の場合は魔法貫通
-const penetration = isPhysical ? basicStats.physicalPenetration : basicStats.magicalPenetration
+// 貫通値の適用条件：
+// - 物理貫通：参照防御力がDEFの場合のみ適用
+// - 魔法貫通：参照防御力がMDEFの場合のみ適用
+const isPhysicalAttack = attackType === 'physical'
+const referencesPhysicalDef = isPhysicalAttack // 物理攻撃はDEF参照
+const referencesMagicalDef = !isPhysicalAttack // 魔法攻撃はMDEF参照
+
+let penetration = 0
+if (referencesPhysicalDef) {
+    penetration = basicStats.physicalPenetration
+} else if (referencesMagicalDef) {
+    penetration = basicStats.magicalPenetration
+}
+
 const finalDEF = Math.floor(Math.max(0, processedDEF - penetration))
 ```
+
+**重要な適用条件**:
+- **物理貫通**: 物理攻撃でDEFを参照する場合のみ有効
+- **魔法貫通**: 魔法攻撃でMDEFを参照する場合のみ有効
+- **混合攻撃**: 参照防御力の種類に応じて対応する貫通値のみ適用
+
 **注意**: ステップ2の処理後の値をもとにステップ3を計算
 
 ### 固定値補正

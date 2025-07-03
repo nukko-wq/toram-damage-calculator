@@ -217,6 +217,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('  物理耐性 (%):', input.resistance.physical)
 			console.log('  魔法耐性 (%):', input.resistance.magical)
 			console.log('  武器耐性 (%):', input.resistance.weapon)
+			console.log('  DEBUG: enemyInfo?.stats.physicalResistance:', enemyInfo?.stats.physicalResistance)
+			console.log('  DEBUG: enemyInfo?.stats.magicalResistance:', enemyInfo?.stats.magicalResistance)
+			console.log('  DEBUG: defaultInput.resistance:', defaultInput.resistance)
 			
 			// 4. 敵のDEF/MDEF
 			console.log('4. 敵の防御力:')
