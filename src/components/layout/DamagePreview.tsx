@@ -28,7 +28,7 @@ interface PowerOptions {
 	skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3'
 	elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous'
 	combo: boolean
-	damageType: 'critical' | 'graze' | 'normal' | 'expected'
+	damageType: 'critical' | 'graze' | 'expected' | 'white'
 	distance: 'short' | 'long' | 'disabled'
 	elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'
 	unsheathe: boolean
@@ -41,7 +41,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		skillDamage: 'all',
 		elementAttack: 'advantageous',
 		combo: false,
-		damageType: 'expected',
+		damageType: 'white',
 		distance: 'disabled',
 		elementPower: 'enabled',
 		unsheathe: false,
@@ -344,22 +344,59 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 			console.log('================================')
 
-			// 最終結果を返す（攻撃スキルが選択されている場合は既にfinalInputで適用済み）
-			const hasSkillSelected = calculatorData.attackSkill?.selectedSkillId !== undefined
+			// ダメージ判定タイプに応じて表示するダメージを決定
+			const getDamageByType = () => {
+				const baseDamage = attackResult.baseDamage // 白ダメ（基本ダメージ）
+				const stabilityResult = attackResult.stabilityResult
+				
+				switch (powerOptions.damageType) {
+					case 'white':
+						// 白ダメ：基本ダメージをそのまま表示（安定率適用なし）
+						return {
+							min: baseDamage,
+							max: baseDamage,
+							average: baseDamage,
+							stability: stabilityResult.stabilityRate,
+						}
+					case 'critical':
+						// クリティカル：後で実装予定
+						return {
+							min: Math.floor(baseDamage * 1.25), // 仮のクリティカル倍率
+							max: Math.floor(baseDamage * 1.25),
+							average: Math.floor(baseDamage * 1.25),
+							stability: stabilityResult.stabilityRate,
+						}
+					case 'graze':
+						// グレイズ：後で実装予定
+						return {
+							min: Math.floor(baseDamage * 0.1), // 仮のグレイズ倍率
+							max: Math.floor(baseDamage * 0.1),
+							average: Math.floor(baseDamage * 0.1),
+							stability: stabilityResult.stabilityRate,
+						}
+					case 'expected':
+						// 期待値
+						return {
+							min: stabilityResult.averageDamage,
+							max: stabilityResult.averageDamage,
+							average: stabilityResult.averageDamage,
+							stability: stabilityResult.stabilityRate,
+						}
+					default:
+						return {
+							min: stabilityResult.minDamage,
+							max: stabilityResult.maxDamage,
+							average: stabilityResult.averageDamage,
+							stability: stabilityResult.stabilityRate,
+						}
+				}
+			}
+			
+			const damageDisplay = getDamageByType()
 			
 			return {
-				normal: {
-					min: hasSkillSelected ? attackResult.stabilityResult.minDamage : attackResult.stabilityResult.minDamage,
-					max: hasSkillSelected ? attackResult.stabilityResult.maxDamage : attackResult.stabilityResult.maxDamage,
-					average: hasSkillSelected ? attackResult.stabilityResult.averageDamage : attackResult.stabilityResult.averageDamage,
-					stability: attackResult.stabilityResult.stabilityRate,
-				},
-				skill: {
-					min: attackResult.stabilityResult.minDamage,
-					max: attackResult.stabilityResult.maxDamage,
-					average: attackResult.stabilityResult.averageDamage,
-					stability: attackResult.stabilityResult.stabilityRate,
-				},
+				normal: damageDisplay,
+				skill: damageDisplay, // スキル攻撃も同じ判定を適用
 			}
 		} catch (error) {
 			console.error('ダメージ計算エラー:', error)
@@ -637,7 +674,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								ダメージ判定
 							</label>
 							<div className="flex sm:gap-2">
-								{(['critical', 'graze', 'normal', 'expected'] as const).map(
+								{(['critical', 'graze', 'white', 'expected'] as const).map(
 									(type) => (
 										<button
 											key={type}
@@ -648,12 +685,12 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
 											}`}
 										>
-											{type === 'critical'
-												? 'Critical'
-												: type === 'graze'
-													? 'Graze'
-													: type === 'normal'
-														? '白ダメ'
+											{type === 'white'
+												? '白ダメ'
+												: type === 'critical'
+													? 'Critical'
+													: type === 'graze'
+														? 'Graze'
 														: '期待値'}
 										</button>
 									),
