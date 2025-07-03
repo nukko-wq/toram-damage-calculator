@@ -22,11 +22,25 @@ AttackSkillFormは攻撃スキル選択・表示・倍率計算を担当する�
 
 ### AttackSkill インターフェース
 
+#### 系統別番号体系
+表示順序を管理するため、以下の番号体系でorderプロパティを割り振ります：
+
+- **100番台**: 剣系統
+- **200番台**: 槍系統
+- **300番台**: 魔法剣士系統
+- **400番台**: 手甲系統
+- **500番台**: 弓系統
+- **600番台**: 魔法系統
+- **700番台**: 抜刀系統
+- **800番台**: 双剣系統
+- **900番台**: その他
+
 ```typescript
 interface AttackSkill {
   // 基本情報
   id: string                           // 一意識別子
   name: string                        // スキル名
+  order: number                       // 表示順序（系統別番号）
   category: AttackSkillCategory        // スキルカテゴリ
   weaponTypeRequirements?: WeaponType[] // 必要武器種（指定なしは全武器対応）
   
@@ -376,6 +390,7 @@ export const attackSkillsData: AttackSkill[] = [
   {
     id: 'slash',
     name: 'スラッシュ',
+    order: 101,
     category: 'sword',
     mpCost: 8,
     multiplierFormula: "125%",
@@ -405,6 +420,7 @@ export const attackSkillsData: AttackSkill[] = [
   {
     id: 'moon_slash',
     name: 'ムーンスラッシュ',
+    order: 102,
     category: 'sword',
     mpCost: 400,
     multiplierFormula: "特殊計算",

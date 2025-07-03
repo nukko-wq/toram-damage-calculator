@@ -808,6 +808,7 @@ export interface AttackSkill {
 	// 基本情報
 	id: string                           // 一意識別子
 	name: string                        // スキル名
+	order: number                       // 表示順序（系統別番号）
 	category: AttackSkillCategory        // スキルカテゴリ
 	weaponTypeRequirements?: WeaponType[] // 必要武器種（指定なしは全武器対応）
 	

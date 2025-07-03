@@ -1,14 +1,15 @@
 import type { AttackSkill, WeaponType } from '@/types/calculator'
 
 /**
- * 攻撃スキルマスタデータ
+ * 攻撃スキルマスタデータ（定義順）
  * 表示専用の情報を管理（実際の計算は別システムで実行）
  */
-export const attackSkillsData: AttackSkill[] = [
+const attackSkillsRawData: AttackSkill[] = [
 	// 片手剣スキル
 	{
 		id: 'slash',
 		name: 'スラッシュ',
+		order: 101,
 		category: 'sword',
 		weaponTypeRequirements: ['片手剣'],
 		mpCost: 8,
@@ -39,6 +40,7 @@ export const attackSkillsData: AttackSkill[] = [
 	{
 		id: 'moon_slash',
 		name: 'ムーンスラッシュ',
+		order: 102,
 		category: 'sword',
 		weaponTypeRequirements: ['片手剣'],
 		mpCost: 400,
@@ -85,6 +87,7 @@ export const attackSkillsData: AttackSkill[] = [
 	{
 		id: 'strike_stab',
 		name: 'ストライクスタブ(通常時)',
+		order: 201,
 		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'],
 		mpCost: 200,
@@ -147,6 +150,7 @@ export const attackSkillsData: AttackSkill[] = [
 	{
 		id: 'strike_stab_ailment',
 		name: 'ストライクスタブ(敵状態異常時)',
+		order: 202,
 		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'],
 		mpCost: 200,
@@ -209,6 +213,7 @@ export const attackSkillsData: AttackSkill[] = [
 	{
 		id: 'magic_arrow',
 		name: 'マジックアロー',
+		order: 601,
 		category: 'staff',
 		weaponTypeRequirements: ['杖'],
 		mpCost: 5,
@@ -238,6 +243,7 @@ export const attackSkillsData: AttackSkill[] = [
 	{
 		id: 'power_shot',
 		name: 'パワーショット',
+		order: 501,
 		category: 'bow',
 		weaponTypeRequirements: ['弓'],
 		mpCost: 10,
@@ -268,6 +274,7 @@ export const attackSkillsData: AttackSkill[] = [
 	{
 		id: 'dual_strike',
 		name: 'デュアルストライク',
+		order: 801,
 		category: 'dualSword',
 		weaponTypeRequirements: ['双剣'],
 		mpCost: 15,
@@ -310,6 +317,24 @@ export const attackSkillsData: AttackSkill[] = [
 		],
 	},
 ]
+
+/**
+ * 系統別番号順でソートされた攻撃スキルデータ
+ * 
+ * 系統別番号体系:
+ * - 100番台: 剣系統
+ * - 200番台: 槍系統  
+ * - 300番台: 魔法剣士系統
+ * - 400番台: 手甲系統
+ * - 500番台: 弓系統
+ * - 600番台: 魔法系統
+ * - 700番台: 抜刀系統
+ * - 800番台: 双剣系統
+ * - 900番台: その他
+ */
+export const attackSkillsData: AttackSkill[] = [...attackSkillsRawData].sort(
+	(a, b) => a.order - b.order,
+)
 
 /**
  * スキルIDからスキルデータを取得

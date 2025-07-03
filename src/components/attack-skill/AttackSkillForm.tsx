@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import type { CalculatedHit, AttackSkillDisplayData } from '@/types/calculator'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import {
@@ -198,6 +198,34 @@ export default function AttackSkillForm({
 		}
 	}
 
+	// 系統別グループ名の取得
+	const getSystemGroupLabel = useCallback((orderRange: number): string => {
+		if (orderRange >= 100 && orderRange < 200) return '剣系統------'
+		if (orderRange >= 200 && orderRange < 300) return '槍系統------'
+		if (orderRange >= 300 && orderRange < 400) return '魔法剣士系統------'
+		if (orderRange >= 400 && orderRange < 500) return '手甲系統------'
+		if (orderRange >= 500 && orderRange < 600) return '弓系統------'
+		if (orderRange >= 600 && orderRange < 700) return '魔法系統------'
+		if (orderRange >= 700 && orderRange < 800) return '抜刀系統------'
+		if (orderRange >= 800 && orderRange < 900) return '双剣系統------'
+		return 'その他------'
+	}, [])
+
+	// 系統別にスキルをグループ化
+	const skillGroups = useMemo(() => {
+		const groups: { [key: string]: typeof attackSkillsData } = {}
+		
+		attackSkillsData.forEach((skill) => {
+			const groupLabel = getSystemGroupLabel(skill.order)
+			if (!groups[groupLabel]) {
+				groups[groupLabel] = []
+			}
+			groups[groupLabel].push(skill)
+		})
+		
+		return groups
+	}, [getSystemGroupLabel])
+
 	return (
 		<div className="space-y-4 p-4 border border-gray-300 rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">攻撃スキル</h2>
@@ -210,10 +238,14 @@ export default function AttackSkillForm({
 					className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 				>
 					<option value="">⚔️ 攻撃スキルを選択してください</option>
-					{attackSkillsData.map((skill) => (
-						<option key={skill.id} value={skill.id}>
-							{skill.name}
-						</option>
+					{Object.entries(skillGroups).map(([groupLabel, skills]) => (
+						<optgroup key={groupLabel} label={groupLabel}>
+							{skills.map((skill) => (
+								<option key={skill.id} value={skill.id}>
+									{skill.name}
+								</option>
+							))}
+						</optgroup>
 					))}
 				</select>
 				<button
