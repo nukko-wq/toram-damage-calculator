@@ -111,7 +111,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 								{/* 与ダメージプレビュー */}
 								{showDamagePreview ? (
 									<div
-										className="bg-orange-50 rounded-lg"
+										className="bg-gray-50 rounded-lg"
 										id="damage-preview"
 										aria-labelledby="damage-toggle"
 									>
@@ -138,7 +138,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 								{/* 与ダメージプレビューを優先表示 */}
 								{showDamagePreview && (
 									<div
-										className="bg-orange-50 rounded-lg"
+										className="bg-gray-50 rounded-lg"
 										id="damage-preview-mobile"
 										aria-labelledby="damage-toggle"
 									>
