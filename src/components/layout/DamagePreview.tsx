@@ -513,31 +513,46 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				switch (powerOptions.damageType) {
 					case 'white': {
 						// 白ダメ：基本ダメージに対して安定率を適用
+						const minStabilityRate = stabilityRate
+						const maxStabilityRate = 100
+						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
+						
 						return {
 							min: Math.floor(baseDamage * stabilityRate / 100),
 							max: baseDamage,
-							average: baseDamage, // 平均は後で修正予定
+							average: Math.floor(baseDamage * averageStabilityRate / 100),
 							stability: stabilityRate,
+							averageStability: averageStabilityRate,
 						}
 					}
 					case 'critical': {
 						// クリティカル：後で実装予定
 						const criticalBaseDamage = Math.floor(baseDamage * 1.25)
+						const minStabilityRate = stabilityRate
+						const maxStabilityRate = 100
+						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
+						
 						return {
-							min: Math.floor(criticalBaseDamage * stabilityRate / 100), // 安定率適用
+							min: Math.floor(criticalBaseDamage * stabilityRate / 100),
 							max: criticalBaseDamage,
-							average: criticalBaseDamage, // 平均は後で修正予定
+							average: Math.floor(criticalBaseDamage * averageStabilityRate / 100),
 							stability: stabilityRate,
+							averageStability: averageStabilityRate,
 						}
 					}
 					case 'graze': {
 						// グレイズ：後で実装予定
 						const grazeBaseDamage = Math.floor(baseDamage * 0.1)
+						const minStabilityRate = stabilityRate
+						const maxStabilityRate = 100
+						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
+						
 						return {
-							min: Math.floor(grazeBaseDamage * stabilityRate / 100), // 安定率適用
+							min: Math.floor(grazeBaseDamage * stabilityRate / 100),
 							max: grazeBaseDamage,
-							average: grazeBaseDamage, // 平均は後で修正予定
+							average: Math.floor(grazeBaseDamage * averageStabilityRate / 100),
 							stability: stabilityRate,
+							averageStability: averageStabilityRate,
 						}
 					}
 					case 'expected': {
@@ -547,15 +562,21 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							max: stabilityResult.averageDamage,
 							average: stabilityResult.averageDamage,
 							stability: stabilityRate,
+							averageStability: stabilityRate,
 						}
 					}
 					default: {
 						// 通常ダメージ：最大=基本ダメージ、最小=基本ダメージ×安定率（小数点以下切り捨て）
+						const minStabilityRate = stabilityRate
+						const maxStabilityRate = 100
+						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
+						
 						return {
 							min: Math.floor(baseDamage * stabilityRate / 100),
 							max: baseDamage,
-							average: baseDamage, // 平均は後で修正予定
+							average: Math.floor(baseDamage * averageStabilityRate / 100),
 							stability: stabilityRate,
+							averageStability: averageStabilityRate,
 						}
 					}
 				}
@@ -593,6 +614,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				currentDamage.max,
 				currentDamage.average,
 				currentDamage.stability,
+				currentDamage.averageStability,
 			)
 
 			// LocalStorageに保存
@@ -733,13 +755,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									{damageResults.normal.average.toLocaleString()}
 								</td>
 								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
-									{Math.round(
-										((damageResults.normal.min + damageResults.normal.max) /
-											2 /
-											damageResults.normal.max) *
-											100,
-									)}
-									%
+									{damageResults.normal.averageStability}%
 								</td>
 								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-bold text-gray-700 font-roboto">
 									{captureData

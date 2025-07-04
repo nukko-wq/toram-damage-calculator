@@ -74,6 +74,7 @@ export const createCaptureData = (
 	max: number,
 	average: number,
 	stability: number,
+	averageStability: number,
 ): DamageCaptureData => {
 	const now = new Date().toISOString()
 	
@@ -89,7 +90,7 @@ export const createCaptureData = (
 			},
 			average: {
 				damage: average,
-				stability: Math.round(((min + max) / 2 / max) * 100), // 平均安定率
+				stability: averageStability, // 計算済みの平均安定率を使用
 			},
 			calculatedAt: now,
 		},
