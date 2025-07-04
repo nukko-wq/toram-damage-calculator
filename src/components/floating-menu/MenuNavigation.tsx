@@ -164,7 +164,9 @@ export default function MenuNavigation({
 							{item.icon}
 						</div>
 						<div className="min-w-0 flex-1">
-							<div className="text-sm font-medium truncate">{item.label}</div>
+							<div className="text-xs sm:text-sm font-medium truncate">
+								{item.label}
+							</div>
 						</div>
 					</div>
 				</button>

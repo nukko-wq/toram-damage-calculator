@@ -63,8 +63,8 @@ export default function MenuPanel({
 				ref={panelRef}
 				id="floating-menu-panel"
 				className={`
-					fixed top-20 right-4 z-[9999]
-					w-96 lg:w-[500px] max-w-[calc(100vw-2rem)]
+					fixed top-20 right-2 sm:right-4 z-[9999]
+					w-96 lg:w-[500px] max-w-[calc(100vw-1rem)]
 					max-h-[calc(100vh-6rem)]
 					bg-white rounded-lg shadow-2xl
 					border border-gray-200
@@ -79,7 +79,7 @@ export default function MenuPanel({
 				<div className="flex items-center justify-between p-4 border-b border-gray-200">
 					<h2
 						id="floating-menu-title"
-						className="text-lg font-semibold text-gray-900"
+						className="sm:text-lg font-semibold text-gray-900"
 					>
 						メニュー
 					</h2>
