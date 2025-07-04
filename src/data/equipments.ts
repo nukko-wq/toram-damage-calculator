@@ -49,14 +49,14 @@ export const equipmentsData: EquipmentsData = {
 		mainWeapon: [
 			{
 				id: '5ecbbbad-1fb8-4e44-b36b-8181cc268f15',
-				name: '槍有利23%A10%S10%C29',
+				name: '槍有利23%A15%S10%',
 				properties: {
 					ATK_Rate: 10,
 					ElementAdvantage_Rate: 23,
 					Critical: 29,
 					STR_Rate: 10,
-					NaturalHPRecovery: -27,
-					Dodge: -14,
+					NaturalHPRecovery: -30,
+					Dodge: -16,
 				},
 				crystalSlots: {
 					slot1: null,
@@ -65,17 +65,19 @@ export const equipmentsData: EquipmentsData = {
 			},
 			{
 				id: 'ee0de0d7-8402-4dca-9294-5527f5abb53c',
-				name: '有利-クリダメ%-STR%-クリ率',
+				name: '槍有利23%A10%S10%C30',
 				weaponStats: {
 					ATK: 927,
 					stability: 60,
 					refinement: 15,
 				},
 				properties: {
-					ElementAdvantage_Rate: 22,
+					ElementAdvantage_Rate: 23,
 					CriticalDamage_Rate: 10,
 					STR_Rate: 10,
-					Critical_Rate: 10,
+					Critical_Rate: 30,
+					NaturalHPRecovery: -30,
+					Dodge: -16,
 				},
 			},
 		],
@@ -97,12 +99,16 @@ export const equipmentsData: EquipmentsData = {
 			},
 			{
 				id: 'cd287974-decd-4fbe-8c20-52d6801159f8',
-				name: '有利-クリダメ-クリダメ%-クリ率',
+				name: '有利23%S10%CD11%CD23',
 				properties: {
-					ElementAdvantage_Rate: 22,
-					CriticalDamage: 22,
-					CriticalDamage_Rate: 10,
-					Critical_Rate: 27,
+					ElementAdvantage_Rate: 23,
+					CriticalDamage_Rate: 11,
+					CriticalDamage: 23,
+					STR_Rate: 10,
+					MATK_Rate: -15,
+					MagicalPenetration_Rate: -9,
+					Accuracy: -16,
+					Accuracy_Rate: -6,
 				},
 				armorType: 'normal',
 			},

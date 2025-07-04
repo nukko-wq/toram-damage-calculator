@@ -55,7 +55,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 		const handleScroll = () => {
 			updateHeight()
 		}
-		
+
 		// ウィンドウリサイズでモバイル判定更新
 		const handleResize = () => {
 			checkMobile()
@@ -111,9 +111,9 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 	return (
 		<>
 			{/* トグルボタンバー */}
-			<div 
+			<div
 				ref={toggleBarRef}
-				className={`sticky top-0 left-0 right-0 z-40 ${className}`}
+				className={`sticky top-0 left-0 right-0 z-40 col-start-1 col-end-5 row-start-2 row-end-3 ${className}`}
 			>
 				<div
 					className="grid grid-cols-2 lg:grid-cols-[520px_1fr]"
@@ -185,8 +185,8 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 			{/* 与ダメージプレビュー */}
 			{showDamagePreview && (
 				<div
-					className={`sticky z-30 max-h-[80vh] ${
-						isMobile ? "w-full" : "w-[520px]"
+					className={`sticky z-30 max-h-[80vh] col-start-1 col-end-5 row-start-3 row-end-4 ${
+						isMobile ? 'w-full' : 'w-[520px]'
 					}`}
 					style={{ top: `${toggleBarHeight}px` }}
 				>
@@ -203,12 +203,8 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 			{/* ステータスプレビュー */}
 			{showStatusPreview && (
 				<div
-					className={`sticky z-30 max-h-[80vh] ${
-						isMobile 
-							? "w-full" 
-							: showDamagePreview 
-								? "w-[calc(100%-520px)] ml-[520px]" 
-								: "w-[calc(100%-520px)] ml-[520px]"
+					className={`sticky z-20 max-h-[80vh] col-start-1 col-end-5 row-start-3 row-end-4 ${
+						isMobile ? 'w-full' : 'w-[calc(100%-520px)] ml-[520px]'
 					}`}
 					style={{ top: `${toggleBarHeight}px` }}
 				>

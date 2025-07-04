@@ -3,6 +3,7 @@ import { Roboto } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import ResultToggleBar from '@/components/layout/ResultToggleBar'
+import Footer from '@/components/layout/Footer'
 import { FloatingMenuSystem } from '@/components/floating-menu'
 
 // Robotoフォントの設定（数字表示用）
@@ -29,12 +30,15 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="ja">
-			<body className={roboto.variable}>
-				<div className="min-h-screen bg-gray-50">
+			<body className={`${roboto.variable}`}>
+				<div className="min-h-screen bg-gray-50 grid grid-custom-layout">
 					<Header />
 					<ResultToggleBar />
-					<main>{children}</main>
+					<main className="col-start-1 col-end-5 row-start-4 row-end-5">
+						{children}
+					</main>
 					<FloatingMenuSystem />
+					<Footer />
 				</div>
 			</body>
 		</html>

@@ -22,7 +22,7 @@ export default function EquipmentCard({
 		return stats.length > 0 ? stats.join(', ') : ''
 	}
 
-	const formatProperties = () => {
+	const getPropertyList = () => {
 		// 装備フォームと同じプロパティ名マッピング
 		const propertyNameMap: Record<string, string> = {
 			// 基本攻撃力系
@@ -171,7 +171,7 @@ export default function EquipmentCard({
 			MagicalFollowup_Rate: '魔法追撃',
 		}
 
-		const props = Object.entries(equipment.properties)
+		return Object.entries(equipment.properties)
 			.filter(([_, value]) => value !== 0)
 			.map(([key, value]) => {
 				// マッピングから日本語名を取得、なければ元のキーを使用
@@ -181,18 +181,12 @@ export default function EquipmentCard({
 				const isPercentage = key.endsWith('_Rate')
 				const suffix = isPercentage ? '%' : ''
 
-				return `${propName}${value > 0 ? '+' : ''}${value}${suffix}`
+				return {
+					text: `${propName}${value > 0 ? '+' : ''}${value}${suffix}`,
+					isNegative: value < 0,
+				}
 			})
-			.slice(0, 4) // 最大4つまで表示
-
-		// 2つずつのグループに分ける
-		const rows: string[] = []
-		for (let i = 0; i < props.length; i += 2) {
-			const row = props.slice(i, i + 2).join(', ')
-			rows.push(row)
-		}
-
-		return rows
+			.slice(0, 8) // 最大8つまで表示
 	}
 
 	return (
@@ -239,13 +233,20 @@ export default function EquipmentCard({
 			)}
 
 			{/* プロパティ */}
-			{formatProperties().length > 0 && (
-				<div className="text-sm text-gray-600 mb-2 min-h-[1.25rem]">
-					{formatProperties().map((row) => (
-						<div key={row} className="flex flex-wrap gap-x-3">
-							{row}
-						</div>
-					))}
+			{getPropertyList().length > 0 && (
+				<div className="text-sm mb-2 min-h-[1.25rem]">
+					<div className="flex flex-wrap gap-x-3">
+						{getPropertyList().map((property) => (
+							<span
+								key={property.text}
+								className={
+									property.isNegative ? 'text-red-500' : 'text-gray-600'
+								}
+							>
+								{property.text}
+							</span>
+						))}
+					</div>
 				</div>
 			)}
 

@@ -62,10 +62,14 @@ const createDataUpdateWithDifferenceCheck = (set: any, get: any) => {
 				const newData = { ...state.data, ...dataUpdates }
 				const hasChanges = hasDataDifferences(newData, state.lastSavedData)
 
+				// データ更新時に計算結果も自動更新
+				const results = calculateResults(newData)
+
 				return {
 					data: newData,
 					hasUnsavedChanges: hasChanges, // 実際に差分がある場合のみtrueに設定
 					hasRealChanges: hasChanges,
+					calculationResults: results, // 計算結果を自動更新
 				}
 			},
 			false,

@@ -1010,10 +1010,7 @@ export default function EquipmentForm({
 					{activeTab === 'body' && effectiveEquipment.body?.id && (
 						<div className="mt-4">
 							<ArmorTypeSelect
-								selectedType={
-									getCombinedEquipmentById(effectiveEquipment.body.id)
-										?.armorType || 'normal'
-								}
+								selectedType={effectiveEquipment.body.armorType || 'normal'}
 								onChange={handleArmorTypeChange}
 								className="max-w-md"
 							/>
