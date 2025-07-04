@@ -60,7 +60,7 @@ export default function Home() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8">
+		<div className="min-h-screen bg-gray-50 py-2 sm:py-8">
 			<div className="max-w-[1500px] mx-auto px-2 sm:px-6 lg:px-8">
 				{/* 更新通知 */}
 				{showUpdateNotifications && updateNotifications.length > 0 && (
