@@ -1016,7 +1016,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 				{/* 敵情報 */}
 				<div className="p-1 sm:p-2 flex items-center gap-2">
-					<p className="text-sm font-medium text-gray-700">敵：{getSelectedEnemyName()}</p>
+					<p className="text-sm font-medium text-gray-700">
+						敵：{getSelectedEnemyName()}
+					</p>
 				</div>
 
 				{/* 威力オプション */}
@@ -1044,7 +1046,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 											onClick={() =>
 												handlePowerOptionChange('bossDifficulty', difficulty)
 											}
-											className={`px-3 py-0.5 sm:py-1 text-xs md:text-[13px] rounded min-h-6 ${
+											className={`px-3 py-0.5 sm:py-1 text-xs md:text-[13px] rounded min-h-6 cursor-pointer ${
 												powerOptions.bossDifficulty === difficulty
 													? 'bg-blue-400 text-white'
 													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1073,7 +1075,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									<button
 										key={hit}
 										onClick={() => handlePowerOptionChange('skillDamage', hit)}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded min-h-6 ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded min-h-6 cursor-pointer ${
 											powerOptions.skillDamage === hit
 												? 'bg-blue-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1105,7 +1107,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 										onClick={() =>
 											handlePowerOptionChange('elementAttack', element)
 										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
 											powerOptions.elementAttack === element
 												? 'bg-pink-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1138,7 +1140,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 										onClick={() =>
 											handlePowerOptionChange('combo', option.value)
 										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
 											powerOptions.combo === option.value
 												? 'bg-rose-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1163,7 +1165,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 											onClick={() =>
 												handlePowerOptionChange('damageType', type)
 											}
-											className={`px-3 py-1 text-xs md:text-[13px] rounded ${
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
 												powerOptions.damageType === type
 													? 'bg-amber-400 text-white'
 													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1194,7 +1196,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 										onClick={() =>
 											handlePowerOptionChange('distance', distance)
 										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
 											powerOptions.distance === distance
 												? 'bg-rose-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1229,7 +1231,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 										onClick={() =>
 											handlePowerOptionChange('elementPower', power)
 										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
 											powerOptions.elementPower === power
 												? 'bg-rose-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1262,7 +1264,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 										onClick={() =>
 											handlePowerOptionChange('unsheathe', option.value)
 										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
 											powerOptions.unsheathe === option.value
 												? 'bg-rose-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'

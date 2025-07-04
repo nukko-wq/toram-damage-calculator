@@ -1030,6 +1030,14 @@ export function calculateASPD(
 	const armorTypeBonus = getArmorTypeASPDBonus(armorType)
 	const effectiveASPDPercent = aspdPercent + armorTypeBonus
 
+	// ArmorType補正のデバッグログ
+	console.log('=== ASPD ArmorType Debug ===')
+	console.log('Received armorType:', armorType)
+	console.log('ArmorType bonus:', armorTypeBonus)
+	console.log('ASPD% from equipment:', aspdPercent)
+	console.log('Effective ASPD%:', effectiveASPDPercent)
+	console.log('ASPD before %:', aspdBeforePercent)
+
 	// 5. 実効ASPD%補正適用
 	const aspdAfterPercent = Math.floor(
 		aspdBeforePercent * (1 + effectiveASPDPercent / 100),
@@ -1038,6 +1046,11 @@ export function calculateASPD(
 	// 6. ASPD固定値加算
 	const aspdFixed = bonuses.AttackSpeed || 0
 	const finalASPD = aspdAfterPercent + aspdFixed
+
+	console.log('ASPD after %:', aspdAfterPercent)
+	console.log('ASPD fixed:', aspdFixed)
+	console.log('Final ASPD:', finalASPD)
+	console.log('=========================')
 
 	return {
 		level: stats.level,
@@ -1200,11 +1213,25 @@ export function getBodyArmorType(bodyEquipment: any): ArmorType {
 		return 'normal'
 	}
 
+	// まず体装備スロット自体のarmorTypeをチェック（ユーザーが設定した改造タイプ）
+	if (bodyEquipment.armorType) {
+		console.log('=== ArmorType Debug ===')
+		console.log('Body equipment armorType found:', bodyEquipment.armorType)
+		console.log('Body equipment data:', bodyEquipment)
+		return bodyEquipment.armorType
+	}
+
 	// 体装備のArmorTypeを取得（装備データから）
 	const { getCombinedEquipmentById } = require('./equipmentDatabase')
 	const equipment = getCombinedEquipmentById(bodyEquipment.id)
+	
+	const finalArmorType = equipment?.armorType || 'normal'
+	console.log('=== ArmorType Debug (fallback) ===')
+	console.log('Body equipment ID:', bodyEquipment.id)
+	console.log('Equipment data armorType:', equipment?.armorType)
+	console.log('Final armorType:', finalArmorType)
 
-	return equipment?.armorType || 'normal'
+	return finalArmorType
 }
 
 /**
