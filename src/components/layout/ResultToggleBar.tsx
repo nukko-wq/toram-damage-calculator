@@ -23,7 +23,10 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 	const toggleBarRef = useRef<HTMLDivElement>(null)
 	const [toggleBarHeight, setToggleBarHeight] = useState(60)
 
-	// ToggleBarの高さを動的に測定
+	// モバイル判定
+	const [isMobile, setIsMobile] = useState(false)
+
+	// モバイル判定とToggleBarの高さを動的に測定
 	useEffect(() => {
 		const updateHeight = () => {
 			if (toggleBarRef.current) {
@@ -32,10 +35,18 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 			}
 		}
 
+		const checkMobile = () => {
+			setIsMobile(window.innerWidth < 1024) // lg breakpoint
+		}
+
 		updateHeight()
+		checkMobile()
 
 		// ResizeObserverでサイズ変更を監視
-		const resizeObserver = new ResizeObserver(updateHeight)
+		const resizeObserver = new ResizeObserver(() => {
+			updateHeight()
+			checkMobile()
+		})
 		if (toggleBarRef.current) {
 			resizeObserver.observe(toggleBarRef.current)
 		}
@@ -44,13 +55,58 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 		const handleScroll = () => {
 			updateHeight()
 		}
+		
+		// ウィンドウリサイズでモバイル判定更新
+		const handleResize = () => {
+			checkMobile()
+		}
+
 		window.addEventListener('scroll', handleScroll)
+		window.addEventListener('resize', handleResize)
 
 		return () => {
 			resizeObserver.disconnect()
 			window.removeEventListener('scroll', handleScroll)
+			window.removeEventListener('resize', handleResize)
 		}
 	}, [])
+
+	// モバイル用のトグル処理
+	const handleMobileDamageToggle = () => {
+		if (isMobile) {
+			if (showDamagePreview) {
+				// 与ダメージが表示中の場合は閉じる
+				toggleDamagePreview()
+			} else {
+				// 与ダメージが非表示の場合は表示（ステータスがあれば閉じる）
+				if (showStatusPreview) {
+					toggleStatusPreview() // ステータスを閉じる
+				}
+				toggleDamagePreview() // 与ダメージを開く
+			}
+		} else {
+			// デスクトップは従来通り
+			toggleDamagePreview()
+		}
+	}
+
+	const handleMobileStatusToggle = () => {
+		if (isMobile) {
+			if (showStatusPreview) {
+				// ステータスが表示中の場合は閉じる
+				toggleStatusPreview()
+			} else {
+				// ステータスが非表示の場合は表示（与ダメージがあれば閉じる）
+				if (showDamagePreview) {
+					toggleDamagePreview() // 与ダメージを閉じる
+				}
+				toggleStatusPreview() // ステータスを開く
+			}
+		} else {
+			// デスクトップは従来通り
+			toggleStatusPreview()
+		}
+	}
 
 	return (
 		<>
@@ -67,7 +123,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					{/* 与ダメージ確認ボタン */}
 					<button
 						type="button"
-						onClick={toggleDamagePreview}
+						onClick={handleMobileDamageToggle}
 						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
 							showDamagePreview
 								? 'bg-blue-300 text-white'
@@ -97,7 +153,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					{/* ステータス確認ボタン */}
 					<button
 						type="button"
-						onClick={toggleStatusPreview}
+						onClick={handleMobileStatusToggle}
 						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
 							showStatusPreview
 								? 'bg-blue-300 text-white'
@@ -132,11 +188,13 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					className="sticky z-30 max-h-[80vh]"
 					style={{ top: `${toggleBarHeight}px` }}
 				>
-					<div className="flex">
+					<div className={isMobile ? "block" : "flex"}>
 						{/* 与ダメージプレビュー */}
 						{showDamagePreview && (
 							<div
-								className="w-[520px] overflow-y-auto bg-gray-50"
+								className={`overflow-y-auto bg-gray-50 ${
+									isMobile ? "w-full" : "w-[520px]"
+								}`}
 								id="damage-preview"
 								aria-labelledby="damage-toggle"
 							>
@@ -147,7 +205,9 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 						{/* ステータスプレビュー */}
 						{showStatusPreview && (
 							<div
-								className="flex-1 w-[calc(100%-520px)] overflow-y-auto bg-blue-50"
+								className={`overflow-y-auto bg-blue-50 ${
+									isMobile ? "w-full" : "flex-1"
+								}`}
 								id="status-preview"
 								aria-labelledby="status-toggle"
 							>
