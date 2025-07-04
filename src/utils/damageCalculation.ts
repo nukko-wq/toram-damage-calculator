@@ -158,8 +158,8 @@ export interface DamageCalculationSteps {
 		result: number
 	}
 
-	// ステップ3a: クリティカルダメージ（クリティカル時のみ）
-	step3a_critical?: {
+	// ステップ2a: クリティカルダメージ（クリティカル時のみ）
+	step2a_critical?: {
 		beforeCritical: number
 		criticalRate: number
 		result: number
@@ -224,16 +224,16 @@ export function calculateDamage(input: DamageCalculationInput): DamageCalculatio
 	const step1Result = calculateBaseDamage(input, steps)
 
 	// ステップ2: 固定値加算
-	const step2Result = applyFixedValues(step1Result, input, steps)
+	let step2Result = applyFixedValues(step1Result, input, steps)
+
+	// ステップ2a: クリティカルダメージ補正（クリティカル時のみ）
+	if (input.userSettings.damageType === 'critical') {
+		console.log('→ ステップ2a: クリティカル計算を実行')
+		step2Result = applyCriticalDamage(step2Result, input, steps)
+	}
 
 	// ステップ3: 属性有利補正
-	let step3Result = applyElementAdvantage(step2Result, input, steps)
-
-	// ステップ3a: クリティカルダメージ補正（クリティカル時のみ）
-	if (input.userSettings.damageType === 'critical') {
-		console.log('→ ステップ3a: クリティカル計算を実行')
-		step3Result = applyCriticalDamage(step3Result, input, steps)
-	}
+	const step3Result = applyElementAdvantage(step2Result, input, steps)
 
 	// ステップ4: スキル倍率補正
 	const step4Result = applySkillMultiplier(step3Result, input, steps)
@@ -542,33 +542,33 @@ function applyBraveMultiplier(
 }
 
 /**
- * ステップ3a: クリティカルダメージ補正（属性有利後に適用）
+ * ステップ2a: クリティカルダメージ補正（固定値加算後に適用）
  */
 function applyCriticalDamage(
-	step3Result: number,
+	step2Result: number,
 	input: DamageCalculationInput,
 	steps: DamageCalculationSteps,
 ): number {
-	console.log('=== CRITICAL DAMAGE CALCULATION (Step 3a) ===')
-	console.log('step3Result (有利適用後):', step3Result)
+	console.log('=== CRITICAL DAMAGE CALCULATION (Step 2a) ===')
+	console.log('step2Result (固定値適用後):', step2Result)
 	
 	// クリティカルダメージ倍率を取得
 	const criticalRate = input.critical.damage
 	console.log('criticalRate (クリティカルダメージ%):', criticalRate)
 	
-	// ステップ3a: 属性有利の後、スキル倍率の前にクリティカル倍率を適用
-	console.log('=== ステップ3a: クリティカル倍率適用（スキル倍率の前） ===')
-	console.log(`有利適用後: ${step3Result}`)
+	// ステップ2a: 固定値加算の後、属性有利の前にクリティカル倍率を適用
+	console.log('=== ステップ2a: クリティカル倍率適用（属性有利の前） ===')
+	console.log(`固定値適用後: ${step2Result}`)
 	console.log(`クリティカル倍率: ${criticalRate}%`)
-	console.log(`計算式: Math.floor(${step3Result} * ${criticalRate}/100)`)
-	console.log(`= Math.floor(${step3Result} * ${criticalRate / 100})`)
-	console.log(`= Math.floor(${step3Result * (criticalRate / 100)})`)
-	const result = Math.floor(step3Result * (criticalRate / 100))
+	console.log(`計算式: Math.floor(${step2Result} * ${criticalRate}/100)`)
+	console.log(`= Math.floor(${step2Result} * ${criticalRate / 100})`)
+	console.log(`= Math.floor(${step2Result * (criticalRate / 100)})`)
+	const result = Math.floor(step2Result * (criticalRate / 100))
 	console.log('result (クリティカル適用後):', result)
 
 	// 計算過程を記録
-	steps.step3a_critical = {
-		beforeCritical: step3Result,
+	steps.step2a_critical = {
+		beforeCritical: step2Result,
 		criticalRate,
 		result,
 	}

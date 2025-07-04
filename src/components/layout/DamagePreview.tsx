@@ -535,13 +535,13 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('')
 			console.log('=== CALCULATION STEPS ===')
 			
-			// クリティカル計算が実行されたかチェック（ステップ3a）
-			if (attackResult.calculationSteps.step3a_critical) {
-				const step3a = attackResult.calculationSteps.step3a_critical
-				console.log('ステップ3a クリティカルダメージ:')
-				console.log('  有利適用後:', step3a.beforeCritical)
-				console.log('  クリティカル倍率:', step3a.criticalRate + '%')
-				console.log('  クリティカル適用後:', step3a.result)
+			// クリティカル計算が実行されたかチェック（ステップ2a）
+			if (attackResult.calculationSteps.step2a_critical) {
+				const step2a = attackResult.calculationSteps.step2a_critical
+				console.log('ステップ2a クリティカルダメージ:')
+				console.log('  固定値適用後:', step2a.beforeCritical)
+				console.log('  クリティカル倍率:', step2a.criticalRate + '%')
+				console.log('  クリティカル適用後:', step2a.result)
 			}
 			
 			// ブレイブ倍率ステップ
