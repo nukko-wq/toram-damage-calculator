@@ -489,13 +489,23 @@ function applyDistance(
 		}
 	}
 
-	const result = Math.floor(beforeDistance * (1 + distanceRate / 100))
+	// クリティカル時は距離補正で小数点を保持
+	let result: number
+	if (input.userSettings.damageType === 'critical') {
+		// クリティカル時：小数点を保持して次のステップに渡す
+		result = beforeDistance * (1 + distanceRate / 100)
+		console.log(`=== クリティカル時距離補正: 小数点保持 ===`)
+		console.log(`${beforeDistance} × (1 + ${distanceRate}/100) = ${result}`)
+	} else {
+		// 通常時：切り捨て
+		result = Math.floor(beforeDistance * (1 + distanceRate / 100))
+	}
 
-	// 計算過程を記録
+	// 計算過程を記録（表示用は切り捨て値）
 	steps.step7_distance = {
 		beforeDistance,
 		distanceRate,
-		result,
+		result: Math.floor(result),
 	}
 
 	return Math.max(1, result) // 最低1ダメージ保証
