@@ -17,6 +17,12 @@ import {
 	getBuffBonuses,
 } from '@/utils/dataSourceIntegration'
 import { aggregateAllBonuses } from '@/utils/basicStatsCalculation'
+import {
+	type DamageCaptureData,
+	saveCaptureData,
+	loadCaptureData,
+	createCaptureData,
+} from '@/utils/damageCaptureStorage'
 
 interface DamagePreviewProps {
 	isVisible: boolean
@@ -34,6 +40,21 @@ interface PowerOptions {
 	unsheathe: boolean
 }
 
+// ダメージ表示結果の型定義
+interface DamageDisplayResult {
+	min: number
+	max: number
+	average: number
+	stability: number
+	averageStability: number
+}
+
+// ダメージ計算結果の型定義
+interface DamageResults {
+	normal: DamageDisplayResult
+	skill: DamageDisplayResult
+}
+
 export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	// 威力オプション設定の状態管理
 	const [powerOptions, setPowerOptions] = useState<PowerOptions>({
@@ -46,6 +67,15 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		elementPower: 'enabled',
 		unsheathe: false,
 	})
+
+	// キャプチャデータの状態管理
+	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
+
+	// キャプチャデータの初期読み込み
+	useEffect(() => {
+		const loadedData = loadCaptureData()
+		setCaptureData(loadedData)
+	}, [])
 
 	// Zustandストアから計算データと計算結果を取得
 	const calculatorData = useCalculatorStore((state) => state.data)
@@ -64,7 +94,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	}, [calculationResults, updateCalculationResults])
 
 	// 実際のダメージ計算
-	const damageResults = useMemo(() => {
+	const damageResults = useMemo((): DamageResults => {
 		try {
 			// 基本的な計算入力データを作成
 			const defaultInput = createDefaultDamageInput()
@@ -119,30 +149,33 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 			// PowerOptionsに基づく属性攻撃設定
 			const getElementAdvantageTotal = () => {
-				// 属性攻撃が無効、または属性威力が無効の場合は0を返す
-				if (
-					powerOptions.elementAttack === 'none' ||
-					powerOptions.elementPower === 'disabled'
-				)
+				// 属性攻撃が無効の場合は0を返す
+				if (powerOptions.elementAttack === 'none') {
 					return 0
+				}
+
 				// 基本ステータスから総属性有利を取得（装備・クリスタ・料理・バフ統合済み）
 				const baseAdvantage =
 					calculationResults?.basicStats?.totalElementAdvantage ?? 0
 
-				// 属性攻撃が有効な場合は基本ステータスの総属性有利をそのまま使用
-				// PowerOptionsの設定は属性攻撃の有効/無効の判定にのみ使用
-				return baseAdvantage
+				// 属性威力オプションに応じて計算
+				switch (powerOptions.elementPower) {
+					case 'disabled':
+						return 0 // 属性威力無効時は0
+					case 'awakeningOnly':
+						return 25 // 覚醒のみ時は25%固定
+					case 'advantageOnly':
+						return baseAdvantage // 装備品補正値1の総属性有利のみ
+					case 'enabled':
+						return baseAdvantage + 25 // 総属性有利 + 属性覚醒25%
+					default:
+						return baseAdvantage
+				}
 			}
 
 			const getElementAdvantageAwakening = () => {
-				// 属性攻撃が無効、または属性威力が無効の場合は0を返す
-				if (
-					powerOptions.elementAttack === 'none' ||
-					powerOptions.elementPower === 'disabled'
-				)
-					return 0
-				// 実際の計算結果から属性覚醒有利を取得
-				return calculationResults?.basicStats?.elementAwakeningAdvantage ?? 0
+				// 属性覚醒は常に0（getElementAdvantageTotalで統合計算されるため）
+				return 0
 			}
 
 			// PowerOptionsに基づく距離設定
@@ -339,7 +372,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('================================')
 
 			// 攻撃スキルが選択されている場合は、スキルの計算結果を使用
-			let finalInput = input
+			const attackResults: Array<{hitNumber: number, result: ReturnType<typeof calculateDamage>}> = []
 			if (calculatorData.attackSkill?.selectedSkillId) {
 				const selectedSkill = getAttackSkillById(
 					calculatorData.attackSkill.selectedSkillId,
@@ -351,40 +384,133 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						calculatorData,
 					)
 
-					// スキル用の計算入力データを作成
-					finalInput = {
-						...input,
-						// スキルの場合はMATKまたはtotalATKを参照
-						referenceStat:
-							selectedSkill.hits[0].powerReference === 'MATK'
-								? calculationResults?.basicStats.MATK || 1500
-								: totalATK,
-						attackSkill: {
-							type: selectedSkill.hits[0].attackType,
-							multiplier:
-								skillCalculationResult.hits[0]?.calculatedMultiplier ||
-								selectedSkill.hits[0].multiplier,
-							fixedDamage:
-								skillCalculationResult.hits[0]?.calculatedFixedDamage ||
-								selectedSkill.hits[0].fixedDamage,
-							supportedDistances: selectedSkill.hits[0].canUseDistancePower
-								? ['short', 'long']
-								: [],
-							canUseLongRange: selectedSkill.hits[0].canUseLongRange,
-						},
-						// スキルでも距離・抜刀・慣れ設定を適用
-						unsheathe: {
-							...input.unsheathe,
-							isActive:
-								powerOptions.unsheathe &&
-								selectedSkill.hits[0].canUseUnsheathePower,
-						},
+					// スキルダメージオプションに応じて計算対象の撃を決定
+					// 注意：UIでは3撃目までしか表示しないが、実際のスキルには6撃目まで存在するものがある
+					// 「全て」選択時は1～6撃目全ての合計ダメージを計算する
+					const getTargetHits = () => {
+						switch (powerOptions.skillDamage) {
+							case 'hit1':
+								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 1)
+							case 'hit2':
+								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 2)
+							case 'hit3':
+								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 3)
+							case 'all':
+								// 1～6撃目全てを対象（スキルに存在する全ての撃の合計）
+								return skillCalculationResult.hits
+							default:
+								return skillCalculationResult.hits
+						}
+					}
+
+					const targetHits = getTargetHits()
+
+					// 各撃に対してダメージ計算を実行
+					for (const hitResult of targetHits) {
+						const originalHit = selectedSkill.hits.find(
+							hit => hit.hitNumber === hitResult.hitNumber
+						)
+						if (!originalHit) continue
+
+						const skillInput = {
+							...input,
+							// スキルの場合はMATKまたはtotalATKを参照
+							referenceStat:
+								originalHit.powerReference === 'MATK'
+									? calculationResults?.basicStats.MATK || 1500
+									: totalATK,
+							attackSkill: {
+								type: originalHit.attackType,
+								multiplier: hitResult.calculatedMultiplier,
+								fixedDamage: hitResult.calculatedFixedDamage,
+								supportedDistances: (() => {
+									const distances: ('short' | 'long')[] = []
+									if (originalHit.canUseShortRangePower) distances.push('short')
+									if (originalHit.canUseLongRangePower) distances.push('long')
+									return distances
+								})(),
+								canUseLongRange: originalHit.canUseLongRange,
+							},
+							// スキルでも距離・抜刀・慣れ設定を適用
+							unsheathe: {
+								...input.unsheathe,
+								isActive:
+									powerOptions.unsheathe && originalHit.canUseUnsheathePower,
+							},
+						}
+
+						const hitAttackResult = calculateDamage(skillInput)
+						attackResults.push({
+							hitNumber: hitResult.hitNumber,
+							result: hitAttackResult
+						})
 					}
 				}
+			} else {
+				// 通常攻撃の場合
+				const normalAttackResult = calculateDamage(input)
+				attackResults.push({
+					hitNumber: 1,
+					result: normalAttackResult
+				})
 			}
 
-			// 最終的なダメージ計算
-			const attackResult = calculateDamage(finalInput)
+			// 複数撃がある場合は合計ダメージを計算
+			const totalAttackResult = (() => {
+				if (attackResults.length === 0) {
+					// 存在しない撃を選択した場合（例：ムーンスラッシュの3撃目）は0ダメージを返す
+					const defaultStabilityRate = calculationResults?.basicStats.stabilityRate || 85
+					return {
+						baseDamage: 0,
+						stabilityResult: {
+							minDamage: 0,
+							maxDamage: 0,
+							averageDamage: 0,
+							stabilityRate: defaultStabilityRate
+						},
+						calculationSteps: {
+							step1_baseDamage: {
+								playerLevel: calculatorData.baseStats.level,
+								referenceStat: 0,
+								enemyLevel: 0,
+								beforeResistance: 0,
+								physicalResistanceRate: 0,
+								magicalResistanceRate: 0,
+								weaponResistanceRate: 0,
+								afterResistance: 0,
+								enemyDEF: 0,
+								result: 0
+							}
+						} as any
+					}
+				}
+
+				if (attackResults.length === 1) {
+					// 単発攻撃または特定撃のみ選択時
+					return attackResults[0].result
+				}
+
+				// 複数撃の合計計算（'all'選択時）
+				const totalBaseDamage = attackResults.reduce(
+					(sum, hit) => sum + hit.result.baseDamage, 0
+				)
+				
+				// 安定率は最初の撃の値を使用（全撃で同じ安定率のため）
+				const stabilityRate = attackResults[0].result.stabilityResult.stabilityRate
+				
+				return {
+					baseDamage: totalBaseDamage,
+					stabilityResult: {
+						minDamage: Math.floor(totalBaseDamage * stabilityRate / 100),
+						maxDamage: totalBaseDamage,
+						averageDamage: Math.floor(totalBaseDamage * (stabilityRate + 100) / 2 / 100),
+						stabilityRate: stabilityRate
+					},
+					calculationSteps: attackResults[0].result.calculationSteps // 最初の撃の計算過程を参考表示
+				}
+			})()
+
+			const attackResult = totalAttackResult
 
 			// 計算結果の詳細ログ
 			console.log('=== CALCULATION RESULTS ===')
@@ -493,47 +619,77 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const getDamageByType = () => {
 				const baseDamage = attackResult.baseDamage // 白ダメ（基本ダメージ）
 				const stabilityResult = attackResult.stabilityResult
+				const stabilityRate = stabilityResult.stabilityRate
 
 				switch (powerOptions.damageType) {
-					case 'white':
-						// 白ダメ：基本ダメージをそのまま表示（安定率適用なし）
+					case 'white': {
+						// 白ダメ：基本ダメージに対して安定率を適用
+						const minStabilityRate = stabilityRate
+						const maxStabilityRate = 100
+						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
+						
 						return {
-							min: baseDamage,
+							min: Math.floor(baseDamage * stabilityRate / 100),
 							max: baseDamage,
-							average: baseDamage,
-							stability: stabilityResult.stabilityRate,
+							average: Math.floor(baseDamage * averageStabilityRate / 100),
+							stability: stabilityRate,
+							averageStability: averageStabilityRate,
 						}
-					case 'critical':
+					}
+					case 'critical': {
 						// クリティカル：後で実装予定
+						const criticalBaseDamage = Math.floor(baseDamage * 1.25)
+						const minStabilityRate = stabilityRate
+						const maxStabilityRate = 100
+						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
+						
 						return {
-							min: Math.floor(baseDamage * 1.25), // 仮のクリティカル倍率
-							max: Math.floor(baseDamage * 1.25),
-							average: Math.floor(baseDamage * 1.25),
-							stability: stabilityResult.stabilityRate,
+							min: Math.floor(criticalBaseDamage * stabilityRate / 100),
+							max: criticalBaseDamage,
+							average: Math.floor(criticalBaseDamage * averageStabilityRate / 100),
+							stability: stabilityRate,
+							averageStability: averageStabilityRate,
 						}
-					case 'graze':
+					}
+					case 'graze': {
 						// グレイズ：後で実装予定
+						const grazeBaseDamage = Math.floor(baseDamage * 0.1)
+						const minStabilityRate = stabilityRate
+						const maxStabilityRate = 100
+						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
+						
 						return {
-							min: Math.floor(baseDamage * 0.1), // 仮のグレイズ倍率
-							max: Math.floor(baseDamage * 0.1),
-							average: Math.floor(baseDamage * 0.1),
-							stability: stabilityResult.stabilityRate,
+							min: Math.floor(grazeBaseDamage * stabilityRate / 100),
+							max: grazeBaseDamage,
+							average: Math.floor(grazeBaseDamage * averageStabilityRate / 100),
+							stability: stabilityRate,
+							averageStability: averageStabilityRate,
 						}
-					case 'expected':
+					}
+					case 'expected': {
 						// 期待値
 						return {
 							min: stabilityResult.averageDamage,
 							max: stabilityResult.averageDamage,
 							average: stabilityResult.averageDamage,
-							stability: stabilityResult.stabilityRate,
+							stability: stabilityRate,
+							averageStability: stabilityRate,
 						}
-					default:
+					}
+					default: {
+						// 通常ダメージ：最大=基本ダメージ、最小=基本ダメージ×安定率（小数点以下切り捨て）
+						const minStabilityRate = stabilityRate
+						const maxStabilityRate = 100
+						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
+						
 						return {
-							min: stabilityResult.minDamage,
-							max: stabilityResult.maxDamage,
-							average: stabilityResult.averageDamage,
-							stability: stabilityResult.stabilityRate,
+							min: Math.floor(baseDamage * stabilityRate / 100),
+							max: baseDamage,
+							average: Math.floor(baseDamage * averageStabilityRate / 100),
+							stability: stabilityRate,
+							averageStability: averageStabilityRate,
 						}
+					}
 				}
 			}
 
@@ -547,8 +703,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.error('ダメージ計算エラー:', error)
 			// エラー時はフォールバック値を返す
 			return {
-				normal: { min: 1000, max: 1500, average: 1250, stability: 85 },
-				skill: { min: 1200, max: 1800, average: 1500, stability: 85 },
+				normal: { min: 1000, max: 1500, average: 1250, stability: 85, averageStability: 92 },
+				skill: { min: 1200, max: 1800, average: 1500, stability: 85, averageStability: 92 },
 			}
 		}
 	}, [calculatorData, calculationResults, powerOptions])
@@ -557,9 +713,32 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		return null
 	}
 
-	const handleScreenshot = () => {
-		// スクリーンショット機能（将来実装）
-		console.log('キャプチャ機能は将来実装予定です')
+	// キャプチャボタンクリック処理
+	const handleCapture = () => {
+		try {
+			// 現在のダメージ値を取得
+			const currentDamage = damageResults.normal
+
+			// キャプチャデータを作成
+			const newCaptureData = createCaptureData(
+				currentDamage.min,
+				currentDamage.max,
+				currentDamage.average,
+				currentDamage.stability,
+				currentDamage.averageStability,
+			)
+
+			// LocalStorageに保存
+			saveCaptureData(newCaptureData)
+
+			// 状態を更新
+			setCaptureData(newCaptureData)
+
+			console.log('ダメージをキャプチャしました:', newCaptureData)
+		} catch (error) {
+			console.error('キャプチャに失敗しました:', error)
+			alert('キャプチャに失敗しました')
+		}
 	}
 
 	const updatePowerOption = <K extends keyof PowerOptions>(
@@ -572,117 +751,127 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	return (
 		<div className="bg-blue-50 py-2">
 			<div className="container mx-auto px-4">
-				{/* キャプチャボタン */}
-				<div className="mb-4 flex justify-end">
-					<button
-						onClick={handleScreenshot}
-						className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2 cursor-pointer"
-					>
-						<svg
-							className="w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-							/>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-							/>
-						</svg>
-						キャプチャ
-					</button>
-				</div>
-
 				{/* ダメージ表示テーブル */}
-				<div className="mb-6 overflow-x-auto">
+				<div className="overflow-x-auto">
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b border-gray-200">
-								<th className="sm:px-4 py-3 text-left text-gray-700 font-medium" />
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="sm:px-2 py-3 text-left text-gray-700 font-medium" />
+								<th
+									className="px-1 sm:px-2 py-3 text-center text-gray-700 font-medium"
+									colSpan={2}
+								>
+									現在の計算結果
+								</th>
+								<th
+									className="px-1 sm:px-2 py-3 text-center text-gray-700 font-medium"
+									colSpan={2}
+								>
+									<button
+										onClick={handleCapture}
+										className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 cursor-pointer text-sm mx-auto"
+									>
+										<svg
+											className="w-3 h-3"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+											/>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+											/>
+										</svg>
+										キャプチャ
+									</button>
+								</th>
+							</tr>
+							<tr className="border-b border-gray-200">
+								<th className="sm:px-2 py-1 text-left text-gray-700 font-medium" />
+								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
 									安定率
 								</th>
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
 									安定率
 								</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr className="border-b border-gray-100">
-								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+								<td className="px-1 sm:pl-4 sm:pr-2 py-1 font-medium text-gray-700">
 									最小
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
 									{damageResults.normal.min.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-700 font-roboto">
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-700 font-roboto">
 									{damageResults.normal.stability}%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
-									{damageResults.skill.min.toLocaleString()}
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
+									{captureData
+										? captureData.damageResult.minimum.damage.toLocaleString()
+										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-700 font-roboto">
-									{damageResults.skill.stability}%
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-700 font-roboto">
+									{captureData
+										? `${captureData.damageResult.minimum.stability}%`
+										: '-'}
 								</td>
 							</tr>
 							<tr className="border-b border-gray-100">
-								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+								<td className="px-1 sm:px-4 py-1 font-medium text-gray-700">
 									最大
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
 									{damageResults.normal.max.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
 									100%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
-									{damageResults.skill.max.toLocaleString()}
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
+									{captureData
+										? captureData.damageResult.maximum.damage.toLocaleString()
+										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
-									100%
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+									{captureData
+										? `${captureData.damageResult.maximum.stability}%`
+										: '-'}
 								</td>
 							</tr>
 							<tr>
-								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+								<td className="px-1 sm:px-4 py-1 font-medium text-gray-700">
 									平均
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-bold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-bold text-gray-700 font-roboto">
 									{damageResults.normal.average.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
-									{Math.round(
-										((damageResults.normal.min + damageResults.normal.max) /
-											2 /
-											damageResults.normal.max) *
-											100,
-									)}
-									%
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+									{damageResults.normal.averageStability}%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-bold text-gray-700 font-roboto">
-									{damageResults.skill.average.toLocaleString()}
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-bold text-gray-700 font-roboto">
+									{captureData
+										? captureData.damageResult.average.damage.toLocaleString()
+										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
-									{Math.round(
-										((damageResults.skill.min + damageResults.skill.max) /
-											2 /
-											damageResults.skill.max) *
-											100,
-									)}
-									%
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+									{captureData
+										? `${captureData.damageResult.average.stability}%`
+										: '-'}
 								</td>
 							</tr>
 						</tbody>
@@ -690,7 +879,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* 慣れ倍率スライダー（後で実装予定の枠） */}
-				<div className="bg-white rounded-lg border border-gray-200 p-4 mb-6 flex items-center gap-2">
+				<div className="p-2 flex items-center">
 					<div className="text-[13px] font-medium text-gray-700">
 						慣れ倍率（後で実装）
 					</div>

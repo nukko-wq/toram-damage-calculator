@@ -86,7 +86,8 @@ export default function AttackSkillForm({
 					familiarityGrant: originalHit.familiarityGrant,
 					canUseUnsheathePower: originalHit.canUseUnsheathePower,
 					canUseLongRange: originalHit.canUseLongRange,
-					canUseDistancePower: originalHit.canUseDistancePower,
+					canUseShortRangePower: originalHit.canUseShortRangePower,
+					canUseLongRangePower: originalHit.canUseLongRangePower,
 					calculationProcess: calculatedHit.calculationProcess,
 				}
 			},
@@ -143,7 +144,8 @@ export default function AttackSkillForm({
 						familiarityGrant: originalHit.familiarityGrant,
 						canUseUnsheathePower: originalHit.canUseUnsheathePower,
 						canUseLongRange: originalHit.canUseLongRange,
-						canUseDistancePower: originalHit.canUseDistancePower,
+						canUseShortRangePower: originalHit.canUseShortRangePower,
+						canUseLongRangePower: originalHit.canUseLongRangePower,
 						calculationProcess: calculatedHit.calculationProcess,
 					}
 				})
@@ -349,29 +351,37 @@ export default function AttackSkillForm({
 										</div>
 									</div>
 
-									{/* 3行目: 3列表示 (距離威力、抜刀威力、ロングレンジ) */}
+									{/* 3行目: 3列表示 (近距離威力、遠距離威力、抜刀威力) */}
 									<div className="border-b border-gray-300 grid grid-cols-3">
 										<div className="px-3 py-2 border-r border-gray-300">
-											<span className="text-gray-600">距離威力:</span>{' '}
+											<span className="text-gray-600">近距離威力:</span>{' '}
 											<span className="text-gray-700">
-												{currentHit.canUseDistancePower ? '○' : '×'}
+												{currentHit.canUseShortRangePower ? '○' : '×'}
 											</span>
 										</div>
 										<div className="px-3 py-2 border-r border-gray-300">
+											<span className="text-gray-600">遠距離威力:</span>{' '}
+											<span className="text-gray-700">
+												{currentHit.canUseLongRangePower ? '○' : '×'}
+											</span>
+										</div>
+										<div className="px-3 py-2">
 											<span className="text-gray-600">抜刀威力:</span>{' '}
 											<span className="text-gray-700">
 												{currentHit.canUseUnsheathePower ? '○' : '×'}
 											</span>
 										</div>
-										<div className="px-3 py-2">
-											<span className="text-gray-600">ロングレンジ:</span>{' '}
-											<span className="text-gray-700">
-												{currentHit.canUseLongRange ? '○' : '×'}
-											</span>
-										</div>
 									</div>
 
-									{/* 4行目: 1列表示 (威力参照) */}
+									{/* 4行目: 1列表示 (ロングレンジ) */}
+									<div className="border-b border-gray-300 px-3 py-2">
+										<span className="text-gray-600">ロングレンジ:</span>{' '}
+										<span className="text-gray-700">
+											{currentHit.canUseLongRange ? '○' : '×'}
+										</span>
+									</div>
+
+									{/* 5行目: 1列表示 (威力参照) */}
 									<div className="px-3 py-2">
 										<span className="text-gray-700">威力参照/攻撃力:</span>{' '}
 										<span className="text-gray-700">

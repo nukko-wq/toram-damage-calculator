@@ -220,12 +220,32 @@ const finalDEF = Math.floor(processedDEF * (1 - penetrationRate / 100))
 
 #### 有利（属性有利）
 ```typescript
-const totalAdvantage = basicStats.totalElementAdvantage + elementAwakeningAdvantage
+const totalAdvantage = calculateElementAdvantage(basicStats, powerOptions)
+
+function calculateElementAdvantage(basicStats: BasicStats, powerOptions: PowerOptions): number {
+  switch (powerOptions.elementPower) {
+    case 'disabled':
+      return 0 // 属性威力無効時は0
+    case 'awakeningOnly':
+      return 25 // 覚醒のみ時は25%固定
+    case 'advantageOnly':
+      return basicStats.totalElementAdvantage // 装備品補正値1の総属性有利のみ
+    case 'enabled':
+      return basicStats.totalElementAdvantage + 25 // 総属性有利 + 属性覚醒25%
+    default:
+      return basicStats.totalElementAdvantage
+  }
+}
 ```
-- **総属性有利**: 基本ステータスの総属性有利
-- **属性覚醒有利**: 25%固定（実装予定）
-- **計算方式**: 加算（総属性有利 + 属性覚醒有利）
-- **選択制御**: DamagePreview.tsxで属性攻撃が有効かどうか選択可能
+
+- **総属性有利**: 基本ステータスの総属性有利（装備品補正値1から算出）
+- **属性覚醒有利**: 25%固定
+- **計算方式**: 属性威力オプションに応じて決定
+  - **有効**: 総属性有利 + 25%（属性覚醒）
+  - **有利のみ**: 総属性有利のみ（属性覚醒なし）
+  - **覚醒のみ**: 25%固定（装備品の属性有利無視）
+  - **無効**: 0%（属性有利計算を完全に無効化）
+- **選択制御**: DamagePreview.tsxで属性攻撃および属性威力オプションで制御
 
 #### スキル倍率
 - **説明**: 攻撃スキルごとに設定される倍率
