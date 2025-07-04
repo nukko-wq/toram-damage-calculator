@@ -149,30 +149,33 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 			// PowerOptionsに基づく属性攻撃設定
 			const getElementAdvantageTotal = () => {
-				// 属性攻撃が無効、または属性威力が無効の場合は0を返す
-				if (
-					powerOptions.elementAttack === 'none' ||
-					powerOptions.elementPower === 'disabled'
-				)
+				// 属性攻撃が無効の場合は0を返す
+				if (powerOptions.elementAttack === 'none') {
 					return 0
+				}
+
 				// 基本ステータスから総属性有利を取得（装備・クリスタ・料理・バフ統合済み）
 				const baseAdvantage =
 					calculationResults?.basicStats?.totalElementAdvantage ?? 0
 
-				// 属性攻撃が有効な場合は基本ステータスの総属性有利をそのまま使用
-				// PowerOptionsの設定は属性攻撃の有効/無効の判定にのみ使用
-				return baseAdvantage
+				// 属性威力オプションに応じて計算
+				switch (powerOptions.elementPower) {
+					case 'disabled':
+						return 0 // 属性威力無効時は0
+					case 'awakeningOnly':
+						return 25 // 覚醒のみ時は25%固定
+					case 'advantageOnly':
+						return baseAdvantage // 装備品補正値1の総属性有利のみ
+					case 'enabled':
+						return baseAdvantage + 25 // 総属性有利 + 属性覚醒25%
+					default:
+						return baseAdvantage
+				}
 			}
 
 			const getElementAdvantageAwakening = () => {
-				// 属性攻撃が無効、または属性威力が無効の場合は0を返す
-				if (
-					powerOptions.elementAttack === 'none' ||
-					powerOptions.elementPower === 'disabled'
-				)
-					return 0
-				// 実際の計算結果から属性覚醒有利を取得
-				return calculationResults?.basicStats?.elementAwakeningAdvantage ?? 0
+				// 属性覚醒は常に0（getElementAdvantageTotalで統合計算されるため）
+				return 0
 			}
 
 			// PowerOptionsに基づく距離設定
