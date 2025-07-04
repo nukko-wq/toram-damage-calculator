@@ -9,7 +9,7 @@ import {
 } from '@/utils/damageCalculation'
 import { getAttackSkillById } from '@/data/attackSkills'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
-import { getEnemyById } from '@/utils/enemyDatabase'
+import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import {
 	getEquipmentBonuses,
 	getCrystalBonuses,
@@ -79,6 +79,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		}
 	}, [calculationResults, updateCalculationResults])
 
+	// 選択されている敵の名前を取得
+	const getSelectedEnemyName = (): string => {
+		if (calculatorData.enemy?.selectedEnemyId) {
+			const enemy = getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
+			if (enemy) {
+				return enemy.name
+			}
+		}
+		return '未選択'
+	}
+
 	// 実際のダメージ計算
 	const damageResults = useMemo((): DamageResults => {
 		try {
@@ -92,7 +103,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// 敵情報を取得
 			let enemyInfo = null
 			if (calculatorData.enemy?.selectedEnemyId) {
-				enemyInfo = getEnemyById(calculatorData.enemy.selectedEnemyId)
+				enemyInfo = getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
 			}
 
 			// 実際の装備品ボーナスを計算
@@ -1005,7 +1016,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 				{/* 敵情報 */}
 				<div className="p-1 sm:p-2 flex items-center gap-2">
-					<p className="text-sm font-medium text-gray-700">敵：ラフィー</p>
+					<p className="text-sm font-medium text-gray-700">敵：{getSelectedEnemyName()}</p>
 				</div>
 
 				{/* 威力オプション */}

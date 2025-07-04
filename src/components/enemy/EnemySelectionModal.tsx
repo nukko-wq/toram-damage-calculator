@@ -131,7 +131,7 @@ export default function EnemySelectionModal({
 						</h2>
 						<button
 							onClick={onClose}
-							className="text-gray-400 hover:text-gray-600 transition-colors"
+							className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
 							aria-label="閉じる"
 						>
 							<svg
@@ -160,7 +160,7 @@ export default function EnemySelectionModal({
 							<button
 								key={filter}
 								onClick={() => setActiveFilter(filter)}
-								className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+								className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
 									activeFilter === filter
 										? 'bg-blue-500 text-white'
 										: 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
@@ -278,7 +278,7 @@ export default function EnemySelectionModal({
 					<div className="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
 						<button
 							onClick={onClose}
-							className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+							className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
 						>
 							キャンセル
 						</button>
