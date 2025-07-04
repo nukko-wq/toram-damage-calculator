@@ -40,6 +40,21 @@ interface PowerOptions {
 	unsheathe: boolean
 }
 
+// ダメージ表示結果の型定義
+interface DamageDisplayResult {
+	min: number
+	max: number
+	average: number
+	stability: number
+	averageStability: number
+}
+
+// ダメージ計算結果の型定義
+interface DamageResults {
+	normal: DamageDisplayResult
+	skill: DamageDisplayResult
+}
+
 export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	// 威力オプション設定の状態管理
 	const [powerOptions, setPowerOptions] = useState<PowerOptions>({
@@ -79,7 +94,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	}, [calculationResults, updateCalculationResults])
 
 	// 実際のダメージ計算
-	const damageResults = useMemo(() => {
+	const damageResults = useMemo((): DamageResults => {
 		try {
 			// 基本的な計算入力データを作成
 			const defaultInput = createDefaultDamageInput()
@@ -592,8 +607,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.error('ダメージ計算エラー:', error)
 			// エラー時はフォールバック値を返す
 			return {
-				normal: { min: 1000, max: 1500, average: 1250, stability: 85 },
-				skill: { min: 1200, max: 1800, average: 1500, stability: 85 },
+				normal: { min: 1000, max: 1500, average: 1250, stability: 85, averageStability: 92 },
+				skill: { min: 1200, max: 1800, average: 1500, stability: 85, averageStability: 92 },
 			}
 		}
 	}, [calculatorData, calculationResults, powerOptions])
@@ -640,35 +655,6 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	return (
 		<div className="bg-blue-50 py-2">
 			<div className="container mx-auto px-4">
-				{/* キャプチャボタン */}
-				<div className="mb-4 flex justify-end">
-					<button
-						onClick={handleCapture}
-						className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2 cursor-pointer"
-					>
-						<svg
-							className="w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-							/>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-							/>
-						</svg>
-						キャプチャ
-					</button>
-				</div>
-
 				{/* ダメージ表示テーブル */}
 				<div className="overflow-x-auto">
 					<table className="w-full text-sm">
@@ -685,7 +671,31 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									className="px-1 sm:px-2 py-3 text-center text-gray-700 font-medium"
 									colSpan={2}
 								>
-									キャプチャしたダメージ
+									<button
+										onClick={handleCapture}
+										className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 cursor-pointer text-sm mx-auto"
+									>
+										<svg
+											className="w-3 h-3"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+											/>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+											/>
+										</svg>
+										キャプチャ
+									</button>
 								</th>
 							</tr>
 							<tr className="border-b border-gray-200">
