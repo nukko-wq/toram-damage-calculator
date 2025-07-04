@@ -23,21 +23,11 @@ import {
 	loadCaptureData,
 	createCaptureData,
 } from '@/utils/damageCaptureStorage'
+import type { PowerOptions } from '@/types/calculator'
+import { createInitialPowerOptions } from '@/utils/initialData'
 
 interface DamagePreviewProps {
 	isVisible: boolean
-}
-
-// 威力オプション設定の型定義
-interface PowerOptions {
-	bossDifficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate'
-	skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3'
-	elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous'
-	combo: boolean
-	damageType: 'critical' | 'graze' | 'expected' | 'white'
-	distance: 'short' | 'long' | 'disabled'
-	elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'
-	unsheathe: boolean
 }
 
 // ダメージ表示結果の型定義
@@ -56,17 +46,13 @@ interface DamageResults {
 }
 
 export default function DamagePreview({ isVisible }: DamagePreviewProps) {
-	// 威力オプション設定の状態管理
-	const [powerOptions, setPowerOptions] = useState<PowerOptions>({
-		bossDifficulty: 'normal',
-		skillDamage: 'all',
-		elementAttack: 'advantageous',
-		combo: false,
-		damageType: 'white',
-		distance: 'disabled',
-		elementPower: 'enabled',
-		unsheathe: false,
-	})
+	// 威力オプション設定をZustandストアから取得（フォールバック付き）
+	const powerOptions =
+		useCalculatorStore((state) => state.data.powerOptions) ||
+		createInitialPowerOptions()
+	const updatePowerOptions = useCalculatorStore(
+		(state) => state.updatePowerOptions,
+	)
 
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
@@ -286,10 +272,24 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// 3. ダメージタイプとクリティカル設定
 			console.log('3. ダメージタイプ設定:')
 			console.log('  ダメージタイプ:', powerOptions.damageType)
-			console.log('  input.userSettings.damageType:', input.userSettings.damageType)
-			console.log('  クリティカルダメージ input.critical.damage:', input.critical.damage)
-			console.log('  元データ calculationResults?.basicStats.criticalDamage:', calculationResults?.basicStats.criticalDamage)
-			console.log('  クリティカル判定:', input.userSettings.damageType === 'critical' ? 'クリティカル計算を実行' : '通常計算を実行')
+			console.log(
+				'  input.userSettings.damageType:',
+				input.userSettings.damageType,
+			)
+			console.log(
+				'  クリティカルダメージ input.critical.damage:',
+				input.critical.damage,
+			)
+			console.log(
+				'  元データ calculationResults?.basicStats.criticalDamage:',
+				calculationResults?.basicStats.criticalDamage,
+			)
+			console.log(
+				'  クリティカル判定:',
+				input.userSettings.damageType === 'critical'
+					? 'クリティカル計算を実行'
+					: '通常計算を実行',
+			)
 
 			// 3. 敵の耐性
 			console.log('3. 敵の耐性:')
@@ -385,7 +385,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('================================')
 
 			// 攻撃スキルが選択されている場合は、スキルの計算結果を使用
-			const attackResults: Array<{hitNumber: number, result: ReturnType<typeof calculateDamage>}> = []
+			const attackResults: Array<{
+				hitNumber: number
+				result: ReturnType<typeof calculateDamage>
+			}> = []
 			if (calculatorData.attackSkill?.selectedSkillId) {
 				const selectedSkill = getAttackSkillById(
 					calculatorData.attackSkill.selectedSkillId,
@@ -403,11 +406,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					const getTargetHits = () => {
 						switch (powerOptions.skillDamage) {
 							case 'hit1':
-								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 1)
+								return skillCalculationResult.hits.filter(
+									(hit) => hit.hitNumber === 1,
+								)
 							case 'hit2':
-								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 2)
+								return skillCalculationResult.hits.filter(
+									(hit) => hit.hitNumber === 2,
+								)
 							case 'hit3':
-								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 3)
+								return skillCalculationResult.hits.filter(
+									(hit) => hit.hitNumber === 3,
+								)
 							case 'all':
 								// 1～6撃目全てを対象（スキルに存在する全ての撃の合計）
 								return skillCalculationResult.hits
@@ -421,7 +430,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					// 各撃に対してダメージ計算を実行
 					for (const hitResult of targetHits) {
 						const originalHit = selectedSkill.hits.find(
-							hit => hit.hitNumber === hitResult.hitNumber
+							(hit) => hit.hitNumber === hitResult.hitNumber,
 						)
 						if (!originalHit) continue
 
@@ -455,7 +464,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						const hitAttackResult = calculateDamage(skillInput)
 						attackResults.push({
 							hitNumber: hitResult.hitNumber,
-							result: hitAttackResult
+							result: hitAttackResult,
 						})
 					}
 				}
@@ -464,7 +473,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				const normalAttackResult = calculateDamage(input)
 				attackResults.push({
 					hitNumber: 1,
-					result: normalAttackResult
+					result: normalAttackResult,
 				})
 			}
 
@@ -472,14 +481,15 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const totalAttackResult = (() => {
 				if (attackResults.length === 0) {
 					// 存在しない撃を選択した場合（例：ムーンスラッシュの3撃目）は0ダメージを返す
-					const defaultStabilityRate = calculationResults?.basicStats.stabilityRate || 85
+					const defaultStabilityRate =
+						calculationResults?.basicStats.stabilityRate || 85
 					return {
 						baseDamage: 0,
 						stabilityResult: {
 							minDamage: 0,
 							maxDamage: 0,
 							averageDamage: 0,
-							stabilityRate: defaultStabilityRate
+							stabilityRate: defaultStabilityRate,
 						},
 						calculationSteps: {
 							step1_baseDamage: {
@@ -492,9 +502,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								weaponResistanceRate: 0,
 								afterResistance: 0,
 								enemyDEF: 0,
-								result: 0
-							}
-						} as any
+								result: 0,
+							},
+						} as any,
 					}
 				}
 
@@ -505,21 +515,25 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 				// 複数撃の合計計算（'all'選択時）
 				const totalBaseDamage = attackResults.reduce(
-					(sum, hit) => sum + hit.result.baseDamage, 0
+					(sum, hit) => sum + hit.result.baseDamage,
+					0,
 				)
-				
+
 				// 安定率は最初の撃の値を使用（全撃で同じ安定率のため）
-				const stabilityRate = attackResults[0].result.stabilityResult.stabilityRate
-				
+				const stabilityRate =
+					attackResults[0].result.stabilityResult.stabilityRate
+
 				return {
 					baseDamage: totalBaseDamage,
 					stabilityResult: {
-						minDamage: Math.floor(totalBaseDamage * stabilityRate / 100),
+						minDamage: Math.floor((totalBaseDamage * stabilityRate) / 100),
 						maxDamage: totalBaseDamage,
-						averageDamage: Math.floor(totalBaseDamage * (stabilityRate + 100) / 2 / 100),
-						stabilityRate: stabilityRate
+						averageDamage: Math.floor(
+							(totalBaseDamage * (stabilityRate + 100)) / 2 / 100,
+						),
+						stabilityRate: stabilityRate,
 					},
-					calculationSteps: attackResults[0].result.calculationSteps // 最初の撃の計算過程を参考表示
+					calculationSteps: attackResults[0].result.calculationSteps, // 最初の撃の計算過程を参考表示
 				}
 			})()
 
@@ -534,7 +548,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('平均ダメージ:', attackResult.stabilityResult.averageDamage)
 			console.log('')
 			console.log('=== CALCULATION STEPS ===')
-			
+
 			// クリティカル計算が実行されたかチェック（ステップ2a）
 			if (attackResult.calculationSteps.step2a_critical) {
 				const step2a = attackResult.calculationSteps.step2a_critical
@@ -543,7 +557,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				console.log('  クリティカル倍率:', step2a.criticalRate + '%')
 				console.log('  クリティカル適用後:', step2a.result)
 			}
-			
+
 			// ブレイブ倍率ステップ
 			if (attackResult.calculationSteps.step10_brave) {
 				const step10 = attackResult.calculationSteps.step10_brave
@@ -552,7 +566,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				console.log('  ブレイブ倍率:', step10.braveRate + '%')
 				console.log('  適用後:', step10.result)
 			}
-			
+
 			if (attackResult.calculationSteps.step1_baseDamage) {
 				const step1 = attackResult.calculationSteps.step1_baseDamage
 				console.log('ステップ1 基礎ダメージ:')
@@ -659,12 +673,14 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						// 白ダメ：基本ダメージに対して安定率を適用
 						const minStabilityRate = stabilityRate
 						const maxStabilityRate = 100
-						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
-						
+						const averageStabilityRate = Math.floor(
+							(minStabilityRate + maxStabilityRate) / 2,
+						)
+
 						return {
-							min: Math.floor(baseDamage * stabilityRate / 100),
+							min: Math.floor((baseDamage * stabilityRate) / 100),
 							max: baseDamage,
-							average: Math.floor(baseDamage * averageStabilityRate / 100),
+							average: Math.floor((baseDamage * averageStabilityRate) / 100),
 							stability: stabilityRate,
 							averageStability: averageStabilityRate,
 						}
@@ -673,19 +689,27 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						// クリティカル：baseDamageがすでにクリティカル計算済み
 						const minStabilityRate = stabilityRate
 						const maxStabilityRate = 100
-						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
-						
+						const averageStabilityRate = Math.floor(
+							(minStabilityRate + maxStabilityRate) / 2,
+						)
+
 						console.log('=== CRITICAL DISPLAY DEBUG ===')
 						console.log('baseDamage (クリティカル計算済み):', baseDamage)
 						console.log('stabilityRate:', stabilityRate)
-						console.log('計算される最小ダメージ:', Math.floor(baseDamage * stabilityRate / 100))
+						console.log(
+							'計算される最小ダメージ:',
+							Math.floor((baseDamage * stabilityRate) / 100),
+						)
 						console.log('計算される最大ダメージ:', baseDamage)
-						console.log('計算される平均ダメージ:', Math.floor(baseDamage * averageStabilityRate / 100))
-						
+						console.log(
+							'計算される平均ダメージ:',
+							Math.floor((baseDamage * averageStabilityRate) / 100),
+						)
+
 						return {
-							min: Math.floor(baseDamage * stabilityRate / 100),
+							min: Math.floor((baseDamage * stabilityRate) / 100),
 							max: baseDamage,
-							average: Math.floor(baseDamage * averageStabilityRate / 100),
+							average: Math.floor((baseDamage * averageStabilityRate) / 100),
 							stability: stabilityRate,
 							averageStability: averageStabilityRate,
 						}
@@ -695,12 +719,16 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						const grazeBaseDamage = Math.floor(baseDamage * 0.1)
 						const minStabilityRate = stabilityRate
 						const maxStabilityRate = 100
-						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
-						
+						const averageStabilityRate = Math.floor(
+							(minStabilityRate + maxStabilityRate) / 2,
+						)
+
 						return {
-							min: Math.floor(grazeBaseDamage * stabilityRate / 100),
+							min: Math.floor((grazeBaseDamage * stabilityRate) / 100),
 							max: grazeBaseDamage,
-							average: Math.floor(grazeBaseDamage * averageStabilityRate / 100),
+							average: Math.floor(
+								(grazeBaseDamage * averageStabilityRate) / 100,
+							),
 							stability: stabilityRate,
 							averageStability: averageStabilityRate,
 						}
@@ -719,12 +747,14 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						// 通常ダメージ：最大=基本ダメージ、最小=基本ダメージ×安定率（小数点以下切り捨て）
 						const minStabilityRate = stabilityRate
 						const maxStabilityRate = 100
-						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
-						
+						const averageStabilityRate = Math.floor(
+							(minStabilityRate + maxStabilityRate) / 2,
+						)
+
 						return {
-							min: Math.floor(baseDamage * stabilityRate / 100),
+							min: Math.floor((baseDamage * stabilityRate) / 100),
 							max: baseDamage,
-							average: Math.floor(baseDamage * averageStabilityRate / 100),
+							average: Math.floor((baseDamage * averageStabilityRate) / 100),
 							stability: stabilityRate,
 							averageStability: averageStabilityRate,
 						}
@@ -743,9 +773,18 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('表示される安定率:', damageDisplay.stability)
 			console.log('表示される平均安定率:', damageDisplay.averageStability)
 			console.log('コンソールログの最終ダメージ:', attackResult.baseDamage)
-			console.log('コンソールログの最小ダメージ:', attackResult.stabilityResult.minDamage)
-			console.log('コンソールログの最大ダメージ:', attackResult.stabilityResult.maxDamage)
-			console.log('コンソールログの平均ダメージ:', attackResult.stabilityResult.averageDamage)
+			console.log(
+				'コンソールログの最小ダメージ:',
+				attackResult.stabilityResult.minDamage,
+			)
+			console.log(
+				'コンソールログの最大ダメージ:',
+				attackResult.stabilityResult.maxDamage,
+			)
+			console.log(
+				'コンソールログの平均ダメージ:',
+				attackResult.stabilityResult.averageDamage,
+			)
 			console.log('============================')
 
 			return {
@@ -756,8 +795,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.error('ダメージ計算エラー:', error)
 			// エラー時はフォールバック値を返す
 			return {
-				normal: { min: 1000, max: 1500, average: 1250, stability: 85, averageStability: 92 },
-				skill: { min: 1200, max: 1800, average: 1500, stability: 85, averageStability: 92 },
+				normal: {
+					min: 1000,
+					max: 1500,
+					average: 1250,
+					stability: 85,
+					averageStability: 92,
+				},
+				skill: {
+					min: 1200,
+					max: 1800,
+					average: 1500,
+					stability: 85,
+					averageStability: 92,
+				},
 			}
 		}
 	}, [calculatorData, calculationResults, powerOptions])
@@ -794,11 +845,22 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		}
 	}
 
-	const updatePowerOption = <K extends keyof PowerOptions>(
+	const handlePowerOptionChange = <K extends keyof PowerOptions>(
 		key: K,
 		value: PowerOptions[K],
 	) => {
-		setPowerOptions((prev) => ({ ...prev, [key]: value }))
+		updatePowerOptions({ ...powerOptions, [key]: value })
+	}
+
+	// powerOptionsが存在しない場合のフォールバック表示
+	if (!powerOptions) {
+		return (
+			<div className="bg-blue-50 py-2">
+				<div className="container mx-auto px-4">
+					<div className="text-center py-4">Loading...</div>
+				</div>
+			</div>
+		)
 	}
 
 	return (
@@ -971,7 +1033,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 										<button
 											key={difficulty}
 											onClick={() =>
-												updatePowerOption('bossDifficulty', difficulty)
+												handlePowerOptionChange('bossDifficulty', difficulty)
 											}
 											className={`px-3 py-0.5 sm:py-1 text-xs md:text-[13px] rounded ${
 												powerOptions.bossDifficulty === difficulty
@@ -1001,7 +1063,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								{(['all', 'hit1', 'hit2', 'hit3'] as const).map((hit) => (
 									<button
 										key={hit}
-										onClick={() => updatePowerOption('skillDamage', hit)}
+										onClick={() => handlePowerOptionChange('skillDamage', hit)}
 										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.skillDamage === hit
 												? 'bg-blue-400 text-white'
@@ -1031,7 +1093,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								).map((element) => (
 									<button
 										key={element}
-										onClick={() => updatePowerOption('elementAttack', element)}
+										onClick={() =>
+											handlePowerOptionChange('elementAttack', element)
+										}
 										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.elementAttack === element
 												? 'bg-pink-400 text-white'
@@ -1062,7 +1126,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								].map((option) => (
 									<button
 										key={option.label}
-										onClick={() => updatePowerOption('combo', option.value)}
+										onClick={() =>
+											handlePowerOptionChange('combo', option.value)
+										}
 										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.combo === option.value
 												? 'bg-rose-400 text-white'
@@ -1085,7 +1151,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									(type) => (
 										<button
 											key={type}
-											onClick={() => updatePowerOption('damageType', type)}
+											onClick={() =>
+												handlePowerOptionChange('damageType', type)
+											}
 											className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 												powerOptions.damageType === type
 													? 'bg-amber-400 text-white'
@@ -1114,7 +1182,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								{(['short', 'long', 'disabled'] as const).map((distance) => (
 									<button
 										key={distance}
-										onClick={() => updatePowerOption('distance', distance)}
+										onClick={() =>
+											handlePowerOptionChange('distance', distance)
+										}
 										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.distance === distance
 												? 'bg-rose-400 text-white'
@@ -1147,7 +1217,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								).map((power) => (
 									<button
 										key={power}
-										onClick={() => updatePowerOption('elementPower', power)}
+										onClick={() =>
+											handlePowerOptionChange('elementPower', power)
+										}
 										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.elementPower === power
 												? 'bg-rose-400 text-white'
@@ -1178,7 +1250,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								].map((option) => (
 									<button
 										key={option.label}
-										onClick={() => updatePowerOption('unsheathe', option.value)}
+										onClick={() =>
+											handlePowerOptionChange('unsheathe', option.value)
+										}
 										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
 											powerOptions.unsheathe === option.value
 												? 'bg-rose-400 text-white'

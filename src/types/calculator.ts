@@ -375,6 +375,7 @@ export interface CalculatorData {
 	buffItems: BuffItemFormData // バフアイテムデータ
 	register: RegisterFormData // レジスタ他データ
 	attackSkill: AttackSkillFormData // 攻撃スキルデータ
+	powerOptions: PowerOptions // ダメージプレビュー威力オプション設定
 }
 
 // 計算結果
@@ -752,6 +753,18 @@ export interface RegisterEffect {
 // レジスタフォームデータ
 export interface RegisterFormData {
 	effects: RegisterEffect[]
+}
+
+// ダメージプレビュー威力オプション設定
+export interface PowerOptions {
+	bossDifficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate'  // ボス戦難易度
+	skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3'              // スキルダメージ
+	elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous'  // 属性攻撃
+	combo: boolean                                              // コンボ:強打
+	damageType: 'critical' | 'graze' | 'expected' | 'white'    // ダメージ判定
+	distance: 'short' | 'long' | 'disabled'                    // 距離判定
+	elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'  // 属性威力
+	unsheathe: boolean                                          // 抜刀威力
 }
 
 // 攻撃スキルシステム

@@ -254,11 +254,174 @@ export const clearCaptureData = (): void => {
 - **データ利用**: どのセーブデータからでもアクセス可能
 - **保存内容**: ダメージ値と安定率のみ（シンプルな比較用データ）
 
+## 威力オプション設定の永続化
+
+### 概要
+ダメージプレビューの威力オプション設定をセーブデータ毎にローカルストレージに保存し、セーブデータ切り替え時にも設定を維持する機能を実装します。
+
+### 保存対象の威力オプション
+```typescript
+interface PowerOptions {
+  bossDifficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate'  // ボス戦難易度
+  skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3'              // スキルダメージ
+  elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous'  // 属性攻撃
+  combo: boolean                                              // コンボ:強打
+  damageType: 'critical' | 'graze' | 'expected' | 'white'    // ダメージ判定
+  distance: 'short' | 'long' | 'disabled'                    // 距離判定
+  elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'  // 属性威力
+  unsheathe: boolean                                          // 抜刀威力
+}
+```
+
+### 保存仕様
+
+#### セーブデータ統合方式
+威力オプションは各セーブデータに含めて保存し、セーブデータ切り替え時に連動して設定も切り替わります。
+
+```typescript
+interface SaveData {
+  id: string
+  name: string
+  isDefault: boolean
+  createdAt: string
+  updatedAt: string
+  order: number
+  data: {
+    // 既存のフォームデータ
+    baseStats: BaseStatsFormData
+    weapons: WeaponFormData
+    crystals: CrystalFormData
+    equipments: EquipmentFormData
+    food: FoodFormData
+    enemy: EnemyFormData
+    buffSkills: BuffSkillFormData
+    buffItems: BuffItemFormData
+    // 新規追加: 威力オプション設定
+    powerOptions: PowerOptions
+  }
+}
+```
+
+#### デフォルト値
+```typescript
+const DEFAULT_POWER_OPTIONS: PowerOptions = {
+  bossDifficulty: 'normal',
+  skillDamage: 'all',
+  elementAttack: 'advantageous',
+  combo: false,
+  damageType: 'white',
+  distance: 'disabled',
+  elementPower: 'enabled',
+  unsheathe: false
+}
+```
+
+### 保存タイミング
+
+#### 自動保存
+威力オプションの変更時に、現在のセーブデータに自動的に保存されます。
+
+#### 手動保存（「現在のデータを保存」ボタン）
+セーブデータ管理画面の「現在のデータを保存」ボタンを押すと、フォームデータと威力オプション設定の両方が保存されます。
+
+### 実装アーキテクチャ
+
+#### calculatorStore の拡張
+```typescript
+interface CalculatorStore {
+  // 既存データ
+  data: CalculatorFormData
+  
+  // 新規追加: 威力オプション
+  powerOptions: PowerOptions
+  
+  // 新規追加: 威力オプション更新メソッド
+  updatePowerOptions: (options: Partial<PowerOptions>) => void
+  
+  // 既存の差分検知システムに威力オプションも含める
+  hasUnsavedChanges: () => boolean  // 威力オプションの変更も検知
+}
+```
+
+#### saveDataManager の拡張
+```typescript
+// セーブデータの読み込み時に威力オプションも復元
+export const loadSaveData = async (saveId: string): Promise<void> => {
+  const saveData = await getSaveDataById(saveId)
+  if (saveData) {
+    // フォームデータの復元
+    calculatorStore.getState().setData(saveData.data)
+    
+    // 威力オプションの復元
+    const powerOptions = saveData.data.powerOptions || DEFAULT_POWER_OPTIONS
+    calculatorStore.getState().updatePowerOptions(powerOptions)
+  }
+}
+
+// セーブデータの保存時に威力オプションも保存
+export const saveSaveData = async (saveId: string): Promise<void> => {
+  const currentData = calculatorStore.getState().data
+  const currentPowerOptions = calculatorStore.getState().powerOptions
+  
+  await updateSaveData(saveId, {
+    data: {
+      ...currentData,
+      powerOptions: currentPowerOptions
+    }
+  })
+}
+```
+
+### データマイグレーション
+
+既存のセーブデータに威力オプションが含まれていない場合、デフォルト値で初期化します。
+
+```typescript
+const migrateOldSaveData = (saveData: any): SaveData => {
+  return {
+    ...saveData,
+    data: {
+      ...saveData.data,
+      powerOptions: saveData.data.powerOptions || DEFAULT_POWER_OPTIONS
+    }
+  }
+}
+```
+
+### UI との統合
+
+#### DamagePreview コンポーネント
+```typescript
+export default function DamagePreview({ isVisible }: DamagePreviewProps) {
+  // Zustandから威力オプションを取得
+  const powerOptions = useCalculatorStore((state) => state.powerOptions)
+  const updatePowerOptions = useCalculatorStore((state) => state.updatePowerOptions)
+  
+  // ローカルステートを削除し、Zustandから直接管理
+  const handlePowerOptionChange = (key: keyof PowerOptions, value: any) => {
+    updatePowerOptions({ [key]: value })
+  }
+  
+  // 以下既存のロジック
+}
+```
+
+#### 保存ボタンとの連携
+セーブデータ管理画面の「現在のデータを保存」ボタンを押すと、威力オプションも含めて保存されます。
+
+### メリット
+
+1. **設定の永続化**: セーブデータ切り替え時にも威力オプション設定が維持される
+2. **設定の共有**: 特定のビルド構成と威力オプションをセットで管理・共有可能
+3. **一貫性**: セーブデータシステムと統合されることで、データ管理が一元化される
+4. **UX向上**: ユーザーが毎回威力オプションを再設定する必要がなくなる
+
 ## 更新履歴
 
 | 日付 | 更新内容 | 備考 |
 |------|----------|------|
 | 2024-12-25 | DamagePreview UI設計書作成 | 初版作成 |
+| 2025-01-04 | 威力オプション永続化機能の設計追加 | セーブデータ統合方式で実装 |
 
 ## 関連ドキュメント
 - [ダメージ計算ロジック設計書](../calculations/damage-calculation.md) - ダメージ計算の詳細仕様

@@ -8,7 +8,7 @@ import type {
 import type { CalculatorData, EnemyFormData } from '@/types/calculator'
 import type { EquipmentSlots } from '@/types/calculator'
 import type { BuffSkillFormData } from '@/types/buffSkill'
-import { createInitialCalculatorData, migrateRegisterEffects } from '@/utils/initialData'
+import { createInitialCalculatorData, migrateRegisterEffects, createInitialPowerOptions } from '@/utils/initialData'
 // 敵設定はenemySettingsStoreで管理するため、このインポートは削除
 import {
 	saveCurrentData,
@@ -107,7 +107,12 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			setData: (data) => {
-				set({ data }, false, 'setData')
+				// powerOptionsが存在しない場合はデフォルト値で補完
+				const migratedData = {
+					...data,
+					powerOptions: data.powerOptions || createInitialPowerOptions(),
+				}
+				set({ data: migratedData }, false, 'setData')
 			},
 
 			resetUnsavedChanges: () => {
@@ -380,6 +385,11 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			updateRegister: (register) => {
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
 				dataUpdate({ register }, 'updateRegister')
+			},
+
+			updatePowerOptions: (powerOptions) => {
+				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				dataUpdate({ powerOptions }, 'updatePowerOptions')
 			},
 
 			updateRegisterEffect: (effectId, enabled) => {

@@ -14,6 +14,7 @@ import type {
 	RegisterFormData,
 	SaveData,
 	ArmorType,
+	PowerOptions,
 } from './calculator'
 import type { CalculationResults } from './calculationResult'
 import type { BuffSkillFormData } from './buffSkill'
@@ -102,6 +103,7 @@ export interface CalculatorStore {
 		partyMembers?: number,
 	) => void
 	resetRegisterData: () => void
+	updatePowerOptions: (powerOptions: PowerOptions) => void
 
 	// ===== カスタム装備管理 =====
 	createTemporaryCustomEquipment: (

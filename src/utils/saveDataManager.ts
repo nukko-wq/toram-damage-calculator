@@ -9,7 +9,7 @@ import type {
 	UpdateNotification,
 } from '@/types/calculator'
 import { StorageHelper, STORAGE_KEYS } from './storage'
-import { createInitialCalculatorData } from './initialData'
+import { createInitialCalculatorData, createInitialPowerOptions } from './initialData'
 import {
 	checkAndUpdatePresetData,
 	forceResetPresetData,
@@ -132,6 +132,24 @@ export async function createSaveData(
 }
 
 /**
+ * 古いセーブデータのマイグレーション（powerOptions追加対応）
+ */
+function migrateSaveData(saveData: SaveData): SaveData {
+	// powerOptionsが存在しない場合は追加
+	if (!(saveData.data as any).powerOptions) {
+		return {
+			...saveData,
+			data: {
+				...saveData.data,
+				powerOptions: createInitialPowerOptions(),
+			},
+		}
+	}
+	
+	return saveData
+}
+
+/**
  * セーブデータを読み込み
  */
 export async function loadSaveData(id: string): Promise<SaveData> {
@@ -145,7 +163,18 @@ export async function loadSaveData(id: string): Promise<SaveData> {
 		throw new Error(`Save data with id ${id} not found`)
 	}
 
-	return saveData
+	// マイグレーション実行
+	const migratedSaveData = migrateSaveData(saveData)
+	
+	// マイグレーションにより変更があった場合は保存
+	if (migratedSaveData !== saveData) {
+		const updatedList = saveDataList.map(save => 
+			save.id === id ? migratedSaveData : save
+		)
+		StorageHelper.set(STORAGE_KEYS.SAVE_DATA_LIST, updatedList)
+	}
+
+	return migratedSaveData
 }
 
 /**
