@@ -385,6 +385,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					)
 
 					// スキルダメージオプションに応じて計算対象の撃を決定
+					// 注意：UIでは3撃目までしか表示しないが、実際のスキルには6撃目まで存在するものがある
+					// 「全て」選択時は1～6撃目全ての合計ダメージを計算する
 					const getTargetHits = () => {
 						switch (powerOptions.skillDamage) {
 							case 'hit1':
@@ -394,6 +396,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							case 'hit3':
 								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 3)
 							case 'all':
+								// 1～6撃目全てを対象（スキルに存在する全ての撃の合計）
 								return skillCalculationResult.hits
 							default:
 								return skillCalculationResult.hits
