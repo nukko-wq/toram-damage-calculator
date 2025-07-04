@@ -90,37 +90,26 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 				</div>
 			</div>
 
-			{/* プレビューエリア - main要素の下に配置 */}
-			{(showDamagePreview || showStatusPreview) && (
-			<div className="relative left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
-				<div className="bg-gray-50">
-					<div className="grid grid-cols-[520px_1fr]">
-						{/* 与ダメージプレビュー */}
-						{showDamagePreview ? (
-							<div
-								className="bg-gray-50 rounded-lg"
-								id="damage-preview"
-								aria-labelledby="damage-toggle"
-							>
-								<DamagePreview isVisible={showDamagePreview} />
-							</div>
-						) : (
-							<div /> /* プレースホルダー */
-						)}
-
-						{/* ステータスプレビュー */}
-						{showStatusPreview && (
-							<div
-								className="bg-blue-50"
-								id="status-preview"
-								aria-labelledby="status-toggle"
-							>
-								<StatusPreview isVisible={showStatusPreview} />
-							</div>
-						)}
-					</div>
+			{/* 与ダメージプレビュー */}
+			{showDamagePreview && (
+				<div 
+					className="absolute left-0 top-full w-[520px] z-30 max-h-[80vh] overflow-y-auto bg-gray-50 rounded-lg"
+					id="damage-preview"
+					aria-labelledby="damage-toggle"
+				>
+					<DamagePreview isVisible={showDamagePreview} />
 				</div>
-			</div>
+			)}
+
+			{/* ステータスプレビュー */}
+			{showStatusPreview && (
+				<div 
+					className="absolute left-[520px] right-0 top-full z-30 max-h-[80vh] overflow-y-auto bg-blue-50"
+					id="status-preview"
+					aria-labelledby="status-toggle"
+				>
+					<StatusPreview isVisible={showStatusPreview} />
+				</div>
 			)}
 		</div>
 	)
