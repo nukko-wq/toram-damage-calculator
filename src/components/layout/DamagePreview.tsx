@@ -452,8 +452,31 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// 複数撃がある場合は合計ダメージを計算
 			const totalAttackResult = (() => {
 				if (attackResults.length === 0) {
-					// エラー時のフォールバック
-					return calculateDamage(input)
+					// 存在しない撃を選択した場合（例：ムーンスラッシュの3撃目）は0ダメージを返す
+					const defaultStabilityRate = calculationResults?.basicStats.stabilityRate || 85
+					return {
+						baseDamage: 0,
+						stabilityResult: {
+							minDamage: 0,
+							maxDamage: 0,
+							averageDamage: 0,
+							stabilityRate: defaultStabilityRate
+						},
+						calculationSteps: {
+							step1_baseDamage: {
+								playerLevel: calculatorData.baseStats.level,
+								referenceStat: 0,
+								enemyLevel: 0,
+								beforeResistance: 0,
+								physicalResistanceRate: 0,
+								magicalResistanceRate: 0,
+								weaponResistanceRate: 0,
+								afterResistance: 0,
+								enemyDEF: 0,
+								result: 0
+							}
+						} as any
+					}
 				}
 
 				if (attackResults.length === 1) {
