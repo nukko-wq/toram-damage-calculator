@@ -198,7 +198,7 @@ const sortedSaveDataList = useMemo(() => {
 ### Phase 3: 機能拡張
 1. 検索・フィルタ機能
 2. バックアップ・復元機能
-3. インポート・エクスポート機能
+3. **インポート・エクスポート機能** → [詳細設計書](save-data-import-export.md)
 
 ## アクセシビリティ
 
