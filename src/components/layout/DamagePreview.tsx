@@ -372,7 +372,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('================================')
 
 			// 攻撃スキルが選択されている場合は、スキルの計算結果を使用
-			let finalInput = input
+			const attackResults: Array<{hitNumber: number, result: ReturnType<typeof calculateDamage>}> = []
 			if (calculatorData.attackSkill?.selectedSkillId) {
 				const selectedSkill = getAttackSkillById(
 					calculatorData.attackSkill.selectedSkillId,
@@ -384,40 +384,104 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						calculatorData,
 					)
 
-					// スキル用の計算入力データを作成
-					finalInput = {
-						...input,
-						// スキルの場合はMATKまたはtotalATKを参照
-						referenceStat:
-							selectedSkill.hits[0].powerReference === 'MATK'
-								? calculationResults?.basicStats.MATK || 1500
-								: totalATK,
-						attackSkill: {
-							type: selectedSkill.hits[0].attackType,
-							multiplier:
-								skillCalculationResult.hits[0]?.calculatedMultiplier ||
-								selectedSkill.hits[0].multiplier,
-							fixedDamage:
-								skillCalculationResult.hits[0]?.calculatedFixedDamage ||
-								selectedSkill.hits[0].fixedDamage,
-							supportedDistances: selectedSkill.hits[0].canUseDistancePower
-								? ['short', 'long']
-								: [],
-							canUseLongRange: selectedSkill.hits[0].canUseLongRange,
-						},
-						// スキルでも距離・抜刀・慣れ設定を適用
-						unsheathe: {
-							...input.unsheathe,
-							isActive:
-								powerOptions.unsheathe &&
-								selectedSkill.hits[0].canUseUnsheathePower,
-						},
+					// スキルダメージオプションに応じて計算対象の撃を決定
+					const getTargetHits = () => {
+						switch (powerOptions.skillDamage) {
+							case 'hit1':
+								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 1)
+							case 'hit2':
+								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 2)
+							case 'hit3':
+								return skillCalculationResult.hits.filter(hit => hit.hitNumber === 3)
+							case 'all':
+								return skillCalculationResult.hits
+							default:
+								return skillCalculationResult.hits
+						}
+					}
+
+					const targetHits = getTargetHits()
+
+					// 各撃に対してダメージ計算を実行
+					for (const hitResult of targetHits) {
+						const originalHit = selectedSkill.hits.find(
+							hit => hit.hitNumber === hitResult.hitNumber
+						)
+						if (!originalHit) continue
+
+						const skillInput = {
+							...input,
+							// スキルの場合はMATKまたはtotalATKを参照
+							referenceStat:
+								originalHit.powerReference === 'MATK'
+									? calculationResults?.basicStats.MATK || 1500
+									: totalATK,
+							attackSkill: {
+								type: originalHit.attackType,
+								multiplier: hitResult.calculatedMultiplier,
+								fixedDamage: hitResult.calculatedFixedDamage,
+								supportedDistances: originalHit.canUseDistancePower
+									? ['short' as const, 'long' as const]
+									: [],
+								canUseLongRange: originalHit.canUseLongRange,
+							},
+							// スキルでも距離・抜刀・慣れ設定を適用
+							unsheathe: {
+								...input.unsheathe,
+								isActive:
+									powerOptions.unsheathe && originalHit.canUseUnsheathePower,
+							},
+						}
+
+						const hitAttackResult = calculateDamage(skillInput)
+						attackResults.push({
+							hitNumber: hitResult.hitNumber,
+							result: hitAttackResult
+						})
 					}
 				}
+			} else {
+				// 通常攻撃の場合
+				const normalAttackResult = calculateDamage(input)
+				attackResults.push({
+					hitNumber: 1,
+					result: normalAttackResult
+				})
 			}
 
-			// 最終的なダメージ計算
-			const attackResult = calculateDamage(finalInput)
+			// 複数撃がある場合は合計ダメージを計算
+			const totalAttackResult = (() => {
+				if (attackResults.length === 0) {
+					// エラー時のフォールバック
+					return calculateDamage(input)
+				}
+
+				if (attackResults.length === 1) {
+					// 単発攻撃または特定撃のみ選択時
+					return attackResults[0].result
+				}
+
+				// 複数撃の合計計算（'all'選択時）
+				const totalBaseDamage = attackResults.reduce(
+					(sum, hit) => sum + hit.result.baseDamage, 0
+				)
+				
+				// 安定率は最初の撃の値を使用（全撃で同じ安定率のため）
+				const stabilityRate = attackResults[0].result.stabilityResult.stabilityRate
+				
+				return {
+					baseDamage: totalBaseDamage,
+					stabilityResult: {
+						minDamage: Math.floor(totalBaseDamage * stabilityRate / 100),
+						maxDamage: totalBaseDamage,
+						averageDamage: Math.floor(totalBaseDamage * (stabilityRate + 100) / 2 / 100),
+						stabilityRate: stabilityRate
+					},
+					calculationSteps: attackResults[0].result.calculationSteps // 最初の撃の計算過程を参考表示
+				}
+			})()
+
+			const attackResult = totalAttackResult
 
 			// 計算結果の詳細ログ
 			console.log('=== CALCULATION RESULTS ===')
