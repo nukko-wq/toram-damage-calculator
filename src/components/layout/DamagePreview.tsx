@@ -577,21 +577,21 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		try {
 			// 現在のダメージ値を取得
 			const currentDamage = damageResults.normal
-			
+
 			// キャプチャデータを作成
 			const newCaptureData = createCaptureData(
 				currentDamage.min,
 				currentDamage.max,
 				currentDamage.average,
-				currentDamage.stability
+				currentDamage.stability,
 			)
-			
+
 			// LocalStorageに保存
 			saveCaptureData(newCaptureData)
-			
+
 			// 状態を更新
 			setCaptureData(newCaptureData)
-			
+
 			console.log('ダメージをキャプチャしました:', newCaptureData)
 		} catch (error) {
 			console.error('キャプチャに失敗しました:', error)
@@ -639,77 +639,91 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* ダメージ表示テーブル */}
-				<div className="mb-6 overflow-x-auto">
+				<div className="overflow-x-auto">
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="border-b border-gray-200">
-								<th className="sm:px-4 py-3 text-left text-gray-700 font-medium" />
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium" colSpan={2}>
+								<th className="sm:px-2 py-3 text-left text-gray-700 font-medium" />
+								<th
+									className="px-1 sm:px-2 py-3 text-center text-gray-700 font-medium"
+									colSpan={2}
+								>
 									現在の計算結果
 								</th>
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium" colSpan={2}>
+								<th
+									className="px-1 sm:px-2 py-3 text-center text-gray-700 font-medium"
+									colSpan={2}
+								>
 									キャプチャしたダメージ
 								</th>
 							</tr>
 							<tr className="border-b border-gray-200">
-								<th className="sm:px-4 py-3 text-left text-gray-700 font-medium" />
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="sm:px-2 py-1 text-left text-gray-700 font-medium" />
+								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
 									安定率
 								</th>
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
 									安定率
 								</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr className="border-b border-gray-100">
-								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+								<td className="px-1 sm:pl-4 sm:pr-2 py-1 font-medium text-gray-700">
 									最小
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
 									{damageResults.normal.min.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-700 font-roboto">
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-700 font-roboto">
 									{damageResults.normal.stability}%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
-									{captureData ? captureData.damageResult.minimum.damage.toLocaleString() : 'データなし'}
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
+									{captureData
+										? captureData.damageResult.minimum.damage.toLocaleString()
+										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-700 font-roboto">
-									{captureData ? `${captureData.damageResult.minimum.stability}%` : '-'}
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-700 font-roboto">
+									{captureData
+										? `${captureData.damageResult.minimum.stability}%`
+										: '-'}
 								</td>
 							</tr>
 							<tr className="border-b border-gray-100">
-								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+								<td className="px-1 sm:px-4 py-1 font-medium text-gray-700">
 									最大
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
 									{damageResults.normal.max.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
 									100%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
-									{captureData ? captureData.damageResult.maximum.damage.toLocaleString() : 'データなし'}
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
+									{captureData
+										? captureData.damageResult.maximum.damage.toLocaleString()
+										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
-									{captureData ? `${captureData.damageResult.maximum.stability}%` : '-'}
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+									{captureData
+										? `${captureData.damageResult.maximum.stability}%`
+										: '-'}
 								</td>
 							</tr>
 							<tr>
-								<td className="px-1 sm:px-4 py-3 font-medium text-gray-700">
+								<td className="px-1 sm:px-4 py-1 font-medium text-gray-700">
 									平均
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-bold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-bold text-gray-700 font-roboto">
 									{damageResults.normal.average.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
 									{Math.round(
 										((damageResults.normal.min + damageResults.normal.max) /
 											2 /
@@ -718,11 +732,15 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									)}
 									%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-bold text-gray-700 font-roboto">
-									{captureData ? captureData.damageResult.average.damage.toLocaleString() : 'データなし'}
+								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-bold text-gray-700 font-roboto">
+									{captureData
+										? captureData.damageResult.average.damage.toLocaleString()
+										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
-									{captureData ? `${captureData.damageResult.average.stability}%` : '-'}
+								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+									{captureData
+										? `${captureData.damageResult.average.stability}%`
+										: '-'}
 								</td>
 							</tr>
 						</tbody>
@@ -730,7 +748,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* 慣れ倍率スライダー（後で実装予定の枠） */}
-				<div className="bg-white rounded-lg border border-gray-200 p-4 mb-6 flex items-center gap-2">
+				<div className="p-2 flex items-center">
 					<div className="text-[13px] font-medium text-gray-700">
 						慣れ倍率（後で実装）
 					</div>
