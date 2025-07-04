@@ -97,7 +97,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 						{/* 与ダメージプレビュー */}
 						{showDamagePreview && (
 							<div
-								className="w-[520px] overflow-y-auto bg-gray-50 rounded-lg"
+								className="w-[520px] overflow-y-auto bg-gray-50"
 								id="damage-preview"
 								aria-labelledby="damage-toggle"
 							>

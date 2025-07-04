@@ -30,7 +30,7 @@ export default function RootLayout({
 	return (
 		<html lang="ja">
 			<body className={roboto.variable}>
-				<div className="min-h-screen">
+				<div className="min-h-screen bg-gray-50">
 					<Header />
 					<ResultToggleBar />
 					<main>{children}</main>
