@@ -227,28 +227,26 @@ export function calculateDamage(input: DamageCalculationInput): DamageCalculatio
 	// ステップ7: 距離補正 (Phase 3で実装)
 	const step7Result = applyDistance(step6Result, input, steps)
 
-	// Phase 3では基礎～距離補正まで実装
-	// 残りのステップ（8-10）は後のPhaseで実装予定
-	const baseDamage = step7Result
+	// ステップ8: コンボ補正 (Phase 3で実装)
+	const step8Result = applyCombo(step7Result, input, steps)
+
+	// Phase 3では基礎～コンボ補正まで実装
+	// 残りのステップ（9-10）は後のPhaseで実装予定
+	const baseDamage = step8Result
 
 	// 安定率適用
 	const stabilityResult = calculateStabilityDamage(baseDamage, input.stability.rate)
 
-	// Phase 3用のプレースホルダー（ステップ8-10は後で実装）
-	steps.step8_combo = {
-		beforeCombo: step7Result,
-		comboRate: input.combo.isActive ? input.combo.multiplier : 100,
-		result: step7Result,
-	}
+	// Phase 3用のプレースホルダー（ステップ9-10は後で実装）
 	steps.step9_passive = {
-		beforePassive: step7Result,
+		beforePassive: step8Result,
 		passiveRate: input.passiveMultiplier,
-		result: step7Result,
+		result: step8Result,
 	}
 	steps.step10_brave = {
-		beforeBrave: step7Result,
+		beforeBrave: step8Result,
 		braveRate: input.braveMultiplier,
-		result: step7Result,
+		result: step8Result,
 	}
 
 	return {
@@ -458,6 +456,28 @@ function applyDistance(
 	steps.step7_distance = {
 		beforeDistance,
 		distanceRate,
+		result,
+	}
+
+	return Math.max(1, result) // 最低1ダメージ保証
+}
+
+/**
+ * ステップ8: コンボ補正
+ */
+function applyCombo(
+	beforeCombo: number,
+	input: DamageCalculationInput,
+	steps: DamageCalculationSteps,
+): number {
+	const comboRate = input.combo.isActive ? input.combo.multiplier : 100
+
+	const result = Math.floor(beforeCombo * (comboRate / 100))
+
+	// 計算過程を記録
+	steps.step8_combo = {
+		beforeCombo,
+		comboRate,
 		result,
 	}
 
