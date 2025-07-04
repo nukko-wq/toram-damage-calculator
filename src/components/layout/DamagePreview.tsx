@@ -420,9 +420,12 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								type: originalHit.attackType,
 								multiplier: hitResult.calculatedMultiplier,
 								fixedDamage: hitResult.calculatedFixedDamage,
-								supportedDistances: originalHit.canUseDistancePower
-									? ['short' as const, 'long' as const]
-									: [],
+								supportedDistances: (() => {
+									const distances: ('short' | 'long')[] = []
+									if (originalHit.canUseShortRangePower) distances.push('short')
+									if (originalHit.canUseLongRangePower) distances.push('long')
+									return distances
+								})(),
 								canUseLongRange: originalHit.canUseLongRange,
 							},
 							// スキルでも距離・抜刀・慣れ設定を適用
