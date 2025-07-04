@@ -206,9 +206,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					className={`sticky z-20 max-h-[80vh] ${
 						isMobile 
 							? "w-full" 
-							: showDamagePreview 
-								? "w-[calc(100%-520px)] ml-[520px]" 
-								: "w-full"
+							: "w-[calc(100%-520px)] ml-[520px]"
 					}`}
 					style={{ top: `${toggleBarHeight}px` }}
 				>
