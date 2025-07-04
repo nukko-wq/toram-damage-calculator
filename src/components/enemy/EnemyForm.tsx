@@ -206,16 +206,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 		return `${selectedEnemy.name} (Lv.${selectedEnemy.level})`
 	}
 
-	// 選択済み敵の詳細情報を取得
-	const getSelectedEnemyInfo = (): string => {
-		if (!selectedEnemy) return ''
-		const parts = []
-		if (selectedEnemy.stats.DEF > 0)
-			parts.push(`DEF ${selectedEnemy.stats.DEF}`)
-		if (selectedEnemy.stats.MDEF > 0)
-			parts.push(`MDEF ${selectedEnemy.stats.MDEF}`)
-		return parts.slice(0, 2).join(', ')
-	}
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-6 md:row-end-7 xl:col-start-1 xl:col-end-3 xl:row-start-6 xl:row-end-8">
@@ -244,11 +234,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 								>
 									{getSelectedEnemyName()}
 								</div>
-								{selectedEnemy && (
-									<div className="text-xs text-gray-600 mt-1 truncate">
-										{getSelectedEnemyInfo()}
-									</div>
-								)}
 							</div>
 							<div className="ml-2 flex-shrink-0">
 								<svg
