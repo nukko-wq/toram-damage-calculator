@@ -206,7 +206,7 @@ export default function AttackSkillForm({
 				<select
 					value={attackSkillData.selectedSkillId || ''}
 					onChange={(e) => handleSkillSelect(e.target.value)}
-					className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+					className="w-full text-xs sm:text-sm px-1 sm:px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 				>
 					<option value="">⚔️ 攻撃スキルを選択してください</option>
 					{Object.entries(skillGroups).map(([groupLabel, skills]) => (
@@ -231,7 +231,7 @@ export default function AttackSkillForm({
 								<span className="text-gray-700 w-[7rem] text-sm">
 									スキル威力値:
 								</span>{' '}
-								<span className="flex items-center gap-3">
+								<span className="flex items-center gap-3 text-sm">
 									{displayData.calculatedHits.map((hit, index) => (
 										<span
 											key={hit.hitNumber}
@@ -246,8 +246,10 @@ export default function AttackSkillForm({
 								</span>
 							</div>
 							<div className="flex">
-								<span className="text-gray-700 w-[7rem]">スキル固定値:</span>{' '}
-								<span className="flex items-center gap-3">
+								<span className="text-gray-700 w-[7rem] text-sm">
+									スキル固定値:
+								</span>{' '}
+								<span className="flex items-center gap-3 text-sm">
 									{displayData.calculatedHits.map((hit, index) => (
 										<span
 											key={hit.hitNumber}
@@ -262,8 +264,10 @@ export default function AttackSkillForm({
 								</span>
 							</div>
 							<div className="flex">
-								<span className="text-gray-700 w-[7rem]">消費MP:</span>{' '}
-								<span className="text-gray-700">{selectedSkill.mpCost}</span>
+								<span className="text-gray-700 w-[7rem] text-sm">消費MP:</span>{' '}
+								<span className="text-gray-700 text-sm">
+									{selectedSkill.mpCost}
+								</span>
 							</div>
 						</div>
 					</div>
@@ -295,7 +299,7 @@ export default function AttackSkillForm({
 						return (
 							<div className="space-y-3">
 								{/* テーブル風の詳細情報 */}
-								<div className="border border-gray-300 rounded text-sm">
+								<div className="border border-gray-300 rounded text-xs sm:text-sm">
 									{/* 1行目: 3列表示 (スキルタイプ、慣れ参照、慣れ付与) */}
 									<div className="border-b border-gray-300 grid grid-cols-3">
 										<div className="px-3 py-2 border-r border-gray-300">
@@ -376,14 +380,14 @@ export default function AttackSkillForm({
 									<div className="space-y-2 p-3 rounded border border-gray-300 bg-gray-50">
 										{currentHit.multiplierFormula && (
 											<div className="flex items-center text-sm">
-												<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500">
+												<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500 text-xs sm:text-sm">
 													{currentHit.multiplierFormula}
 												</span>
 											</div>
 										)}
 										{currentHit.fixedDamageFormula && (
 											<div className="flex items-center text-sm">
-												<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500">
+												<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500 text-xs sm:text-sm">
 													{currentHit.fixedDamageFormula}
 												</span>
 											</div>
@@ -394,7 +398,7 @@ export default function AttackSkillForm({
 								{/* 計算過程表示（特殊計算がある場合） */}
 								{currentHit.calculationProcess && (
 									<div className="space-y-2 p-3 rounded border border-gray-300 bg-blue-50">
-										<div className="text-sm">
+										<div className="text-xs sm:text-sm">
 											<span className="text-gray-600">計算過程:</span>
 											<div className="text-gray-700 font-mono mt-1">
 												{currentHit.calculationProcess}
