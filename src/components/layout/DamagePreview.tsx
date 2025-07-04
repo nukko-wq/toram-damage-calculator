@@ -17,6 +17,12 @@ import {
 	getBuffBonuses,
 } from '@/utils/dataSourceIntegration'
 import { aggregateAllBonuses } from '@/utils/basicStatsCalculation'
+import {
+	type DamageCaptureData,
+	saveCaptureData,
+	loadCaptureData,
+	createCaptureData,
+} from '@/utils/damageCaptureStorage'
 
 interface DamagePreviewProps {
 	isVisible: boolean
@@ -46,6 +52,15 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		elementPower: 'enabled',
 		unsheathe: false,
 	})
+
+	// キャプチャデータの状態管理
+	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
+
+	// キャプチャデータの初期読み込み
+	useEffect(() => {
+		const loadedData = loadCaptureData()
+		setCaptureData(loadedData)
+	}, [])
 
 	// Zustandストアから計算データと計算結果を取得
 	const calculatorData = useCalculatorStore((state) => state.data)
@@ -557,9 +572,31 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		return null
 	}
 
-	const handleScreenshot = () => {
-		// スクリーンショット機能（将来実装）
-		console.log('キャプチャ機能は将来実装予定です')
+	// キャプチャボタンクリック処理
+	const handleCapture = () => {
+		try {
+			// 現在のダメージ値を取得
+			const currentDamage = damageResults.normal
+			
+			// キャプチャデータを作成
+			const newCaptureData = createCaptureData(
+				currentDamage.min,
+				currentDamage.max,
+				currentDamage.average,
+				currentDamage.stability
+			)
+			
+			// LocalStorageに保存
+			saveCaptureData(newCaptureData)
+			
+			// 状態を更新
+			setCaptureData(newCaptureData)
+			
+			console.log('ダメージをキャプチャしました:', newCaptureData)
+		} catch (error) {
+			console.error('キャプチャに失敗しました:', error)
+			alert('キャプチャに失敗しました')
+		}
 	}
 
 	const updatePowerOption = <K extends keyof PowerOptions>(
@@ -575,7 +612,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				{/* キャプチャボタン */}
 				<div className="mb-4 flex justify-end">
 					<button
-						onClick={handleScreenshot}
+						onClick={handleCapture}
 						className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2 cursor-pointer"
 					>
 						<svg
@@ -607,6 +644,15 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						<thead>
 							<tr className="border-b border-gray-200">
 								<th className="sm:px-4 py-3 text-left text-gray-700 font-medium" />
+								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium" colSpan={2}>
+									現在の計算結果
+								</th>
+								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium" colSpan={2}>
+									キャプチャしたダメージ
+								</th>
+							</tr>
+							<tr className="border-b border-gray-200">
+								<th className="sm:px-4 py-3 text-left text-gray-700 font-medium" />
 								<th className="px-1 sm:px-4 py-3 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
@@ -633,10 +679,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									{damageResults.normal.stability}%
 								</td>
 								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
-									{damageResults.skill.min.toLocaleString()}
+									{captureData ? captureData.damageResult.minimum.damage.toLocaleString() : 'データなし'}
 								</td>
 								<td className="px-1 sm:px-4 py-3 text-center text-gray-700 font-roboto">
-									{damageResults.skill.stability}%
+									{captureData ? `${captureData.damageResult.minimum.stability}%` : '-'}
 								</td>
 							</tr>
 							<tr className="border-b border-gray-100">
@@ -650,10 +696,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									100%
 								</td>
 								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-semibold text-gray-700 font-roboto">
-									{damageResults.skill.max.toLocaleString()}
+									{captureData ? captureData.damageResult.maximum.damage.toLocaleString() : 'データなし'}
 								</td>
 								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
-									100%
+									{captureData ? `${captureData.damageResult.maximum.stability}%` : '-'}
 								</td>
 							</tr>
 							<tr>
@@ -673,16 +719,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									%
 								</td>
 								<td className="pl-1 pr-2 sm:px-4 py-3 text-right font-bold text-gray-700 font-roboto">
-									{damageResults.skill.average.toLocaleString()}
+									{captureData ? captureData.damageResult.average.damage.toLocaleString() : 'データなし'}
 								</td>
 								<td className="px-1 sm:px-4 py-3 text-center text-gray-600 font-roboto">
-									{Math.round(
-										((damageResults.skill.min + damageResults.skill.max) /
-											2 /
-											damageResults.skill.max) *
-											100,
-									)}
-									%
+									{captureData ? `${captureData.damageResult.average.stability}%` : '-'}
 								</td>
 							</tr>
 						</tbody>
