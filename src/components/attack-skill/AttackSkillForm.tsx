@@ -198,15 +198,21 @@ export default function AttackSkillForm({
 	}, [])
 
 	return (
-		<div className="space-y-4 p-4 border border-gray-300 rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8">
+		<div className="space-y-4 p-4 border border-gray-300 rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8 max-w-full overflow-hidden">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">攻撃スキル</h2>
 
 			{/* スキル選択セクション */}
-			<div>
+			<div className="w-full min-w-0">
 				<select
 					value={attackSkillData.selectedSkillId || ''}
 					onChange={(e) => handleSkillSelect(e.target.value)}
-					className="w-full text-xs sm:text-sm px-1 sm:px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+					className="w-full text-xs sm:text-sm px-1 sm:px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-0 max-w-full"
+					style={{
+						width: '100%',
+						maxWidth: '100%',
+						minWidth: '0',
+						boxSizing: 'border-box'
+					}}
 				>
 					<option value="">⚔️ 攻撃スキルを選択してください</option>
 					{Object.entries(skillGroups).map(([groupLabel, skills]) => (
