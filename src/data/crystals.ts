@@ -216,7 +216,7 @@ export const crystalsData: CrystalsData = {
 				properties: {
 					ATK_Rate: 9,
 					CriticalDamage: 12,
-					MagicalPenetration_Rate: -15,
+					MagicalResistance_Rate: -15,
 				},
 			},
 			{
