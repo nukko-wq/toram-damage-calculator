@@ -20,9 +20,9 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 	} = useUIStore()
 
 	return (
-		<div className={`sticky top-0 left-0 right-0 z-40 ${className}`}>
+		<>
 			{/* トグルボタンバー */}
-			<div className="">
+			<div className={`sticky top-0 left-0 right-0 z-40 ${className}`}>
 				<div
 					className="grid grid-cols-2 lg:grid-cols-[520px_1fr]"
 					role="group"
@@ -90,27 +90,34 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 				</div>
 			</div>
 
-			{/* 与ダメージプレビュー */}
-			{showDamagePreview && (
-				<div 
-					className="absolute left-0 top-full w-[520px] z-30 max-h-[80vh] overflow-y-auto bg-gray-50 rounded-lg"
-					id="damage-preview"
-					aria-labelledby="damage-toggle"
-				>
-					<DamagePreview isVisible={showDamagePreview} />
-				</div>
-			)}
+			{/* プレビューエリア */}
+			{(showDamagePreview || showStatusPreview) && (
+				<div className="sticky top-[60px] z-30 max-h-[80vh]">
+					<div className="flex">
+						{/* 与ダメージプレビュー */}
+						{showDamagePreview && (
+							<div
+								className="w-[520px] overflow-y-auto bg-gray-50 rounded-lg"
+								id="damage-preview"
+								aria-labelledby="damage-toggle"
+							>
+								<DamagePreview isVisible={showDamagePreview} />
+							</div>
+						)}
 
-			{/* ステータスプレビュー */}
-			{showStatusPreview && (
-				<div 
-					className="absolute left-[520px] right-0 top-full z-30 max-h-[80vh] overflow-y-auto bg-blue-50"
-					id="status-preview"
-					aria-labelledby="status-toggle"
-				>
-					<StatusPreview isVisible={showStatusPreview} />
+						{/* ステータスプレビュー */}
+						{showStatusPreview && (
+							<div
+								className="flex-1 w-[calc(100%-520px)] overflow-y-auto bg-blue-50"
+								id="status-preview"
+								aria-labelledby="status-toggle"
+							>
+								<StatusPreview isVisible={showStatusPreview} />
+							</div>
+						)}
+					</div>
 				</div>
 			)}
-		</div>
+		</>
 	)
 })
