@@ -81,11 +81,17 @@ export interface DamageCalculationInput {
 	userSettings: {
 		familiarity: number // 慣れ(50-250%)
 		currentDistance: 'short' | 'long' | 'disabled' // 現在の距離判定
+		damageType: 'critical' | 'graze' | 'expected' | 'white' // ダメージ判定
 	}
 
 	// 安定率
 	stability: {
 		rate: number // 安定率(%)（例: 70）
+	}
+
+	// クリティカル
+	critical: {
+		damage: number // クリティカルダメージ(%)（例: 125）
 	}
 
 	// バフスキル情報（エターナルナイトメア用）
@@ -152,6 +158,13 @@ export interface DamageCalculationSteps {
 		result: number
 	}
 
+	// ステップ2a: クリティカルダメージ（クリティカル時のみ）
+	step2a_critical?: {
+		beforeCritical: number
+		criticalRate: number
+		result: number
+	}
+
 	// ステップ5: 抜刀%
 	step5_unsheatheRate: {
 		beforeUnsheathe: number
@@ -193,6 +206,7 @@ export interface DamageCalculationSteps {
 		braveRate: number
 		result: number
 	}
+
 }
 
 // ============================================================================
@@ -206,50 +220,73 @@ export interface DamageCalculationSteps {
 export function calculateDamage(input: DamageCalculationInput): DamageCalculationResult {
 	const steps = {} as DamageCalculationSteps
 
+	console.log('=== 計算ステップ詳細 ===')
+	console.log('damageType:', input.userSettings.damageType)
+	console.log('combo.isActive:', input.combo.isActive)
+	console.log('combo.multiplier:', input.combo.multiplier)
+
 	// ステップ1: 基礎ダメージ計算
+	console.log('\n--- ステップ1: 基礎ダメージ計算 ---')
 	const step1Result = calculateBaseDamage(input, steps)
+	console.log(`ステップ1結果: ${step1Result}`)
 
 	// ステップ2: 固定値加算
-	const step2Result = applyFixedValues(step1Result, input, steps)
+	console.log('\n--- ステップ2: 固定値加算 ---')
+	let step2Result = applyFixedValues(step1Result, input, steps)
+	console.log(`ステップ2結果: ${step2Result}`)
+
+	// ステップ2a: クリティカルダメージ補正（クリティカル時のみ）
+	if (input.userSettings.damageType === 'critical') {
+		console.log('\n--- ステップ2a: クリティカル計算 ---')
+		step2Result = applyCriticalDamage(step2Result, input, steps)
+		console.log(`ステップ2a結果: ${step2Result}`)
+	}
 
 	// ステップ3: 属性有利補正
+	console.log('\n--- ステップ3: 属性有利補正 ---')
 	const step3Result = applyElementAdvantage(step2Result, input, steps)
+	console.log(`ステップ3結果: ${step3Result}`)
 
 	// ステップ4: スキル倍率補正
+	console.log('\n--- ステップ4: スキル倍率補正 ---')
 	const step4Result = applySkillMultiplier(step3Result, input, steps)
+	console.log(`ステップ4結果: ${step4Result}`)
 
 	// ステップ5: 抜刀%補正 (Phase 3で実装)
+	console.log('\n--- ステップ5: 抜刀%補正 ---')
 	const step5Result = applyUnsheatheRate(step4Result, input, steps)
+	console.log(`ステップ5結果: ${step5Result}`)
 
 	// ステップ6: 慣れ補正 (Phase 3で実装)
+	console.log('\n--- ステップ6: 慣れ補正 ---')
 	const step6Result = applyFamiliarity(step5Result, input, steps)
+	console.log(`ステップ6結果: ${step6Result}`)
 
 	// ステップ7: 距離補正 (Phase 3で実装)
+	console.log('\n--- ステップ7: 距離補正 ---')
 	const step7Result = applyDistance(step6Result, input, steps)
+	console.log(`ステップ7結果: ${step7Result}`)
 
-	// Phase 3では基礎～距離補正まで実装
-	// 残りのステップ（8-10）は後のPhaseで実装予定
-	const baseDamage = step7Result
+	// ステップ8: コンボ補正 (Phase 3で実装)
+	console.log('\n--- ステップ8: コンボ補正 ---')
+	const step8Result = applyCombo(step7Result, input, steps)
+	console.log(`ステップ8結果: ${step8Result}`)
+
+	// ステップ9: パッシブ倍率補正（プレースホルダー）
+	console.log('\n--- ステップ9: パッシブ倍率補正 ---')
+	const step9Result = applyPassiveMultiplier(step8Result, input, steps)
+	console.log(`ステップ9結果: ${step9Result}`)
+
+	// ステップ10: ブレイブ倍率補正
+	console.log('\n--- ステップ10: ブレイブ倍率補正 ---')
+	const baseDamage = applyBraveMultiplier(step9Result, input, steps)
+	console.log(`ステップ10結果: ${baseDamage}`)
+	
+	console.log('\n=== 最終結果 ===')
+	console.log('最終baseDamage:', baseDamage)
 
 	// 安定率適用
 	const stabilityResult = calculateStabilityDamage(baseDamage, input.stability.rate)
-
-	// Phase 3用のプレースホルダー（ステップ8-10は後で実装）
-	steps.step8_combo = {
-		beforeCombo: step7Result,
-		comboRate: input.combo.isActive ? input.combo.multiplier : 100,
-		result: step7Result,
-	}
-	steps.step9_passive = {
-		beforePassive: step7Result,
-		passiveRate: input.passiveMultiplier,
-		result: step7Result,
-	}
-	steps.step10_brave = {
-		beforeBrave: step7Result,
-		braveRate: input.braveMultiplier,
-		result: step7Result,
-	}
 
 	return {
 		baseDamage,
@@ -452,12 +489,135 @@ function applyDistance(
 		}
 	}
 
-	const result = Math.floor(beforeDistance * (1 + distanceRate / 100))
+	// クリティカル時は距離補正で小数点を保持
+	let result: number
+	if (input.userSettings.damageType === 'critical') {
+		// クリティカル時：小数点を保持して次のステップに渡す
+		result = beforeDistance * (1 + distanceRate / 100)
+		console.log(`=== クリティカル時距離補正: 小数点保持 ===`)
+		console.log(`${beforeDistance} × (1 + ${distanceRate}/100) = ${result}`)
+	} else {
+		// 通常時：切り捨て
+		result = Math.floor(beforeDistance * (1 + distanceRate / 100))
+	}
 
-	// 計算過程を記録
+	// 計算過程を記録（表示用は切り捨て値）
 	steps.step7_distance = {
 		beforeDistance,
 		distanceRate,
+		result: Math.floor(result),
+	}
+
+	return Math.max(1, result) // 最低1ダメージ保証
+}
+
+/**
+ * ステップ8: コンボ補正
+ */
+function applyCombo(
+	beforeCombo: number,
+	input: DamageCalculationInput,
+	steps: DamageCalculationSteps,
+): number {
+	const comboRate = input.combo.isActive ? input.combo.multiplier : 100
+
+	console.log('=== COMBO CALCULATION (Step 8) ===')
+	console.log('beforeCombo (距離適用後):', beforeCombo)
+	console.log('combo.isActive:', input.combo.isActive)
+	console.log('combo.multiplier:', input.combo.multiplier)
+	console.log('comboRate (使用される倍率):', comboRate)
+	console.log(`計算式: Math.floor(${beforeCombo} * ${comboRate}/100)`)
+	console.log(`= Math.floor(${beforeCombo} * ${comboRate / 100})`)
+	console.log(`= Math.floor(${beforeCombo * (comboRate / 100)})`)
+
+	const result = Math.floor(beforeCombo * (comboRate / 100))
+	console.log('result (コンボ適用後):', result)
+
+	// 計算過程を記録
+	steps.step8_combo = {
+		beforeCombo,
+		comboRate,
+		result,
+	}
+
+	return Math.max(1, result) // 最低1ダメージ保証
+}
+
+/**
+ * ステップ9: パッシブ倍率補正（プレースホルダー）
+ */
+function applyPassiveMultiplier(
+	beforePassive: number,
+	input: DamageCalculationInput,
+	steps: DamageCalculationSteps,
+): number {
+	// Phase 3ではプレースホルダー実装（倍率は適用せず）
+	const passiveRate = 0 // input.passiveMultiplier
+
+	const result = Math.floor(beforePassive * (1 + passiveRate / 100))
+
+	// 計算過程を記録
+	steps.step9_passive = {
+		beforePassive,
+		passiveRate,
+		result,
+	}
+
+	return Math.max(1, result) // 最低1ダメージ保証
+}
+
+/**
+ * ステップ10: ブレイブ倍率補正
+ */
+function applyBraveMultiplier(
+	beforeBrave: number,
+	input: DamageCalculationInput,
+	steps: DamageCalculationSteps,
+): number {
+	// Phase 3ではプレースホルダー実装（倍率は適用せず）
+	const braveRate = 0 // input.braveMultiplier
+
+	const result = Math.floor(beforeBrave * (1 + braveRate / 100))
+
+	// 計算過程を記録
+	steps.step10_brave = {
+		beforeBrave,
+		braveRate,
+		result,
+	}
+
+	return Math.max(1, result) // 最低1ダメージ保証
+}
+
+/**
+ * ステップ2a: クリティカルダメージ補正（固定値加算後に適用）
+ */
+function applyCriticalDamage(
+	step2Result: number,
+	input: DamageCalculationInput,
+	steps: DamageCalculationSteps,
+): number {
+	console.log('=== CRITICAL DAMAGE CALCULATION (Step 2a) ===')
+	console.log('step2Result (固定値適用後):', step2Result)
+	
+	// クリティカルダメージ倍率を取得
+	const criticalRate = input.critical.damage
+	console.log('criticalRate (クリティカルダメージ%):', criticalRate)
+	
+	// ステップ2a: 固定値加算の後、属性有利の前にクリティカル倍率を適用
+	console.log('=== ステップ2a: クリティカル倍率適用（属性有利の前） ===')
+	console.log(`固定値適用後: ${step2Result}`)
+	console.log(`クリティカル倍率: ${criticalRate}%`)
+	console.log(`計算式: Math.floor(${step2Result} * ${criticalRate}/100)`)
+	console.log(`= Math.floor(${step2Result} * ${criticalRate / 100})`)
+	console.log(`= Math.floor(${step2Result * (criticalRate / 100)})`)
+	const result = Math.floor(step2Result * (criticalRate / 100))
+	console.log('result (クリティカル適用後):', result)
+
+	// 計算過程を記録
+	steps.step2a_critical = {
+		beforeCritical: step2Result,
+		criticalRate,
 		result,
 	}
 
@@ -634,6 +794,10 @@ export function createDefaultDamageInput(): DamageCalculationInput {
 		userSettings: {
 			familiarity: 100,
 			currentDistance: 'disabled',
+			damageType: 'white',
+		},
+		critical: {
+			damage: 100, // デフォルト100%
 		},
 		stability: {
 			rate: 85, // デフォルト85%

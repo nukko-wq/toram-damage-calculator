@@ -11,6 +11,7 @@ import type {
 	RegisterEffect,
 	CalculatorData,
 	EquipmentProperties,
+	PowerOptions,
 } from '@/types/calculator'
 import { getDefaultBuffSkillFormData } from './buffSkillDefaults'
 import { getDefaultBuffItems } from './buffItemDefaults'
@@ -366,6 +367,18 @@ export const createInitialAttackSkillFormData = (): import('@/types/calculator')
 	lastCalculatedAt: undefined,
 })
 
+// 威力オプション初期データ作成
+export const createInitialPowerOptions = (): PowerOptions => ({
+	bossDifficulty: 'normal',
+	skillDamage: 'all',
+	elementAttack: 'advantageous',
+	combo: false,
+	damageType: 'white',
+	distance: 'disabled',
+	elementPower: 'enabled',
+	unsheathe: false,
+})
+
 export const createInitialCalculatorData = (): CalculatorData => ({
 	baseStats: createInitialBaseStats(),
 	mainWeapon: createInitialMainWeapon(),
@@ -378,4 +391,5 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	buffItems: getDefaultBuffItems(), // バフアイテムシステム
 	register: createInitialRegisterFormData(), // レジスタ他システム
 	attackSkill: createInitialAttackSkillFormData(), // 攻撃スキルシステム
+	powerOptions: createInitialPowerOptions(), // 威力オプション設定
 })

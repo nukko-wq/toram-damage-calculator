@@ -32,6 +32,9 @@ interface SaveData {
     enemy: EnemyFormData           // 敵設定
     buffSkills: BuffSkillFormData   // バフスキル設定
     buffItems: BuffItemFormData     // バフアイテム設定
+    powerOptions: PowerOptions      // ダメージプレビュー威力オプション設定（v2.0で追加）
+    attackSkill: AttackSkillFormData // 攻撃スキル設定（実装済み）
+    register: RegisterFormData      // レジスター設定（実装済み）
   }
 }
 
@@ -176,7 +179,10 @@ const DEFAULT_MAIN_DATA: DefaultSaveData = {
     food: getDefaultFood(),               // 料理未選択状態（全スロット「なし」）
     enemy: getDefaultEnemy(),              // 敵の基本設定
     buffSkills: getDefaultBuffSkills(),     // バフスキル未選択状態（全スキルOFF）
-    buffItems: getDefaultBuffItems()       // バフアイテム未選択状態（全カテゴリ「なし」）
+    buffItems: getDefaultBuffItems(),      // バフアイテム未選択状態（全カテゴリ「なし」）
+    powerOptions: getDefaultPowerOptions(), // 威力オプションデフォルト設定（v2.0で追加）
+    attackSkill: getDefaultAttackSkill(),  // 攻撃スキル未選択状態（実装済み）
+    register: getDefaultRegister()         // レジスター設定デフォルト（実装済み）
   }
 }
 ```
@@ -382,8 +388,45 @@ async function ensureDefaultSaveData(): Promise<void> {
 const STORAGE_KEYS = {
   SAVE_DATA_LIST: 'toram_save_data_list',           // SaveData[]
   CURRENT_SAVE_ID: 'toram_current_save_id',         // string
+  // 威力オプション関連は各セーブデータ内に含まれるため、専用キーは不要
 } as const
 ```
+
+## 威力オプション設定（PowerOptions）管理
+
+### 概要
+ダメージプレビューの威力オプション設定は、セーブデータ内に含めて管理されます。
+
+### PowerOptions データ構造
+```typescript
+interface PowerOptions {
+  bossDifficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate'  // ボス戦難易度
+  skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3'              // スキルダメージ
+  elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous'  // 属性攻撃
+  combo: boolean                                              // コンボ:強打
+  damageType: 'critical' | 'graze' | 'expected' | 'white'    // ダメージ判定
+  distance: 'short' | 'long' | 'disabled'                    // 距離判定
+  elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'  // 属性威力
+  unsheathe: boolean                                          // 抜刀威力
+}
+
+const DEFAULT_POWER_OPTIONS: PowerOptions = {
+  bossDifficulty: 'normal',
+  skillDamage: 'all',
+  elementAttack: 'advantageous',
+  combo: false,
+  damageType: 'white',
+  distance: 'disabled',
+  elementPower: 'enabled',
+  unsheathe: false
+}
+```
+
+### 保存・読み込み仕様
+- **保存場所**: 各セーブデータの `data.powerOptions` フィールド
+- **保存タイミング**: 威力オプション変更時の自動保存、または「現在のデータを保存」ボタン
+- **読み込みタイミング**: セーブデータ切り替え時に復元
+- **デフォルト処理**: 既存セーブデータに威力オプションが存在しない場合はデフォルト値を適用
 
 ## 関連ドキュメント
 

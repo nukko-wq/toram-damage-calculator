@@ -182,38 +182,42 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 				</div>
 			</div>
 
-			{/* プレビューエリア */}
-			{(showDamagePreview || showStatusPreview) && (
-				<div 
-					className="sticky z-30 max-h-[80vh]"
+			{/* 与ダメージプレビュー */}
+			{showDamagePreview && (
+				<div
+					className={`sticky z-30 max-h-[80vh] ${
+						isMobile ? "w-full" : "w-[520px]"
+					}`}
 					style={{ top: `${toggleBarHeight}px` }}
 				>
-					<div className={isMobile ? "block" : "flex"}>
-						{/* 与ダメージプレビュー */}
-						{showDamagePreview && (
-							<div
-								className={`overflow-y-auto bg-gray-50 ${
-									isMobile ? "w-full" : "w-[520px]"
-								}`}
-								id="damage-preview"
-								aria-labelledby="damage-toggle"
-							>
-								<DamagePreview isVisible={showDamagePreview} />
-							</div>
-						)}
+					<div
+						className="overflow-y-auto bg-gray-50 h-full"
+						id="damage-preview"
+						aria-labelledby="damage-toggle"
+					>
+						<DamagePreview isVisible={showDamagePreview} />
+					</div>
+				</div>
+			)}
 
-						{/* ステータスプレビュー */}
-						{showStatusPreview && (
-							<div
-								className={`overflow-y-auto bg-blue-50 ${
-									isMobile ? "w-full" : "flex-1"
-								}`}
-								id="status-preview"
-								aria-labelledby="status-toggle"
-							>
-								<StatusPreview isVisible={showStatusPreview} />
-							</div>
-						)}
+			{/* ステータスプレビュー */}
+			{showStatusPreview && (
+				<div
+					className={`sticky z-30 max-h-[80vh] ${
+						isMobile 
+							? "w-full" 
+							: showDamagePreview 
+								? "w-[calc(100%-520px)] ml-[520px]" 
+								: "w-[calc(100%-520px)] ml-[520px]"
+					}`}
+					style={{ top: `${toggleBarHeight}px` }}
+				>
+					<div
+						className="overflow-y-auto bg-blue-50 h-full"
+						id="status-preview"
+						aria-labelledby="status-toggle"
+					>
+						<StatusPreview isVisible={showStatusPreview} />
 					</div>
 				</div>
 			)}
