@@ -508,47 +508,56 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const getDamageByType = () => {
 				const baseDamage = attackResult.baseDamage // 白ダメ（基本ダメージ）
 				const stabilityResult = attackResult.stabilityResult
+				const stabilityRate = stabilityResult.stabilityRate
 
 				switch (powerOptions.damageType) {
-					case 'white':
-						// 白ダメ：基本ダメージをそのまま表示（安定率適用なし）
+					case 'white': {
+						// 白ダメ：基本ダメージに対して安定率を適用
 						return {
-							min: baseDamage,
+							min: Math.floor(baseDamage * stabilityRate / 100),
 							max: baseDamage,
-							average: baseDamage,
-							stability: stabilityResult.stabilityRate,
+							average: baseDamage, // 平均は後で修正予定
+							stability: stabilityRate,
 						}
-					case 'critical':
+					}
+					case 'critical': {
 						// クリティカル：後で実装予定
+						const criticalBaseDamage = Math.floor(baseDamage * 1.25)
 						return {
-							min: Math.floor(baseDamage * 1.25), // 仮のクリティカル倍率
-							max: Math.floor(baseDamage * 1.25),
-							average: Math.floor(baseDamage * 1.25),
-							stability: stabilityResult.stabilityRate,
+							min: Math.floor(criticalBaseDamage * stabilityRate / 100), // 安定率適用
+							max: criticalBaseDamage,
+							average: criticalBaseDamage, // 平均は後で修正予定
+							stability: stabilityRate,
 						}
-					case 'graze':
+					}
+					case 'graze': {
 						// グレイズ：後で実装予定
+						const grazeBaseDamage = Math.floor(baseDamage * 0.1)
 						return {
-							min: Math.floor(baseDamage * 0.1), // 仮のグレイズ倍率
-							max: Math.floor(baseDamage * 0.1),
-							average: Math.floor(baseDamage * 0.1),
-							stability: stabilityResult.stabilityRate,
+							min: Math.floor(grazeBaseDamage * stabilityRate / 100), // 安定率適用
+							max: grazeBaseDamage,
+							average: grazeBaseDamage, // 平均は後で修正予定
+							stability: stabilityRate,
 						}
-					case 'expected':
+					}
+					case 'expected': {
 						// 期待値
 						return {
 							min: stabilityResult.averageDamage,
 							max: stabilityResult.averageDamage,
 							average: stabilityResult.averageDamage,
-							stability: stabilityResult.stabilityRate,
+							stability: stabilityRate,
 						}
-					default:
+					}
+					default: {
+						// 通常ダメージ：最大=基本ダメージ、最小=基本ダメージ×安定率（小数点以下切り捨て）
 						return {
-							min: stabilityResult.minDamage,
-							max: stabilityResult.maxDamage,
-							average: stabilityResult.averageDamage,
-							stability: stabilityResult.stabilityRate,
+							min: Math.floor(baseDamage * stabilityRate / 100),
+							max: baseDamage,
+							average: baseDamage, // 平均は後で修正予定
+							stability: stabilityRate,
 						}
+					}
 				}
 			}
 
