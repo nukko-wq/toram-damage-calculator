@@ -220,41 +220,69 @@ export interface DamageCalculationSteps {
 export function calculateDamage(input: DamageCalculationInput): DamageCalculationResult {
 	const steps = {} as DamageCalculationSteps
 
+	console.log('=== 計算ステップ詳細 ===')
+	console.log('damageType:', input.userSettings.damageType)
+	console.log('combo.isActive:', input.combo.isActive)
+	console.log('combo.multiplier:', input.combo.multiplier)
+
 	// ステップ1: 基礎ダメージ計算
+	console.log('\n--- ステップ1: 基礎ダメージ計算 ---')
 	const step1Result = calculateBaseDamage(input, steps)
+	console.log(`ステップ1結果: ${step1Result}`)
 
 	// ステップ2: 固定値加算
+	console.log('\n--- ステップ2: 固定値加算 ---')
 	let step2Result = applyFixedValues(step1Result, input, steps)
+	console.log(`ステップ2結果: ${step2Result}`)
 
 	// ステップ2a: クリティカルダメージ補正（クリティカル時のみ）
 	if (input.userSettings.damageType === 'critical') {
-		console.log('→ ステップ2a: クリティカル計算を実行')
+		console.log('\n--- ステップ2a: クリティカル計算 ---')
 		step2Result = applyCriticalDamage(step2Result, input, steps)
+		console.log(`ステップ2a結果: ${step2Result}`)
 	}
 
 	// ステップ3: 属性有利補正
+	console.log('\n--- ステップ3: 属性有利補正 ---')
 	const step3Result = applyElementAdvantage(step2Result, input, steps)
+	console.log(`ステップ3結果: ${step3Result}`)
 
 	// ステップ4: スキル倍率補正
+	console.log('\n--- ステップ4: スキル倍率補正 ---')
 	const step4Result = applySkillMultiplier(step3Result, input, steps)
+	console.log(`ステップ4結果: ${step4Result}`)
 
 	// ステップ5: 抜刀%補正 (Phase 3で実装)
+	console.log('\n--- ステップ5: 抜刀%補正 ---')
 	const step5Result = applyUnsheatheRate(step4Result, input, steps)
+	console.log(`ステップ5結果: ${step5Result}`)
 
 	// ステップ6: 慣れ補正 (Phase 3で実装)
+	console.log('\n--- ステップ6: 慣れ補正 ---')
 	const step6Result = applyFamiliarity(step5Result, input, steps)
+	console.log(`ステップ6結果: ${step6Result}`)
 
 	// ステップ7: 距離補正 (Phase 3で実装)
+	console.log('\n--- ステップ7: 距離補正 ---')
 	const step7Result = applyDistance(step6Result, input, steps)
+	console.log(`ステップ7結果: ${step7Result}`)
 
 	// ステップ8: コンボ補正 (Phase 3で実装)
+	console.log('\n--- ステップ8: コンボ補正 ---')
 	const step8Result = applyCombo(step7Result, input, steps)
+	console.log(`ステップ8結果: ${step8Result}`)
 
 	// ステップ9: パッシブ倍率補正（プレースホルダー）
+	console.log('\n--- ステップ9: パッシブ倍率補正 ---')
 	const step9Result = applyPassiveMultiplier(step8Result, input, steps)
+	console.log(`ステップ9結果: ${step9Result}`)
 
 	// ステップ10: ブレイブ倍率補正
+	console.log('\n--- ステップ10: ブレイブ倍率補正 ---')
 	const baseDamage = applyBraveMultiplier(step9Result, input, steps)
+	console.log(`ステップ10結果: ${baseDamage}`)
+	
+	console.log('\n=== 最終結果 ===')
 	console.log('最終baseDamage:', baseDamage)
 
 	// 安定率適用
@@ -483,7 +511,17 @@ function applyCombo(
 ): number {
 	const comboRate = input.combo.isActive ? input.combo.multiplier : 100
 
+	console.log('=== COMBO CALCULATION (Step 8) ===')
+	console.log('beforeCombo (距離適用後):', beforeCombo)
+	console.log('combo.isActive:', input.combo.isActive)
+	console.log('combo.multiplier:', input.combo.multiplier)
+	console.log('comboRate (使用される倍率):', comboRate)
+	console.log(`計算式: Math.floor(${beforeCombo} * ${comboRate}/100)`)
+	console.log(`= Math.floor(${beforeCombo} * ${comboRate / 100})`)
+	console.log(`= Math.floor(${beforeCombo * (comboRate / 100)})`)
+
 	const result = Math.floor(beforeCombo * (comboRate / 100))
+	console.log('result (コンボ適用後):', result)
 
 	// 計算過程を記録
 	steps.step8_combo = {
