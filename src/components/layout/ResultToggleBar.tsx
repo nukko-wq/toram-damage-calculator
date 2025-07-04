@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { useUIStore } from '@/stores'
 import DamagePreview from './DamagePreview'
 import StatusPreview from './StatusPreview'
@@ -19,10 +19,46 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 		toggleDamagePreview,
 	} = useUIStore()
 
+	// ToggleBarの高さを測定するためのref
+	const toggleBarRef = useRef<HTMLDivElement>(null)
+	const [toggleBarHeight, setToggleBarHeight] = useState(60)
+
+	// ToggleBarの高さを動的に測定
+	useEffect(() => {
+		const updateHeight = () => {
+			if (toggleBarRef.current) {
+				const height = toggleBarRef.current.offsetHeight
+				setToggleBarHeight(height)
+			}
+		}
+
+		updateHeight()
+
+		// ResizeObserverでサイズ変更を監視
+		const resizeObserver = new ResizeObserver(updateHeight)
+		if (toggleBarRef.current) {
+			resizeObserver.observe(toggleBarRef.current)
+		}
+
+		// スクロールイベントでも更新（sticky動作対応）
+		const handleScroll = () => {
+			updateHeight()
+		}
+		window.addEventListener('scroll', handleScroll)
+
+		return () => {
+			resizeObserver.disconnect()
+			window.removeEventListener('scroll', handleScroll)
+		}
+	}, [])
+
 	return (
 		<>
 			{/* トグルボタンバー */}
-			<div className={`sticky top-0 left-0 right-0 z-40 ${className}`}>
+			<div 
+				ref={toggleBarRef}
+				className={`sticky top-0 left-0 right-0 z-40 ${className}`}
+			>
 				<div
 					className="grid grid-cols-2 lg:grid-cols-[520px_1fr]"
 					role="group"
@@ -92,7 +128,10 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 
 			{/* プレビューエリア */}
 			{(showDamagePreview || showStatusPreview) && (
-				<div className="sticky top-[60px] z-30 max-h-[80vh]">
+				<div 
+					className="sticky z-30 max-h-[80vh]"
+					style={{ top: `${toggleBarHeight}px` }}
+				>
 					<div className="flex">
 						{/* 与ダメージプレビュー */}
 						{showDamagePreview && (
