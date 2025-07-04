@@ -910,80 +910,80 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								</th>
 							</tr>
 							<tr className="border-b border-gray-200">
-								<th className="sm:px-2 py-1 text-left text-gray-700 font-medium" />
-								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
+								<th className="sm:px-2 py-0.5 text-left text-gray-700 font-medium" />
+								<th className="px-1 sm:px-2 py-0.5 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-0.5 text-center text-gray-700 font-medium">
 									安定率
 								</th>
-								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-0.5 text-center text-gray-700 font-medium">
 									ダメージ
 								</th>
-								<th className="px-1 sm:px-2 py-1 text-center text-gray-700 font-medium">
+								<th className="px-1 sm:px-2 py-0.5 text-center text-gray-700 font-medium">
 									安定率
 								</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr className="border-b border-gray-100">
-								<td className="px-1 sm:pl-4 sm:pr-2 py-1 font-medium text-gray-700">
+								<td className="px-1 sm:pl-4 sm:pr-2 pb-0.5 pt-1 font-medium text-gray-700">
 									最小
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 pb-0.5 pt-1 text-right font-semibold text-gray-700 font-roboto">
 									{damageResults.normal.min.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-1 text-center text-gray-700 font-roboto">
+								<td className="px-1 sm:px-4 pb-0.5 pt-1 text-center text-gray-700 font-roboto">
 									{damageResults.normal.stability}%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 pb-0.5 pt-1 text-right font-semibold text-gray-700 font-roboto">
 									{captureData
 										? captureData.damageResult.minimum.damage.toLocaleString()
 										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-1 text-center text-gray-700 font-roboto">
+								<td className="px-1 sm:px-4 pb-0.5 pt-1 text-center text-gray-700 font-roboto">
 									{captureData
 										? `${captureData.damageResult.minimum.stability}%`
 										: '-'}
 								</td>
 							</tr>
 							<tr className="border-b border-gray-100">
-								<td className="px-1 sm:px-4 py-1 font-medium text-gray-700">
+								<td className="px-1 sm:px-4 py-0.5 font-medium text-gray-700">
 									最大
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-semibold text-gray-700 font-roboto">
 									{damageResults.normal.max.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
 									100%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-semibold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-semibold text-gray-700 font-roboto">
 									{captureData
 										? captureData.damageResult.maximum.damage.toLocaleString()
 										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
 									{captureData
 										? `${captureData.damageResult.maximum.stability}%`
 										: '-'}
 								</td>
 							</tr>
 							<tr>
-								<td className="px-1 sm:px-4 py-1 font-medium text-gray-700">
+								<td className="px-1 sm:px-4 py-0.5 font-medium text-gray-700">
 									平均
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-bold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-bold text-gray-700 font-roboto">
 									{damageResults.normal.average.toLocaleString()}
 								</td>
-								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
 									{damageResults.normal.averageStability}%
 								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-1 text-right font-bold text-gray-700 font-roboto">
+								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-bold text-gray-700 font-roboto">
 									{captureData
 										? captureData.damageResult.average.damage.toLocaleString()
 										: 'データなし'}
 								</td>
-								<td className="px-1 sm:px-4 py-1 text-center text-gray-600 font-roboto">
+								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
 									{captureData
 										? `${captureData.damageResult.average.stability}%`
 										: '-'}
@@ -1005,9 +1005,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 				{/* 敵情報 */}
 				<div className="p-1 sm:p-2 flex items-center gap-2">
-					<p className="text-xs sm:text-[13px] font-medium text-gray-700">
-						敵：ラフィー
-					</p>
+					<p className="text-sm font-medium text-gray-700">敵：ラフィー</p>
 				</div>
 
 				{/* 威力オプション */}
