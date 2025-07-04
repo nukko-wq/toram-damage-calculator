@@ -873,13 +873,13 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							<tr className="border-b border-gray-200">
 								<th className="sm:px-2 py-3 text-left text-gray-700 font-medium" />
 								<th
-									className="px-1 sm:px-2 py-3 text-center text-gray-700 font-medium"
+									className="px-1 sm:px-2 py-1 sm:py-3 text-center text-gray-700 font-medium"
 									colSpan={2}
 								>
 									現在の計算結果
 								</th>
 								<th
-									className="px-1 sm:px-2 py-3 text-center text-gray-700 font-medium"
+									className="px-1 py-1 sm:px-2 sm:py-3 text-center text-gray-700 font-medium"
 									colSpan={2}
 								>
 									<button
@@ -994,8 +994,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* 慣れ倍率スライダー（後で実装予定の枠） */}
-				<div className="p-2 flex items-center">
-					<div className="text-[13px] font-medium text-gray-700">
+				<div className="p-1 sm:p-2 flex items-center">
+					<div className="text-xs sm:text-[13px] font-medium text-gray-700">
 						慣れ倍率（後で実装）
 					</div>
 					<div className="h-8 bg-gray-100 rounded flex items-center justify-center">
@@ -1004,7 +1004,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* 敵情報 */}
-				<div className="p-2 flex items-center gap-2">
+				<div className="p-1 sm:p-2 flex items-center gap-2">
 					<p className="text-xs sm:text-[13px] font-medium text-gray-700">
 						敵：ラフィー
 					</p>
@@ -1012,7 +1012,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 				{/* 威力オプション */}
 				<div className=" sm:p-2">
-					<ul className="flex gap-2 bg-blue-100 p-1">
+					<ul className="flex gap-2 bg-blue-100 p-1 mb-1">
 						<li className="text-[10px] sm:text-xs font-semibold text-gray-900 flex-1 text-center">
 							威力オプション
 						</li>
@@ -1035,7 +1035,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 											onClick={() =>
 												handlePowerOptionChange('bossDifficulty', difficulty)
 											}
-											className={`px-3 py-0.5 sm:py-1 text-xs md:text-[13px] rounded ${
+											className={`px-3 py-0.5 sm:py-1 text-xs md:text-[13px] rounded min-h-6 ${
 												powerOptions.bossDifficulty === difficulty
 													? 'bg-blue-400 text-white'
 													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -1064,7 +1064,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									<button
 										key={hit}
 										onClick={() => handlePowerOptionChange('skillDamage', hit)}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded ${
+										className={`px-3 py-1 text-xs md:text-[13px] rounded min-h-6 ${
 											powerOptions.skillDamage === hit
 												? 'bg-blue-400 text-white'
 												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
