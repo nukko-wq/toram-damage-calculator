@@ -221,6 +221,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				userSettings: {
 					familiarity: 100, // 仮の慣れ値（100%）
 					currentDistance: powerOptions.distance,
+					damageType: powerOptions.damageType,
+				},
+				// クリティカルダメージ設定
+				critical: {
+					damage: calculationResults?.basicStats.criticalDamage || 100,
 				},
 				// 敵情報設定を実際のデータに基づいて更新
 				enemy: {
@@ -277,6 +282,14 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('2. 参照ステータス:')
 			console.log('  総ATK (referenceStat):', input.referenceStat)
 			console.log('  参照タイプ:', input.referenceStatType)
+
+			// 3. ダメージタイプとクリティカル設定
+			console.log('3. ダメージタイプ設定:')
+			console.log('  ダメージタイプ:', powerOptions.damageType)
+			console.log('  input.userSettings.damageType:', input.userSettings.damageType)
+			console.log('  クリティカルダメージ input.critical.damage:', input.critical.damage)
+			console.log('  元データ calculationResults?.basicStats.criticalDamage:', calculationResults?.basicStats.criticalDamage)
+			console.log('  クリティカル判定:', input.userSettings.damageType === 'critical' ? 'クリティカル計算を実行' : '通常計算を実行')
 
 			// 3. 敵の耐性
 			console.log('3. 敵の耐性:')
@@ -514,12 +527,32 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 			// 計算結果の詳細ログ
 			console.log('=== CALCULATION RESULTS ===')
+			console.log('damageType:', powerOptions.damageType)
 			console.log('最終ダメージ:', attackResult.baseDamage)
 			console.log('最小ダメージ:', attackResult.stabilityResult.minDamage)
 			console.log('最大ダメージ:', attackResult.stabilityResult.maxDamage)
 			console.log('平均ダメージ:', attackResult.stabilityResult.averageDamage)
 			console.log('')
 			console.log('=== CALCULATION STEPS ===')
+			
+			// クリティカル計算が実行されたかチェック（ステップ3a）
+			if (attackResult.calculationSteps.step3a_critical) {
+				const step3a = attackResult.calculationSteps.step3a_critical
+				console.log('ステップ3a クリティカルダメージ:')
+				console.log('  有利適用後:', step3a.beforeCritical)
+				console.log('  クリティカル倍率:', step3a.criticalRate + '%')
+				console.log('  クリティカル適用後:', step3a.result)
+			}
+			
+			// ブレイブ倍率ステップ
+			if (attackResult.calculationSteps.step10_brave) {
+				const step10 = attackResult.calculationSteps.step10_brave
+				console.log('ステップ10 ブレイブ倍率:')
+				console.log('  適用前:', step10.beforeBrave)
+				console.log('  ブレイブ倍率:', step10.braveRate + '%')
+				console.log('  適用後:', step10.result)
+			}
+			
 			if (attackResult.calculationSteps.step1_baseDamage) {
 				const step1 = attackResult.calculationSteps.step1_baseDamage
 				console.log('ステップ1 基礎ダメージ:')
@@ -637,16 +670,22 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						}
 					}
 					case 'critical': {
-						// クリティカル：後で実装予定
-						const criticalBaseDamage = Math.floor(baseDamage * 1.25)
+						// クリティカル：baseDamageがすでにクリティカル計算済み
 						const minStabilityRate = stabilityRate
 						const maxStabilityRate = 100
 						const averageStabilityRate = Math.floor((minStabilityRate + maxStabilityRate) / 2)
 						
+						console.log('=== CRITICAL DISPLAY DEBUG ===')
+						console.log('baseDamage (クリティカル計算済み):', baseDamage)
+						console.log('stabilityRate:', stabilityRate)
+						console.log('計算される最小ダメージ:', Math.floor(baseDamage * stabilityRate / 100))
+						console.log('計算される最大ダメージ:', baseDamage)
+						console.log('計算される平均ダメージ:', Math.floor(baseDamage * averageStabilityRate / 100))
+						
 						return {
-							min: Math.floor(criticalBaseDamage * stabilityRate / 100),
-							max: criticalBaseDamage,
-							average: Math.floor(criticalBaseDamage * averageStabilityRate / 100),
+							min: Math.floor(baseDamage * stabilityRate / 100),
+							max: baseDamage,
+							average: Math.floor(baseDamage * averageStabilityRate / 100),
 							stability: stabilityRate,
 							averageStability: averageStabilityRate,
 						}
@@ -694,6 +733,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 
 			const damageDisplay = getDamageByType()
+
+			// 最終表示値とコンソールログとの対応確認
+			console.log('=== FINAL DISPLAY VALUES ===')
+			console.log('damageType:', powerOptions.damageType)
+			console.log('表示される最小ダメージ:', damageDisplay.min)
+			console.log('表示される最大ダメージ:', damageDisplay.max)
+			console.log('表示される平均ダメージ:', damageDisplay.average)
+			console.log('表示される安定率:', damageDisplay.stability)
+			console.log('表示される平均安定率:', damageDisplay.averageStability)
+			console.log('コンソールログの最終ダメージ:', attackResult.baseDamage)
+			console.log('コンソールログの最小ダメージ:', attackResult.stabilityResult.minDamage)
+			console.log('コンソールログの最大ダメージ:', attackResult.stabilityResult.maxDamage)
+			console.log('コンソールログの平均ダメージ:', attackResult.stabilityResult.averageDamage)
+			console.log('============================')
 
 			return {
 				normal: damageDisplay,

@@ -13,6 +13,25 @@
 最終ダメージ = 基本ダメージ × 安定率ランダム係数
 ```
 
+
+### クリティカルダメージ計算式
+クリティカルダメージ時は属性有利適用直後（ステップ3の後）でクリティカルダメージ倍率を適用します。
+
+```
+クリティカルダメージ = INT(INT(INT(INT(INT(INT(INT(INT((INT((INT((自Lv+参照ステータス-敵Lv)×(1-物魔耐性/100)×(1-武器耐性/100)-計算後敵(M)DEF)+抜刀固定値+スキル固定値)×(1+有利/100))×クリティカルダメージ%)×スキル倍率/100)×(1+抜刀%/100))×慣れ/100)×(1+距離/100))×コンボ/100)×(1+パッシブ倍率/100))×(1+ブレイブ倍率/100))
+
+最終クリティカルダメージ = クリティカルダメージ × 安定率ランダム係数
+```
+
+**重要な計算の違い**:
+- **基本ダメージ（白ダメ）**: スキル倍率はINT(スキル倍率)/100で計算（先に小数点切り捨て）
+- **クリティカルダメージ**: 属性有利後にクリティカルダメージを適用し、その後スキル倍率を適用
+- その他のステップは両方とも各ステップで小数点以下を切り捨て（INT適用）
+
+**クリティカルダメージ%の参照**:
+- 基本ステータスのクリティカルダメージ値を使用
+- 例: クリティカルダメージ125%の場合、1.25倍として計算
+
 ### 安定率システム
 安定率は基本ステータスで決定され、実際のダメージに幅を与えます。
 
@@ -71,10 +90,34 @@
 - スキル倍率334.4% → INT(334.4) = 334% として計算
 - スキル倍率120.9% → INT(120.9) = 120% として計算
 
+#### ステップ3a: クリティカルダメージ補正（クリティカル時のみ）
+クリティカルダメージ時は、属性有利の後、スキル倍率の前にクリティカルダメージ倍率を適用します。
+
+```
+クリティカル適用後 = INT(有利適用後 × クリティカルダメージ%)
+```
+
+#### ステップ4: スキル倍率補正（クリティカル時）
+```
+スキル倍率適用後 = INT(クリティカル適用後 × INT(スキル倍率)/100)
+```
+
+**計算の特徴**:
+- 属性有利の直後にクリティカルダメージ倍率を適用して小数点切り捨て
+- その後スキル倍率を適用して小数点切り捨て
+- 基本ステータスのクリティカルダメージ値（例: 125%）を使用
+
+**例**:
+- 有利適用後: 8617、クリティカルダメージ: 296%、スキル倍率: 334.4%
+- ステップ3a: INT(8617 × 296/100) = INT(25506.32) = 25506
+- ステップ4: INT(25506 × INT(334.4)/100) = INT(25506 × 334/100) = INT(85190.04) = 85190
+
 #### ステップ5: 抜刀%補正
 ```
-抜刀%適用後 = INT(スキル倍率適用後 × (1 + 抜刀%/100))
+抜刀%適用後 = INT(クリティカル適用後 × (1 + 抜刀%/100))
 ```
+
+**注意**: クリティカル時は「クリティカル適用後」の値を、通常時は「スキル倍率適用後」の値を使用します。
 
 #### ステップ6: 慣れ補正
 ```
@@ -388,11 +431,17 @@ export interface DamageCalculationInput {
   userSettings: {
     familiarity: number // 慣れ(50-250%)
     currentDistance: 'short' | 'long' | 'disabled' // 現在の距離判定
+    damageType: 'critical' | 'graze' | 'expected' | 'white' // ダメージ判定
   }
   
   // 安定率
   stability: {
     rate: number // 安定率(%)（例: 70）
+  }
+  
+  // クリティカル
+  critical: {
+    damage: number // クリティカルダメージ(%)（例: 125）
   }
   
   // バフスキル情報（エターナルナイトメア用）
@@ -490,6 +539,13 @@ export interface DamageCalculationSteps {
     result: number
   }
   
+  // ステップ4a: クリティカルダメージ（クリティカル時のみ）
+  step4a_critical?: {
+    beforeCritical: number
+    criticalRate: number
+    result: number
+  }
+  
   // ステップ10: ブレイブ倍率
   step10_brave: {
     beforeBrave: number
@@ -514,10 +570,17 @@ export function calculateDamage(input: DamageCalculationInput): DamageCalculatio
   // ステップ2: 固定値加算
   const step2Result = applyFixedValues(step1Result, input, steps)
   
-  // ステップ3-10: 各種倍率適用
+  // ステップ3-4: 属性有利とスキル倍率
   let currentDamage = step2Result
   currentDamage = applyElementAdvantage(currentDamage, input, steps)
   currentDamage = applySkillMultiplier(currentDamage, input, steps)
+  
+  // ステップ4a: クリティカルダメージ（クリティカル時のみ）
+  if (input.userSettings.damageType === 'critical') {
+    currentDamage = applyCriticalDamage(currentDamage, input, steps)
+  }
+  
+  // ステップ5-10: 残りの倍率適用
   currentDamage = applyUnsheatheRate(currentDamage, input, steps)
   currentDamage = applyFamiliarity(currentDamage, input, steps)
   currentDamage = applyDistance(currentDamage, input, steps)
