@@ -248,18 +248,21 @@ export function canExport(type: ExportType): boolean {
 			case 'full':
 				return true // 常にエクスポート可能
 				
-			case 'save-data':
+			case 'save-data': {
 				const saves = getAllSaveData()
 				return saves.length > 0
+			}
 				
-			case 'custom-data':
+			case 'custom-data': {
 				const equipment = getUserEquipments()
 				const crystals = getUserCrystals()
 				return equipment.length > 0 || crystals.length > 0
+			}
 				
-			case 'current-save':
+			case 'current-save': {
 				const currentSave = getCurrentSaveData()
 				return !!currentSave
+			}
 				
 			default:
 				return false
