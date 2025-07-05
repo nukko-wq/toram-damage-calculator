@@ -1,6 +1,5 @@
 /**
- * ダメージ差分表示コンポーネント（シンプル版）
- * 型エラーを避けつつ基本機能を提供
+ * 正しいダメージ計算エンジンを使ったダメージ差分表示コンポーネント
  */
 
 'use client'
@@ -10,9 +9,9 @@ import type {
 	SlotInfo, 
 	DamageDifferenceOptions 
 } from '@/types/damagePreview'
-import { useDamageDifferenceSimple } from '@/hooks/useDamageDifferenceSimple'
+import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 
-interface DamageDifferenceDisplaySimpleProps {
+interface DamageDifferenceDisplayCorrectProps {
 	item: PreviewItem
 	slotInfo: SlotInfo
 	className?: string
@@ -21,20 +20,20 @@ interface DamageDifferenceDisplaySimpleProps {
 }
 
 /**
- * ダメージ差分表示コンポーネント（シンプル版）
+ * 正しいダメージ計算エンジンを使ったダメージ差分表示コンポーネント
  */
-export function DamageDifferenceDisplaySimple({ 
+export function DamageDifferenceDisplayCorrect({ 
 	item, 
 	slotInfo, 
 	className = '',
 	options = {},
 	size = 'sm'
-}: DamageDifferenceDisplaySimpleProps) {
-	const { difference, isCalculating, error } = useDamageDifferenceSimple(item, slotInfo, options)
+}: DamageDifferenceDisplayCorrectProps) {
+	const { difference, isCalculating, error } = useDamageDifferenceCorrect(item, slotInfo, options)
 	
 	// デバッグモード時のみログ出力
 	if (options.debug) {
-		console.log('🎨 DamageDifferenceDisplaySimple render:', {
+		console.log('🎨 DamageDifferenceDisplayCorrect render:', {
 			itemName: item.name,
 			difference,
 			isCalculating,
@@ -90,22 +89,22 @@ export function DamageDifferenceDisplaySimple({
 }
 
 /**
- * バッジ形式でのダメージ差分表示（シンプル版）
+ * バッジ形式での正しいダメージ差分表示
  */
-interface DamageDifferenceBadgeSimpleProps {
+interface DamageDifferenceBadgeCorrectProps {
 	item: PreviewItem
 	slotInfo: SlotInfo
 	className?: string
 	options?: DamageDifferenceOptions
 }
 
-export function DamageDifferenceBadgeSimple({ 
+export function DamageDifferenceBadgeCorrect({ 
 	item, 
 	slotInfo, 
 	className = '',
 	options = {}
-}: DamageDifferenceBadgeSimpleProps) {
-	const { difference, isCalculating, error } = useDamageDifferenceSimple(item, slotInfo, options)
+}: DamageDifferenceBadgeCorrectProps) {
+	const { difference, isCalculating, error } = useDamageDifferenceCorrect(item, slotInfo, options)
 	
 	// 計算中またはエラー時は非表示
 	if (isCalculating || error || difference === 0) {

@@ -1,7 +1,7 @@
 'use client'
 
 import type { Crystal } from '@/types/calculator'
-import { DamageDifferenceDisplaySimple } from '@/components/common/DamageDifferenceDisplaySimple'
+import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
 import type { SlotInfo } from '@/types/damagePreview'
 
 interface CrystalCardProps {
@@ -69,11 +69,12 @@ export default function CrystalCard({
 			{/* ダメージ差分表示（選択されていない場合のみ） */}
 			{showDamageDifference && !isSelected && slotInfo && (
 				<div className="absolute top-2 left-2 z-10">
-					<DamageDifferenceDisplaySimple
+					<DamageDifferenceDisplayCorrect
 						item={crystal}
 						slotInfo={slotInfo}
 						size="sm"
 						className="bg-white rounded px-1 py-0.5 shadow-sm border"
+						options={{ debug: true }}
 					/>
 				</div>
 			)}
