@@ -1,17 +1,24 @@
 'use client'
 
 import type { Crystal } from '@/types/calculator'
+import { DamageDifferenceDisplaySimple } from '@/components/common/DamageDifferenceDisplaySimple'
+import type { SlotInfo } from '@/types/damagePreview'
 
 interface CrystalCardProps {
 	crystal: Crystal
 	isSelected: boolean
 	onClick: () => void
+	// ダメージ差分表示用の追加プロパティ
+	showDamageDifference?: boolean
+	slotInfo?: SlotInfo
 }
 
 export default function CrystalCard({
 	crystal,
 	isSelected,
 	onClick,
+	showDamageDifference = false,
+	slotInfo,
 }: CrystalCardProps) {
 	const getTypeLabel = (type: string) => {
 		switch (type) {
@@ -59,6 +66,18 @@ export default function CrystalCard({
 				}
 			`}
 		>
+			{/* ダメージ差分表示（選択されていない場合のみ） */}
+			{showDamageDifference && !isSelected && slotInfo && (
+				<div className="absolute top-2 left-2 z-10">
+					<DamageDifferenceDisplaySimple
+						item={crystal}
+						slotInfo={slotInfo}
+						size="sm"
+						className="bg-white rounded px-1 py-0.5 shadow-sm border"
+					/>
+				</div>
+			)}
+
 			{/* 選択状態のチェックマーク */}
 			{isSelected && (
 				<div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">

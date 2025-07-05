@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import type { CrystalType, Crystal } from '@/types/calculator'
 import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
+import type { SlotInfo } from '@/types/damagePreview'
 
 interface CrystalSelectionModalProps {
 	isOpen: boolean
@@ -12,6 +13,8 @@ interface CrystalSelectionModalProps {
 	selectedCrystalId: string | null
 	allowedTypes: CrystalType[]
 	title: string
+	// ダメージ差分表示用
+	slotInfo?: SlotInfo
 }
 
 export default function CrystalSelectionModal({
@@ -21,6 +24,7 @@ export default function CrystalSelectionModal({
 	selectedCrystalId,
 	allowedTypes,
 	title,
+	slotInfo,
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
 	const [availableCrystals, setAvailableCrystals] = useState<Crystal[]>(
@@ -260,6 +264,8 @@ export default function CrystalSelectionModal({
 											crystal={crystal}
 											isSelected={selectedCrystalId === crystal.id}
 											onClick={() => handleSelect(crystal.id)}
+											showDamageDifference={!!slotInfo}
+											slotInfo={slotInfo}
 										/>
 									))}
 								</div>
