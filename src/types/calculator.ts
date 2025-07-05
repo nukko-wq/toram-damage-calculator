@@ -783,6 +783,7 @@ export type AttackSkillSystemGroup =
 	| 'other' // その他
 
 export type AttackSkillCategory = 
+	// 旧分類（互換性のため残す）
 	| 'sword'      // 片手剣
 	| 'twohandSword' // 両手剣
 	| 'bow'        // 弓
@@ -794,6 +795,34 @@ export type AttackSkillCategory =
 	| 'katana'     // 刀
 	| 'dualSword'  // 双剣
 	| 'martialArts' // 格闘
+	// 新スキルツリー分類
+	| 'blade'        // ブレードスキル
+	| 'shoot'        // シュートスキル
+	| 'magic'        // マジックスキル
+	| 'martial'      // マーシャルスキル
+	| 'halberdSkill' // ハルバードスキル
+	| 'mononofu'     // モノノフスキル
+	| 'dualSwordSkill' // デュアルソードスキル
+	| 'crasher'      // クラッシャースキル
+	| 'sprite'       // スプライトスキル
+	| 'shield'       // シールドスキル
+	| 'knife'        // ナイフスキル
+	| 'knight'       // ナイトスキル
+	| 'hunter'       // ハンタースキル
+	| 'priest'       // プリーストスキル
+	| 'magicBlade'   // マジックブレードスキル
+	| 'darkPower'    // ダークパワースキル
+	| 'assassin'     // アサシンスキル
+	| 'wizard'       // ウィザードスキル
+	| 'guard'        // ガードスキル
+	| 'bareHand'     // ベアハンドスキル
+	| 'ninja'        // ニンジャスキル
+	| 'partizan'     // パルチザンスキル
+	| 'survival'     // サバイバルスキル
+	| 'support'      // サポートスキル
+	| 'battle'       // バトルスキル
+	| 'dancer'       // ダンサースキル
+	| 'minstrel'     // ミンストレルスキル
 
 // 威力参照タイプ
 export type PowerReferenceType = 'totalATK' | 'MATK' // 将来拡張: 'spearMATK', 'STR', 'INT', etc.

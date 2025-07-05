@@ -1,11 +1,12 @@
 // ステータス計算結果の型定義
 
 export interface CalculationResults {
-	// 基本ステータス（29項目）
+	// 基本ステータス（30項目）
 	basicStats: {
 		HP: number
 		MP: number
 		ATK: number
+		subATK: number
 		subBaseATK: number
 		totalATK: number
 		bringerAM: number
@@ -141,6 +142,7 @@ export const STAT_LABELS = {
 		HP: 'HP',
 		MP: 'MP',
 		ATK: 'ATK',
+		subATK: 'サブATK',
 		subBaseATK: 'サブ基礎ATK',
 		totalATK: '総ATK',
 		bringerAM: 'BringerA/M',
