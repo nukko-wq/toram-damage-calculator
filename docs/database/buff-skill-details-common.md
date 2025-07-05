@@ -261,51 +261,40 @@ interface UISettings {
 }
 ```
 
-#### 4.2 神速の捌手 (hb4-1)
+#### 4.2 神速の捌手 (godspeed_parry)
 ```typescript
 {
-  id: 'hb4-1',
+  id: 'godspeed_parry',
   name: '神速の捌手',
   category: 'halberd',
   type: 'stack',
-  order: 502,
+  order: 602,
   maxStack: 3,
   description: '攻撃速度と行動速度を上昇させる代わりに、MPと耐性が減少する',
-  effects: [
-    {
-      property: 'AttackSpeed',
-      formula: 'stackCount * (weaponType === "halberd" ? 400 : 300)',
-      conditions: [],
-      weaponTypeModifier: '旋風槍:400/stack, その他:300/stack'
+  weaponConditionalEffects: {
+    // 旋風槍装備時の効果
+    halberd: {
+      effects: [
+        { property: 'AttackSpeed', formula: 'stackCount * 400' },
+        { property: 'MotionSpeed_Rate', formula: 'stackCount * 10' },
+        { property: 'MP', formula: 'stackCount * -100' },
+        { property: 'PhysicalResistance_Rate', formula: 'stackCount * -25' },
+        { property: 'MagicalResistance_Rate', formula: 'stackCount * -25' },
+        { property: 'AvoidRecharge_Rate', formula: 'stackCount * 10' }
+      ]
     },
-    {
-      property: 'MotionSpeed_Rate',
-      formula: 'stackCount * 10',
-      conditions: []
-    },
-    {
-      property: 'MP',
-      formula: 'stackCount * -100',
-      conditions: []
-    },
-    {
-      property: 'PhysicalResistance_Rate',
-      formula: 'stackCount * (weaponType === "halberd" ? -25 : -70)',
-      conditions: [],
-      weaponTypeModifier: '旋風槍:-25%/stack, その他:-70%/stack'
-    },
-    {
-      property: 'MagicalResistance_Rate',
-      formula: 'stackCount * (weaponType === "halberd" ? -25 : -70)',
-      conditions: [],
-      weaponTypeModifier: '旋風槍:-25%/stack, その他:-70%/stack'
-    },
-    {
-      property: 'AvoidRecharge_Rate',
-      formula: 'stackCount * 10',
-      conditions: []
+    // その他武器装備時の効果
+    default: {
+      effects: [
+        { property: 'AttackSpeed', formula: 'stackCount * 300' },
+        { property: 'MotionSpeed_Rate', formula: 'stackCount * 10' },
+        { property: 'MP', formula: 'stackCount * -100' },
+        { property: 'PhysicalResistance_Rate', formula: 'stackCount * -70' },
+        { property: 'MagicalResistance_Rate', formula: 'stackCount * -70' },
+        { property: 'AvoidRecharge_Rate', formula: 'stackCount * 10' }
+      ]
     }
-  ],
+  },
   calculationFormula: `
     旋風槍装備時:
     - 攻撃速度 = stackCount × 400
@@ -323,31 +312,30 @@ interface UISettings {
     - 魔法耐性% = stackCount × -70
     - Avoid回復% = stackCount × 10
   `,
-  conditionalEffects: [
-    {
-      condition: '旋風槍装備時',
-      effects: [
-        { property: 'AttackSpeed', value: 'stackCount * 400' },
-        { property: 'PhysicalResistance_Rate', value: 'stackCount * -25' },
-        { property: 'MagicalResistance_Rate', value: 'stackCount * -25' }
-      ],
-      priority: 1
-    },
-    {
-      condition: 'その他武器装備時',
-      effects: [
-        { property: 'AttackSpeed', value: 'stackCount * 300' },
-        { property: 'PhysicalResistance_Rate', value: 'stackCount * -70' },
-        { property: 'MagicalResistance_Rate', value: 'stackCount * -70' }
-      ],
-      priority: 2
-    }
-  ],
   uiSettings: {
     parameterName: '重ねがけ数',
     parameterUnit: '回',
     showInModal: true,
     quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateGodspeedParryEffects(
+  stackCount: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (!stackCount || stackCount === 0) return {}
+  
+  const isHalberd = weaponType === 'halberd'
+  
+  return {
+    AttackSpeed: stackCount * (isHalberd ? 400 : 300),
+    MotionSpeed_Rate: stackCount * 10,
+    MP: stackCount * -100,
+    PhysicalResistance_Rate: stackCount * (isHalberd ? -25 : -70),
+    MagicalResistance_Rate: stackCount * (isHalberd ? -25 : -70),
+    AvoidRecharge_Rate: stackCount * 10
   }
 }
 ```
