@@ -51,7 +51,7 @@ export const equipmentsData: EquipmentsData = {
 				id: '5ecbbbad-1fb8-4e44-b36b-8181cc268f15',
 				name: '槍有利23%A15%S10%',
 				properties: {
-					ATK_Rate: 10,
+					ATK_Rate: 15,
 					ElementAdvantage_Rate: 23,
 					STR_Rate: 10,
 					NaturalHPRecovery: -30,

@@ -309,19 +309,18 @@ function calculateBaseDamage(
 	const beforeResistance =
 		input.playerLevel + input.referenceStat - input.enemyLevel
 
-	// 耐性適用（浮動小数点精度問題を避けるため整数演算を使用）
+	// 耐性適用（小数点処理せずにそのまま保持）
 	const mainResistance = input.attackSkill.type === 'physical' 
 		? input.resistance.physical 
 		: input.resistance.magical
 	const weaponResistance = input.resistance.weapon
 
-	// (1 - 主耐性/100) × (1 - 武器耐性/100) を整数演算で計算
-	// = (100 - 主耐性) × (100 - 武器耐性) / 10000
-	const mainMultiplierNumerator = 100 - mainResistance
-	const weaponMultiplierNumerator = 100 - weaponResistance
-	const combinedNumerator = mainMultiplierNumerator * weaponMultiplierNumerator
+	// (1 - 主耐性/100) × (1 - 武器耐性/100) の計算
+	const mainMultiplier = (100 - mainResistance) / 100
+	const weaponMultiplier = (100 - weaponResistance) / 100
+	const combinedMultiplier = mainMultiplier * weaponMultiplier
 
-	const afterResistance = (beforeResistance * combinedNumerator) / 10000
+	const afterResistance = beforeResistance * combinedMultiplier
 
 	// 敵防御力処理
 	const enemyDefense =
@@ -329,6 +328,7 @@ function calculateBaseDamage(
 	const defenseType = input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF'
 	const processedDefense = processEnemyDefense(enemyDefense, input, defenseType)
 
+	// 防御力減算後にfloorを適用
 	const result = Math.floor(afterResistance - processedDefense)
 
 	// 計算過程を記録
@@ -672,7 +672,8 @@ function processEnemyDefense(
 		penetrationRate = input.penetration.magical
 	}
 
-	processed = Math.floor(processed * (1 - penetrationRate / 100))
+	// 貫通計算（小数点保持）
+	processed = processed * (1 - penetrationRate / 100)
 
 	return processed
 }
