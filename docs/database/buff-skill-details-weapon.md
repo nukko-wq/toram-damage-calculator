@@ -412,33 +412,62 @@ function calculateBladeMasteryEffects(
 
 ### 4. 手甲 (knuckle)
 
-#### 4.1 手甲マスタリ (Ms-knuckle)
+#### 4.1 マーシャルマスタリ (Ms-Marchal)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
-  id: 'Ms-knuckle',
-  name: '手甲マスタリ',
+  id: 'Ms-Marchal',
+  name: 'マーシャルマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 104,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['knuckle'],
-    description: '手甲装備時'
-  },
-  description: '手甲の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: ['手甲装備時']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が手甲の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - ATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+ATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateMartialMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (weaponType !== 'knuckle' || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // ATK%計算（スキルレベル別）
+  let atkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    atkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    atkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    atkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    ATK_Rate: atkRate,
   }
 }
 ```

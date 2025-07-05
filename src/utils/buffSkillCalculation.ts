@@ -139,6 +139,34 @@ export function calculateShootMasteryEffects(
 }
 
 /**
+ * マーシャルマスタリの効果計算関数
+ */
+export function calculateMartialMasteryEffects(
+	skillLevel: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (weaponType !== 'knuckle' || skillLevel <= 0) return {}
+
+	// WeaponATK%計算
+	const weaponATKRate = skillLevel * 3
+
+	// ATK%計算（スキルレベル別）
+	let atkRate = 0
+	if (skillLevel >= 1 && skillLevel <= 2) {
+		atkRate = 1
+	} else if (skillLevel >= 3 && skillLevel <= 7) {
+		atkRate = 2
+	} else if (skillLevel >= 8 && skillLevel <= 10) {
+		atkRate = 3
+	}
+
+	return {
+		WeaponATK_Rate: weaponATKRate,
+		ATK_Rate: atkRate,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -206,6 +234,23 @@ export function getBuffSkillBonuses(
 	if (shootMastery?.isEnabled && shootMastery.level) {
 		const effects = calculateShootMasteryEffects(
 			shootMastery.level,
+			convertedWeaponType,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// マーシャルマスタリの処理
+	const martialMastery = buffSkillData['Ms-Marchal']
+	if (martialMastery?.isEnabled && martialMastery.level) {
+		const effects = calculateMartialMasteryEffects(
+			martialMastery.level,
 			convertedWeaponType,
 		)
 
