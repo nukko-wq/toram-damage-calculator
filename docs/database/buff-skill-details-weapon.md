@@ -441,33 +441,62 @@ interface WeaponRequirement {
 
 ### 5. 旋風槍 (halberd)
 
-#### 5.1 旋風槍マスタリ (Ms-halberd)
+#### 5.1 ハルバードマスタリ (Ms-halberd)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
   id: 'Ms-halberd',
-  name: '旋風槍マスタリ',
+  name: 'ハルバードマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 105,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['halberd'],
-    description: '旋風槍装備時'
-  },
-  description: '旋風槍の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: ['旋風槍装備時']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が旋風槍の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - ATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+ATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateHalberdMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (weaponType !== 'halberd' || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // ATK%計算（スキルレベル別）
+  let atkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    atkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    atkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    atkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    ATK_Rate: atkRate
   }
 }
 ```

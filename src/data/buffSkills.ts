@@ -872,6 +872,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'ハルバードマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 

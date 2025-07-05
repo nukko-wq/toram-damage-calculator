@@ -53,6 +53,34 @@ export function calculateGodspeedParryEffects(
 }
 
 /**
+ * ハルバードマスタリの効果計算関数
+ */
+export function calculateHalberdMasteryEffects(
+	skillLevel: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (weaponType !== 'halberd' || skillLevel <= 0) return {}
+
+	// WeaponATK%計算
+	const weaponATKRate = skillLevel * 3
+
+	// ATK%計算（スキルレベル別）
+	let atkRate = 0
+	if (skillLevel >= 1 && skillLevel <= 2) {
+		atkRate = 1
+	} else if (skillLevel >= 3 && skillLevel <= 7) {
+		atkRate = 2
+	} else if (skillLevel >= 8 && skillLevel <= 10) {
+		atkRate = 3
+	}
+
+	return {
+		WeaponATK_Rate: weaponATKRate,
+		ATK_Rate: atkRate,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -81,24 +109,23 @@ export function getBuffSkillBonuses(
 		}
 	}
 
+	// ハルバードマスタリの処理
+	const halberdMastery = buffSkillData['Ms-halberd']
+	if (halberdMastery?.isEnabled && halberdMastery.level) {
+		const effects = calculateHalberdMasteryEffects(
+			halberdMastery.level,
+			convertedWeaponType,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
 	return bonuses
 }
 
-/**
- * プロパティ値のバリデーション
- */
-function validateBuffSkillPropertyValue(
-	value: number,
-	propertyId: string,
-): number {
-	// 数値チェック
-	if (typeof value !== 'number' || Number.isNaN(value)) return 0
-
-	// 範囲チェック（プロパティ別）
-	if (propertyId.includes('Rate')) {
-		// %系は-100〜1000の範囲
-		return Math.max(-100, Math.min(1000, value))
-	}
-	// 固定値系は-9999〜9999の範囲
-	return Math.max(-9999, Math.min(9999, value))
-}
