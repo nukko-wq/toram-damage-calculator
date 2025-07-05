@@ -10,6 +10,7 @@ import {
 import { getAttackSkillById } from '@/data/attackSkills'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
+import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
 import {
 	getEquipmentBonuses,
 	getCrystalBonuses,
@@ -186,10 +187,22 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// Zustandストアのデータで入力を更新
 			const distanceValues = getDistanceValues()
 
-			// 敵情報を明示的に作成
-			const finalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
-			const finalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
-			const finalEnemyLevel = enemyInfo?.level ?? defaultInput.enemy.level
+			// 敵情報を明示的に作成（ボス難易度適用）
+			let finalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
+			let finalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
+			let finalEnemyLevel = enemyInfo?.level ?? defaultInput.enemy.level
+
+			// ボス系敵かつ難易度がnormal以外の場合、難易度調整を適用
+			if (enemyInfo?.category === 'boss' && powerOptions.bossDifficulty !== 'normal') {
+				const adjustedStats = calculateBossDifficultyStats(
+					finalEnemyLevel,
+					enemyInfo.stats,
+					powerOptions.bossDifficulty,
+				)
+				finalEnemyLevel = adjustedStats.level
+				finalEnemyDEF = adjustedStats.stats.DEF
+				finalEnemyMDEF = adjustedStats.stats.MDEF
+			}
 
 			const input: DamageCalculationInput = {
 				...defaultInput,

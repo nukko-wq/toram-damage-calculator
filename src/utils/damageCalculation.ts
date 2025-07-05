@@ -494,7 +494,7 @@ function applyDistance(
 	if (input.userSettings.damageType === 'critical') {
 		// クリティカル時：小数点を保持して次のステップに渡す
 		result = beforeDistance * (1 + distanceRate / 100)
-		console.log(`=== クリティカル時距離補正: 小数点保持 ===`)
+		console.log('=== クリティカル時距離補正: 小数点保持 ===')
 		console.log(`${beforeDistance} × (1 + ${distanceRate}/100) = ${result}`)
 	} else {
 		// 通常時：切り捨て
@@ -639,11 +639,8 @@ function processEnemyDefense(
 ): number {
 	let processed = defense
 
-	// 1. ボス難易度による防御力補正
-	if (input.enemy.category === 'boss' && input.enemy.difficulty) {
-		const difficultyMultiplier = getBossDifficultyDefenseMultiplier(input.enemy.difficulty)
-		processed = Math.floor(processed * difficultyMultiplier)
-	}
+	// 1. ボス難易度による防御力補正は既にDamagePreview.tsxで適用済みなのでここでは行わない
+	// ボス難易度計算は`calculateBossDifficultyStats`で処理済み
 
 	// 2. 破壊状態異常による半減（小数点以下切り上げ）
 	// Phase 3では未実装
@@ -672,24 +669,13 @@ function processEnemyDefense(
 		penetrationRate = input.penetration.magical
 	}
 
-	// 貫通計算（小数点保持）
+	// 貫通計算（小数点を保持したまま返す）
 	processed = processed * (1 - penetrationRate / 100)
 
+	// 小数点を保持したまま返す（Math.floorは基礎ダメージ計算で適用）
 	return processed
 }
 
-/**
- * ボス難易度による防御力倍率を取得
- */
-function getBossDifficultyDefenseMultiplier(difficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate'): number {
-	switch (difficulty) {
-		case 'normal': return 1.0   // 100%
-		case 'hard': return 1.2     // 120%
-		case 'lunatic': return 1.5  // 150%
-		case 'ultimate': return 2.0 // 200%
-		default: return 1.0
-	}
-}
 
 /**
  * 安定率ダメージ計算

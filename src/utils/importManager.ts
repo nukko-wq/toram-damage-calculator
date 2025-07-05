@@ -227,7 +227,7 @@ async function importSaveData(
 			if (options.mergeMode === 'skip') {
 				skipped++
 				continue
-			} else if (options.mergeMode === 'merge') {
+			}if (options.mergeMode === 'merge') {
 				// 名前を変更してインポート
 				let newName = `${saveData.name} (インポート)`
 				let counter = 1
@@ -272,7 +272,7 @@ async function importCustomEquipment(
 			if (options.mergeMode === 'skip') {
 				skipped++
 				continue
-			} else if (options.mergeMode === 'merge') {
+			}if (options.mergeMode === 'merge') {
 				// 名前を変更してインポート
 				let newName = `${equipment.name} (インポート)`
 				let counter = 1
@@ -320,7 +320,7 @@ async function importCustomCrystals(
 			if (options.mergeMode === 'skip') {
 				skipped++
 				continue
-			} else if (options.mergeMode === 'merge') {
+			}if (options.mergeMode === 'merge') {
 				// 名前を変更してインポート
 				let newName = `${crystal.name} (インポート)`
 				let counter = 1
