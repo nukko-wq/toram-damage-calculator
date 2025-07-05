@@ -633,33 +633,63 @@ function calculateHalberdMasteryEffects(
 
 ### 7. 弓 (bow)
 
-#### 7.1 弓マスタリ (Ms-bow)
+#### 7.1 シュートマスタリ (Ms-shoot)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
-  id: 'Ms-bow',
-  name: '弓マスタリ',
+  id: 'Ms-shoot',
+  name: 'シュートマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 107,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['bow'],
-    description: '弓装備時'
-  },
-  description: '弓の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: ['弓装備時']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が弓、自動弓の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - ATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+ATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateShootMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  const shootWeapons: MainWeaponType[] = ['bow', 'bowgun']
+  if (!weaponType || !shootWeapons.includes(weaponType) || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // ATK%計算（スキルレベル別）
+  let atkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    atkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    atkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    atkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    ATK_Rate: atkRate,
   }
 }
 ```
@@ -703,36 +733,8 @@ function calculateHalberdMasteryEffects(
 
 ### 8. 自動弓 (bowgun)
 
-#### 8.1 自動弓マスタリ (Ms-bowgun)
-```typescript
-{
-  id: 'Ms-bowgun',
-  name: '自動弓マスタリ',
-  category: 'mastery',
-  type: 'level',
-  order: 108,
-  maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['bowgun'],
-    description: '自動弓装備時'
-  },
-  description: '自動弓の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: ['自動弓装備時']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+#### 8.1 シュートマスタリ (Ms-shoot)
+※ 弓セクション（7.1）を参照。自動弓でも同じ効果。
 
 ### 9. 杖 (staff)
 
