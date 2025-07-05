@@ -111,32 +111,43 @@ function calculateBladeMasteryEffects(
 ```
 
 #### 1.2 素早い斬撃 (sm2)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
   id: 'sm2',
   name: '素早い斬撃',
   category: 'blade',
   type: 'level',
-  order: 202,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['oneHandSword', 'dualSword'],
-    description: '片手剣または双剣装備時'
-  },
-  description: '攻撃速度を上昇させる',
-  effects: [
-    {
-      property: 'AttackSpeed_Rate',
-      formula: 'skillLevel * 5',
-      conditions: ['剣系武器装備時']
-    }
-  ],
-  calculationFormula: '攻撃速度% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 202,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が片手剣、双剣、両手剣の場合のみ効果あり
+- **効果内容**:
+  - AttackSpeed: `スキルレベル × 10`
+  - AttackSpeed_Rate: `スキルレベル × 1%`
+
+**計算式**:
+```
+AttackSpeed = skillLevel × 10
+AttackSpeed_Rate = skillLevel × 1
+```
+
+**実装用計算関数**:
+```typescript
+function calculateQuickSlashEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+  if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0) return {}
+  
+  return {
+    AttackSpeed: skillLevel * 10,
+    AttackSpeed_Rate: skillLevel * 1,
   }
 }
 ```
@@ -208,6 +219,9 @@ function calculateBladeMasteryEffects(
 
 #### 2.1 ブレードマスタリ (Ms-blade)
 ※ 片手剣セクション（1.1）を参照。双剣でも同じ効果。
+
+#### 2.1.1 素早い斬撃 (sm2)
+※ 片手剣セクション（1.2）を参照。双剣でも同じ効果。
 
 #### 2.2 デュアルマスタリ (DSpena1)
 ```typescript
@@ -342,6 +356,9 @@ function calculateBladeMasteryEffects(
 
 #### 3.1 ブレードマスタリ (Ms-blade)
 ※ 片手剣セクション（1.1）を参照。両手剣でも同じ効果。
+
+#### 3.1.1 素早い斬撃 (sm2)
+※ 片手剣セクション（1.2）を参照。両手剣でも同じ効果。
 
 #### 3.2 両手剣マスタリ (Ms-twohand)
 ```typescript

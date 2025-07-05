@@ -196,6 +196,22 @@ export function calculateMagicMasteryEffects(
 }
 
 /**
+ * 素早い斬撃の効果計算関数
+ */
+export function calculateQuickSlashEffects(
+	skillLevel: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+	if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0) return {}
+
+	return {
+		AttackSpeed: skillLevel * 10,
+		AttackSpeed_Rate: skillLevel * 1,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -297,6 +313,23 @@ export function getBuffSkillBonuses(
 	if (magicMastery?.isEnabled && magicMastery.level) {
 		const effects = calculateMagicMasteryEffects(
 			magicMastery.level,
+			convertedWeaponType,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// 素早い斬撃の処理
+	const quickSlash = buffSkillData['sm2']
+	if (quickSlash?.isEnabled && quickSlash.level) {
+		const effects = calculateQuickSlashEffects(
+			quickSlash.level,
 			convertedWeaponType,
 		)
 
