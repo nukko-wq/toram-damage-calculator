@@ -28,10 +28,7 @@ import {
 	getBodyArmorType,
 } from '@/utils/basicStatsCalculation'
 import {
-	getEquipmentBonuses,
-	getCrystalBonuses,
-	getFoodBonuses,
-	getBuffBonuses,
+	getAllDataSourceBonusesWithBuffSkills,
 } from '@/utils/dataSourceIntegration'
 import StatSection from './StatSection'
 
@@ -62,31 +59,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
 
-	// データソース別のメモ化
-	const equipmentBonuses = useMemo(() => {
-		return getEquipmentBonuses(data.equipment)
-	}, [data.equipment])
-
-	const crystalBonuses = useMemo(
-		() => getCrystalBonuses(data.crystals),
-		[data.crystals],
-	)
-
-	const foodBonuses = useMemo(() => getFoodBonuses(data.food), [data.food])
-
-	const buffBonuses = useMemo(
-		() => getBuffBonuses(data.buffItems),
-		[data.buffItems],
-	)
-
 	// 統合計算のメモ化
 	const calculationResults = useMemo(() => {
-		const allBonuses = aggregateAllBonuses(
-			equipmentBonuses,
-			crystalBonuses,
-			foodBonuses,
-			buffBonuses,
-		)
+		// バフスキルを含む全データソースのボーナスを取得
+		const allBonuses = getAllDataSourceBonusesWithBuffSkills(data)
 
 		// 全ての効果を統合した最終ボーナス値を作成
 		const finalBonuses = { ...allBonuses }
@@ -182,138 +158,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					(finalBonuses.MP || 0) + freshFruitTradeEffect.level * 10
 			}
 		}
-
-		// TODO: 将来的にバフスキル効果もここに統合
-
-		// 料理の効果をデバッグ
-		console.log('料理データソースデバッグ:', {
-			rawFoodData: data.food,
-			foodBonuses: foodBonuses,
-			foodAggroValue: foodBonuses.Aggro || 0,
-			foodAggroRateValue: foodBonuses.Aggro_Rate || 0,
-		})
-
-		// デバッグ: 攻撃MP回復、物理耐性、魔法耐性、異常耐性、ヘイトの値を確認
-		console.log('ステータスデバッグ:', {
-			attackMP: {
-				equipment: equipmentBonuses.AttackMPRecovery || 0,
-				equipment_rate: equipmentBonuses.AttackMPRecovery_Rate || 0,
-				total: allBonuses.AttackMPRecovery || 0,
-				total_rate: allBonuses.AttackMPRecovery_Rate || 0,
-			},
-			physicalResist: {
-				equipment: equipmentBonuses.PhysicalResistance_Rate || 0,
-				equipment_rate: equipmentBonuses.PhysicalResistance_Rate || 0,
-				crystal: crystalBonuses.PhysicalResistance_Rate || 0,
-				crystal_rate: crystalBonuses.PhysicalResistance_Rate || 0,
-				buff: buffBonuses.PhysicalResistance_Rate || 0,
-				buff_rate: buffBonuses.PhysicalResistance_Rate || 0,
-				total: allBonuses.PhysicalResistance_Rate || 0,
-				total_rate: allBonuses.PhysicalResistance_Rate || 0,
-			},
-			magicalResist: {
-				equipment: equipmentBonuses.MagicalResistance_Rate || 0,
-				equipment_rate: equipmentBonuses.MagicalResistance_Rate || 0,
-				crystal: crystalBonuses.MagicalResistance_Rate || 0,
-				crystal_rate: crystalBonuses.MagicalResistance_Rate || 0,
-				buff: buffBonuses.MagicalResistance_Rate || 0,
-				buff_rate: buffBonuses.MagicalResistance_Rate || 0,
-				total: allBonuses.MagicalResistance_Rate || 0,
-				total_rate: allBonuses.MagicalResistance_Rate || 0,
-			},
-			ailmentResist: {
-				equipment: equipmentBonuses.AilmentResistance_Rate || 0,
-				equipment_rate: equipmentBonuses.AilmentResistance_Rate || 0,
-				total: allBonuses.AilmentResistance_Rate || 0,
-				total_rate: allBonuses.AilmentResistance_Rate || 0,
-			},
-			aggro: {
-				equipment_plus: Math.max(0, equipmentBonuses.Aggro || 0),
-				equipment_plus_rate: Math.max(0, equipmentBonuses.Aggro_Rate || 0),
-				equipment_minus: Math.abs(Math.min(0, equipmentBonuses.Aggro || 0)),
-				equipment_minus_rate: Math.abs(
-					Math.min(0, equipmentBonuses.Aggro_Rate || 0),
-				),
-				food_aggro: foodBonuses.Aggro || 0,
-				food_aggro_rate: foodBonuses.Aggro_Rate || 0,
-				total_plus: Math.max(0, allBonuses.Aggro || 0),
-				total_plus_rate: Math.max(0, allBonuses.Aggro_Rate || 0),
-				total_minus: Math.abs(Math.min(0, allBonuses.Aggro || 0)),
-				total_minus_rate: Math.abs(Math.min(0, allBonuses.Aggro_Rate || 0)),
-			},
-			naturalRecovery: {
-				equipment_hp: equipmentBonuses.NaturalHPRecovery || 0,
-				equipment_hp_rate: equipmentBonuses.NaturalHPRecovery_Rate || 0,
-				equipment_mp: equipmentBonuses.NaturalMPRecovery || 0,
-				equipment_mp_rate: equipmentBonuses.NaturalMPRecovery_Rate || 0,
-				crystal_hp: crystalBonuses.NaturalHPRecovery || 0,
-				crystal_hp_rate: crystalBonuses.NaturalHPRecovery_Rate || 0,
-				crystal_mp: crystalBonuses.NaturalMPRecovery || 0,
-				crystal_mp_rate: crystalBonuses.NaturalMPRecovery_Rate || 0,
-				total_hp: allBonuses.NaturalHPRecovery || 0,
-				total_hp_rate: allBonuses.NaturalHPRecovery_Rate || 0,
-				total_mp: allBonuses.NaturalMPRecovery || 0,
-				total_mp_rate: allBonuses.NaturalMPRecovery_Rate || 0,
-			},
-			absolute: {
-				equipment_accuracy: equipmentBonuses.AbsoluteAccuracy_Rate || 0,
-				equipment_accuracy_rate: equipmentBonuses.AbsoluteAccuracy_Rate || 0,
-				equipment_dodge: equipmentBonuses.AbsoluteDodge_Rate || 0,
-				equipment_dodge_rate: equipmentBonuses.AbsoluteDodge_Rate || 0,
-				total_accuracy: allBonuses.AbsoluteAccuracy_Rate || 0,
-				total_accuracy_rate: allBonuses.AbsoluteAccuracy_Rate || 0,
-				total_dodge: allBonuses.AbsoluteDodge_Rate || 0,
-				total_dodge_rate: allBonuses.AbsoluteDodge_Rate || 0,
-			},
-			itemCooldown: {
-				equipment: equipmentBonuses.ItemCooldown || 0,
-				total: allBonuses.ItemCooldown || 0,
-			},
-			elementalResistance: {
-				fire: {
-					equipment: equipmentBonuses.FireResistance_Rate || 0,
-					equipment_rate: equipmentBonuses.FireResistance_Rate || 0,
-					total: allBonuses.FireResistance_Rate || 0,
-					total_rate: allBonuses.FireResistance_Rate || 0,
-				},
-				water: {
-					equipment: equipmentBonuses.WaterResistance_Rate || 0,
-					equipment_rate: equipmentBonuses.WaterResistance_Rate || 0,
-					total: allBonuses.WaterResistance_Rate || 0,
-					total_rate: allBonuses.WaterResistance_Rate || 0,
-				},
-				wind: {
-					equipment: equipmentBonuses.WindResistance_Rate || 0,
-					equipment_rate: equipmentBonuses.WindResistance_Rate || 0,
-					total: allBonuses.WindResistance_Rate || 0,
-					total_rate: allBonuses.WindResistance_Rate || 0,
-				},
-				earth: {
-					equipment: equipmentBonuses.EarthResistance_Rate || 0,
-					equipment_rate: equipmentBonuses.EarthResistance_Rate || 0,
-					total: allBonuses.EarthResistance_Rate || 0,
-					total_rate: allBonuses.EarthResistance_Rate || 0,
-				},
-				light: {
-					equipment: equipmentBonuses.LightResistance_Rate || 0,
-					equipment_rate: equipmentBonuses.LightResistance_Rate || 0,
-					total: allBonuses.LightResistance_Rate || 0,
-					total_rate: allBonuses.LightResistance_Rate || 0,
-				},
-				dark: {
-					equipment: equipmentBonuses.DarkResistance_Rate || 0,
-					equipment_rate: equipmentBonuses.DarkResistance_Rate || 0,
-					total: allBonuses.DarkResistance_Rate || 0,
-					total_rate: allBonuses.DarkResistance_Rate || 0,
-				},
-				neutral: {
-					equipment: equipmentBonuses.NeutralResistance_Rate || 0,
-					equipment_rate: equipmentBonuses.NeutralResistance_Rate || 0,
-					total: allBonuses.NeutralResistance_Rate || 0,
-					total_rate: allBonuses.NeutralResistance_Rate || 0,
-				},
-			},
-		})
 
 		const adjustedStatsCalculation = calculateAdjustedStats(
 			baseStats,
@@ -421,17 +265,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			adjustedStatsCalculation,
 		}
 	}, [
-		equipmentBonuses,
-		crystalBonuses,
-		foodBonuses,
-		buffBonuses,
+		data,
 		baseStats,
-		data.mainWeapon,
-		data.subWeapon,
-		data.equipment.body,
-		data.register, // レジスタデータを依存関係に追加
-		data.food, // 料理データを依存関係に追加（デバッグログ用）
-		data.buffSkills, // バフスキルデータを依存関係に追加
 	])
 
 	const {
@@ -479,57 +314,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		atkCalculation.finalATK,
 		subATKCalculation?.subFinalATK || 0,
 	)
-
-	// デバッグ: equipmentBonus3の全プロパティを確認
-	console.log('equipmentBonus3 プロパティ:', {
-		naturalHPRecovery: equipmentBonus3.naturalHPRecovery,
-		naturalHPRecovery_Rate: equipmentBonus3.naturalHPRecovery_Rate,
-		naturalMPRecovery: equipmentBonus3.naturalMPRecovery,
-		naturalMPRecovery_Rate: equipmentBonus3.naturalMPRecovery_Rate,
-		revivalTime: equipmentBonus3.revivalTime,
-		revivalTime_Rate: equipmentBonus3.revivalTime_Rate,
-		absoluteAccuracy: equipmentBonus3.absoluteAccuracy,
-		absoluteAccuracy_Rate: equipmentBonus3.absoluteAccuracy_Rate,
-		absoluteDodge: equipmentBonus3.absoluteDodge,
-		absoluteDodge_Rate: equipmentBonus3.absoluteDodge_Rate,
-		itemCooldown: equipmentBonus3.itemCooldown,
-		allKeys: Object.keys(equipmentBonus3),
-		specialKeys: Object.keys(equipmentBonus3).filter(
-			(key) =>
-				key.includes('natural') ||
-				key.includes('Natural') ||
-				key.includes('revival') ||
-				key.includes('Revival') ||
-				key.includes('absolute') ||
-				key.includes('Absolute') ||
-				key.includes('item') ||
-				key.includes('Item') ||
-				key.includes('tool') ||
-				key.includes('Tool'),
-		),
-	})
-
-	// デバッグ: equipmentBonus2の属性耐性を確認
-	console.log('equipmentBonus2 属性耐性:', {
-		fireResistance: equipmentBonus2.fireResistance,
-		fireResistance_Rate: equipmentBonus2.fireResistance_Rate,
-		waterResistance: equipmentBonus2.waterResistance,
-		waterResistance_Rate: equipmentBonus2.waterResistance_Rate,
-		windResistance: equipmentBonus2.windResistance,
-		windResistance_Rate: equipmentBonus2.windResistance_Rate,
-		earthResistance: equipmentBonus2.earthResistance,
-		earthResistance_Rate: equipmentBonus2.earthResistance_Rate,
-		lightResistance: equipmentBonus2.lightResistance,
-		lightResistance_Rate: equipmentBonus2.lightResistance_Rate,
-		darkResistance: equipmentBonus2.darkResistance,
-		darkResistance_Rate: equipmentBonus2.darkResistance_Rate,
-		neutralResistance: equipmentBonus2.neutralResistance,
-		neutralResistance_Rate: equipmentBonus2.neutralResistance_Rate,
-		allKeys: Object.keys(equipmentBonus2),
-		resistanceKeys: Object.keys(equipmentBonus2).filter(
-			(key) => key.includes('Resistance') || key.includes('resistance'),
-		),
-	})
 
 	if (!isVisible) {
 		return null

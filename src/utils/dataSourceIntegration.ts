@@ -16,6 +16,7 @@ import type {
 } from '@/types/bonusCalculation'
 import type { CalculatorData } from '@/types/calculator'
 import { getCrystalById } from './crystalDatabase'
+import { getBuffSkillBonuses } from './buffSkillCalculation'
 
 /**
  * プロパティ値のバリデーション
@@ -450,6 +451,43 @@ export function getAllDataSourceBonuses(
 		food: getFoodBonuses(data.food),
 		buff: getBuffBonuses(data.buffItems),
 	}
+}
+
+/**
+ * バフスキルを含む全データソースを一括取得するヘルパー
+ */
+export function getAllDataSourceBonusesWithBuffSkills(
+	data: CalculatorData,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	// 従来の4つのデータソースを統合
+	const dataSources = getAllDataSourceBonuses(data)
+	
+	// 各データソースの補正値を統合
+	for (const source of Object.values(dataSources)) {
+		for (const [key, value] of Object.entries(source)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// バフスキルの補正値を追加
+	const buffSkillBonuses = getBuffSkillBonuses(
+		data.buffSkills?.skills || null,
+		data.mainWeapon?.weaponType || null,
+	)
+	
+	for (const [key, value] of Object.entries(buffSkillBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	return bonuses
 }
 
 /**

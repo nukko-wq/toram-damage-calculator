@@ -558,43 +558,40 @@ export function calculateATK(
 
 ### サブ基礎ATK計算式
 ```
-サブ基礎ATK = INT((自Lv + 総サブ武器ATK + ステータスサブATK) × (1 + ATK%/100)) + ATK固定値
+サブ基礎ATK = INT(自Lv + 総サブ武器ATK + サブステータスATK)
 ```
 
 ### サブ安定率計算式
 ```
-サブ安定率 = INT(サブ武器の安定率とサブ武器のステータス安定率をもとに計算) + 安定率%
+サブ安定率 = INT(MAX(0, MIN(100, サブ武器の安定率/2 + ステータス安定率 + 安定率%)))
 ```
 
-#### サブ武器の安定率とサブ武器のステータス安定率をもとに計算
+#### ステータス安定率
 ```
-サブ武器の安定率とサブ武器のステータス安定率をもとに計算 = MAX(0, MIN(100, サブ武器の安定率/2 + 双剣のサブ武器のステータス安定率 + 安定率%))
-```
-
-#### 双剣のサブ武器のステータス安定率
-```
-双剣のサブ武器のステータス安定率 = STR × 0.06 + AGI × 0.04
+ステータス安定率 = 補正後STR × 0.06 + 補正後AGI × 0.04
 ```
 
 ### サブATK計算式
 ```
-サブATK = INT(サブ基礎ATK × サブ安定率/100)
+サブATK = INT((INT(サブ基礎ATK × (1 + ATK%/100)) + ATK固定値) × (サブ安定率/100))
 ```
 
 **構成要素:**
 - **サブ武器の安定率**: サブ武器フォームで設定された安定率値（0-100の数値）
-- **双剣のサブ武器のステータス安定率**: STR × 0.06 + AGI × 0.04（基礎ステータスを使用）
+- **ステータス安定率**: 補正後STR × 0.06 + 補正後AGI × 0.04
 - **安定率%**: 装備/プロパティ、クリスタ、バフアイテムのStability_Rate補正の合計
+- **ATK%**: 装備/プロパティ、クリスタ、料理、バフアイテムのATK_Rate補正の合計
+- **ATK固定値**: 装備/プロパティ、クリスタ、料理、バフアイテムのATK補正の合計
 
 **注意**: 
 - サブATK計算にはATKアップ(ステータス%)・ATKダウン(ステータス%)は含まれない
 - サブ基礎ATKにATK%とATK固定値を適用してから、サブ安定率による計算を行う
-- ステータス安定率は基礎ステータス（補正前）を使用
-- 安定率の合計は0-100の範囲に制限される
+- ステータス安定率は補正後ステータスを使用
+- サブ安定率はINT()関数で整数化される
 
 ### サブステータスATK計算式（双剣専用）
 ```
-サブステータスATK = STR × 1.0 + AGI × 3.0
+サブステータスATK = 補正後STR × 1 + 補正後AGI × 3
 ```
 
 ### 総サブ武器ATK計算
@@ -641,32 +638,29 @@ const subTotalWeaponATK = subRefinedWeaponATK + subWeaponATKPercentBonus + subWe
 const subStatusATK = adjustedStats.STR * 1.0 + adjustedStats.AGI * 3.0
 ```
 
-#### 4. サブ基礎ATK計算（ATKアップ・ATKダウンは含まない）
+#### 4. サブ基礎ATK計算
 ```typescript
-const subBaseATKBeforePercent = stats.level + subTotalWeaponATK + subStatusATK
-const subATKAfterPercent = Math.floor(subBaseATKBeforePercent * (1 + atkPercent / 100))
-const subBaseATK = subATKAfterPercent + atkFixed
+const subBaseATK = Math.floor(stats.level + subTotalWeaponATK + subStatusATK)
 ```
 
-#### 5. 双剣のサブ武器ステータス安定率計算
+#### 5. ステータス安定率計算
 ```typescript
-const subWeaponStatusStability = baseStats.STR * 0.06 + baseStats.AGI * 0.04
+const subWeaponStatusStability = adjustedStats.STR * 0.06 + adjustedStats.AGI * 0.04
 ```
 
-#### 6. サブ武器の安定率とステータス安定率をもとに計算
+#### 6. サブ安定率計算
 ```typescript
 const stabilityPercent = bonuses.Stability_Rate || 0
-const stabilityBase = Math.max(0, Math.min(100, subWeapon.stability / 2 + subWeaponStatusStability + stabilityPercent))
+const subStability = Math.floor(Math.max(0, Math.min(100, subWeapon.stability / 2 + subWeaponStatusStability + stabilityPercent)))
 ```
 
-#### 7. サブ安定率計算
+#### 7. サブATK計算（ATK%・ATK固定値適用後、サブ安定率適用）
 ```typescript
-const subStability = Math.floor(stabilityBase) + stabilityPercent
-```
-
-#### 8. サブATK計算（サブ安定率適用）
-```typescript
-const subFinalATK = Math.floor(subBaseATK * subStability / 100)
+const atkPercent = bonuses.ATK_Rate || 0
+const atkFixed = bonuses.ATK || 0
+const subATKAfterPercent = Math.floor(subBaseATK * (1 + atkPercent / 100))
+const subATKAfterFixed = subATKAfterPercent + atkFixed
+const subFinalATK = Math.floor(subATKAfterFixed * subStability / 100)
 ```
 
 ### TypeScript実装例
@@ -685,16 +679,15 @@ interface SubATKCalculationSteps {
   subStatusATK: number              // サブステータスATK（STR×1 + AGI×3）
 
   // サブ基礎ATK計算
-  subBaseATKBeforePercent: number   // サブATK%適用前
-  subATKAfterPercent: number        // サブATK%適用後
-  subBaseATK: number                // サブ基礎ATK（ATK固定値適用後）
+  subBaseATK: number                // サブ基礎ATK
 
   // サブATK最終計算（安定率適用）
   subWeaponStability: number        // サブ武器の安定率
-  subWeaponStatusStability: number  // 双剣のサブ武器ステータス安定率
+  subWeaponStatusStability: number  // ステータス安定率（補正後STR×0.06+補正後AGI×0.04）
   stabilityPercent: number          // 安定率%補正
-  stabilityBase: number             // 安定率とステータス安定率をもとに計算
   subStability: number              // サブ安定率（計算後）
+  subATKAfterPercent: number        // サブATK%適用後
+  subATKAfterFixed: number          // サブATK固定値適用後
   subFinalATK: number               // サブ最終ATK
 }
 
@@ -721,29 +714,22 @@ function calculateSubATK(
   // サブステータスATK計算（双剣専用計算式、補正後ステータスを使用）
   const subStatusATK = adjustedStats.STR * 1.0 + adjustedStats.AGI * 3.0
 
-  // サブ基礎ATK計算（ATKアップ・ATKダウンは含まない）
-  const subBaseATKBeforePercent = stats.level + subTotalWeaponATK + subStatusATK
+  // サブ基礎ATK計算
+  const subBaseATK = Math.floor(stats.level + subTotalWeaponATK + subStatusATK)
 
-  // サブATK%適用（メイン武器と同じATK%を使用）
-  const atkPercent = bonuses.ATK_Rate || 0
-  const subATKAfterPercent = Math.floor(subBaseATKBeforePercent * (1 + atkPercent / 100))
-  
-  // サブATK固定値適用（メイン武器と同じATK固定値を使用）
-  const atkFixed = bonuses.ATK || 0
-  const subBaseATK = subATKAfterPercent + atkFixed
-
-  // 双剣のサブ武器ステータス安定率計算
-  const subWeaponStatusStability = stats.STR * 0.06 + stats.AGI * 0.04
-
-  // サブ武器の安定率とサブ武器のステータス安定率をもとに計算
-  const stabilityPercent = bonuses.Stability_Rate || 0
-  const stabilityBase = Math.max(0, Math.min(100, subWeapon.stability / 2 + subWeaponStatusStability + stabilityPercent))
+  // ステータス安定率計算（補正後ステータスを使用）
+  const subWeaponStatusStability = adjustedStats.STR * 0.06 + adjustedStats.AGI * 0.04
 
   // サブ安定率計算
-  const subStability = Math.floor(stabilityBase) + stabilityPercent
+  const stabilityPercent = bonuses.Stability_Rate || 0
+  const subStability = Math.floor(Math.max(0, Math.min(100, subWeapon.stability / 2 + subWeaponStatusStability + stabilityPercent)))
 
-  // サブATK計算（サブ安定率適用）
-  const subFinalATK = Math.floor(subBaseATK * subStability / 100)
+  // サブATK計算（ATK%・ATK固定値適用後、サブ安定率適用）
+  const atkPercent = bonuses.ATK_Rate || 0
+  const atkFixed = bonuses.ATK || 0
+  const subATKAfterPercent = Math.floor(subBaseATK * (1 + atkPercent / 100))
+  const subATKAfterFixed = subATKAfterPercent + atkFixed
+  const subFinalATK = Math.floor(subATKAfterFixed * subStability / 100)
 
   return {
     subBaseWeaponATK: subWeapon.ATK,
@@ -753,14 +739,13 @@ function calculateSubATK(
     subWeaponATKFixedBonus,
     subTotalWeaponATK,
     subStatusATK,
-    subBaseATKBeforePercent,
-    subATKAfterPercent,
     subBaseATK,
     subWeaponStability: subWeapon.stability,
     subWeaponStatusStability,
     stabilityPercent,
-    stabilityBase,
     subStability,
+    subATKAfterPercent,
+    subATKAfterFixed,
     subFinalATK,
   }
 }
@@ -797,17 +782,37 @@ function calculateSubATK(
 2. サブ武器ATK%補正 = INT(100 × 15/100) = 15
 3. サブ総武器ATK = 160 + 15 + 50 = 225
 4. サブステータスATK = 200 × 1.0 + 180 × 3.0 = 740
-5. サブATK%適用前 = 150 + 225 + 740 = 1115
-6. サブATK%適用後 = INT(1115 × 1.20) = 1338
-7. サブ基礎ATK = 1338 + 100 = 1438
-8. 双剣のサブ武器のステータス安定率 = 200 × 0.06 + 180 × 0.04 = 12 + 7.2 = 19.2
-9. サブ武器の安定率とサブ武器のステータス安定率をもとに計算 = MAX(0, MIN(100, 80/2 + 19.2 + 10)) = MAX(0, MIN(100, 40 + 19.2 + 10)) = MAX(0, MIN(100, 69.2)) = 69.2
-10. サブ安定率 = INT(69.2) + 10 = 69 + 10 = 79
-11. サブATK = INT(1438 × 79/100) = INT(1136.02) = 1136
+5. サブ基礎ATK = INT(150 + 225 + 740) = INT(1115) = 1115
+6. ステータス安定率 = 200 × 0.06 + 180 × 0.04 = 12 + 7.2 = 19.2
+7. サブ安定率 = INT(MAX(0, MIN(100, 80/2 + 19.2 + 10))) = INT(MAX(0, MIN(100, 69.2))) = INT(69.2) = 69
+8. サブATK%適用後 = INT(1115 × (1 + 20/100)) = INT(1115 × 1.20) = INT(1338) = 1338
+9. サブATK固定値適用後 = 1338 + 100 = 1438
+10. サブATK = INT(1438 × 69/100) = INT(992.22) = 992
 
 **表示結果:**
-- サブATK: 1136
-- サブ基礎ATK: 1438
+- サブATK: 992
+- サブ基礎ATK: 1115
+
+### ユーザー提供の計算例
+
+**入力値:**
+- サブ基礎ATK: 1935
+- ATK%: 78
+- ATK固定値: 0
+- サブ武器の安定率: 60
+- 補正後STR: 774
+- 補正後AGI: 277
+- 安定率%: 6
+
+**計算手順:**
+1. ステータス安定率 = 774 × 0.06 + 277 × 0.04 = 46.44 + 11.08 = 57.52
+2. サブ安定率 = INT(MAX(0, MIN(100, 60/2 + 57.52 + 6))) = INT(MAX(0, MIN(100, 30 + 57.52 + 6))) = INT(MAX(0, MIN(100, 93.52))) = INT(93.52) = 93
+3. サブATK%適用後 = INT(1935 × (1 + 78/100)) = INT(1935 × 1.78) = INT(3444.3) = 3444
+4. サブATK固定値適用後 = 3444 + 0 = 3444
+5. サブATK = INT(3444 × 93/100) = INT(3202.92) = 3202
+
+**表示結果:**
+- サブATK: 3202
 
 ## 関連ドキュメント
 - [基本ステータス計算式](./basic-stats.md) - 補正後ステータス計算

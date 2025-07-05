@@ -446,6 +446,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'ブレードマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 
@@ -455,6 +456,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '素早い斬撃',
 			category: 'blade',
 			type: 'level',
+			maxLevel: 10,
 			order: 202,
 		},
 		{
@@ -560,6 +562,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'ブレードマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 		{
@@ -576,6 +579,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '素早い斬撃',
 			category: 'blade',
 			type: 'level',
+			maxLevel: 10,
 			order: 202,
 		},
 		{
@@ -690,6 +694,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'ブレードマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 
@@ -699,6 +704,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '素早い斬撃',
 			category: 'blade',
 			type: 'level',
+			maxLevel: 10,
 			order: 202,
 		},
 		{
@@ -764,6 +770,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'マーシャルマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 		{
@@ -872,6 +879,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'ハルバードマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 
@@ -968,6 +976,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'シュートマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 
@@ -1040,6 +1049,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'シュートマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 		{
@@ -1149,6 +1159,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'マジックマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 		{
@@ -1287,6 +1298,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'マジックマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 

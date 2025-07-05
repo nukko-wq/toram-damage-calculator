@@ -50,64 +50,104 @@ interface WeaponRequirement {
 ### 1. 片手剣 (oneHandSword)
 
 #### 1.1 ブレードマスタリ (Ms-blade)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
   id: 'Ms-blade',
   name: 'ブレードマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 101,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['oneHandSword', 'dualSword'],
-    description: '片手剣または双剣装備時'
-  },
-  description: '剣系武器の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 2',
-      conditions: ['剣系武器装備時'],
-      weaponTypeModifier: 'oneHandSword: +0, dualSword: +1'
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 2 (片手剣), skillLevel × 3 (双剣)',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が片手剣、両手剣、双剣の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - ATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+ATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateBladeMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+  if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // ATK%計算（スキルレベル別）
+  let atkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    atkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    atkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    atkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    ATK_Rate: atkRate,
   }
 }
 ```
 
 #### 1.2 素早い斬撃 (sm2)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
   id: 'sm2',
   name: '素早い斬撃',
   category: 'blade',
   type: 'level',
-  order: 202,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['oneHandSword', 'dualSword'],
-    description: '片手剣または双剣装備時'
-  },
-  description: '攻撃速度を上昇させる',
-  effects: [
-    {
-      property: 'AttackSpeed_Rate',
-      formula: 'skillLevel * 5',
-      conditions: ['剣系武器装備時']
-    }
-  ],
-  calculationFormula: '攻撃速度% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 202,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が片手剣、双剣、両手剣の場合のみ効果あり
+- **効果内容**:
+  - AttackSpeed: `スキルレベル × 10`
+  - AttackSpeed_Rate: `スキルレベル × 1%`
+
+**計算式**:
+```
+AttackSpeed = skillLevel × 10
+AttackSpeed_Rate = skillLevel × 1
+```
+
+**実装用計算関数**:
+```typescript
+function calculateQuickSlashEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+  if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0) return {}
+  
+  return {
+    AttackSpeed: skillLevel * 10,
+    AttackSpeed_Rate: skillLevel * 1,
   }
 }
 ```
@@ -177,7 +217,13 @@ interface WeaponRequirement {
 
 ### 2. 双剣 (dualSword)
 
-#### 2.1 デュアルマスタリ (DSpena1)
+#### 2.1 ブレードマスタリ (Ms-blade)
+※ 片手剣セクション（1.1）を参照。双剣でも同じ効果。
+
+#### 2.1.1 素早い斬撃 (sm2)
+※ 片手剣セクション（1.2）を参照。双剣でも同じ効果。
+
+#### 2.2 デュアルマスタリ (DSpena1)
 ```typescript
 {
   id: 'DSpena1',
@@ -308,7 +354,13 @@ interface WeaponRequirement {
 
 ### 3. 両手剣 (twoHandSword)
 
-#### 3.1 両手剣マスタリ (Ms-twohand)
+#### 3.1 ブレードマスタリ (Ms-blade)
+※ 片手剣セクション（1.1）を参照。両手剣でも同じ効果。
+
+#### 3.1.1 素早い斬撃 (sm2)
+※ 片手剣セクション（1.2）を参照。両手剣でも同じ効果。
+
+#### 3.2 両手剣マスタリ (Ms-twohand)
 ```typescript
 {
   id: 'Ms-twohand',
@@ -377,33 +429,62 @@ interface WeaponRequirement {
 
 ### 4. 手甲 (knuckle)
 
-#### 4.1 手甲マスタリ (Ms-knuckle)
+#### 4.1 マーシャルマスタリ (Ms-Marchal)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
-  id: 'Ms-knuckle',
-  name: '手甲マスタリ',
+  id: 'Ms-Marchal',
+  name: 'マーシャルマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 104,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['knuckle'],
-    description: '手甲装備時'
-  },
-  description: '手甲の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: ['手甲装備時']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が手甲の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - ATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+ATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateMartialMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (weaponType !== 'knuckle' || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // ATK%計算（スキルレベル別）
+  let atkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    atkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    atkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    atkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    ATK_Rate: atkRate,
   }
 }
 ```
@@ -441,33 +522,62 @@ interface WeaponRequirement {
 
 ### 5. 旋風槍 (halberd)
 
-#### 5.1 旋風槍マスタリ (Ms-halberd)
+#### 5.1 ハルバードマスタリ (Ms-halberd)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
   id: 'Ms-halberd',
-  name: '旋風槍マスタリ',
+  name: 'ハルバードマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 105,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['halberd'],
-    description: '旋風槍装備時'
-  },
-  description: '旋風槍の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: ['旋風槍装備時']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が旋風槍の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - ATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+ATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateHalberdMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (weaponType !== 'halberd' || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // ATK%計算（スキルレベル別）
+  let atkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    atkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    atkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    atkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    ATK_Rate: atkRate
   }
 }
 ```
@@ -569,33 +679,63 @@ interface WeaponRequirement {
 
 ### 7. 弓 (bow)
 
-#### 7.1 弓マスタリ (Ms-bow)
+#### 7.1 シュートマスタリ (Ms-shoot)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
-  id: 'Ms-bow',
-  name: '弓マスタリ',
+  id: 'Ms-shoot',
+  name: 'シュートマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 107,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['bow'],
-    description: '弓装備時'
-  },
-  description: '弓の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: ['弓装備時']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が弓、自動弓の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - ATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+ATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateShootMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  const shootWeapons: MainWeaponType[] = ['bow', 'bowgun']
+  if (!weaponType || !shootWeapons.includes(weaponType) || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // ATK%計算（スキルレベル別）
+  let atkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    atkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    atkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    atkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    ATK_Rate: atkRate,
   }
 }
 ```
@@ -639,66 +779,68 @@ interface WeaponRequirement {
 
 ### 8. 自動弓 (bowgun)
 
-#### 8.1 自動弓マスタリ (Ms-bowgun)
-```typescript
-{
-  id: 'Ms-bowgun',
-  name: '自動弓マスタリ',
-  category: 'mastery',
-  type: 'level',
-  order: 108,
-  maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['bowgun'],
-    description: '自動弓装備時'
-  },
-  description: '自動弓の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: ['自動弓装備時']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+#### 8.1 シュートマスタリ (Ms-shoot)
+※ 弓セクション（7.1）を参照。自動弓でも同じ効果。
 
 ### 9. 杖 (staff)
 
-#### 9.1 杖マスタリ (Ms-staff)
+#### 9.1 マジックマスタリ (Ms-magic)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
-  id: 'Ms-staff',
-  name: '杖マスタリ',
+  id: 'Ms-magic',
+  name: 'マジックマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 109,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['staff'],
-    description: '杖装備時'
-  },
-  description: '杖の魔法攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 4',
-      conditions: ['杖装備時']
-    }
-  ],
-  calculationFormula: 'MATK% = skillLevel × 4',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が杖、魔道具の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - MATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+MATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateMagicMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  const magicWeapons: MainWeaponType[] = ['staff', 'magicDevice']
+  if (!weaponType || !magicWeapons.includes(weaponType) || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // MATK%計算（スキルレベル別）
+  let matkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    matkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    matkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    matkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    MATK_Rate: matkRate,
   }
 }
 ```
@@ -741,36 +883,16 @@ interface WeaponRequirement {
 
 ### 10. 魔導具 (magicDevice)
 
-#### 10.1 魔導具マスタリ (Ms-magicDevice)
-```typescript
-{
-  id: 'Ms-magicDevice',
-  name: '魔導具マスタリ',
-  category: 'mastery',
-  type: 'level',
-  order: 110,
-  maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['magicDevice'],
-    description: '魔導具装備時'
-  },
-  description: '魔導具の魔法攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 4',
-      conditions: ['魔導具装備時']
-    }
-  ],
-  calculationFormula: 'MATK% = skillLevel × 4',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+#### 10.1 マジックマスタリ (Ms-magic)
+
+魔導具のマジックマスタリは杖と同じ実装となります。
+
+**buffSkills.ts 実装**: 杖セクションと同じ Ms-magic を使用
+**効果仕様**: 杖セクションと同じ  
+**計算式**: 杖セクションと同じ
+**実装用計算関数**: 杖セクションと同じ
+
+参照: 9.1 マジックマスタリ (Ms-magic)
 
 ### 11. 素手 (bareHands)
 

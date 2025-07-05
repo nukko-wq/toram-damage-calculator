@@ -12,13 +12,6 @@ import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
 import {
-	getEquipmentBonuses,
-	getCrystalBonuses,
-	getFoodBonuses,
-	getBuffBonuses,
-} from '@/utils/dataSourceIntegration'
-import { aggregateAllBonuses } from '@/utils/basicStatsCalculation'
-import {
 	type DamageCaptureData,
 	saveCaptureData,
 	loadCaptureData,
@@ -97,29 +90,22 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// 基本的な計算入力データを作成
 			const defaultInput = createDefaultDamageInput()
 
-			// 計算結果が利用可能な場合は使用、なければフォールバック値を使用
-			const totalATK = calculationResults?.basicStats.totalATK || 1000
+			// 中央集約された計算結果を使用
+			const totalATK = calculationResults?.basicStats.totalATK || 0
 			const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
+			
+			// デバッグ: 中央集約された値を確認
+			console.log('=== DamagePreview 中央集約計算結果 ===')
+			console.log('calculationResults?.basicStats.totalATK:', totalATK)
+			console.log('calculationResults?.basicStats.stabilityRate:', stabilityRate)
+			console.log('calculationResults?.equipmentBonus1.physicalPenetration:', calculationResults?.equipmentBonus1.physicalPenetration)
+			console.log('calculationResults?.equipmentBonus1.magicalPenetration:', calculationResults?.equipmentBonus1.magicalPenetration)
 
 			// 敵情報を取得
 			let enemyInfo = null
 			if (calculatorData.enemy?.selectedEnemyId) {
 				enemyInfo = getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
 			}
-
-			// 実際の装備品ボーナスを計算
-			const equipmentBonuses = getEquipmentBonuses(calculatorData.equipment)
-			const crystalBonuses = getCrystalBonuses(calculatorData.crystals)
-			const foodBonuses = getFoodBonuses(calculatorData.food)
-			const buffBonuses = getBuffBonuses(calculatorData.buffItems)
-
-			// 全てのボーナスを統合
-			const allBonuses = aggregateAllBonuses(
-				equipmentBonuses,
-				crystalBonuses,
-				foodBonuses,
-				buffBonuses,
-			)
 
 			// デバッグ用ログ - 実際の値を確認
 			console.log('=== DamagePreview Debug ===')
@@ -179,8 +165,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// PowerOptionsに基づく距離設定
 			const getDistanceValues = () => {
 				return {
-					shortRange: allBonuses.ShortRangeDamage_Rate ?? 0,
-					longRange: allBonuses.LongRangeDamage_Rate ?? 0,
+					shortRange: calculationResults?.equipmentBonus1?.shortRangeDamage || 0,
+					longRange: calculationResults?.equipmentBonus1?.longRangeDamage || 0,
 				}
 			}
 
@@ -223,9 +209,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 				distance: distanceValues,
 				unsheathe: {
-					fixedDamage:
-						allBonuses.UnsheatheAttack ?? defaultInput.unsheathe.fixedDamage,
-					rateBonus: allBonuses.UnsheatheAttack_Rate ?? 0,
+					fixedDamage: calculationResults?.equipmentBonus1?.unsheatheAttack || defaultInput.unsheathe.fixedDamage,
+					rateBonus: calculationResults?.equipmentBonus1?.elementPower || 0, // 抜刀威力%は一旦elementPowerで代用
 					isActive: powerOptions.unsheathe,
 				},
 				userSettings: {
@@ -256,14 +241,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						enemyInfo?.stats.magicalResistance ??
 						defaultInput.resistance.magical,
 				},
-				// 貫通値を実際の装備品ボーナスから取得
+				// 貫通値を中央集約された装備品補正値1から取得
 				penetration: {
-					physical:
-						allBonuses.PhysicalPenetration_Rate ??
-						defaultInput.penetration.physical,
-					magical:
-						allBonuses.MagicalPenetration_Rate ??
-						defaultInput.penetration.magical,
+					physical: calculationResults?.equipmentBonus1?.physicalPenetration || defaultInput.penetration.physical,
+					magical: calculationResults?.equipmentBonus1?.magicalPenetration || defaultInput.penetration.magical,
 				},
 				// コンボ設定を反映
 				combo: {
@@ -339,29 +320,12 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('5. 貫通値:')
 			console.log('  物理貫通:', input.penetration.physical)
 			console.log('  魔法貫通:', input.penetration.magical)
-			console.log(
-				'  DEBUG: allBonuses.PhysicalPenetration_Rate:',
-				allBonuses.PhysicalPenetration_Rate,
-			)
-			console.log(
-				'  DEBUG: allBonuses.MagicalPenetration_Rate:',
-				allBonuses.MagicalPenetration_Rate,
-			)
-			console.log('  DEBUG: allBonuses:', allBonuses)
 
 			// 6. 固定値
 			console.log('6. 固定値:')
 			console.log('  抜刀固定値:', input.unsheathe.fixedDamage)
 			console.log('  スキル固定値:', input.attackSkill.fixedDamage)
 			console.log('  抜刀有効:', input.unsheathe.isActive)
-			console.log(
-				'  DEBUG: allBonuses.UnsheatheAttack:',
-				allBonuses.UnsheatheAttack,
-			)
-			console.log(
-				'  DEBUG: allBonuses.UnsheatheAttack_Rate:',
-				allBonuses.UnsheatheAttack_Rate,
-			)
 
 			// 7. 属性有利
 			console.log('7. 属性有利:')
@@ -376,10 +340,6 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				'  DEBUG: calculationResults?.basicStats?.elementAwakeningAdvantage:',
 				calculationResults?.basicStats?.elementAwakeningAdvantage,
 			)
-			console.log(
-				'  DEBUG: allBonuses.ElementAdvantage_Rate:',
-				allBonuses.ElementAdvantage_Rate,
-			)
 
 			// 8. スキル倍率
 			console.log('8. スキル倍率:')
@@ -391,14 +351,6 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.log('  近距離威力 (%):', input.distance.shortRange)
 			console.log('  遠距離威力 (%):', input.distance.longRange)
 			console.log('  現在の距離判定:', input.userSettings.currentDistance)
-			console.log(
-				'  DEBUG: allBonuses.ShortRangeDamage_Rate:',
-				allBonuses.ShortRangeDamage_Rate,
-			)
-			console.log(
-				'  DEBUG: allBonuses.LongRangeDamage_Rate:',
-				allBonuses.LongRangeDamage_Rate,
-			)
 
 			// 10. その他重要な値
 			console.log('10. その他:')

@@ -31,6 +31,7 @@
 **クリティカルダメージ%の参照**:
 - 基本ステータスのクリティカルダメージ値を使用
 - 例: クリティカルダメージ125%の場合、1.25倍として計算
+- **データソース**: `calculationResults.basicStats.criticalDamage`
 
 ### 安定率システム
 安定率は基本ステータスで決定され、実際のダメージに幅を与えます。
@@ -52,6 +53,8 @@
 
 ランダム係数 = (70 + ランダム(0-30)) / 100
 ```
+
+**データソース**: `calculationResults.basicStats.stabilityRate`
 
 #### 安定率別ダメージ例
 | 安定率 | 基本ダメージ | 最小ダメージ | 最大ダメージ | ダメージ幅 |
@@ -116,33 +119,21 @@ INT(9779.3 - 121.55) = INT(9657.75) = 9657
 - スキル倍率120.9% → INT(120.9) = 120% として計算
 
 #### ステップ2a: クリティカルダメージ補正（クリティカル時のみ）
-クリティカルダメージ時は、固定値加算の後、属性有利の前にクリティカルダメージ倍率を適用します。
+クリティカルダメージ時は、固定値加算の後にクリティカルダメージ倍率を適用します。
 
 ```
 クリティカル適用後 = INT(固定値適用後 × クリティカルダメージ%)
 ```
 
-#### ステップ3: 属性有利補正（クリティカル時）
-```
-有利適用後 = INT(クリティカル適用後 × (1 + 有利/100))
-```
-
-#### ステップ4: スキル倍率補正（クリティカル時）
-```
-スキル倍率適用後 = INT(有利適用後 × INT(スキル倍率)/100)
-```
-
 **計算の特徴**:
 - 固定値加算の直後にクリティカルダメージ倍率を適用して小数点切り捨て
-- その後属性有利を適用して小数点切り捨て
-- 最後にスキル倍率を適用して小数点切り捨て
+- その後は通常と同じ順序で属性有利、スキル倍率を適用
 - 基本ステータスのクリティカルダメージ値（例: 125%）を使用
+- calculationResults.basicStats.criticalDamageから取得
 
 **例**:
-- 固定値適用後: 8617、クリティカルダメージ: 296%、属性有利: 15%、スキル倍率: 334.4%
-- ステップ2a: INT(8617 × 296/100) = INT(25506.32) = 25506
-- ステップ3: INT(25506 × (1 + 15/100)) = INT(25506 × 1.15) = INT(29331.9) = 29331
-- ステップ4: INT(29331 × INT(334.4)/100) = INT(29331 × 334/100) = INT(97965.54) = 97965
+- 固定値適用後: 10302、クリティカルダメージ: 336%
+- ステップ2a: INT(10302 × 336/100) = INT(34614.72) = 34614
 
 #### ステップ5: 抜刀%補正
 ```
@@ -191,7 +182,7 @@ INT(9779.3 - 121.55) = INT(9657.75) = 9657
   - **物理スキル**: 基本ステータスの総ATK
   - **魔法スキル**: 基本ステータスのMATK
   - **その他**: スキル固有の参照ステータス
-- **データソース**: `basicStats.totalATK` または `basicStats.MATK`
+- **データソース**: `calculationResults.basicStats.totalATK` または `calculationResults.basicStats.MATK`
 
 #### 敵Lv
 - **説明**: 敵情報にセットされている敵レベル
@@ -204,7 +195,7 @@ INT(9779.3 - 121.55) = INT(9657.75) = 9657
 - **物理耐性**: 基本ステータスの物理耐性(%)
 - **魔法耐性**: 基本ステータスの魔法耐性(%)
 - **選択基準**: 使用する攻撃スキルのタイプによって決定
-- **データソース**: `basicStats.physicalResistance` または `basicStats.magicalResistance`
+- **データソース**: `calculationResults.basicStats.physicalResistance` または `calculationResults.basicStats.magicalResistance`
 
 #### 武器耐性
 - **現在の実装**: 考慮しない（値は0）
@@ -249,28 +240,32 @@ function calculateEternalNightmareReduction(
 
 ##### 3. 貫通による低下
 ```typescript
-// 貫通値の適用条件と計算方法：
+// 貫通値の適用条件と計算方法（%計算）：
 // - 物理貫通：参照防御力がDEFの場合のみ適用
 // - 魔法貫通：参照防御力がMDEFの場合のみ適用
 // - 貫通値は%で計算：(M)DEF × (1 - 貫通%/100)
-const isPhysicalAttack = attackType === 'physical'
-const referencesPhysicalDef = isPhysicalAttack // 物理攻撃はDEF参照
-const referencesMagicalDef = !isPhysicalAttack // 魔法攻撃はMDEF参照
+// - 小数点は保持したまま基礎ダメージ計算で最終的にfloorを適用
 
 let penetrationRate = 0
-if (referencesPhysicalDef) {
-    penetrationRate = basicStats.physicalPenetration // %値
-} else if (referencesMagicalDef) {
-    penetrationRate = basicStats.magicalPenetration // %値
+if (defenseType === 'DEF') {
+    penetrationRate = input.penetration.physical
+} else if (defenseType === 'MDEF') {
+    penetrationRate = input.penetration.magical
 }
 
-const finalDEF = Math.floor(processedDEF * (1 - penetrationRate / 100))
+// 貫通計算（小数点を保持したまま返す）
+processed = processed * (1 - penetrationRate / 100)
+
+// 小数点を保持したまま返す（Math.floorは基礎ダメージ計算で適用）
+return processed
 ```
 
 **重要な計算方法**:
 - **貫通値は%として適用**: 例えば物理貫通15%の場合、DEF × 0.85
 - **計算式**: `(M)DEF × (1 - 貫通%/100)`
-- **例**: DEF 143、物理貫通15% → 143 × (1 - 15/100) = 143 × 0.85 = 121.55 → Math.floor(121.55) = 121
+- **小数点処理**: 貫通計算では小数点を保持し、基礎ダメージ計算の最終段階でMath.floor適用
+- **例**: DEF 143、物理貫通15% → 143 × (1 - 15/100) = 143 × 0.85 = 121.55 → 基礎ダメージ計算でfloor適用
+- **データソース**: `calculationResults.equipmentBonus1.physicalPenetration` または `calculationResults.equipmentBonus1.magicalPenetration`
 
 **適用条件**:
 - **物理貫通**: 物理攻撃でDEFを参照する場合のみ有効
@@ -283,7 +278,7 @@ const finalDEF = Math.floor(processedDEF * (1 - penetrationRate / 100))
 
 #### 抜刀固定値
 - **説明**: 装備品補正値1の抜刀威力(+)
-- **データソース**: `equipmentBonus1.unsheatheAttack`（固定値）
+- **データソース**: `calculationResults.equipmentBonus1.unsheatheAttack`（固定値）
 - **適用条件**: 抜刀攻撃時のみ
 
 #### スキル固定値
@@ -321,6 +316,7 @@ function calculateElementAdvantage(basicStats: BasicStats, powerOptions: PowerOp
   - **覚醒のみ**: 25%固定（装備品の属性有利無視）
   - **無効**: 0%（属性有利計算を完全に無効化）
 - **選択制御**: DamagePreview.tsxで属性攻撃および属性威力オプションで制御
+- **データソース**: `calculationResults.basicStats.totalElementAdvantage`
 
 #### スキル倍率
 - **説明**: 攻撃スキルごとに設定される倍率
@@ -329,7 +325,7 @@ function calculateElementAdvantage(basicStats: BasicStats, powerOptions: PowerOp
 
 #### 抜刀%
 - **説明**: 装備品補正値1の抜刀威力(%)
-- **データソース**: `equipmentBonus1.unsheatheAttack_Rate`
+- **データソース**: `calculationResults.equipmentBonus1.unsheatheAttack_Rate`（注：現在は実装中）
 - **適用条件**: 抜刀攻撃時のみ
 
 #### 慣れ
@@ -340,8 +336,8 @@ function calculateElementAdvantage(basicStats: BasicStats, powerOptions: PowerOp
 #### 距離
 - **説明**: 装備品補正値1の近距離威力(%) または 遠距離威力(%)
 - **データソース**: 
-  - 近距離時: `equipmentBonus1.shortRangeDamage_Rate`
-  - 遠距離時: `equipmentBonus1.longRangeDamage_Rate`
+  - 近距離時: `calculationResults.equipmentBonus1.shortRangeDamage`
+  - 遠距離時: `calculationResults.equipmentBonus1.longRangeDamage`
 - **適用条件**: 
   - 攻撃スキルが距離補正に対応している
   - かつ、ユーザーが選択した距離と一致している
