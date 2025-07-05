@@ -767,33 +767,63 @@ function calculateShootMasteryEffects(
 
 ### 9. 杖 (staff)
 
-#### 9.1 杖マスタリ (Ms-staff)
+#### 9.1 マジックマスタリ (Ms-magic)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
-  id: 'Ms-staff',
-  name: '杖マスタリ',
+  id: 'Ms-magic',
+  name: 'マジックマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 109,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['staff'],
-    description: '杖装備時'
-  },
-  description: '杖の魔法攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 4',
-      conditions: ['杖装備時']
-    }
-  ],
-  calculationFormula: 'MATK% = skillLevel × 4',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が杖、魔道具の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - MATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+MATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateMagicMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  const magicWeapons: MainWeaponType[] = ['staff', 'magicDevice']
+  if (!weaponType || !magicWeapons.includes(weaponType) || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // MATK%計算（スキルレベル別）
+  let matkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    matkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    matkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    matkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    MATK_Rate: matkRate,
   }
 }
 ```
@@ -836,36 +866,16 @@ function calculateShootMasteryEffects(
 
 ### 10. 魔導具 (magicDevice)
 
-#### 10.1 魔導具マスタリ (Ms-magicDevice)
-```typescript
-{
-  id: 'Ms-magicDevice',
-  name: '魔導具マスタリ',
-  category: 'mastery',
-  type: 'level',
-  order: 110,
-  maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['magicDevice'],
-    description: '魔導具装備時'
-  },
-  description: '魔導具の魔法攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 4',
-      conditions: ['魔導具装備時']
-    }
-  ],
-  calculationFormula: 'MATK% = skillLevel × 4',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+#### 10.1 マジックマスタリ (Ms-magic)
+
+魔導具のマジックマスタリは杖と同じ実装となります。
+
+**buffSkills.ts 実装**: 杖セクションと同じ Ms-magic を使用
+**効果仕様**: 杖セクションと同じ  
+**計算式**: 杖セクションと同じ
+**実装用計算関数**: 杖セクションと同じ
+
+参照: 9.1 マジックマスタリ (Ms-magic)
 
 ### 11. 素手 (bareHands)
 

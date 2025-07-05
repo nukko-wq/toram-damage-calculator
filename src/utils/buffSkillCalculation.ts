@@ -167,6 +167,35 @@ export function calculateMartialMasteryEffects(
 }
 
 /**
+ * マジックマスタリの効果計算関数
+ */
+export function calculateMagicMasteryEffects(
+	skillLevel: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	const magicWeapons: MainWeaponType[] = ['staff', 'magicDevice']
+	if (!weaponType || !magicWeapons.includes(weaponType) || skillLevel <= 0) return {}
+
+	// WeaponATK%計算
+	const weaponATKRate = skillLevel * 3
+
+	// MATK%計算（スキルレベル別）
+	let matkRate = 0
+	if (skillLevel >= 1 && skillLevel <= 2) {
+		matkRate = 1
+	} else if (skillLevel >= 3 && skillLevel <= 7) {
+		matkRate = 2
+	} else if (skillLevel >= 8 && skillLevel <= 10) {
+		matkRate = 3
+	}
+
+	return {
+		WeaponATK_Rate: weaponATKRate,
+		MATK_Rate: matkRate,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -251,6 +280,23 @@ export function getBuffSkillBonuses(
 	if (martialMastery?.isEnabled && martialMastery.level) {
 		const effects = calculateMartialMasteryEffects(
 			martialMastery.level,
+			convertedWeaponType,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// マジックマスタリの処理
+	const magicMastery = buffSkillData['Ms-magic']
+	if (magicMastery?.isEnabled && magicMastery.level) {
+		const effects = calculateMagicMasteryEffects(
+			magicMastery.level,
 			convertedWeaponType,
 		)
 

@@ -1156,6 +1156,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'マジックマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 		{
@@ -1294,6 +1295,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: 'マジックマスタリ',
 			category: 'mastery',
 			type: 'level',
+			maxLevel: 10,
 			order: 101,
 		},
 
