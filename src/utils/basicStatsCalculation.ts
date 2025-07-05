@@ -393,9 +393,7 @@ export interface SubATKCalculationSteps {
 	subStatusATK: number // サブステータスATK（STR×1 + AGI×3）
 
 	// サブ基礎ATK計算
-	subBaseATKBeforePercent: number // サブATK%適用前
-	subATKAfterPercent: number // サブATK%適用後
-	subBaseATK: number // サブ基礎ATK（ATK固定値適用後）
+	subBaseATK: number // サブ基礎ATK
 
 	// サブATK最終計算（安定率適用）
 	subWeaponStability: number // サブ武器の安定率
@@ -954,18 +952,8 @@ export function calculateSubATK(
 	// 2. サブステータスATK計算（双剣専用計算式: STR × 1.0 + AGI × 3.0）
 	const subStatusATK = adjustedStats.STR * 1.0 + adjustedStats.AGI * 3.0
 
-	// 3. サブ基礎ATK計算（ATKアップ・ATKダウンは含まない）
-	const subBaseATKBeforePercent = stats.level + subTotalWeaponATK + subStatusATK
-
-	// 4. サブATK%適用（メイン武器と同じATK%を使用）
-	const atkPercent = bonuses.ATK_Rate || 0
-	const subATKAfterPercent = Math.floor(
-		subBaseATKBeforePercent * (1 + atkPercent / 100),
-	)
-
-	// 5. サブATK固定値適用（メイン武器と同じATK固定値を使用）
-	const atkFixed = bonuses.ATK || 0
-	const subBaseATK = subATKAfterPercent + atkFixed
+	// 3. サブ基礎ATK計算
+	const subBaseATK = Math.floor(stats.level + subTotalWeaponATK + subStatusATK)
 
 	// 6. サブ安定率計算（複雑な計算式）
 	const stabilityPercent = bonuses.Stability_Rate || 0
@@ -990,8 +978,6 @@ export function calculateSubATK(
 		subWeaponATKFixedBonus,
 		subTotalWeaponATK,
 		subStatusATK,
-		subBaseATKBeforePercent,
-		subATKAfterPercent,
 		subBaseATK,
 		subWeaponStability: subWeapon.stability,
 		subWeaponStatusStability,
