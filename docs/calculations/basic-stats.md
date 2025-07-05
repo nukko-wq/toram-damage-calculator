@@ -23,8 +23,14 @@
 
 ### 基本計算式
 ```
-ステータスポイント = 基本ポイント + レベル増加ポイント + レベル305ボーナス
+利用可能ステータスポイント = 基本ポイント + レベル増加ポイント + レベル305ボーナス - 使用済みポイント
 ```
+
+### 使用済みポイント計算
+```
+使用済みポイント = (STR - 1) + (INT - 1) + (VIT - 1) + (AGI - 1) + (DEX - 1) + (CRT - 1) + (MEN - 1) + (TEC - 1)
+```
+※各ステータスの初期値1は使用済みポイントに含めない
 
 ### 詳細計算
 
@@ -71,19 +77,37 @@
 3. レベル305ボーナス = 0（レベル305未満）
 4. **総ステータスポイント = 172 + 598 + 0 = 770**
 
-#### 例5: レベル305の場合
+#### 例5: レベル305の場合（ステータス振り分けなし）
 **計算手順:**
 1. 基本ポイント = 172
 2. レベル増加ポイント = (305 - 1) × 2 = 608
 3. レベル305ボーナス = 5（レベル305以上）
-4. **総ステータスポイント = 172 + 608 + 5 = 785**
+4. 使用済みポイント = 0（全ステータス1のまま）
+5. **利用可能ステータスポイント = 172 + 608 + 5 - 0 = 785**
 
-#### 例6: レベル400の場合
+#### 例6: レベル305の場合（ステータス振り分けあり）
+**入力値:**
+- レベル: 305
+- STR: 5, INT: 1, VIT: 1, AGI: 1, DEX: 1, CRT: 1, MEN: 1, TEC: 1
+
+**計算手順:**
+1. 基本ポイント = 172
+2. レベル増加ポイント = (305 - 1) × 2 = 608
+3. レベル305ボーナス = 5（レベル305以上）
+4. 使用済みポイント = (5 - 1) + (1 - 1) + (1 - 1) + (1 - 1) + (1 - 1) + (1 - 1) + (1 - 1) + (1 - 1) = 4
+5. **利用可能ステータスポイント = 172 + 608 + 5 - 4 = 781**
+
+#### 例7: レベル400の場合（複数ステータス振り分けあり）
+**入力値:**
+- レベル: 400
+- STR: 100, INT: 50, VIT: 30, AGI: 1, DEX: 1, CRT: 1, MEN: 1, TEC: 1
+
 **計算手順:**
 1. 基本ポイント = 172
 2. レベル増加ポイント = (400 - 1) × 2 = 798
 3. レベル305ボーナス = 5（レベル305以上）
-4. **総ステータスポイント = 172 + 798 + 5 = 975**
+4. 使用済みポイント = (100 - 1) + (50 - 1) + (30 - 1) + (1 - 1) + (1 - 1) + (1 - 1) + (1 - 1) + (1 - 1) = 99 + 49 + 29 = 177
+5. **利用可能ステータスポイント = 172 + 798 + 5 - 177 = 798**
 
 ### TypeScript実装例
 
@@ -94,9 +118,23 @@ interface StatPointCalculationSteps {
   levelIncreasePoints: number
   level305Bonus: number
   totalStatPoints: number
+  usedPoints: number
+  availableStatPoints: number
 }
 
-function calculateStatPoints(level: number): StatPointCalculationSteps {
+interface BaseStats {
+  level: number
+  STR: number
+  INT: number
+  VIT: number
+  AGI: number
+  DEX: number
+  CRT: number
+  MEN: number
+  TEC: number
+}
+
+function calculateStatPoints(level: number, stats?: BaseStats): StatPointCalculationSteps {
   // 基本ポイント
   const basePoints = 172
   
@@ -109,12 +147,24 @@ function calculateStatPoints(level: number): StatPointCalculationSteps {
   // 総ステータスポイント
   const totalStatPoints = basePoints + levelIncreasePoints + level305Bonus
   
+  // 使用済みポイント計算
+  let usedPoints = 0
+  if (stats) {
+    usedPoints = (stats.STR - 1) + (stats.INT - 1) + (stats.VIT - 1) + (stats.AGI - 1) + 
+                 (stats.DEX - 1) + (stats.CRT - 1) + (stats.MEN - 1) + (stats.TEC - 1)
+  }
+  
+  // 利用可能ステータスポイント
+  const availableStatPoints = totalStatPoints - usedPoints
+  
   return {
     level,
     basePoints,
     levelIncreasePoints,
     level305Bonus,
     totalStatPoints,
+    usedPoints,
+    availableStatPoints,
   }
 }
 ```
@@ -124,7 +174,9 @@ function calculateStatPoints(level: number): StatPointCalculationSteps {
 1. **レベル1時の基本値**: 必ず172ポイントから開始
 2. **レベル毎の増加**: レベルが1上がるごとに2ポイント増加
 3. **レベル305ボーナス**: レベル305以上で追加5ポイント
-4. **UI表示**: BaseStatsFormのレベル右隣に「振れるステータス合計」として表示
+4. **初期値除外**: 各ステータスの初期値1は使用済みポイントに含めない
+5. **使用済みポイント**: STR～TECの8つのステータスの(現在値 - 1)の合計
+6. **UI表示**: BaseStatsFormのレベル右隣に「残りステータスポイント：XXX」として利用可能ポイントを表示、マイナス時は赤字
 
 ## 補正後基本ステータス計算
 
@@ -1237,6 +1289,7 @@ function calculateTotalATK(
 | 2025-07-05 | ステータスポイント計算式を追加 | レベル依存のステータスポイント計算、BaseStatsFormでの表示機能、4つの計算例とTypeScript実装例を含む |
 | 2025-07-05 | ステータスポイント計算式を簡素化 | 基本値172、レベル毎+2のシンプルな計算に変更、特定レベルボーナスを廃止 |
 | 2025-07-05 | レベル305ボーナスを追加 | レベル305以上で追加5ポイント、6つの計算例とTypeScript実装例を更新 |
+| 2025-07-05 | 使用済みポイント計算を追加 | 利用可能ステータスポイント = 総ポイント - 使用済みポイント、初期値1を除外、7つの計算例とUI表示を更新 |
 
 ## 関連ドキュメント
 - [HP・MP計算式](./hp-mp-calculation.md) - HP・MP計算の詳細

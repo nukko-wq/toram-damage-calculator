@@ -37,11 +37,12 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		mode: 'onChange',
 	})
 
-	// 現在のレベル値を取得してステータスポイントを計算
+	// 現在のレベル値と全ステータス値を取得してステータスポイントを計算
 	const currentLevel = watch('level') || effectiveStats.level || 1
+	const allStats = watch()
 	const statPointsResult = useMemo(() => {
-		return calculateStatPoints(currentLevel)
-	}, [currentLevel])
+		return calculateStatPoints(currentLevel, allStats)
+	}, [currentLevel, allStats])
 
 	// 入力値を範囲内に制限する関数
 	const handleBlur = (fieldName: keyof BaseStatsFormData) => {
@@ -155,14 +156,16 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 					{/* ステータスポイント表示 */}
 					<div className="flex items-center gap-2 col-span-2">
 						<span className="text-sm text-gray-600">
-							振れるステータス合計:
+							残りステータスポイント：
 						</span>
-						<span className="text-sm font-medium text-blue-600">
-							{statPointsResult.totalStatPoints}
-						</span>
-						<span className="text-xs text-gray-500">
-							({statPointsResult.basePoints} + {statPointsResult.levelIncreasePoints}
-							{statPointsResult.level305Bonus > 0 && ` + ${statPointsResult.level305Bonus}`})
+						<span
+							className={`text-sm font-medium ${
+								statPointsResult.availableStatPoints < 0
+									? 'text-red-600'
+									: 'text-blue-600'
+							}`}
+						>
+							{statPointsResult.availableStatPoints}
 						</span>
 					</div>
 				</div>
