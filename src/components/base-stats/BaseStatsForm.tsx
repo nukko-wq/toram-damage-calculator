@@ -4,8 +4,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { baseStatsSchema, type BaseStatsFormData } from '@/schemas/baseStats'
 import type { BaseStats } from '@/types/calculator'
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
+import { calculateStatPoints } from '@/utils/statPointCalculation'
 
 interface BaseStatsFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -35,6 +36,12 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		values: effectiveStats,
 		mode: 'onChange',
 	})
+
+	// 現在のレベル値を取得してステータスポイントを計算
+	const currentLevel = watch('level') || effectiveStats.level || 1
+	const statPointsResult = useMemo(() => {
+		return calculateStatPoints(currentLevel)
+	}, [currentLevel])
 
 	// 入力値を範囲内に制限する関数
 	const handleBlur = (fieldName: keyof BaseStatsFormData) => {
@@ -144,6 +151,19 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 								})}
 							/>
 						</div>
+					</div>
+					{/* ステータスポイント表示 */}
+					<div className="flex items-center gap-2 col-span-2">
+						<span className="text-sm text-gray-600">
+							振れるステータス合計:
+						</span>
+						<span className="text-sm font-medium text-blue-600">
+							{statPointsResult.totalStatPoints}
+						</span>
+						<span className="text-xs text-gray-500">
+							({statPointsResult.basePoints} + {statPointsResult.levelIncreasePoints}
+							{statPointsResult.level305Bonus > 0 && ` + ${statPointsResult.level305Bonus}`})
+						</span>
 					</div>
 				</div>
 				{/* メインステータス第1行 */}
