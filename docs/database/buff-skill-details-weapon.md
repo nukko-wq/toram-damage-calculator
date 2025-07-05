@@ -50,33 +50,62 @@ interface WeaponRequirement {
 ### 1. 片手剣 (oneHandSword)
 
 #### 1.1 ブレードマスタリ (Ms-blade)
+
+**buffSkills.ts 実装**:
 ```typescript
 {
   id: 'Ms-blade',
   name: 'ブレードマスタリ',
   category: 'mastery',
   type: 'level',
-  order: 101,
   maxLevel: 10,
-  weaponRequirement: {
-    mainWeapon: ['oneHandSword', 'dualSword'],
-    description: '片手剣または双剣装備時'
-  },
-  description: '剣系武器の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 2',
-      conditions: ['剣系武器装備時'],
-      weaponTypeModifier: 'oneHandSword: +0, dualSword: +1'
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 2 (片手剣), skillLevel × 3 (双剣)',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+  order: 101,
+}
+```
+
+**効果仕様**:
+- **適用条件**: メイン武器が片手剣、両手剣、双剣の場合のみ効果あり
+- **効果内容**:
+  - WeaponATK_Rate: `スキルレベル × 3%`
+  - ATK_Rate: スキルレベル段階別固定値
+    - Lv1-2: 1%
+    - Lv3-7: 2% 
+    - Lv8-10: 3%
+
+**計算式**:
+```
+WeaponATK% = skillLevel × 3
+ATK% = 段階別固定値
+  if (skillLevel >= 1 && skillLevel <= 2) return 1
+  if (skillLevel >= 3 && skillLevel <= 7) return 2  
+  if (skillLevel >= 8 && skillLevel <= 10) return 3
+```
+
+**実装用計算関数**:
+```typescript
+function calculateBladeMasteryEffects(
+  skillLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+  if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0) return {}
+  
+  // WeaponATK%計算
+  const weaponATKRate = skillLevel * 3
+  
+  // ATK%計算（スキルレベル別）
+  let atkRate = 0
+  if (skillLevel >= 1 && skillLevel <= 2) {
+    atkRate = 1
+  } else if (skillLevel >= 3 && skillLevel <= 7) {
+    atkRate = 2
+  } else if (skillLevel >= 8 && skillLevel <= 10) {
+    atkRate = 3
+  }
+  
+  return {
+    WeaponATK_Rate: weaponATKRate,
+    ATK_Rate: atkRate,
   }
 }
 ```
@@ -177,7 +206,10 @@ interface WeaponRequirement {
 
 ### 2. 双剣 (dualSword)
 
-#### 2.1 デュアルマスタリ (DSpena1)
+#### 2.1 ブレードマスタリ (Ms-blade)
+※ 片手剣セクション（1.1）を参照。双剣でも同じ効果。
+
+#### 2.2 デュアルマスタリ (DSpena1)
 ```typescript
 {
   id: 'DSpena1',
@@ -308,7 +340,10 @@ interface WeaponRequirement {
 
 ### 3. 両手剣 (twoHandSword)
 
-#### 3.1 両手剣マスタリ (Ms-twohand)
+#### 3.1 ブレードマスタリ (Ms-blade)
+※ 片手剣セクション（1.1）を参照。両手剣でも同じ効果。
+
+#### 3.2 両手剣マスタリ (Ms-twohand)
 ```typescript
 {
   id: 'Ms-twohand',
