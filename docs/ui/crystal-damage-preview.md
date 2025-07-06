@@ -1,16 +1,16 @@
-# クリスタル選択時ダメージ差分プレビュー機能設計書
+# クリスタル選択時ダメージ差分プレビュー機能実装ドキュメント
 
 ## 概要
 
-CrystalForm、EquipmentForm、BuffItemFormにおいて、アイテム選択時にそのアイテムをセットした場合のダメージ差分をリアルタイムで表示する機能の設計書。
+CrystalFormにおいて、クリスタル選択時にそのクリスタルをセットした場合のダメージ差分をリアルタイムで表示する機能の実装ドキュメント。
 
-## 機能要件
+## 実装済み機能
 
 ### 基本機能
-- **対象フォーム**: CrystalForm、EquipmentForm、BuffItemForm
-- **表示位置**: 各アイテムカードの上部
-- **表示内容**: 現在のダメージ最大値との差分
-- **更新タイミング**: アイテム選択モーダル表示時、リアルタイム計算
+- **対象フォーム**: CrystalForm（実装済み）、EquipmentForm、BuffItemForm（将来）
+- **表示位置**: 各クリスタルカードの左上角
+- **表示内容**: 現在の平均ダメージとの差分
+- **更新タイミング**: クリスタル選択モーダル表示時、リアルタイム計算
 
 ### 表示仕様
 - **正の差分**: `+1,234` (緑色)
@@ -20,174 +20,226 @@ CrystalForm、EquipmentForm、BuffItemFormにおいて、アイテム選択時�
 
 ## 技術仕様
 
+### 実装アーキテクチャ
+
+現在の実装では、DamagePreviewと完全に同じ計算エンジンを使用した共通のダメージ計算サービスを使用しています。
+
 ### データフロー
 
 ```typescript
-// 1. 現在のダメージ計算結果を取得
-const currentDamageResult = useCalculatorStore(state => state.calculationResults)
-const currentMaxDamage = getCurrentMaxDamage(currentDamageResult)
+// 1. 現在の状態でダメージを計算（共通サービス使用）
+const baselineResults = calculateResults(baselineData)
+const currentDamageResult = calculateDamageWithService(
+  baselineData, 
+  baselineResults, 
+  { debug: options.debug, powerOptions }
+)
 
-// 2. 仮想的にアイテムをセットした状態でダメージを計算
-const simulatedData = simulateItemEquip(currentData, targetItem, slotInfo)
-const simulatedDamageResult = calculateDamagePreview(simulatedData)
-const simulatedMaxDamage = getCurrentMaxDamage(simulatedDamageResult)
+// 2. クリスタル装着をシミュレーション
+const simulatedData = simulateItemEquipSimple(currentData, item, slotInfo)
+const simulatedResults = calculateResults(simulatedData)
+const simulatedDamageResult = calculateDamageWithService(
+  simulatedData, 
+  simulatedResults, 
+  { debug: options.debug, powerOptions }
+)
 
-// 3. 差分を計算
-const damageDifference = simulatedMaxDamage - currentMaxDamage
+// 3. 平均ダメージの差分を計算
+const averageDifference = simulatedDamageResult.normal.average - currentDamageResult.normal.average
+const difference = Math.round(averageDifference)
 ```
 
-### 核心となる関数
+### 実装されたコンポーネントとファイル
 
-#### 1. ダメージシミュレーション関数
+#### 1. 共通ダメージ計算サービス
+
+**ファイル**: `src/utils/damageCalculationService.ts`
 
 ```typescript
 /**
- * アイテム装着シミュレーション
+ * DamagePreviewと同じ方法でダメージを計算する共通サービス
  */
-export function simulateItemEquip(
+export function calculateDamageWithService(
+  calculatorData: CalculatorData,
+  calculationResults: any,
+  options: DamageCalculationOptions = {}
+): DamageCalculationServiceResult {
+  // DamagePreview.tsxと完全に同じ計算ロジックを使用
+  // 最小、最大、平均ダメージを正確に計算
+  // ダメージタイプ（白ダメ、クリティカル等）に対応
+}
+```
+
+#### 2. クリスタル装着シミュレーション
+
+**ファイル**: `src/utils/damageSimulationSimple.ts`
+
+```typescript
+/**
+ * アイテム装着シミュレーション（シンプル版）
+ */
+export function simulateItemEquipSimple(
   currentData: CalculatorData,
-  item: Crystal | Equipment | BuffItem,
+  item: PreviewItem,
   slotInfo: SlotInfo
 ): CalculatorData {
-  const simulatedData = JSON.parse(JSON.stringify(currentData)) // Deep copy
+  const simulatedData: CalculatorData = JSON.parse(JSON.stringify(currentData))
   
-  switch (slotInfo.type) {
-    case 'crystal':
-      simulatedData.crystals[slotInfo.category][slotInfo.slot] = item as Crystal
-      break
-    case 'equipment':
-      simulatedData.equipment[slotInfo.slot as EquipmentSlot] = item as Equipment
-      break
-    case 'buffItem':
-      simulatedData.buffItems[slotInfo.category] = item as BuffItem
-      break
+  // クリスタルスロットの更新
+  if (slotInfo.type === 'crystal' && slotInfo.category && typeof slotInfo.slot === 'number') {
+    const slotKey = `${slotInfo.category}${slotInfo.slot + 1}` // weapon1, armor2, etc.
+    (simulatedData.crystals as unknown as Record<string, string | null>)[slotKey] = item.id
   }
   
   return simulatedData
 }
-
-/**
- * ダメージプレビュー計算（軽量版）
- */
-export function calculateDamagePreview(data: CalculatorData): DamagePreviewResult {
-  // 基本ステータス計算（軽量版）
-  const results = calculateResults(data)
-  
-  // ダメージ計算（現在のDamagePreviewと同じロジック）
-  const damageInput = createDamageInputFromCalculatorData(data, results)
-  const damageResult = calculateDamage(damageInput)
-  
-  return {
-    maxDamage: damageResult.stabilityResult.maxDamage,
-    minDamage: damageResult.stabilityResult.minDamage,
-    baseDamage: damageResult.baseDamage
-  }
-}
-
-/**
- * 現在の最大ダメージ取得
- */
-export function getCurrentMaxDamage(results: CalculationResults | null): number {
-  if (!results) return 0
-  
-  // 現在のDamagePreviewと同じロジックで最大ダメージを計算
-  // 通常攻撃の最大ダメージを返す
-  const damageInput = createDamageInputFromResults(results)
-  const damageResult = calculateDamage(damageInput)
-  
-  return damageResult.stabilityResult.maxDamage
-}
 ```
 
-#### 2. フック定義
+#### 2. ダメージ差分計算フック
+
+**ファイル**: `src/hooks/useDamageDifferenceCorrect.ts`
 
 ```typescript
 /**
- * アイテム選択時のダメージ差分計算フック
+ * 正しい方法によるダメージ差分計算フック
+ * DamagePreviewと同じ計算エンジンを使用
  */
-export function useDamageDifference(
-  item: Crystal | Equipment | BuffItem | null,
-  slotInfo: SlotInfo
-) {
-  const currentData = useCalculatorStore(state => state.data)
-  const currentResults = useCalculatorStore(state => state.calculationResults)
-  
-  return useMemo(() => {
-    if (!item || !currentResults) {
-      return { difference: 0, isCalculating: false, error: null }
-    }
-    
-    try {
-      // 現在のダメージ
-      const currentMaxDamage = getCurrentMaxDamage(currentResults)
-      
-      // シミュレーション
-      const simulatedData = simulateItemEquip(currentData, item, slotInfo)
-      const simulatedResult = calculateDamagePreview(simulatedData)
-      
-      // 差分計算
-      const difference = simulatedResult.maxDamage - currentMaxDamage
-      
-      return { difference, isCalculating: false, error: null }
-    } catch (error) {
-      console.error('Damage difference calculation failed:', error)
-      return { difference: 0, isCalculating: false, error: error as Error }
-    }
-  }, [item, currentData, currentResults, slotInfo])
+export function useDamageDifferenceCorrect(
+	item: PreviewItem | null,
+	slotInfo: SlotInfo,
+	options: DamageDifferenceOptions = {},
+): DamageDifferenceResult {
+	const currentData = useCalculatorStore((state) => state.data)
+	const currentResults = useCalculatorStore((state) => state.calculationResults)
+	const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
+	
+	return useMemo(() => {
+		// 現在装着中のクリスタルIDを確認
+		const currentSlotKey = slotInfo.category && typeof slotInfo.slot === 'number' 
+			? `${slotInfo.category}${slotInfo.slot + 1}` 
+			: null
+		const currentEquippedCrystalId = currentSlotKey 
+			? (currentData.crystals as unknown as Record<string, string | null>)[currentSlotKey]
+			: null
+			
+		const isCurrentlyEquipped = currentEquippedCrystalId === item.id
+		
+		let baselineData: CalculatorData
+		let simulatedData: CalculatorData
+
+		if (isCurrentlyEquipped) {
+			// 現在装着中のクリスタルの場合：外した状態を基準にして差分を計算
+			baselineData = removeItemFromSlot(currentData, slotInfo)
+			simulatedData = currentData // 現在の状態が装着状態
+		} else {
+			// 装着していないクリスタルの場合：現在の状態を基準にして装着後の差分を計算
+			baselineData = currentData
+			simulatedData = simulateItemEquipSimple(currentData, item, slotInfo)
+		}
+
+		// 基準状態のダメージを計算（共通サービスを使用）
+		const baselineResults = calculateResults(baselineData)
+		const currentDamageResult = calculateDamageWithService(
+			baselineData, 
+			baselineResults, 
+			{ debug: options.debug, powerOptions: powerOptions || {} }
+		)
+		
+		// シミュレーション後のステータスを計算（共通サービスを使用）
+		const simulatedResults = calculateResults(simulatedData)
+		const simulatedDamageResult = calculateDamageWithService(
+			simulatedData, 
+			simulatedResults, 
+			{ debug: options.debug, powerOptions: powerOptions || {} }
+		)
+		
+		// 平均ダメージの差分を計算
+		const averageDifference = simulatedDamageResult.normal.average - currentDamageResult.normal.average
+		const difference = Math.round(averageDifference)
+		
+		return {
+			difference,
+			isCalculating: false,
+			error: null,
+			currentDamage: currentDamageResult.normal.max,
+			simulatedDamage: simulatedDamageResult.normal.max,
+		}
+	}, [item, currentData, currentResults, powerOptions, slotInfo, options.disabled, options.debug])
 }
 ```
 
 #### 3. UIコンポーネント
 
+**ファイル**: `src/components/common/DamageDifferenceDisplayCorrect.tsx`
+
 ```typescript
 /**
- * ダメージ差分表示コンポーネント
+ * ダメージ差分表示コンポーネント（正しい版）
  */
-interface DamageDifferenceDisplayProps {
-  item: Crystal | Equipment | BuffItem
-  slotInfo: SlotInfo
-  className?: string
+export interface DamageDifferenceDisplayCorrectProps {
+	item: PreviewItem
+	slotInfo: SlotInfo
+	size?: 'sm' | 'md' | 'lg'
+	className?: string
+	options?: DamageDifferenceOptions
 }
 
-export function DamageDifferenceDisplay({ 
-  item, 
-  slotInfo, 
-  className = '' 
-}: DamageDifferenceDisplayProps) {
-  const { difference, isCalculating, error } = useDamageDifference(item, slotInfo)
-  
-  if (isCalculating) {
-    return (
-      <div className={`text-xs text-gray-400 ${className}`}>
-        計算中...
-      </div>
-    )
-  }
-  
-  if (error) {
-    return (
-      <div className={`text-xs text-gray-400 ${className}`}>
-        ---
-      </div>
-    )
-  }
-  
-  const formatDifference = (diff: number): string => {
-    if (diff === 0) return '±0'
-    return diff > 0 ? `+${diff.toLocaleString()}` : diff.toLocaleString()
-  }
-  
-  const getColorClass = (diff: number): string => {
-    if (diff > 0) return 'text-green-600'
-    if (diff < 0) return 'text-red-600'
-    return 'text-gray-400'
-  }
-  
-  return (
-    <div className={`text-xs font-medium ${getColorClass(difference)} ${className}`}>
-      {formatDifference(difference)}
-    </div>
-  )
+export function DamageDifferenceDisplayCorrect({
+	item,
+	slotInfo,
+	size = 'md',
+	className = '',
+	options = {},
+}: DamageDifferenceDisplayCorrectProps) {
+	const { difference, isCalculating, error } = useDamageDifferenceCorrect(
+		item,
+		slotInfo,
+		options,
+	)
+
+	if (isCalculating) {
+		return (
+			<div className={`text-xs text-gray-400 ${className}`}>
+				計算中...
+			</div>
+		)
+	}
+
+	if (error) {
+		return (
+			<div className={`text-xs text-gray-400 ${className}`}>
+				---
+			</div>
+		)
+	}
+
+	const formatDifference = (diff: number): string => {
+		if (diff === 0) return '±0'
+		return diff > 0 ? `+${diff.toLocaleString()}` : diff.toLocaleString()
+	}
+
+	const getColorClass = (diff: number): string => {
+		if (diff > 0) return 'text-green-600 font-semibold'
+		if (diff < 0) return 'text-red-600 font-semibold'
+		return 'text-gray-400'
+	}
+
+	const getSizeClass = (size: string): string => {
+		switch (size) {
+			case 'sm':
+				return 'text-xs'
+			case 'lg':
+				return 'text-sm'
+			default:
+				return 'text-xs'
+		}
+	}
+
+	return (
+		<div className={`${getSizeClass(size)} ${getColorClass(difference)} ${className}`}>
+			{formatDifference(difference)}
+		</div>
+	)
 }
 ```
 
@@ -213,34 +265,36 @@ export interface DamagePreviewResult {
 }
 ```
 
-## 実装計画
+## 実装状況
 
-### Phase 1: 基盤実装
-1. **シミュレーション関数の実装**
-   - `simulateItemEquip`
-   - `calculateDamagePreview`
-   - `getCurrentMaxDamage`
+### Phase 1: 基盤実装 ✅ 完了
+1. **シミュレーション関数の実装** ✅
+   - `simulateItemEquipSimple` (damageSimulationSimple.ts)
+   - `calculateDamageWithService` (damageCalculationService.ts)
+   - `calculateResults` (calculationEngine.ts)
 
-2. **フックの実装**
-   - `useDamageDifference`
+2. **フックの実装** ✅
+   - `useDamageDifferenceCorrect` (useDamageDifferenceCorrect.ts)
 
-3. **UIコンポーネントの実装**
-   - `DamageDifferenceDisplay`
+3. **UIコンポーネントの実装** ✅
+   - `DamageDifferenceDisplayCorrect` (DamageDifferenceDisplayCorrect.tsx)
 
-### Phase 2: CrystalFormへの適用
-1. **CrystalCardの更新**
+### Phase 2: CrystalFormへの適用 ✅ 完了
+1. **CrystalCardの更新** ✅
    - カード上部にダメージ差分表示を追加
    - 選択モーダル内の各クリスタルカードに適用
+   - CrystalSelectionModal.tsx でslotInfoを渡すように更新
 
-2. **パフォーマンス最適化**
-   - 計算結果のメモ化
+2. **パフォーマンス最適化** ✅
+   - 計算結果のメモ化 (useMemo)
    - 不要な再計算の防止
+   - デバッグオプション対応
 
-### Phase 3: 他フォームへの展開
-1. **EquipmentFormへの適用**
+### Phase 3: 他フォームへの展開 📋 計画中
+1. **EquipmentFormへの適用** 📋
    - 装備選択時のダメージ差分表示
 
-2. **BuffItemFormへの適用**
+2. **BuffItemFormへの適用** 📋
    - バフアイテム選択時のダメージ差分表示
 
 ## パフォーマンス考慮事項
@@ -298,27 +352,43 @@ export interface DamagePreviewResult {
    - 最適なアイテムの自動提案
    - ビルド最適化支援
 
-## ファイル構成
+## 実装されたファイル構成
 
 ```
 src/
 ├── hooks/
-│   └── useDamageDifference.ts          # ダメージ差分計算フック
+│   └── useDamageDifferenceCorrect.ts   # ダメージ差分計算フック（実装済み）
 ├── utils/
-│   ├── damageSimulation.ts             # シミュレーション関数群
-│   └── damagePreviewCalculation.ts     # 軽量ダメージ計算
+│   ├── damageCalculationService.ts     # 共通ダメージ計算サービス（実装済み）
+│   └── damageSimulationSimple.ts       # シンプルなシミュレーション（実装済み）
 ├── components/
 │   ├── common/
-│   │   └── DamageDifferenceDisplay.tsx # 差分表示コンポーネント
+│   │   └── DamageDifferenceDisplayCorrect.tsx # 差分表示コンポーネント（実装済み）
 │   ├── crystal/
-│   │   ├── CrystalCard.tsx            # 更新: 差分表示追加
-│   │   └── CrystalSelectionModal.tsx   # 更新: 差分表示追加
+│   │   ├── CrystalCard.tsx            # 更新済み: 差分表示追加
+│   │   └── CrystalSelectionModal.tsx   # 更新済み: slotInfo渡し対応
 │   ├── equipment/
 │   │   └── EquipmentCard.tsx          # 将来: 差分表示追加
 │   └── buff-item/
 │       └── BuffItemCard.tsx           # 将来: 差分表示追加
 └── types/
-    └── damagePreview.ts               # 型定義
+    └── damagePreview.ts               # 型定義（実装済み）
 ```
 
-このように、段階的に実装し、最終的に全フォームで統一されたダメージ差分プレビュー機能を提供します。
+## 主な技術的特徴
+
+1. **DamagePreviewとの統合**: 同じ計算エンジンを使用することで一貫性を保証
+2. **リアルタイム計算**: クリスタル選択モーダルを開いた瞬間から全クリスタルの差分を表示
+3. **装着状態の考慮**: 現在装着中のクリスタルは外した場合の差分を表示
+4. **平均ダメージベース**: 最小・最大・平均の複雑な計算から平均ダメージの差分に単純化
+5. **デバッグ機能**: 詳細なログ出力でトラブルシューティングを支援
+6. **型安全性**: TypeScriptによる厳密な型チェック
+
+## 次期展開予定
+
+1. **EquipmentForm**: 装備選択時のダメージ差分表示
+2. **BuffItemForm**: バフアイテム選択時のダメージ差分表示
+3. **パフォーマンス向上**: Worker利用による重い計算の非同期化
+4. **比較機能**: 複数アイテムの同時比較とソート機能
+
+この実装により、クリスタル選択時のダメージ差分プレビュー機能が完成し、ユーザーはより効率的にクリスタル選択を行うことができるようになりました。
