@@ -11,7 +11,7 @@ import EnemyCard from './EnemyCard'
 interface EnemySelectionModalProps {
 	isOpen: boolean
 	onClose: () => void
-	onSelect: (enemyId: string | null) => void
+	onSelect: (enemyId: string) => void
 	selectedEnemyId: string | null
 	title: string
 }
@@ -81,11 +81,6 @@ export default function EnemySelectionModal({
 		onClose()
 	}
 
-	// 選択解除
-	const handleRemove = () => {
-		onSelect(null)
-		onClose()
-	}
 
 	// 背景クリックで閉じる
 	const handleBackgroundClick = (e: React.MouseEvent) => {
@@ -201,55 +196,6 @@ export default function EnemySelectionModal({
 							role="grid"
 							aria-label="敵選択一覧"
 						>
-							{/* 「なし」オプション */}
-							<div
-								onClick={handleRemove}
-								className={`
-								relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
-								${
-									selectedEnemyId === null
-										? 'border-blue-500 bg-blue-50 shadow-md'
-										: 'border-gray-200 bg-white hover:border-gray-300'
-								}
-							`}
-							>
-								{selectedEnemyId === null && (
-									<div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-										<svg
-											className="w-4 h-4 text-white"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M5 13l4 4L19 7"
-											/>
-										</svg>
-									</div>
-								)}
-								<div className="text-center sm:py-8">
-									<div className="text-gray-400 mb-2">
-										<svg
-											className="w-12 h-12 mx-auto"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"
-											/>
-										</svg>
-									</div>
-									<div className="font-medium text-gray-700">なし</div>
-									<div className="text-sm text-gray-500">敵を選択しない</div>
-								</div>
-							</div>
 
 							{/* 敵カード */}
 							{filteredEnemies.map((enemy) => (

@@ -183,9 +183,9 @@ export const createInitialFoodFormData = (): FoodFormData => ({
 
 // 敵情報システムの初期値（個別セーブデータ用）
 export const createInitialSaveDataEnemyInfo = (): SaveDataEnemyInfo => ({
-	selectedEnemyId: null,
-	enemyType: null,
-	lastSelectedAt: undefined,
+	selectedEnemyId: '2b981c85-54f5-4c67-bac1-0e9cba4bdeb2', // ラフィー
+	enemyType: 'preset',
+	lastSelectedAt: new Date().toISOString(),
 })
 
 // レジスタ他システムの初期値

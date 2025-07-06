@@ -60,18 +60,7 @@ export default function EnemyForm() {
 	}
 
 	// 敵選択の処理
-	const handleEnemySelect = (enemyId: string | null) => {
-		if (enemyId === null) {
-			// 未選択の場合：個別データのみクリア（共通設定は保持）
-			const newData: EnemyFormData = {
-				...effectiveEnemyData,
-				selectedId: null,
-				type: null,
-			}
-			updateEnemy(newData)
-
-			return
-		}
+	const handleEnemySelect = (enemyId: string) => {
 
 		const enemy = getPresetEnemyById(enemyId)
 		if (!enemy) return
@@ -158,7 +147,7 @@ export default function EnemyForm() {
 
 	// 選択済み敵の名前を取得
 	const getSelectedEnemyName = (): string => {
-		if (!selectedEnemy) return 'なし'
+		if (!selectedEnemy) return '敵を選択してください'
 		return `${selectedEnemy.name} (Lv.${selectedEnemy.level})`
 	}
 
@@ -482,12 +471,6 @@ export default function EnemyForm() {
 					</div>
 				)}
 
-				{/* 未選択時のメッセージ */}
-				{!selectedEnemy && (
-					<div className="bg-gray-50 p-3 rounded text-sm text-gray-600 text-center">
-						敵選択ボタンをクリックして敵を選択してください
-					</div>
-				)}
 			</div>
 
 			{/* 敵選択モーダル */}
