@@ -66,14 +66,9 @@ export function useDamageDifferenceCorrect(
 		}
 
 		try {
-			// ダメージ計算のログを一時的に無効化
-			const originalConsoleLog = console.log
-			if (!options.debug) {
-				console.log = () => {}
-			}
 
 			// 1. 現在のダメージを計算（DamagePreview.tsxと同じ方法）
-			const currentMaxDamage = calculateDamageFromResults(currentResults, currentData, powerOptions || {})
+			const currentMaxDamage = calculateDamageFromResults(currentResults, currentData, powerOptions || {}, options.debug)
 			
 			// 2. アイテム装着をシミュレーション
 			const simulatedData = simulateItemEquipSimple(currentData, item, slotInfo)
@@ -81,13 +76,41 @@ export function useDamageDifferenceCorrect(
 			// 3. シミュレーション後のステータスを計算
 			const simulatedResults = calculateResults(simulatedData)
 			
-			// 4. シミュレーション後のダメージを計算（DamagePreview.tsxと同じ方法）
-			const simulatedMaxDamage = calculateDamageFromResults(simulatedResults, simulatedData, powerOptions || {})
-			
-			// console.logを復元
-			if (!options.debug) {
-				console.log = originalConsoleLog
+			// デバッグログ: calculateResults実行後
+			if (options.debug) {
+				console.log('⚙️  CALCULATE RESULTS COMPARISON:', {
+					'=== CURRENT RESULTS ===': '======================',
+					currentBasicStats: currentResults.basicStats,
+					currentEquipmentBonus1: currentResults.equipmentBonus1,
+					'=== SIMULATED RESULTS ===': '====================',
+					simulatedBasicStats: simulatedResults.basicStats,
+					simulatedEquipmentBonus1: simulatedResults.equipmentBonus1,
+					'=== COMPARISON ===': '===========================',
+					atkDifference: simulatedResults.basicStats.totalATK - currentResults.basicStats.totalATK,
+					strDifference: simulatedResults.adjustedStats.STR - currentResults.adjustedStats.STR,
+					criticalRateDifference: simulatedResults.equipmentBonus1.criticalRate - currentResults.equipmentBonus1.criticalRate,
+					vitDifference: simulatedResults.adjustedStats.VIT - currentResults.adjustedStats.VIT,
+				})
 			}
+			
+			// 4. シミュレーション後のダメージを計算（DamagePreview.tsxと同じ方法）
+			const simulatedMaxDamage = calculateDamageFromResults(simulatedResults, simulatedData, powerOptions || {}, options.debug)
+			
+			// デバッグログ: ダメージ計算結果の比較
+			if (options.debug) {
+				console.log('🎯 DAMAGE CALCULATION COMPARISON:', {
+					'=== DAMAGE RESULTS ===': '========================',
+					currentMaxDamage,
+					simulatedMaxDamage,
+					rawDifference: simulatedMaxDamage - currentMaxDamage,
+					roundedDifference: Math.round(simulatedMaxDamage - currentMaxDamage),
+					'=== EXPECTED VS ACTUAL ===': '===================',
+					expectedDifference: 188273, // 実際の差分: 1,733,894 - 1,545,621
+					calculatedDifference: Math.round(simulatedMaxDamage - currentMaxDamage),
+					discrepancy: 188273 - Math.round(simulatedMaxDamage - currentMaxDamage),
+				})
+			}
+			
 			
 			// 5. 差分を計算
 			const difference = Math.round(simulatedMaxDamage - currentMaxDamage)
@@ -102,6 +125,38 @@ export function useDamageDifferenceCorrect(
 					currentTotalATK: currentResults.basicStats.totalATK,
 					simulatedTotalATK: simulatedResults.basicStats.totalATK,
 				})
+				
+				// 詳細デバッグ: クリスタル装着前後の比較
+				console.log('📊 DETAILED DAMAGE DIFFERENCE DEBUG:', {
+					'=== CRYSTAL SIMULATION ===': '=================',
+					itemName: item.name,
+					slotCategory: slotInfo.category,
+					slotNumber: slotInfo.slot,
+					'=== CURRENT DATA ===': '=================',
+					currentCrystals: currentData.crystals,
+					currentTotalATK: currentResults.basicStats.totalATK,
+					currentMaxDamage: currentMaxDamage,
+					'=== SIMULATED DATA ===': '=================',
+					simulatedCrystals: simulatedData.crystals,
+					simulatedTotalATK: simulatedResults.basicStats.totalATK,
+					simulatedMaxDamage: simulatedMaxDamage,
+					'=== DIFFERENCE ===': '=================',
+					attackDifference: simulatedResults.basicStats.totalATK - currentResults.basicStats.totalATK,
+					damageDifference: difference,
+					'=== BONUS COMPARISON ===': '=================',
+					currentEquipmentBonus1: currentResults.equipmentBonus1,
+					simulatedEquipmentBonus1: simulatedResults.equipmentBonus1,
+				})
+				
+				// クリスタル装着シミュレーションの詳細確認
+				console.log('🔍 CRYSTAL EQUIP SIMULATION DETAILS:')
+				console.log('slotInfo:', slotInfo)
+				if (slotInfo.category && typeof slotInfo.slot === 'number') {
+					const slotKey = `${slotInfo.category}${slotInfo.slot + 1}`
+					console.log('Expected slot key:', slotKey)
+					console.log('Current crystal in slot:', (currentData.crystals as unknown as Record<string, string | null>)[slotKey])
+					console.log('Simulated crystal in slot:', (simulatedData.crystals as unknown as Record<string, string | null>)[slotKey])
+				}
 			}
 
 			return {
@@ -128,16 +183,28 @@ export function useDamageDifferenceCorrect(
  * （計算結果から直接ダメージを計算）
  */
 function calculateDamageFromResults(
-	calculationResults: any,
+	calculationResults: unknown,
 	data: CalculatorData,
-	powerOptions: any
+	powerOptions: unknown,
+	debug = false
 ): number {
 	// 基本的な計算入力データを作成
 	const defaultInput = createDefaultDamageInput()
 
 	// 中央集約された計算結果を使用
-	const totalATK = calculationResults?.basicStats.totalATK || 0
-	const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
+	const totalATK = (calculationResults as any)?.basicStats.totalATK || 0
+	const stabilityRate = (calculationResults as any)?.basicStats.stabilityRate || 85
+	
+	// デバッグログ
+	if (debug) {
+		console.log('💡 calculateDamageFromResults called with:', {
+			totalATK,
+			stabilityRate,
+			calculationResults: calculationResults,
+			basicStats: (calculationResults as any)?.basicStats,
+			equipmentBonus1: (calculationResults as any)?.equipmentBonus1,
+		})
+	}
 	
 	// 敵情報を取得
 	let enemyInfo = null
@@ -147,16 +214,17 @@ function calculateDamageFromResults(
 
 	// PowerOptionsに基づく属性攻撃設定
 	const getElementAdvantageTotal = () => {
+		const powerOpts = powerOptions as any
 		// 属性攻撃が無効の場合は0を返す
-		if (powerOptions.elementAttack === 'none') {
+		if (powerOpts.elementAttack === 'none') {
 			return 0
 		}
 
 		// 基本ステータスから総属性有利を取得（装備・クリスタ・料理・バフ統合済み）
-		const baseAdvantage = calculationResults?.basicStats?.totalElementAdvantage ?? 0
+		const baseAdvantage = (calculationResults as any)?.basicStats?.totalElementAdvantage ?? 0
 
 		// 属性威力オプションに応じて計算
-		switch (powerOptions.elementPower) {
+		switch (powerOpts.elementPower) {
 			case 'disabled':
 				return 0 // 属性威力無効時は0
 			case 'awakeningOnly':
@@ -173,8 +241,8 @@ function calculateDamageFromResults(
 	// PowerOptionsに基づく距離設定
 	const getDistanceValues = () => {
 		return {
-			shortRange: calculationResults?.equipmentBonus1?.shortRangeDamage || 0,
-			longRange: calculationResults?.equipmentBonus1?.longRangeDamage || 0,
+			shortRange: (calculationResults as any)?.equipmentBonus1?.shortRangeDamage || 0,
+			longRange: (calculationResults as any)?.equipmentBonus1?.longRangeDamage || 0,
 		}
 	}
 
@@ -187,11 +255,12 @@ function calculateDamageFromResults(
 	let finalEnemyLevel = enemyInfo?.level ?? defaultInput.enemy.level
 
 	// ボス系敵かつ難易度がnormal以外の場合、難易度調整を適用
-	if (enemyInfo?.category === 'boss' && powerOptions.bossDifficulty !== 'normal') {
+	const powerOpts = powerOptions as any
+	if (enemyInfo?.category === 'boss' && powerOpts.bossDifficulty !== 'normal') {
 		const adjustedStats = calculateBossDifficultyStats(
 			finalEnemyLevel,
 			enemyInfo.stats,
-			powerOptions.bossDifficulty,
+			powerOpts.bossDifficulty,
 		)
 		finalEnemyLevel = adjustedStats.level
 		finalEnemyDEF = adjustedStats.stats.DEF
@@ -208,7 +277,7 @@ function calculateDamageFromResults(
 			rate: stabilityRate, // 計算済みの安定率を使用
 		},
 		critical: {
-			damage: calculationResults?.basicStats?.criticalDamage || 100,
+			damage: (calculationResults as any)?.basicStats?.criticalDamage || 100,
 		},
 		resistance: {
 			physical: enemyInfo?.stats.physicalResistance ?? defaultInput.resistance.physical,
@@ -220,13 +289,13 @@ function calculateDamageFromResults(
 			MDEF: finalEnemyMDEF,
 			level: finalEnemyLevel,
 			category: enemyInfo?.category ?? defaultInput.enemy.category,
-			difficulty: powerOptions.bossDifficulty,
+			difficulty: powerOpts.bossDifficulty,
 			hasDestruction: false, // TODO: 破壊状態設定
 			guaranteedCritical: 0,
 		},
 		penetration: {
-			physical: calculationResults?.equipmentBonus1?.physicalPenetration || 0,
-			magical: calculationResults?.equipmentBonus1?.magicalPenetration || 0,
+			physical: (calculationResults as any)?.equipmentBonus1?.physicalPenetration || 0,
+			magical: (calculationResults as any)?.equipmentBonus1?.magicalPenetration || 0,
 		},
 		elementAdvantage: {
 			total: getElementAdvantageTotal(),
@@ -247,6 +316,16 @@ function calculateDamageFromResults(
 
 	// ダメージ計算実行
 	const damageResult = calculateDamage(input)
+	
+	if (debug) {
+		console.log('🔥 DAMAGE CALCULATION RESULT:', {
+			referenceStat: input.referenceStat,
+			baseDamage: damageResult.baseDamage,
+			maxDamage: damageResult.stabilityResult.maxDamage,
+			minDamage: damageResult.stabilityResult.minDamage,
+			stabilityRate: damageResult.stabilityResult.stabilityRate,
+		})
+	}
 	
 	// 最大ダメージを返す
 	return damageResult.stabilityResult.maxDamage

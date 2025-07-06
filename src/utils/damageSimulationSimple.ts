@@ -29,10 +29,31 @@ export function simulateItemEquipSimple(
 					const slotNumber = slotInfo.slot + 1 // 0-based to 1-based
 					const slotKey = `${slotInfo.category}${slotNumber}`
 					
+					// デバッグログ：更新前の状態
+					console.log('🔧 CRYSTAL SIMULATION START:', {
+						itemName: item.name,
+						crystalId,
+						slotCategory: slotInfo.category,
+						slotNumber: slotInfo.slot,
+						slotKey,
+						beforeUpdateCrystal: (currentData.crystals as unknown as Record<string, string | null>)[slotKey],
+						currentCrystals: JSON.stringify(currentData.crystals, null, 2),
+					})
+					
 					// crystalsオブジェクトを直接更新
 					if (simulatedData.crystals) {
 						// 型安全性のため、unknownを経由してキャスト
 						(simulatedData.crystals as unknown as Record<string, string | null>)[slotKey] = crystalId
+						
+						// デバッグログ：更新後の状態
+						console.log('🔧 CRYSTAL SIMULATION EXECUTED:', {
+							itemName: item.name,
+							crystalId,
+							slotKey,
+							afterUpdateCrystal: (simulatedData.crystals as unknown as Record<string, string | null>)[slotKey],
+							simulatedCrystals: JSON.stringify(simulatedData.crystals, null, 2),
+							crystalChangeSuccess: (simulatedData.crystals as unknown as Record<string, string | null>)[slotKey] === crystalId,
+						})
 					}
 					
 					// Crystal slot updated successfully
