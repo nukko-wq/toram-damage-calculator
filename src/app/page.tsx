@@ -117,13 +117,13 @@ export default function Home() {
 				<div className="grid grid-cols-[1fr] grid-rows-[repeat(9,auto)] md:grid-cols-[repeat(8,1fr)] md:grid-rows-[repeat(6,auto)] xl:grid-cols-[350px_100px_minmax(500px,1000px)] xl:grid-rows-[220px_250px_auto_auto_auto_250px_auto_auto_auto_auto] gap-2 md:gap-4">
 					<BaseStatsForm />
 					<WeaponForm />
-					<CrystalForm />
 					<EquipmentForm />
-					<FoodForm />
+					<CrystalForm />
 					<BuffItemForm />
-					<EnemyForm />
-					<AttackSkillForm />
+					<FoodForm />
 					<BuffSkillForm />
+					<AttackSkillForm />
+					<EnemyForm />
 				</div>
 			</div>
 		</div>
