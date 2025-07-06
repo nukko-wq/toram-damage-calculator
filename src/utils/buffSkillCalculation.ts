@@ -280,6 +280,23 @@ export function calculateAttackUpEffects(
 }
 
 /**
+ * 魔法力up(exMATK1)の効果計算関数
+ */
+export function calculateMagicUpEffects(
+	skillLevel: number,
+	playerLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+	
+	// MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
+	const matkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+	
+	return {
+		MATK: matkBonus,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -429,6 +446,37 @@ export function getAttackUpEffects(
 	if (attackUp?.isEnabled && attackUp.level) {
 		const effects = calculateAttackUpEffects(
 			attackUp.level,
+			playerLevel,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから魔法力upの効果を取得（プレイヤーレベルが必要）
+ */
+export function getMagicUpEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	playerLevel: number,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 魔法力up(exMATK1)の処理
+	const magicUp = buffSkillData['exMATK1']
+	if (magicUp?.isEnabled && magicUp.level) {
+		const effects = calculateMagicUpEffects(
+			magicUp.level,
 			playerLevel,
 		)
 
