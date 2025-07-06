@@ -83,18 +83,24 @@ export function DamageDifferenceDisplayCorrect({
 		return diff > 0 ? `+${diff.toLocaleString()}` : diff.toLocaleString()
 	}
 
-	// 色クラスの決定
-	const getColorClass = (diff: number): string => {
-		if (diff > 0) return 'text-blue-500 dark:text-green-400'
-		if (diff < 0) return 'text-red-500 dark:text-red-400'
-		return 'text-gray-400 dark:text-gray-500'
+	// ラベル色クラスの決定（「ダメージ：」部分）
+	const getLabelColorClass = (diff: number): string => {
+		if (diff > 0) return 'text-blue-500'
+		if (diff < 0) return 'text-red-500'
+		return 'text-gray-400'
+	}
+
+	// 値の色クラスの決定
+	const getValueColorClass = (diff: number): string => {
+		if (diff > 0) return 'text-blue-600'
+		if (diff < 0) return 'text-red-600'
+		return 'text-gray-500'
 	}
 
 	return (
-		<div
-			className={`${sizeClasses[size]} font-medium ${getColorClass(difference)} ${className}`}
-		>
-			{formatDifference(difference)}
+		<div className={`${sizeClasses[size]} font-medium ${className}`}>
+			<span className={getLabelColorClass(difference)}>ダメージ：</span>
+			<span className={getValueColorClass(difference)}>{formatDifference(difference)}</span>
 		</div>
 	)
 }
