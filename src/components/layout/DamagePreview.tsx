@@ -243,8 +243,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 				// 貫通値を中央集約された装備品補正値1から取得
 				penetration: {
-					physical: calculationResults?.equipmentBonus1?.physicalPenetration || defaultInput.penetration.physical,
-					magical: calculationResults?.equipmentBonus1?.magicalPenetration || defaultInput.penetration.magical,
+					physical: calculationResults?.equipmentBonus1?.physicalPenetration ?? defaultInput.penetration.physical,
+					magical: calculationResults?.equipmentBonus1?.magicalPenetration ?? defaultInput.penetration.magical,
 				},
 				// コンボ設定を反映
 				combo: {

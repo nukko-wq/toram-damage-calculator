@@ -95,8 +95,8 @@ export function calculateDamageWithService(
 		// PowerOptionsに基づく距離設定
 		const getDistanceValues = () => {
 			return {
-				shortRange: calculationResults?.equipmentBonus1?.shortRangeDamage || 0,
-				longRange: calculationResults?.equipmentBonus1?.longRangeDamage || 0,
+				shortRange: calculationResults?.equipmentBonus1?.shortRangeDamage ?? 0,
+				longRange: calculationResults?.equipmentBonus1?.longRangeDamage ?? 0,
 			}
 		}
 
@@ -139,8 +139,8 @@ export function calculateDamageWithService(
 			},
 			distance: distanceValues,
 			unsheathe: {
-				fixedDamage: calculationResults?.equipmentBonus1?.unsheatheAttack || defaultInput.unsheathe.fixedDamage,
-				rateBonus: calculationResults?.equipmentBonus1?.elementPower || 0, // 抜刀威力%は一旦elementPowerで代用
+				fixedDamage: calculationResults?.equipmentBonus1?.unsheatheAttack ?? defaultInput.unsheathe.fixedDamage,
+				rateBonus: calculationResults?.equipmentBonus1?.elementPower ?? 0, // 抜刀威力%は一旦elementPowerで代用
 				isActive: powerOptions.unsheathe,
 			},
 			userSettings: {
@@ -150,7 +150,7 @@ export function calculateDamageWithService(
 			},
 			// クリティカルダメージ設定
 			critical: {
-				damage: calculationResults?.basicStats.criticalDamage || 100,
+				damage: calculationResults?.basicStats.criticalDamage ?? 100,
 			},
 			// 敵情報設定を実際のデータに基づいて更新
 			enemy: {
@@ -173,8 +173,8 @@ export function calculateDamageWithService(
 			},
 			// 貫通値を中央集約された装備品補正値1から取得
 			penetration: {
-				physical: calculationResults?.equipmentBonus1?.physicalPenetration || defaultInput.penetration.physical,
-				magical: calculationResults?.equipmentBonus1?.magicalPenetration || defaultInput.penetration.magical,
+				physical: calculationResults?.equipmentBonus1?.physicalPenetration ?? defaultInput.penetration.physical,
+				magical: calculationResults?.equipmentBonus1?.magicalPenetration ?? defaultInput.penetration.magical,
 			},
 			// コンボ設定を反映
 			combo: {

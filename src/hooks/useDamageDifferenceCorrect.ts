@@ -129,13 +129,11 @@ export function useDamageDifferenceCorrect(
 				{ debug: options.debug, powerOptions: powerOptions || {} }
 			)
 			
-			// 3. 最小、最大、平均ダメージの差分を計算
-			const minDifference = simulatedDamageResult.normal.min - currentDamageResult.normal.min
-			const maxDifference = simulatedDamageResult.normal.max - currentDamageResult.normal.max
+			// 3. 平均ダメージの差分を計算
 			const averageDifference = simulatedDamageResult.normal.average - currentDamageResult.normal.average
 			
-			// 4. 差分の平均値を計算
-			const averageDamageDifference = Math.round((minDifference + maxDifference + averageDifference) / 3)
+			// 4. 平均ダメージの差分を使用
+			const averageDamageDifference = Math.round(averageDifference)
 			
 			// デバッグログ: calculateResults実行後
 			if (options.debug) {
@@ -200,13 +198,10 @@ export function useDamageDifferenceCorrect(
 					simulatedMin: simulatedDamageResult.normal.min,
 					simulatedMax: simulatedDamageResult.normal.max,
 					simulatedAverage: simulatedDamageResult.normal.average,
-					'=== INDIVIDUAL DIFFERENCES ===': '========================',
-					minDifference: minDifference,
-					maxDifference: maxDifference,
+					'=== AVERAGE DAMAGE DIFFERENCE ===': '========================',
 					averageDifference: averageDifference,
 					'=== FINAL CALCULATION ===': '========================',
-					calculationFormula: `(${minDifference} + ${maxDifference} + ${averageDifference}) / 3`,
-					rawResult: (minDifference + maxDifference + averageDifference) / 3,
+					calculationMethod: 'Using average damage difference only',
 					finalRoundedDifference: averageDamageDifference,
 				})
 			}
@@ -215,7 +210,7 @@ export function useDamageDifferenceCorrect(
 			const difference = averageDamageDifference
 
 			if (options.debug) {
-				console.log('🎯 Correct Damage Difference Calculation (Average Method):', {
+				console.log('🎯 Correct Damage Difference Calculation (Average Damage Only):', {
 					currentMin: currentDamageResult.normal.min,
 					currentMax: currentDamageResult.normal.max,
 					currentAverage: currentDamageResult.normal.average,
