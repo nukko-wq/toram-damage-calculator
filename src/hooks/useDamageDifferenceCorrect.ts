@@ -120,7 +120,6 @@ export function useDamageDifferenceCorrect(
 				baselineResults, 
 				{ debug: options.debug, powerOptions: powerOptions || {} }
 			)
-			const currentMaxDamage = currentDamageResult.normal.max
 			
 			// 2. シミュレーション後のステータスを計算（共通サービスを使用）
 			const simulatedResults = calculateResults(simulatedData)
@@ -129,7 +128,14 @@ export function useDamageDifferenceCorrect(
 				simulatedResults, 
 				{ debug: options.debug, powerOptions: powerOptions || {} }
 			)
-			const simulatedMaxDamage = simulatedDamageResult.normal.max
+			
+			// 3. 最小、最大、平均ダメージの差分を計算
+			const minDifference = simulatedDamageResult.normal.min - currentDamageResult.normal.min
+			const maxDifference = simulatedDamageResult.normal.max - currentDamageResult.normal.max
+			const averageDifference = simulatedDamageResult.normal.average - currentDamageResult.normal.average
+			
+			// 4. 差分の平均値を計算
+			const averageDamageDifference = Math.round((minDifference + maxDifference + averageDifference) / 3)
 			
 			// デバッグログ: calculateResults実行後
 			if (options.debug) {
@@ -183,30 +189,40 @@ export function useDamageDifferenceCorrect(
 			}
 			
 			
-			// デバッグログ: ダメージ計算結果の比較
+			// デバッグログ: ダメージ計算結果の詳細比較
 			if (options.debug) {
-				console.log('🎯 DAMAGE CALCULATION COMPARISON:', {
-					'=== DAMAGE RESULTS ===': '========================',
-					currentMaxDamage,
-					simulatedMaxDamage,
-					rawDifference: simulatedMaxDamage - currentMaxDamage,
-					roundedDifference: Math.round(simulatedMaxDamage - currentMaxDamage),
-					'=== EXPECTED VS ACTUAL ===': '===================',
-					expectedDifference: 188273, // 実際の差分: 1,733,894 - 1,545,621
-					calculatedDifference: Math.round(simulatedMaxDamage - currentMaxDamage),
-					discrepancy: 188273 - Math.round(simulatedMaxDamage - currentMaxDamage),
+				console.log('🎯 DAMAGE CALCULATION DETAILED COMPARISON:', {
+					'=== CURRENT (BASELINE) DAMAGES ===': '========================',
+					currentMin: currentDamageResult.normal.min,
+					currentMax: currentDamageResult.normal.max,
+					currentAverage: currentDamageResult.normal.average,
+					'=== SIMULATED DAMAGES ===': '========================',
+					simulatedMin: simulatedDamageResult.normal.min,
+					simulatedMax: simulatedDamageResult.normal.max,
+					simulatedAverage: simulatedDamageResult.normal.average,
+					'=== INDIVIDUAL DIFFERENCES ===': '========================',
+					minDifference: minDifference,
+					maxDifference: maxDifference,
+					averageDifference: averageDifference,
+					'=== FINAL CALCULATION ===': '========================',
+					calculationFormula: `(${minDifference} + ${maxDifference} + ${averageDifference}) / 3`,
+					rawResult: (minDifference + maxDifference + averageDifference) / 3,
+					finalRoundedDifference: averageDamageDifference,
 				})
 			}
 			
-			
-			// 5. 差分を計算
-			const difference = Math.round(simulatedMaxDamage - currentMaxDamage)
+			// 5. 最終差分は平均差分を使用
+			const difference = averageDamageDifference
 
 			if (options.debug) {
-				console.log('🎯 Correct Damage Difference Calculation:', {
-					current: currentMaxDamage,
-					simulated: simulatedMaxDamage,
-					difference,
+				console.log('🎯 Correct Damage Difference Calculation (Average Method):', {
+					currentMin: currentDamageResult.normal.min,
+					currentMax: currentDamageResult.normal.max,
+					currentAverage: currentDamageResult.normal.average,
+					simulatedMin: simulatedDamageResult.normal.min,
+					simulatedMax: simulatedDamageResult.normal.max,
+					simulatedAverage: simulatedDamageResult.normal.average,
+					finalDifference: difference,
 					item: item.name,
 					slotInfo,
 					currentTotalATK: effectiveCurrentResults.basicStats.totalATK,
@@ -222,14 +238,14 @@ export function useDamageDifferenceCorrect(
 					'=== CURRENT DATA ===': '=================',
 					currentCrystals: currentData.crystals,
 					currentTotalATK: effectiveCurrentResults.basicStats.totalATK,
-					currentMaxDamage: currentMaxDamage,
+					currentDamages: currentDamageResult.normal,
 					'=== SIMULATED DATA ===': '=================',
 					simulatedCrystals: simulatedData.crystals,
 					simulatedTotalATK: simulatedResults.basicStats.totalATK,
-					simulatedMaxDamage: simulatedMaxDamage,
+					simulatedDamages: simulatedDamageResult.normal,
 					'=== DIFFERENCE ===': '=================',
 					attackDifference: simulatedResults.basicStats.totalATK - effectiveCurrentResults.basicStats.totalATK,
-					damageDifference: difference,
+					damageDifferenceAverage: difference,
 					'=== BONUS COMPARISON ===': '=================',
 					currentEquipmentBonus1: effectiveCurrentResults.equipmentBonus1,
 					simulatedEquipmentBonus1: simulatedResults.equipmentBonus1,
@@ -250,8 +266,8 @@ export function useDamageDifferenceCorrect(
 				difference,
 				isCalculating: false,
 				error: null,
-				currentDamage: currentMaxDamage,
-				simulatedDamage: simulatedMaxDamage,
+				currentDamage: currentDamageResult.normal.max,
+				simulatedDamage: simulatedDamageResult.normal.max,
 			}
 		} catch (error) {
 			if (options.debug) {
