@@ -454,6 +454,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 
 			// 複数撃がある場合は合計ダメージを計算
+			// 多撃判定フラグ
+			const isMultiHit = attackResults.length > 1
 			const totalAttackResult = (() => {
 				if (attackResults.length === 0) {
 					// 存在しない撃を選択した場合（例：ムーンスラッシュの3撃目）は0ダメージを返す
@@ -490,24 +492,65 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				}
 
 				// 複数撃の合計計算（'all'選択時）
-				const totalBaseDamage = attackResults.reduce(
+				// 各撃の最大ダメージを合計
+				const totalMaxDamage = attackResults.reduce(
 					(sum, hit) => sum + hit.result.baseDamage,
 					0,
 				)
 
-				// 安定率は最初の撃の値を使用（全撃で同じ安定率のため）
-				const stabilityRate =
-					attackResults[0].result.stabilityResult.stabilityRate
+				// 基本ステータスの安定率を取得
+				const baseStabilityRate = calculationResults?.basicStats.stabilityRate || 85
+
+				// 各撃の最小ダメージを個別に計算して合計
+				// 各撃: 最大ダメージ × 最小安定率（小数点切り捨て）
+				const totalMinDamage = attackResults.reduce((sum, hit) => {
+					const hitMaxDamage = hit.result.baseDamage
+					const hitMinDamage = Math.floor((hitMaxDamage * baseStabilityRate) / 100)
+					return sum + hitMinDamage
+				}, 0)
+
+				// 各撃の平均ダメージを個別に計算して合計
+				// 平均安定率 = (最大安定率 + 最小安定率) / 2（小数点切り捨て）
+				// 各撃: 最大ダメージ × 平均安定率（小数点切り捨て）
+				const totalAverageDamage = attackResults.reduce((sum, hit) => {
+					const hitMaxDamage = hit.result.baseDamage
+					const hitMaxStabilityRate = 100
+					const hitAverageStabilityRate = Math.floor((hitMaxStabilityRate + baseStabilityRate) / 2)
+					const hitAverageDamage = Math.floor((hitMaxDamage * hitAverageStabilityRate) / 100)
+					return sum + hitAverageDamage
+				}, 0)
+
+				// 全体の平均安定率を計算（すべての撃で同じ安定率のため）
+				const hitMaxStabilityRate = 100
+				const overallAverageStabilityRate = Math.floor((hitMaxStabilityRate + baseStabilityRate) / 2)
+
+				console.log('=== MULTI-HIT DAMAGE CALCULATION (New Method) ===')
+				attackResults.forEach((hit, index) => {
+					const hitMaxDamage = hit.result.baseDamage
+					const hitMaxStabilityRate = 100
+					const hitAverageStabilityRate = Math.floor((hitMaxStabilityRate + baseStabilityRate) / 2)
+					const hitMinDamage = Math.floor((hitMaxDamage * baseStabilityRate) / 100)
+					const hitAverageDamage = Math.floor((hitMaxDamage * hitAverageStabilityRate) / 100)
+					
+					console.log(`${index + 1}撃目:`)
+					console.log(`  最大ダメージ: ${hitMaxDamage}`)
+					console.log(`  最小安定率: ${baseStabilityRate}%`)
+					console.log(`  平均安定率: ${hitAverageStabilityRate}% = (${hitMaxStabilityRate} + ${baseStabilityRate}) / 2`)
+					console.log(`  最小ダメージ: ${hitMaxDamage} × ${baseStabilityRate}% = ${hitMinDamage}`)
+					console.log(`  平均ダメージ: ${hitMaxDamage} × ${hitAverageStabilityRate}% = ${hitAverageDamage}`)
+				})
+				console.log(`合計最大ダメージ: ${totalMaxDamage}`)
+				console.log(`合計最小ダメージ: ${totalMinDamage}`)
+				console.log(`合計平均ダメージ: ${totalAverageDamage}`)
+				console.log(`全体平均安定率: ${overallAverageStabilityRate}%`)
 
 				return {
-					baseDamage: totalBaseDamage,
+					baseDamage: totalMaxDamage,
 					stabilityResult: {
-						minDamage: Math.floor((totalBaseDamage * stabilityRate) / 100),
-						maxDamage: totalBaseDamage,
-						averageDamage: Math.floor(
-							(totalBaseDamage * (stabilityRate + 100)) / 2 / 100,
-						),
-						stabilityRate: stabilityRate,
+						minDamage: totalMinDamage,
+						maxDamage: totalMaxDamage,
+						averageDamage: totalAverageDamage,
+						stabilityRate: baseStabilityRate, // 最小の安定率を使用
 					},
 					calculationSteps: attackResults[0].result.calculationSteps, // 最初の撃の計算過程を参考表示
 				}
@@ -653,6 +696,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							(minStabilityRate + maxStabilityRate) / 2,
 						)
 
+						// 多撃の場合は既に計算済みの値を使用
+						if (isMultiHit) {
+							return {
+								min: stabilityResult.minDamage, // 既に計算済み
+								max: stabilityResult.maxDamage, // 既に計算済み
+								average: stabilityResult.averageDamage, // 既に計算済み
+								stability: stabilityRate,
+								averageStability: averageStabilityRate,
+							}
+						}
+
 						return {
 							min: Math.floor((baseDamage * stabilityRate) / 100),
 							max: baseDamage,
@@ -682,6 +736,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							Math.floor((baseDamage * averageStabilityRate) / 100),
 						)
 
+						// 多撃の場合は既に計算済みの値を使用
+						if (isMultiHit) {
+							return {
+								min: stabilityResult.minDamage, // 既に計算済み
+								max: stabilityResult.maxDamage, // 既に計算済み
+								average: stabilityResult.averageDamage, // 既に計算済み
+								stability: stabilityRate,
+								averageStability: averageStabilityRate,
+							}
+						}
+
 						return {
 							min: Math.floor((baseDamage * stabilityRate) / 100),
 							max: baseDamage,
@@ -699,6 +764,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							(minStabilityRate + maxStabilityRate) / 2,
 						)
 
+						// 多撃の場合は既に計算済みの値を使用（グレイズ適用後）
+						if (isMultiHit) {
+							return {
+								min: Math.floor(stabilityResult.minDamage * 0.1),
+								max: Math.floor(stabilityResult.maxDamage * 0.1),
+								average: Math.floor(stabilityResult.averageDamage * 0.1),
+								stability: stabilityRate,
+								averageStability: averageStabilityRate,
+							}
+						}
+
 						return {
 							min: Math.floor((grazeBaseDamage * stabilityRate) / 100),
 							max: grazeBaseDamage,
@@ -710,7 +786,16 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						}
 					}
 					case 'expected': {
-						// 期待値
+						// 期待値（多撃の場合は既に計算済みの値を使用）
+						if (isMultiHit) {
+							return {
+								min: stabilityResult.averageDamage,
+								max: stabilityResult.averageDamage,
+								average: stabilityResult.averageDamage,
+								stability: stabilityRate,
+								averageStability: stabilityRate,
+							}
+						}
 						return {
 							min: stabilityResult.averageDamage,
 							max: stabilityResult.averageDamage,
@@ -726,6 +811,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						const averageStabilityRate = Math.floor(
 							(minStabilityRate + maxStabilityRate) / 2,
 						)
+
+						// 多撃の場合は既に計算済みの値を使用
+						if (isMultiHit) {
+							return {
+								min: stabilityResult.minDamage, // 既に計算済み
+								max: stabilityResult.maxDamage, // 既に計算済み
+								average: stabilityResult.averageDamage, // 既に計算済み
+								stability: stabilityRate,
+								averageStability: averageStabilityRate,
+							}
+						}
 
 						return {
 							min: Math.floor((baseDamage * stabilityRate) / 100),

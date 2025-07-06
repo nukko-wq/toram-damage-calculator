@@ -314,24 +314,43 @@ export function calculateDamageWithService(
 			}
 
 			// 複数撃の合計計算（'all'選択時）
-			const totalBaseDamage = attackResults.reduce(
+			// 各撃の最大ダメージを合計
+			const totalMaxDamage = attackResults.reduce(
 				(sum, hit) => sum + hit.result.baseDamage,
 				0,
 			)
 
-			// 安定率は最初の撃の値を使用（全撃で同じ安定率のため）
-			const stabilityRate =
-				attackResults[0].result.stabilityResult.stabilityRate
+			// 基本ステータスの安定率を取得
+			const baseStabilityRate = calculationResults?.basicStats.stabilityRate || 85
+
+			// 各撃の最小ダメージを個別に計算して合計
+			// 各撃: 最大ダメージ × 最小安定率（小数点切り捨て）
+			const totalMinDamage = attackResults.reduce((sum, hit) => {
+				const hitMaxDamage = hit.result.baseDamage
+				const hitMinDamage = Math.floor((hitMaxDamage * baseStabilityRate) / 100)
+				return sum + hitMinDamage
+			}, 0)
+
+			// 各撃の平均ダメージを個別に計算して合計
+			// 平均安定率 = (最大安定率 + 最小安定率) / 2（小数点切り捨て）
+			// 各撃: 最大ダメージ × 平均安定率（小数点切り捨て）
+			const totalAverageDamage = attackResults.reduce((sum, hit) => {
+				const hitMaxDamage = hit.result.baseDamage
+				const hitMaxStabilityRate = 100
+				const hitAverageStabilityRate = Math.floor((hitMaxStabilityRate + baseStabilityRate) / 2)
+				const hitAverageDamage = Math.floor((hitMaxDamage * hitAverageStabilityRate) / 100)
+				return sum + hitAverageDamage
+			}, 0)
+
+			// Note: 平均安定率は表示時に個別計算
 
 			return {
-				baseDamage: totalBaseDamage,
+				baseDamage: totalMaxDamage,
 				stabilityResult: {
-					minDamage: Math.floor((totalBaseDamage * stabilityRate) / 100),
-					maxDamage: totalBaseDamage,
-					averageDamage: Math.floor(
-						(totalBaseDamage * (stabilityRate + 100)) / 2 / 100,
-					),
-					stabilityRate: stabilityRate,
+					minDamage: totalMinDamage,
+					maxDamage: totalMaxDamage,
+					averageDamage: totalAverageDamage,
+					stabilityRate: baseStabilityRate, // 最小の安定率を使用
 				},
 				calculationSteps: attackResults[0].result.calculationSteps, // 最初の撃の計算過程を参考表示
 			}
