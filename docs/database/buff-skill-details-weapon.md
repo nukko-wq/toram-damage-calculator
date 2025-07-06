@@ -391,38 +391,31 @@ function calculateQuickSlashEffects(
 }
 ```
 
-#### 3.2 重い一撃 (th1)
+#### 3.2 匠の剣術 (sm4)
 ```typescript
 {
-  id: 'th1',
-  name: '重い一撃',
+  id: 'sm4',
+  name: '匠の剣術',
   category: 'blade',
-  type: 'level',
-  order: 208,
-  maxLevel: 10,
+  type: 'toggle',
+  order: 209,
   weaponRequirement: {
-    mainWeapon: ['twoHandSword'],
-    description: '両手剣装備時'
+    mainWeapon: ['oneHandSword', 'twoHandSword', 'dualSword'],
+    description: '剣系武器装備時'
   },
-  description: '攻撃力上昇、攻撃速度減少',
+  description: 'パッシブ倍率を上昇させる',
   effects: [
     {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 6',
-      conditions: ['両手剣装備時']
-    },
-    {
-      property: 'AttackSpeed_Rate',
-      formula: 'skillLevel * -2',
-      conditions: ['両手剣装備時']
+      property: 'PassiveMultiplier_Rate',
+      formula: '+20',
+      conditions: ['剣系武器装備時']
     }
   ],
-  calculationFormula: 'ATK% = skillLevel × 6, 攻撃速度% = skillLevel × -2',
+  calculationFormula: 'パッシブ倍率% = base + 20',
   uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
   }
 }
 ```
