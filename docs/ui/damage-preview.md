@@ -1,39 +1,53 @@
-# DamagePreview UI設計書
+# DamagePreview 実装ドキュメント
 
 ## 概要
 
-DamagePreviewコンポーネントは、計算されたダメージ値と安定率を表示し、ダメージデータのキャプチャ・記録機能を提供するコンポーネントです。
+DamagePreviewコンポーネントは、Toram Onlineダメージ計算機のメインコンポーネントとして、計算されたダメージ値・安定率・威力オプション設定を一元管理するコンポーネントです。
 
-**目的**: フォーム入力に基づいてリアルタイムでダメージ計算結果を表示し、異なる設定でのダメージ比較を可能にする
+**目的**: フォーム入力に基づいてリアルタイムでダメージ計算結果を表示し、詳細な威力オプション設定を提供する
 
 **主要機能**:
-- ダメージ値と安定率のリアルタイム表示
-- 最小・最大・平均ダメージの計算表示
+- ダメージ値と安定率のリアルタイム表示（最小・最大・平均）
+- 8つの威力オプション設定（ボス難易度、スキルダメージ、属性攻撃など）
 - ダメージデータのキャプチャ機能（過去1回分のみ保存）
 - キャプチャしたダメージとの比較表示
 - LocalStorageによるキャプチャデータの永続化（全セーブデータ共通）
+- 中央集約されたダメージ計算エンジンとの統合
 
-## レイアウト設計
+## 実装されたレイアウト構造
 
 ### 全体構造
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ DamagePreview                                [キャプチャ] ボタン │
+│ DamagePreview (青背景)                                          │
+├─────────────────────────────────────────────────────────────────┤
+│ ダメージ表示テーブル                                             │
+│ ┌─────────┬─────────────────┬─────────────────┐                 │
+│ │項目     │ 現在の計算結果   │ [キャプチャ]ボタン │                 │
+│ │         ├─────────┬───────┼─────────┬───────┤                 │
+│ │         │ダメージ │安定率  │ダメージ │安定率  │                 │
+│ ├─────────┼─────────┼───────┼─────────┼───────┤                 │
+│ │最小     │50,000   │90%    │52,000   │90%    │                 │
+│ │最大     │60,000   │100%   │60,000   │100%   │                 │
+│ │平均     │56,000   │95%    │57,000   │95%    │                 │
+│ └─────────┴─────────┴───────┴─────────┴───────┘                 │
+├─────────────────────────────────────────────────────────────────┤
+│ 慣れ倍率（後で実装予定）                                           │
+├─────────────────────────────────────────────────────────────────┤
+│ 敵：[選択された敵の名前]                                           │
+├─────────────────────────────────────────────────────────────────┤
+│ 威力オプション                                                   │
+│ ┌─────────────────┬─────────────────┐                         │
+│ │ ボス戦難易度     │ Normal/Hard/... │                         │
+│ │ スキルダメージ   │ 全て/1撃目/...  │                         │
+│ │ 属性攻撃        │ 有(有利)/無/... │                         │
+│ │ コンボ:強打     │ 有効/無効       │                         │
+│ │ ダメージ判定     │ 白ダメ/Critical │                         │
+│ │ 距離判定        │ 近距離/遠距離   │                         │
+│ │ 属性威力        │ 有効/有利のみ   │                         │
+│ │ 抜刀威力        │ 有効/無効       │                         │
+│ └─────────────────┴─────────────────┘                         │
 └─────────────────────────────────────────────────────────────────┘
-┌─────────────────────────────┬───────────────────────────────────┐
-│ 現在の計算結果                │ キャプチャしたダメージ             │
-│                            │                                  │
-│ ┌─────────┬─────────────────┐ │ ┌─────────────┬─────────────────┐ │
-│ │項目     │ダメージ │安定率  │ │ │項目         │ダメージ │安定率  │ │
-│ ├─────────┼─────────┼───────┤ │ ├─────────────┼─────────┼───────┤ │
-│ │最小     │50,000   │90%    │ │ │最小         │52,000   │90%    │ │
-│ │最大     │60,000   │100%   │ │ │最大         │60,000   │100%   │ │
-│ │平均     │56,000   │95%    │ │ │平均         │57,000   │95%    │ │
-│ └─────────┴─────────┴───────┘ │ └─────────────┴─────────┴───────┘ │
-│                            │                                  │
-│                            │ ※キャプチャデータがない場合は     │
-│                            │   「データなし」を表示            │
-└─────────────────────────────┴───────────────────────────────────┘
 ```
 
 ### レスポンシブ対応
@@ -41,35 +55,57 @@ DamagePreviewコンポーネントは、計算されたダメージ値と安定�
 - **タブレット**: 左右2カラム表示（幅調整）
 - **モバイル**: 上下積み重ね表示
 
-## コンポーネント構造
+## 実装されたコンポーネント構造
 
 ### ファイル構成
 ```
-src/components/damage-preview/
-├── DamagePreview.tsx              # メインコンポーネント
-├── DamageCalculationDisplay.tsx   # 現在の計算結果表示
-├── DamageCaptureDisplay.tsx       # キャプチャダメージ表示
-└── DamageCaptureButton.tsx        # キャプチャボタンコンポーネント
+src/components/layout/
+└── DamagePreview.tsx              # 単一ファイルで完結した実装
+
+src/utils/
+├── damageCalculation.ts           # メインダメージ計算エンジン
+├── damageCaptureStorage.ts        # キャプチャデータ管理
+├── bossDifficultyCalculation.ts   # ボス難易度計算
+└── attackSkillCalculation.ts      # スキル計算
+
+src/stores/
+└── calculatorStore.ts             # Zustand状態管理
 ```
 
-## 表示データ仕様
+### 実装アーキテクチャ
+- **単一コンポーネント**: 分離されたサブコンポーネントは使用せず、一つのファイルで完結
+- **Zustand統合**: 中央集約された状態管理との密接な統合
+- **計算エンジン統合**: damageCalculationService.tsと同じ計算ロジックを使用
+
+## 実装されたデータ仕様
 
 ### ダメージ計算結果
 ```typescript
-interface DamageCalculationResult {
-  minimum: {
-    damage: number      // 最小ダメージ
-    stability: number   // 最小時の安定率(%)
-  }
-  maximum: {
-    damage: number      // 最大ダメージ  
-    stability: number   // 最大時の安定率(%)
-  }
-  average: {
-    damage: number      // 平均ダメージ
-    stability: number   // 平均安定率(%)
-  }
-  calculatedAt: string  // 計算時刻
+// ダメージ表示結果の型定義
+interface DamageDisplayResult {
+	min: number
+	max: number
+	average: number
+	stability: number
+	averageStability: number
+}
+
+// ダメージ計算結果の型定義
+interface DamageResults {
+	normal: DamageDisplayResult
+	skill: DamageDisplayResult
+}
+
+// 威力オプション（実装済み）
+interface PowerOptions {
+  bossDifficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate'
+  skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3'
+  elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous'
+  combo: boolean
+  damageType: 'critical' | 'graze' | 'expected' | 'white'
+  distance: 'short' | 'long' | 'disabled'
+  elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'
+  unsheathe: boolean
 }
 ```
 
@@ -142,15 +178,27 @@ const LAYOUT_CONFIG = {
 }
 ```
 
-## データフロー
+## 実装されたデータフロー
 
 ### 計算結果の取得
 ```mermaid
 graph TD
     A[フォーム入力変更] --> B[Zustandストア更新]
-    B --> C[ダメージ計算エンジン]
-    C --> D[計算結果生成]
-    D --> E[DamagePreview表示更新]
+    B --> C[updateCalculationResults]
+    C --> D[calculationResults更新]
+    D --> E[damageResults useMemo再計算]
+    E --> F[calculateDamage実行]
+    F --> G[DamagePreview表示更新]
+```
+
+### 威力オプション管理
+```mermaid
+graph TD
+    A[威力オプション変更] --> B[handlePowerOptionChange]
+    B --> C[updatePowerOptions]
+    C --> D[powerOptionsストア更新]
+    D --> E[damageResults useMemo再計算]
+    E --> F[表示更新]
 ```
 
 ### キャプチャフロー
@@ -254,167 +302,244 @@ export const clearCaptureData = (): void => {
 - **データ利用**: どのセーブデータからでもアクセス可能
 - **保存内容**: ダメージ値と安定率のみ（シンプルな比較用データ）
 
-## 威力オプション設定の永続化
+## 実装された威力オプション機能
 
-### 概要
-ダメージプレビューの威力オプション設定をセーブデータ毎にローカルストレージに保存し、セーブデータ切り替え時にも設定を維持する機能を実装します。
+### 8つの威力オプション（実装完了）
 
-### 保存対象の威力オプション
+1. **ボス戦難易度**: Normal/Hard/Lunatic/Ultimate
+2. **スキルダメージ**: 全て/1撃目/2撃目/3撃目  
+3. **属性攻撃**: 有(有利)/有(その他)/無/不利属性
+4. **コンボ:強打**: 有効/無効
+5. **ダメージ判定**: Critical/Graze/白ダメ/期待値
+6. **距離判定**: 近距離/遠距離/無効化
+7. **属性威力**: 有効/有利のみ/覚醒のみ/無効
+8. **抜刀威力**: 有効/無効
+
+### セーブデータ統合（実装済み）
+威力オプションはセーブデータの一部として保存され、セーブデータ切り替え時に自動的に復元されます。
+
 ```typescript
-interface PowerOptions {
-  bossDifficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate'  // ボス戦難易度
-  skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3'              // スキルダメージ
-  elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous'  // 属性攻撃
-  combo: boolean                                              // コンボ:強打
-  damageType: 'critical' | 'graze' | 'expected' | 'white'    // ダメージ判定
-  distance: 'short' | 'long' | 'disabled'                    // 距離判定
-  elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'  // 属性威力
-  unsheathe: boolean                                          // 抜刀威力
+// calculatorStoreでの管理
+const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
+const updatePowerOptions = useCalculatorStore((state) => state.updatePowerOptions)
+```
+
+## ダメージ計算統合
+
+### 中央集約された計算エンジン
+DamagePreviewは中央集約された計算システムと統合されています：
+
+```typescript
+// 中央集約された計算結果を使用
+const totalATK = calculationResults?.basicStats.totalATK || 0
+const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
+
+// 貫通値の取得
+const penetration = {
+	physical: calculationResults?.equipmentBonus1?.physicalPenetration ?? defaultInput.penetration.physical,
+	magical: calculationResults?.equipmentBonus1?.magicalPenetration ?? defaultInput.penetration.magical,
 }
 ```
 
-### 保存仕様
-
-#### セーブデータ統合方式
-威力オプションは各セーブデータに含めて保存し、セーブデータ切り替え時に連動して設定も切り替わります。
+### ダメージ計算の詳細ログ
+実装では詳細なデバッグログが出力され、計算過程を確認できます：
 
 ```typescript
-interface SaveData {
-  id: string
-  name: string
-  isDefault: boolean
-  createdAt: string
-  updatedAt: string
-  order: number
-  data: {
-    // 既存のフォームデータ
-    baseStats: BaseStatsFormData
-    weapons: WeaponFormData
-    crystals: CrystalFormData
-    equipments: EquipmentFormData
-    food: FoodFormData
-    enemy: EnemyFormData
-    buffSkills: BuffSkillFormData
-    buffItems: BuffItemFormData
-    // 新規追加: 威力オプション設定
-    powerOptions: PowerOptions
-  }
+console.log('=== DAMAGE CALCULATION DEBUG ===')
+console.log('1. レベル情報:', input.playerLevel, input.enemyLevel)
+console.log('2. 参照ステータス:', input.referenceStat)
+console.log('3. 敵の防御力:', input.enemy.DEF, input.enemy.MDEF)
+console.log('4. 貫通値:', input.penetration)
+console.log('5. 属性有利:', input.elementAdvantage.total)
+```
+
+## UIコンポーネント詳細
+
+### 威力オプションUI実装
+すべての威力オプションはボタン形式で実装され、選択状態に応じて背景色が変化します：
+
+```typescript
+// ボタンスタイル例
+className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+	powerOptions.bossDifficulty === difficulty
+		? 'bg-blue-400 text-white'
+		: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+}`}
+```
+
+### レスポンシブ対応
+- **モバイル**: `text-xs` (10px)
+- **デスクトップ**: `md:text-[13px]` (13px)
+- **ギャップ調整**: `sm:gap-2` (768px以上で適用)
+
+## キャプチャ機能実装
+
+### キャプチャボタン
+テーブルヘッダー内にカメラアイコン付きのボタンとして実装：
+
+```typescript
+<button
+	onClick={handleCapture}
+	className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+>
+	<svg className="w-3 h-3" /* カメラアイコン */ />
+	キャプチャ
+</button>
+```
+
+### キャプチャデータ管理
+```typescript
+const handleCapture = () => {
+	const currentDamage = damageResults.normal
+	const newCaptureData = createCaptureData(
+		currentDamage.min,
+		currentDamage.max,
+		currentDamage.average,
+		currentDamage.stability,
+		currentDamage.averageStability,
+	)
+	saveCaptureData(newCaptureData)
+	setCaptureData(newCaptureData)
 }
 ```
 
-#### デフォルト値
+## パフォーマンス最適化
+
+### useMemo使用
+ダメージ計算は重い処理のため、useMemoで最適化：
+
 ```typescript
-const DEFAULT_POWER_OPTIONS: PowerOptions = {
-  bossDifficulty: 'normal',
-  skillDamage: 'all',
-  elementAttack: 'advantageous',
-  combo: false,
-  damageType: 'white',
-  distance: 'disabled',
-  elementPower: 'enabled',
-  unsheathe: false
+const damageResults = useMemo((): DamageResults => {
+	// 複雑なダメージ計算ロジック
+	return calculateDamageWithAllOptions()
+}, [calculatorData, calculationResults, powerOptions])
+```
+
+### 条件付きレンダリング
+```typescript
+if (!isVisible) {
+	return null
+}
+
+if (!powerOptions) {
+	return <div className="text-center py-4">Loading...</div>
 }
 ```
 
-### 保存タイミング
+## エラーハンドリング
 
-#### 自動保存
-威力オプションの変更時に、現在のセーブデータに自動的に保存されます。
-
-#### 手動保存（「現在のデータを保存」ボタン）
-セーブデータ管理画面の「現在のデータを保存」ボタンを押すと、フォームデータと威力オプション設定の両方が保存されます。
-
-### 実装アーキテクチャ
-
-#### calculatorStore の拡張
+### 計算エラーのフォールバック
 ```typescript
-interface CalculatorStore {
-  // 既存データ
-  data: CalculatorFormData
-  
-  // 新規追加: 威力オプション
-  powerOptions: PowerOptions
-  
-  // 新規追加: 威力オプション更新メソッド
-  updatePowerOptions: (options: Partial<PowerOptions>) => void
-  
-  // 既存の差分検知システムに威力オプションも含める
-  hasUnsavedChanges: () => boolean  // 威力オプションの変更も検知
+try {
+	// 複雑なダメージ計算
+	return calculateDamageResults()
+} catch (error) {
+	console.error('ダメージ計算エラー:', error)
+	// エラー時はフォールバック値を返す
+	return {
+		normal: {
+			min: 1000, max: 1500, average: 1250,
+			stability: 85, averageStability: 92
+		}
+	}
 }
 ```
 
-#### saveDataManager の拡張
+### キャプチャエラー処理
 ```typescript
-// セーブデータの読み込み時に威力オプションも復元
-export const loadSaveData = async (saveId: string): Promise<void> => {
-  const saveData = await getSaveDataById(saveId)
-  if (saveData) {
-    // フォームデータの復元
-    calculatorStore.getState().setData(saveData.data)
-    
-    // 威力オプションの復元
-    const powerOptions = saveData.data.powerOptions || DEFAULT_POWER_OPTIONS
-    calculatorStore.getState().updatePowerOptions(powerOptions)
-  }
-}
-
-// セーブデータの保存時に威力オプションも保存
-export const saveSaveData = async (saveId: string): Promise<void> => {
-  const currentData = calculatorStore.getState().data
-  const currentPowerOptions = calculatorStore.getState().powerOptions
-  
-  await updateSaveData(saveId, {
-    data: {
-      ...currentData,
-      powerOptions: currentPowerOptions
-    }
-  })
+try {
+	saveCaptureData(newCaptureData)
+	console.log('ダメージをキャプチャしました')
+} catch (error) {
+	console.error('キャプチャに失敗しました:', error)
+	alert('キャプチャに失敗しました')
 }
 ```
 
-### データマイグレーション
+## 特殊な実装詳細
 
-既存のセーブデータに威力オプションが含まれていない場合、デフォルト値で初期化します。
-
+### 敵情報の動的取得
 ```typescript
-const migrateOldSaveData = (saveData: any): SaveData => {
-  return {
-    ...saveData,
-    data: {
-      ...saveData.data,
-      powerOptions: saveData.data.powerOptions || DEFAULT_POWER_OPTIONS
-    }
-  }
+const getSelectedEnemyName = (): string => {
+	if (calculatorData.enemy?.selectedEnemyId) {
+		const enemy = getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
+		if (enemy) {
+			return enemy.name
+		}
+	}
+	return '未選択'
 }
 ```
 
-### UI との統合
-
-#### DamagePreview コンポーネント
+### ボス難易度調整
 ```typescript
-export default function DamagePreview({ isVisible }: DamagePreviewProps) {
-  // Zustandから威力オプションを取得
-  const powerOptions = useCalculatorStore((state) => state.powerOptions)
-  const updatePowerOptions = useCalculatorStore((state) => state.updatePowerOptions)
-  
-  // ローカルステートを削除し、Zustandから直接管理
-  const handlePowerOptionChange = (key: keyof PowerOptions, value: any) => {
-    updatePowerOptions({ [key]: value })
-  }
-  
-  // 以下既存のロジック
+// ボス系敵かつ難易度がnormal以外の場合、難易度調整を適用
+if (enemyInfo?.category === 'boss' && powerOptions.bossDifficulty !== 'normal') {
+	const adjustedStats = calculateBossDifficultyStats(
+		finalEnemyLevel,
+		enemyInfo.stats,
+		powerOptions.bossDifficulty,
+	)
+	finalEnemyLevel = adjustedStats.level
+	finalEnemyDEF = adjustedStats.stats.DEF
+	finalEnemyMDEF = adjustedStats.stats.MDEF
 }
 ```
 
-#### 保存ボタンとの連携
-セーブデータ管理画面の「現在のデータを保存」ボタンを押すと、威力オプションも含めて保存されます。
+### 攻撃スキル対応
+実装では攻撃スキル選択時に自動的にスキル計算を実行：
 
-### メリット
+```typescript
+if (calculatorData.attackSkill?.selectedSkillId) {
+	const selectedSkill = getAttackSkillById(calculatorData.attackSkill.selectedSkillId)
+	if (selectedSkill) {
+		const skillCalculationResult = attackSkillCalculation.calculateSkill(
+			selectedSkill.id,
+			calculatorData,
+		)
+		// スキルダメージオプションに応じて計算対象の撃を決定
+		const getTargetHits = () => {
+			switch (powerOptions.skillDamage) {
+				case 'hit1': return skillCalculationResult.hits.filter(hit => hit.hitNumber === 1)
+				case 'all': return skillCalculationResult.hits
+				// ...
+			}
+		}
+	}
+}
+```
 
-1. **設定の永続化**: セーブデータ切り替え時にも威力オプション設定が維持される
-2. **設定の共有**: 特定のビルド構成と威力オプションをセットで管理・共有可能
-3. **一貫性**: セーブデータシステムと統合されることで、データ管理が一元化される
-4. **UX向上**: ユーザーが毎回威力オプションを再設定する必要がなくなる
+### 慣れ倍率（実装予定）
+現在は実装予定として表示されています：
+
+```typescript
+{/* 慣れ倍率スライダー（後で実装予定の枠） */}
+<div className="p-1 sm:p-2 flex items-center">
+	<div className="text-xs sm:text-[13px] font-medium text-gray-700">
+		慣れ倍率（後で実装）
+	</div>
+	<div className="h-8 bg-gray-100 rounded flex items-center justify-center">
+		<span className="text-xs text-gray-500">スライダー実装予定</span>
+	</div>
+</div>
+```
+
+## 技術的特徴
+
+### Zustand統合
+- 威力オプションはcalculatorStoreで一元管理
+- セーブデータの一部として自動保存・復元
+- リアルタイム更新によるダメージ計算の即座反映
+
+### 計算エンジン統合
+- DamagePreview.tsxとdamageCalculationService.tsで同じ計算ロジック使用
+- 中央集約されたcalculationResultsからの値取得
+- 詳細なデバッグログによる計算過程の透明性
+
+### レスポンシブデザイン
+- モバイル・デスクトップ対応のテキストサイズ
+- テーブルの横スクロール対応
+- ボタンレイアウトのブレークポイント調整
 
 ## 更新履歴
 
@@ -422,8 +547,16 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 |------|----------|------|
 | 2024-12-25 | DamagePreview UI設計書作成 | 初版作成 |
 | 2025-01-04 | 威力オプション永続化機能の設計追加 | セーブデータ統合方式で実装 |
+| 2025-01-06 | 実装ドキュメントへ更新 | 実際の実装に合わせて全面改訂 |
 
 ## 関連ドキュメント
 - [ダメージ計算ロジック設計書](../calculations/damage-calculation.md) - ダメージ計算の詳細仕様
 - [StatusPreview UI設計書](./status-preview.md) - 関連UIコンポーネント
 - [基本ステータス計算式](../calculations/basic-stats.md) - 計算基盤
+- [クリスタルダメージ差分プレビュー](./crystal-damage-preview.md) - DamagePreviewと統合された差分計算機能
+
+## 実装ファイル
+- `src/components/layout/DamagePreview.tsx` - メイン実装ファイル
+- `src/utils/damageCalculationService.ts` - 共通ダメージ計算サービス
+- `src/utils/damageCaptureStorage.ts` - キャプチャデータ管理
+- `src/stores/calculatorStore.ts` - 状態管理

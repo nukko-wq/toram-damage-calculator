@@ -105,8 +105,9 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 				className="px-1 py-1 mr-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors min-w-0 w-full"
 			>
 				{selectedCrystal ? (
-					<div className="flex items-center min-w-0">
+					<div className="flex items-center justify-between min-w-0">
 						<span className="text-sm truncate min-w-0">{selectedCrystal.name}</span>
+						{/* ダメージ差分表示は現在セットされているクリスタルには表示しない */}
 					</div>
 				) : (
 					<div className="flex items-center justify-between min-w-0">
@@ -178,6 +179,11 @@ export default function CrystalForm({ crystals, onChange }: CrystalFormProps) {
 				}
 				allowedTypes={modalState.allowedTypes}
 				title={modalState.title}
+				slotInfo={modalState.slotKey ? {
+					type: 'crystal' as const,
+					category: modalState.allowedTypes[0],
+					slot: modalState.slotKey.includes('1') ? 0 : 1,
+				} : undefined}
 			/>
 		</section>
 	)

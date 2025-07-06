@@ -1,57 +1,30 @@
 'use client'
 
 import type { Crystal } from '@/types/calculator'
+import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import type { SlotInfo } from '@/types/damagePreview'
 
 interface CrystalCardProps {
 	crystal: Crystal
 	isSelected: boolean
 	onClick: () => void
+	// ダメージ差分表示用の追加プロパティ
+	showDamageDifference?: boolean
+	slotInfo?: SlotInfo
 }
 
 export default function CrystalCard({
 	crystal,
 	isSelected,
 	onClick,
+	showDamageDifference = false,
+	slotInfo,
 }: CrystalCardProps) {
-	const getTypeLabel = (type: string) => {
-		switch (type) {
-			case 'weapon':
-				return '武器'
-			case 'armor':
-				return '防具'
-			case 'additional':
-				return '追加'
-			case 'special':
-				return '特殊'
-			case 'normal':
-				return 'ノーマル'
-			default:
-				return type
-		}
-	}
-
-	const getTypeColor = (type: string) => {
-		switch (type) {
-			case 'weapon':
-				return 'bg-red-100 text-red-800'
-			case 'armor':
-				return 'bg-blue-100 text-blue-800'
-			case 'additional':
-				return 'bg-green-100 text-green-800'
-			case 'special':
-				return 'bg-purple-100 text-purple-800'
-			case 'normal':
-				return 'bg-gray-100 text-gray-800'
-			default:
-				return 'bg-gray-100 text-gray-800'
-		}
-	}
-
 	return (
 		<div
 			onClick={onClick}
 			className={`
-				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+				p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md'
@@ -59,36 +32,65 @@ export default function CrystalCard({
 				}
 			`}
 		>
-			{/* 選択状態のチェックマーク */}
-			{isSelected && (
-				<div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-					<svg
-						className="w-4 h-4 text-white"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M5 13l4 4L19 7"
-						/>
-					</svg>
+			{/* 上部エリア：ダメージ差分表示と選択マーク */}
+			<div className="flex justify-between items-start mb-2 min-h-[24px]">
+				{/* ダメージ差分表示 - 現在選択中のクリスタには表示しない */}
+				<div className="flex-1">
+					{showDamageDifference && slotInfo && !isSelected && (
+						<div className="inline-block">
+							{(() => {
+								console.log(
+									'🔧 About to render DamageDifferenceDisplayCorrect for:',
+									crystal.name,
+								)
+								try {
+									return (
+										<DamageDifferenceDisplayCorrect
+											item={crystal}
+											slotInfo={slotInfo}
+											size="sm"
+											className="px-1 py-0.5"
+											options={{ debug: true }}
+										/>
+									)
+								} catch (error) {
+									console.error(
+										'🔧 Error rendering DamageDifferenceDisplayCorrect:',
+										error,
+									)
+									return (
+										<div className="bg-red-100 text-red-600 text-xs p-1">
+											Error
+										</div>
+									)
+								}
+							})()}
+						</div>
+					)}
 				</div>
-			)}
 
-			{/* タイプバッジ */}
-			<div className="mb-2">
-				<span
-					className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getTypeColor(crystal.type)}`}
-				>
-					{getTypeLabel(crystal.type)}
-				</span>
+				{/* 選択状態のチェックマーク */}
+				{isSelected && (
+					<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+						<svg
+							className="w-4 h-4 text-white"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M5 13l4 4L19 7"
+							/>
+						</svg>
+					</div>
+				)}
 			</div>
 
 			{/* クリスタ名 */}
-			<h3 className="font-semibold text-gray-900 mb-2 pr-8">{crystal.name}</h3>
+			<h3 className="font-semibold text-gray-900 mb-2">{crystal.name}</h3>
 
 			{/* プロパティ */}
 			{Object.entries(crystal.properties).filter(([_, value]) => value !== 0)
