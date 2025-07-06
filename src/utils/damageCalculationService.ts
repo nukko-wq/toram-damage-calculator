@@ -12,6 +12,7 @@ import { getAttackSkillById } from '@/data/attackSkills'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
+import { getBuffSkillPassiveMultiplier } from '@/utils/buffSkillCalculation'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import { createInitialPowerOptions } from '@/utils/initialData'
 
@@ -54,10 +55,17 @@ export function calculateDamageWithService(
 		const totalATK = calculationResults?.basicStats.totalATK || 0
 		const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
 		
+		// バフスキルからパッシブ倍率を取得
+		const passiveMultiplier = getBuffSkillPassiveMultiplier(
+			calculatorData.buffSkills?.skills || null,
+			calculatorData.mainWeapon?.weaponType || null
+		)
+		
 		if (debug) {
 			console.log('=== DamageCalculationService 中央集約計算結果 ===')
 			console.log('calculationResults?.basicStats.totalATK:', totalATK)
 			console.log('calculationResults?.basicStats.stabilityRate:', stabilityRate)
+			console.log('passiveMultiplier:', passiveMultiplier)
 		}
 
 		// 敵情報を取得
@@ -124,6 +132,7 @@ export function calculateDamageWithService(
 			...defaultInput,
 			playerLevel: calculatorData.baseStats.level,
 			referenceStat: totalATK, // 計算済みの総ATKを使用
+			passiveMultiplier: passiveMultiplier, // バフスキルから取得したパッシブ倍率を適用
 			// 敵情報を実際のデータに基づいて設定
 			enemyLevel: finalEnemyLevel,
 			stability: {
@@ -254,6 +263,7 @@ export function calculateDamageWithService(
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
 								: totalATK,
+						passiveMultiplier: passiveMultiplier, // パッシブ倍率をスキル攻撃にも適用
 						attackSkill: {
 							type: originalHit.attackType,
 							multiplier: hitResult.calculatedMultiplier,

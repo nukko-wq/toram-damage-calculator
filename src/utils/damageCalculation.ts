@@ -489,16 +489,25 @@ function applyDistance(
 		}
 	}
 
-	// クリティカル時は距離補正で小数点を保持
+	// パッシブ倍率、ブレイブ倍率、クリティカル倍率がある場合は距離補正で小数点を保持
 	let result: number
-	if (input.userSettings.damageType === 'critical') {
-		// クリティカル時：小数点を保持して次のステップに渡す
+	const hasPassiveMultiplier = input.passiveMultiplier && input.passiveMultiplier > 0
+	const hasBraveMultiplier = input.braveMultiplier && input.braveMultiplier > 0
+	const isCritical = input.userSettings.damageType === 'critical'
+	
+	const hasMultiplierAfterDistance = isCritical || hasPassiveMultiplier || hasBraveMultiplier
+	
+	if (hasMultiplierAfterDistance) {
+		// 後続に倍率補正がある場合：小数点を保持して次のステップに渡す
 		result = beforeDistance * (1 + distanceRate / 100)
-		console.log('=== クリティカル時距離補正: 小数点保持 ===')
+		console.log('=== 距離補正: 小数点保持 (後続倍率補正あり) ===')
+		console.log(`後続倍率: パッシブ(${input.passiveMultiplier}%) ブレイブ(${input.braveMultiplier}%) クリティカル(${isCritical})`)
 		console.log(`${beforeDistance} × (1 + ${distanceRate}/100) = ${result}`)
 	} else {
-		// 通常時：切り捨て
+		// 後続に倍率補正がない場合：切り捨て
 		result = Math.floor(beforeDistance * (1 + distanceRate / 100))
+		console.log('=== 距離補正: 切り捨て (後続倍率補正なし) ===')
+		console.log(`Math.floor(${beforeDistance} × (1 + ${distanceRate}/100)) = ${result}`)
 	}
 
 	// 計算過程を記録（表示用は切り捨て値）
@@ -526,18 +535,35 @@ function applyCombo(
 	console.log('combo.isActive:', input.combo.isActive)
 	console.log('combo.multiplier:', input.combo.multiplier)
 	console.log('comboRate (使用される倍率):', comboRate)
-	console.log(`計算式: Math.floor(${beforeCombo} * ${comboRate}/100)`)
-	console.log(`= Math.floor(${beforeCombo} * ${comboRate / 100})`)
-	console.log(`= Math.floor(${beforeCombo * (comboRate / 100)})`)
 
-	const result = Math.floor(beforeCombo * (comboRate / 100))
+	// パッシブ倍率、ブレイブ倍率、クリティカル倍率がある場合はコンボ補正で小数点を保持
+	const hasPassiveMultiplier = input.passiveMultiplier && input.passiveMultiplier > 0
+	const hasBraveMultiplier = input.braveMultiplier && input.braveMultiplier > 0
+	const isCritical = input.userSettings.damageType === 'critical'
+	
+	const hasMultiplierAfterCombo = isCritical || hasPassiveMultiplier || hasBraveMultiplier
+	
+	let result: number
+	if (hasMultiplierAfterCombo) {
+		// 後続に倍率補正がある場合：小数点を保持
+		result = beforeCombo * (comboRate / 100)
+		console.log('=== コンボ補正: 小数点保持 (後続倍率補正あり) ===')
+		console.log(`後続倍率: パッシブ(${input.passiveMultiplier}%) ブレイブ(${input.braveMultiplier}%) クリティカル(${isCritical})`)
+		console.log(`計算式: ${beforeCombo} * ${comboRate}/100 = ${result} (小数点保持)`)
+	} else {
+		// 後続に倍率補正がない場合：切り捨て
+		result = Math.floor(beforeCombo * (comboRate / 100))
+		console.log('=== コンボ補正: 切り捨て (後続倍率補正なし) ===')
+		console.log(`計算式: Math.floor(${beforeCombo} * ${comboRate}/100) = ${result} (切り捨て)`)
+	}
+
 	console.log('result (コンボ適用後):', result)
 
-	// 計算過程を記録
+	// 計算過程を記録（表示用は切り捨て値）
 	steps.step8_combo = {
 		beforeCombo,
 		comboRate,
-		result,
+		result: Math.floor(result), // 表示用は切り捨て
 	}
 
 	return Math.max(1, result) // 最低1ダメージ保証
@@ -551,10 +577,20 @@ function applyPassiveMultiplier(
 	input: DamageCalculationInput,
 	steps: DamageCalculationSteps,
 ): number {
-	// Phase 3ではプレースホルダー実装（倍率は適用せず）
-	const passiveRate = 0 // input.passiveMultiplier
+	// バフスキルから取得したパッシブ倍率を適用
+	const passiveRate = input.passiveMultiplier
 
+	console.log('=== PASSIVE MULTIPLIER DEBUG ===')
+	console.log('beforePassive:', beforePassive)
+	console.log('input.passiveMultiplier:', input.passiveMultiplier)
+	console.log('passiveRate:', passiveRate)
+
+	// 現在ブレイブ倍率は未実装(0)なので、パッシブ倍率で最終切り捨てを行う
 	const result = Math.floor(beforePassive * (1 + passiveRate / 100))
+	console.log('計算式: Math.floor(' + beforePassive + ' * (1 + ' + passiveRate + '/100)) = ' + result + ' (最終切り捨て)')
+
+	console.log('result:', result)
+	console.log('===============================')
 
 	// 計算過程を記録
 	steps.step9_passive = {

@@ -212,6 +212,19 @@ export function calculateQuickSlashEffects(
 }
 
 /**
+ * 匠の剣術(sm4)のパッシブ倍率計算関数
+ */
+export function calculateTakumiKenjutsuPassiveMultiplier(
+	isEnabled: boolean,
+	weaponType: MainWeaponType | null,
+): number {
+	const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+	if (!isEnabled || !weaponType || !bladeWeapons.includes(weaponType)) return 0
+
+	return 20 // パッシブ倍率 +20%
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -343,5 +356,29 @@ export function getBuffSkillBonuses(
 	}
 
 	return bonuses
+}
+
+/**
+ * バフスキルデータからパッシブ倍率を取得
+ */
+export function getBuffSkillPassiveMultiplier(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	weaponType: WeaponType | null,
+): number {
+	const convertedWeaponType = convertWeaponType(weaponType)
+	let totalPassiveMultiplier = 0
+
+	if (!buffSkillData) return totalPassiveMultiplier
+
+	// 匠の剣術(sm4)の処理
+	const takumiKenjutsu = buffSkillData['sm4']
+	if (takumiKenjutsu?.isEnabled) {
+		totalPassiveMultiplier += calculateTakumiKenjutsuPassiveMultiplier(
+			takumiKenjutsu.isEnabled,
+			convertedWeaponType,
+		)
+	}
+
+	return totalPassiveMultiplier
 }
 
