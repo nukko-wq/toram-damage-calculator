@@ -27,9 +27,7 @@ export default function CrystalSelectionModal({
 	slotInfo,
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
-	const [availableCrystals, setAvailableCrystals] = useState<Crystal[]>(
-		[],
-	)
+	const [availableCrystals, setAvailableCrystals] = useState<Crystal[]>([])
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
@@ -155,7 +153,7 @@ export default function CrystalSelectionModal({
 							<button
 								type="button"
 								onClick={onClose}
-								className="text-gray-400 hover:text-gray-600 transition-colors"
+								className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
 								aria-label="モーダルを閉じる"
 							>
 								<svg
@@ -200,7 +198,7 @@ export default function CrystalSelectionModal({
 											key={type}
 											type="button"
 											onClick={() => setActiveFilter(type)}
-											className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+											className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
 												activeFilter === type
 													? 'bg-blue-500 text-white'
 													: 'bg-white text-gray-700 hover:bg-gray-100'
@@ -281,7 +279,7 @@ export default function CrystalSelectionModal({
 							<button
 								type="button"
 								onClick={onClose}
-								className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+								className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
 							>
 								キャンセル
 							</button>

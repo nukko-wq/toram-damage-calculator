@@ -146,7 +146,7 @@ export default function BuffItemSelectionModal({
 						<button
 							type="button"
 							onClick={onClose}
-							className="text-gray-400 hover:text-gray-600 transition-colors"
+							className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
 							aria-label="モーダルを閉じる"
 						>
 							<svg
@@ -232,7 +232,7 @@ export default function BuffItemSelectionModal({
 						<button
 							type="button"
 							onClick={onClose}
-							className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+							className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
 						>
 							キャンセル
 						</button>

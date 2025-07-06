@@ -230,7 +230,7 @@ export default function EnemySelectionModal({
 										</svg>
 									</div>
 								)}
-								<div className="text-center py-8">
+								<div className="text-center sm:py-8">
 									<div className="text-gray-400 mb-2">
 										<svg
 											className="w-12 h-12 mx-auto"
