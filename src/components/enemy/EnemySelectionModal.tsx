@@ -110,16 +110,17 @@ export default function EnemySelectionModal({
 	return (
 		<dialog
 			open={isOpen}
-			className="fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-black/50 transition-opacity"
+			className="fixed inset-0 z-50 p-0 m-0 w-full h-full bg-black/50 transition-opacity"
 			onClick={handleBackgroundClick}
 			aria-labelledby="enemy-modal-title"
 			aria-describedby="enemy-modal-description"
 			role="dialog"
 		>
-			<div className="min-h-screen flex items-center justify-center p-4">
+			<div className="flex items-center justify-center min-h-full p-4 overflow-y-auto">
 				<div
 					data-modal-content="true"
-					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] flex flex-col"
+					onClick={(e) => e.stopPropagation()}
 				>
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -191,7 +192,7 @@ export default function EnemySelectionModal({
 
 					{/* 敵一覧 */}
 					<div
-						className="flex-1 overflow-y-auto p-6"
+						className="flex-1 overflow-y-auto p-6 min-h-0"
 						id="enemy-modal-description"
 					>
 						<div
