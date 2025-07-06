@@ -423,6 +423,94 @@ function calculateGodspeedParryEffects(
 }
 ```
 
+#### 5.4 両手持ち (sm1-1)
+```typescript
+{
+  id: 'sm1-1',
+  name: '両手持ち',
+  category: 'mononofu',
+  type: 'toggle',
+  order: 704,
+  description: 'サブ武器を装備していない時に各種能力を上昇させる',
+  weaponConditionalEffects: {
+    // 抜刀剣の場合（サブ武器がなしまたは巻物の場合）
+    katana: {
+      conditions: ['サブ武器がなしまたは巻物'],
+      effects: [
+        { property: 'Accuracy_Rate', formula: '+10' },
+        { property: 'Stability_Rate', formula: '+10' },
+        { property: 'Critical', formula: '+10' },
+        { property: 'WeaponATK_Rate', formula: '+10' }
+      ]
+    },
+    // その他の武器（サブ武器がなしの場合のみ）
+    default: {
+      conditions: ['サブ武器がなし'],
+      effects: [
+        { property: 'Accuracy_Rate', formula: '+10' },
+        { property: 'Stability_Rate', formula: '+5' },
+        { property: 'Critical', formula: '+5' },
+        { property: 'WeaponATK_Rate', formula: '+10' }
+      ]
+    }
+  },
+  calculationFormula: `
+    抜刀剣装備時（サブ武器がなしまたは巻物）:
+    - 命中% = base + 10
+    - 安定率% = base + 10
+    - クリティカル = base + 10
+    - 武器ATK% = base + 10
+    
+    その他武器装備時（サブ武器がなし）:
+    - 命中% = base + 10
+    - 安定率% = base + 5
+    - クリティカル = base + 5
+    - 武器ATK% = base + 10
+  `,
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+
+// 実装用の効果計算関数
+function calculateTwoHandsEffects(
+  isEnabled: boolean,
+  mainWeaponType: MainWeaponType | null,
+  subWeaponType: SubWeaponType | null
+): Partial<EquipmentProperties> {
+  if (!isEnabled) return {}
+  
+  const isKatana = mainWeaponType === 'katana'
+  const isSubWeaponNone = !subWeaponType || subWeaponType === 'なし'
+  const isSubWeaponScroll = subWeaponType === '巻物'
+  
+  // 抜刀剣の場合：サブ武器がなしまたは巻物
+  if (isKatana && (isSubWeaponNone || isSubWeaponScroll)) {
+    return {
+      Accuracy_Rate: 10,
+      Stability_Rate: 10,
+      Critical: 10,
+      WeaponATK_Rate: 10
+    }
+  }
+  
+  // その他の武器の場合：サブ武器がなしのみ
+  if (!isKatana && isSubWeaponNone) {
+    return {
+      Accuracy_Rate: 10,
+      Stability_Rate: 5,
+      Critical: 5,
+      WeaponATK_Rate: 10
+    }
+  }
+  
+  // 効果条件を満たさない場合
+  return {}
+}
+```
+
 ### 6. スプライトスキル系統
 
 #### 6.1 パワーウェーブ (sprite1)

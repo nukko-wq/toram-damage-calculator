@@ -16,7 +16,7 @@ import type {
 } from '@/types/bonusCalculation'
 import type { CalculatorData } from '@/types/calculator'
 import { getCrystalById } from './crystalDatabase'
-import { getBuffSkillBonuses } from './buffSkillCalculation'
+import { getBuffSkillBonuses, getTwoHandsEffects } from './buffSkillCalculation'
 
 /**
  * プロパティ値のバリデーション
@@ -481,6 +481,20 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 	
 	for (const [key, value] of Object.entries(buffSkillBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 両手持ちスキルの補正値を追加（サブ武器情報が必要）
+	const twoHandsBonuses = getTwoHandsEffects(
+		data.buffSkills?.skills || null,
+		data.mainWeapon?.weaponType || null,
+		data.subWeapon?.weaponType || null,
+	)
+	
+	for (const [key, value] of Object.entries(twoHandsBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
