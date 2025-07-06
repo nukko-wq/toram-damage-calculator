@@ -184,6 +184,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							return createInitialCalculatorData()
 						})()
 
+				// 計算結果を更新
+				const results = calculateResults(validData)
+
 				// データを設定し、差分状態をリセット
 				const snapshot = createDataSnapshot(validData)
 				set({
@@ -191,6 +194,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					lastSavedData: snapshot,
 					hasUnsavedChanges: false,
 					hasRealChanges: false,
+					calculationResults: results, // 計算結果も更新
 				})
 
 				// フォームの変更検知を同期的に無効化（遅延によるちらつきを防止）
