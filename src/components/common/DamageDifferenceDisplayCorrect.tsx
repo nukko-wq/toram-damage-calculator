@@ -99,8 +99,12 @@ export function DamageDifferenceDisplayCorrect({
 
 	return (
 		<div className={`${sizeClasses[size]} font-medium ${className}`}>
-			<span className={getLabelColorClass(difference)}>ダメージ：</span>
-			<span className={getValueColorClass(difference)}>{formatDifference(difference)}</span>
+			<span className={`${getLabelColorClass(difference)} mr-3 text-sm`}>
+				ダメージ：
+			</span>
+			<span className={`${getValueColorClass(difference)} text-sm`}>
+				{formatDifference(difference)}
+			</span>
 		</div>
 	)
 }
