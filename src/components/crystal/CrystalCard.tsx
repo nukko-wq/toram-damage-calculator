@@ -66,8 +66,17 @@ export default function CrystalCard({
 				}
 			`}
 		>
-			{/* ダメージ差分表示（選択されていない場合のみ） */}
-			{showDamageDifference && !isSelected && slotInfo && (
+			{/* ダメージ差分表示（全てのクリスタルに表示） */}
+			{(() => {
+				console.log('🔎 CrystalCard render check:', {
+					crystalName: crystal.name,
+					showDamageDifference,
+					hasSlotInfo: !!slotInfo,
+					willShow: showDamageDifference && slotInfo,
+				})
+				return null
+			})()}
+			{showDamageDifference && slotInfo && (
 				<div className="absolute top-2 left-2 z-10">
 					<DamageDifferenceDisplayCorrect
 						item={crystal}

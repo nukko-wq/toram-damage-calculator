@@ -264,7 +264,7 @@ export default function CrystalSelectionModal({
 											crystal={crystal}
 											isSelected={selectedCrystalId === crystal.id}
 											onClick={() => handleSelect(crystal.id)}
-											showDamageDifference={!!slotInfo}
+											showDamageDifference={isOpen && !!slotInfo}
 											slotInfo={slotInfo}
 										/>
 									))}

@@ -2,7 +2,7 @@
  * DamagePreview.tsxの正しい方法を参考にしたダメージ差分計算フック
  */
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { 
 	PreviewItem, 
@@ -29,12 +29,22 @@ export function useDamageDifferenceCorrect(
 	slotInfo: SlotInfo,
 	options: DamageDifferenceOptions = {},
 ): DamageDifferenceResult {
+	// 強制的な再計算用のタイムスタンプ
+	const [, forceUpdate] = useState(0)
 	// 現在のデータと計算結果を取得
 	const currentData = useCalculatorStore((state) => state.data)
 	const currentResults = useCalculatorStore((state) => state.calculationResults)
 	const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
 	
 	return useMemo(() => {
+		console.log('🔄 useDamageDifferenceCorrect called:', {
+			itemName: item?.name,
+			hasItem: !!item,
+			hasSlotInfo: !!slotInfo,
+			hasCurrentData: !!currentData,
+			hasCurrentResults: !!currentResults,
+			disabled: options.disabled,
+		})
 		// 初期値
 		const initialResult: DamageDifferenceResult = {
 			difference: 0,
@@ -49,52 +59,89 @@ export function useDamageDifferenceCorrect(
 			return initialResult
 		}
 
-		// アイテム、データ、または計算結果がない場合
-		if (!item || !currentData || !currentResults) {
+		// アイテムまたはデータがない場合
+		if (!item || !currentData) {
 			if (options.debug) {
-				console.log('❌ Missing item, data, or currentResults:', { 
+				console.log('❌ Missing item or currentData:', { 
 					item: !!item, 
-					currentData: !!currentData, 
-					currentResults: !!currentResults 
+					currentData: !!currentData
 				})
 			}
 			return initialResult
 		}
 
+		// currentResultsがない場合は、その場で計算を実行
+		let effectiveCurrentResults = currentResults
+		if (!effectiveCurrentResults) {
+			if (options.debug) {
+				console.log('⚠️ calculationResults not available, calculating on-demand')
+			}
+			effectiveCurrentResults = calculateResults(currentData)
+		}
+
 		if (options.debug) {
 			console.log('✅ Starting correct damage difference calculation for:', item.name)
+			console.log('🔍 Crystal properties:', item.properties)
 		}
 
 		try {
+			// 現在装着中のクリスタルIDを確認
+			const currentSlotKey = slotInfo.category && typeof slotInfo.slot === 'number' 
+				? `${slotInfo.category}${slotInfo.slot + 1}` 
+				: null
+			const currentEquippedCrystalId = currentSlotKey 
+				? (currentData.crystals as unknown as Record<string, string | null>)[currentSlotKey]
+				: null
+			
+			const isCurrentlyEquipped = currentEquippedCrystalId === item.id
+			
+			if (options.debug) {
+				console.log('🔍 CRYSTAL EQUIP STATUS:', {
+					currentSlotKey,
+					currentEquippedCrystalId,
+					targetCrystalId: item.id,
+					isCurrentlyEquipped,
+				})
+			}
 
-			// 1. 現在のダメージを計算（DamagePreview.tsxと同じ方法）
-			const currentMaxDamage = calculateDamageFromResults(currentResults, currentData, powerOptions || {}, options.debug)
+			let baselineData: CalculatorData
+			let simulatedData: CalculatorData
+
+			if (isCurrentlyEquipped) {
+				// 現在装着中のクリスタルの場合：外した状態を基準にして差分を計算
+				baselineData = removeItemFromSlot(currentData, slotInfo)
+				simulatedData = currentData // 現在の状態が装着状態
+			} else {
+				// 装着していないクリスタルの場合：現在の状態を基準にして装着後の差分を計算
+				baselineData = currentData
+				simulatedData = simulateItemEquipSimple(currentData, item, slotInfo)
+			}
+
+			// 1. 基準状態のダメージを計算
+			const baselineResults = calculateResults(baselineData)
+			const currentMaxDamage = calculateDamageFromResults(baselineResults, baselineData, powerOptions || {}, options.debug)
 			
-			// 2. アイテム装着をシミュレーション
-			const simulatedData = simulateItemEquipSimple(currentData, item, slotInfo)
-			
-			// 3. シミュレーション後のステータスを計算
+			// 2. シミュレーション後のステータスを計算
 			const simulatedResults = calculateResults(simulatedData)
+			const simulatedMaxDamage = calculateDamageFromResults(simulatedResults, simulatedData, powerOptions || {}, options.debug)
 			
 			// デバッグログ: calculateResults実行後
 			if (options.debug) {
 				console.log('⚙️  CALCULATE RESULTS COMPARISON:', {
 					'=== CURRENT RESULTS ===': '======================',
-					currentBasicStats: currentResults.basicStats,
-					currentEquipmentBonus1: currentResults.equipmentBonus1,
+					currentBasicStats: effectiveCurrentResults.basicStats,
+					currentEquipmentBonus1: effectiveCurrentResults.equipmentBonus1,
 					'=== SIMULATED RESULTS ===': '====================',
 					simulatedBasicStats: simulatedResults.basicStats,
 					simulatedEquipmentBonus1: simulatedResults.equipmentBonus1,
 					'=== COMPARISON ===': '===========================',
-					atkDifference: simulatedResults.basicStats.totalATK - currentResults.basicStats.totalATK,
-					strDifference: simulatedResults.adjustedStats.STR - currentResults.adjustedStats.STR,
-					criticalRateDifference: simulatedResults.equipmentBonus1.criticalRate - currentResults.equipmentBonus1.criticalRate,
-					vitDifference: simulatedResults.adjustedStats.VIT - currentResults.adjustedStats.VIT,
+					atkDifference: simulatedResults.basicStats.totalATK - effectiveCurrentResults.basicStats.totalATK,
+					strDifference: simulatedResults.adjustedStats.STR - effectiveCurrentResults.adjustedStats.STR,
+					criticalRateDifference: simulatedResults.equipmentBonus1.criticalRate - effectiveCurrentResults.equipmentBonus1.criticalRate,
+					vitDifference: simulatedResults.adjustedStats.VIT - effectiveCurrentResults.adjustedStats.VIT,
 				})
 			}
 			
-			// 4. シミュレーション後のダメージを計算（DamagePreview.tsxと同じ方法）
-			const simulatedMaxDamage = calculateDamageFromResults(simulatedResults, simulatedData, powerOptions || {}, options.debug)
 			
 			// デバッグログ: ダメージ計算結果の比較
 			if (options.debug) {
@@ -122,7 +169,7 @@ export function useDamageDifferenceCorrect(
 					difference,
 					item: item.name,
 					slotInfo,
-					currentTotalATK: currentResults.basicStats.totalATK,
+					currentTotalATK: effectiveCurrentResults.basicStats.totalATK,
 					simulatedTotalATK: simulatedResults.basicStats.totalATK,
 				})
 				
@@ -134,17 +181,17 @@ export function useDamageDifferenceCorrect(
 					slotNumber: slotInfo.slot,
 					'=== CURRENT DATA ===': '=================',
 					currentCrystals: currentData.crystals,
-					currentTotalATK: currentResults.basicStats.totalATK,
+					currentTotalATK: effectiveCurrentResults.basicStats.totalATK,
 					currentMaxDamage: currentMaxDamage,
 					'=== SIMULATED DATA ===': '=================',
 					simulatedCrystals: simulatedData.crystals,
 					simulatedTotalATK: simulatedResults.basicStats.totalATK,
 					simulatedMaxDamage: simulatedMaxDamage,
 					'=== DIFFERENCE ===': '=================',
-					attackDifference: simulatedResults.basicStats.totalATK - currentResults.basicStats.totalATK,
+					attackDifference: simulatedResults.basicStats.totalATK - effectiveCurrentResults.basicStats.totalATK,
 					damageDifference: difference,
 					'=== BONUS COMPARISON ===': '=================',
-					currentEquipmentBonus1: currentResults.equipmentBonus1,
+					currentEquipmentBonus1: effectiveCurrentResults.equipmentBonus1,
 					simulatedEquipmentBonus1: simulatedResults.equipmentBonus1,
 				})
 				
@@ -176,6 +223,29 @@ export function useDamageDifferenceCorrect(
 			}
 		}
 	}, [item, currentData, currentResults, powerOptions, slotInfo, options.disabled, options.debug])
+}
+
+/**
+ * 指定されたスロットからアイテムを削除した状態のデータを作成
+ */
+function removeItemFromSlot(
+	currentData: CalculatorData,
+	slotInfo: SlotInfo,
+): CalculatorData {
+	// ディープコピーを作成
+	const resultData: CalculatorData = JSON.parse(JSON.stringify(currentData))
+
+	if (slotInfo.type === 'crystal' && slotInfo.category && typeof slotInfo.slot === 'number') {
+		const slotNumber = slotInfo.slot + 1 // 0-based to 1-based
+		const slotKey = `${slotInfo.category}${slotNumber}`
+		
+		// クリスタルスロットを空にする
+		if (resultData.crystals) {
+			(resultData.crystals as unknown as Record<string, string | null>)[slotKey] = null
+		}
+	}
+
+	return resultData
 }
 
 /**
