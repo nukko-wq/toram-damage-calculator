@@ -206,7 +206,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 		return `${selectedEnemy.name} (Lv.${selectedEnemy.level})`
 	}
 
-
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-6 md:row-end-7 xl:col-start-1 xl:col-end-3 xl:row-start-6 xl:row-end-8">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">敵情報</h2>
@@ -257,9 +256,9 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 
 				{/* 選択された敵の詳細情報表示 */}
 				{selectedEnemy && (
-					<div className="bg-gray-50 rounded-lg p-4 space-y-4">
+					<div className="bg-gray-50 rounded-lg p-4 space-y-2 sm:space-y-4">
 						{/* 基本情報表示 */}
-						<div className="grid grid-cols-2 gap-4 text-sm">
+						<div className="grid grid-cols-2 gap-4 text-xs">
 							<div>
 								<span className="font-medium text-gray-700 pl-4">
 									◆ 物理耐性:
