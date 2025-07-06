@@ -66,25 +66,26 @@ export default function CrystalCard({
 				}
 			`}
 		>
-			{/* ダメージ差分表示（全てのクリスタルに表示） */}
-			{(() => {
-				console.log('🔎 CrystalCard render check:', {
-					crystalName: crystal.name,
-					showDamageDifference,
-					hasSlotInfo: !!slotInfo,
-					willShow: showDamageDifference && slotInfo,
-				})
-				return null
-			})()}
+			{/* ダメージ差分表示 */}
 			{showDamageDifference && slotInfo && (
 				<div className="absolute top-2 left-2 z-10">
-					<DamageDifferenceDisplayCorrect
-						item={crystal}
-						slotInfo={slotInfo}
-						size="sm"
-						className="bg-white rounded px-1 py-0.5 shadow-sm border"
-						options={{ debug: true }}
-					/>
+					{(() => {
+						console.log('🔧 About to render DamageDifferenceDisplayCorrect for:', crystal.name)
+						try {
+							return (
+								<DamageDifferenceDisplayCorrect
+									item={crystal}
+									slotInfo={slotInfo}
+									size="sm"
+									className="bg-white rounded px-1 py-0.5 shadow-sm border"
+									options={{ debug: true }}
+								/>
+							)
+						} catch (error) {
+							console.error('🔧 Error rendering DamageDifferenceDisplayCorrect:', error)
+							return <div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
+						}
+					})()}
 				</div>
 			)}
 

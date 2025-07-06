@@ -37,7 +37,8 @@ export function simulateItemEquipSimple(
 						slotNumber: slotInfo.slot,
 						slotKey,
 						beforeUpdateCrystal: (currentData.crystals as unknown as Record<string, string | null>)[slotKey],
-						currentCrystals: JSON.stringify(currentData.crystals, null, 2),
+						'currentData.crystals': currentData.crystals,
+						'item.properties': item.properties,
 					})
 					
 					// crystalsオブジェクトを直接更新

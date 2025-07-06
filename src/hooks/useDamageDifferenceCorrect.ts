@@ -37,6 +37,7 @@ export function useDamageDifferenceCorrect(
 	const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
 	
 	return useMemo(() => {
+		// 常にログを表示して、フックが呼ばれているかを確認
 		console.log('🔄 useDamageDifferenceCorrect called:', {
 			itemName: item?.name,
 			hasItem: !!item,
@@ -127,18 +128,52 @@ export function useDamageDifferenceCorrect(
 			
 			// デバッグログ: calculateResults実行後
 			if (options.debug) {
-				console.log('⚙️  CALCULATE RESULTS COMPARISON:', {
-					'=== CURRENT RESULTS ===': '======================',
-					currentBasicStats: effectiveCurrentResults.basicStats,
-					currentEquipmentBonus1: effectiveCurrentResults.equipmentBonus1,
-					'=== SIMULATED RESULTS ===': '====================',
-					simulatedBasicStats: simulatedResults.basicStats,
-					simulatedEquipmentBonus1: simulatedResults.equipmentBonus1,
-					'=== COMPARISON ===': '===========================',
-					atkDifference: simulatedResults.basicStats.totalATK - effectiveCurrentResults.basicStats.totalATK,
-					strDifference: simulatedResults.adjustedStats.STR - effectiveCurrentResults.adjustedStats.STR,
-					criticalRateDifference: simulatedResults.equipmentBonus1.criticalRate - effectiveCurrentResults.equipmentBonus1.criticalRate,
-					vitDifference: simulatedResults.adjustedStats.VIT - effectiveCurrentResults.adjustedStats.VIT,
+				console.log('⚙️ CRYSTAL SIMULATION VERIFICATION:', {
+					'=== EXPECTED VALUES ===': '========================',
+					'Before (no crystal)': {
+						totalATK: 4873,
+						'equipmentBonus1.ATK_Rate': 0,
+						'equipmentBonus1.STR_Rate': 0,
+						'equipmentBonus1.criticalRate': 0,
+					},
+					'After (Don Profond)': {
+						totalATK: 5475,
+						'equipmentBonus1.ATK_Rate': 10,
+						'equipmentBonus1.STR_Rate': 7,
+						'equipmentBonus1.criticalRate': 8,
+					},
+					'=== ACTUAL BASELINE RESULTS ===': '================',
+					baselineTotalATK: baselineResults.basicStats.totalATK,
+					'baseline.equipmentBonus1.atkRate': (baselineResults.equipmentBonus1 as any)?.atkRate || 0,
+					'baseline.equipmentBonus1.strRate': (baselineResults.equipmentBonus1 as any)?.strRate || 0,
+					'baseline.equipmentBonus1.criticalRate': baselineResults.equipmentBonus1?.criticalRate || 0,
+					'=== ACTUAL SIMULATED RESULTS ===': '================',
+					simulatedTotalATK: simulatedResults.basicStats.totalATK,
+					'simulated.equipmentBonus1.ATK_Rate': (simulatedResults.equipmentBonus1 as any)?.ATK_Rate || 0,
+					'simulated.equipmentBonus1.STR_Rate': (simulatedResults.equipmentBonus1 as any)?.STR_Rate || 0,
+					'simulated.equipmentBonus1.Critical_Rate': (simulatedResults.equipmentBonus1 as any)?.Critical_Rate || 0,
+					'=== DIFFERENCES ===': '========================',
+					totalATKDiff: simulatedResults.basicStats.totalATK - baselineResults.basicStats.totalATK,
+					atkRateDiff: ((simulatedResults.equipmentBonus1 as any)?.ATK_Rate || 0) - ((baselineResults.equipmentBonus1 as any)?.ATK_Rate || 0),
+					strRateDiff: ((simulatedResults.equipmentBonus1 as any)?.STR_Rate || 0) - ((baselineResults.equipmentBonus1 as any)?.STR_Rate || 0),
+					criticalRateDiff: ((simulatedResults.equipmentBonus1 as any)?.Critical_Rate || 0) - ((baselineResults.equipmentBonus1 as any)?.Critical_Rate || 0),
+				})
+				
+				console.log('🔍 CRYSTAL DATA VERIFICATION:', {
+					crystalName: item.name,
+					crystalProperties: item.properties,
+					expectedProperties: {
+						ATK_Rate: 10,
+						STR_Rate: 7,
+						Critical_Rate: 8,
+						DEF_Rate: -27,
+					},
+					propertiesMatch: {
+						ATK_Rate: (item.properties as any)?.ATK_Rate === 10,
+						STR_Rate: (item.properties as any)?.STR_Rate === 7,
+						Critical_Rate: (item.properties as any)?.Critical_Rate === 8,
+						DEF_Rate: (item.properties as any)?.DEF_Rate === -27,
+					}
 				})
 			}
 			
@@ -397,6 +432,25 @@ function calculateDamageFromResults(
 		})
 	}
 	
-	// 最大ダメージを返す
-	return damageResult.stabilityResult.maxDamage
+	// 白ダメージ計算：DamagePreviewと同じ方法を使用
+	// 最大ダメージ = baseDamage（100%の安定率）
+	// 最小ダメージ = baseDamage * stabilityRate / 100（切り捨て）
+	const baseDamage = damageResult.baseDamage
+	const currentStabilityRate = damageResult.stabilityResult.stabilityRate
+	const maxDamage = baseDamage // DamagePreviewと同じ：最大ダメージ = baseDamage
+	const minDamage = Math.floor((baseDamage * currentStabilityRate) / 100)
+	
+	if (debug) {
+		console.log('🔥 WHITE DAMAGE CALCULATION (DamagePreview style):', {
+			baseDamage,
+			stabilityRate: currentStabilityRate,
+			maxDamage,
+			minDamage,
+			'maxDamage === baseDamage': maxDamage === baseDamage,
+		})
+	}
+	
+	// ダメージタイプに応じて適切なダメージを返す
+	// 現在は白ダメージで統一（DamagePreviewのデフォルト）
+	return maxDamage
 }
