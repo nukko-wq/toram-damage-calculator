@@ -4,10 +4,10 @@
 
 'use client'
 
-import type { 
-	PreviewItem, 
-	SlotInfo, 
-	DamageDifferenceOptions 
+import type {
+	PreviewItem,
+	SlotInfo,
+	DamageDifferenceOptions,
 } from '@/types/damagePreview'
 import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 
@@ -22,20 +22,24 @@ interface DamageDifferenceDisplayCorrectProps {
 /**
  * 正しいダメージ計算エンジンを使ったダメージ差分表示コンポーネント
  */
-export function DamageDifferenceDisplayCorrect({ 
-	item, 
-	slotInfo, 
+export function DamageDifferenceDisplayCorrect({
+	item,
+	slotInfo,
 	className = '',
 	options = {},
-	size = 'sm'
+	size = 'sm',
 }: DamageDifferenceDisplayCorrectProps) {
 	// 強制的にログを表示
 	console.log('🎨 DamageDifferenceDisplayCorrect CALLED!', item.name)
 	console.log('🎨 Props:', { item, slotInfo, options })
-	
-	const { difference, isCalculating, error } = useDamageDifferenceCorrect(item, slotInfo, options)
+
+	const { difference, isCalculating, error } = useDamageDifferenceCorrect(
+		item,
+		slotInfo,
+		options,
+	)
 	console.log('🎨 Hook result:', { difference, isCalculating, error })
-	
+
 	// デバッグモード時のみログ出力
 	if (options.debug) {
 		console.log('🎨 DamageDifferenceDisplayCorrect render:', {
@@ -44,17 +48,17 @@ export function DamageDifferenceDisplayCorrect({
 			isCalculating,
 			error: !!error,
 			className,
-			size
+			size,
 		})
 	}
-	
+
 	// サイズ別のクラス
 	const sizeClasses = {
 		sm: 'text-xs',
 		md: 'text-sm',
-		lg: 'text-base'
+		lg: 'text-base',
 	}
-	
+
 	// 計算中の表示
 	if (isCalculating) {
 		return (
@@ -63,7 +67,7 @@ export function DamageDifferenceDisplayCorrect({
 			</div>
 		)
 	}
-	
+
 	// エラー時の表示
 	if (error) {
 		return (
@@ -72,22 +76,24 @@ export function DamageDifferenceDisplayCorrect({
 			</div>
 		)
 	}
-	
+
 	// 差分値のフォーマット
 	const formatDifference = (diff: number): string => {
 		if (diff === 0) return '±0'
 		return diff > 0 ? `+${diff.toLocaleString()}` : diff.toLocaleString()
 	}
-	
+
 	// 色クラスの決定
 	const getColorClass = (diff: number): string => {
-		if (diff > 0) return 'text-green-600 dark:text-green-400'
-		if (diff < 0) return 'text-red-600 dark:text-red-400'
+		if (diff > 0) return 'text-blue-500 dark:text-green-400'
+		if (diff < 0) return 'text-red-500 dark:text-red-400'
 		return 'text-gray-400 dark:text-gray-500'
 	}
-	
+
 	return (
-		<div className={`${sizeClasses[size]} font-medium ${getColorClass(difference)} ${className}`}>
+		<div
+			className={`${sizeClasses[size]} font-medium ${getColorClass(difference)} ${className}`}
+		>
 			{formatDifference(difference)}
 		</div>
 	)
@@ -103,31 +109,36 @@ interface DamageDifferenceBadgeCorrectProps {
 	options?: DamageDifferenceOptions
 }
 
-export function DamageDifferenceBadgeCorrect({ 
-	item, 
-	slotInfo, 
+export function DamageDifferenceBadgeCorrect({
+	item,
+	slotInfo,
 	className = '',
-	options = {}
+	options = {},
 }: DamageDifferenceBadgeCorrectProps) {
-	const { difference, isCalculating, error } = useDamageDifferenceCorrect(item, slotInfo, options)
-	
+	const { difference, isCalculating, error } = useDamageDifferenceCorrect(
+		item,
+		slotInfo,
+		options,
+	)
+
 	// 計算中またはエラー時は非表示
 	if (isCalculating || error || difference === 0) {
 		return null
 	}
-	
+
 	const formatDifference = (diff: number): string => {
 		return diff > 0 ? `+${diff.toLocaleString()}` : diff.toLocaleString()
 	}
-	
+
 	const getBadgeClass = (diff: number): string => {
-		const baseClass = 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium'
+		const baseClass =
+			'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium'
 		if (diff > 0) {
 			return `${baseClass} bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200`
 		}
 		return `${baseClass} bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200`
 	}
-	
+
 	return (
 		<span className={`${getBadgeClass(difference)} ${className}`}>
 			{formatDifference(difference)}
