@@ -200,7 +200,7 @@ export default function AttackSkillForm({
 	}, [])
 
 	return (
-		<div className="space-y-4 p-4 border border-gray-300 rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8 max-w-full overflow-hidden">
+		<div className="space-y-4 p-4 shadow-md rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8 max-w-full overflow-hidden">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">攻撃スキル</h2>
 
 			{/* スキル選択セクション */}
@@ -213,7 +213,7 @@ export default function AttackSkillForm({
 						width: '100%',
 						maxWidth: '100%',
 						minWidth: '0',
-						boxSizing: 'border-box'
+						boxSizing: 'border-box',
 					}}
 				>
 					<option value="">⚔️ 攻撃スキルを選択してください</option>
