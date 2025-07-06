@@ -291,6 +291,8 @@ export function calculateDamageWithService(
 		}
 
 		// 複数撃がある場合は合計ダメージを計算
+		// 多撃判定フラグ
+		const isMultiHit = attackResults.length > 1
 		const totalAttackResult = (() => {
 			if (attackResults.length === 0) {
 				// 存在しない撃を選択した場合（例：ムーンスラッシュの3撃目）は0ダメージを返す
@@ -379,6 +381,17 @@ export function calculateDamageWithService(
 						(minStabilityRate + maxStabilityRate) / 2,
 					)
 
+					// 多撃の場合は既に計算済みの値を使用
+					if (isMultiHit) {
+						return {
+							min: stabilityResult.minDamage, // 既に計算済み
+							max: stabilityResult.maxDamage, // 既に計算済み
+							average: stabilityResult.averageDamage, // 既に計算済み
+							stability: stabilityRate,
+							averageStability: averageStabilityRate,
+						}
+					}
+
 					return {
 						min: Math.floor((baseDamage * stabilityRate) / 100),
 						max: baseDamage,
@@ -394,6 +407,17 @@ export function calculateDamageWithService(
 					const averageStabilityRate = Math.floor(
 						(minStabilityRate + maxStabilityRate) / 2,
 					)
+
+					// 多撃の場合は既に計算済みの値を使用
+					if (isMultiHit) {
+						return {
+							min: stabilityResult.minDamage, // 既に計算済み
+							max: stabilityResult.maxDamage, // 既に計算済み
+							average: stabilityResult.averageDamage, // 既に計算済み
+							stability: stabilityRate,
+							averageStability: averageStabilityRate,
+						}
+					}
 
 					return {
 						min: Math.floor((baseDamage * stabilityRate) / 100),
@@ -412,6 +436,17 @@ export function calculateDamageWithService(
 						(minStabilityRate + maxStabilityRate) / 2,
 					)
 
+					// 多撃の場合は既に計算済みの値を使用（グレイズ適用後）
+					if (isMultiHit) {
+						return {
+							min: Math.floor(stabilityResult.minDamage * 0.1),
+							max: Math.floor(stabilityResult.maxDamage * 0.1),
+							average: Math.floor(stabilityResult.averageDamage * 0.1),
+							stability: stabilityRate,
+							averageStability: averageStabilityRate,
+						}
+					}
+
 					return {
 						min: Math.floor((grazeBaseDamage * stabilityRate) / 100),
 						max: grazeBaseDamage,
@@ -423,7 +458,16 @@ export function calculateDamageWithService(
 					}
 				}
 				case 'expected': {
-					// 期待値
+					// 期待値（多撃の場合は既に計算済みの値を使用）
+					if (isMultiHit) {
+						return {
+							min: stabilityResult.averageDamage,
+							max: stabilityResult.averageDamage,
+							average: stabilityResult.averageDamage,
+							stability: stabilityRate,
+							averageStability: stabilityRate,
+						}
+					}
 					return {
 						min: stabilityResult.averageDamage,
 						max: stabilityResult.averageDamage,
@@ -439,6 +483,17 @@ export function calculateDamageWithService(
 					const averageStabilityRate = Math.floor(
 						(minStabilityRate + maxStabilityRate) / 2,
 					)
+
+					// 多撃の場合は既に計算済みの値を使用
+					if (isMultiHit) {
+						return {
+							min: stabilityResult.minDamage, // 既に計算済み
+							max: stabilityResult.maxDamage, // 既に計算済み
+							average: stabilityResult.averageDamage, // 既に計算済み
+							stability: stabilityRate,
+							averageStability: averageStabilityRate,
+						}
+					}
 
 					return {
 						min: Math.floor((baseDamage * stabilityRate) / 100),
