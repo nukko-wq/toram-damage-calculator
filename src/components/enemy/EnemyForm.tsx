@@ -8,16 +8,12 @@ import {
 	calculateRaidBossStats,
 	isSelditeFLEEUnknown,
 } from '@/utils/raidBossCalculation'
+import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
 import { useEnemyData } from '@/hooks/useEnemyData'
 import { useEnemySettingsStore } from '@/stores/enemySettingsStore'
 import EnemySelectionModal from './EnemySelectionModal'
 
-interface EnemyFormProps {
-	// 後方互換性のため残存（新システムでは不要）
-	onChange?: (enemyData: EnemyFormData) => void
-}
-
-export default function EnemyForm({ onChange }: EnemyFormProps) {
+export default function EnemyForm() {
 	// 新しい敵データ取得システムを使用
 	const { enemyFormData } = useEnemyData()
 	const updateEnemy = useCalculatorStore((state) => state.updateEnemy)
@@ -28,9 +24,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 	)
 	const setManualOverrides = useEnemySettingsStore(
 		(state) => state.setManualOverrides,
-	)
-	const loadFromLocalStorage = useEnemySettingsStore(
-		(state) => state.loadFromLocalStorage,
 	)
 
 	// 実際のデータは新システムから取得
@@ -77,10 +70,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 			}
 			updateEnemy(newData)
 
-			// 後方互換性のため従来のonChangeも呼び出し
-			if (onChange) {
-				onChange(newData)
-			}
 			return
 		}
 
@@ -97,10 +86,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 		// Zustandストアを更新
 		updateEnemy(newData)
 
-		// 後方互換性のため従来のonChangeも呼び出し
-		if (onChange) {
-			onChange(newData)
-		}
 	}
 
 	// 手動調整値の変更処理
@@ -128,10 +113,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 		// Zustandストアを更新
 		updateEnemy(newData)
 
-		// 後方互換性のため従来のonChangeも呼び出し
-		if (onChange) {
-			onChange(newData)
-		}
 	}
 
 	// レイドボスステータス計算
@@ -143,30 +124,7 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 	// 難易度別ステータス計算（表示専用）
 	const getBossDifficultyStats = (difficulty: BossDifficulty) => {
 		if (!selectedEnemy || selectedEnemy.category !== 'boss') return null
-
-		const levelBonus =
-			difficulty === 'normal'
-				? 0
-				: difficulty === 'hard'
-					? 10
-					: difficulty === 'lunatic'
-						? 20
-						: 40
-
-		const defMultiplier =
-			difficulty === 'normal'
-				? 1
-				: difficulty === 'hard'
-					? 2
-					: difficulty === 'lunatic'
-						? 4
-						: 6
-
-		return {
-			level: selectedEnemy.level + levelBonus,
-			DEF: Math.floor(selectedEnemy.stats.DEF * defMultiplier),
-			MDEF: Math.floor(selectedEnemy.stats.MDEF * defMultiplier),
-		}
+		return calculateBossDifficultyStats(selectedEnemy.level, selectedEnemy.stats, difficulty)
 	}
 
 	// レイドボスレベル変更処理
@@ -183,7 +141,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 				raidBossLevel: undefined,
 			}
 			updateEnemy(newData)
-			if (onChange) onChange(newData)
 			return
 		}
 
@@ -197,7 +154,6 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 			raidBossLevel: numLevel,
 		}
 		updateEnemy(newData)
-		if (onChange) onChange(newData)
 	}
 
 	// 選択済み敵の名前を取得
@@ -371,16 +327,16 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 										{selectedEnemy.category === 'boss' ? (
 											<>
 												<td className="border border-gray-300 px-2 py-1 text-center">
-													{getBossDifficultyStats('normal')?.DEF}
+													{getBossDifficultyStats('normal')?.stats.DEF}
 												</td>
 												<td className="border border-gray-300 px-2 py-1 text-center">
-													{getBossDifficultyStats('hard')?.DEF}
+													{getBossDifficultyStats('hard')?.stats.DEF}
 												</td>
 												<td className="border border-gray-300 px-2 py-1 text-center">
-													{getBossDifficultyStats('lunatic')?.DEF}
+													{getBossDifficultyStats('lunatic')?.stats.DEF}
 												</td>
 												<td className="border border-gray-300 px-2 py-1 text-center">
-													{getBossDifficultyStats('ultimate')?.DEF}
+													{getBossDifficultyStats('ultimate')?.stats.DEF}
 												</td>
 											</>
 										) : selectedEnemy.category === 'raidBoss' ? (
@@ -403,16 +359,16 @@ export default function EnemyForm({ onChange }: EnemyFormProps) {
 										{selectedEnemy.category === 'boss' ? (
 											<>
 												<td className="border border-gray-300 px-2 py-1 text-center">
-													{getBossDifficultyStats('normal')?.MDEF}
+													{getBossDifficultyStats('normal')?.stats.MDEF}
 												</td>
 												<td className="border border-gray-300 px-2 py-1 text-center">
-													{getBossDifficultyStats('hard')?.MDEF}
+													{getBossDifficultyStats('hard')?.stats.MDEF}
 												</td>
 												<td className="border border-gray-300 px-2 py-1 text-center">
-													{getBossDifficultyStats('lunatic')?.MDEF}
+													{getBossDifficultyStats('lunatic')?.stats.MDEF}
 												</td>
 												<td className="border border-gray-300 px-2 py-1 text-center">
-													{getBossDifficultyStats('ultimate')?.MDEF}
+													{getBossDifficultyStats('ultimate')?.stats.MDEF}
 												</td>
 											</>
 										) : selectedEnemy.category === 'raidBoss' ? (
