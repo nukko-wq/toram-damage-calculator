@@ -16,7 +16,7 @@ import type {
 } from '@/types/bonusCalculation'
 import type { CalculatorData } from '@/types/calculator'
 import { getCrystalById } from './crystalDatabase'
-import { getBuffSkillBonuses, getTwoHandsEffects } from './buffSkillCalculation'
+import { getBuffSkillBonuses, getTwoHandsEffects, getAttackUpEffects } from './buffSkillCalculation'
 
 /**
  * プロパティ値のバリデーション
@@ -495,6 +495,19 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 	
 	for (const [key, value] of Object.entries(twoHandsBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 攻撃力upスキルの補正値を追加（プレイヤーレベルが必要）
+	const attackUpBonuses = getAttackUpEffects(
+		data.buffSkills?.skills || null,
+		data.baseStats?.level || 1,
+	)
+	
+	for (const [key, value] of Object.entries(attackUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

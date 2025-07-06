@@ -971,6 +971,54 @@ function calculateTwoHandsEffects(
 }
 ```
 
+#### 17.2 攻撃力up (exATK1)
+```typescript
+{
+  id: 'exATK1',
+  name: '攻撃力up',
+  category: 'battle',
+  type: 'level',
+  order: 2204,
+  maxLevel: 10,
+  description: 'プレイヤーレベルに比例してATKを上昇させる',
+  effects: [
+    {
+      property: 'ATK',
+      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
+  example: {
+    playerLevel: 305,
+    skillLevel: 10,
+    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
+    result: 'ATK +76'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateAttackUpEffects(
+  skillLevel: number,
+  playerLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  // ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
+  const atkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+  
+  return {
+    ATK: atkBonus
+  }
+}
+```
+
 ### 18. ペット使用スキル系統
 
 #### 18.1 アニマル (pet1)

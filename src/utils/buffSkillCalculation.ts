@@ -263,6 +263,23 @@ export function calculateTwoHandsEffects(
 }
 
 /**
+ * 攻撃力up(exATK1)の効果計算関数
+ */
+export function calculateAttackUpEffects(
+	skillLevel: number,
+	playerLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+	
+	// ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
+	const atkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+	
+	return {
+		ATK: atkBonus,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -382,6 +399,37 @@ export function getBuffSkillBonuses(
 		const effects = calculateQuickSlashEffects(
 			quickSlash.level,
 			convertedWeaponType,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから攻撃力upの効果を取得（プレイヤーレベルが必要）
+ */
+export function getAttackUpEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	playerLevel: number,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 攻撃力up(exATK1)の処理
+	const attackUp = buffSkillData['exATK1']
+	if (attackUp?.isEnabled && attackUp.level) {
+		const effects = calculateAttackUpEffects(
+			attackUp.level,
+			playerLevel,
 		)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
