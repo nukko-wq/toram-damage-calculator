@@ -1138,6 +1138,55 @@ function calculateThreatPowerEffects(
 }
 ```
 
+#### 17.5 更なる魔力 (exMATK2)
+```typescript
+{
+  id: 'exMATK2',
+  name: '更なる魔力',
+  category: 'battle',
+  type: 'level',
+  order: 2207,
+  maxLevel: 10,
+  description: 'プレイヤーレベルに比例してMATKを上昇させる（魔法力upより高い効果）',
+  effects: [
+    {
+      property: 'MATK',
+      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
+  example: {
+    playerLevel: 305,
+    skillLevel: 10,
+    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
+    result: 'MATK +76'
+  },
+  note: '魔法力up (exMATK1) と同じ計算式を使用',
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateFurtherMagicEffects(
+  skillLevel: number,
+  playerLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  // MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
+  const matkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+  
+  return {
+    MATK: matkBonus
+  }
+}
+```
+
 ### 18. ペット使用スキル系統
 
 #### 18.1 アニマル (pet1)

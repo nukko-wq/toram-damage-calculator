@@ -16,7 +16,7 @@ import type {
 } from '@/types/bonusCalculation'
 import type { CalculatorData } from '@/types/calculator'
 import { getCrystalById } from './crystalDatabase'
-import { getBuffSkillBonuses, getTwoHandsEffects, getAttackUpEffects, getMagicUpEffects, getThreatPowerEffects } from './buffSkillCalculation'
+import { getBuffSkillBonuses, getTwoHandsEffects, getAttackUpEffects, getMagicUpEffects, getThreatPowerEffects, getFurtherMagicEffects } from './buffSkillCalculation'
 
 /**
  * プロパティ値のバリデーション
@@ -534,6 +534,19 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 	
 	for (const [key, value] of Object.entries(threatPowerBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 更なる魔力スキルの補正値を追加（プレイヤーレベルが必要）
+	const furtherMagicBonuses = getFurtherMagicEffects(
+		data.buffSkills?.skills || null,
+		data.baseStats?.level || 1,
+	)
+	
+	for (const [key, value] of Object.entries(furtherMagicBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
