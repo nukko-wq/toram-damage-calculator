@@ -300,6 +300,81 @@ interface UISettings {
 }
 ```
 
+#### 9.2 カムフラージュ (hunter5-2)
+```typescript
+{
+  id: 'hunter5-2',
+  name: 'カムフラージュ',
+  category: 'hunter',
+  type: 'level',
+  order: 1701,
+  maxLevel: 10,
+  description: '基本ステータスのレベルとスキルレベルに応じてATKとクリティカルを上昇させる',
+  weaponConditionalEffects: {
+    // 弓・自動弓の場合
+    bow: {
+      conditions: ['メイン武器が弓または自動弓'],
+      effects: [
+        { property: 'ATK', formula: 'Math.floor(baseStatsLevel)' },
+        { property: 'Critical', formula: 'skillLevel * 4' }
+      ]
+    },
+    // その他の武器の場合
+    default: {
+      conditions: ['メイン武器が弓・自動弓以外'],
+      effects: [
+        { property: 'ATK', formula: 'Math.floor(baseStatsLevel / 2)' },
+        { property: 'Critical', formula: 'skillLevel * 4' }
+      ]
+    }
+  },
+  calculationFormula: `
+    弓・自動弓装備時:
+    - ATK = Math.floor(基本ステータスレベル)
+    - クリティカル = skillLevel × 4
+    
+    その他武器装備時:
+    - ATK = Math.floor(基本ステータスレベル ÷ 2)
+    - クリティカル = skillLevel × 4
+  `,
+  example: {
+    baseStatsLevel: 305,
+    skillLevel: 10,
+    bowCalculation: 'ATK = Math.floor(305) = 305, Critical = 10 × 4 = 40',
+    otherCalculation: 'ATK = Math.floor(305 ÷ 2) = Math.floor(152.5) = 152, Critical = 10 × 4 = 40',
+    bowResult: 'ATK +305, Critical +40',
+    otherResult: 'ATK +152, Critical +40'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateCamouflageEffects(
+  skillLevel: number,
+  baseStatsLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  const isBowWeapon = weaponType === 'bow' || weaponType === 'bowgun'
+  
+  // ATK計算：弓系は基本ステータスレベル、その他は半分（小数点切り捨て）
+  const atkBonus = isBowWeapon 
+    ? Math.floor(baseStatsLevel)
+    : Math.floor(baseStatsLevel / 2)
+  
+  return {
+    ATK: atkBonus,
+    Critical: skillLevel * 4
+  }
+}
+```
+
 ### 10. アサシンスキル系統
 
 #### 10.1 ヴァニッシュ (vanish1)
