@@ -361,6 +361,20 @@ export function calculateMPBoostEffects(
 }
 
 /**
+ * HPブースト(oh4)の効果計算関数
+ */
+export function calculateHPBoostEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+	
+	return {
+		HP: skillLevel * 100,
+		HP_Rate: skillLevel * 2,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -523,6 +537,20 @@ export function getBuffSkillBonuses(
 	const mpBoost = buffSkillData['oh2']
 	if (mpBoost?.isEnabled && mpBoost.level) {
 		const effects = calculateMPBoostEffects(mpBoost.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// HPブーストの処理
+	const hpBoost = buffSkillData['oh4']
+	if (hpBoost?.isEnabled && hpBoost.level) {
+		const effects = calculateHPBoostEffects(hpBoost.level)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {

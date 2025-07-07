@@ -391,29 +391,51 @@ interface UISettings {
 
 ### 13. サバイバルスキル系統
 
-#### 13.1 HPブースト (survival1)
+#### 13.1 HPブースト (oh4)
 ```typescript
 {
-  id: 'survival1',
+  id: 'oh4',
   name: 'HPブースト',
   category: 'survival',
   type: 'level',
-  order: 1701,
+  order: 2101,
   maxLevel: 10,
   description: '最大HPを上昇させる',
   effects: [
     {
+      property: 'HP',
+      formula: 'skillLevel * 100',
+      conditions: []
+    },
+    {
       property: 'HP_Rate',
-      formula: 'skillLevel * 20',
+      formula: 'skillLevel * 2',
       conditions: []
     }
   ],
-  calculationFormula: 'HP% = skillLevel × 20',
+  calculationFormula: 'HP = skillLevel × 100, HP% = skillLevel × 2',
+  example: {
+    skillLevel: 10,
+    calculation: 'HP = 10 × 100 = 1000, HP% = 10 × 2 = 20',
+    result: 'HP +1000, HP% +20'
+  },
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
     showInModal: true,
     quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateHPBoostEffects(
+  skillLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  return {
+    HP: skillLevel * 100,
+    HP_Rate: skillLevel * 2
   }
 }
 ```
@@ -425,7 +447,7 @@ interface UISettings {
   name: 'MPブースト',
   category: 'survival',
   type: 'level',
-  order: 2101,
+  order: 2102,
   maxLevel: 10,
   description: '最大MPを上昇させる',
   effects: [
