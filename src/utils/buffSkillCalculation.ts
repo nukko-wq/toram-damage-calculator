@@ -348,6 +348,19 @@ export function calculateCriticalUpEffects(
 }
 
 /**
+ * MPブースト(oh2)の効果計算関数
+ */
+export function calculateMPBoostEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+	
+	return {
+		MP: skillLevel * 30,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -496,6 +509,20 @@ export function getBuffSkillBonuses(
 	const criticalUp = buffSkillData['oh1']
 	if (criticalUp?.isEnabled) {
 		const effects = calculateCriticalUpEffects(criticalUp.isEnabled)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// MPブーストの処理
+	const mpBoost = buffSkillData['oh2']
+	if (mpBoost?.isEnabled && mpBoost.level) {
+		const effects = calculateMPBoostEffects(mpBoost.level)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
