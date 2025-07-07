@@ -334,6 +334,20 @@ export function calculateGodspeedTrajectoryEffects(
 }
 
 /**
+ * クリティカルup(oh1)の効果計算関数
+ */
+export function calculateCriticalUpEffects(
+	isEnabled: boolean,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+	
+	return {
+		Critical: 5,
+		CriticalDamage_Rate: 5,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -468,6 +482,20 @@ export function getBuffSkillBonuses(
 	const quickAura = buffSkillData['hb1']
 	if (quickAura?.isEnabled && quickAura.level) {
 		const effects = calculateQuickAuraEffects(quickAura.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// クリティカルupの処理
+	const criticalUp = buffSkillData['oh1']
+	if (criticalUp?.isEnabled) {
+		const effects = calculateCriticalUpEffects(criticalUp.isEnabled)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
