@@ -13,6 +13,7 @@ buff-skills-common/
 ├── blade-skills.md             # ブレードスキル系統
 ├── halberd-skills.md           # ハルバードスキル系統
 ├── mononofu-skills.md          # モノノフスキル系統
+├── survival-skills.md          # サバイバルスキル系統
 ├── battle-skills.md            # バトルスキル系統
 ├── shoot-skills.md             # シュートスキル系統（予定）
 ├── dualSword-skills.md         # デュアルソードスキル系統（予定）
@@ -39,6 +40,12 @@ buff-skills-common/
   - 明鏡止水 (mf1-1)
   - 怪力乱神 (mf1)
   - 両手持ち (sm1-1)
+
+### ✅ survival-skills.md
+- **スキル系統**: サバイバルスキル (category: 'survival')
+- **含まれるスキル**: 2スキル
+  - HPブースト (oh4)
+  - MPブースト (oh2)
 
 ## 分割予定ファイル
 

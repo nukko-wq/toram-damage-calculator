@@ -11,6 +11,7 @@
 - **ブレードスキル系統**: [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) ✅
 - **ハルバードスキル系統**: [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) ✅
 - **モノノフスキル系統**: [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) ✅
+- **サバイバルスキル系統**: [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) ✅
 - **バトルスキル系統**: [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
@@ -391,97 +392,11 @@ interface UISettings {
 
 ### 13. サバイバルスキル系統
 
-#### 13.1 HPブースト (oh4)
-```typescript
-{
-  id: 'oh4',
-  name: 'HPブースト',
-  category: 'survival',
-  type: 'level',
-  order: 2101,
-  maxLevel: 10,
-  description: '最大HPを上昇させる',
-  effects: [
-    {
-      property: 'HP',
-      formula: 'skillLevel * 100',
-      conditions: []
-    },
-    {
-      property: 'HP_Rate',
-      formula: 'skillLevel * 2',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'HP = skillLevel × 100, HP% = skillLevel × 2',
-  example: {
-    skillLevel: 10,
-    calculation: 'HP = 10 × 100 = 1000, HP% = 10 × 2 = 20',
-    result: 'HP +1000, HP% +20'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
+詳細は [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) を参照してください。
 
-// 実装用の効果計算関数
-function calculateHPBoostEffects(
-  skillLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  return {
-    HP: skillLevel * 100,
-    HP_Rate: skillLevel * 2
-  }
-}
-```
-
-#### 13.2 MPブースト (oh2)
-```typescript
-{
-  id: 'oh2',
-  name: 'MPブースト',
-  category: 'survival',
-  type: 'level',
-  order: 2102,
-  maxLevel: 10,
-  description: '最大MPを上昇させる',
-  effects: [
-    {
-      property: 'MP',
-      formula: 'skillLevel * 30',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'MP = skillLevel × 30',
-  example: {
-    skillLevel: 10,
-    calculation: 'MP = 10 × 30 = 300',
-    result: 'MP +300'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-
-// 実装用の効果計算関数
-function calculateMPBoostEffects(
-  skillLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  return {
-    MP: skillLevel * 30
-  }
-}
-```
+**含まれるスキル:**
+- 13.1 HPブースト (oh4) - HP = skillLevel × 100, HP% = skillLevel × 2
+- 13.2 MPブースト (oh2) - MP = skillLevel × 30
 
 ### 14. バトルスキル系統
 
