@@ -334,6 +334,47 @@ export function calculateGodspeedTrajectoryEffects(
 }
 
 /**
+ * クリティカルup(oh1)の効果計算関数
+ */
+export function calculateCriticalUpEffects(
+	isEnabled: boolean,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+	
+	return {
+		Critical: 5,
+		CriticalDamage_Rate: 5,
+	}
+}
+
+/**
+ * MPブースト(oh2)の効果計算関数
+ */
+export function calculateMPBoostEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+	
+	return {
+		MP: skillLevel * 30,
+	}
+}
+
+/**
+ * HPブースト(oh4)の効果計算関数
+ */
+export function calculateHPBoostEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+	
+	return {
+		HP: skillLevel * 100,
+		HP_Rate: skillLevel * 2,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -468,6 +509,48 @@ export function getBuffSkillBonuses(
 	const quickAura = buffSkillData['hb1']
 	if (quickAura?.isEnabled && quickAura.level) {
 		const effects = calculateQuickAuraEffects(quickAura.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// クリティカルupの処理
+	const criticalUp = buffSkillData['oh1']
+	if (criticalUp?.isEnabled) {
+		const effects = calculateCriticalUpEffects(criticalUp.isEnabled)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// MPブーストの処理
+	const mpBoost = buffSkillData['oh2']
+	if (mpBoost?.isEnabled && mpBoost.level) {
+		const effects = calculateMPBoostEffects(mpBoost.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// HPブーストの処理
+	const hpBoost = buffSkillData['oh4']
+	if (hpBoost?.isEnabled && hpBoost.level) {
+		const effects = calculateHPBoostEffects(hpBoost.level)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {

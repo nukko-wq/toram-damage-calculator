@@ -5,6 +5,18 @@
 全武器種で使用可能な共通バフスキル（35個）の詳細仕様を記述します。
 各スキルの効果計算式、パラメータ、UI表示形式を定義します。
 
+**📁 分割ファイル構造**
+
+スキル系統ごとに詳細仕様を分割整理しています：
+- **ブレードスキル系統**: [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) ✅
+- **ハルバードスキル系統**: [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) ✅
+- **モノノフスキル系統**: [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) ✅
+- **サバイバルスキル系統**: [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) ✅
+- **バトルスキル系統**: [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) ✅
+- **その他の系統**: 順次分割予定
+
+詳細な分割状況は [buff-skills-common/README.md](./buff-skills-common/README.md) を参照してください。
+
 ## データ構造
 
 ```typescript
@@ -40,87 +52,10 @@ interface UISettings {
 
 ### 1. ブレードスキル系統
 
-#### 1.1 ウォークライ (IsWarcry)
-```typescript
-{
-  id: 'IsWarcry',
-  name: 'ウォークライ',
-  category: 'blade',
-  type: 'toggle',
-  order: 201,
-  description: '攻撃力と移動速度を上昇させる',
-  effects: [
-    {
-      property: 'ATK',
-      formula: '+300',
-      conditions: []
-    },
-    {
-      property: 'MotionSpeed_Rate',
-      formula: '+50',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK = base + 300, 行動速度% = base + 50',
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
+詳細は [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) を参照してください。
 
-#### 1.2 ハードヒット (sm1)
-```typescript
-{
-  id: 'sm1',
-  name: 'ハードヒット',
-  category: 'blade',
-  type: 'level',
-  order: 202,
-  maxLevel: 10,
-  description: '攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 1.3 アストラルブレイズ (sm6)
-```typescript
-{
-  id: 'sm6',
-  name: 'アストラルブレイズ',
-  category: 'blade',
-  type: 'toggle',
-  order: 203,
-  description: '武器ATKを上昇させる',
-  effects: [
-    {
-      property: 'WeaponATK_Rate',
-      formula: '+25',
-      conditions: []
-    }
-  ],
-  calculationFormula: '武器ATK% = base + 25',
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
+**含まれるスキル:**
+- 1.1 ウォークライ (IsWarcry) - ATK+300, 行動速度%+50
 
 ### 2. シュートスキル系統
 
@@ -151,391 +86,28 @@ interface UISettings {
 }
 ```
 
-#### 2.2 パワーショット (ar4)
-```typescript
-{
-  id: 'ar4',
-  name: 'パワーショット',
-  category: 'shoot',
-  type: 'level',
-  order: 302,
-  maxLevel: 10,
-  description: '弓装備時の攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 2',
-      conditions: ['武器種が弓または自動弓']
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 2 (弓系武器装備時のみ)',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
 
-### 3. マーシャルスキル系統
+### 3. ハルバードスキル系統
 
-#### 3.1 スマッシュ (ma1)
-```typescript
-{
-  id: 'ma1',
-  name: 'スマッシュ',
-  category: 'martial',
-  type: 'level',
-  order: 401,
-  maxLevel: 10,
-  description: '攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+詳細は [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) を参照してください。
 
-#### 3.2 アシュラオーラ (ma2)
-```typescript
-{
-  id: 'ma2',
-  name: 'アシュラオーラ',
-  category: 'martial',
-  type: 'toggle',
-  order: 402,
-  description: '攻撃速度を上昇させる',
-  effects: [
-    {
-      property: 'AttackSpeed_Rate',
-      formula: '+100',
-      conditions: []
-    }
-  ],
-  calculationFormula: '攻撃速度% = base + 100',
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
+**含まれるスキル:**
+- 3.1 クイックオーラ (hb1) - 攻撃速度 = skillLevel × 50, 攻撃速度% = Math.floor(skillLevel × 2.5)
+- 3.2 神速の捌手 (godspeed_parry) - 武器依存の複合効果（スタック型）
 
-### 4. ハルバードスキル系統
+### 4. モノノフスキル系統
 
-#### 4.1 クイックオーラ (hb1)
-```typescript
-{
-  id: 'hb1',
-  name: 'クイックオーラ',
-  category: 'halberd',
-  type: 'level',
-  order: 601,
-  maxLevel: 10,
-  description: '攻撃速度を上昇させる',
-  effects: [
-    {
-      property: 'AttackSpeed',
-      formula: 'skillLevel * 50',
-      conditions: []
-    },
-    {
-      property: 'AttackSpeed_Rate',
-      formula: 'Math.floor(skillLevel * 2.5)',
-      conditions: []
-    }
-  ],
-  calculationFormula: '攻撃速度 = skillLevel × 50, 攻撃速度% = Math.floor(skillLevel × 2.5)',
-  example: {
-    skillLevel: 10,
-    calculation: 'AttackSpeed = 10 × 50 = 500, AttackSpeed_Rate = Math.floor(10 × 2.5) = Math.floor(25) = 25',
-    result: '攻撃速度 +500, 攻撃速度% +25'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
+詳細は [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) を参照してください。
 
-// 実装用の効果計算関数
-function calculateQuickAuraEffects(
-  skillLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  return {
-    AttackSpeed: skillLevel * 50,
-    AttackSpeed_Rate: Math.floor(skillLevel * 2.5)
-  }
-}
-```
+**含まれるスキル:**
+- 4.1 武士道 (Mononof) - クリティカル率% = skillLevel × 3
+- 4.2 明鏡止水 (mf1-1) - 回避% = skillLevel × 10
+- 4.3 怪力乱神 (mf1) - ATK% = skillLevel × 5
+- 4.4 両手持ち (sm1-1) - 武器依存の複合効果（トグル型）
 
-#### 4.2 神速の捌手 (godspeed_parry)
-```typescript
-{
-  id: 'godspeed_parry',
-  name: '神速の捌手',
-  category: 'halberd',
-  type: 'stack',
-  order: 602,
-  maxStack: 3,
-  description: '攻撃速度と行動速度を上昇させる代わりに、MPと耐性が減少する',
-  weaponConditionalEffects: {
-    // 旋風槍装備時の効果
-    halberd: {
-      effects: [
-        { property: 'AttackSpeed', formula: 'stackCount * 400' },
-        { property: 'MotionSpeed_Rate', formula: 'stackCount * 10' },
-        { property: 'MP', formula: 'stackCount * -100' },
-        { property: 'PhysicalResistance_Rate', formula: 'stackCount * -25' },
-        { property: 'MagicalResistance_Rate', formula: 'stackCount * -25' },
-        { property: 'AvoidRecharge_Rate', formula: 'stackCount * 10' }
-      ]
-    },
-    // その他武器装備時の効果
-    default: {
-      effects: [
-        { property: 'AttackSpeed', formula: 'stackCount * 300' },
-        { property: 'MotionSpeed_Rate', formula: 'stackCount * 10' },
-        { property: 'MP', formula: 'stackCount * -100' },
-        { property: 'PhysicalResistance_Rate', formula: 'stackCount * -70' },
-        { property: 'MagicalResistance_Rate', formula: 'stackCount * -70' },
-        { property: 'AvoidRecharge_Rate', formula: 'stackCount * 10' }
-      ]
-    }
-  },
-  calculationFormula: `
-    旋風槍装備時:
-    - 攻撃速度 = stackCount × 400
-    - 行動速度% = stackCount × 10
-    - MP = stackCount × -100
-    - 物理耐性% = stackCount × -25
-    - 魔法耐性% = stackCount × -25
-    - Avoid回復% = stackCount × 10
-    
-    その他武器装備時:
-    - 攻撃速度 = stackCount × 300
-    - 行動速度% = stackCount × 10
-    - MP = stackCount × -100
-    - 物理耐性% = stackCount × -70
-    - 魔法耐性% = stackCount × -70
-    - Avoid回復% = stackCount × 10
-  `,
-  uiSettings: {
-    parameterName: '重ねがけ数',
-    parameterUnit: '回',
-    showInModal: true,
-    quickToggle: false
-  }
-}
+### 5. スプライトスキル系統
 
-// 実装用の効果計算関数
-function calculateGodspeedParryEffects(
-  stackCount: number,
-  weaponType: MainWeaponType | null
-): Partial<EquipmentProperties> {
-  if (!stackCount || stackCount === 0) return {}
-  
-  const isHalberd = weaponType === 'halberd'
-  
-  return {
-    AttackSpeed: stackCount * (isHalberd ? 400 : 300),
-    MotionSpeed_Rate: stackCount * 10,
-    MP: stackCount * -100,
-    PhysicalResistance_Rate: stackCount * (isHalberd ? -25 : -70),
-    MagicalResistance_Rate: stackCount * (isHalberd ? -25 : -70),
-    AvoidRecharge_Rate: stackCount * 10
-  }
-}
-```
-
-### 5. モノノフスキル系統
-
-#### 5.1 武士道 (Mononof)
-```typescript
-{
-  id: 'Mononof',
-  name: '武士道',
-  category: 'mononofu',
-  type: 'level',
-  order: 601,
-  maxLevel: 10,
-  description: 'クリティカル率を上昇させる',
-  effects: [
-    {
-      property: 'Critical_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'クリティカル率% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 5.2 明鏡止水 (mf1-1)
-```typescript
-{
-  id: 'mf1-1',
-  name: '明鏡止水',
-  category: 'mononofu',
-  type: 'level',
-  order: 602,
-  maxLevel: 10,
-  description: '回避を上昇させる',
-  effects: [
-    {
-      property: 'Dodge_Rate',
-      formula: 'skillLevel * 10',
-      conditions: []
-    }
-  ],
-  calculationFormula: '回避% = skillLevel × 10',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 5.3 怪力乱神 (mf1)
-```typescript
-{
-  id: 'mf1',
-  name: '怪力乱神',
-  category: 'mononofu',
-  type: 'level',
-  order: 603,
-  maxLevel: 10,
-  description: '攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 5',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 5.4 両手持ち (sm1-1)
-```typescript
-{
-  id: 'sm1-1',
-  name: '両手持ち',
-  category: 'mononofu',
-  type: 'toggle',
-  order: 704,
-  description: 'サブ武器を装備していない時に各種能力を上昇させる',
-  weaponConditionalEffects: {
-    // 抜刀剣の場合（サブ武器がなしまたは巻物の場合）
-    katana: {
-      conditions: ['サブ武器がなしまたは巻物'],
-      effects: [
-        { property: 'Accuracy_Rate', formula: '+10' },
-        { property: 'Stability_Rate', formula: '+10' },
-        { property: 'Critical', formula: '+10' },
-        { property: 'WeaponATK_Rate', formula: '+10' }
-      ]
-    },
-    // その他の武器（サブ武器がなしの場合のみ）
-    default: {
-      conditions: ['サブ武器がなし'],
-      effects: [
-        { property: 'Accuracy_Rate', formula: '+10' },
-        { property: 'Stability_Rate', formula: '+5' },
-        { property: 'Critical', formula: '+5' },
-        { property: 'WeaponATK_Rate', formula: '+10' }
-      ]
-    }
-  },
-  calculationFormula: `
-    抜刀剣装備時（サブ武器がなしまたは巻物）:
-    - 命中% = base + 10
-    - 安定率% = base + 10
-    - クリティカル = base + 10
-    - 武器ATK% = base + 10
-    
-    その他武器装備時（サブ武器がなし）:
-    - 命中% = base + 10
-    - 安定率% = base + 5
-    - クリティカル = base + 5
-    - 武器ATK% = base + 10
-  `,
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-
-// 実装用の効果計算関数
-function calculateTwoHandsEffects(
-  isEnabled: boolean,
-  mainWeaponType: MainWeaponType | null,
-  subWeaponType: SubWeaponType | null
-): Partial<EquipmentProperties> {
-  if (!isEnabled) return {}
-  
-  const isKatana = mainWeaponType === 'katana'
-  const isSubWeaponNone = !subWeaponType || subWeaponType === 'なし'
-  const isSubWeaponScroll = subWeaponType === '巻物'
-  
-  // 抜刀剣の場合：サブ武器がなしまたは巻物
-  if (isKatana && (isSubWeaponNone || isSubWeaponScroll)) {
-    return {
-      Accuracy_Rate: 10,
-      Stability_Rate: 10,
-      Critical: 10,
-      WeaponATK_Rate: 10
-    }
-  }
-  
-  // その他の武器の場合：サブ武器がなしのみ
-  if (!isKatana && isSubWeaponNone) {
-    return {
-      Accuracy_Rate: 10,
-      Stability_Rate: 5,
-      Critical: 5,
-      WeaponATK_Rate: 10
-    }
-  }
-  
-  // 効果条件を満たさない場合
-  return {}
-}
-```
-
-### 6. スプライトスキル系統
-
-#### 6.1 パワーウェーブ (sprite1)
+#### 5.1 パワーウェーブ (sprite1)
 ```typescript
 {
   id: 'sprite1',
@@ -562,7 +134,7 @@ function calculateTwoHandsEffects(
 }
 ```
 
-#### 6.2 ヒール (heal1)
+#### 5.2 ヒール (heal1)
 ```typescript
 {
   id: 'heal1',
@@ -589,9 +161,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 7. プリーストスキル系統
+### 6. プリーストスキル系統
 
-#### 7.1 聖なる加護 (pr1)
+#### 6.1 聖なる加護 (pr1)
 ```typescript
 {
   id: 'pr1',
@@ -618,7 +190,7 @@ function calculateTwoHandsEffects(
 }
 ```
 
-#### 7.2 ネメシス (nemesis1)
+#### 6.2 ネメシス (nemesis1)
 ```typescript
 {
   id: 'nemesis1',
@@ -643,65 +215,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 8. ウィザードスキル系統
+### 7. ダークパワースキル系統
 
-#### 8.1 チェインキャスト (mg4)
-```typescript
-{
-  id: 'mg4',
-  name: 'チェインキャスト',
-  category: 'wizard',
-  type: 'stack',
-  order: 901,
-  maxStack: 10,
-  description: '詠唱速度を重ねがけで上昇させる',
-  effects: [
-    {
-      property: 'CastingSpeed_Rate',
-      formula: 'stackCount * 15',
-      conditions: []
-    }
-  ],
-  calculationFormula: '詠唱速度% = stackCount × 15',
-  uiSettings: {
-    parameterName: '重ねがけ数',
-    parameterUnit: '回',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 8.2 マジックマスタリ (mg1)
-```typescript
-{
-  id: 'mg1',
-  name: 'マジックマスタリ',
-  category: 'wizard',
-  type: 'level',
-  order: 902,
-  maxLevel: 10,
-  description: '魔法攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'MATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-### 9. ダークパワースキル系統
-
-#### 9.1 ダークパワー (DarkPower)
+#### 7.1 ダークパワー (DarkPower)
 ```typescript
 {
   id: 'DarkPower',
@@ -728,38 +244,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 10. シールドスキル系統
+### 8. ナイトスキル系統
 
-#### 10.1 ハードボディ (shield3)
-```typescript
-{
-  id: 'shield3',
-  name: 'ハードボディ',
-  category: 'shield',
-  type: 'level',
-  order: 1101,
-  maxLevel: 10,
-  description: '物理防御力を上昇させる',
-  effects: [
-    {
-      property: 'DEF_Rate',
-      formula: 'skillLevel * 10',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'DEF% = skillLevel × 10',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-### 11. ナイトスキル系統
-
-#### 11.1 チャレンジ (challenge1)
+#### 8.1 チャレンジ (challenge1)
 ```typescript
 {
   id: 'challenge1',
@@ -784,9 +271,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 12. ハンタースキル系統
+### 9. ハンタースキル系統
 
-#### 12.1 レンジャーズサイト (hunter1)
+#### 9.1 レンジャーズサイト (hunter1)
 ```typescript
 {
   id: 'hunter1',
@@ -813,9 +300,84 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 13. アサシンスキル系統
+#### 9.2 カムフラージュ (hunter5-2)
+```typescript
+{
+  id: 'hunter5-2',
+  name: 'カムフラージュ',
+  category: 'hunter',
+  type: 'level',
+  order: 1701,
+  maxLevel: 10,
+  description: '基本ステータスのレベルとスキルレベルに応じてATKとクリティカルを上昇させる',
+  weaponConditionalEffects: {
+    // 弓・自動弓の場合
+    bow: {
+      conditions: ['メイン武器が弓または自動弓'],
+      effects: [
+        { property: 'ATK', formula: 'Math.floor(baseStatsLevel)' },
+        { property: 'Critical', formula: 'skillLevel * 4' }
+      ]
+    },
+    // その他の武器の場合
+    default: {
+      conditions: ['メイン武器が弓・自動弓以外'],
+      effects: [
+        { property: 'ATK', formula: 'Math.floor(baseStatsLevel / 2)' },
+        { property: 'Critical', formula: 'skillLevel * 4' }
+      ]
+    }
+  },
+  calculationFormula: `
+    弓・自動弓装備時:
+    - ATK = Math.floor(基本ステータスレベル)
+    - クリティカル = skillLevel × 4
+    
+    その他武器装備時:
+    - ATK = Math.floor(基本ステータスレベル ÷ 2)
+    - クリティカル = skillLevel × 4
+  `,
+  example: {
+    baseStatsLevel: 305,
+    skillLevel: 10,
+    bowCalculation: 'ATK = Math.floor(305) = 305, Critical = 10 × 4 = 40',
+    otherCalculation: 'ATK = Math.floor(305 ÷ 2) = Math.floor(152.5) = 152, Critical = 10 × 4 = 40',
+    bowResult: 'ATK +305, Critical +40',
+    otherResult: 'ATK +152, Critical +40'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
 
-#### 13.1 ヴァニッシュ (vanish1)
+// 実装用の効果計算関数
+function calculateCamouflageEffects(
+  skillLevel: number,
+  baseStatsLevel: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  const isBowWeapon = weaponType === 'bow' || weaponType === 'bowgun'
+  
+  // ATK計算：弓系は基本ステータスレベル、その他は半分（小数点切り捨て）
+  const atkBonus = isBowWeapon 
+    ? Math.floor(baseStatsLevel)
+    : Math.floor(baseStatsLevel / 2)
+  
+  return {
+    ATK: atkBonus,
+    Critical: skillLevel * 4
+  }
+}
+```
+
+### 10. アサシンスキル系統
+
+#### 10.1 ヴァニッシュ (vanish1)
 ```typescript
 {
   id: 'vanish1',
@@ -840,9 +402,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 14. ニンジャスキル系統
+### 11. ニンジャスキル系統
 
-#### 14.1 忍術 (ninja2)
+#### 11.1 忍術 (ninja2)
 ```typescript
 {
   id: 'ninja2',
@@ -874,9 +436,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 15. サポートスキル系統
+### 12. サポートスキル系統
 
-#### 15.1 ファーストエイド (support1)
+#### 12.1 ファーストエイド (support1)
 ```typescript
 {
   id: 'support1',
@@ -903,293 +465,28 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 16. サバイバルスキル系統
+### 13. サバイバルスキル系統
 
-#### 16.1 HPブースト (survival1)
-```typescript
-{
-  id: 'survival1',
-  name: 'HPブースト',
-  category: 'survival',
-  type: 'level',
-  order: 1701,
-  maxLevel: 10,
-  description: '最大HPを上昇させる',
-  effects: [
-    {
-      property: 'HP_Rate',
-      formula: 'skillLevel * 20',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'HP% = skillLevel × 20',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+詳細は [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) を参照してください。
 
-#### 16.2 MPブースト (survival2)
-```typescript
-{
-  id: 'survival2',
-  name: 'MPブースト',
-  category: 'survival',
-  type: 'level',
-  order: 1702,
-  maxLevel: 10,
-  description: '最大MPを上昇させる',
-  effects: [
-    {
-      property: 'MP_Rate',
-      formula: 'skillLevel * 20',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'MP% = skillLevel × 20',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+**含まれるスキル:**
+- 13.1 HPブースト (oh4) - HP = skillLevel × 100, HP% = skillLevel × 2
+- 13.2 MPブースト (oh2) - MP = skillLevel × 30
 
-### 17. バトルスキル系統
+### 14. バトルスキル系統
 
-#### 17.1 バトルタクティクス (battle1)
-```typescript
-{
-  id: 'battle1',
-  name: 'バトルタクティクス',
-  category: 'battle',
-  type: 'level',
-  order: 1801,
-  maxLevel: 10,
-  description: '攻撃力とクリティカル率を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 2',
-      conditions: []
-    },
-    {
-      property: 'Critical_Rate',
-      formula: 'skillLevel * 2',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 2, クリティカル率% = skillLevel × 2',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+詳細は [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) を参照してください。
 
-#### 17.2 攻撃力up (exATK1)
-```typescript
-{
-  id: 'exATK1',
-  name: '攻撃力up',
-  category: 'battle',
-  type: 'level',
-  order: 2204,
-  maxLevel: 10,
-  description: 'プレイヤーレベルに比例してATKを上昇させる',
-  effects: [
-    {
-      property: 'ATK',
-      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
-  example: {
-    playerLevel: 305,
-    skillLevel: 10,
-    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
-    result: 'ATK +76'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
+**含まれるスキル:**
+- 17.1 クリティカルup (oh1) - Critical+5, CriticalDamage_Rate+5
+- 17.2 攻撃力up (exATK1) - プレイヤーレベル依存ATK計算
+- 17.3 魔法力up (exMATK1) - プレイヤーレベル依存MATK計算
+- 17.4 驚異の威力 (exATK2) - 攻撃力upと同じ計算式
+- 17.5 更なる魔力 (exMATK2) - 魔法力upと同じ計算式
 
-// 実装用の効果計算関数
-function calculateAttackUpEffects(
-  skillLevel: number,
-  playerLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  // ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-  const atkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
-  
-  return {
-    ATK: atkBonus
-  }
-}
-```
+### 15. ペット使用スキル系統
 
-#### 17.3 魔法力up (exMATK1)
-```typescript
-{
-  id: 'exMATK1',
-  name: '魔法力up',
-  category: 'battle',
-  type: 'level',
-  order: 2206,
-  maxLevel: 10,
-  description: 'プレイヤーレベルに比例してMATKを上昇させる',
-  effects: [
-    {
-      property: 'MATK',
-      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
-  example: {
-    playerLevel: 305,
-    skillLevel: 10,
-    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
-    result: 'MATK +76'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-
-// 実装用の効果計算関数
-function calculateMagicUpEffects(
-  skillLevel: number,
-  playerLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  // MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-  const matkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
-  
-  return {
-    MATK: matkBonus
-  }
-}
-```
-
-#### 17.4 驚異の威力 (exATK2)
-```typescript
-{
-  id: 'exATK2',
-  name: '驚異の威力',
-  category: 'battle',
-  type: 'level',
-  order: 2205,
-  maxLevel: 10,
-  description: 'プレイヤーレベルに比例してATKを上昇させる（攻撃力upより高い効果）',
-  effects: [
-    {
-      property: 'ATK',
-      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
-  example: {
-    playerLevel: 305,
-    skillLevel: 10,
-    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
-    result: 'ATK +76'
-  },
-  note: '攻撃力up (exATK1) と同じ計算式を使用',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-
-// 実装用の効果計算関数
-function calculateThreatPowerEffects(
-  skillLevel: number,
-  playerLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  // ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-  const atkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
-  
-  return {
-    ATK: atkBonus
-  }
-}
-```
-
-#### 17.5 更なる魔力 (exMATK2)
-```typescript
-{
-  id: 'exMATK2',
-  name: '更なる魔力',
-  category: 'battle',
-  type: 'level',
-  order: 2207,
-  maxLevel: 10,
-  description: 'プレイヤーレベルに比例してMATKを上昇させる（魔法力upより高い効果）',
-  effects: [
-    {
-      property: 'MATK',
-      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
-  example: {
-    playerLevel: 305,
-    skillLevel: 10,
-    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
-    result: 'MATK +76'
-  },
-  note: '魔法力up (exMATK1) と同じ計算式を使用',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-
-// 実装用の効果計算関数
-function calculateFurtherMagicEffects(
-  skillLevel: number,
-  playerLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  // MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-  const matkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
-  
-  return {
-    MATK: matkBonus
-  }
-}
-```
-
-### 18. ペット使用スキル系統
-
-#### 18.1 アニマル (pet1)
+#### 15.1 アニマル (pet1)
 ```typescript
 {
   id: 'pet1',
@@ -1214,9 +511,9 @@ function calculateFurtherMagicEffects(
 }
 ```
 
-### 19. デュアルソードスキル系統
+### 16. デュアルソードスキル系統
 
-#### 19.1 神速の軌跡 (ds1-2)
+#### 16.1 神速の軌跡 (ds1-2)
 ```typescript
 {
   id: 'ds1-2',
@@ -1276,9 +573,9 @@ function calculateGodspeedTrajectoryEffects(
 }
 ```
 
-### 20. ミンストレルスキル系統
+### 17. ミンストレルスキル系統
 
-#### 20.1 インスピレーション (minstrel1)
+#### 17.1 インスピレーション (minstrel1)
 ```typescript
 {
   id: 'minstrel1',
@@ -1309,9 +606,9 @@ function calculateGodspeedTrajectoryEffects(
 }
 ```
 
-### 20. パルチザンスキル系統
+### 18. パルチザンスキル系統
 
-#### 20.1 ガード (partisan1)
+#### 18.1 ガード (partisan1)
 ```typescript
 {
   id: 'partisan1',

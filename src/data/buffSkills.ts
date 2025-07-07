@@ -287,7 +287,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'survival',
 		type: 'level',
 		maxLevel: 10,
-		order: 2101,
+		order: 2102,
 	},
 
 	// バトルスキル
@@ -308,10 +308,10 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 	{
 		id: 'oh4',
 		name: 'HPブースト',
-		category: 'battle',
+		category: 'survival',
 		type: 'level',
 		maxLevel: 10,
-		order: 2203,
+		order: 2101,
 	},
 	{
 		id: 'exATK1',
