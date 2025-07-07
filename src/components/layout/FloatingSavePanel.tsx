@@ -1,11 +1,13 @@
+'use client'
+
 import React, { useMemo, useRef } from 'react'
 import { useCalculatorStore, useSaveDataStore } from '@/stores'
 
-interface HeaderActionsProps {
+interface FloatingSavePanelProps {
 	className?: string
 }
 
-export default React.memo<HeaderActionsProps>(function HeaderActions({
+export default React.memo<FloatingSavePanelProps>(function FloatingSavePanel({
 	className = '',
 }) {
 	// ストアからデータを取得
@@ -56,7 +58,7 @@ export default React.memo<HeaderActionsProps>(function HeaderActions({
 
 	return (
 		<div
-			className={`hidden sm:flex flex-col sm:flex-row gap-2 sm:gap-3 items-center ${className}`}
+			className={`fixed bottom-20 right-4 z-40 flex flex-col sm:flex-row gap-2 sm:gap-3 items-end bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-lg p-3 ${className}`}
 		>
 			{/* 現在のセーブデータ名 */}
 			{currentSaveName && (

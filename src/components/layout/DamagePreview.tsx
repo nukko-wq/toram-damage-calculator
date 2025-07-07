@@ -17,6 +17,7 @@ import {
 	loadCaptureData,
 	createCaptureData,
 } from '@/utils/damageCaptureStorage'
+import { getBuffSkillPassiveMultiplier } from '@/utils/buffSkillCalculation'
 import type { PowerOptions } from '@/types/calculator'
 import { createInitialPowerOptions } from '@/utils/initialData'
 
@@ -190,10 +191,23 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				finalEnemyMDEF = adjustedStats.stats.MDEF
 			}
 
+			// バフスキルからパッシブ倍率を取得
+			const passiveMultiplier = getBuffSkillPassiveMultiplier(
+				calculatorData.buffSkills?.skills || null,
+				calculatorData.mainWeapon?.weaponType || null
+			)
+
+			console.log('=== PASSIVE MULTIPLIER ACQUISITION DEBUG ===')
+			console.log('calculatorData.buffSkills?.skills:', calculatorData.buffSkills?.skills)
+			console.log('calculatorData.mainWeapon?.weaponType:', calculatorData.mainWeapon?.weaponType)
+			console.log('passiveMultiplier:', passiveMultiplier)
+			console.log('==============================================')			
+
 			const input: DamageCalculationInput = {
 				...defaultInput,
 				playerLevel: calculatorData.baseStats.level,
 				referenceStat: totalATK, // 計算済みの総ATKを使用
+				passiveMultiplier: passiveMultiplier, // バフスキルから取得したパッシブ倍率を適用
 				// 敵情報を実際のデータに基づいて設定
 				enemyLevel: finalEnemyLevel,
 				stability: {
@@ -417,6 +431,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								originalHit.powerReference === 'MATK'
 									? calculationResults?.basicStats.MATK || 1500
 									: totalATK,
+							passiveMultiplier: passiveMultiplier, // パッシブ倍率をスキル攻撃にも適用
 							attackSkill: {
 								type: originalHit.attackType,
 								multiplier: hitResult.calculatedMultiplier,

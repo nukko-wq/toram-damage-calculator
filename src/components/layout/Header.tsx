@@ -2,7 +2,6 @@
 
 import React from 'react'
 import HeaderTitle from './HeaderTitle'
-import HeaderActions from './HeaderActions'
 
 interface HeaderProps {
 	className?: string
@@ -20,10 +19,6 @@ export default React.memo<HeaderProps>(function Header({ className = '' }) {
 					{/* サイトタイトル */}
 					<HeaderTitle />
 
-					{/* アクションボタン */}
-					<nav role="navigation" aria-label="ヘッダーアクション">
-						<HeaderActions />
-					</nav>
 				</div>
 			</div>
 		</header>

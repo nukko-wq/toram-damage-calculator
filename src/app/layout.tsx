@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
+import FloatingSavePanel from '@/components/layout/FloatingSavePanel'
 import ResultToggleBar from '@/components/layout/ResultToggleBar'
 import Footer from '@/components/layout/Footer'
 import { FloatingMenuSystem } from '@/components/floating-menu'
@@ -33,6 +34,7 @@ export default function RootLayout({
 			<body className={`${roboto.variable}`}>
 				<div className="min-h-screen bg-gray-50 grid grid-custom-layout">
 					<Header />
+					<FloatingSavePanel />
 					<ResultToggleBar />
 					<main className="col-start-1 col-end-5 row-start-4 row-end-5">
 						{children}
