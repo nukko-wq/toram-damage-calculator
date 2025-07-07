@@ -418,29 +418,45 @@ interface UISettings {
 }
 ```
 
-#### 13.2 MPブースト (survival2)
+#### 13.2 MPブースト (oh2)
 ```typescript
 {
-  id: 'survival2',
+  id: 'oh2',
   name: 'MPブースト',
   category: 'survival',
   type: 'level',
-  order: 1702,
+  order: 2101,
   maxLevel: 10,
   description: '最大MPを上昇させる',
   effects: [
     {
-      property: 'MP_Rate',
-      formula: 'skillLevel * 20',
+      property: 'MP',
+      formula: 'skillLevel * 30',
       conditions: []
     }
   ],
-  calculationFormula: 'MP% = skillLevel × 20',
+  calculationFormula: 'MP = skillLevel × 30',
+  example: {
+    skillLevel: 10,
+    calculation: 'MP = 10 × 30 = 300',
+    result: 'MP +300'
+  },
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
     showInModal: true,
     quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateMPBoostEffects(
+  skillLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  return {
+    MP: skillLevel * 30
   }
 }
 ```
