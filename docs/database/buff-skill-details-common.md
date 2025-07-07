@@ -87,71 +87,17 @@ interface UISettings {
 ```
 
 
-### 3. マーシャルスキル系統
-
-#### 3.1 スマッシュ (ma1)
-```typescript
-{
-  id: 'ma1',
-  name: 'スマッシュ',
-  category: 'martial',
-  type: 'level',
-  order: 401,
-  maxLevel: 10,
-  description: '攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 3.2 アシュラオーラ (ma2)
-```typescript
-{
-  id: 'ma2',
-  name: 'アシュラオーラ',
-  category: 'martial',
-  type: 'toggle',
-  order: 402,
-  description: '攻撃速度を上昇させる',
-  effects: [
-    {
-      property: 'AttackSpeed_Rate',
-      formula: '+100',
-      conditions: []
-    }
-  ],
-  calculationFormula: '攻撃速度% = base + 100',
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
-
-### 4. ハルバードスキル系統
+### 3. ハルバードスキル系統
 
 詳細は [buff-skills/halberd-skills.md](./buff-skills/halberd-skills.md) を参照してください。
 
 **含まれるスキル:**
-- 4.1 クイックオーラ (hb1) - 攻撃速度 = skillLevel × 50, 攻撃速度% = Math.floor(skillLevel × 2.5)
-- 4.2 神速の捌手 (godspeed_parry) - 武器依存の複合効果（スタック型）
+- 3.1 クイックオーラ (hb1) - 攻撃速度 = skillLevel × 50, 攻撃速度% = Math.floor(skillLevel × 2.5)
+- 3.2 神速の捌手 (godspeed_parry) - 武器依存の複合効果（スタック型）
 
-### 5. モノノフスキル系統
+### 4. モノノフスキル系統
 
-#### 5.1 武士道 (Mononof)
+#### 4.1 武士道 (Mononof)
 ```typescript
 {
   id: 'Mononof',
@@ -178,7 +124,7 @@ interface UISettings {
 }
 ```
 
-#### 5.2 明鏡止水 (mf1-1)
+#### 4.2 明鏡止水 (mf1-1)
 ```typescript
 {
   id: 'mf1-1',
@@ -205,7 +151,7 @@ interface UISettings {
 }
 ```
 
-#### 5.3 怪力乱神 (mf1)
+#### 4.3 怪力乱神 (mf1)
 ```typescript
 {
   id: 'mf1',
@@ -232,7 +178,7 @@ interface UISettings {
 }
 ```
 
-#### 5.4 両手持ち (sm1-1)
+#### 4.4 両手持ち (sm1-1)
 ```typescript
 {
   id: 'sm1-1',
@@ -320,9 +266,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 6. スプライトスキル系統
+### 5. スプライトスキル系統
 
-#### 6.1 パワーウェーブ (sprite1)
+#### 5.1 パワーウェーブ (sprite1)
 ```typescript
 {
   id: 'sprite1',
@@ -349,7 +295,7 @@ function calculateTwoHandsEffects(
 }
 ```
 
-#### 6.2 ヒール (heal1)
+#### 5.2 ヒール (heal1)
 ```typescript
 {
   id: 'heal1',
@@ -376,9 +322,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 7. プリーストスキル系統
+### 6. プリーストスキル系統
 
-#### 7.1 聖なる加護 (pr1)
+#### 6.1 聖なる加護 (pr1)
 ```typescript
 {
   id: 'pr1',
@@ -405,7 +351,7 @@ function calculateTwoHandsEffects(
 }
 ```
 
-#### 7.2 ネメシス (nemesis1)
+#### 6.2 ネメシス (nemesis1)
 ```typescript
 {
   id: 'nemesis1',
@@ -430,9 +376,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 8. ウィザードスキル系統
+### 7. ウィザードスキル系統
 
-#### 8.1 チェインキャスト (mg4)
+#### 7.1 チェインキャスト (mg4)
 ```typescript
 {
   id: 'mg4',
@@ -459,7 +405,7 @@ function calculateTwoHandsEffects(
 }
 ```
 
-#### 8.2 マジックマスタリ (mg1)
+#### 7.2 マジックマスタリ (mg1)
 ```typescript
 {
   id: 'mg1',
@@ -486,9 +432,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 9. ダークパワースキル系統
+### 8. ダークパワースキル系統
 
-#### 9.1 ダークパワー (DarkPower)
+#### 8.1 ダークパワー (DarkPower)
 ```typescript
 {
   id: 'DarkPower',
@@ -515,9 +461,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 10. シールドスキル系統
+### 9. シールドスキル系統
 
-#### 10.1 ハードボディ (shield3)
+#### 9.1 ハードボディ (shield3)
 ```typescript
 {
   id: 'shield3',
@@ -544,9 +490,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 11. ナイトスキル系統
+### 10. ナイトスキル系統
 
-#### 11.1 チャレンジ (challenge1)
+#### 10.1 チャレンジ (challenge1)
 ```typescript
 {
   id: 'challenge1',
@@ -571,9 +517,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 12. ハンタースキル系統
+### 11. ハンタースキル系統
 
-#### 12.1 レンジャーズサイト (hunter1)
+#### 11.1 レンジャーズサイト (hunter1)
 ```typescript
 {
   id: 'hunter1',
@@ -600,9 +546,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 13. アサシンスキル系統
+### 12. アサシンスキル系統
 
-#### 13.1 ヴァニッシュ (vanish1)
+#### 12.1 ヴァニッシュ (vanish1)
 ```typescript
 {
   id: 'vanish1',
@@ -627,9 +573,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 14. ニンジャスキル系統
+### 13. ニンジャスキル系統
 
-#### 14.1 忍術 (ninja2)
+#### 13.1 忍術 (ninja2)
 ```typescript
 {
   id: 'ninja2',
@@ -661,9 +607,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 15. サポートスキル系統
+### 14. サポートスキル系統
 
-#### 15.1 ファーストエイド (support1)
+#### 14.1 ファーストエイド (support1)
 ```typescript
 {
   id: 'support1',
@@ -690,9 +636,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 16. サバイバルスキル系統
+### 15. サバイバルスキル系統
 
-#### 16.1 HPブースト (survival1)
+#### 15.1 HPブースト (survival1)
 ```typescript
 {
   id: 'survival1',
@@ -719,7 +665,7 @@ function calculateTwoHandsEffects(
 }
 ```
 
-#### 16.2 MPブースト (survival2)
+#### 15.2 MPブースト (survival2)
 ```typescript
 {
   id: 'survival2',
@@ -746,7 +692,7 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 17. バトルスキル系統
+### 16. バトルスキル系統
 
 詳細は [buff-skills/battle-skills.md](./buff-skills/battle-skills.md) を参照してください。
 
@@ -757,9 +703,9 @@ function calculateTwoHandsEffects(
 - 17.4 驚異の威力 (exATK2) - 攻撃力upと同じ計算式
 - 17.5 更なる魔力 (exMATK2) - 魔法力upと同じ計算式
 
-### 18. ペット使用スキル系統
+### 17. ペット使用スキル系統
 
-#### 18.1 アニマル (pet1)
+#### 17.1 アニマル (pet1)
 ```typescript
 {
   id: 'pet1',
@@ -784,9 +730,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 19. デュアルソードスキル系統
+### 18. デュアルソードスキル系統
 
-#### 19.1 神速の軌跡 (ds1-2)
+#### 18.1 神速の軌跡 (ds1-2)
 ```typescript
 {
   id: 'ds1-2',
@@ -846,9 +792,9 @@ function calculateGodspeedTrajectoryEffects(
 }
 ```
 
-### 20. ミンストレルスキル系統
+### 19. ミンストレルスキル系統
 
-#### 20.1 インスピレーション (minstrel1)
+#### 19.1 インスピレーション (minstrel1)
 ```typescript
 {
   id: 'minstrel1',
