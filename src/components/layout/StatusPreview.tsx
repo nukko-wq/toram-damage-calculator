@@ -592,7 +592,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								magicalPenetration: { hasRate: true, hasFixed: false },
 								weaponATK: { hasRate: true, hasFixed: true },
 								elementPower: { hasRate: true, hasFixed: false },
-								unsheatheAttack: { hasRate: true, hasFixed: false },
+								unsheatheAttack: { hasRate: true, hasFixed: true },
 								shortRangeDamage: { hasRate: true, hasFixed: false },
 								longRangeDamage: { hasRate: true, hasFixed: false },
 								criticalDamage: { hasRate: true, hasFixed: true },
