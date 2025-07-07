@@ -993,7 +993,49 @@ function calculateTwoHandsEffects(
 }
 ```
 
-#### 17.2 攻撃力up (exATK1)
+#### 17.2 クリティカルup (oh1)
+```typescript
+{
+  id: 'oh1',
+  name: 'クリティカルup',
+  category: 'battle',
+  type: 'toggle',
+  order: 2202,
+  description: 'クリティカル率と命中時クリティカル率を上昇させる',
+  effects: [
+    {
+      property: 'Critical',
+      formula: '5',
+      conditions: []
+    },
+    {
+      property: 'Critical_Rate',
+      formula: '5',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'クリティカル率 = base + 5, クリティカル率% = base + 5',
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+
+// 実装用の効果計算関数
+function calculateCriticalUpEffects(
+  isEnabled: boolean
+): Partial<EquipmentProperties> {
+  if (!isEnabled) return {}
+  
+  return {
+    Critical: 5,
+    Critical_Rate: 5
+  }
+}
+```
+
+#### 17.3 攻撃力up (exATK1)
 ```typescript
 {
   id: 'exATK1',
@@ -1041,7 +1083,7 @@ function calculateAttackUpEffects(
 }
 ```
 
-#### 17.3 魔法力up (exMATK1)
+#### 17.4 魔法力up (exMATK1)
 ```typescript
 {
   id: 'exMATK1',
@@ -1089,7 +1131,7 @@ function calculateMagicUpEffects(
 }
 ```
 
-#### 17.4 驚異の威力 (exATK2)
+#### 17.5 驚異の威力 (exATK2)
 ```typescript
 {
   id: 'exATK2',
@@ -1138,7 +1180,7 @@ function calculateThreatPowerEffects(
 }
 ```
 
-#### 17.5 更なる魔力 (exMATK2)
+#### 17.6 更なる魔力 (exMATK2)
 ```typescript
 {
   id: 'exMATK2',
