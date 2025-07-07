@@ -297,6 +297,20 @@ export function calculateMagicUpEffects(
 }
 
 /**
+ * クイックオーラ(hb1)の効果計算関数
+ */
+export function calculateQuickAuraEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+	
+	return {
+		AttackSpeed: skillLevel * 50,
+		AttackSpeed_Rate: Math.floor(skillLevel * 2.5),
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -417,6 +431,20 @@ export function getBuffSkillBonuses(
 			quickSlash.level,
 			convertedWeaponType,
 		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// クイックオーラの処理
+	const quickAura = buffSkillData['hb1']
+	if (quickAura?.isEnabled && quickAura.level) {
+		const effects = calculateQuickAuraEffects(quickAura.level)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {

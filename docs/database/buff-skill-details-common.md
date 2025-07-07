@@ -241,22 +241,44 @@ interface UISettings {
   name: 'クイックオーラ',
   category: 'halberd',
   type: 'level',
-  order: 501,
+  order: 601,
   maxLevel: 10,
   description: '攻撃速度を上昇させる',
   effects: [
     {
+      property: 'AttackSpeed',
+      formula: 'skillLevel * 50',
+      conditions: []
+    },
+    {
       property: 'AttackSpeed_Rate',
-      formula: 'skillLevel * 10',
+      formula: 'Math.floor(skillLevel * 2.5)',
       conditions: []
     }
   ],
-  calculationFormula: '攻撃速度% = skillLevel × 10',
+  calculationFormula: '攻撃速度 = skillLevel × 50, 攻撃速度% = Math.floor(skillLevel × 2.5)',
+  example: {
+    skillLevel: 10,
+    calculation: 'AttackSpeed = 10 × 50 = 500, AttackSpeed_Rate = Math.floor(10 × 2.5) = Math.floor(25) = 25',
+    result: '攻撃速度 +500, 攻撃速度% +25'
+  },
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
     showInModal: true,
     quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateQuickAuraEffects(
+  skillLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  return {
+    AttackSpeed: skillLevel * 50,
+    AttackSpeed_Rate: Math.floor(skillLevel * 2.5)
   }
 }
 ```

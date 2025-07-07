@@ -1,7 +1,4 @@
-import type {
-	BuffSkillDefinition,
-	MainWeaponType,
-} from '@/types/buffSkill'
+import type { BuffSkillDefinition, MainWeaponType } from '@/types/buffSkill'
 
 // 共通バフスキル（35個）- 全武器種で使用可能
 export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
@@ -123,15 +120,15 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 				min: 1,
 				max: 10,
 				default: 10,
-				unit: 'Lv'
+				unit: 'Lv',
 			},
 			param2: {
 				name: 'スキルポイント合計',
 				min: 25,
 				max: 80,
 				default: 80,
-				unit: 'pt'
-			}
+				unit: 'pt',
+			},
 		},
 		order: 1401,
 	},
@@ -164,22 +161,22 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 				min: 1,
 				max: 10,
 				default: 10,
-				unit: 'Lv'
+				unit: 'Lv',
 			},
 			param2: {
 				name: 'バフエリア内のプレイヤーの数',
 				min: 0,
 				max: 4,
 				default: 4,
-				unit: '人'
+				unit: '人',
 			},
 			param3: {
 				name: '盾の精錬値',
 				min: 0,
 				max: 15,
 				default: 15,
-				unit: ''
-			}
+				unit: '',
+			},
 		},
 		order: 1601,
 	},
@@ -256,8 +253,8 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 				min: 1,
 				max: 2,
 				default: 2,
-				unit: ''
-			}
+				unit: '',
+			},
 		},
 		order: 2001,
 	},
@@ -666,15 +663,15 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 					min: 1,
 					max: 10,
 					default: 10,
-					unit: 'Lv'
+					unit: 'Lv',
 				},
 				param2: {
 					name: 'カウント数',
 					min: 1,
 					max: 100,
 					default: 100,
-					unit: ''
-				}
+					unit: '',
+				},
 			},
 			order: 809,
 		},
@@ -1240,22 +1237,22 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 					min: 1,
 					max: 10,
 					default: 10,
-					unit: 'Lv'
+					unit: 'Lv',
 				},
 				param2: {
 					name: 'ウィザードスキル習得数',
 					min: 0,
 					max: 14,
 					default: 14,
-					unit: '個'
+					unit: '個',
 				},
 				param3: {
 					name: '使用全スキルポイント',
 					min: 64,
 					max: 150,
 					default: 150,
-					unit: 'pt'
-				}
+					unit: 'pt',
+				},
 			},
 			order: 1203,
 		},
@@ -1347,22 +1344,22 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 					min: 1,
 					max: 10,
 					default: 10,
-					unit: 'Lv'
+					unit: 'Lv',
 				},
 				param2: {
 					name: 'ウィザードスキル習得数',
 					min: 0,
 					max: 14,
 					default: 14,
-					unit: '個'
+					unit: '個',
 				},
 				param3: {
 					name: '使用全スキルポイント',
 					min: 64,
 					max: 150,
 					default: 150,
-					unit: 'pt'
-				}
+					unit: 'pt',
+				},
 			},
 			order: 1203,
 		},
