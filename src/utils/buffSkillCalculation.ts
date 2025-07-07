@@ -521,6 +521,38 @@ export function getMagicUpEffects(
 }
 
 /**
+ * バフスキルデータから驚異の威力の効果を取得（プレイヤーレベルが必要）
+ */
+export function getThreatPowerEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	playerLevel: number,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 驚異の威力(exATK2)の処理
+	const threatPower = buffSkillData['exATK2']
+	if (threatPower?.isEnabled && threatPower.level) {
+		// 攻撃力upと同じ計算式を使用
+		const effects = calculateAttackUpEffects(
+			threatPower.level,
+			playerLevel,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
  * バフスキルデータから両手持ちの効果を取得（サブ武器情報が必要）
  */
 export function getTwoHandsEffects(

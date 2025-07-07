@@ -1089,6 +1089,55 @@ function calculateMagicUpEffects(
 }
 ```
 
+#### 17.4 驚異の威力 (exATK2)
+```typescript
+{
+  id: 'exATK2',
+  name: '驚異の威力',
+  category: 'battle',
+  type: 'level',
+  order: 2205,
+  maxLevel: 10,
+  description: 'プレイヤーレベルに比例してATKを上昇させる（攻撃力upより高い効果）',
+  effects: [
+    {
+      property: 'ATK',
+      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
+  example: {
+    playerLevel: 305,
+    skillLevel: 10,
+    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
+    result: 'ATK +76'
+  },
+  note: '攻撃力up (exATK1) と同じ計算式を使用',
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateThreatPowerEffects(
+  skillLevel: number,
+  playerLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  // ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
+  const atkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+  
+  return {
+    ATK: atkBonus
+  }
+}
+```
+
 ### 18. ペット使用スキル系統
 
 #### 18.1 アニマル (pet1)
