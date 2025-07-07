@@ -617,13 +617,6 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			order: 803,
 		},
 		{
-			id: 'ds1-1',
-			name: '神速の軌跡',
-			category: 'dualSword',
-			type: 'level',
-			order: 704,
-		},
-		{
 			id: '2-DSeclair',
 			name: 'フィロエクレール',
 			category: 'dualSword',

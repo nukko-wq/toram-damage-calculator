@@ -1214,9 +1214,71 @@ function calculateFurtherMagicEffects(
 }
 ```
 
-### 19. ミンストレルスキル系統
+### 19. デュアルソードスキル系統
 
-#### 19.1 インスピレーション (minstrel1)
+#### 19.1 神速の軌跡 (ds1-2)
+```typescript
+{
+  id: 'ds1-2',
+  name: '神速の軌跡',
+  category: 'dualSword',
+  type: 'level',
+  order: 801,
+  maxLevel: 10,
+  description: 'AGIと抜刀威力を上昇させる（双剣装備時は抜刀威力がより大きく上昇）',
+  effects: [
+    {
+      property: 'AGI',
+      formula: 'skillLevel + Math.max(skillLevel - 5, 0)',
+      conditions: []
+    },
+    {
+      property: 'UnsheatheAttack',
+      formula: 'mainWeapon === "dualSword" ? (15 + skillLevel) : (5 + skillLevel)',
+      conditions: ['武器種によって効果値変動']
+    }
+  ],
+  calculationFormula: 'AGI = スキルレベル + MAX(スキルレベル - 5, 0)\n双剣以外: 抜刀威力 = 5 + スキルレベル\n双剣装備時: 抜刀威力 = 15 + スキルレベル',
+  example: {
+    skillLevel: 10,
+    calculation: 'AGI = 10 + MAX(10 - 5, 0) = 10 + 5 = 15\n双剣以外: 抜刀威力 = 5 + 10 = 15\n双剣装備時: 抜刀威力 = 15 + 10 = 25',
+    result: 'AGI +15, 抜刀威力 +15(双剣以外) / +25(双剣)'
+  },
+  weaponRequirement: {
+    description: '全武器種で使用可能、双剣装備時は抜刀威力の効果が強化される'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateGodspeedTrajectoryEffects(
+  skillLevel: number,
+  mainWeaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  // AGI = スキルレベル + MAX(スキルレベル - 5, 0)
+  const agiBonus = skillLevel + Math.max(skillLevel - 5, 0)
+  
+  // 抜刀威力 = 双剣装備時は15+スキルレベル、それ以外は5+スキルレベル
+  const isDualSword = mainWeaponType === 'dualSword'
+  const unsheatheAttackBonus = isDualSword ? (15 + skillLevel) : (5 + skillLevel)
+  
+  return {
+    AGI: agiBonus,
+    UnsheatheAttack: unsheatheAttackBonus
+  }
+}
+```
+
+### 20. ミンストレルスキル系統
+
+#### 20.1 インスピレーション (minstrel1)
 ```typescript
 {
   id: 'minstrel1',
