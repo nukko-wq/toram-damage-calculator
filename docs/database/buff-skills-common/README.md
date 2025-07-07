@@ -8,14 +8,13 @@
 ## ファイル構造
 
 ```
-buff-skills/
+buff-skills-common/
 ├── README.md                    # このファイル
 ├── blade-skills.md             # ブレードスキル系統
 ├── halberd-skills.md           # ハルバードスキル系統
+├── mononofu-skills.md          # モノノフスキル系統
 ├── battle-skills.md            # バトルスキル系統
 ├── shoot-skills.md             # シュートスキル系統（予定）
-├── martial-skills.md           # マーシャルスキル系統（予定）
-├── mononofu-skills.md          # モノノフスキル系統（予定）
 ├── dualSword-skills.md         # デュアルソードスキル系統（予定）
 └── ... (他の系統)
 ```
@@ -24,16 +23,22 @@ buff-skills/
 
 ### ✅ blade-skills.md
 - **スキル系統**: ブレードスキル (category: 'blade')
-- **含まれるスキル**: 3スキル
+- **含まれるスキル**: 1スキル
   - ウォークライ (IsWarcry)
-  - ハードヒット (sm1) 
-  - アストラルブレイズ (sm6)
 
 ### ✅ halberd-skills.md
 - **スキル系統**: ハルバードスキル (category: 'halberd')
 - **含まれるスキル**: 2スキル
   - クイックオーラ (hb1)
   - 神速の捌手 (godspeed_parry)
+
+### ✅ mononofu-skills.md
+- **スキル系統**: モノノフスキル (category: 'mononofu')
+- **含まれるスキル**: 4スキル
+  - 武士道 (Mononof)
+  - 明鏡止水 (mf1-1)
+  - 怪力乱神 (mf1)
+  - 両手持ち (sm1-1)
 
 ## 分割予定ファイル
 

@@ -67,85 +67,10 @@ function calculateWarcryEffects(
 }
 ```
 
-### 1.2 ハードヒット (sm1)
-```typescript
-{
-  id: 'sm1',
-  name: 'ハードヒット',
-  category: 'blade',
-  type: 'level',
-  order: 202,
-  maxLevel: 10,
-  description: '攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-
-// 実装用の効果計算関数
-function calculateHardHitEffects(
-  skillLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  return {
-    ATK_Rate: skillLevel * 3
-  }
-}
-```
-
-### 1.3 アストラルブレイズ (sm6)
-```typescript
-{
-  id: 'sm6',
-  name: 'アストラルブレイズ',
-  category: 'blade',
-  type: 'toggle',
-  order: 203,
-  description: '武器ATKを上昇させる',
-  effects: [
-    {
-      property: 'WeaponATK_Rate',
-      formula: '+25',
-      conditions: []
-    }
-  ],
-  calculationFormula: '武器ATK% = base + 25',
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-
-// 実装用の効果計算関数
-function calculateAstralBlazeEffects(
-  isEnabled: boolean
-): Partial<EquipmentProperties> {
-  if (!isEnabled) return {}
-  
-  return {
-    WeaponATK_Rate: 25
-  }
-}
-```
 
 ## 実装ステータス
 
 - [x] ウォークライ (IsWarcry) - 設計完了
-- [x] ハードヒット (sm1) - 設計完了
-- [x] アストラルブレイズ (sm6) - 設計完了
 
 ## 関連ファイル
 

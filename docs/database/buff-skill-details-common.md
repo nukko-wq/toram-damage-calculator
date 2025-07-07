@@ -8,12 +8,13 @@
 **📁 分割ファイル構造**
 
 スキル系統ごとに詳細仕様を分割整理しています：
-- **ブレードスキル系統**: [buff-skills/blade-skills.md](./buff-skills/blade-skills.md) ✅
-- **ハルバードスキル系統**: [buff-skills/halberd-skills.md](./buff-skills/halberd-skills.md) ✅
-- **バトルスキル系統**: [buff-skills/battle-skills.md](./buff-skills/battle-skills.md) ✅
+- **ブレードスキル系統**: [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) ✅
+- **ハルバードスキル系統**: [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) ✅
+- **モノノフスキル系統**: [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) ✅
+- **バトルスキル系統**: [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
-詳細な分割状況は [buff-skills/README.md](./buff-skills/README.md) を参照してください。
+詳細な分割状況は [buff-skills-common/README.md](./buff-skills-common/README.md) を参照してください。
 
 ## データ構造
 
@@ -50,12 +51,10 @@ interface UISettings {
 
 ### 1. ブレードスキル系統
 
-詳細は [buff-skills/blade-skills.md](./buff-skills/blade-skills.md) を参照してください。
+詳細は [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 1.1 ウォークライ (IsWarcry) - ATK+300, 行動速度%+50
-- 1.2 ハードヒット (sm1) - ATK% = skillLevel × 3  
-- 1.3 アストラルブレイズ (sm6) - 武器ATK%+25
 
 ### 2. シュートスキル系統
 
@@ -89,7 +88,7 @@ interface UISettings {
 
 ### 3. ハルバードスキル系統
 
-詳細は [buff-skills/halberd-skills.md](./buff-skills/halberd-skills.md) を参照してください。
+詳細は [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 3.1 クイックオーラ (hb1) - 攻撃速度 = skillLevel × 50, 攻撃速度% = Math.floor(skillLevel × 2.5)
@@ -97,174 +96,13 @@ interface UISettings {
 
 ### 4. モノノフスキル系統
 
-#### 4.1 武士道 (Mononof)
-```typescript
-{
-  id: 'Mononof',
-  name: '武士道',
-  category: 'mononofu',
-  type: 'level',
-  order: 601,
-  maxLevel: 10,
-  description: 'クリティカル率を上昇させる',
-  effects: [
-    {
-      property: 'Critical_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'クリティカル率% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+詳細は [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) を参照してください。
 
-#### 4.2 明鏡止水 (mf1-1)
-```typescript
-{
-  id: 'mf1-1',
-  name: '明鏡止水',
-  category: 'mononofu',
-  type: 'level',
-  order: 602,
-  maxLevel: 10,
-  description: '回避を上昇させる',
-  effects: [
-    {
-      property: 'Dodge_Rate',
-      formula: 'skillLevel * 10',
-      conditions: []
-    }
-  ],
-  calculationFormula: '回避% = skillLevel × 10',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 4.3 怪力乱神 (mf1)
-```typescript
-{
-  id: 'mf1',
-  name: '怪力乱神',
-  category: 'mononofu',
-  type: 'level',
-  order: 603,
-  maxLevel: 10,
-  description: '攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 5',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 4.4 両手持ち (sm1-1)
-```typescript
-{
-  id: 'sm1-1',
-  name: '両手持ち',
-  category: 'mononofu',
-  type: 'toggle',
-  order: 704,
-  description: 'サブ武器を装備していない時に各種能力を上昇させる',
-  weaponConditionalEffects: {
-    // 抜刀剣の場合（サブ武器がなしまたは巻物の場合）
-    katana: {
-      conditions: ['サブ武器がなしまたは巻物'],
-      effects: [
-        { property: 'Accuracy_Rate', formula: '+10' },
-        { property: 'Stability_Rate', formula: '+10' },
-        { property: 'Critical', formula: '+10' },
-        { property: 'WeaponATK_Rate', formula: '+10' }
-      ]
-    },
-    // その他の武器（サブ武器がなしの場合のみ）
-    default: {
-      conditions: ['サブ武器がなし'],
-      effects: [
-        { property: 'Accuracy_Rate', formula: '+10' },
-        { property: 'Stability_Rate', formula: '+5' },
-        { property: 'Critical', formula: '+5' },
-        { property: 'WeaponATK_Rate', formula: '+10' }
-      ]
-    }
-  },
-  calculationFormula: `
-    抜刀剣装備時（サブ武器がなしまたは巻物）:
-    - 命中% = base + 10
-    - 安定率% = base + 10
-    - クリティカル = base + 10
-    - 武器ATK% = base + 10
-    
-    その他武器装備時（サブ武器がなし）:
-    - 命中% = base + 10
-    - 安定率% = base + 5
-    - クリティカル = base + 5
-    - 武器ATK% = base + 10
-  `,
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-
-// 実装用の効果計算関数
-function calculateTwoHandsEffects(
-  isEnabled: boolean,
-  mainWeaponType: MainWeaponType | null,
-  subWeaponType: SubWeaponType | null
-): Partial<EquipmentProperties> {
-  if (!isEnabled) return {}
-  
-  const isKatana = mainWeaponType === 'katana'
-  const isSubWeaponNone = !subWeaponType || subWeaponType === 'なし'
-  const isSubWeaponScroll = subWeaponType === '巻物'
-  
-  // 抜刀剣の場合：サブ武器がなしまたは巻物
-  if (isKatana && (isSubWeaponNone || isSubWeaponScroll)) {
-    return {
-      Accuracy_Rate: 10,
-      Stability_Rate: 10,
-      Critical: 10,
-      WeaponATK_Rate: 10
-    }
-  }
-  
-  // その他の武器の場合：サブ武器がなしのみ
-  if (!isKatana && isSubWeaponNone) {
-    return {
-      Accuracy_Rate: 10,
-      Stability_Rate: 5,
-      Critical: 5,
-      WeaponATK_Rate: 10
-    }
-  }
-  
-  // 効果条件を満たさない場合
-  return {}
-}
-```
+**含まれるスキル:**
+- 4.1 武士道 (Mononof) - クリティカル率% = skillLevel × 3
+- 4.2 明鏡止水 (mf1-1) - 回避% = skillLevel × 10
+- 4.3 怪力乱神 (mf1) - ATK% = skillLevel × 5
+- 4.4 両手持ち (sm1-1) - 武器依存の複合効果（トグル型）
 
 ### 5. スプライトスキル系統
 
@@ -376,65 +214,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 7. ウィザードスキル系統
+### 7. ダークパワースキル系統
 
-#### 7.1 チェインキャスト (mg4)
-```typescript
-{
-  id: 'mg4',
-  name: 'チェインキャスト',
-  category: 'wizard',
-  type: 'stack',
-  order: 901,
-  maxStack: 10,
-  description: '詠唱速度を重ねがけで上昇させる',
-  effects: [
-    {
-      property: 'CastingSpeed_Rate',
-      formula: 'stackCount * 15',
-      conditions: []
-    }
-  ],
-  calculationFormula: '詠唱速度% = stackCount × 15',
-  uiSettings: {
-    parameterName: '重ねがけ数',
-    parameterUnit: '回',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 7.2 マジックマスタリ (mg1)
-```typescript
-{
-  id: 'mg1',
-  name: 'マジックマスタリ',
-  category: 'wizard',
-  type: 'level',
-  order: 902,
-  maxLevel: 10,
-  description: '魔法攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'MATK% = skillLevel × 3',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-### 8. ダークパワースキル系統
-
-#### 8.1 ダークパワー (DarkPower)
+#### 7.1 ダークパワー (DarkPower)
 ```typescript
 {
   id: 'DarkPower',
@@ -461,38 +243,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 9. シールドスキル系統
+### 8. ナイトスキル系統
 
-#### 9.1 ハードボディ (shield3)
-```typescript
-{
-  id: 'shield3',
-  name: 'ハードボディ',
-  category: 'shield',
-  type: 'level',
-  order: 1101,
-  maxLevel: 10,
-  description: '物理防御力を上昇させる',
-  effects: [
-    {
-      property: 'DEF_Rate',
-      formula: 'skillLevel * 10',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'DEF% = skillLevel × 10',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-### 10. ナイトスキル系統
-
-#### 10.1 チャレンジ (challenge1)
+#### 8.1 チャレンジ (challenge1)
 ```typescript
 {
   id: 'challenge1',
@@ -517,9 +270,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 11. ハンタースキル系統
+### 9. ハンタースキル系統
 
-#### 11.1 レンジャーズサイト (hunter1)
+#### 9.1 レンジャーズサイト (hunter1)
 ```typescript
 {
   id: 'hunter1',
@@ -546,9 +299,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 12. アサシンスキル系統
+### 10. アサシンスキル系統
 
-#### 12.1 ヴァニッシュ (vanish1)
+#### 10.1 ヴァニッシュ (vanish1)
 ```typescript
 {
   id: 'vanish1',
@@ -573,9 +326,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 13. ニンジャスキル系統
+### 11. ニンジャスキル系統
 
-#### 13.1 忍術 (ninja2)
+#### 11.1 忍術 (ninja2)
 ```typescript
 {
   id: 'ninja2',
@@ -607,9 +360,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 14. サポートスキル系統
+### 12. サポートスキル系統
 
-#### 14.1 ファーストエイド (support1)
+#### 12.1 ファーストエイド (support1)
 ```typescript
 {
   id: 'support1',
@@ -636,9 +389,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 15. サバイバルスキル系統
+### 13. サバイバルスキル系統
 
-#### 15.1 HPブースト (survival1)
+#### 13.1 HPブースト (survival1)
 ```typescript
 {
   id: 'survival1',
@@ -665,7 +418,7 @@ function calculateTwoHandsEffects(
 }
 ```
 
-#### 15.2 MPブースト (survival2)
+#### 13.2 MPブースト (survival2)
 ```typescript
 {
   id: 'survival2',
@@ -692,9 +445,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 16. バトルスキル系統
+### 14. バトルスキル系統
 
-詳細は [buff-skills/battle-skills.md](./buff-skills/battle-skills.md) を参照してください。
+詳細は [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 17.1 クリティカルup (oh1) - Critical+5, CriticalDamage_Rate+5
@@ -703,9 +456,9 @@ function calculateTwoHandsEffects(
 - 17.4 驚異の威力 (exATK2) - 攻撃力upと同じ計算式
 - 17.5 更なる魔力 (exMATK2) - 魔法力upと同じ計算式
 
-### 17. ペット使用スキル系統
+### 15. ペット使用スキル系統
 
-#### 17.1 アニマル (pet1)
+#### 15.1 アニマル (pet1)
 ```typescript
 {
   id: 'pet1',
@@ -730,9 +483,9 @@ function calculateTwoHandsEffects(
 }
 ```
 
-### 18. デュアルソードスキル系統
+### 16. デュアルソードスキル系統
 
-#### 18.1 神速の軌跡 (ds1-2)
+#### 16.1 神速の軌跡 (ds1-2)
 ```typescript
 {
   id: 'ds1-2',
@@ -792,9 +545,9 @@ function calculateGodspeedTrajectoryEffects(
 }
 ```
 
-### 19. ミンストレルスキル系統
+### 17. ミンストレルスキル系統
 
-#### 19.1 インスピレーション (minstrel1)
+#### 17.1 インスピレーション (minstrel1)
 ```typescript
 {
   id: 'minstrel1',
@@ -825,9 +578,9 @@ function calculateGodspeedTrajectoryEffects(
 }
 ```
 
-### 20. パルチザンスキル系統
+### 18. パルチザンスキル系統
 
-#### 20.1 ガード (partisan1)
+#### 18.1 ガード (partisan1)
 ```typescript
 {
   id: 'partisan1',
