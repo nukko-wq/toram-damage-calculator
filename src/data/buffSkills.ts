@@ -18,7 +18,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'shoot',
 		type: 'level',
 		maxLevel: 10,
-		order: 301,
+		order: 302,
 	},
 
 	// ハルバードスキル
@@ -62,7 +62,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'mononofu',
 		type: 'level',
 		maxLevel: 10,
-		order: 603,
+		order: 704,
 	},
 
 	// デュアルソードスキル
@@ -420,7 +420,7 @@ export const NEARLY_COMMON_SKILLS: BuffSkillDefinition[] = [
 		name: '武士弓術',
 		category: 'shoot',
 		type: 'toggle',
-		order: 302,
+		order: 301,
 		requirements: [
 			{
 				exclude: {
@@ -507,7 +507,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 704,
+			order: 603,
 		},
 
 		// マジックブレードスキル
@@ -615,13 +615,6 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			category: 'dualSword',
 			type: 'level',
 			order: 803,
-		},
-		{
-			id: 'ds1-1',
-			name: '神速の軌跡',
-			category: 'dualSword',
-			type: 'level',
-			order: 704,
 		},
 		{
 			id: '2-DSeclair',
@@ -747,7 +740,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 704,
+			order: 603,
 		},
 
 		// マジックブレードスキル
@@ -816,7 +809,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 704,
+			order: 603,
 		},
 
 		// クラッシャースキル
@@ -919,7 +912,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 704,
+			order: 603,
 		},
 	],
 
@@ -1035,7 +1028,7 @@ export const WEAPON_SPECIFIC_SKILLS: Record<
 			name: '両手持ち',
 			category: 'mononofu',
 			type: 'toggle',
-			order: 704,
+			order: 603,
 		},
 	],
 

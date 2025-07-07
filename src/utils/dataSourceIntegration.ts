@@ -16,7 +16,7 @@ import type {
 } from '@/types/bonusCalculation'
 import type { CalculatorData } from '@/types/calculator'
 import { getCrystalById } from './crystalDatabase'
-import { getBuffSkillBonuses, getTwoHandsEffects, getAttackUpEffects, getMagicUpEffects, getThreatPowerEffects } from './buffSkillCalculation'
+import { getBuffSkillBonuses, getTwoHandsEffects, getAttackUpEffects, getMagicUpEffects, getThreatPowerEffects, getFurtherMagicEffects, getGodspeedTrajectoryEffects } from './buffSkillCalculation'
 
 /**
  * プロパティ値のバリデーション
@@ -534,6 +534,32 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 	
 	for (const [key, value] of Object.entries(threatPowerBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 更なる魔力スキルの補正値を追加（プレイヤーレベルが必要）
+	const furtherMagicBonuses = getFurtherMagicEffects(
+		data.buffSkills?.skills || null,
+		data.baseStats?.level || 1,
+	)
+	
+	for (const [key, value] of Object.entries(furtherMagicBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 神速の軌跡スキルの補正値を追加（武器タイプが必要）
+	const godspeedTrajectoryBonuses = getGodspeedTrajectoryEffects(
+		data.buffSkills?.skills || null,
+		data.mainWeapon?.weaponType || null,
+	)
+	
+	for (const [key, value] of Object.entries(godspeedTrajectoryBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

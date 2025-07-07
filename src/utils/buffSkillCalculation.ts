@@ -311,6 +311,29 @@ export function calculateQuickAuraEffects(
 }
 
 /**
+ * 神速の軌跡(ds1-2)の効果計算関数
+ */
+export function calculateGodspeedTrajectoryEffects(
+	skillLevel: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+	
+	const isDualSword = weaponType === 'dualSword'
+	
+	// AGI = スキルレベル + MAX(スキルレベル-5, 0)
+	const agiBonus = skillLevel + Math.max(skillLevel - 5, 0)
+	
+	// UnsheatheAttack = 双剣なら15+スキルレベル、それ以外なら5+スキルレベル
+	const unsheatheAttackBonus = isDualSword ? 15 + skillLevel : 5 + skillLevel
+	
+	return {
+		AGI: agiBonus,
+		UnsheatheAttack: unsheatheAttackBonus,
+	}
+}
+
+/**
  * バフスキルデータから全体の補正値を取得
  */
 export function getBuffSkillBonuses(
@@ -553,6 +576,38 @@ export function getThreatPowerEffects(
 }
 
 /**
+ * バフスキルデータから更なる魔力の効果を取得（プレイヤーレベルが必要）
+ */
+export function getFurtherMagicEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	playerLevel: number,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 更なる魔力(exMATK2)の処理
+	const furtherMagic = buffSkillData['exMATK2']
+	if (furtherMagic?.isEnabled && furtherMagic.level) {
+		// 魔法力upと同じ計算式を使用
+		const effects = calculateMagicUpEffects(
+			furtherMagic.level,
+			playerLevel,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
  * バフスキルデータから両手持ちの効果を取得（サブ武器情報が必要）
  */
 export function getTwoHandsEffects(
@@ -572,6 +627,38 @@ export function getTwoHandsEffects(
 			twoHands.isEnabled,
 			convertedWeaponType,
 			subWeaponType,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから神速の軌跡の効果を取得（武器タイプが必要）
+ */
+export function getGodspeedTrajectoryEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	weaponType: WeaponType | null,
+): Partial<AllBonuses> {
+	const convertedWeaponType = convertWeaponType(weaponType)
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 神速の軌跡(ds1-2)の処理
+	const godspeedTrajectory = buffSkillData['ds1-2']
+	if (godspeedTrajectory?.isEnabled && godspeedTrajectory.level) {
+		const effects = calculateGodspeedTrajectoryEffects(
+			godspeedTrajectory.level,
+			convertedWeaponType,
 		)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合

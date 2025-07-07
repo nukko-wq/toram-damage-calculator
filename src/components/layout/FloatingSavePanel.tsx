@@ -58,7 +58,7 @@ export default React.memo<FloatingSavePanelProps>(function FloatingSavePanel({
 
 	return (
 		<div
-			className={`fixed bottom-20 right-4 z-40 flex flex-col sm:flex-row gap-2 sm:gap-3 items-end bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-lg p-3 ${className}`}
+			className={`fixed bottom-24 right-4 z-40 flex flex-col sm:flex-row gap-2 sm:gap-3 items-end bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-lg p-3 ${className}`}
 		>
 			{/* 現在のセーブデータ名 */}
 			{currentSaveName && (
