@@ -102,7 +102,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// レスポンシブ表示制御
 	const [isMobile, setIsMobile] = useState(false)
-	const [activeSection, setActiveSection] = useState<keyof typeof visibleSections>('basicStats')
+	const [activeSection, setActiveSection] = useState<keyof typeof visibleSections | null>('basicStats')
 
 	// セクション表示の切り替え
 	const toggleSection = (section: keyof typeof visibleSections) => {
@@ -119,9 +119,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			setIsMobile(mediaQuery.matches)
 			// モバイル切り替え時に初期状態に設定
 			if (mediaQuery.matches) {
-				// モバイルでは基本ステータスのみ表示
+				// モバイルでは基本ステータスを初期表示
+				setActiveSection('basicStats')
 				setVisibleSections({
-					basicStats: false,
+					basicStats: true,
 					adjustedStats: false,
 					equipmentBonus1: false,
 					equipmentBonus2: false,
@@ -137,19 +138,31 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// モバイル用セクション切り替え処理
 	const handleMobileSectionChange = (section: keyof typeof visibleSections) => {
-		setActiveSection(section)
-		// モバイルでは選択されたセクションのみ表示
-		setVisibleSections({
-			basicStats: false,
-			adjustedStats: false,
-			equipmentBonus1: false,
-			equipmentBonus2: false,
-			equipmentBonus3: false,
-		})
-		setVisibleSections(prev => ({
-			...prev,
-			[section]: true,
-		}))
+		// 現在選択中のセクションと同じ場合はトグル（非表示）
+		if (activeSection === section && visibleSections[section]) {
+			setActiveSection(null) // アクティブセクションをクリア
+			setVisibleSections({
+				basicStats: false,
+				adjustedStats: false,
+				equipmentBonus1: false,
+				equipmentBonus2: false,
+				equipmentBonus3: false,
+			})
+		} else {
+			// 新しいセクションを選択
+			setActiveSection(section)
+			setVisibleSections({
+				basicStats: false,
+				adjustedStats: false,
+				equipmentBonus1: false,
+				equipmentBonus2: false,
+				equipmentBonus3: false,
+			})
+			setVisibleSections(prev => ({
+				...prev,
+				[section]: true,
+			}))
+		}
 	}
 
 	// フィルター変更処理
