@@ -78,3 +78,42 @@ export interface DataSourceBonuses {
 	food: Partial<AllBonuses>
 	buff: Partial<AllBonuses>
 }
+
+// 詳細データソース統合結果（フィルター機能用）
+export interface DetailedDataSourceBonuses {
+	equipment: {
+		main: Partial<AllBonuses>
+		body: Partial<AllBonuses>
+		additional: Partial<AllBonuses>
+		special: Partial<AllBonuses>
+		subWeapon: Partial<AllBonuses>
+		fashion1: Partial<AllBonuses>
+		fashion2: Partial<AllBonuses>
+		fashion3: Partial<AllBonuses>
+		freeInput1: Partial<AllBonuses>
+		freeInput2: Partial<AllBonuses>
+		freeInput3: Partial<AllBonuses>
+		enchantment: Partial<AllBonuses>
+	}
+	crystal: Partial<AllBonuses>
+	food: Partial<AllBonuses>
+	buffItems: Partial<AllBonuses>
+	buffSkills: Partial<AllBonuses>
+}
+
+// フィルターオプション型
+export type FilterOption = 
+	| 'all'
+	| 'main'
+	| 'subWeapon' 
+	| 'body'
+	| 'additional'
+	| 'special'
+	| 'enchantment'
+	| 'freeInput1'
+	| 'freeInput2'
+	| 'freeInput3'
+	| 'crystal'
+	| 'food'
+	| 'buffItems'
+	| 'buffSkills'
