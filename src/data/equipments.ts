@@ -155,6 +155,83 @@ export const equipmentsData: EquipmentsData = {
 					AbsoluteAccuracy_Rate: 5,
 				},
 			},
+			{
+				id: '',
+				name: '魅力的なくちびる',
+				properties: {
+					PhysicalResistance_Rate: 40,
+					AilmentResistance_Rate: 20,
+					MotionSpeed_Rate: 10
+				},
+			},
+			{
+				id: '',
+				name: 'エクトピエズム(軽鎧装備)',
+				properties: {
+					MP: 500,
+					MotionSpeed_Rate: 4,
+					Anticipate_Rate: 30,
+					AvoidRecharge_Rate: 20
+				},
+			},
+			{
+				id: '',
+				name: 'シュメッタヘアピン',
+				properties: {
+					MATK_Rate: 9,
+					INT_Rate: 9,
+					MagicalResistance_Rate: 9
+				},
+			},
+			{
+				id: '',
+				name: 'ジンジャーサンタ',
+				properties: {
+					MATK_Rate: 11,
+					INT_Rate: 10,
+					HP: 9000,
+					DarkResistance_Rate: 8
+				},
+			},
+			{
+				id: '',
+				name: 'エルモターバン',
+				properties: {
+					STR_Rate: 10,
+					INT_Rate: 10,
+					PhysicalPenetration_Rate: 10,
+					MagicalPenetration_Rate: 10,
+				},
+			},
+			{
+				id: '',
+				name: 'くわえクナイ',
+				properties: {
+					PhysicalPenetration_Rate: 10,
+					MotionSpeed_Rate: 10
+				},
+			},
+			{
+				id: '',
+				name: 'ブルーローズウィング',
+				properties: {
+					ShortRangeDamage_Rate: 11,
+					AttackSpeed: 1000,
+					LongRangeDamage_Rate: -10,
+					HP: -2000,
+					Dodge: 100,
+					AvoidRecharge_Rate: 10
+				},
+			},
+			{
+				id: '',
+				name: 'ほおひげ',
+				properties: {
+					STR_Rate: 5,
+					ShortRangeDamage_Rate: 6,
+					AttackSpeed: 400
+				},
+			},
 		],
 		special: [
 			{
@@ -174,6 +251,69 @@ export const equipmentsData: EquipmentsData = {
 					AttackSpeed: 1000,
 					PhysicalResistance_Rate: -9,
 					MagicalResistance_Rate: -9,
+				},
+			},
+			{
+				id: '',
+				name: '鮭トバのお守り',
+				properties: {
+					MP: 200,
+					Stability_Rate: 10,
+					MagicalPenetration_Rate: 5
+				},
+			},
+			{
+				id: '',
+				name: '冥氷の指輪(力)',
+				properties: {
+					MP: 500,
+					ATK_Rate: 3,
+					Anticipate_Rate: 7,
+					PhysicalFollowup_Rate: 50,
+					BladeReduction_Rate: 10
+				},
+			},
+			{
+				id: '',
+				name: '星詠みのランプ',
+				properties: {
+					MP: 300,
+					MagicalPenetration_Rate: 10,
+					NaturalMPRecovery_Rate: 20
+				},
+			},
+			{
+				id: '',
+				name: '竜落子の腕輪',
+				properties: {
+					MP: 400,
+					Critical: 20
+				},
+			},
+			{
+				id: '',
+				name: '爛漫の守石',
+				properties: {
+					MP: 200,
+					AttackSpeed: 750,
+					CastingSpeed: 750,
+					AilmentResistance_Rate: -8
+				},
+			},
+			{
+				id: '',
+				name: '熊戦士の帯',
+				properties: {
+					ShortRangeDamage_Rate: 2,
+					Critical: 15
+				},
+			},
+			{
+				id: '',
+				name: '熊戦士の帯(両手剣装備)',
+				properties: {
+					ShortRangeDamage_Rate: 2,
+					Critical: 30
 				},
 			},
 		],
@@ -198,6 +338,81 @@ export const equipmentsData: EquipmentsData = {
 					Aggro_Rate: -10,
 				},
 			},
+			{
+				id: '',
+				name: '刺身包丁(水+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					WaterResistance_Rate: 10,
+					Aggro_Rate: -15
+				},
+			},
+			{
+				id: '',
+				name: 'キッチンナイフ(地+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					EarthResistance_Rate: 10,
+					Aggro_Rate: -15
+				},
+			},
+			{
+				id: '',
+				name: '檎の枝剣(風+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					WindResistance_Rate: 5,
+					AttackSpeed_Rate: 5
+				},
+			},
+			{
+				id: '',
+				name: '白獣の短剣(闇+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					DarkResistance_Rate: 10,
+					AvoidRecharge_Rate: 15,
+					Dodge: 20
+				},
+			},
+			{
+				id: '',
+				name: 'ツッパリダガー(光+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					Critical: 10,
+					AttackSpeed_Rate: 15
+				},
+			},
+			{
+				id: '',
+				name: '溶解ナイフ(無+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					PhysicalPenetration_Rate: 5,
+					ArmorBreak_Rate: 5,
+					WaterResistance_Rate: -15
+				},
+			},
+			{
+				id: '',
+				name: 'ムーンライトダガー',
+				properties: {
+					MATK_Rate: 4,
+					DEX_Rate: 2,
+					MotionSpeed_Rate: 2
+				},
+			},
+			{
+				id: '',
+				name: 'チューニングナイフ',
+				properties: {
+					Stability_Rate: 10,
+					Critical: 10,
+					BladeReduction_Rate: 10
+				},
+			},
+
 		],
 		fashion1: [
 			{
