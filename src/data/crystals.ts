@@ -145,14 +145,30 @@ export const crystalsData: CrystalsData = {
 		armor: [
 			{
 				id: '049bea51-bcde-47f0-a6d8-8556cc74b628',
-				name: 'アルタダール(軽鎧装備)',
+				name: 'アルタダール',
 				type: 'armor',
 				properties: {
-					Stability_Rate: 6,
+					Stability_Rate: 11,
 					STR_Rate: 6,
 					VIT_Rate: 6,
-					ShortRangeDamage_Rate: 11,
 				},
+				memo1: '軽鎧装備時: 近距離威力+11% 安定率-5%',
+				memo2: '重鎧装備時: 遠距離威力+11%',
+				conditionalEffects: [
+					{
+						condition: { type: 'armor', armorType: 'light' },
+						properties: {
+							ShortRangeDamage_Rate: 11,
+							Stability_Rate: -5,
+						},
+						description: '軽鎧装備時: 近距離威力+11%, 安定率-5%',
+					},
+					{
+						condition: { type: 'armor', armorType: 'heavy' },
+						properties: { LongRangeDamage_Rate: 11 },
+						description: '重鎧装備時: 遠距離威力+11%',
+					},
+				],
 			},
 			{
 				id: 'ebc3fa48-5a5a-4134-94ff-dd20ad0133bc',
