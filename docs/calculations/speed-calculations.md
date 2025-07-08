@@ -24,7 +24,7 @@
 
 ### 基本計算式
 ```
-ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorType補正)/100)) + ASPD固定値
+ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorType補正 + ShieldType補正)/100)) + ASPD固定値
 ```
 
 ### ArmorType（防具の改造）補正
@@ -45,6 +45,19 @@ ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorTy
 - データベースレベル更新と同時にZustandストアの状態も強制更新される
 - StatusPreviewのASPD計算が自動的に再実行され、新しいArmorType補正が即座に反映される
 - 体装備以外のArmorType変更には影響しない（安全性確保）
+
+### ShieldType（盾装備）補正
+サブ武器に盾を装備している場合の内部ASPD%補正：
+
+| SubWeaponType | ASPD%補正 |
+|---------------|----------|
+| 盾 (shield) | -50% |
+| その他 | +0% |
+
+**重要な注意点:**
+- ShieldType補正は内部計算のみで使用され、StatusPreviewの装備品補正値には表示されません
+- 最終的なASPD計算にのみ影響し、表示上のASPD%には加算されません
+- ArmorType補正と同様に、内部での計算結果にのみ影響します
 
 ### ステータスASPD計算
 
@@ -86,12 +99,13 @@ ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorTy
 
 ### 計算例
 
-#### 例1: 片手剣 + 通常防具
+#### 例1: 片手剣 + 通常防具 + サブ武器なし
 **入力値:**
 - Lv: 150
 - STR: 200（補正後）
 - AGI: 150（補正後）
 - 武器種: 片手剣
+- サブ武器種: なし
 - ASPD%: 20%
 - ASPD固定値: 50
 - ArmorType: 通常 (normal)
@@ -101,16 +115,18 @@ ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorTy
 2. 武器補正値 = 100（片手剣）
 3. ASPD%適用前 = 150 + 670 + 100 = 920
 4. ArmorType補正 = 0%（通常）
-5. 実効ASPD% = 20% + 0% = 20%
-6. ASPD%適用後 = INT(920 × (1 + 20/100)) = INT(920 × 1.20) = INT(1104) = 1104
-7. 最終ASPD = 1104 + 50 = 1154
+5. ShieldType補正 = 0%（サブ武器なし）
+6. 実効ASPD% = 20% + 0% + 0% = 20%
+7. ASPD%適用後 = INT(920 × (1 + 20/100)) = INT(920 × 1.20) = INT(1104) = 1104
+8. 最終ASPD = 1104 + 50 = 1154
 
-#### 例2: 片手剣 + 軽量化防具
+#### 例2: 片手剣 + 軽量化防具 + サブ武器なし
 **入力値:**
 - Lv: 150
 - STR: 200（補正後）
 - AGI: 150（補正後）
 - 武器種: 片手剣
+- サブ武器種: なし
 - ASPD%: 20%
 - ASPD固定値: 50
 - ArmorType: 軽量化 (light)
@@ -120,16 +136,18 @@ ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorTy
 2. 武器補正値 = 100（片手剣）
 3. ASPD%適用前 = 150 + 670 + 100 = 920
 4. ArmorType補正 = +50%（軽量化）
-5. 実効ASPD% = 20% + 50% = 70%
-6. ASPD%適用後 = INT(920 × (1 + 70/100)) = INT(920 × 1.70) = INT(1564) = 1564
-7. 最終ASPD = 1564 + 50 = 1614
+5. ShieldType補正 = 0%（サブ武器なし）
+6. 実効ASPD% = 20% + 50% + 0% = 70%
+7. ASPD%適用後 = INT(920 × (1 + 70/100)) = INT(920 × 1.70) = INT(1564) = 1564
+8. 最終ASPD = 1564 + 50 = 1614
 
-#### 例3: 片手剣 + 重量化防具
+#### 例3: 片手剣 + 重量化防具 + サブ武器なし
 **入力値:**
 - Lv: 150
 - STR: 200（補正後）
 - AGI: 150（補正後）
 - 武器種: 片手剣
+- サブ武器種: なし
 - ASPD%: 20%
 - ASPD固定値: 50
 - ArmorType: 重量化 (heavy)
@@ -139,9 +157,31 @@ ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorTy
 2. 武器補正値 = 100（片手剣）
 3. ASPD%適用前 = 150 + 670 + 100 = 920
 4. ArmorType補正 = -50%（重量化）
-5. 実効ASPD% = 20% + (-50%) = -30%
-6. ASPD%適用後 = INT(920 × (1 + (-30)/100)) = INT(920 × 0.70) = INT(644) = 644
-7. 最終ASPD = 644 + 50 = 694
+5. ShieldType補正 = 0%（サブ武器なし）
+6. 実効ASPD% = 20% + (-50%) + 0% = -30%
+7. ASPD%適用後 = INT(920 × (1 + (-30)/100)) = INT(920 × 0.70) = INT(644) = 644
+8. 最終ASPD = 644 + 50 = 694
+
+#### 例4: 片手剣 + 通常防具 + 盾装備
+**入力値:**
+- Lv: 150
+- STR: 200（補正後）
+- AGI: 150（補正後）
+- 武器種: 片手剣
+- サブ武器種: 盾 (shield)
+- ASPD%: 20%
+- ASPD固定値: 50
+- ArmorType: 通常 (normal)
+
+**計算手順:**
+1. ステータスASPD = STR × 0.2 + AGI × 4.2 = 200 × 0.2 + 150 × 4.2 = 40 + 630 = 670
+2. 武器補正値 = 100（片手剣）
+3. ASPD%適用前 = 150 + 670 + 100 = 920
+4. ArmorType補正 = 0%（通常）
+5. ShieldType補正 = -50%（盾装備）
+6. 実効ASPD% = 20% + 0% + (-50%) = -30%
+7. ASPD%適用後 = INT(920 × (1 + (-30)/100)) = INT(920 × 0.70) = INT(644) = 644
+8. 最終ASPD = 644 + 50 = 694
 
 ### 構成要素
 
@@ -161,6 +201,11 @@ ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorTy
 - 体装備の防具の改造設定による内部ASPD%補正
 - StatusPreview表示には影響しない
 - 通常: 0%、軽量化: +50%、重量化: -50%
+
+**ShieldType補正（内部計算のみ）:**
+- サブ武器に盾を装備している場合の内部ASPD%補正
+- StatusPreview表示には影響しない
+- 盾: -50%、その他: 0%
 
 ## 行動速度（Motion Speed）計算
 
@@ -360,6 +405,7 @@ interface ASPDCalculationSteps {
   weaponBaseASPD: number
   aspdPercent: number
   armorTypeBonus: number
+  shieldTypeBonus: number
   effectiveASPDPercent: number
   aspdBase: number
   aspdAfterPercent: number
@@ -371,6 +417,7 @@ function calculateASPD(
   level: number,
   stats: AdjustedStats,
   weaponType: WeaponType,
+  subWeaponType: SubWeaponType,
   allBonuses: AllBonuses,
   armorType: ArmorType = 'normal'
 ): ASPDCalculationSteps {
@@ -386,16 +433,19 @@ function calculateASPD(
   // 4. ArmorType補正計算（内部計算のみ）
   const armorTypeBonus = getArmorTypeASPDBonus(armorType)
   
-  // 5. 実効ASPD%計算
-  const effectiveASPDPercent = aspdPercent + armorTypeBonus
+  // 5. ShieldType補正計算（内部計算のみ）
+  const shieldTypeBonus = getShieldTypeASPDBonus(subWeaponType)
   
-  // 6. ASPD基本値計算
+  // 6. 実効ASPD%計算
+  const effectiveASPDPercent = aspdPercent + armorTypeBonus + shieldTypeBonus
+  
+  // 7. ASPD基本値計算
   const aspdBase = level + statusASPD + weaponBaseASPD
   
-  // 7. ASPD%適用
+  // 8. ASPD%適用
   const aspdAfterPercent = Math.floor(aspdBase * (1 + effectiveASPDPercent / 100))
   
-  // 8. ASPD固定値加算
+  // 9. ASPD固定値加算
   const aspdFixed = allBonuses.AttackSpeed || 0
   const finalASPD = aspdAfterPercent + aspdFixed
   
@@ -405,6 +455,7 @@ function calculateASPD(
     weaponBaseASPD,
     aspdPercent,
     armorTypeBonus,
+    shieldTypeBonus,
     effectiveASPDPercent,
     aspdBase,
     aspdAfterPercent,
@@ -419,6 +470,13 @@ function getArmorTypeASPDBonus(armorType: ArmorType): number {
     case 'heavy': return -50  // 重量化: -50%
     case 'normal':
     default: return 0         // 通常: +0%
+  }
+}
+
+function getShieldTypeASPDBonus(subWeaponType: SubWeaponType): number {
+  switch (subWeaponType) {
+    case 'shield': return -50  // 盾: -50%
+    default: return 0          // その他: +0%
   }
 }
 ```
@@ -510,19 +568,28 @@ function calculateCSPD(
 ## 検証データ
 
 ### ASPD計算検証例
-| Lv | STR | AGI | 武器種 | ASPD% | ASPD固定 | ArmorType | 期待ASPD | 実測ASPD | 状態 |
-|----|-----|-----|--------|-------|----------|-----------|----------|----------|------|
-| 150 | 200 | 150 | 片手剣 | 20% | 50 | 通常 | 1154 | - | 🔄 |
-| 150 | 200 | 150 | 片手剣 | 20% | 50 | 軽量化 | 1614 | - | 🔄 |
-| 150 | 200 | 150 | 片手剣 | 20% | 50 | 重量化 | 694 | - | 🔄 |
+| Lv | STR | AGI | 武器種 | サブ武器 | ASPD% | ASPD固定 | ArmorType | 期待ASPD | 実測ASPD | 状態 |
+|----|-----|-----|--------|----------|-------|----------|-----------|----------|----------|------|
+| 150 | 200 | 150 | 片手剣 | なし | 20% | 50 | 通常 | 1154 | - | 🔄 |
+| 150 | 200 | 150 | 片手剣 | なし | 20% | 50 | 軽量化 | 1614 | - | 🔄 |
+| 150 | 200 | 150 | 片手剣 | なし | 20% | 50 | 重量化 | 694 | - | 🔄 |
+| 150 | 200 | 150 | 片手剣 | 盾 | 20% | 50 | 通常 | 694 | - | 🔄 |
 
 **ASPD計算詳細例（Lv:150, STR:200, AGI:150, 片手剣, 軽量化）:**
 1. ステータスASPD = 200 × 0.2 + 150 × 4.2 = 670
 2. 武器補正値 = 100（片手剣）
 3. ASPD基本値 = 150 + 670 + 100 = 920
-4. 実効ASPD% = 20% + 50%（軽量化） = 70%
+4. 実効ASPD% = 20% + 50%（軽量化） + 0%（サブ武器なし） = 70%
 5. ASPD%適用後 = INT(920 × 1.70) = 1564
 6. 最終ASPD = 1564 + 50 = 1614
+
+**ASPD計算詳細例（Lv:150, STR:200, AGI:150, 片手剣, 通常, 盾装備）:**
+1. ステータスASPD = 200 × 0.2 + 150 × 4.2 = 670
+2. 武器補正値 = 100（片手剣）
+3. ASPD基本値 = 150 + 670 + 100 = 920
+4. 実効ASPD% = 20% + 0%（通常） + (-50%)（盾） = -30%
+5. ASPD%適用後 = INT(920 × 0.70) = 644
+6. 最終ASPD = 644 + 50 = 694
 
 ### 行動速度計算検証例
 | ASPD | 行動速度% | 期待行動速度 | 実測行動速度 | 状態 |
@@ -542,6 +609,7 @@ function calculateCSPD(
 
 | 日付 | 更新内容 | 備考 |
 |------|----------|------|
+| 2025-07-08 | ASPD計算式にShieldType補正を追加 | 盾装備時-50%、内部計算のみでStatusPreview表示に影響しない |
 | 2025-06-28 | ASPD・CSPD・行動速度計算の専用ファイル作成 | basic-stats.mdから分離、TypeScript実装例と検証データを追加 |
 | 2025-06-28 | ASPD計算式にArmorType補正を追加 | 軽量化+50%、重量化-50%、内部計算のみでUI表示に影響しない |
 | 2024-06-25 | 行動速度計算式を追加 | MIN/MAX/INT関数使用、ASPD依存、50%上限制限 |
