@@ -156,7 +156,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq001-2345-6789-abcd-ef0123456789',
 				name: '魅力的なくちびる',
 				properties: {
 					PhysicalResistance_Rate: 40,
@@ -165,7 +165,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq002-3456-789a-bcde-f01234567890',
 				name: 'エクトピエズム(軽鎧装備)',
 				properties: {
 					MP: 500,
@@ -175,7 +175,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq003-4567-89ab-cdef-012345678901',
 				name: 'シュメッタヘアピン',
 				properties: {
 					MATK_Rate: 9,
@@ -184,7 +184,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq004-5678-9abc-def0-123456789012',
 				name: 'ジンジャーサンタ',
 				properties: {
 					MATK_Rate: 11,
@@ -194,7 +194,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq005-6789-abcd-ef01-234567890123',
 				name: 'エルモターバン',
 				properties: {
 					STR_Rate: 10,
@@ -204,7 +204,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq006-789a-bcde-f012-345678901234',
 				name: 'くわえクナイ',
 				properties: {
 					PhysicalPenetration_Rate: 10,
@@ -212,7 +212,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq007-89ab-cdef-0123-456789012345',
 				name: 'ブルーローズウィング',
 				properties: {
 					ShortRangeDamage_Rate: 11,
@@ -224,7 +224,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq008-9abc-def0-1234-567890123456',
 				name: 'ほおひげ',
 				properties: {
 					STR_Rate: 5,
@@ -254,7 +254,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq009-abcd-ef01-2345-678901234567',
 				name: '鮭トバのお守り',
 				properties: {
 					MP: 200,
@@ -263,7 +263,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq010-bcde-f012-3456-789012345678',
 				name: '冥氷の指輪(力)',
 				properties: {
 					MP: 500,
@@ -274,7 +274,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq011-cdef-0123-4567-890123456789',
 				name: '星詠みのランプ',
 				properties: {
 					MP: 300,
@@ -283,7 +283,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq012-def0-1234-5678-90123456789a',
 				name: '竜落子の腕輪',
 				properties: {
 					MP: 400,
@@ -291,7 +291,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq013-ef01-2345-6789-0123456789ab',
 				name: '爛漫の守石',
 				properties: {
 					MP: 200,
@@ -301,7 +301,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq014-f012-3456-789a-bcdef0123456',
 				name: '熊戦士の帯',
 				properties: {
 					ShortRangeDamage_Rate: 2,
@@ -309,7 +309,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq015-0123-4567-89ab-cdef01234567',
 				name: '熊戦士の帯(両手剣装備)',
 				properties: {
 					ShortRangeDamage_Rate: 2,
@@ -339,7 +339,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq016-1234-5678-9abc-def012345678',
 				name: '刺身包丁(水+)',
 				properties: {
 					ElementAdvantage_Rate: 5,
@@ -348,7 +348,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq017-2345-6789-abcd-ef0123456789',
 				name: 'キッチンナイフ(地+)',
 				properties: {
 					ElementAdvantage_Rate: 5,
@@ -357,7 +357,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq018-3456-789a-bcde-f01234567890',
 				name: '檎の枝剣(風+)',
 				properties: {
 					ElementAdvantage_Rate: 5,
@@ -366,7 +366,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq019-4567-89ab-cdef-012345678901',
 				name: '白獣の短剣(闇+)',
 				properties: {
 					ElementAdvantage_Rate: 5,
@@ -376,7 +376,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq020-5678-9abc-def0-123456789012',
 				name: 'ツッパリダガー(光+)',
 				properties: {
 					ElementAdvantage_Rate: 5,
@@ -385,7 +385,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq021-6789-abcd-ef01-234567890123',
 				name: '溶解ナイフ(無+)',
 				properties: {
 					ElementAdvantage_Rate: 5,
@@ -395,7 +395,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq022-789a-bcde-f012-345678901234',
 				name: 'ムーンライトダガー',
 				properties: {
 					MATK_Rate: 4,
@@ -404,7 +404,7 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
-				id: '',
+				id: 'eq023-89ab-cdef-0123-456789012345',
 				name: 'チューニングナイフ',
 				properties: {
 					Stability_Rate: 10,
