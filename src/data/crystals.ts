@@ -40,6 +40,18 @@ export const crystalsData: CrystalsData = {
 				},
 				memo1: '盾装備時: ヘイト-50%',
 				memo2: '短剣装備時: クリティカルダメージ+1%',
+				conditionalEffects: [
+					{
+						condition: { type: 'subWeapon', weaponType: '盾' },
+						properties: { Aggro_Rate: -50 },
+						description: '盾装備時: ヘイト-50%',
+					},
+					{
+						condition: { type: 'subWeapon', weaponType: 'ナイフ' },
+						properties: { CriticalDamage_Rate: 1 },
+						description: '短剣装備時: クリティカルダメージ+1%',
+					},
+				],
 			},
 			{
 				id: 'a88d8016-d3a8-4e31-9a21-99eaf6fe107b',
@@ -224,6 +236,18 @@ export const crystalsData: CrystalsData = {
 				},
 				memo1: '片手剣装備時：ヘイト+15%',
 				memo2: '手甲装備時：ヘイト+15%',
+				conditionalEffects: [
+					{
+						condition: { type: 'mainWeapon', weaponType: '片手剣' },
+						properties: { Aggro_Rate: 15 },
+						description: '片手剣装備時：ヘイト+15%',
+					},
+					{
+						condition: { type: 'mainWeapon', weaponType: '手甲' },
+						properties: { Aggro_Rate: 15 },
+						description: '手甲装備時：ヘイト+15%',
+					},
+				],
 			},
 		],
 		additional: [
@@ -296,6 +320,13 @@ export const crystalsData: CrystalsData = {
 					Aggro_Rate: -15,
 				},
 				memo1: '盾装備時: 行動速度+1%',
+				conditionalEffects: [
+					{
+						condition: { type: 'subWeapon', weaponType: '盾' },
+						properties: { MotionSpeed_Rate: 1 },
+						description: '盾装備時: 行動速度+1%',
+					},
+				],
 			},
 		],
 		special: [
@@ -367,6 +398,13 @@ export const crystalsData: CrystalsData = {
 					FractionalBarrier: 5,
 				},
 				memo1: '重鎧装備時: 物理耐性+15%',
+				conditionalEffects: [
+					{
+						condition: { type: 'armor', armorType: 'heavy' },
+						properties: { PhysicalResistance_Rate: 15 },
+						description: '重鎧装備時: 物理耐性+15%',
+					},
+				],
 			},
 			{
 				id: '89012345-6789-abcd-ef01-23456789abcd',
@@ -380,6 +418,18 @@ export const crystalsData: CrystalsData = {
 				},
 				memo1: '軽鎧装備時：バリア速度+10%',
 				memo2: '重鎧装備時：割合バリア+10%',
+				conditionalEffects: [
+					{
+						condition: { type: 'armor', armorType: 'light' },
+						properties: { BarrierCooldown_Rate: 10 },
+						description: '軽鎧装備時：バリア速度+10%',
+					},
+					{
+						condition: { type: 'armor', armorType: 'heavy' },
+						properties: { FractionalBarrier: 10 },
+						description: '重鎧装備時：割合バリア+10%',
+					},
+				],
 			},
 		],
 		normal: [
