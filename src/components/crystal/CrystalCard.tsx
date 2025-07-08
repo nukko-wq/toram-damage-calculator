@@ -3,6 +3,7 @@
 import type { Crystal } from '@/types/calculator'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
 import type { SlotInfo } from '@/types/damagePreview'
+import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
 
 interface CrystalCardProps {
 	crystal: Crystal
@@ -262,7 +263,26 @@ export default function CrystalCard({
 				</div>
 			)}
 
-			{/* メモ */}
+			{/* 条件付き効果 */}
+			{crystal.conditionalEffects && crystal.conditionalEffects.length > 0 && (
+				<div className="text-sm text-blue-600 space-y-1">
+					{crystal.conditionalEffects.map((effect, index) => {
+						const { conditionText, effectTexts } = formatConditionalEffect(effect)
+						return (
+							<div key={`${crystal.id}-condition-${index}`} className="space-y-1">
+								<div className="font-medium">{conditionText}：</div>
+								{effectTexts.map((effectText, effectIndex) => (
+									<div key={`${crystal.id}-effect-${index}-${effectIndex}`} className="ml-2">
+										{effectText}
+									</div>
+								))}
+							</div>
+						)
+					})}
+				</div>
+			)}
+			
+			{/* メモ（後方互換性） */}
 			{(crystal.memo1 || crystal.memo2) && (
 				<div className="text-sm text-blue-600 space-y-1">
 					{crystal.memo1 && <div className="">{crystal.memo1}</div>}
