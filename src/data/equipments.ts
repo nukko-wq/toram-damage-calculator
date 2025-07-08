@@ -232,6 +232,16 @@ export const equipmentsData: EquipmentsData = {
 					AttackSpeed: 400,
 				},
 			},
+			{
+				id: 'eq024-abcd-ef01-2345-67890123456a',
+				name: 'キンピカファーファン',
+				properties: {
+					Anticipate_Rate: 30,
+					ArmorBreak_Rate: 30,
+					Aggro_Rate: 50,
+					NeutralResistance_Rate: 40
+				},
+			},
 		],
 		special: [
 			{
