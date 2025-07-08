@@ -13,8 +13,10 @@ import type { EnemyFormData } from '@/types/calculator'
  */
 export function useEnemyData() {
 	const saveDataEnemyInfo = useCalculatorStore((state) => state.data.enemy)
-	const getEnemySettings = useEnemySettingsStore((state) => state.getEnemySettings)
-	
+	const getEnemySettings = useEnemySettingsStore(
+		(state) => state.getEnemySettings,
+	)
+
 	const enemyFormData = useMemo((): EnemyFormData => {
 		// 選択された敵がない場合
 		if (!saveDataEnemyInfo.selectedEnemyId) {
@@ -32,7 +34,7 @@ export function useEnemyData() {
 
 		// 選択された敵の設定を取得
 		const enemySettings = getEnemySettings(saveDataEnemyInfo.selectedEnemyId)
-		
+
 		return {
 			selectedId: saveDataEnemyInfo.selectedEnemyId,
 			type: saveDataEnemyInfo.enemyType,
@@ -41,7 +43,7 @@ export function useEnemyData() {
 			manualOverrides: enemySettings.manualOverrides,
 		}
 	}, [saveDataEnemyInfo, getEnemySettings])
-	
+
 	return {
 		enemyFormData,
 	}

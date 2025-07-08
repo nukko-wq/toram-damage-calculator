@@ -18,7 +18,8 @@ export default function ImportModal({
 	const [dragActive, setDragActive] = useState(false)
 	const [isValidating, setIsValidating] = useState(false)
 	const [error, setError] = useState<string | null>(null)
-	const [validationResult, setValidationResult] = useState<ImportValidationResult | null>(null)
+	const [validationResult, setValidationResult] =
+		useState<ImportValidationResult | null>(null)
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	// モーダルが開いたときの初期化
@@ -182,13 +183,14 @@ export default function ImportModal({
 						<label className="block text-sm font-medium text-gray-700 mb-3">
 							バックアップファイルを選択してください
 						</label>
-						
+
 						<div
 							className={`
 								border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer
-								${dragActive 
-									? 'border-blue-500 bg-blue-50' 
-									: 'border-gray-300 hover:border-gray-400'
+								${
+									dragActive
+										? 'border-blue-500 bg-blue-50'
+										: 'border-gray-300 hover:border-gray-400'
 								}
 								${!importAvailable ? 'opacity-50 cursor-not-allowed' : ''}
 							`}
@@ -206,7 +208,7 @@ export default function ImportModal({
 								onChange={(e) => handleFileSelect(e.target.files)}
 								disabled={!importAvailable}
 							/>
-							
+
 							{isValidating ? (
 								<div className="space-y-2">
 									<svg
@@ -228,9 +230,7 @@ export default function ImportModal({
 											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 										/>
 									</svg>
-									<p className="text-sm text-gray-600">
-										ファイルを検証中...
-									</p>
+									<p className="text-sm text-gray-600">ファイルを検証中...</p>
 								</div>
 							) : (
 								<div className="space-y-2">
@@ -251,9 +251,7 @@ export default function ImportModal({
 										<p className="text-base font-medium">
 											ファイルを選択またはここにドラッグ&ドロップ
 										</p>
-										<p className="text-sm">
-											JSONファイルのみ対応
-										</p>
+										<p className="text-sm">JSONファイルのみ対応</p>
 									</div>
 								</div>
 							)}
@@ -264,11 +262,13 @@ export default function ImportModal({
 					{validationResult && (
 						<div className="space-y-4">
 							{/* 成功/失敗状態 */}
-							<div className={`p-4 rounded-md ${
-								validationResult.isValid 
-									? 'bg-green-50 border border-green-200' 
-									: 'bg-red-50 border border-red-200'
-							}`}>
+							<div
+								className={`p-4 rounded-md ${
+									validationResult.isValid
+										? 'bg-green-50 border border-green-200'
+										: 'bg-red-50 border border-red-200'
+								}`}
+							>
 								<div className="flex">
 									<div className="flex-shrink-0">
 										{validationResult.isValid ? (
@@ -298,13 +298,16 @@ export default function ImportModal({
 										)}
 									</div>
 									<div className="ml-3">
-										<p className={`text-sm ${
-											validationResult.isValid ? 'text-green-800' : 'text-red-800'
-										}`}>
-											{validationResult.isValid 
-												? 'ファイルの検証が完了しました' 
-												: 'ファイルの検証に失敗しました'
-											}
+										<p
+											className={`text-sm ${
+												validationResult.isValid
+													? 'text-green-800'
+													: 'text-red-800'
+											}`}
+										>
+											{validationResult.isValid
+												? 'ファイルの検証が完了しました'
+												: 'ファイルの検証に失敗しました'}
 										</p>
 									</div>
 								</div>
@@ -318,86 +321,112 @@ export default function ImportModal({
 									</h4>
 									<div className="space-y-1 text-sm text-gray-600">
 										{validationResult.data.saveData && (
-											<div>• セーブデータ: {validationResult.data.saveData.saves?.length || 0}個</div>
+											<div>
+												• セーブデータ:{' '}
+												{validationResult.data.saveData.saves?.length || 0}個
+											</div>
 										)}
 										{validationResult.data.customData?.equipment && (
-											<div>• カスタム装備: {validationResult.data.customData.equipment.length}個</div>
+											<div>
+												• カスタム装備:{' '}
+												{validationResult.data.customData.equipment.length}個
+											</div>
 										)}
 										{validationResult.data.customData?.crystals && (
-											<div>• カスタムクリスタル: {validationResult.data.customData.crystals.length}個</div>
+											<div>
+												• カスタムクリスタル:{' '}
+												{validationResult.data.customData.crystals.length}個
+											</div>
 										)}
 										{validationResult.data.settings && (
 											<div>• 設定データ: 1個</div>
 										)}
 										<div className="text-xs text-gray-500 mt-2">
-											エクスポート日時: {validationResult.data.exportDate ? new Date(validationResult.data.exportDate).toLocaleString('ja-JP') : '不明'}
+											エクスポート日時:{' '}
+											{validationResult.data.exportDate
+												? new Date(
+														validationResult.data.exportDate,
+													).toLocaleString('ja-JP')
+												: '不明'}
 										</div>
 									</div>
 								</div>
 							)}
 
 							{/* 競合警告 */}
-							{validationResult.conflicts && (
-								Object.values(validationResult.conflicts).some(arr => arr.length > 0)
-							) && (
-								<div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-									<div className="flex">
-										<div className="flex-shrink-0">
-											<svg
-												className="h-5 w-5 text-yellow-400"
-												viewBox="0 0 20 20"
-												fill="currentColor"
-											>
-												<path
-													fillRule="evenodd"
-													d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-													clipRule="evenodd"
-												/>
-											</svg>
-										</div>
-										<div className="ml-3">
-											<h4 className="text-sm font-medium text-yellow-800">
-												競合するデータがあります
-											</h4>
-											<div className="mt-2 text-sm text-yellow-700">
-												{validationResult.conflicts.saveData.length > 0 && (
-													<div>• セーブデータ: {validationResult.conflicts.saveData.join(', ')}</div>
-												)}
-												{validationResult.conflicts.equipment.length > 0 && (
-													<div>• カスタム装備: {validationResult.conflicts.equipment.join(', ')}</div>
-												)}
-												{validationResult.conflicts.crystals.length > 0 && (
-													<div>• カスタムクリスタル: {validationResult.conflicts.crystals.join(', ')}</div>
-												)}
-												<div className="mt-1 text-xs">
-													競合するデータは自動的に名前が変更されてインポートされます
+							{validationResult.conflicts &&
+								Object.values(validationResult.conflicts).some(
+									(arr) => arr.length > 0,
+								) && (
+									<div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+										<div className="flex">
+											<div className="flex-shrink-0">
+												<svg
+													className="h-5 w-5 text-yellow-400"
+													viewBox="0 0 20 20"
+													fill="currentColor"
+												>
+													<path
+														fillRule="evenodd"
+														d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+														clipRule="evenodd"
+													/>
+												</svg>
+											</div>
+											<div className="ml-3">
+												<h4 className="text-sm font-medium text-yellow-800">
+													競合するデータがあります
+												</h4>
+												<div className="mt-2 text-sm text-yellow-700">
+													{validationResult.conflicts.saveData.length > 0 && (
+														<div>
+															• セーブデータ:{' '}
+															{validationResult.conflicts.saveData.join(', ')}
+														</div>
+													)}
+													{validationResult.conflicts.equipment.length > 0 && (
+														<div>
+															• カスタム装備:{' '}
+															{validationResult.conflicts.equipment.join(', ')}
+														</div>
+													)}
+													{validationResult.conflicts.crystals.length > 0 && (
+														<div>
+															• カスタムクリスタル:{' '}
+															{validationResult.conflicts.crystals.join(', ')}
+														</div>
+													)}
+													<div className="mt-1 text-xs">
+														競合するデータは自動的に名前が変更されてインポートされます
+													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-							)}
+								)}
 
 							{/* 警告とエラー */}
-							{validationResult.warnings && validationResult.warnings.length > 0 && (
-								<div className="space-y-1">
-									{validationResult.warnings.map((warning, index) => (
-										<div key={index} className="text-sm text-yellow-600">
-											⚠️ {warning}
-										</div>
-									))}
-								</div>
-							)}
+							{validationResult.warnings &&
+								validationResult.warnings.length > 0 && (
+									<div className="space-y-1">
+										{validationResult.warnings.map((warning, index) => (
+											<div key={index} className="text-sm text-yellow-600">
+												⚠️ {warning}
+											</div>
+										))}
+									</div>
+								)}
 
-							{validationResult.errors && validationResult.errors.length > 0 && (
-								<div className="space-y-1">
-									{validationResult.errors.map((error, index) => (
-										<div key={index} className="text-sm text-red-600">
-											❌ {error}
-										</div>
-									))}
-								</div>
-							)}
+							{validationResult.errors &&
+								validationResult.errors.length > 0 && (
+									<div className="space-y-1">
+										{validationResult.errors.map((error, index) => (
+											<div key={index} className="text-sm text-red-600">
+												❌ {error}
+											</div>
+										))}
+									</div>
+								)}
 						</div>
 					)}
 
@@ -443,7 +472,8 @@ export default function ImportModal({
 							</div>
 							<div className="ml-3">
 								<p className="text-sm text-blue-800">
-									<strong>注意:</strong> インポートにより現在のデータが上書きされる可能性があります。
+									<strong>注意:</strong>{' '}
+									インポートにより現在のデータが上書きされる可能性があります。
 									重要なデータは事前にエクスポートしてバックアップを取得することを推奨します。
 								</p>
 							</div>
@@ -462,7 +492,9 @@ export default function ImportModal({
 					</button>
 					<button
 						onClick={handleImport}
-						disabled={!validationResult?.isValid || isValidating || !importAvailable}
+						disabled={
+							!validationResult?.isValid || isValidating || !importAvailable
+						}
 						className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						インポート

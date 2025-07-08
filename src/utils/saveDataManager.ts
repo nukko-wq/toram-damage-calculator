@@ -9,7 +9,10 @@ import type {
 	UpdateNotification,
 } from '@/types/calculator'
 import { StorageHelper, STORAGE_KEYS } from './storage'
-import { createInitialCalculatorData, createInitialPowerOptions } from './initialData'
+import {
+	createInitialCalculatorData,
+	createInitialPowerOptions,
+} from './initialData'
 import {
 	checkAndUpdatePresetData,
 	forceResetPresetData,
@@ -145,7 +148,7 @@ function migrateSaveData(saveData: SaveData): SaveData {
 			},
 		}
 	}
-	
+
 	return saveData
 }
 
@@ -165,11 +168,11 @@ export async function loadSaveData(id: string): Promise<SaveData> {
 
 	// マイグレーション実行
 	const migratedSaveData = migrateSaveData(saveData)
-	
+
 	// マイグレーションにより変更があった場合は保存
 	if (migratedSaveData !== saveData) {
-		const updatedList = saveDataList.map(save => 
-			save.id === id ? migratedSaveData : save
+		const updatedList = saveDataList.map((save) =>
+			save.id === id ? migratedSaveData : save,
 		)
 		StorageHelper.set(STORAGE_KEYS.SAVE_DATA_LIST, updatedList)
 	}
@@ -398,10 +401,13 @@ async function validateStorageIntegrity(): Promise<boolean> {
  */
 async function checkStorageVersion(): Promise<void> {
 	// attackSkillフィールドの追加マイグレーション
-	const saveDataList = StorageHelper.get<SaveData[]>(STORAGE_KEYS.SAVE_DATA_LIST, [])
+	const saveDataList = StorageHelper.get<SaveData[]>(
+		STORAGE_KEYS.SAVE_DATA_LIST,
+		[],
+	)
 	let needsUpdate = false
 
-	const updatedSaveDataList = saveDataList.map(saveData => {
+	const updatedSaveDataList = saveDataList.map((saveData) => {
 		if (!saveData.data.attackSkill) {
 			needsUpdate = true
 			return {
@@ -411,10 +417,10 @@ async function checkStorageVersion(): Promise<void> {
 					attackSkill: {
 						selectedSkillId: null,
 						calculatedData: null,
-						lastCalculatedAt: undefined
-					}
+						lastCalculatedAt: undefined,
+					},
 				},
-				updatedAt: new Date().toISOString()
+				updatedAt: new Date().toISOString(),
 			}
 		}
 		return saveData

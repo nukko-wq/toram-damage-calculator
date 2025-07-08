@@ -15,7 +15,7 @@ import {
 	validateFileSize,
 	validateFileType,
 	validateSecurity,
-	safeParseJSON
+	safeParseJSON,
 } from './dataValidator'
 
 // インポートオプション
@@ -46,7 +46,9 @@ export interface ImportResult {
 /**
  * ファイルを読み込んでJSONとして解析
  */
-export async function readImportFile(file: File): Promise<ImportValidationResult> {
+export async function readImportFile(
+	file: File,
+): Promise<ImportValidationResult> {
 	const errors: string[] = []
 	const warnings: string[] = []
 
@@ -59,7 +61,7 @@ export async function readImportFile(file: File): Promise<ImportValidationResult
 		return {
 			isValid: false,
 			errors,
-			warnings
+			warnings,
 		}
 	}
 
@@ -72,7 +74,7 @@ export async function readImportFile(file: File): Promise<ImportValidationResult
 		return {
 			isValid: false,
 			errors,
-			warnings
+			warnings,
 		}
 	}
 
@@ -86,7 +88,7 @@ export async function readImportFile(file: File): Promise<ImportValidationResult
 			return {
 				isValid: false,
 				errors: [`JSONファイルの解析に失敗しました: ${parseResult.error}`],
-				warnings
+				warnings,
 			}
 		}
 
@@ -101,7 +103,7 @@ export async function readImportFile(file: File): Promise<ImportValidationResult
 			return {
 				isValid: false,
 				errors,
-				warnings
+				warnings,
 			}
 		}
 
@@ -117,13 +119,15 @@ export async function readImportFile(file: File): Promise<ImportValidationResult
 			errors,
 			warnings,
 			data: jsonData as ExportData,
-			conflicts
+			conflicts,
 		}
 	} catch (error) {
 		return {
 			isValid: false,
-			errors: [`ファイル読み込みエラー: ${error instanceof Error ? error.message : '不明なエラー'}`],
-			warnings
+			errors: [
+				`ファイル読み込みエラー: ${error instanceof Error ? error.message : '不明なエラー'}`,
+			],
+			warnings,
 		}
 	}
 }
@@ -139,13 +143,13 @@ async function checkDataConflicts(data: ExportData): Promise<{
 	const conflicts = {
 		saveData: [] as string[],
 		equipment: [] as string[],
-		crystals: [] as string[]
+		crystals: [] as string[],
 	}
 
 	// セーブデータの競合チェック
 	if (data.saveData?.saves) {
 		const existingSaves = getAllSaveData()
-		const existingNames = new Set(existingSaves.map(save => save.name))
+		const existingNames = new Set(existingSaves.map((save) => save.name))
 
 		for (const save of data.saveData.saves) {
 			if (existingNames.has(save.name)) {
@@ -157,7 +161,7 @@ async function checkDataConflicts(data: ExportData): Promise<{
 	// カスタム装備の競合チェック
 	if (data.customData?.equipment) {
 		const existingEquipments = getUserEquipments()
-		const existingNames = new Set(existingEquipments.map(eq => eq.name))
+		const existingNames = new Set(existingEquipments.map((eq) => eq.name))
 
 		for (const equipment of data.customData.equipment) {
 			if (existingNames.has(equipment.name)) {
@@ -169,7 +173,9 @@ async function checkDataConflicts(data: ExportData): Promise<{
 	// カスタムクリスタルの競合チェック
 	if (data.customData?.crystals) {
 		const existingCrystals = getUserCrystals()
-		const existingNames = new Set(existingCrystals.map(crystal => crystal.name))
+		const existingNames = new Set(
+			existingCrystals.map((crystal) => crystal.name),
+		)
 
 		for (const crystal of data.customData.crystals) {
 			if (existingNames.has(crystal.name)) {
@@ -192,7 +198,7 @@ export async function createBackupBeforeImport(): Promise<string> {
 	const { exportData } = await import('./exportManager')
 	const result = await exportData({
 		type: 'full',
-		filename: backupFilename
+		filename: backupFilename,
 	})
 
 	if (!result.success) {
@@ -207,13 +213,13 @@ export async function createBackupBeforeImport(): Promise<string> {
  */
 async function importSaveData(
 	saveDataInfo: { saves: SaveData[]; currentSaveId: string | null },
-	options: ImportOptions
+	options: ImportOptions,
 ): Promise<{ imported: number; skipped: number }> {
 	let imported = 0
 	let skipped = 0
 
 	const existingSaves = getAllSaveData()
-	const existingNames = new Set(existingSaves.map(save => save.name))
+	const existingNames = new Set(existingSaves.map((save) => save.name))
 
 	for (const saveData of saveDataInfo.saves) {
 		// デフォルトセーブデータはスキップ
@@ -227,7 +233,8 @@ async function importSaveData(
 			if (options.mergeMode === 'skip') {
 				skipped++
 				continue
-			}if (options.mergeMode === 'merge') {
+			}
+			if (options.mergeMode === 'merge') {
 				// 名前を変更してインポート
 				let newName = `${saveData.name} (インポート)`
 				let counter = 1
@@ -258,13 +265,13 @@ async function importSaveData(
  */
 async function importCustomEquipment(
 	equipments: UserEquipment[],
-	options: ImportOptions
+	options: ImportOptions,
 ): Promise<{ imported: number; skipped: number }> {
 	let imported = 0
 	let skipped = 0
 
 	const existingEquipments = getUserEquipments()
-	const existingNames = new Set(existingEquipments.map(eq => eq.name))
+	const existingNames = new Set(existingEquipments.map((eq) => eq.name))
 
 	for (const equipment of equipments) {
 		// 競合処理
@@ -272,7 +279,8 @@ async function importCustomEquipment(
 			if (options.mergeMode === 'skip') {
 				skipped++
 				continue
-			}if (options.mergeMode === 'merge') {
+			}
+			if (options.mergeMode === 'merge') {
 				// 名前を変更してインポート
 				let newName = `${equipment.name} (インポート)`
 				let counter = 1
@@ -289,7 +297,9 @@ async function importCustomEquipment(
 			// カスタム装備として保存
 			saveUserEquipment({
 				...equipment,
-				id: equipment.id || `import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+				id:
+					equipment.id ||
+					`import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
 			})
 			imported++
 		} catch (error) {
@@ -306,13 +316,13 @@ async function importCustomEquipment(
  */
 async function importCustomCrystals(
 	crystals: any[],
-	options: ImportOptions
+	options: ImportOptions,
 ): Promise<{ imported: number; skipped: number }> {
 	let imported = 0
 	let skipped = 0
 
 	const existingCrystals = getUserCrystals()
-	const existingNames = new Set(existingCrystals.map(crystal => crystal.name))
+	const existingNames = new Set(existingCrystals.map((crystal) => crystal.name))
 
 	for (const crystal of crystals) {
 		// 競合処理
@@ -320,7 +330,8 @@ async function importCustomCrystals(
 			if (options.mergeMode === 'skip') {
 				skipped++
 				continue
-			}if (options.mergeMode === 'merge') {
+			}
+			if (options.mergeMode === 'merge') {
 				// 名前を変更してインポート
 				let newName = `${crystal.name} (インポート)`
 				let counter = 1
@@ -337,7 +348,9 @@ async function importCustomCrystals(
 			// カスタムクリスタルとして保存
 			saveUserCrystal({
 				...crystal,
-				id: crystal.id || `import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+				id:
+					crystal.id ||
+					`import_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
 			})
 			imported++
 		} catch (error) {
@@ -354,7 +367,7 @@ async function importCustomCrystals(
  */
 async function importSettings(
 	settings: any,
-	_options: ImportOptions
+	_options: ImportOptions,
 ): Promise<{ imported: number; skipped: number }> {
 	// 将来的に設定データがあればここで処理
 	// 現在は設定データがないため、スキップ
@@ -366,7 +379,7 @@ async function importSettings(
  */
 export async function importData(
 	data: ExportData,
-	options: ImportOptions = {}
+	options: ImportOptions = {},
 ): Promise<ImportResult> {
 	const errors: string[] = []
 	const warnings: string[] = []
@@ -374,12 +387,12 @@ export async function importData(
 		saveData: 0,
 		customEquipment: 0,
 		customCrystals: 0,
-		settings: 0
+		settings: 0,
 	}
 	const skippedCounts = {
 		saveData: 0,
 		customEquipment: 0,
-		customCrystals: 0
+		customCrystals: 0,
 	}
 
 	try {
@@ -388,7 +401,9 @@ export async function importData(
 			try {
 				await createBackupBeforeImport()
 			} catch (error) {
-				warnings.push(`バックアップ作成に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
+				warnings.push(
+					`バックアップ作成に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+				)
 			}
 		}
 
@@ -399,29 +414,41 @@ export async function importData(
 				importedCounts.saveData = result.imported
 				skippedCounts.saveData = result.skipped
 			} catch (error) {
-				errors.push(`セーブデータのインポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
+				errors.push(
+					`セーブデータのインポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+				)
 			}
 		}
 
 		// カスタム装備のインポート
 		if (data.customData?.equipment) {
 			try {
-				const result = await importCustomEquipment(data.customData.equipment, options)
+				const result = await importCustomEquipment(
+					data.customData.equipment,
+					options,
+				)
 				importedCounts.customEquipment = result.imported
 				skippedCounts.customEquipment = result.skipped
 			} catch (error) {
-				errors.push(`カスタム装備のインポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
+				errors.push(
+					`カスタム装備のインポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+				)
 			}
 		}
 
 		// カスタムクリスタルのインポート
 		if (data.customData?.crystals) {
 			try {
-				const result = await importCustomCrystals(data.customData.crystals, options)
+				const result = await importCustomCrystals(
+					data.customData.crystals,
+					options,
+				)
 				importedCounts.customCrystals = result.imported
 				skippedCounts.customCrystals = result.skipped
 			} catch (error) {
-				errors.push(`カスタムクリスタルのインポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
+				errors.push(
+					`カスタムクリスタルのインポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+				)
 			}
 		}
 
@@ -431,7 +458,9 @@ export async function importData(
 				const result = await importSettings(data.settings, options)
 				importedCounts.settings = result.imported
 			} catch (error) {
-				errors.push(`設定データのインポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`)
+				errors.push(
+					`設定データのインポートに失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`,
+				)
 			}
 		}
 
@@ -440,7 +469,7 @@ export async function importData(
 			importedCounts,
 			skippedCounts,
 			errors: errors.length > 0 ? errors : undefined,
-			warnings: warnings.length > 0 ? warnings : undefined
+			warnings: warnings.length > 0 ? warnings : undefined,
 		}
 	} catch (error) {
 		return {
@@ -449,14 +478,16 @@ export async function importData(
 				saveData: 0,
 				customEquipment: 0,
 				customCrystals: 0,
-				settings: 0
+				settings: 0,
 			},
 			skippedCounts: {
 				saveData: 0,
 				customEquipment: 0,
-				customCrystals: 0
+				customCrystals: 0,
 			},
-			errors: [`インポート処理エラー: ${error instanceof Error ? error.message : '不明なエラー'}`]
+			errors: [
+				`インポート処理エラー: ${error instanceof Error ? error.message : '不明なエラー'}`,
+			],
 		}
 	}
 }
@@ -493,27 +524,33 @@ export function generateImportSummary(result: ImportResult): string {
 	const skipped = result.skippedCounts
 
 	if (imported.saveData > 0 || skipped.saveData > 0) {
-		lines.push(`  セーブデータ: ${imported.saveData}個 インポート, ${skipped.saveData}個 スキップ`)
+		lines.push(
+			`  セーブデータ: ${imported.saveData}個 インポート, ${skipped.saveData}個 スキップ`,
+		)
 	}
 
 	if (imported.customEquipment > 0 || skipped.customEquipment > 0) {
-		lines.push(`  カスタム装備: ${imported.customEquipment}個 インポート, ${skipped.customEquipment}個 スキップ`)
+		lines.push(
+			`  カスタム装備: ${imported.customEquipment}個 インポート, ${skipped.customEquipment}個 スキップ`,
+		)
 	}
 
 	if (imported.customCrystals > 0 || skipped.customCrystals > 0) {
-		lines.push(`  カスタムクリスタル: ${imported.customCrystals}個 インポート, ${skipped.customCrystals}個 スキップ`)
+		lines.push(
+			`  カスタムクリスタル: ${imported.customCrystals}個 インポート, ${skipped.customCrystals}個 スキップ`,
+		)
 	}
 
 	if (result.warnings && result.warnings.length > 0) {
 		lines.push('')
 		lines.push('⚠️ 警告:')
-		result.warnings.forEach(warning => lines.push(`  ${warning}`))
+		result.warnings.forEach((warning) => lines.push(`  ${warning}`))
 	}
 
 	if (result.errors && result.errors.length > 0) {
 		lines.push('')
 		lines.push('❌ エラー:')
-		result.errors.forEach(error => lines.push(`  ${error}`))
+		result.errors.forEach((error) => lines.push(`  ${error}`))
 	}
 
 	return lines.join('\n')

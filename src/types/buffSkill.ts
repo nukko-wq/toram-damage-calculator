@@ -176,7 +176,10 @@ export const CATEGORY_LABELS: Record<BuffSkillCategory, string> = {
 }
 
 // 順序番号生成ヘルパー
-export function getSkillOrder(category: BuffSkillCategory, index: number): number {
+export function getSkillOrder(
+	category: BuffSkillCategory,
+	index: number,
+): number {
 	return CATEGORY_ORDER_RANGES[category] + index + 1
 }
 

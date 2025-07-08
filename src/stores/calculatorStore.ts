@@ -8,7 +8,11 @@ import type {
 import type { CalculatorData, EnemyFormData } from '@/types/calculator'
 import type { EquipmentSlots } from '@/types/calculator'
 import type { BuffSkillFormData } from '@/types/buffSkill'
-import { createInitialCalculatorData, migrateRegisterEffects, createInitialPowerOptions } from '@/utils/initialData'
+import {
+	createInitialCalculatorData,
+	migrateRegisterEffects,
+	createInitialPowerOptions,
+} from '@/utils/initialData'
 // 敵設定はenemySettingsStoreで管理するため、このインポートは削除
 import {
 	saveCurrentData,
@@ -173,7 +177,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							// 既存データのレジスタ効果を移行（新効果があれば追加）
 							const migratedData = { ...data }
 							if (migratedData.register) {
-								migratedData.register = migrateRegisterEffects(migratedData.register)
+								migratedData.register = migrateRegisterEffects(
+									migratedData.register,
+								)
 							}
 							return migratedData
 						})()
@@ -258,13 +264,18 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				// 敵設定はEnemyFormコンポーネント側でenemySettingsStoreに直接保存される
 				// ここでは個別データ（敵選択情報）のみ保存
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
-				dataUpdate({ 
-					enemy: { 
-						selectedEnemyId: enemy.selectedId,
-						enemyType: enemy.type,
-						lastSelectedAt: enemy.selectedId ? new Date().toISOString() : undefined
-					} 
-				}, 'updateEnemy')
+				dataUpdate(
+					{
+						enemy: {
+							selectedEnemyId: enemy.selectedId,
+							enemyType: enemy.type,
+							lastSelectedAt: enemy.selectedId
+								? new Date().toISOString()
+								: undefined,
+						},
+					},
+					'updateEnemy',
+				)
 			},
 
 			updateAttackSkill: (attackSkill) => {
@@ -280,9 +291,12 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			updateBuffSkillState: (skillId, state) => {
 				const { data } = get()
 				const buffSkillsData = data.buffSkills.skills
-				
-				let updatedSkills: Record<string, import('@/types/buffSkill').BuffSkillState>
-				
+
+				let updatedSkills: Record<
+					string,
+					import('@/types/buffSkill').BuffSkillState
+				>
+
 				// Handle both old array format and new Record format
 				if (Array.isArray(buffSkillsData)) {
 					// Convert array format to Record format
@@ -295,7 +309,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 								isEnabled: skill.isEnabled,
 								level: skill.parameters.skillLevel || 10,
 								stackCount: skill.parameters.stackCount || 1,
-								specialParam: skill.parameters.playerCount || 0
+								specialParam: skill.parameters.playerCount || 0,
 							}
 						}
 					}
@@ -305,27 +319,36 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					}
 				} else {
 					// New format: Record<string, BuffSkillState>
-					const currentSkills = buffSkillsData as Record<string, import('@/types/buffSkill').BuffSkillState>
+					const currentSkills = buffSkillsData as Record<
+						string,
+						import('@/types/buffSkill').BuffSkillState
+					>
 					updatedSkills = {
 						...currentSkills,
-						[skillId]: state
+						[skillId]: state,
 					}
 				}
-				
+
 				const updatedBuffSkills: BuffSkillFormData = {
-					skills: updatedSkills
+					skills: updatedSkills,
 				}
-				
+
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
-				dataUpdate({ buffSkills: updatedBuffSkills }, `updateBuffSkillState:${skillId}`)
+				dataUpdate(
+					{ buffSkills: updatedBuffSkills },
+					`updateBuffSkillState:${skillId}`,
+				)
 			},
 
 			updateSkillParameter: (skillId, paramType, value) => {
 				const { data } = get()
 				const buffSkillsData = data.buffSkills.skills
-				
-				let updatedSkills: Record<string, import('@/types/buffSkill').BuffSkillState>
-				
+
+				let updatedSkills: Record<
+					string,
+					import('@/types/buffSkill').BuffSkillState
+				>
+
 				// Handle both old array format and new Record format
 				if (Array.isArray(buffSkillsData)) {
 					// Convert array format to Record format
@@ -336,18 +359,18 @@ export const useCalculatorStore = create<CalculatorStore>()(
 								isEnabled: skill.isEnabled,
 								level: skill.parameters.skillLevel || 10,
 								stackCount: skill.parameters.stackCount || 1,
-								specialParam: skill.parameters.playerCount || 0
+								specialParam: skill.parameters.playerCount || 0,
 							}
 							updatedSkills[skillId] = {
 								...currentState,
-								[paramType]: value
+								[paramType]: value,
 							}
 						} else {
 							updatedSkills[skill.id] = {
 								isEnabled: skill.isEnabled,
 								level: skill.parameters.skillLevel || 10,
 								stackCount: skill.parameters.stackCount || 1,
-								specialParam: skill.parameters.playerCount || 0
+								specialParam: skill.parameters.playerCount || 0,
 							}
 						}
 					}
@@ -358,31 +381,42 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							level: 10,
 							stackCount: 1,
 							specialParam: 0,
-							[paramType]: value
+							[paramType]: value,
 						}
 					}
 				} else {
 					// New format: Record<string, BuffSkillState>
-					const currentSkills = buffSkillsData as Record<string, import('@/types/buffSkill').BuffSkillState>
-					const currentSkillState = currentSkills[skillId] || { isEnabled: false, level: 10, stackCount: 1, specialParam: 0 }
-					
+					const currentSkills = buffSkillsData as Record<
+						string,
+						import('@/types/buffSkill').BuffSkillState
+					>
+					const currentSkillState = currentSkills[skillId] || {
+						isEnabled: false,
+						level: 10,
+						stackCount: 1,
+						specialParam: 0,
+					}
+
 					const updatedSkillState = {
 						...currentSkillState,
-						[paramType]: value
+						[paramType]: value,
 					}
-					
+
 					updatedSkills = {
 						...currentSkills,
-						[skillId]: updatedSkillState
+						[skillId]: updatedSkillState,
 					}
 				}
-				
+
 				const updatedBuffSkills: BuffSkillFormData = {
-					skills: updatedSkills
+					skills: updatedSkills,
 				}
-				
+
 				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
-				dataUpdate({ buffSkills: updatedBuffSkills }, `updateSkillParameter:${skillId}:${paramType}`)
+				dataUpdate(
+					{ buffSkills: updatedBuffSkills },
+					`updateSkillParameter:${skillId}:${paramType}`,
+				)
 			},
 
 			updateBuffItems: (buffItems) => {
@@ -681,7 +715,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							}
 							// 差分検知システムを使用してデータを更新
 							const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
-							dataUpdate({ equipment: updatedEquipment }, 'updateEquipmentArmorType')
+							dataUpdate(
+								{ equipment: updatedEquipment },
+								'updateEquipmentArmorType',
+							)
 						} else {
 							// 体装備以外やカスタム装備の場合も差分チェックを強制実行
 							// データベースレイヤーでの変更を検知するため、空の更新をトリガー
@@ -795,7 +832,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					// レジスタ効果の移行（新効果があれば追加）
 					const migratedData = { ...currentSave.data }
 					if (migratedData.register) {
-						migratedData.register = migrateRegisterEffects(migratedData.register)
+						migratedData.register = migrateRegisterEffects(
+							migratedData.register,
+						)
 					}
 
 					// 初期化時に差分検知状態も設定

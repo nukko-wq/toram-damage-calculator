@@ -23,12 +23,12 @@ export function simulateItemEquipSimple(
 				// クリスタルの場合
 				if (slotInfo.category && typeof slotInfo.slot === 'number') {
 					const crystalId = item.id
-					
+
 					// クリスタルスロットの構造に基づいて適切にセット
 					// CrystalSlotsの実際の構造: weapon1, weapon2, armor1, armor2, etc.
 					const slotNumber = slotInfo.slot + 1 // 0-based to 1-based
 					const slotKey = `${slotInfo.category}${slotNumber}`
-					
+
 					// デバッグログ：更新前の状態
 					console.log('🔧 CRYSTAL SIMULATION START:', {
 						itemName: item.name,
@@ -36,27 +36,46 @@ export function simulateItemEquipSimple(
 						slotCategory: slotInfo.category,
 						slotNumber: slotInfo.slot,
 						slotKey,
-						beforeUpdateCrystal: (currentData.crystals as unknown as Record<string, string | null>)[slotKey],
+						beforeUpdateCrystal: (
+							currentData.crystals as unknown as Record<string, string | null>
+						)[slotKey],
 						'currentData.crystals': currentData.crystals,
 						'item.properties': item.properties,
 					})
-					
+
 					// crystalsオブジェクトを直接更新
 					if (simulatedData.crystals) {
 						// 型安全性のため、unknownを経由してキャスト
-						(simulatedData.crystals as unknown as Record<string, string | null>)[slotKey] = crystalId
-						
+						;(
+							simulatedData.crystals as unknown as Record<string, string | null>
+						)[slotKey] = crystalId
+
 						// デバッグログ：更新後の状態
 						console.log('🔧 CRYSTAL SIMULATION EXECUTED:', {
 							itemName: item.name,
 							crystalId,
 							slotKey,
-							afterUpdateCrystal: (simulatedData.crystals as unknown as Record<string, string | null>)[slotKey],
-							simulatedCrystals: JSON.stringify(simulatedData.crystals, null, 2),
-							crystalChangeSuccess: (simulatedData.crystals as unknown as Record<string, string | null>)[slotKey] === crystalId,
+							afterUpdateCrystal: (
+								simulatedData.crystals as unknown as Record<
+									string,
+									string | null
+								>
+							)[slotKey],
+							simulatedCrystals: JSON.stringify(
+								simulatedData.crystals,
+								null,
+								2,
+							),
+							crystalChangeSuccess:
+								(
+									simulatedData.crystals as unknown as Record<
+										string,
+										string | null
+									>
+								)[slotKey] === crystalId,
 						})
 					}
-					
+
 					// Crystal slot updated successfully
 				}
 				break
@@ -75,7 +94,7 @@ export function simulateItemEquipSimple(
 			}
 
 			default:
-				// Unknown slot type
+			// Unknown slot type
 		}
 
 		return simulatedData

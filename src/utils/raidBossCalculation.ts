@@ -7,7 +7,10 @@ import type { EnemyStats } from '@/types/calculator'
 /**
  * レイドボス レベル調整時のステータス計算
  */
-export function calculateRaidBossStats(raidBossId: string, level: number): EnemyStats {
+export function calculateRaidBossStats(
+	raidBossId: string,
+	level: number,
+): EnemyStats {
 	switch (raidBossId) {
 		case 'ca10a211-71b5-4683-811e-3e09457edbe3': // 竜骨の魔人
 			return {

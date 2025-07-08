@@ -20,7 +20,7 @@ import { CATEGORY_ORDER_RANGES } from '@/types/buffSkill'
 // 武器組み合わせに応じた利用可能スキルを取得
 export function getAvailableSkills(
 	mainWeapon: MainWeaponType | null,
-	subWeapon: SubWeaponType | null
+	subWeapon: SubWeaponType | null,
 ): BuffSkillDefinition[] {
 	const skills: BuffSkillDefinition[] = []
 
@@ -46,15 +46,15 @@ export function getAvailableSkills(
 
 	// 5. 重複除去（IDベース）と要件チェック
 	const uniqueSkills = deduplicateSkills(skills)
-	return uniqueSkills.filter(skill =>
-		isSkillCompatible(skill, mainWeapon, subWeapon)
+	return uniqueSkills.filter((skill) =>
+		isSkillCompatible(skill, mainWeapon, subWeapon),
 	)
 }
 
 // サブ武器特殊スキルを取得
 function getSubWeaponSkills(
 	mainWeapon: MainWeaponType | null,
-	subWeapon: SubWeaponType
+	subWeapon: SubWeaponType,
 ): BuffSkillDefinition[] {
 	const skills: BuffSkillDefinition[] = []
 
@@ -82,9 +82,11 @@ function getSubWeaponSkills(
 }
 
 // スキルの重複除去（IDベース）
-function deduplicateSkills(skills: BuffSkillDefinition[]): BuffSkillDefinition[] {
+function deduplicateSkills(
+	skills: BuffSkillDefinition[],
+): BuffSkillDefinition[] {
 	const seen = new Set<string>()
-	return skills.filter(skill => {
+	return skills.filter((skill) => {
 		if (seen.has(skill.id)) {
 			return false
 		}
@@ -97,7 +99,7 @@ function deduplicateSkills(skills: BuffSkillDefinition[]): BuffSkillDefinition[]
 export function isSkillCompatible(
 	skill: BuffSkillDefinition,
 	mainWeapon: MainWeaponType | null,
-	subWeapon: SubWeaponType | null
+	subWeapon: SubWeaponType | null,
 ): boolean {
 	// 要件が指定されていない場合は互換性あり
 	if (!skill.requirements || skill.requirements.length === 0) {
@@ -105,8 +107,8 @@ export function isSkillCompatible(
 	}
 
 	// いずれかの要件を満たせば互換性あり
-	return skill.requirements.some(requirement =>
-		checkWeaponRequirement(requirement, mainWeapon, subWeapon)
+	return skill.requirements.some((requirement) =>
+		checkWeaponRequirement(requirement, mainWeapon, subWeapon),
 	)
 }
 
@@ -114,7 +116,7 @@ export function isSkillCompatible(
 function checkWeaponRequirement(
 	requirement: WeaponRequirement,
 	mainWeapon: MainWeaponType | null,
-	subWeapon: SubWeaponType | null
+	subWeapon: SubWeaponType | null,
 ): boolean {
 	// 除外条件をチェック
 	if (requirement.exclude) {
@@ -164,7 +166,9 @@ function checkWeaponRequirement(
 }
 
 // スキルを順序番号でソート
-export function sortSkills(skills: BuffSkillDefinition[]): BuffSkillDefinition[] {
+export function sortSkills(
+	skills: BuffSkillDefinition[],
+): BuffSkillDefinition[] {
 	return [...skills].sort((a, b) => {
 		// 1. カテゴリ順序で比較
 		const categoryOrderA = CATEGORY_ORDER_RANGES[a.category]
@@ -185,10 +189,10 @@ export function sortSkills(skills: BuffSkillDefinition[]): BuffSkillDefinition[]
 // カテゴリ内でのスキルソート
 export function sortSkillsInCategory(
 	skills: BuffSkillDefinition[],
-	category: BuffSkillCategory
+	category: BuffSkillCategory,
 ): BuffSkillDefinition[] {
 	return skills
-		.filter(skill => skill.category === category)
+		.filter((skill) => skill.category === category)
 		.sort((a, b) => {
 			const orderA = getEffectiveOrder(a)
 			const orderB = getEffectiveOrder(b)
@@ -203,14 +207,14 @@ export function getEffectiveOrder(skill: BuffSkillDefinition): number {
 
 // デフォルトのスキル状態を生成
 export function getDefaultSkillStates(
-	skills: BuffSkillDefinition[]
+	skills: BuffSkillDefinition[],
 ): Record<string, BuffSkillState> {
 	const states: Record<string, BuffSkillState> = {}
 
 	for (const skill of skills) {
 		// 特別なデフォルト値
 		const defaultStackCount = skill.id === 'mg2' ? 15 : 1
-		
+
 		if (skill.type === 'multiParam' && skill.multiParams) {
 			states[skill.id] = {
 				isEnabled: false,
@@ -235,7 +239,7 @@ export function getDefaultSkillStates(
 // 武器変更時のスキル状態マージ（既存設定を保持）
 export function mergeSkillStates(
 	currentStates: Record<string, BuffSkillState>,
-	newSkills: BuffSkillDefinition[]
+	newSkills: BuffSkillDefinition[],
 ): Record<string, BuffSkillState> {
 	const newStates = getDefaultSkillStates(newSkills)
 
@@ -251,7 +255,7 @@ export function mergeSkillStates(
 
 // スキルをカテゴリ別にグループ化
 export function groupSkillsByCategory(
-	skills: BuffSkillDefinition[]
+	skills: BuffSkillDefinition[],
 ): Map<BuffSkillCategory, BuffSkillDefinition[]> {
 	const categoryMap = new Map<BuffSkillCategory, BuffSkillDefinition[]>()
 
@@ -273,12 +277,9 @@ export function groupSkillsByCategory(
 // 武器変更時のスキル状態適応
 export function adaptSkillsToWeapon(
 	currentSkills: BuffSkillFormData,
-	availableSkills: BuffSkillDefinition[]
+	availableSkills: BuffSkillDefinition[],
 ): BuffSkillFormData {
-	const newSkillStates = mergeSkillStates(
-		currentSkills.skills,
-		availableSkills
-	)
+	const newSkillStates = mergeSkillStates(currentSkills.skills, availableSkills)
 
 	return {
 		skills: newSkillStates,
@@ -288,7 +289,7 @@ export function adaptSkillsToWeapon(
 // スキル効果値の検証
 export function validateSkillState(
 	skill: BuffSkillDefinition,
-	state: BuffSkillState
+	state: BuffSkillState,
 ): boolean {
 	if (!state.isEnabled) return true
 
@@ -307,25 +308,25 @@ export function validateSkillState(
 	return true
 }
 
-
 // モーダル表示判定
 export function shouldShowModal(skill: BuffSkillDefinition): boolean {
 	// toggleタイプのスキルはモーダル表示しない（ON/OFFのみ）
 	if (skill.type === 'toggle') {
 		return false
 	}
-	
+
 	// level, stack, multiParam, specialタイプはモーダル表示
 	return ['level', 'stack', 'multiParam', 'special'].includes(skill.type)
 }
 
 // スキル名のクリック可能性を示すCSSクラス名を取得
 export function getSkillNameClassName(skill: BuffSkillDefinition): string {
-	const baseClass = 'skill-name text-[13px] font-medium text-gray-700 flex-1 mr-2 leading-tight'
-	
+	const baseClass =
+		'skill-name text-[13px] font-medium text-gray-700 flex-1 mr-2 leading-tight'
+
 	if (shouldShowModal(skill)) {
 		return `${baseClass} hover:text-blue-600 cursor-pointer`
 	}
-	
+
 	return baseClass
 }

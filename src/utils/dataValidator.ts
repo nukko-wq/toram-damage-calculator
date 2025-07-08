@@ -13,9 +13,9 @@ export interface ValidationResult {
 export interface ImportValidationResult extends ValidationResult {
 	data?: ExportData
 	conflicts?: {
-		saveData: string[]      // 競合するセーブデータ名
-		equipment: string[]     // 競合するカスタム装備名
-		crystals: string[]      // 競合するカスタムクリスタル名
+		saveData: string[] // 競合するセーブデータ名
+		equipment: string[] // 競合するカスタム装備名
+		crystals: string[] // 競合するカスタムクリスタル名
 	}
 }
 
@@ -56,14 +56,16 @@ export function validateFileStructure(jsonData: any): ValidationResult {
 	return {
 		isValid: errors.length === 0,
 		errors,
-		warnings
+		warnings,
 	}
 }
 
 /**
  * バージョン互換性をチェック
  */
-export function validateVersionCompatibility(version: string): ValidationResult {
+export function validateVersionCompatibility(
+	version: string,
+): ValidationResult {
 	const errors: string[] = []
 	const warnings: string[] = []
 
@@ -79,7 +81,9 @@ export function validateVersionCompatibility(version: string): ValidationResult 
 
 	// バージョン比較（将来の実装）
 	const [major, minor, patch] = version.split('.').map(Number)
-	const [currentMajor, currentMinor, currentPatch] = currentVersion.split('.').map(Number)
+	const [currentMajor, currentMinor, currentPatch] = currentVersion
+		.split('.')
+		.map(Number)
 
 	// メジャーバージョンが異なる場合は互換性なし
 	if (major !== currentMajor) {
@@ -87,17 +91,21 @@ export function validateVersionCompatibility(version: string): ValidationResult 
 	}
 	// マイナーバージョンが新しい場合は警告
 	else if (minor > currentMinor) {
-		warnings.push(`新しいバージョンのデータです (${version} vs ${currentVersion})`)
+		warnings.push(
+			`新しいバージョンのデータです (${version} vs ${currentVersion})`,
+		)
 	}
 	// パッチバージョンが異なる場合は情報として表示
 	else if (patch !== currentPatch) {
-		warnings.push(`パッチバージョンが異なります (${version} vs ${currentVersion})`)
+		warnings.push(
+			`パッチバージョンが異なります (${version} vs ${currentVersion})`,
+		)
 	}
 
 	return {
 		isValid: errors.length === 0,
 		errors,
-		warnings
+		warnings,
 	}
 }
 
@@ -137,7 +145,14 @@ export function validateSaveData(saveData: any): ValidationResult {
 
 		// 計算機データの基本構造チェック
 		if (save.data) {
-			const requiredFields = ['baseStats', 'mainWeapon', 'subWeapon', 'equipment', 'crystals', 'enemy']
+			const requiredFields = [
+				'baseStats',
+				'mainWeapon',
+				'subWeapon',
+				'equipment',
+				'crystals',
+				'enemy',
+			]
 			for (const field of requiredFields) {
 				if (!save.data[field]) {
 					warnings.push(`${prefix}: ${field}データが見つかりません`)
@@ -164,7 +179,7 @@ export function validateSaveData(saveData: any): ValidationResult {
 	return {
 		isValid: errors.length === 0,
 		errors,
-		warnings
+		warnings,
 	}
 }
 
@@ -238,7 +253,7 @@ export function validateCustomData(customData: any): ValidationResult {
 	return {
 		isValid: errors.length === 0,
 		errors,
-		warnings
+		warnings,
 	}
 }
 
@@ -258,7 +273,7 @@ export function validateExportData(jsonData: any): ValidationResult {
 		return {
 			isValid: false,
 			errors: allErrors,
-			warnings: allWarnings
+			warnings: allWarnings,
 		}
 	}
 
@@ -280,7 +295,7 @@ export function validateExportData(jsonData: any): ValidationResult {
 	return {
 		isValid: allErrors.length === 0,
 		errors: allErrors,
-		warnings: allWarnings
+		warnings: allWarnings,
 	}
 }
 
@@ -293,22 +308,26 @@ export function validateFileSize(file: File): ValidationResult {
 
 	// 最大ファイルサイズ: 10MB
 	const maxSize = 10 * 1024 * 1024
-	
+
 	if (file.size > maxSize) {
-		errors.push(`ファイルサイズが大きすぎます (${Math.round(file.size / 1024 / 1024)}MB > 10MB)`)
+		errors.push(
+			`ファイルサイズが大きすぎます (${Math.round(file.size / 1024 / 1024)}MB > 10MB)`,
+		)
 	}
 
 	// 推奨サイズ: 1MB
 	const recommendedSize = 1 * 1024 * 1024
-	
+
 	if (file.size > recommendedSize) {
-		warnings.push(`ファイルサイズが大きいため、処理に時間がかかる可能性があります (${Math.round(file.size / 1024 / 1024)}MB)`)
+		warnings.push(
+			`ファイルサイズが大きいため、処理に時間がかかる可能性があります (${Math.round(file.size / 1024 / 1024)}MB)`,
+		)
 	}
 
 	return {
 		isValid: errors.length === 0,
 		errors,
-		warnings
+		warnings,
 	}
 }
 
@@ -332,21 +351,25 @@ export function validateFileType(file: File): ValidationResult {
 	return {
 		isValid: errors.length === 0,
 		errors,
-		warnings
+		warnings,
 	}
 }
 
 /**
  * JSON文字列を安全にパース
  */
-export function safeParseJSON(jsonString: string): { success: boolean; data?: any; error?: string } {
+export function safeParseJSON(jsonString: string): {
+	success: boolean
+	data?: any
+	error?: string
+} {
 	try {
 		const data = JSON.parse(jsonString)
 		return { success: true, data }
 	} catch (error) {
 		return {
 			success: false,
-			error: error instanceof Error ? error.message : '不明なJSONパースエラー'
+			error: error instanceof Error ? error.message : '不明なJSONパースエラー',
 		}
 	}
 }
@@ -378,7 +401,9 @@ export function validateSecurity(jsonData: any): ValidationResult {
 
 	const maxDepth = checkDepth(jsonData)
 	if (maxDepth > 15) {
-		warnings.push('データの構造が深すぎます。処理に時間がかかる可能性があります。')
+		warnings.push(
+			'データの構造が深すぎます。処理に時間がかかる可能性があります。',
+		)
 	}
 
 	// 大きすぎるプロパティをチェック
@@ -388,7 +413,9 @@ export function validateSecurity(jsonData: any): ValidationResult {
 				const currentPath = path ? `${path}.${key}` : key
 
 				if (typeof value === 'string' && value.length > 10000) {
-					warnings.push(`大きすぎる文字列データが含まれています: ${currentPath}`)
+					warnings.push(
+						`大きすぎる文字列データが含まれています: ${currentPath}`,
+					)
 				}
 
 				if (Array.isArray(value) && value.length > 1000) {
@@ -407,6 +434,6 @@ export function validateSecurity(jsonData: any): ValidationResult {
 	return {
 		isValid: true, // セキュリティチェックは警告のみ
 		errors,
-		warnings
+		warnings,
 	}
 }

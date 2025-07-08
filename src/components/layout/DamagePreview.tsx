@@ -94,13 +94,22 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// 中央集約された計算結果を使用
 			const totalATK = calculationResults?.basicStats.totalATK || 0
 			const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
-			
+
 			// デバッグ: 中央集約された値を確認
 			console.log('=== DamagePreview 中央集約計算結果 ===')
 			console.log('calculationResults?.basicStats.totalATK:', totalATK)
-			console.log('calculationResults?.basicStats.stabilityRate:', stabilityRate)
-			console.log('calculationResults?.equipmentBonus1.physicalPenetration:', calculationResults?.equipmentBonus1.physicalPenetration)
-			console.log('calculationResults?.equipmentBonus1.magicalPenetration:', calculationResults?.equipmentBonus1.magicalPenetration)
+			console.log(
+				'calculationResults?.basicStats.stabilityRate:',
+				stabilityRate,
+			)
+			console.log(
+				'calculationResults?.equipmentBonus1.physicalPenetration:',
+				calculationResults?.equipmentBonus1.physicalPenetration,
+			)
+			console.log(
+				'calculationResults?.equipmentBonus1.magicalPenetration:',
+				calculationResults?.equipmentBonus1.magicalPenetration,
+			)
 
 			// 敵情報を取得
 			let enemyInfo = null
@@ -166,7 +175,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// PowerOptionsに基づく距離設定
 			const getDistanceValues = () => {
 				return {
-					shortRange: calculationResults?.equipmentBonus1?.shortRangeDamage || 0,
+					shortRange:
+						calculationResults?.equipmentBonus1?.shortRangeDamage || 0,
 					longRange: calculationResults?.equipmentBonus1?.longRangeDamage || 0,
 				}
 			}
@@ -180,7 +190,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			let finalEnemyLevel = enemyInfo?.level ?? defaultInput.enemy.level
 
 			// ボス系敵かつ難易度がnormal以外の場合、難易度調整を適用
-			if (enemyInfo?.category === 'boss' && powerOptions.bossDifficulty !== 'normal') {
+			if (
+				enemyInfo?.category === 'boss' &&
+				powerOptions.bossDifficulty !== 'normal'
+			) {
 				const adjustedStats = calculateBossDifficultyStats(
 					finalEnemyLevel,
 					enemyInfo.stats,
@@ -194,14 +207,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// バフスキルからパッシブ倍率を取得
 			const passiveMultiplier = getBuffSkillPassiveMultiplier(
 				calculatorData.buffSkills?.skills || null,
-				calculatorData.mainWeapon?.weaponType || null
+				calculatorData.mainWeapon?.weaponType || null,
 			)
 
 			console.log('=== PASSIVE MULTIPLIER ACQUISITION DEBUG ===')
-			console.log('calculatorData.buffSkills?.skills:', calculatorData.buffSkills?.skills)
-			console.log('calculatorData.mainWeapon?.weaponType:', calculatorData.mainWeapon?.weaponType)
+			console.log(
+				'calculatorData.buffSkills?.skills:',
+				calculatorData.buffSkills?.skills,
+			)
+			console.log(
+				'calculatorData.mainWeapon?.weaponType:',
+				calculatorData.mainWeapon?.weaponType,
+			)
 			console.log('passiveMultiplier:', passiveMultiplier)
-			console.log('==============================================')			
+			console.log('==============================================')
 
 			const input: DamageCalculationInput = {
 				...defaultInput,
@@ -223,7 +242,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 				distance: distanceValues,
 				unsheathe: {
-					fixedDamage: calculationResults?.equipmentBonus1?.unsheatheAttack || defaultInput.unsheathe.fixedDamage,
+					fixedDamage:
+						calculationResults?.equipmentBonus1?.unsheatheAttack ||
+						defaultInput.unsheathe.fixedDamage,
 					rateBonus: calculationResults?.equipmentBonus1?.elementPower || 0, // 抜刀威力%は一旦elementPowerで代用
 					isActive: powerOptions.unsheathe,
 				},
@@ -257,8 +278,12 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 				// 貫通値を中央集約された装備品補正値1から取得
 				penetration: {
-					physical: calculationResults?.equipmentBonus1?.physicalPenetration ?? defaultInput.penetration.physical,
-					magical: calculationResults?.equipmentBonus1?.magicalPenetration ?? defaultInput.penetration.magical,
+					physical:
+						calculationResults?.equipmentBonus1?.physicalPenetration ??
+						defaultInput.penetration.physical,
+					magical:
+						calculationResults?.equipmentBonus1?.magicalPenetration ??
+						defaultInput.penetration.magical,
 				},
 				// コンボ設定を反映
 				combo: {
@@ -514,13 +539,16 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				)
 
 				// 基本ステータスの安定率を取得
-				const baseStabilityRate = calculationResults?.basicStats.stabilityRate || 85
+				const baseStabilityRate =
+					calculationResults?.basicStats.stabilityRate || 85
 
 				// 各撃の最小ダメージを個別に計算して合計
 				// 各撃: 最大ダメージ × 最小安定率（小数点切り捨て）
 				const totalMinDamage = attackResults.reduce((sum, hit) => {
 					const hitMaxDamage = hit.result.baseDamage
-					const hitMinDamage = Math.floor((hitMaxDamage * baseStabilityRate) / 100)
+					const hitMinDamage = Math.floor(
+						(hitMaxDamage * baseStabilityRate) / 100,
+					)
 					return sum + hitMinDamage
 				}, 0)
 
@@ -530,29 +558,47 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				const totalAverageDamage = attackResults.reduce((sum, hit) => {
 					const hitMaxDamage = hit.result.baseDamage
 					const hitMaxStabilityRate = 100
-					const hitAverageStabilityRate = Math.floor((hitMaxStabilityRate + baseStabilityRate) / 2)
-					const hitAverageDamage = Math.floor((hitMaxDamage * hitAverageStabilityRate) / 100)
+					const hitAverageStabilityRate = Math.floor(
+						(hitMaxStabilityRate + baseStabilityRate) / 2,
+					)
+					const hitAverageDamage = Math.floor(
+						(hitMaxDamage * hitAverageStabilityRate) / 100,
+					)
 					return sum + hitAverageDamage
 				}, 0)
 
 				// 全体の平均安定率を計算（すべての撃で同じ安定率のため）
 				const hitMaxStabilityRate = 100
-				const overallAverageStabilityRate = Math.floor((hitMaxStabilityRate + baseStabilityRate) / 2)
+				const overallAverageStabilityRate = Math.floor(
+					(hitMaxStabilityRate + baseStabilityRate) / 2,
+				)
 
 				console.log('=== MULTI-HIT DAMAGE CALCULATION (New Method) ===')
 				attackResults.forEach((hit, index) => {
 					const hitMaxDamage = hit.result.baseDamage
 					const hitMaxStabilityRate = 100
-					const hitAverageStabilityRate = Math.floor((hitMaxStabilityRate + baseStabilityRate) / 2)
-					const hitMinDamage = Math.floor((hitMaxDamage * baseStabilityRate) / 100)
-					const hitAverageDamage = Math.floor((hitMaxDamage * hitAverageStabilityRate) / 100)
-					
+					const hitAverageStabilityRate = Math.floor(
+						(hitMaxStabilityRate + baseStabilityRate) / 2,
+					)
+					const hitMinDamage = Math.floor(
+						(hitMaxDamage * baseStabilityRate) / 100,
+					)
+					const hitAverageDamage = Math.floor(
+						(hitMaxDamage * hitAverageStabilityRate) / 100,
+					)
+
 					console.log(`${index + 1}撃目:`)
 					console.log(`  最大ダメージ: ${hitMaxDamage}`)
 					console.log(`  最小安定率: ${baseStabilityRate}%`)
-					console.log(`  平均安定率: ${hitAverageStabilityRate}% = (${hitMaxStabilityRate} + ${baseStabilityRate}) / 2`)
-					console.log(`  最小ダメージ: ${hitMaxDamage} × ${baseStabilityRate}% = ${hitMinDamage}`)
-					console.log(`  平均ダメージ: ${hitMaxDamage} × ${hitAverageStabilityRate}% = ${hitAverageDamage}`)
+					console.log(
+						`  平均安定率: ${hitAverageStabilityRate}% = (${hitMaxStabilityRate} + ${baseStabilityRate}) / 2`,
+					)
+					console.log(
+						`  最小ダメージ: ${hitMaxDamage} × ${baseStabilityRate}% = ${hitMinDamage}`,
+					)
+					console.log(
+						`  平均ダメージ: ${hitMaxDamage} × ${hitAverageStabilityRate}% = ${hitAverageDamage}`,
+					)
 				})
 				console.log(`合計最大ダメージ: ${totalMaxDamage}`)
 				console.log(`合計最小ダメージ: ${totalMinDamage}`)

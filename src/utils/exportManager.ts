@@ -25,19 +25,19 @@ export interface ExportData {
 	version: string
 	exportDate: string
 	exportType: ExportType
-	
+
 	// セーブデータ
 	saveData?: {
 		saves: SaveData[]
 		currentSaveId: string | null
 	}
-	
+
 	// カスタムデータ
 	customData?: {
 		equipment: any[]
 		crystals: any[]
 	}
-	
+
 	// 設定データ
 	settings?: {
 		theme?: string
@@ -64,7 +64,7 @@ export function generateDefaultFilename(): string {
 	const hour = String(now.getHours()).padStart(2, '0')
 	const minute = String(now.getMinutes()).padStart(2, '0')
 	const second = String(now.getSeconds()).padStart(2, '0')
-	
+
 	return `toram-calc-backup-${year}-${month}-${day}-${hour}${minute}${second}`
 }
 
@@ -77,10 +77,10 @@ async function collectSaveData(): Promise<{
 }> {
 	const saves = getAllSaveData()
 	const currentSaveId = StorageHelper.get(STORAGE_KEYS.CURRENT_SAVE_ID, null)
-	
+
 	return {
 		saves,
-		currentSaveId
+		currentSaveId,
 	}
 }
 
@@ -93,10 +93,10 @@ async function collectCustomData(): Promise<{
 }> {
 	const equipment = getUserEquipments()
 	const crystals = getUserCrystals()
-	
+
 	return {
 		equipment,
-		crystals
+		crystals,
 	}
 }
 
@@ -109,10 +109,10 @@ async function collectCurrentSaveData(): Promise<{
 }> {
 	const currentSave = getCurrentSaveData()
 	const currentSaveId = StorageHelper.get(STORAGE_KEYS.CURRENT_SAVE_ID, null)
-	
+
 	return {
 		saves: [currentSave],
-		currentSaveId
+		currentSaveId,
 	}
 }
 
@@ -134,32 +134,32 @@ async function collectExportData(type: ExportType): Promise<ExportData> {
 	const exportData: ExportData = {
 		version: APP_VERSION,
 		exportDate: new Date().toISOString(),
-		exportType: type
+		exportType: type,
 	}
-	
+
 	switch (type) {
 		case 'full':
 			exportData.saveData = await collectSaveData()
 			exportData.customData = await collectCustomData()
 			exportData.settings = await collectSettings()
 			break
-			
+
 		case 'save-data':
 			exportData.saveData = await collectSaveData()
 			break
-			
+
 		case 'custom-data':
 			exportData.customData = await collectCustomData()
 			break
-			
+
 		case 'current-save':
 			exportData.saveData = await collectCurrentSaveData()
 			break
-			
+
 		default:
 			throw new Error(`Unknown export type: ${type}`)
 	}
-	
+
 	return exportData
 }
 
@@ -169,43 +169,46 @@ async function collectExportData(type: ExportType): Promise<ExportData> {
 function downloadFile(data: ExportData, filename: string): void {
 	const jsonString = JSON.stringify(data, null, 2)
 	const blob = new Blob([jsonString], {
-		type: 'application/json'
+		type: 'application/json',
 	})
-	
+
 	const url = URL.createObjectURL(blob)
 	const a = document.createElement('a')
 	a.href = url
 	a.download = `${filename}.json`
 	a.style.display = 'none'
-	
+
 	document.body.appendChild(a)
 	a.click()
 	document.body.removeChild(a)
-	
+
 	URL.revokeObjectURL(url)
 }
 
 /**
  * データをエクスポート
  */
-export async function exportData(options: ExportOptions): Promise<ExportResult> {
+export async function exportData(
+	options: ExportOptions,
+): Promise<ExportResult> {
 	try {
 		// データ収集
 		const data = await collectExportData(options.type)
-		
+
 		// ファイルダウンロード
 		downloadFile(data, options.filename)
-		
+
 		return {
 			success: true,
 			filename: `${options.filename}.json`,
-			data
+			data,
 		}
 	} catch (error) {
 		console.error('Export error:', error)
 		return {
 			success: false,
-			error: error instanceof Error ? error.message : 'エクスポートに失敗しました'
+			error:
+				error instanceof Error ? error.message : 'エクスポートに失敗しました',
 		}
 	}
 }
@@ -221,12 +224,12 @@ export async function generateExportPreview(type: ExportType): Promise<{
 }> {
 	try {
 		const data = await collectExportData(type)
-		
+
 		return {
 			saveCount: data.saveData?.saves?.length || 0,
 			customEquipmentCount: data.customData?.equipment?.length || 0,
 			customCrystalCount: data.customData?.crystals?.length || 0,
-			hasSettings: !!data.settings && Object.keys(data.settings).length > 0
+			hasSettings: !!data.settings && Object.keys(data.settings).length > 0,
 		}
 	} catch (error) {
 		console.error('Export preview error:', error)
@@ -234,7 +237,7 @@ export async function generateExportPreview(type: ExportType): Promise<{
 			saveCount: 0,
 			customEquipmentCount: 0,
 			customCrystalCount: 0,
-			hasSettings: false
+			hasSettings: false,
 		}
 	}
 }
@@ -247,23 +250,23 @@ export function canExport(type: ExportType): boolean {
 		switch (type) {
 			case 'full':
 				return true // 常にエクスポート可能
-				
+
 			case 'save-data': {
 				const saves = getAllSaveData()
 				return saves.length > 0
 			}
-				
+
 			case 'custom-data': {
 				const equipment = getUserEquipments()
 				const crystals = getUserCrystals()
 				return equipment.length > 0 || crystals.length > 0
 			}
-				
+
 			case 'current-save': {
 				const currentSave = getCurrentSaveData()
 				return !!currentSave
 			}
-				
+
 			default:
 				return false
 		}

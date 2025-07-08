@@ -306,14 +306,19 @@ export default function MultiParamModal({
 								<button
 									type="button"
 									onClick={() => {
-										const currentValue = skill.type === 'multiParam' 
-											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1)
-											: (currentState.stackCount || 1)
+										const currentValue =
+											skill.type === 'multiParam'
+												? currentState.multiParam2 ||
+													skill.multiParams?.param2?.default ||
+													1
+												: currentState.stackCount || 1
 										handleStackCountChange(currentValue - 10)
 									}}
 									disabled={
 										skill.type === 'multiParam'
-											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1) <= (skill.multiParams?.param2?.min || 1)
+											? (currentState.multiParam2 ||
+													skill.multiParams?.param2?.default ||
+													1) <= (skill.multiParams?.param2?.min || 1)
 											: (currentState.stackCount || 1) <= 1
 									}
 									className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
@@ -325,14 +330,19 @@ export default function MultiParamModal({
 								<button
 									type="button"
 									onClick={() => {
-										const currentValue = skill.type === 'multiParam' 
-											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1)
-											: (currentState.stackCount || 1)
+										const currentValue =
+											skill.type === 'multiParam'
+												? currentState.multiParam2 ||
+													skill.multiParams?.param2?.default ||
+													1
+												: currentState.stackCount || 1
 										handleStackCountChange(currentValue - 1)
 									}}
 									disabled={
 										skill.type === 'multiParam'
-											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1) <= (skill.multiParams?.param2?.min || 1)
+											? (currentState.multiParam2 ||
+													skill.multiParams?.param2?.default ||
+													1) <= (skill.multiParams?.param2?.min || 1)
 											: (currentState.stackCount || 1) <= 1
 									}
 									className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
@@ -355,14 +365,19 @@ export default function MultiParamModal({
 								<button
 									type="button"
 									onClick={() => {
-										const currentValue = skill.type === 'multiParam' 
-											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1)
-											: (currentState.stackCount || 1)
+										const currentValue =
+											skill.type === 'multiParam'
+												? currentState.multiParam2 ||
+													skill.multiParams?.param2?.default ||
+													1
+												: currentState.stackCount || 1
 										handleStackCountChange(currentValue + 1)
 									}}
 									disabled={
 										skill.type === 'multiParam'
-											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1) >= (skill.multiParams?.param2?.max || 10)
+											? (currentState.multiParam2 ||
+													skill.multiParams?.param2?.default ||
+													1) >= (skill.multiParams?.param2?.max || 10)
 											: (currentState.stackCount || 1) >= (skill.maxStack || 10)
 									}
 									className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
@@ -374,14 +389,19 @@ export default function MultiParamModal({
 								<button
 									type="button"
 									onClick={() => {
-										const currentValue = skill.type === 'multiParam' 
-											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1)
-											: (currentState.stackCount || 1)
+										const currentValue =
+											skill.type === 'multiParam'
+												? currentState.multiParam2 ||
+													skill.multiParams?.param2?.default ||
+													1
+												: currentState.stackCount || 1
 										handleStackCountChange(currentValue + 10)
 									}}
 									disabled={
 										skill.type === 'multiParam'
-											? (currentState.multiParam2 || skill.multiParams?.param2?.default || 1) >= (skill.multiParams?.param2?.max || 10)
+											? (currentState.multiParam2 ||
+													skill.multiParams?.param2?.default ||
+													1) >= (skill.multiParams?.param2?.max || 10)
 											: (currentState.stackCount || 1) >= (skill.maxStack || 10)
 									}
 									className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"

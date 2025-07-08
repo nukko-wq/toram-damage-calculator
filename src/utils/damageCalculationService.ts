@@ -43,7 +43,7 @@ export interface DamageCalculationOptions {
 export function calculateDamageWithService(
 	calculatorData: CalculatorData,
 	calculationResults: any,
-	options: DamageCalculationOptions = {}
+	options: DamageCalculationOptions = {},
 ): DamageCalculationServiceResult {
 	const { debug = false, powerOptions = createInitialPowerOptions() } = options
 
@@ -54,17 +54,20 @@ export function calculateDamageWithService(
 		// 中央集約された計算結果を使用
 		const totalATK = calculationResults?.basicStats.totalATK || 0
 		const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
-		
+
 		// バフスキルからパッシブ倍率を取得
 		const passiveMultiplier = getBuffSkillPassiveMultiplier(
 			calculatorData.buffSkills?.skills || null,
-			calculatorData.mainWeapon?.weaponType || null
+			calculatorData.mainWeapon?.weaponType || null,
 		)
-		
+
 		if (debug) {
 			console.log('=== DamageCalculationService 中央集約計算結果 ===')
 			console.log('calculationResults?.basicStats.totalATK:', totalATK)
-			console.log('calculationResults?.basicStats.stabilityRate:', stabilityRate)
+			console.log(
+				'calculationResults?.basicStats.stabilityRate:',
+				stabilityRate,
+			)
 			console.log('passiveMultiplier:', passiveMultiplier)
 		}
 
@@ -117,7 +120,10 @@ export function calculateDamageWithService(
 		let finalEnemyLevel = enemyInfo?.level ?? defaultInput.enemy.level
 
 		// ボス系敵かつ難易度がnormal以外の場合、難易度調整を適用
-		if (enemyInfo?.category === 'boss' && powerOptions.bossDifficulty !== 'normal') {
+		if (
+			enemyInfo?.category === 'boss' &&
+			powerOptions.bossDifficulty !== 'normal'
+		) {
 			const adjustedStats = calculateBossDifficultyStats(
 				finalEnemyLevel,
 				enemyInfo.stats,
@@ -148,7 +154,9 @@ export function calculateDamageWithService(
 			},
 			distance: distanceValues,
 			unsheathe: {
-				fixedDamage: calculationResults?.equipmentBonus1?.unsheatheAttack ?? defaultInput.unsheathe.fixedDamage,
+				fixedDamage:
+					calculationResults?.equipmentBonus1?.unsheatheAttack ??
+					defaultInput.unsheathe.fixedDamage,
 				rateBonus: calculationResults?.equipmentBonus1?.elementPower ?? 0, // 抜刀威力%は一旦elementPowerで代用
 				isActive: powerOptions.unsheathe,
 			},
@@ -177,13 +185,16 @@ export function calculateDamageWithService(
 					enemyInfo?.stats.physicalResistance ??
 					defaultInput.resistance.physical,
 				magical:
-					enemyInfo?.stats.magicalResistance ??
-					defaultInput.resistance.magical,
+					enemyInfo?.stats.magicalResistance ?? defaultInput.resistance.magical,
 			},
 			// 貫通値を中央集約された装備品補正値1から取得
 			penetration: {
-				physical: calculationResults?.equipmentBonus1?.physicalPenetration ?? defaultInput.penetration.physical,
-				magical: calculationResults?.equipmentBonus1?.magicalPenetration ?? defaultInput.penetration.magical,
+				physical:
+					calculationResults?.equipmentBonus1?.physicalPenetration ??
+					defaultInput.penetration.physical,
+				magical:
+					calculationResults?.equipmentBonus1?.magicalPenetration ??
+					defaultInput.penetration.magical,
 			},
 			// コンボ設定を反映
 			combo: {
@@ -212,7 +223,7 @@ export function calculateDamageWithService(
 			hitNumber: number
 			result: ReturnType<typeof calculateDamage>
 		}> = []
-		
+
 		if (calculatorData.attackSkill?.selectedSkillId) {
 			const selectedSkill = getAttackSkillById(
 				calculatorData.attackSkill.selectedSkillId,
@@ -333,13 +344,16 @@ export function calculateDamageWithService(
 			)
 
 			// 基本ステータスの安定率を取得
-			const baseStabilityRate = calculationResults?.basicStats.stabilityRate || 85
+			const baseStabilityRate =
+				calculationResults?.basicStats.stabilityRate || 85
 
 			// 各撃の最小ダメージを個別に計算して合計
 			// 各撃: 最大ダメージ × 最小安定率（小数点切り捨て）
 			const totalMinDamage = attackResults.reduce((sum, hit) => {
 				const hitMaxDamage = hit.result.baseDamage
-				const hitMinDamage = Math.floor((hitMaxDamage * baseStabilityRate) / 100)
+				const hitMinDamage = Math.floor(
+					(hitMaxDamage * baseStabilityRate) / 100,
+				)
 				return sum + hitMinDamage
 			}, 0)
 
@@ -349,8 +363,12 @@ export function calculateDamageWithService(
 			const totalAverageDamage = attackResults.reduce((sum, hit) => {
 				const hitMaxDamage = hit.result.baseDamage
 				const hitMaxStabilityRate = 100
-				const hitAverageStabilityRate = Math.floor((hitMaxStabilityRate + baseStabilityRate) / 2)
-				const hitAverageDamage = Math.floor((hitMaxDamage * hitAverageStabilityRate) / 100)
+				const hitAverageStabilityRate = Math.floor(
+					(hitMaxStabilityRate + baseStabilityRate) / 2,
+				)
+				const hitAverageDamage = Math.floor(
+					(hitMaxDamage * hitAverageStabilityRate) / 100,
+				)
 				return sum + hitAverageDamage
 			}, 0)
 
@@ -460,9 +478,7 @@ export function calculateDamageWithService(
 					return {
 						min: Math.floor((grazeBaseDamage * stabilityRate) / 100),
 						max: grazeBaseDamage,
-						average: Math.floor(
-							(grazeBaseDamage * averageStabilityRate) / 100,
-						),
+						average: Math.floor((grazeBaseDamage * averageStabilityRate) / 100),
 						stability: stabilityRate,
 						averageStability: averageStabilityRate,
 					}

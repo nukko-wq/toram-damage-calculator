@@ -88,7 +88,9 @@ export class SkillCalculationUtils {
 	/**
 	 * CalculatorDataからEquipmentContextに変換
 	 */
-	static convertToEquipmentContext(calculatorData: CalculatorData): EquipmentContext {
+	static convertToEquipmentContext(
+		calculatorData: CalculatorData,
+	): EquipmentContext {
 		const { mainWeapon, subWeapon } = calculatorData
 
 		return {

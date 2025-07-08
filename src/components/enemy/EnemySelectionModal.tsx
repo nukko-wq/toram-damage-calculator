@@ -81,7 +81,6 @@ export default function EnemySelectionModal({
 		onClose()
 	}
 
-
 	// 背景クリックで閉じる
 	const handleBackgroundClick = (e: React.MouseEvent) => {
 		const modalContent = document.querySelector('[data-modal-content="true"]')
@@ -196,7 +195,6 @@ export default function EnemySelectionModal({
 							role="grid"
 							aria-label="敵選択一覧"
 						>
-
 							{/* 敵カード */}
 							{filteredEnemies.map((enemy) => (
 								<EnemyCard

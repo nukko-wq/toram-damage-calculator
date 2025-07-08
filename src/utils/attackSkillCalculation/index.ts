@@ -34,8 +34,10 @@ export class AttackSkillCalculationService {
 		skillId: string,
 		calculatorData: CalculatorData,
 	): { hits: SkillCalculationResult[] } {
-		const playerStats = SkillCalculationUtils.convertToPlayerStats(calculatorData)
-		const equipmentContext = SkillCalculationUtils.convertToEquipmentContext(calculatorData)
+		const playerStats =
+			SkillCalculationUtils.convertToPlayerStats(calculatorData)
+		const equipmentContext =
+			SkillCalculationUtils.convertToEquipmentContext(calculatorData)
 
 		const hits = this.calculator.calculateSkill(
 			skillId,

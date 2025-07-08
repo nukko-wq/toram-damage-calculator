@@ -59,7 +59,7 @@ export const crystalsData: CrystalsData = {
 					ATK_Rate: 9,
 					AttackMPRecovery: 6,
 					Anticipate_Rate: 13,
-					MP: -100
+					MP: -100,
 				},
 			},
 			{
@@ -70,7 +70,7 @@ export const crystalsData: CrystalsData = {
 					ATK_Rate: 11,
 					AttackMPRecovery: 8,
 					Anticipate_Rate: 14,
-					MP: -200
+					MP: -200,
 				},
 			},
 			{
@@ -82,7 +82,7 @@ export const crystalsData: CrystalsData = {
 					PhysicalPenetration_Rate: 20,
 					Aggro_Rate: -15,
 					AilmentResistance_Rate: -15,
-					MP: -200
+					MP: -200,
 				},
 			},
 			{
@@ -103,7 +103,7 @@ export const crystalsData: CrystalsData = {
 				properties: {
 					MATK_Rate: 11,
 					Critical: 13,
-					Aggro_Rate: -13
+					Aggro_Rate: -13,
 				},
 			},
 			{
@@ -116,7 +116,7 @@ export const crystalsData: CrystalsData = {
 					HP_Rate: 10,
 					Anticipate_Rate: 10,
 					ArmorBreak_Rate: 10,
-					MP: -200
+					MP: -200,
 				},
 			},
 			{
@@ -126,7 +126,7 @@ export const crystalsData: CrystalsData = {
 				properties: {
 					ATK_Rate: 11,
 					DEX_Rate: 9,
-					AttackSpeed_Rate: 7
+					AttackSpeed_Rate: 7,
 				},
 			},
 		],
@@ -188,7 +188,7 @@ export const crystalsData: CrystalsData = {
 					PhysicalPenetration_Rate: 8,
 					MagicalPenetration_Rate: 8,
 					Critical: 17,
-					MP: -150
+					MP: -150,
 				},
 			},
 			{
@@ -200,7 +200,7 @@ export const crystalsData: CrystalsData = {
 					LongRangeDamage_Rate: 6,
 					Critical_Rate: 20,
 					HP: 6000,
-					AilmentResistance_Rate: 5
+					AilmentResistance_Rate: 5,
 				},
 			},
 			{
@@ -210,7 +210,7 @@ export const crystalsData: CrystalsData = {
 				properties: {
 					MP: 1000,
 					CastingSpeed: 300,
-					MotionSpeed_Rate: 1
+					MotionSpeed_Rate: 1,
 				},
 			},
 			{
@@ -351,7 +351,7 @@ export const crystalsData: CrystalsData = {
 					MATK_Rate: 9,
 					CastingSpeed_Rate: 9,
 					Anticipate_Rate: 9,
-					Aggro_Rate: 9
+					Aggro_Rate: 9,
 				},
 			},
 			{
@@ -422,7 +422,7 @@ export const crystalsData: CrystalsData = {
 					HP_Rate: 15,
 					AttackSpeed_Rate: 20,
 					ATK_Rate: 10,
-					MP: -100
+					MP: -100,
 				},
 			},
 			{
@@ -443,7 +443,7 @@ export const crystalsData: CrystalsData = {
 					ATK_Rate: 10,
 					MATK_Rate: 10,
 					AttackMPRecovery: 4,
-					MP: -200
+					MP: -200,
 				},
 			},
 			{
@@ -455,10 +455,9 @@ export const crystalsData: CrystalsData = {
 					Accuracy_Rate: 5,
 					MP: 200,
 					HP: -300,
-					Critical: -7
+					Critical: -7,
 				},
 			},
-			
 		],
 	},
 } as const

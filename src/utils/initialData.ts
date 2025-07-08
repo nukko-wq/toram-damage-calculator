@@ -171,7 +171,6 @@ export const createInitialCrystalSlots = (): CrystalSlots => ({
 	special2: null,
 })
 
-
 // 料理システムの初期値
 export const createInitialFoodFormData = (): FoodFormData => ({
 	slot1: { selectedFood: 'none', level: 0 },
@@ -344,28 +343,33 @@ export const createInitialRegisterFormData = (): RegisterFormData => {
 }
 
 // レジスタ効果の移行用関数（既存セーブデータに新効果を追加）
-export const migrateRegisterEffects = (existingData: RegisterFormData): RegisterFormData => {
+export const migrateRegisterEffects = (
+	existingData: RegisterFormData,
+): RegisterFormData => {
 	const currentEffects = createInitialRegisterFormData().effects
 	const existingEffects = existingData.effects || []
-	
+
 	// 既存効果をIDでマップ化
-	const existingEffectMap = new Map(existingEffects.map(effect => [effect.id, effect]))
-	
+	const existingEffectMap = new Map(
+		existingEffects.map((effect) => [effect.id, effect]),
+	)
+
 	// 新しい効果配列を作成（既存効果を保持し、不足分を補完）
-	const migratedEffects = currentEffects.map(currentEffect => {
+	const migratedEffects = currentEffects.map((currentEffect) => {
 		// 既存データにある場合はそれを使用、ない場合は新規効果を追加
 		return existingEffectMap.get(currentEffect.id) || currentEffect
 	})
-	
+
 	return { effects: migratedEffects }
 }
 
 // 攻撃スキル初期データ作成
-export const createInitialAttackSkillFormData = (): import('@/types/calculator').AttackSkillFormData => ({
-	selectedSkillId: null,
-	calculatedData: null,
-	lastCalculatedAt: undefined,
-})
+export const createInitialAttackSkillFormData =
+	(): import('@/types/calculator').AttackSkillFormData => ({
+		selectedSkillId: null,
+		calculatedData: null,
+		lastCalculatedAt: undefined,
+	})
 
 // 威力オプション初期データ作成
 export const createInitialPowerOptions = (): PowerOptions => ({

@@ -30,9 +30,7 @@ export class MoonSlashCalculator extends SkillHitCalculator {
 			}
 
 			default:
-				throw new Error(
-					`Invalid hit number for Moon Slash: ${hitNumber}`,
-				)
+				throw new Error(`Invalid hit number for Moon Slash: ${hitNumber}`)
 		}
 	}
 }
