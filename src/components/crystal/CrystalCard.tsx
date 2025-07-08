@@ -267,26 +267,25 @@ export default function CrystalCard({
 			{crystal.conditionalEffects && crystal.conditionalEffects.length > 0 && (
 				<div className="text-sm text-blue-600 space-y-1">
 					{crystal.conditionalEffects.map((effect, index) => {
-						const { conditionText, effectTexts } = formatConditionalEffect(effect)
+						const { conditionText, effectTexts } =
+							formatConditionalEffect(effect)
 						return (
-							<div key={`${crystal.id}-condition-${index}`} className="space-y-1">
-								<div className="font-medium">{conditionText}：</div>
+							<div
+								key={`${crystal.id}-condition-${index}`}
+								className="space-y-1"
+							>
+								<div className="">{conditionText}：</div>
 								{effectTexts.map((effectText, effectIndex) => (
-									<div key={`${crystal.id}-effect-${index}-${effectIndex}`} className="ml-2">
+									<div
+										key={`${crystal.id}-effect-${index}-${effectIndex}`}
+										className="ml-2"
+									>
 										{effectText}
 									</div>
 								))}
 							</div>
 						)
 					})}
-				</div>
-			)}
-			
-			{/* メモ（後方互換性） */}
-			{(crystal.memo1 || crystal.memo2) && (
-				<div className="text-sm text-blue-600 space-y-1">
-					{crystal.memo1 && <div className="">{crystal.memo1}</div>}
-					{crystal.memo2 && <div className="">{crystal.memo2}</div>}
 				</div>
 			)}
 		</div>

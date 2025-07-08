@@ -38,8 +38,6 @@ export const crystalsData: CrystalsData = {
 					INT_Rate: 3,
 					LongRangeDamage_Rate: -6,
 				},
-				memo1: '盾装備時: ヘイト-50%',
-				memo2: '短剣装備時: クリティカルダメージ+1%',
 				conditionalEffects: [
 					{
 						condition: { type: 'subWeapon', weaponType: '盾' },
@@ -152,8 +150,6 @@ export const crystalsData: CrystalsData = {
 					STR_Rate: 6,
 					VIT_Rate: 6,
 				},
-				memo1: '軽鎧装備時: 近距離威力+11% 安定率-5%',
-				memo2: '重鎧装備時: 遠距離威力+11%',
 				conditionalEffects: [
 					{
 						condition: { type: 'armor', armorType: 'light' },
@@ -250,8 +246,6 @@ export const crystalsData: CrystalsData = {
 					PhysicalResistance_Rate: -7,
 					MagicalResistance_Rate: -7,
 				},
-				memo1: '片手剣装備時：ヘイト+15%',
-				memo2: '手甲装備時：ヘイト+15%',
 				conditionalEffects: [
 					{
 						condition: { type: 'mainWeapon', weaponType: '片手剣' },
@@ -335,7 +329,6 @@ export const crystalsData: CrystalsData = {
 					HP_Rate: 24,
 					Aggro_Rate: -15,
 				},
-				memo1: '盾装備時: 行動速度+1%',
 				conditionalEffects: [
 					{
 						condition: { type: 'subWeapon', weaponType: '盾' },
@@ -413,7 +406,6 @@ export const crystalsData: CrystalsData = {
 					AilmentResistance_Rate: 5,
 					FractionalBarrier: 5,
 				},
-				memo1: '重鎧装備時: 物理耐性+15%',
 				conditionalEffects: [
 					{
 						condition: { type: 'armor', armorType: 'heavy' },
@@ -432,8 +424,6 @@ export const crystalsData: CrystalsData = {
 					AilmentResistance_Rate: 10,
 					Aggro_Rate: 40,
 				},
-				memo1: '軽鎧装備時：バリア速度+10%',
-				memo2: '重鎧装備時：割合バリア+10%',
 				conditionalEffects: [
 					{
 						condition: { type: 'armor', armorType: 'light' },
