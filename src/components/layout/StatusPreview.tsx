@@ -28,7 +28,7 @@ import {
 	calculateAilmentResistance,
 	getBodyArmorType,
 } from '@/utils/basicStatsCalculation'
-import { 
+import {
 	getAllDataSourceBonusesWithBuffSkills,
 	getDetailedDataSourceBonuses,
 } from '@/utils/dataSourceIntegration'
@@ -45,7 +45,11 @@ interface FilterDropdownProps {
 	className?: string
 }
 
-const FilterDropdown: React.FC<FilterDropdownProps> = ({ value, onChange, className }) => {
+const FilterDropdown: React.FC<FilterDropdownProps> = ({
+	value,
+	onChange,
+	className,
+}) => {
 	const options = [
 		{ value: 'all', label: '全ての合計値' },
 		{ value: 'main', label: 'メイン装備' },
@@ -64,12 +68,12 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({ value, onChange, classN
 	]
 
 	return (
-		<select 
-			value={value} 
+		<select
+			value={value}
 			onChange={(e) => onChange(e.target.value as FilterOption)}
-			className={`px-2 py-1 text-xs border rounded ${className}`}
+			className={`px-2 py-1 text-xs border border-gray-300 outline-none rounded ${className}`}
 		>
-			{options.map(option => (
+			{options.map((option) => (
 				<option key={option.value} value={option.value}>
 					{option.label}
 				</option>
@@ -106,10 +110,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	}
 
 	// フィルター変更処理
-	const handleFilterChange = (section: keyof typeof filters, value: FilterOption) => {
-		setFilters(prev => ({
+	const handleFilterChange = (
+		section: keyof typeof filters,
+		value: FilterOption,
+	) => {
+		setFilters((prev) => ({
 			...prev,
-			[section]: value
+			[section]: value,
 		}))
 	}
 
@@ -119,7 +126,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// フィルター適用ロジック
 	const getFilteredBonuses = (
 		detailedBonuses: ReturnType<typeof getDetailedDataSourceBonuses>,
-		filter: FilterOption
+		filter: FilterOption,
 	) => {
 		switch (filter) {
 			case 'all':
@@ -370,9 +377,18 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// フィルター適用後の表示用補正値計算
 	const filteredEquipmentBonuses = useMemo(() => {
-		const filtered1 = getFilteredBonuses(detailedBonuses, filters.equipmentBonus1)
-		const filtered2 = getFilteredBonuses(detailedBonuses, filters.equipmentBonus2)
-		const filtered3 = getFilteredBonuses(detailedBonuses, filters.equipmentBonus3)
+		const filtered1 = getFilteredBonuses(
+			detailedBonuses,
+			filters.equipmentBonus1,
+		)
+		const filtered2 = getFilteredBonuses(
+			detailedBonuses,
+			filters.equipmentBonus2,
+		)
+		const filtered3 = getFilteredBonuses(
+			detailedBonuses,
+			filters.equipmentBonus3,
+		)
 
 		return {
 			equipmentBonus1: calculateEquipmentBonuses(filtered1).equipmentBonus1,
@@ -629,9 +645,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 						<div className="stat-section">
 							<div className="flex items-center justify-between mb-2">
 								<h3 className="text-sm font-semibold">装備品補正値1</h3>
-								<FilterDropdown 
+								<FilterDropdown
 									value={filters.equipmentBonus1}
-									onChange={(value) => handleFilterChange('equipmentBonus1', value)}
+									onChange={(value) =>
+										handleFilterChange('equipmentBonus1', value)
+									}
 									className="ml-2"
 								/>
 							</div>
@@ -640,105 +658,105 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								stats={{
 									...filteredEquipmentBonuses.equipmentBonus1,
 								}}
-							labels={{
-								ATK: 'ATK',
-								physicalPenetration: '物理貫通',
-								MATK: 'MATK',
-								magicalPenetration: '魔法貫通',
-								weaponATK: '武器ATK',
-								elementPower: '属性威力',
-								unsheatheAttack: '抜刀威力',
-								shortRangeDamage: '近距離威力',
-								longRangeDamage: '遠距離威力',
-								criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
-								criticalRate: 'ｸﾘﾃｨｶﾙ率',
-								STR: 'STR',
-								AGI: 'AGI',
-								INT: 'INT',
-								DEX: 'DEX',
-								VIT: 'VIT',
-								ASPD: 'ASPD',
-								CSPD: 'CSPD',
-								stability: '安定率',
-								motionSpeed: '行動速度',
-								accuracy: '命中',
-								dodge: '回避',
-								MP: 'MP',
-								attackMPRecovery: '攻撃MP回復',
-								HP: 'HP',
-								ailmentResistance: '異常耐性',
-								physicalResistance: '物理耐性',
-								magicalResistance: '魔法耐性',
-								aggro: 'ヘイト',
-							}}
-							displayMode="property-double"
-							propertyOrder={[
-								'ATK',
-								'physicalPenetration',
-								'MATK',
-								'magicalPenetration',
-								'weaponATK',
-								'',
-								'elementPower',
-								'unsheatheAttack',
-								'shortRangeDamage',
-								'longRangeDamage',
-								'criticalDamage',
-								'criticalRate',
-								'STR',
-								'AGI',
-								'INT',
-								'DEX',
-								'VIT',
-								'',
-								'ASPD',
-								'CSPD',
-								'stability',
-								'motionSpeed',
-								'accuracy',
-								'dodge',
-								'MP',
-								'attackMPRecovery',
-								'HP',
-								'ailmentResistance',
-								'physicalResistance',
-								'magicalResistance',
-								'aggro',
-								'',
-							]}
-							propertyConfigs={{
-								ATK: { hasRate: true, hasFixed: true },
-								physicalPenetration: { hasRate: true, hasFixed: false },
-								MATK: { hasRate: true, hasFixed: true },
-								magicalPenetration: { hasRate: true, hasFixed: false },
-								weaponATK: { hasRate: true, hasFixed: true },
-								elementPower: { hasRate: true, hasFixed: false },
-								unsheatheAttack: { hasRate: true, hasFixed: true },
-								shortRangeDamage: { hasRate: true, hasFixed: false },
-								longRangeDamage: { hasRate: true, hasFixed: false },
-								criticalDamage: { hasRate: true, hasFixed: true },
-								criticalRate: { hasRate: true, hasFixed: true },
-								STR: { hasRate: true, hasFixed: true },
-								AGI: { hasRate: true, hasFixed: true },
-								INT: { hasRate: true, hasFixed: true },
-								DEX: { hasRate: true, hasFixed: true },
-								VIT: { hasRate: true, hasFixed: true },
-								ASPD: { hasRate: true, hasFixed: true },
-								CSPD: { hasRate: true, hasFixed: true },
-								stability: { hasRate: true, hasFixed: false },
-								motionSpeed: { hasRate: true, hasFixed: false },
-								accuracy: { hasRate: true, hasFixed: true },
-								dodge: { hasRate: true, hasFixed: true },
-								MP: { hasRate: true, hasFixed: true },
-								attackMPRecovery: { hasRate: true, hasFixed: true },
-								HP: { hasRate: true, hasFixed: true },
-								ailmentResistance: { hasRate: true, hasFixed: false },
-								physicalResistance: { hasRate: true, hasFixed: false },
-								magicalResistance: { hasRate: true, hasFixed: false },
-								aggro: { hasRate: true, hasFixed: true },
-							}}
-							className=""
-						/>
+								labels={{
+									ATK: 'ATK',
+									physicalPenetration: '物理貫通',
+									MATK: 'MATK',
+									magicalPenetration: '魔法貫通',
+									weaponATK: '武器ATK',
+									elementPower: '属性威力',
+									unsheatheAttack: '抜刀威力',
+									shortRangeDamage: '近距離威力',
+									longRangeDamage: '遠距離威力',
+									criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+									criticalRate: 'ｸﾘﾃｨｶﾙ率',
+									STR: 'STR',
+									AGI: 'AGI',
+									INT: 'INT',
+									DEX: 'DEX',
+									VIT: 'VIT',
+									ASPD: 'ASPD',
+									CSPD: 'CSPD',
+									stability: '安定率',
+									motionSpeed: '行動速度',
+									accuracy: '命中',
+									dodge: '回避',
+									MP: 'MP',
+									attackMPRecovery: '攻撃MP回復',
+									HP: 'HP',
+									ailmentResistance: '異常耐性',
+									physicalResistance: '物理耐性',
+									magicalResistance: '魔法耐性',
+									aggro: 'ヘイト',
+								}}
+								displayMode="property-double"
+								propertyOrder={[
+									'ATK',
+									'physicalPenetration',
+									'MATK',
+									'magicalPenetration',
+									'weaponATK',
+									'',
+									'elementPower',
+									'unsheatheAttack',
+									'shortRangeDamage',
+									'longRangeDamage',
+									'criticalDamage',
+									'criticalRate',
+									'STR',
+									'AGI',
+									'INT',
+									'DEX',
+									'VIT',
+									'',
+									'ASPD',
+									'CSPD',
+									'stability',
+									'motionSpeed',
+									'accuracy',
+									'dodge',
+									'MP',
+									'attackMPRecovery',
+									'HP',
+									'ailmentResistance',
+									'physicalResistance',
+									'magicalResistance',
+									'aggro',
+									'',
+								]}
+								propertyConfigs={{
+									ATK: { hasRate: true, hasFixed: true },
+									physicalPenetration: { hasRate: true, hasFixed: false },
+									MATK: { hasRate: true, hasFixed: true },
+									magicalPenetration: { hasRate: true, hasFixed: false },
+									weaponATK: { hasRate: true, hasFixed: true },
+									elementPower: { hasRate: true, hasFixed: false },
+									unsheatheAttack: { hasRate: true, hasFixed: true },
+									shortRangeDamage: { hasRate: true, hasFixed: false },
+									longRangeDamage: { hasRate: true, hasFixed: false },
+									criticalDamage: { hasRate: true, hasFixed: true },
+									criticalRate: { hasRate: true, hasFixed: true },
+									STR: { hasRate: true, hasFixed: true },
+									AGI: { hasRate: true, hasFixed: true },
+									INT: { hasRate: true, hasFixed: true },
+									DEX: { hasRate: true, hasFixed: true },
+									VIT: { hasRate: true, hasFixed: true },
+									ASPD: { hasRate: true, hasFixed: true },
+									CSPD: { hasRate: true, hasFixed: true },
+									stability: { hasRate: true, hasFixed: false },
+									motionSpeed: { hasRate: true, hasFixed: false },
+									accuracy: { hasRate: true, hasFixed: true },
+									dodge: { hasRate: true, hasFixed: true },
+									MP: { hasRate: true, hasFixed: true },
+									attackMPRecovery: { hasRate: true, hasFixed: true },
+									HP: { hasRate: true, hasFixed: true },
+									ailmentResistance: { hasRate: true, hasFixed: false },
+									physicalResistance: { hasRate: true, hasFixed: false },
+									magicalResistance: { hasRate: true, hasFixed: false },
+									aggro: { hasRate: true, hasFixed: true },
+								}}
+								className=""
+							/>
 						</div>
 					)}
 
@@ -747,118 +765,120 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 						<div className="stat-section">
 							<div className="flex items-center justify-between mb-2">
 								<h3 className="text-sm font-semibold">装備品補正値2</h3>
-								<FilterDropdown 
+								<FilterDropdown
 									value={filters.equipmentBonus2}
-									onChange={(value) => handleFilterChange('equipmentBonus2', value)}
+									onChange={(value) =>
+										handleFilterChange('equipmentBonus2', value)
+									}
 									className="ml-2"
 								/>
 							</div>
 							<StatSection
 								title=""
 								stats={filteredEquipmentBonuses.equipmentBonus2}
-							labels={{
-								ATK_STR: 'ATK+(STR%)',
-								MATK_STR: 'MATK+(STR%)',
-								ATK_INT: 'ATK+(INT%)',
-								MATK_INT: 'MATK+(INT%)',
-								ATK_VIT: 'ATK+(VIT%)',
-								MATK_VIT: 'MATK+(VIT%)',
-								ATK_AGI: 'ATK+(AGI%)',
-								MATK_AGI: 'MATK+(AGI%)',
-								ATK_DEX: 'ATK+(DEX%)',
-								MATK_DEX: 'MATK+(DEX%)',
-								neutralResistance: '無耐性',
-								fireResistance: '火耐性',
-								waterResistance: '水耐性',
-								windResistance: '風耐性',
-								earthResistance: '地耐性',
-								lightResistance: '光耐性',
-								darkResistance: '闇耐性',
-								linearReduction: '直線軽減',
-								rushReduction: '突進軽減',
-								bulletReduction: '弾丸軽減',
-								proximityReduction: '周囲軽減',
-								areaReduction: '範囲軽減',
-								floorTrapReduction: '痛床軽減',
-								meteorReduction: '隕石軽減',
-								bladeReduction: '射刃軽減',
-								suctionReduction: '吸引軽減',
-								explosionReduction: '爆発軽減',
-								physicalBarrier: '物理バリア',
-								magicalBarrier: '魔法バリア',
-								fractionalBarrier: '割合バリア',
-								barrierCooldown: 'バリア速度',
-							}}
-							displayMode="property-double"
-							propertyOrder={[
-								'ATK_STR',
-								'MATK_STR',
-								'ATK_INT',
-								'MATK_INT',
-								'ATK_VIT',
-								'MATK_VIT',
-								'ATK_AGI',
-								'MATK_AGI',
-								'ATK_DEX',
-								'MATK_DEX',
-								'neutralResistance',
-								'',
-								'fireResistance',
-								'waterResistance',
-								'windResistance',
-								'earthResistance',
-								'lightResistance',
-								'darkResistance',
-								'linearReduction',
-								'rushReduction',
-								'bulletReduction',
-								'proximityReduction',
-								'areaReduction',
-								'floorTrapReduction',
-								'meteorReduction',
-								'bladeReduction',
-								'suctionReduction',
-								'explosionReduction',
-								'physicalBarrier',
-								'magicalBarrier',
-								'fractionalBarrier',
-								'barrierCooldown',
-							]}
-							propertyConfigs={{
-								ATK_STR: { hasRate: true, hasFixed: false },
-								MATK_STR: { hasRate: true, hasFixed: false },
-								ATK_INT: { hasRate: true, hasFixed: false },
-								MATK_INT: { hasRate: true, hasFixed: false },
-								ATK_VIT: { hasRate: true, hasFixed: false },
-								MATK_VIT: { hasRate: true, hasFixed: false },
-								ATK_AGI: { hasRate: true, hasFixed: false },
-								MATK_AGI: { hasRate: true, hasFixed: false },
-								ATK_DEX: { hasRate: true, hasFixed: false },
-								MATK_DEX: { hasRate: true, hasFixed: false },
-								neutralResistance: { hasRate: true, hasFixed: false },
-								fireResistance: { hasRate: true, hasFixed: false },
-								waterResistance: { hasRate: true, hasFixed: false },
-								windResistance: { hasRate: true, hasFixed: false },
-								earthResistance: { hasRate: true, hasFixed: false },
-								lightResistance: { hasRate: true, hasFixed: false },
-								darkResistance: { hasRate: true, hasFixed: false },
-								linearReduction: { hasRate: true, hasFixed: false },
-								rushReduction: { hasRate: true, hasFixed: false },
-								bulletReduction: { hasRate: true, hasFixed: false },
-								proximityReduction: { hasRate: true, hasFixed: false },
-								areaReduction: { hasRate: true, hasFixed: false },
-								floorTrapReduction: { hasRate: true, hasFixed: false },
-								meteorReduction: { hasRate: true, hasFixed: false },
-								bladeReduction: { hasRate: true, hasFixed: false },
-								suctionReduction: { hasRate: true, hasFixed: false },
-								explosionReduction: { hasRate: true, hasFixed: false },
-								physicalBarrier: { hasRate: false, hasFixed: true },
-								magicalBarrier: { hasRate: false, hasFixed: true },
-								fractionalBarrier: { hasRate: false, hasFixed: true },
-								barrierCooldown: { hasRate: true, hasFixed: false },
-							}}
-							className=""
-						/>
+								labels={{
+									ATK_STR: 'ATK+(STR%)',
+									MATK_STR: 'MATK+(STR%)',
+									ATK_INT: 'ATK+(INT%)',
+									MATK_INT: 'MATK+(INT%)',
+									ATK_VIT: 'ATK+(VIT%)',
+									MATK_VIT: 'MATK+(VIT%)',
+									ATK_AGI: 'ATK+(AGI%)',
+									MATK_AGI: 'MATK+(AGI%)',
+									ATK_DEX: 'ATK+(DEX%)',
+									MATK_DEX: 'MATK+(DEX%)',
+									neutralResistance: '無耐性',
+									fireResistance: '火耐性',
+									waterResistance: '水耐性',
+									windResistance: '風耐性',
+									earthResistance: '地耐性',
+									lightResistance: '光耐性',
+									darkResistance: '闇耐性',
+									linearReduction: '直線軽減',
+									rushReduction: '突進軽減',
+									bulletReduction: '弾丸軽減',
+									proximityReduction: '周囲軽減',
+									areaReduction: '範囲軽減',
+									floorTrapReduction: '痛床軽減',
+									meteorReduction: '隕石軽減',
+									bladeReduction: '射刃軽減',
+									suctionReduction: '吸引軽減',
+									explosionReduction: '爆発軽減',
+									physicalBarrier: '物理バリア',
+									magicalBarrier: '魔法バリア',
+									fractionalBarrier: '割合バリア',
+									barrierCooldown: 'バリア速度',
+								}}
+								displayMode="property-double"
+								propertyOrder={[
+									'ATK_STR',
+									'MATK_STR',
+									'ATK_INT',
+									'MATK_INT',
+									'ATK_VIT',
+									'MATK_VIT',
+									'ATK_AGI',
+									'MATK_AGI',
+									'ATK_DEX',
+									'MATK_DEX',
+									'neutralResistance',
+									'',
+									'fireResistance',
+									'waterResistance',
+									'windResistance',
+									'earthResistance',
+									'lightResistance',
+									'darkResistance',
+									'linearReduction',
+									'rushReduction',
+									'bulletReduction',
+									'proximityReduction',
+									'areaReduction',
+									'floorTrapReduction',
+									'meteorReduction',
+									'bladeReduction',
+									'suctionReduction',
+									'explosionReduction',
+									'physicalBarrier',
+									'magicalBarrier',
+									'fractionalBarrier',
+									'barrierCooldown',
+								]}
+								propertyConfigs={{
+									ATK_STR: { hasRate: true, hasFixed: false },
+									MATK_STR: { hasRate: true, hasFixed: false },
+									ATK_INT: { hasRate: true, hasFixed: false },
+									MATK_INT: { hasRate: true, hasFixed: false },
+									ATK_VIT: { hasRate: true, hasFixed: false },
+									MATK_VIT: { hasRate: true, hasFixed: false },
+									ATK_AGI: { hasRate: true, hasFixed: false },
+									MATK_AGI: { hasRate: true, hasFixed: false },
+									ATK_DEX: { hasRate: true, hasFixed: false },
+									MATK_DEX: { hasRate: true, hasFixed: false },
+									neutralResistance: { hasRate: true, hasFixed: false },
+									fireResistance: { hasRate: true, hasFixed: false },
+									waterResistance: { hasRate: true, hasFixed: false },
+									windResistance: { hasRate: true, hasFixed: false },
+									earthResistance: { hasRate: true, hasFixed: false },
+									lightResistance: { hasRate: true, hasFixed: false },
+									darkResistance: { hasRate: true, hasFixed: false },
+									linearReduction: { hasRate: true, hasFixed: false },
+									rushReduction: { hasRate: true, hasFixed: false },
+									bulletReduction: { hasRate: true, hasFixed: false },
+									proximityReduction: { hasRate: true, hasFixed: false },
+									areaReduction: { hasRate: true, hasFixed: false },
+									floorTrapReduction: { hasRate: true, hasFixed: false },
+									meteorReduction: { hasRate: true, hasFixed: false },
+									bladeReduction: { hasRate: true, hasFixed: false },
+									suctionReduction: { hasRate: true, hasFixed: false },
+									explosionReduction: { hasRate: true, hasFixed: false },
+									physicalBarrier: { hasRate: false, hasFixed: true },
+									magicalBarrier: { hasRate: false, hasFixed: true },
+									fractionalBarrier: { hasRate: false, hasFixed: true },
+									barrierCooldown: { hasRate: true, hasFixed: false },
+								}}
+								className=""
+							/>
 						</div>
 					)}
 
@@ -867,48 +887,50 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 						<div className="stat-section">
 							<div className="flex items-center justify-between mb-2">
 								<h3 className="text-sm font-semibold">装備品補正値3</h3>
-								<FilterDropdown 
+								<FilterDropdown
 									value={filters.equipmentBonus3}
-									onChange={(value) => handleFilterChange('equipmentBonus3', value)}
+									onChange={(value) =>
+										handleFilterChange('equipmentBonus3', value)
+									}
 									className="ml-2"
 								/>
 							</div>
 							<StatSection
 								title=""
 								stats={filteredEquipmentBonuses.equipmentBonus3}
-							labels={{
-								physicalFollowup: '物理追撃',
-								magicalFollowup: '魔法追撃',
-								naturalHPRecovery: 'HP自然回復',
-								naturalMPRecovery: 'MP自然回復',
-								absoluteAccuracy: '絶対命中',
-								absoluteDodge: '絶対回避',
-								revivalTime: '復帰短縮',
-								itemCooldown: '道具速度',
-							}}
-							displayMode="property-double"
-							propertyOrder={[
-								'physicalFollowup',
-								'magicalFollowup',
-								'naturalHPRecovery',
-								'naturalMPRecovery',
-								'absoluteAccuracy',
-								'absoluteDodge',
-								'revivalTime',
-								'itemCooldown',
-							]}
-							propertyConfigs={{
-								physicalFollowup: { hasRate: true, hasFixed: false },
-								magicalFollowup: { hasRate: true, hasFixed: false },
-								naturalHPRecovery: { hasRate: true, hasFixed: true },
-								naturalMPRecovery: { hasRate: true, hasFixed: true },
-								absoluteAccuracy: { hasRate: true, hasFixed: true },
-								absoluteDodge: { hasRate: true, hasFixed: true },
-								revivalTime: { hasRate: true, hasFixed: false },
-								itemCooldown: { hasRate: false, hasFixed: true },
-							}}
-							className=""
-						/>
+								labels={{
+									physicalFollowup: '物理追撃',
+									magicalFollowup: '魔法追撃',
+									naturalHPRecovery: 'HP自然回復',
+									naturalMPRecovery: 'MP自然回復',
+									absoluteAccuracy: '絶対命中',
+									absoluteDodge: '絶対回避',
+									revivalTime: '復帰短縮',
+									itemCooldown: '道具速度',
+								}}
+								displayMode="property-double"
+								propertyOrder={[
+									'physicalFollowup',
+									'magicalFollowup',
+									'naturalHPRecovery',
+									'naturalMPRecovery',
+									'absoluteAccuracy',
+									'absoluteDodge',
+									'revivalTime',
+									'itemCooldown',
+								]}
+								propertyConfigs={{
+									physicalFollowup: { hasRate: true, hasFixed: false },
+									magicalFollowup: { hasRate: true, hasFixed: false },
+									naturalHPRecovery: { hasRate: true, hasFixed: true },
+									naturalMPRecovery: { hasRate: true, hasFixed: true },
+									absoluteAccuracy: { hasRate: true, hasFixed: true },
+									absoluteDodge: { hasRate: true, hasFixed: true },
+									revivalTime: { hasRate: true, hasFixed: false },
+									itemCooldown: { hasRate: false, hasFixed: true },
+								}}
+								className=""
+							/>
 						</div>
 					)}
 				</div>
