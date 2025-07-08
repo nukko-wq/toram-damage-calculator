@@ -250,9 +250,19 @@ export const getAllCrystalsLegacy = (): (PresetCrystal | UserCrystal)[] => {
 	return [...presetCrystals, ...getUserCrystals()]
 }
 
-// タイプ別にクリスタを取得（新システム）
+// タイプ別クリスタのキャッシュ
+const crystalsByTypeCache = new Map<CrystalType, Crystal[]>()
+
+// タイプ別にクリスタを取得（新システム）- メモ化対応
 export const getCrystalsByType = (type: CrystalType): Crystal[] => {
-	return getAllCrystals().filter((crystal) => crystal.type === type)
+	if (crystalsByTypeCache.has(type)) {
+		const cached = crystalsByTypeCache.get(type)
+		return cached || []
+	}
+
+	const crystals = getAllCrystals().filter((crystal) => crystal.type === type)
+	crystalsByTypeCache.set(type, crystals)
+	return crystals
 }
 
 // IDでクリスタを取得（新システム）

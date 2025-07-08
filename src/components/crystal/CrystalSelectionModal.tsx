@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { CrystalType, Crystal } from '@/types/calculator'
 import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
@@ -27,7 +27,23 @@ export default function CrystalSelectionModal({
 	slotInfo,
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
-	const [availableCrystals, setAvailableCrystals] = useState<Crystal[]>([])
+
+	// useMemoを使用してavailableCrystalsを同期的に取得
+	const availableCrystals = useMemo(() => {
+		if (!isOpen) return []
+
+		// 許可されたタイプのクリスタ + ノーマルクリスタを取得
+		const allAllowedCrystals = [
+			...allowedTypes.flatMap((type) => getCrystalsByType(type)),
+			...getCrystalsByType('normal'),
+		]
+
+		// 重複を除去
+		return allAllowedCrystals.filter(
+			(crystal, index, self) =>
+				index === self.findIndex((c) => c.id === crystal.id),
+		)
+	}, [isOpen, allowedTypes])
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
@@ -45,23 +61,12 @@ export default function CrystalSelectionModal({
 		}
 	}, [isOpen, onClose])
 
+	// モーダルが開かれるたびにフィルターを初期化
 	useEffect(() => {
-		if (!isOpen) return
-
-		// 許可されたタイプのクリスタ + ノーマルクリスタを取得
-		const allAllowedCrystals = [
-			...allowedTypes.flatMap((type) => getCrystalsByType(type)),
-			...getCrystalsByType('normal'),
-		]
-
-		// 重複を除去
-		const uniqueCrystals = allAllowedCrystals.filter(
-			(crystal, index, self) =>
-				index === self.findIndex((c) => c.id === crystal.id),
-		)
-
-		setAvailableCrystals(uniqueCrystals)
-	}, [isOpen, allowedTypes])
+		if (isOpen) {
+			setActiveFilter('all')
+		}
+	}, [isOpen])
 
 	const filteredCrystals = availableCrystals.filter((crystal) => {
 		if (activeFilter === 'all') return true
