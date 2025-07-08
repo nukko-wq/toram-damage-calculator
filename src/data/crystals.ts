@@ -51,6 +51,84 @@ export const crystalsData: CrystalsData = {
 					CastingSpeed_Rate: -16,
 				},
 			},
+			{
+				id: 'f7c8d9e0-1234-5678-9abc-def012345678',
+				name: 'ベリュム',
+				type: 'weapon',
+				properties: {
+					ATK_Rate: 9,
+					AttackMPRecovery: 6,
+					Anticipate_Rate: 13,
+					MP: -100
+				},
+			},
+			{
+				id: 'a1b2c3d4-5678-9012-3456-789abcdef012',
+				name: 'デフォーミス',
+				type: 'weapon',
+				properties: {
+					ATK_Rate: 11,
+					AttackMPRecovery: 8,
+					Anticipate_Rate: 14,
+					MP: -200
+				},
+			},
+			{
+				id: 'e4f5g6h7-8901-2345-6789-012345678901',
+				name: 'フビット',
+				type: 'weapon',
+				properties: {
+					ATK_Rate: 6,
+					PhysicalPenetration_Rate: 20,
+					Aggro_Rate: -15,
+					AilmentResistance_Rate: -15,
+					MP: -200
+				},
+			},
+			{
+				id: 'b8c9d0e1-2345-6789-0123-456789abcdef',
+				name: 'バテュード',
+				type: 'weapon',
+				properties: {
+					MATK_Rate: 10,
+					MagicalPenetration_Rate: 7,
+					Aggro_Rate: -11,
+					MDEF_Rate: -30,
+				},
+			},
+			{
+				id: 'c3d4e5f6-7890-1234-5678-9012345678ab',
+				name: '春方の夢見草',
+				type: 'weapon',
+				properties: {
+					MATK_Rate: 11,
+					Critical: 13,
+					Aggro_Rate: -13
+				},
+			},
+			{
+				id: 'd7e8f9a0-1234-5678-9012-3456789abcde',
+				name: '原初の誘月華',
+				type: 'weapon',
+				properties: {
+					ATK_Rate: 10,
+					MATK_Rate: 10,
+					HP_Rate: 10,
+					Anticipate_Rate: 10,
+					ArmorBreak_Rate: 10,
+					MP: -200
+				},
+			},
+			{
+				id: 'e2f3g4h5-6789-0123-4567-890123456789',
+				name: 'バクザン',
+				type: 'weapon',
+				properties: {
+					ATK_Rate: 11,
+					DEX_Rate: 9,
+					AttackSpeed_Rate: 7
+				},
+			},
 		],
 		armor: [
 			{
@@ -99,6 +177,53 @@ export const crystalsData: CrystalsData = {
 					CastingSpeed_Rate: 40,
 					AttackMPRecovery_Rate: 10,
 				},
+			},
+			{
+				id: '1a2b3c4d-5e6f-7890-1234-56789abcdef0',
+				name: 'ビーモズ',
+				type: 'armor',
+				properties: {
+					ATK_Rate: 6,
+					MATK_Rate: 6,
+					PhysicalPenetration_Rate: 8,
+					MagicalPenetration_Rate: 8,
+					Critical: 17,
+					MP: -150
+				},
+			},
+			{
+				id: '2b3c4d5e-6f78-9012-3456-789abcdef012',
+				name: 'レオナルド博士Ⅱ',
+				type: 'armor',
+				properties: {
+					MATK_Rate: 3,
+					LongRangeDamage_Rate: 6,
+					Critical_Rate: 20,
+					HP: 6000,
+					AilmentResistance_Rate: 5
+				},
+			},
+			{
+				id: '3c4d5e6f-7890-1234-5678-9abcdef01234',
+				name: '魔神クウィーザ',
+				type: 'armor',
+				properties: {
+					MP: 1000,
+					CastingSpeed: 300,
+					MotionSpeed_Rate: 1
+				},
+			},
+			{
+				id: '4d5e6f78-9012-3456-789a-bcdef0123456',
+				name: 'ビルロッシュ',
+				type: 'armor',
+				properties: {
+					HP_Rate: 60,
+					PhysicalResistance_Rate: -7,
+					MagicalResistance_Rate: -7,
+				},
+				memo1: '片手剣装備時：ヘイト+15%',
+				memo2: '手甲装備時：ヘイト+15%',
 			},
 		],
 		additional: [
@@ -207,6 +332,55 @@ export const crystalsData: CrystalsData = {
 					DEF_Rate: -40,
 				},
 			},
+			{
+				id: '5e6f7890-1234-5678-9abc-def012345678',
+				name: 'シカノカーミ(槍装備時)',
+				type: 'special',
+				properties: {
+					ShortRangeDamage_Rate: 5,
+					AttackMPRecovery: 20,
+					Accuracy: 50,
+					LongRangeDamage_Rate: 5,
+				},
+			},
+			{
+				id: '6f789012-3456-789a-bcde-f01234567890',
+				name: '星の魔導士(盾装備)',
+				type: 'special',
+				properties: {
+					MATK_Rate: 9,
+					CastingSpeed_Rate: 9,
+					Anticipate_Rate: 9,
+					Aggro_Rate: 9
+				},
+			},
+			{
+				id: '78901234-5678-9abc-def0-123456789012',
+				name: '機械紳メイプル',
+				type: 'special',
+				properties: {
+					MP: 200,
+					ShortRangeDamage_Rate: 10,
+					PhysicalResistance_Rate: 10,
+					MagicalResistance_Rate: 10,
+					AilmentResistance_Rate: 5,
+					FractionalBarrier: 5,
+				},
+				memo1: '重鎧装備時: 物理耐性+15%',
+			},
+			{
+				id: '89012345-6789-abcd-ef01-23456789abcd',
+				name: '黒リグシー',
+				type: 'special',
+				properties: {
+					AttackMPRecovery: 20,
+					AttackSpeed: 300,
+					AilmentResistance_Rate: 10,
+					Aggro_Rate: 40,
+				},
+				memo1: '軽鎧装備時：バリア速度+10%',
+				memo2: '重鎧装備時：割合バリア+10%',
+			},
 		],
 		normal: [
 			{
@@ -240,6 +414,51 @@ export const crystalsData: CrystalsData = {
 					Aggro_Rate: 10,
 				},
 			},
+			{
+				id: '9012345a-bcde-f012-3456-789abcdef012',
+				name: '暴獣リグシー',
+				type: 'normal',
+				properties: {
+					HP_Rate: 15,
+					AttackSpeed_Rate: 20,
+					ATK_Rate: 10,
+					MP: -100
+				},
+			},
+			{
+				id: 'a123456b-cdef-0123-4567-89abcdef0123',
+				name: 'リマシナ',
+				type: 'normal',
+				properties: {
+					AilmentResistance_Rate: 5,
+					PhysicalResistance_Rate: 5,
+					MagicalResistance_Rate: 5,
+				},
+			},
+			{
+				id: 'b234567c-def0-1234-5678-9abcdef01234',
+				name: 'ルトセーザ',
+				type: 'normal',
+				properties: {
+					ATK_Rate: 10,
+					MATK_Rate: 10,
+					AttackMPRecovery: 4,
+					MP: -200
+				},
+			},
+			{
+				id: 'c345678d-ef01-2345-6789-abcdef012345',
+				name: '尉竜ルディス',
+				type: 'normal',
+				properties: {
+					ShortRangeDamage_Rate: 9,
+					Accuracy_Rate: 5,
+					MP: 200,
+					HP: -300,
+					Critical: -7
+				},
+			},
+			
 		],
 	},
 } as const
