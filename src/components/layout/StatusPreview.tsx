@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useCalculatorStore } from '@/stores'
+import type { FilterOption } from '@/types/bonusCalculation'
 import {
 	calculateHP,
 	calculateMP,
@@ -27,11 +28,54 @@ import {
 	calculateAilmentResistance,
 	getBodyArmorType,
 } from '@/utils/basicStatsCalculation'
-import { getAllDataSourceBonusesWithBuffSkills } from '@/utils/dataSourceIntegration'
+import { 
+	getAllDataSourceBonusesWithBuffSkills,
+	getDetailedDataSourceBonuses,
+} from '@/utils/dataSourceIntegration'
 import StatSection from './StatSection'
 
 interface StatusPreviewProps {
 	isVisible: boolean
+}
+
+// フィルタードロップダウンコンポーネント
+interface FilterDropdownProps {
+	value: FilterOption
+	onChange: (value: FilterOption) => void
+	className?: string
+}
+
+const FilterDropdown: React.FC<FilterDropdownProps> = ({ value, onChange, className }) => {
+	const options = [
+		{ value: 'all', label: '全ての合計値' },
+		{ value: 'main', label: 'メイン装備' },
+		{ value: 'subWeapon', label: 'サブ装備' },
+		{ value: 'body', label: '体装備' },
+		{ value: 'additional', label: '追加装備' },
+		{ value: 'special', label: '特殊装備' },
+		{ value: 'enchantment', label: 'エンチャント' },
+		{ value: 'freeInput1', label: '自由入力1' },
+		{ value: 'freeInput2', label: '自由入力2' },
+		{ value: 'freeInput3', label: '自由入力3' },
+		{ value: 'crystal', label: 'クリスタ' },
+		{ value: 'food', label: '料理' },
+		{ value: 'buffItems', label: 'アイテムバフ' },
+		{ value: 'buffSkills', label: 'スキルバフ' },
+	]
+
+	return (
+		<select 
+			value={value} 
+			onChange={(e) => onChange(e.target.value as FilterOption)}
+			className={`px-2 py-1 text-xs border rounded ${className}`}
+		>
+			{options.map(option => (
+				<option key={option.value} value={option.value}>
+					{option.label}
+				</option>
+			))}
+		</select>
+	)
 }
 
 export default function StatusPreview({ isVisible }: StatusPreviewProps) {
@@ -46,6 +90,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		equipmentBonus3: false,
 	})
 
+	// フィルター状態管理
+	const [filters, setFilters] = useState({
+		equipmentBonus1: 'all' as FilterOption,
+		equipmentBonus2: 'all' as FilterOption,
+		equipmentBonus3: 'all' as FilterOption,
+	})
+
 	// セクション表示の切り替え
 	const toggleSection = (section: keyof typeof visibleSections) => {
 		setVisibleSections((prev) => ({
@@ -54,12 +105,60 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		}))
 	}
 
+	// フィルター変更処理
+	const handleFilterChange = (section: keyof typeof filters, value: FilterOption) => {
+		setFilters(prev => ({
+			...prev,
+			[section]: value
+		}))
+	}
+
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
 
+	// フィルター適用ロジック
+	const getFilteredBonuses = (
+		detailedBonuses: ReturnType<typeof getDetailedDataSourceBonuses>,
+		filter: FilterOption
+	) => {
+		switch (filter) {
+			case 'all':
+				// 既存のロジック（全ての合計）
+				return getAllDataSourceBonusesWithBuffSkills(data)
+			case 'main':
+				return detailedBonuses.equipment.main
+			case 'subWeapon':
+				return detailedBonuses.equipment.subWeapon
+			case 'body':
+				return detailedBonuses.equipment.body
+			case 'additional':
+				return detailedBonuses.equipment.additional
+			case 'special':
+				return detailedBonuses.equipment.special
+			case 'enchantment':
+				return detailedBonuses.equipment.enchantment
+			case 'freeInput1':
+				return detailedBonuses.equipment.freeInput1
+			case 'freeInput2':
+				return detailedBonuses.equipment.freeInput2
+			case 'freeInput3':
+				return detailedBonuses.equipment.freeInput3
+			case 'crystal':
+				return detailedBonuses.crystal
+			case 'food':
+				return detailedBonuses.food
+			case 'buffItems':
+				return detailedBonuses.buffItems
+			case 'buffSkills':
+				return detailedBonuses.buffSkills
+			default:
+				return {}
+		}
+	}
+
 	// 統合計算のメモ化
 	const calculationResults = useMemo(() => {
-		// バフスキルを含む全データソースのボーナスを取得
+		// バフスキルを含む全データソースのボーナスを取得（計算用は常に全合計値）
 		const allBonuses = getAllDataSourceBonusesWithBuffSkills(data)
 
 		// 全ての効果を統合した最終ボーナス値を作成
@@ -263,6 +362,24 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			adjustedStatsCalculation,
 		}
 	}, [data, baseStats])
+
+	// 詳細データソースボーナス取得（フィルター表示用）
+	const detailedBonuses = useMemo(() => {
+		return getDetailedDataSourceBonuses(data)
+	}, [data])
+
+	// フィルター適用後の表示用補正値計算
+	const filteredEquipmentBonuses = useMemo(() => {
+		const filtered1 = getFilteredBonuses(detailedBonuses, filters.equipmentBonus1)
+		const filtered2 = getFilteredBonuses(detailedBonuses, filters.equipmentBonus2)
+		const filtered3 = getFilteredBonuses(detailedBonuses, filters.equipmentBonus3)
+
+		return {
+			equipmentBonus1: calculateEquipmentBonuses(filtered1).equipmentBonus1,
+			equipmentBonus2: calculateEquipmentBonuses(filtered2).equipmentBonus2,
+			equipmentBonus3: calculateEquipmentBonuses(filtered3).equipmentBonus3,
+		}
+	}, [detailedBonuses, filters, data])
 
 	const {
 		allBonuses: finalBonuses,
@@ -509,11 +626,20 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 					{/* 装備品補正値1 (31項目) */}
 					{visibleSections.equipmentBonus1 && (
-						<StatSection
-							title="装備品補正値1"
-							stats={{
-								...equipmentBonus1,
-							}}
+						<div className="stat-section">
+							<div className="flex items-center justify-between mb-2">
+								<h3 className="text-sm font-semibold">装備品補正値1</h3>
+								<FilterDropdown 
+									value={filters.equipmentBonus1}
+									onChange={(value) => handleFilterChange('equipmentBonus1', value)}
+									className="ml-2"
+								/>
+							</div>
+							<StatSection
+								title=""
+								stats={{
+									...filteredEquipmentBonuses.equipmentBonus1,
+								}}
 							labels={{
 								ATK: 'ATK',
 								physicalPenetration: '物理貫通',
@@ -613,13 +739,23 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							}}
 							className=""
 						/>
+						</div>
 					)}
 
 					{/* 装備品補正値2 (32項目) */}
 					{visibleSections.equipmentBonus2 && (
-						<StatSection
-							title="装備品補正値2"
-							stats={equipmentBonus2}
+						<div className="stat-section">
+							<div className="flex items-center justify-between mb-2">
+								<h3 className="text-sm font-semibold">装備品補正値2</h3>
+								<FilterDropdown 
+									value={filters.equipmentBonus2}
+									onChange={(value) => handleFilterChange('equipmentBonus2', value)}
+									className="ml-2"
+								/>
+							</div>
+							<StatSection
+								title=""
+								stats={filteredEquipmentBonuses.equipmentBonus2}
 							labels={{
 								ATK_STR: 'ATK+(STR%)',
 								MATK_STR: 'MATK+(STR%)',
@@ -723,13 +859,23 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							}}
 							className=""
 						/>
+						</div>
 					)}
 
 					{/* 装備品補正値3 (8項目) */}
 					{visibleSections.equipmentBonus3 && (
-						<StatSection
-							title="装備品補正値3"
-							stats={equipmentBonus3}
+						<div className="stat-section">
+							<div className="flex items-center justify-between mb-2">
+								<h3 className="text-sm font-semibold">装備品補正値3</h3>
+								<FilterDropdown 
+									value={filters.equipmentBonus3}
+									onChange={(value) => handleFilterChange('equipmentBonus3', value)}
+									className="ml-2"
+								/>
+							</div>
+							<StatSection
+								title=""
+								stats={filteredEquipmentBonuses.equipmentBonus3}
 							labels={{
 								physicalFollowup: '物理追撃',
 								magicalFollowup: '魔法追撃',
@@ -763,6 +909,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							}}
 							className=""
 						/>
+						</div>
 					)}
 				</div>
 			</div>

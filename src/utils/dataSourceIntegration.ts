@@ -13,6 +13,7 @@ import type {
 	FoodBonusSource,
 	BuffBonusSource,
 	DataSourceBonuses,
+	DetailedDataSourceBonuses,
 } from '@/types/bonusCalculation'
 import type { CalculatorData } from '@/types/calculator'
 import { getCrystalById } from './crystalDatabase'
@@ -575,6 +576,160 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	}
 
 	return bonuses
+}
+
+/**
+ * 装備スロット別の補正値を取得
+ */
+export function getEquipmentSlotBonuses(equipmentData: any): Record<string, Partial<AllBonuses>> {
+	try {
+		const bonuses: Record<string, Partial<AllBonuses>> = {
+			main: {},
+			body: {},
+			additional: {},
+			special: {},
+			subWeapon: {},
+			fashion1: {},
+			fashion2: {},
+			fashion3: {},
+			freeInput1: {},
+			freeInput2: {},
+			freeInput3: {},
+		}
+
+		// nullチェック
+		if (!equipmentData) {
+			return bonuses
+		}
+
+		// 各スロットごとに個別計算
+		const slots = [
+			{ key: 'main', data: equipmentData.main },
+			{ key: 'body', data: equipmentData.body },
+			{ key: 'additional', data: equipmentData.additional },
+			{ key: 'special', data: equipmentData.special },
+			{ key: 'subWeapon', data: equipmentData.subWeapon },
+			{ key: 'fashion1', data: equipmentData.fashion1 },
+			{ key: 'fashion2', data: equipmentData.fashion2 },
+			{ key: 'fashion3', data: equipmentData.fashion3 },
+			{ key: 'freeInput1', data: equipmentData.freeInput1 },
+			{ key: 'freeInput2', data: equipmentData.freeInput2 },
+			{ key: 'freeInput3', data: equipmentData.freeInput3 },
+		]
+
+		for (const slot of slots) {
+			if (slot.data?.properties) {
+				for (const [propertyKey, value] of Object.entries(slot.data.properties)) {
+					if (typeof value === 'number' && value !== 0) {
+						const validatedValue = validatePropertyValue(value, propertyKey)
+						const normalizedKey = normalizePropertyKey(propertyKey)
+						bonuses[slot.key][normalizedKey as keyof AllBonuses] = validatedValue
+					}
+				}
+			}
+		}
+
+		return bonuses
+	} catch (error) {
+		console.error('Equipment slot bonus calculation error:', error)
+		return {
+			main: {},
+			body: {},
+			additional: {},
+			special: {},
+			subWeapon: {},
+			fashion1: {},
+			fashion2: {},
+			fashion3: {},
+			freeInput1: {},
+			freeInput2: {},
+			freeInput3: {},
+		}
+	}
+}
+
+/**
+ * エンチャント（オシャレ装備）の合計補正値を取得
+ */
+export function getEnchantmentBonuses(equipmentData: any): Partial<AllBonuses> {
+	try {
+		const bonuses: Partial<AllBonuses> = {}
+		
+		// nullチェック
+		if (!equipmentData) return bonuses
+
+		const slots = [equipmentData.fashion1, equipmentData.fashion2, equipmentData.fashion3]
+
+		for (const slot of slots) {
+			if (slot?.properties) {
+				for (const [propertyKey, value] of Object.entries(slot.properties)) {
+					if (typeof value === 'number' && value !== 0) {
+						const validatedValue = validatePropertyValue(value, propertyKey)
+						const normalizedKey = normalizePropertyKey(propertyKey)
+						bonuses[normalizedKey as keyof AllBonuses] = 
+							(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
+					}
+				}
+			}
+		}
+
+		return bonuses
+	} catch (error) {
+		console.error('Enchantment bonus calculation error:', error)
+		return {}
+	}
+}
+
+/**
+ * データソース別補正値を一括取得
+ */
+export function getDetailedDataSourceBonuses(data: CalculatorData): DetailedDataSourceBonuses {
+	try {
+		const equipmentSlots = getEquipmentSlotBonuses(data.equipment)
+		
+		return {
+			equipment: {
+				main: equipmentSlots.main,
+				body: equipmentSlots.body,
+				additional: equipmentSlots.additional,
+				special: equipmentSlots.special,
+				subWeapon: equipmentSlots.subWeapon,
+				fashion1: equipmentSlots.fashion1,
+				fashion2: equipmentSlots.fashion2,
+				fashion3: equipmentSlots.fashion3,
+				freeInput1: equipmentSlots.freeInput1,
+				freeInput2: equipmentSlots.freeInput2,
+				freeInput3: equipmentSlots.freeInput3,
+				enchantment: getEnchantmentBonuses(data.equipment),
+			},
+			crystal: getCrystalBonuses(data.crystals),
+			food: getFoodBonuses(data.food),
+			buffItems: getBuffBonuses(data.buffItems),
+			buffSkills: getBuffSkillBonuses(data.buffSkills?.skills || null, data.mainWeapon?.weaponType || null),
+		}
+	} catch (error) {
+		console.error('Detailed data source bonuses calculation error:', error)
+		return {
+			equipment: {
+				main: {},
+				body: {},
+				additional: {},
+				special: {},
+				subWeapon: {},
+				fashion1: {},
+				fashion2: {},
+				fashion3: {},
+				freeInput1: {},
+				freeInput2: {},
+				freeInput3: {},
+				enchantment: {},
+			},
+			crystal: {},
+			food: {},
+			buffItems: {},
+			buffSkills: {},
+		}
+	}
 }
 
 /**
