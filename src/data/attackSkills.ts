@@ -11,16 +11,16 @@ import type {
 const attackSkillsRawData: AttackSkill[] = [
 	// 片手剣スキル
 	{
-		id: 'slash',
-		name: 'スラッシュ',
+		id: 'buster_blade',
+		name: 'バスターブレード',
 		order: 101,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['片手剣'],
-		mpCost: 8,
-		multiplierFormula: '125%',
-		fixedDamageFormula: '0',
-		specialEffects: ['物理貫通ボーナス: +20%'],
+		mpCost: 300,
+		multiplierFormula: '特殊計算',
+		fixedDamageFormula: '300',
+		specialEffects: ['確定クリティカル'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -34,10 +34,10 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamageFormula: '0',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
-				canUseUnsheathePower: true,
+				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
-				canUseLongRangePower: true,
+				canUseLongRangePower: false,
 			},
 		],
 	},

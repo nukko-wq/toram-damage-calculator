@@ -65,9 +65,6 @@ export default function BuffSkillForm() {
 		<div className="space-y-4 md:col-start-1 md:col-end-9 md:row-start-5 md:row-end-6 xl:col-start-1 xl:col-end-4 xl:row-start-4 xl:row-end-5 bg-white p-4 rounded-lg shadow-md">
 			<div className="mb-6">
 				<h2 className="text-xl font-bold text-gray-900 mb-2">バフスキル</h2>
-				<p className="text-sm text-gray-600">
-					利用可能スキル数: {availableSkills.length}
-				</p>
 			</div>
 
 			<div className="grid grid-cols-2 gap-4 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3">
