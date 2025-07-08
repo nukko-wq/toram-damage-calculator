@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useCalculatorStore } from '@/stores'
 import type { FilterOption } from '@/types/bonusCalculation'
 import {
@@ -23,7 +23,6 @@ import {
 	calculateTotalElementAdvantage,
 	calculateStability,
 	calculateAdjustedStats,
-	aggregateAllBonuses,
 	calculateEquipmentBonuses,
 	calculateAilmentResistance,
 	getBodyArmorType,
@@ -101,11 +100,55 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		equipmentBonus3: 'all' as FilterOption,
 	})
 
+	// レスポンシブ表示制御
+	const [isMobile, setIsMobile] = useState(false)
+	const [activeSection, setActiveSection] = useState<keyof typeof visibleSections>('basicStats')
+
 	// セクション表示の切り替え
 	const toggleSection = (section: keyof typeof visibleSections) => {
 		setVisibleSections((prev) => ({
 			...prev,
 			[section]: !prev[section],
+		}))
+	}
+
+	// ブレークポイント監視
+	useEffect(() => {
+		const mediaQuery = window.matchMedia('(max-width: 639px)') // sm未満
+		const handleChange = () => {
+			setIsMobile(mediaQuery.matches)
+			// モバイル切り替え時に初期状態に設定
+			if (mediaQuery.matches) {
+				// モバイルでは基本ステータスのみ表示
+				setVisibleSections({
+					basicStats: false,
+					adjustedStats: false,
+					equipmentBonus1: false,
+					equipmentBonus2: false,
+					equipmentBonus3: false,
+				})
+			}
+		}
+		
+		handleChange() // 初期状態設定
+		mediaQuery.addEventListener('change', handleChange)
+		return () => mediaQuery.removeEventListener('change', handleChange)
+	}, [])
+
+	// モバイル用セクション切り替え処理
+	const handleMobileSectionChange = (section: keyof typeof visibleSections) => {
+		setActiveSection(section)
+		// モバイルでは選択されたセクションのみ表示
+		setVisibleSections({
+			basicStats: false,
+			adjustedStats: false,
+			equipmentBonus1: false,
+			equipmentBonus2: false,
+			equipmentBonus3: false,
+		})
+		setVisibleSections(prev => ({
+			...prev,
+			[section]: true,
 		}))
 	}
 
@@ -123,45 +166,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
 
-	// フィルター適用ロジック
-	const getFilteredBonuses = (
-		detailedBonuses: ReturnType<typeof getDetailedDataSourceBonuses>,
-		filter: FilterOption,
-	) => {
-		switch (filter) {
-			case 'all':
-				// 既存のロジック（全ての合計）
-				return getAllDataSourceBonusesWithBuffSkills(data)
-			case 'main':
-				return detailedBonuses.equipment.main
-			case 'subWeapon':
-				return detailedBonuses.equipment.subWeapon
-			case 'body':
-				return detailedBonuses.equipment.body
-			case 'additional':
-				return detailedBonuses.equipment.additional
-			case 'special':
-				return detailedBonuses.equipment.special
-			case 'enchantment':
-				return detailedBonuses.equipment.enchantment
-			case 'freeInput1':
-				return detailedBonuses.equipment.freeInput1
-			case 'freeInput2':
-				return detailedBonuses.equipment.freeInput2
-			case 'freeInput3':
-				return detailedBonuses.equipment.freeInput3
-			case 'crystal':
-				return detailedBonuses.crystal
-			case 'food':
-				return detailedBonuses.food
-			case 'buffItems':
-				return detailedBonuses.buffItems
-			case 'buffSkills':
-				return detailedBonuses.buffSkills
-			default:
-				return {}
-		}
-	}
 
 	// 統合計算のメモ化
 	const calculationResults = useMemo(() => {
@@ -377,6 +381,46 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// フィルター適用後の表示用補正値計算
 	const filteredEquipmentBonuses = useMemo(() => {
+		// フィルター適用ロジック
+		const getFilteredBonuses = (
+			detailedBonuses: ReturnType<typeof getDetailedDataSourceBonuses>,
+			filter: FilterOption,
+		) => {
+			switch (filter) {
+				case 'all':
+					// 既存のロジック（全ての合計）
+					return getAllDataSourceBonusesWithBuffSkills(data)
+				case 'main':
+					return detailedBonuses.equipment.main
+				case 'subWeapon':
+					return detailedBonuses.equipment.subWeapon
+				case 'body':
+					return detailedBonuses.equipment.body
+				case 'additional':
+					return detailedBonuses.equipment.additional
+				case 'special':
+					return detailedBonuses.equipment.special
+				case 'enchantment':
+					return detailedBonuses.equipment.enchantment
+				case 'freeInput1':
+					return detailedBonuses.equipment.freeInput1
+				case 'freeInput2':
+					return detailedBonuses.equipment.freeInput2
+				case 'freeInput3':
+					return detailedBonuses.equipment.freeInput3
+				case 'crystal':
+					return detailedBonuses.crystal
+				case 'food':
+					return detailedBonuses.food
+				case 'buffItems':
+					return detailedBonuses.buffItems
+				case 'buffSkills':
+					return detailedBonuses.buffSkills
+				default:
+					return {}
+			}
+		}
+
 		const filtered1 = getFilteredBonuses(
 			detailedBonuses,
 			filters.equipmentBonus1,
@@ -399,7 +443,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	const {
 		allBonuses: finalBonuses,
-		equipmentBonuses: calculatedEquipmentBonuses,
 		hpCalculation,
 		mpCalculation,
 		atkCalculation,
@@ -421,8 +464,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		ailmentResistanceCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
-	const { equipmentBonus1, equipmentBonus2, equipmentBonus3 } =
-		calculatedEquipmentBonuses
 
 	// MATK計算（ATK計算結果が必要なため、useMemoの外で実行）
 	const matkCalculation = calculateMATK(
@@ -526,9 +567,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				<div className="mb-3 flex flex-wrap gap-2">
 					<button
 						type="button"
-						onClick={() => toggleSection('basicStats')}
+						onClick={() => isMobile ? handleMobileSectionChange('basicStats') : toggleSection('basicStats')}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							visibleSections.basicStats
+							(isMobile ? activeSection === 'basicStats' : visibleSections.basicStats)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -537,9 +578,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => toggleSection('adjustedStats')}
+						onClick={() => isMobile ? handleMobileSectionChange('adjustedStats') : toggleSection('adjustedStats')}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							visibleSections.adjustedStats
+							(isMobile ? activeSection === 'adjustedStats' : visibleSections.adjustedStats)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -548,9 +589,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => toggleSection('equipmentBonus1')}
+						onClick={() => isMobile ? handleMobileSectionChange('equipmentBonus1') : toggleSection('equipmentBonus1')}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							visibleSections.equipmentBonus1
+							(isMobile ? activeSection === 'equipmentBonus1' : visibleSections.equipmentBonus1)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -559,9 +600,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => toggleSection('equipmentBonus2')}
+						onClick={() => isMobile ? handleMobileSectionChange('equipmentBonus2') : toggleSection('equipmentBonus2')}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							visibleSections.equipmentBonus2
+							(isMobile ? activeSection === 'equipmentBonus2' : visibleSections.equipmentBonus2)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -570,9 +611,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => toggleSection('equipmentBonus3')}
+						onClick={() => isMobile ? handleMobileSectionChange('equipmentBonus3') : toggleSection('equipmentBonus3')}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							visibleSections.equipmentBonus3
+							(isMobile ? activeSection === 'equipmentBonus3' : visibleSections.equipmentBonus3)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -581,7 +622,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 				</div>
 				{/* レスポンシブグリッドレイアウト - 5つのセクション */}
-				<div className="flex gap-6 flex-wrap justify-center">
+				<div className={`flex gap-6 flex-wrap justify-center ${isMobile ? 'flex-col items-center' : ''}`}>
 					{/* 基本ステータス (30項目) */}
 					{visibleSections.basicStats && (
 						<StatSection
