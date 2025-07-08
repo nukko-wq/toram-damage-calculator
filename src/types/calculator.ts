@@ -757,14 +757,14 @@ export interface RegisterFormData {
 
 // ダメージプレビュー威力オプション設定
 export interface PowerOptions {
-	bossDifficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate'  // ボス戦難易度
-	skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3'              // スキルダメージ
-	elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous'  // 属性攻撃
-	combo: boolean                                              // コンボ:強打
-	damageType: 'critical' | 'graze' | 'expected' | 'white'    // ダメージ判定
-	distance: 'short' | 'long' | 'disabled'                    // 距離判定
-	elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'  // 属性威力
-	unsheathe: boolean                                          // 抜刀威力
+	bossDifficulty: 'normal' | 'hard' | 'lunatic' | 'ultimate' // ボス戦難易度
+	skillDamage: 'all' | 'hit1' | 'hit2' | 'hit3' // スキルダメージ
+	elementAttack: 'advantageous' | 'other' | 'none' | 'disadvantageous' // 属性攻撃
+	combo: boolean // コンボ:強打
+	damageType: 'critical' | 'graze' | 'expected' | 'white' // ダメージ判定
+	distance: 'short' | 'long' | 'disabled' // 距離判定
+	elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled' // 属性威力
+	unsheathe: boolean // 抜刀威力
 }
 
 // 攻撃スキルシステム
@@ -782,47 +782,47 @@ export type AttackSkillSystemGroup =
 	| 'dualSword' // 双剣系統
 	| 'other' // その他
 
-export type AttackSkillCategory = 
+export type AttackSkillCategory =
 	// 旧分類（互換性のため残す）
-	| 'sword'      // 片手剣
+	| 'sword' // 片手剣
 	| 'twohandSword' // 両手剣
-	| 'bow'        // 弓
-	| 'bowgun'     // 自動弓
-	| 'staff'      // 杖
+	| 'bow' // 弓
+	| 'bowgun' // 自動弓
+	| 'staff' // 杖
 	| 'magicDevice' // 魔導具
-	| 'knuckle'    // 拳甲
-	| 'halberd'    // 旋棍
-	| 'katana'     // 刀
-	| 'dualSword'  // 双剣
+	| 'knuckle' // 拳甲
+	| 'halberd' // 旋棍
+	| 'katana' // 刀
+	| 'dualSword' // 双剣
 	| 'martialArts' // 格闘
 	// 新スキルツリー分類
-	| 'blade'        // ブレードスキル
-	| 'shoot'        // シュートスキル
-	| 'magic'        // マジックスキル
-	| 'martial'      // マーシャルスキル
+	| 'blade' // ブレードスキル
+	| 'shoot' // シュートスキル
+	| 'magic' // マジックスキル
+	| 'martial' // マーシャルスキル
 	| 'halberdSkill' // ハルバードスキル
-	| 'mononofu'     // モノノフスキル
+	| 'mononofu' // モノノフスキル
 	| 'dualSwordSkill' // デュアルソードスキル
-	| 'crasher'      // クラッシャースキル
-	| 'sprite'       // スプライトスキル
-	| 'shield'       // シールドスキル
-	| 'knife'        // ナイフスキル
-	| 'knight'       // ナイトスキル
-	| 'hunter'       // ハンタースキル
-	| 'priest'       // プリーストスキル
-	| 'magicBlade'   // マジックブレードスキル
-	| 'darkPower'    // ダークパワースキル
-	| 'assassin'     // アサシンスキル
-	| 'wizard'       // ウィザードスキル
-	| 'guard'        // ガードスキル
-	| 'bareHand'     // ベアハンドスキル
-	| 'ninja'        // ニンジャスキル
-	| 'partizan'     // パルチザンスキル
-	| 'survival'     // サバイバルスキル
-	| 'support'      // サポートスキル
-	| 'battle'       // バトルスキル
-	| 'dancer'       // ダンサースキル
-	| 'minstrel'     // ミンストレルスキル
+	| 'crasher' // クラッシャースキル
+	| 'sprite' // スプライトスキル
+	| 'shield' // シールドスキル
+	| 'knife' // ナイフスキル
+	| 'knight' // ナイトスキル
+	| 'hunter' // ハンタースキル
+	| 'priest' // プリーストスキル
+	| 'magicBlade' // マジックブレードスキル
+	| 'darkPower' // ダークパワースキル
+	| 'assassin' // アサシンスキル
+	| 'wizard' // ウィザードスキル
+	| 'guard' // ガードスキル
+	| 'bareHand' // ベアハンドスキル
+	| 'ninja' // ニンジャスキル
+	| 'partizan' // パルチザンスキル
+	| 'survival' // サバイバルスキル
+	| 'support' // サポートスキル
+	| 'battle' // バトルスキル
+	| 'dancer' // ダンサースキル
+	| 'minstrel' // ミンストレルスキル
 
 // 威力参照タイプ
 export type PowerReferenceType = 'totalATK' | 'MATK' // 将来拡張: 'spearMATK', 'STR', 'INT', etc.
@@ -832,85 +832,85 @@ export type FamiliarityType = 'physical' | 'magical' | 'normal'
 
 // 攻撃段階情報
 export interface AttackHit {
-	hitNumber: number                    // 撃目番号（1-6）
-	attackType: 'physical' | 'magical'   // 攻撃タイプ
-	referenceDefense: 'DEF' | 'MDEF'     // 参照防御力
+	hitNumber: number // 撃目番号（1-6）
+	attackType: 'physical' | 'magical' // 攻撃タイプ
+	referenceDefense: 'DEF' | 'MDEF' // 参照防御力
 	referenceResistance: 'physical' | 'magical' // 参照耐性
-	powerReference: PowerReferenceType    // 威力参照
-	
+	powerReference: PowerReferenceType // 威力参照
+
 	// 倍率情報（表示用）
-	multiplier: number                   // 威力倍率%（表示値、実際の計算は別途）
-	fixedDamage: number                  // 固定ダメージ（表示値、実際の計算は別途）
-	
+	multiplier: number // 威力倍率%（表示値、実際の計算は別途）
+	fixedDamage: number // 固定ダメージ（表示値、実際の計算は別途）
+
 	// 計算式説明（各撃ごとに設定可能）
-	multiplierFormula?: string           // 倍率の計算式説明（例: "1000%", "|補正後STR|%"）
-	fixedDamageFormula?: string          // 固定値の計算式説明（例: "400", "基礎INT/2"）
-	
+	multiplierFormula?: string // 倍率の計算式説明（例: "1000%", "|補正後STR|%"）
+	fixedDamageFormula?: string // 固定値の計算式説明（例: "400", "基礎INT/2"）
+
 	// 補正適用
-	familiarity: FamiliarityType         // 慣れ参照
-	familiarityGrant: FamiliarityType    // 慣れ付与
-	canUseUnsheathePower: boolean        // 抜刀威力適用可否
-	canUseLongRange: boolean             // ロングレンジ適用可否
-	canUseShortRangePower: boolean       // 近距離威力適用可否
-	canUseLongRangePower: boolean        // 遠距離威力適用可否
-	
+	familiarity: FamiliarityType // 慣れ参照
+	familiarityGrant: FamiliarityType // 慣れ付与
+	canUseUnsheathePower: boolean // 抜刀威力適用可否
+	canUseLongRange: boolean // ロングレンジ適用可否
+	canUseShortRangePower: boolean // 近距離威力適用可否
+	canUseLongRangePower: boolean // 遠距離威力適用可否
+
 	// 特殊設定
-	notes?: string                       // 備考
+	notes?: string // 備考
 }
 
 // 攻撃スキル
 export interface AttackSkill {
 	// 基本情報
-	id: string                           // 一意識別子
-	name: string                        // スキル名
-	order: number                       // 表示順序（系統別番号）
+	id: string // 一意識別子
+	name: string // スキル名
+	order: number // 表示順序（系統別番号）
 	systemGroup: AttackSkillSystemGroup // 系統グループ
-	category: AttackSkillCategory        // スキルカテゴリ
+	category: AttackSkillCategory // スキルカテゴリ
 	weaponTypeRequirements?: WeaponType[] // 必要武器種（指定なしは全武器対応）
-	
+
 	// 消費・条件
-	mpCost: number                      // 消費MP
-	levelRequirement?: number            // 必要スキルレベル
-	prerequisites?: string[]            // 前提スキル
-	
+	mpCost: number // 消費MP
+	levelRequirement?: number // 必要スキルレベル
+	prerequisites?: string[] // 前提スキル
+
 	// 表示用計算式説明
-	multiplierFormula?: string           // 倍率の計算式説明（例: "1000%", "|補正後STR|%"）
-	fixedDamageFormula?: string          // 固定値の計算式説明（例: "400", "基礎INT/2"）
-	
+	multiplierFormula?: string // 倍率の計算式説明（例: "1000%", "|補正後STR|%"）
+	fixedDamageFormula?: string // 固定値の計算式説明（例: "400", "基礎INT/2"）
+
 	// 多段攻撃設定
-	hits: AttackHit[]                   // 1〜6撃目の情報配列
-	
+	hits: AttackHit[] // 1〜6撃目の情報配列
+
 	// 特殊効果
 	specialEffects?: string[] // 特殊効果の説明文配列
-	
+
 	// メタ情報
-	notes?: string                     // 実装・使用上の注意
+	notes?: string // 実装・使用上の注意
 }
 
 // 計算済み攻撃段階情報（表示用）
 export interface CalculatedHit {
 	hitNumber: number
 	attackType: 'physical' | 'magical'
-	powerReference: string              // 表示用（例: "総ATK"）
+	powerReference: string // 表示用（例: "総ATK"）
 	referenceDefense: 'DEF' | 'MDEF'
 	referenceResistance: 'physical' | 'magical' // 参照耐性
-	multiplier: number                  // 表示用倍率%
-	fixedDamage: number                 // 表示用固定値
-	
+	multiplier: number // 表示用倍率%
+	fixedDamage: number // 表示用固定値
+
 	// 計算式説明
-	multiplierFormula?: string          // 倍率の計算式説明
-	fixedDamageFormula?: string         // 固定値の計算式説明
-	
+	multiplierFormula?: string // 倍率の計算式説明
+	fixedDamageFormula?: string // 固定値の計算式説明
+
 	// 慣れ情報
 	familiarityReference: FamiliarityType
 	familiarityGrant: FamiliarityType
-	
+
 	// 補正適用
 	canUseUnsheathePower: boolean
 	canUseLongRange: boolean
 	canUseShortRangePower: boolean
 	canUseLongRangePower: boolean
-	
+
 	// 計算過程（特殊計算の場合）
 	calculationProcess?: string
 }
@@ -919,10 +919,10 @@ export interface CalculatedHit {
 export interface AttackSkillDisplayData {
 	// 選択情報
 	selectedSkill: AttackSkill | null
-	
+
 	// 計算結果
 	calculatedHits: CalculatedHit[]
-	
+
 	// 表示設定
 	showDetailedInfo: boolean
 }

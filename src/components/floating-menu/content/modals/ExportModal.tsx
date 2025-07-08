@@ -7,7 +7,7 @@ import {
 	generateExportPreview,
 	getExportTypeLabel,
 	getExportTypeDescription,
-	canExport
+	canExport,
 } from '@/utils/exportManager'
 
 interface ExportModalProps {
@@ -29,7 +29,7 @@ export default function ExportModal({
 		saveCount: 0,
 		customEquipmentCount: 0,
 		customCrystalCount: 0,
-		hasSettings: false
+		hasSettings: false,
 	})
 
 	// モーダルが開いたときの初期化
@@ -95,12 +95,12 @@ export default function ExportModal({
 		try {
 			setIsExporting(true)
 			setError(null)
-			
+
 			const options: ExportOptions = {
 				type: exportType,
-				filename: trimmedFilename
+				filename: trimmedFilename,
 			}
-			
+
 			await onExport(options)
 		} catch (err) {
 			console.error('エクスポートエラー:', err)
@@ -165,14 +165,22 @@ export default function ExportModal({
 							エクスポート対象を選択してください
 						</label>
 						<div className="space-y-3">
-							{(['full', 'save-data', 'custom-data', 'current-save'] as ExportType[]).map((type) => (
+							{(
+								[
+									'full',
+									'save-data',
+									'custom-data',
+									'current-save',
+								] as ExportType[]
+							).map((type) => (
 								<label
 									key={type}
 									className={`
 										flex items-start p-3 border rounded-md cursor-pointer transition-colors
-										${exportType === type 
-											? 'border-blue-500 bg-blue-50' 
-											: 'border-gray-200 hover:border-gray-300'
+										${
+											exportType === type
+												? 'border-blue-500 bg-blue-50'
+												: 'border-gray-200 hover:border-gray-300'
 										}
 										${!canExport(type) ? 'opacity-50 cursor-not-allowed' : ''}
 									`}
@@ -182,7 +190,9 @@ export default function ExportModal({
 										name="exportType"
 										value={type}
 										checked={exportType === type}
-										onChange={(e) => handleExportTypeChange(e.target.value as ExportType)}
+										onChange={(e) =>
+											handleExportTypeChange(e.target.value as ExportType)
+										}
 										disabled={!canExport(type)}
 										className="mt-1 mr-3 text-blue-600 border-gray-300 focus:ring-blue-500"
 									/>
@@ -211,13 +221,17 @@ export default function ExportModal({
 								エクスポート内容プレビュー
 							</h4>
 							<div className="space-y-1 text-sm text-gray-600">
-								{(exportType === 'full' || exportType === 'save-data' || exportType === 'current-save') && (
+								{(exportType === 'full' ||
+									exportType === 'save-data' ||
+									exportType === 'current-save') && (
 									<div>• セーブデータ: {preview.saveCount}個</div>
 								)}
 								{(exportType === 'full' || exportType === 'custom-data') && (
 									<>
 										<div>• カスタム装備: {preview.customEquipmentCount}個</div>
-										<div>• カスタムクリスタル: {preview.customCrystalCount}個</div>
+										<div>
+											• カスタムクリスタル: {preview.customCrystalCount}個
+										</div>
 									</>
 								)}
 								{exportType === 'full' && preview.hasSettings && (

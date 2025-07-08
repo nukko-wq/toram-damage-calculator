@@ -16,7 +16,15 @@ import type {
 } from '@/types/bonusCalculation'
 import type { CalculatorData } from '@/types/calculator'
 import { getCrystalById } from './crystalDatabase'
-import { getBuffSkillBonuses, getTwoHandsEffects, getAttackUpEffects, getMagicUpEffects, getThreatPowerEffects, getFurtherMagicEffects, getGodspeedTrajectoryEffects } from './buffSkillCalculation'
+import {
+	getBuffSkillBonuses,
+	getTwoHandsEffects,
+	getAttackUpEffects,
+	getMagicUpEffects,
+	getThreatPowerEffects,
+	getFurtherMagicEffects,
+	getGodspeedTrajectoryEffects,
+} from './buffSkillCalculation'
 
 /**
  * プロパティ値のバリデーション
@@ -463,7 +471,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 
 	// 従来の4つのデータソースを統合
 	const dataSources = getAllDataSourceBonuses(data)
-	
+
 	// 各データソースの補正値を統合
 	for (const source of Object.values(dataSources)) {
 		for (const [key, value] of Object.entries(source)) {
@@ -479,7 +487,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		data.buffSkills?.skills || null,
 		data.mainWeapon?.weaponType || null,
 	)
-	
+
 	for (const [key, value] of Object.entries(buffSkillBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -493,7 +501,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		data.mainWeapon?.weaponType || null,
 		data.subWeapon?.weaponType || null,
 	)
-	
+
 	for (const [key, value] of Object.entries(twoHandsBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -506,7 +514,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,
 	)
-	
+
 	for (const [key, value] of Object.entries(attackUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -519,7 +527,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,
 	)
-	
+
 	for (const [key, value] of Object.entries(magicUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -532,7 +540,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,
 	)
-	
+
 	for (const [key, value] of Object.entries(threatPowerBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -545,7 +553,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,
 	)
-	
+
 	for (const [key, value] of Object.entries(furtherMagicBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -558,7 +566,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		data.buffSkills?.skills || null,
 		data.mainWeapon?.weaponType || null,
 	)
-	
+
 	for (const [key, value] of Object.entries(godspeedTrajectoryBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =

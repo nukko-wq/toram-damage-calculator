@@ -27,9 +27,7 @@ import {
 	calculateAilmentResistance,
 	getBodyArmorType,
 } from '@/utils/basicStatsCalculation'
-import {
-	getAllDataSourceBonusesWithBuffSkills,
-} from '@/utils/dataSourceIntegration'
+import { getAllDataSourceBonusesWithBuffSkills } from '@/utils/dataSourceIntegration'
 import StatSection from './StatSection'
 
 interface StatusPreviewProps {
@@ -264,10 +262,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			adjustedStatsCalculation,
 		}
-	}, [
-		data,
-		baseStats,
-	])
+	}, [data, baseStats])
 
 	const {
 		allBonuses: finalBonuses,

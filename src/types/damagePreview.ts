@@ -1,18 +1,18 @@
 // ダメージプレビュー機能の型定義
 
-import type { 
-	PresetCrystal, 
-	CrystalType, 
-	PresetEquipment, 
-	EquipmentSlots, 
+import type {
+	PresetCrystal,
+	CrystalType,
+	PresetEquipment,
+	EquipmentSlots,
 	BuffItemCategory,
-	BuffItem as CalculatorBuffItem
+	BuffItem as CalculatorBuffItem,
 } from './calculator'
 
 // クリスタルエイリアス
 export type Crystal = PresetCrystal
 
-// 装備エイリアス  
+// 装備エイリアス
 export type Equipment = PresetEquipment
 
 // 装備スロット型

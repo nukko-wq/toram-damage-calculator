@@ -5,29 +5,35 @@
  */
 
 import type { BuffSkillState, MainWeaponType } from '@/types/buffSkill'
-import type { EquipmentProperties, WeaponType, SubWeaponType } from '@/types/calculator'
+import type {
+	EquipmentProperties,
+	WeaponType,
+	SubWeaponType,
+} from '@/types/calculator'
 import type { AllBonuses } from './basicStatsCalculation'
 
 /**
  * WeaponType（日本語）からMainWeaponType（英語）への変換関数
  */
-function convertWeaponType(weaponType: WeaponType | null): MainWeaponType | null {
+function convertWeaponType(
+	weaponType: WeaponType | null,
+): MainWeaponType | null {
 	if (!weaponType) return null
-	
+
 	const conversionMap: Record<WeaponType, MainWeaponType> = {
-		'片手剣': 'oneHandSword',
-		'双剣': 'dualSword',
-		'両手剣': 'twoHandSword',
-		'手甲': 'knuckle',
-		'旋風槍': 'halberd',
-		'抜刀剣': 'katana',
-		'弓': 'bow',
-		'自動弓': 'bowgun',
-		'杖': 'staff',
-		'魔導具': 'magicDevice',
-		'素手': 'bareHands',
+		片手剣: 'oneHandSword',
+		双剣: 'dualSword',
+		両手剣: 'twoHandSword',
+		手甲: 'knuckle',
+		旋風槍: 'halberd',
+		抜刀剣: 'katana',
+		弓: 'bow',
+		自動弓: 'bowgun',
+		杖: 'staff',
+		魔導具: 'magicDevice',
+		素手: 'bareHands',
 	}
-	
+
 	return conversionMap[weaponType] || null
 }
 
@@ -87,8 +93,13 @@ export function calculateBladeMasteryEffects(
 	skillLevel: number,
 	weaponType: MainWeaponType | null,
 ): Partial<EquipmentProperties> {
-	const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
-	if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0) return {}
+	const bladeWeapons: MainWeaponType[] = [
+		'oneHandSword',
+		'twoHandSword',
+		'dualSword',
+	]
+	if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0)
+		return {}
 
 	// WeaponATK%計算
 	const weaponATKRate = skillLevel * 3
@@ -117,7 +128,8 @@ export function calculateShootMasteryEffects(
 	weaponType: MainWeaponType | null,
 ): Partial<EquipmentProperties> {
 	const shootWeapons: MainWeaponType[] = ['bow', 'bowgun']
-	if (!weaponType || !shootWeapons.includes(weaponType) || skillLevel <= 0) return {}
+	if (!weaponType || !shootWeapons.includes(weaponType) || skillLevel <= 0)
+		return {}
 
 	// WeaponATK%計算
 	const weaponATKRate = skillLevel * 3
@@ -174,7 +186,8 @@ export function calculateMagicMasteryEffects(
 	weaponType: MainWeaponType | null,
 ): Partial<EquipmentProperties> {
 	const magicWeapons: MainWeaponType[] = ['staff', 'magicDevice']
-	if (!weaponType || !magicWeapons.includes(weaponType) || skillLevel <= 0) return {}
+	if (!weaponType || !magicWeapons.includes(weaponType) || skillLevel <= 0)
+		return {}
 
 	// WeaponATK%計算
 	const weaponATKRate = skillLevel * 3
@@ -202,8 +215,13 @@ export function calculateQuickSlashEffects(
 	skillLevel: number,
 	weaponType: MainWeaponType | null,
 ): Partial<EquipmentProperties> {
-	const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
-	if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0) return {}
+	const bladeWeapons: MainWeaponType[] = [
+		'oneHandSword',
+		'twoHandSword',
+		'dualSword',
+	]
+	if (!weaponType || !bladeWeapons.includes(weaponType) || skillLevel <= 0)
+		return {}
 
 	return {
 		AttackSpeed: skillLevel * 10,
@@ -218,7 +236,11 @@ export function calculateTakumiKenjutsuPassiveMultiplier(
 	isEnabled: boolean,
 	weaponType: MainWeaponType | null,
 ): number {
-	const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+	const bladeWeapons: MainWeaponType[] = [
+		'oneHandSword',
+		'twoHandSword',
+		'dualSword',
+	]
 	if (!isEnabled || !weaponType || !bladeWeapons.includes(weaponType)) return 0
 
 	return 20 // パッシブ倍率 +20%
@@ -233,11 +255,11 @@ export function calculateTwoHandsEffects(
 	subWeaponType: SubWeaponType | null,
 ): Partial<EquipmentProperties> {
 	if (!isEnabled) return {}
-	
+
 	const isKatana = mainWeaponType === 'katana'
 	const isSubWeaponNone = !subWeaponType || subWeaponType === 'なし'
 	const isSubWeaponScroll = subWeaponType === '巻物'
-	
+
 	// 抜刀剣の場合：サブ武器がなしまたは巻物
 	if (isKatana && (isSubWeaponNone || isSubWeaponScroll)) {
 		return {
@@ -247,7 +269,7 @@ export function calculateTwoHandsEffects(
 			WeaponATK_Rate: 10,
 		}
 	}
-	
+
 	// その他の武器の場合：サブ武器がなしのみ
 	if (!isKatana && isSubWeaponNone) {
 		return {
@@ -257,7 +279,7 @@ export function calculateTwoHandsEffects(
 			WeaponATK_Rate: 10,
 		}
 	}
-	
+
 	// 効果条件を満たさない場合
 	return {}
 }
@@ -270,10 +292,10 @@ export function calculateAttackUpEffects(
 	playerLevel: number,
 ): Partial<EquipmentProperties> {
 	if (!skillLevel || skillLevel === 0) return {}
-	
+
 	// ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-	const atkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
-	
+	const atkBonus = Math.floor((playerLevel * ((25 * skillLevel) / 10)) / 100)
+
 	return {
 		ATK: atkBonus,
 	}
@@ -287,10 +309,10 @@ export function calculateMagicUpEffects(
 	playerLevel: number,
 ): Partial<EquipmentProperties> {
 	if (!skillLevel || skillLevel === 0) return {}
-	
+
 	// MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-	const matkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
-	
+	const matkBonus = Math.floor((playerLevel * ((25 * skillLevel) / 10)) / 100)
+
 	return {
 		MATK: matkBonus,
 	}
@@ -303,7 +325,7 @@ export function calculateQuickAuraEffects(
 	skillLevel: number,
 ): Partial<EquipmentProperties> {
 	if (!skillLevel || skillLevel === 0) return {}
-	
+
 	return {
 		AttackSpeed: skillLevel * 50,
 		AttackSpeed_Rate: Math.floor(skillLevel * 2.5),
@@ -318,15 +340,15 @@ export function calculateGodspeedTrajectoryEffects(
 	weaponType: MainWeaponType | null,
 ): Partial<EquipmentProperties> {
 	if (!skillLevel || skillLevel === 0) return {}
-	
+
 	const isDualSword = weaponType === 'dualSword'
-	
+
 	// AGI = スキルレベル + MAX(スキルレベル-5, 0)
 	const agiBonus = skillLevel + Math.max(skillLevel - 5, 0)
-	
+
 	// UnsheatheAttack = 双剣なら15+スキルレベル、それ以外なら5+スキルレベル
 	const unsheatheAttackBonus = isDualSword ? 15 + skillLevel : 5 + skillLevel
-	
+
 	return {
 		AGI: agiBonus,
 		UnsheatheAttack: unsheatheAttackBonus,
@@ -340,7 +362,7 @@ export function calculateCriticalUpEffects(
 	isEnabled: boolean,
 ): Partial<EquipmentProperties> {
 	if (!isEnabled) return {}
-	
+
 	return {
 		Critical: 5,
 		CriticalDamage_Rate: 5,
@@ -354,7 +376,7 @@ export function calculateMPBoostEffects(
 	skillLevel: number,
 ): Partial<EquipmentProperties> {
 	if (!skillLevel || skillLevel === 0) return {}
-	
+
 	return {
 		MP: skillLevel * 30,
 	}
@@ -367,7 +389,7 @@ export function calculateHPBoostEffects(
 	skillLevel: number,
 ): Partial<EquipmentProperties> {
 	if (!skillLevel || skillLevel === 0) return {}
-	
+
 	return {
 		HP: skillLevel * 100,
 		HP_Rate: skillLevel * 2,
@@ -578,10 +600,7 @@ export function getAttackUpEffects(
 	// 攻撃力up(exATK1)の処理
 	const attackUp = buffSkillData['exATK1']
 	if (attackUp?.isEnabled && attackUp.level) {
-		const effects = calculateAttackUpEffects(
-			attackUp.level,
-			playerLevel,
-		)
+		const effects = calculateAttackUpEffects(attackUp.level, playerLevel)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
@@ -609,10 +628,7 @@ export function getMagicUpEffects(
 	// 魔法力up(exMATK1)の処理
 	const magicUp = buffSkillData['exMATK1']
 	if (magicUp?.isEnabled && magicUp.level) {
-		const effects = calculateMagicUpEffects(
-			magicUp.level,
-			playerLevel,
-		)
+		const effects = calculateMagicUpEffects(magicUp.level, playerLevel)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
@@ -641,10 +657,7 @@ export function getThreatPowerEffects(
 	const threatPower = buffSkillData['exATK2']
 	if (threatPower?.isEnabled && threatPower.level) {
 		// 攻撃力upと同じ計算式を使用
-		const effects = calculateAttackUpEffects(
-			threatPower.level,
-			playerLevel,
-		)
+		const effects = calculateAttackUpEffects(threatPower.level, playerLevel)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
@@ -673,10 +686,7 @@ export function getFurtherMagicEffects(
 	const furtherMagic = buffSkillData['exMATK2']
 	if (furtherMagic?.isEnabled && furtherMagic.level) {
 		// 魔法力upと同じ計算式を使用
-		const effects = calculateMagicUpEffects(
-			furtherMagic.level,
-			playerLevel,
-		)
+		const effects = calculateMagicUpEffects(furtherMagic.level, playerLevel)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
@@ -779,4 +789,3 @@ export function getBuffSkillPassiveMultiplier(
 
 	return totalPassiveMultiplier
 }
-

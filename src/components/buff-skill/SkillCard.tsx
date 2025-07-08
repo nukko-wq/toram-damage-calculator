@@ -14,50 +14,56 @@ interface SkillCardProps {
 	skill: BuffSkillDefinition
 }
 
-export default function SkillCard({
-	skill,
-}: SkillCardProps) {
+export default function SkillCard({ skill }: SkillCardProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const categoryLabel = CATEGORY_LABELS[skill.category]
-	
+
 	// Zustandから現在の状態を取得（メモ化）
 	const defaultState = useMemo(() => {
 		// 特別なデフォルト値
-		const defaultStackCount = skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1
-		
+		const defaultStackCount =
+			skill.id === 'ds6' ? 100 : skill.id === 'mg2' ? 15 : 1
+
 		return {
 			isEnabled: false,
 			level: 10,
 			stackCount: defaultStackCount,
-			specialParam: 0
+			specialParam: 0,
 		}
 	}, [skill.id])
 
-	const currentState = useCalculatorStore(useCallback(state => {
-		const buffSkillsData = state.data.buffSkills.skills
-		
-		// Handle both old array format and new Record format
-		if (Array.isArray(buffSkillsData)) {
-			// Old format: array of BuffSkill objects
-			const foundSkill = buffSkillsData.find(s => s.id === skill.id)
-			if (foundSkill) {
-				return {
-					isEnabled: foundSkill.isEnabled,
-					level: foundSkill.parameters.skillLevel || 10,
-					stackCount: foundSkill.parameters.stackCount || 1,
-					specialParam: foundSkill.parameters.playerCount || 0
+	const currentState = useCalculatorStore(
+		useCallback(
+			(state) => {
+				const buffSkillsData = state.data.buffSkills.skills
+
+				// Handle both old array format and new Record format
+				if (Array.isArray(buffSkillsData)) {
+					// Old format: array of BuffSkill objects
+					const foundSkill = buffSkillsData.find((s) => s.id === skill.id)
+					if (foundSkill) {
+						return {
+							isEnabled: foundSkill.isEnabled,
+							level: foundSkill.parameters.skillLevel || 10,
+							stackCount: foundSkill.parameters.stackCount || 1,
+							specialParam: foundSkill.parameters.playerCount || 0,
+						}
+					}
+					return defaultState
 				}
-			}
-			return defaultState
-		}
-		
-		// New format: Record<string, BuffSkillState>
-		const skillState = buffSkillsData[skill.id]
-		return skillState || defaultState
-	}, [skill.id, defaultState]))
-	
+
+				// New format: Record<string, BuffSkillState>
+				const skillState = buffSkillsData[skill.id]
+				return skillState || defaultState
+			},
+			[skill.id, defaultState],
+		),
+	)
+
 	// Zustandの更新メソッド
-	const updateBuffSkillState = useCalculatorStore(state => state.updateBuffSkillState)
+	const updateBuffSkillState = useCalculatorStore(
+		(state) => state.updateBuffSkillState,
+	)
 
 	// モーダル開閉ハンドラー
 	const handleSkillNameClick = () => {
@@ -94,7 +100,7 @@ export default function SkillCard({
 	const handleToggle = (enabled: boolean) => {
 		updateBuffSkillState(skill.id, {
 			...currentState,
-			isEnabled: enabled
+			isEnabled: enabled,
 		})
 	}
 
@@ -105,18 +111,23 @@ export default function SkillCard({
 
 			{/* スキル名とトグルスイッチ */}
 			<div className="skill-header flex items-center justify-between mb-1">
-				<span 
+				<span
 					className={getSkillNameClassName(skill)}
 					onClick={handleSkillNameClick}
 					role={shouldShowModal(skill) ? 'button' : undefined}
 					tabIndex={shouldShowModal(skill) ? 0 : undefined}
 					onKeyDown={(e) => {
-						if (shouldShowModal(skill) && (e.key === 'Enter' || e.key === ' ')) {
+						if (
+							shouldShowModal(skill) &&
+							(e.key === 'Enter' || e.key === ' ')
+						) {
 							e.preventDefault()
 							handleSkillNameClick()
 						}
 					}}
-					aria-label={shouldShowModal(skill) ? `${skill.name}の詳細設定を開く` : undefined}
+					aria-label={
+						shouldShowModal(skill) ? `${skill.name}の詳細設定を開く` : undefined
+					}
 				>
 					{getDisplayName()}
 				</span>
@@ -125,7 +136,6 @@ export default function SkillCard({
 					onToggle={handleToggle}
 				/>
 			</div>
-
 
 			{/* モーダル - スキル専用またはデフォルト */}
 			{skill.type === 'stack' ? (

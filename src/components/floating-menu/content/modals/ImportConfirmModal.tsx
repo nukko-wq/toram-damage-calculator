@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { ImportValidationResult, ImportOptions } from '@/utils/importManager'
+import type {
+	ImportValidationResult,
+	ImportOptions,
+} from '@/utils/importManager'
 
 interface ImportConfirmModalProps {
 	isOpen: boolean
@@ -17,7 +20,9 @@ export default function ImportConfirmModal({
 	validationResult,
 }: ImportConfirmModalProps) {
 	const [createBackup, setCreateBackup] = useState(true)
-	const [mergeMode, setMergeMode] = useState<'replace' | 'merge' | 'skip'>('merge')
+	const [mergeMode, setMergeMode] = useState<'replace' | 'merge' | 'skip'>(
+		'merge',
+	)
 	const [isImporting, setIsImporting] = useState(false)
 
 	// モーダルが開いたときの初期化
@@ -47,7 +52,7 @@ export default function ImportConfirmModal({
 
 		const options: ImportOptions = {
 			createBackup,
-			mergeMode
+			mergeMode,
 		}
 
 		try {
@@ -67,8 +72,11 @@ export default function ImportConfirmModal({
 
 	if (!isOpen || !validationResult) return null
 
-	const hasConflicts = validationResult.conflicts && 
-		Object.values(validationResult.conflicts).some((arr: string[]) => arr.length > 0)
+	const hasConflicts =
+		validationResult.conflicts &&
+		Object.values(validationResult.conflicts).some(
+			(arr: string[]) => arr.length > 0,
+		)
 
 	return (
 		<div
@@ -78,9 +86,7 @@ export default function ImportConfirmModal({
 			<div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-auto">
 				{/* ヘッダー */}
 				<div className="flex items-center justify-between p-6 border-b border-gray-200">
-					<h3 className="text-lg font-medium text-gray-900">
-						インポート確認
-					</h3>
+					<h3 className="text-lg font-medium text-gray-900">インポート確認</h3>
 					{!isImporting && (
 						<button
 							onClick={onClose}
@@ -113,32 +119,67 @@ export default function ImportConfirmModal({
 						<div className="bg-gray-50 rounded-md p-4 space-y-2">
 							{validationResult.data?.saveData && (
 								<div className="flex items-center text-sm text-gray-700">
-									<svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+									<svg
+										className="w-4 h-4 mr-2 text-green-500"
+										fill="currentColor"
+										viewBox="0 0 20 20"
+									>
+										<path
+											fillRule="evenodd"
+											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+											clipRule="evenodd"
+										/>
 									</svg>
-									セーブデータ: {validationResult.data.saveData.saves?.length || 0}個
+									セーブデータ:{' '}
+									{validationResult.data.saveData.saves?.length || 0}個
 								</div>
 							)}
 							{validationResult.data?.customData?.equipment && (
 								<div className="flex items-center text-sm text-gray-700">
-									<svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+									<svg
+										className="w-4 h-4 mr-2 text-green-500"
+										fill="currentColor"
+										viewBox="0 0 20 20"
+									>
+										<path
+											fillRule="evenodd"
+											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+											clipRule="evenodd"
+										/>
 									</svg>
-									カスタム装備: {validationResult.data.customData.equipment.length}個
+									カスタム装備:{' '}
+									{validationResult.data.customData.equipment.length}個
 								</div>
 							)}
 							{validationResult.data?.customData?.crystals && (
 								<div className="flex items-center text-sm text-gray-700">
-									<svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+									<svg
+										className="w-4 h-4 mr-2 text-green-500"
+										fill="currentColor"
+										viewBox="0 0 20 20"
+									>
+										<path
+											fillRule="evenodd"
+											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+											clipRule="evenodd"
+										/>
 									</svg>
-									カスタムクリスタル: {validationResult.data.customData.crystals.length}個
+									カスタムクリスタル:{' '}
+									{validationResult.data.customData.crystals.length}個
 								</div>
 							)}
 							{validationResult.data?.settings && (
 								<div className="flex items-center text-sm text-gray-700">
-									<svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+									<svg
+										className="w-4 h-4 mr-2 text-green-500"
+										fill="currentColor"
+										viewBox="0 0 20 20"
+									>
+										<path
+											fillRule="evenodd"
+											d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+											clipRule="evenodd"
+										/>
 									</svg>
 									設定データ: 1個
 								</div>
@@ -168,19 +209,25 @@ export default function ImportConfirmModal({
 										競合するデータ：
 									</h4>
 									<div className="text-sm text-yellow-700 space-y-1">
-										{(validationResult.conflicts?.saveData?.length || 0) > 0 && (
+										{(validationResult.conflicts?.saveData?.length || 0) >
+											0 && (
 											<div>
-												<strong>セーブデータ:</strong> {validationResult.conflicts?.saveData?.join(', ')}
+												<strong>セーブデータ:</strong>{' '}
+												{validationResult.conflicts?.saveData?.join(', ')}
 											</div>
 										)}
-										{(validationResult.conflicts?.equipment?.length || 0) > 0 && (
+										{(validationResult.conflicts?.equipment?.length || 0) >
+											0 && (
 											<div>
-												<strong>カスタム装備:</strong> {validationResult.conflicts?.equipment?.join(', ')}
+												<strong>カスタム装備:</strong>{' '}
+												{validationResult.conflicts?.equipment?.join(', ')}
 											</div>
 										)}
-										{(validationResult.conflicts?.crystals?.length || 0) > 0 && (
+										{(validationResult.conflicts?.crystals?.length || 0) >
+											0 && (
 											<div>
-												<strong>カスタムクリスタル:</strong> {validationResult.conflicts?.crystals?.join(', ')}
+												<strong>カスタムクリスタル:</strong>{' '}
+												{validationResult.conflicts?.crystals?.join(', ')}
 											</div>
 										)}
 									</div>
@@ -208,11 +255,15 @@ export default function ImportConfirmModal({
 								/>
 							</div>
 							<div className="ml-3">
-								<label htmlFor="create-backup" className="text-sm font-medium text-gray-700">
+								<label
+									htmlFor="create-backup"
+									className="text-sm font-medium text-gray-700"
+								>
 									既存データをバックアップしてからインポートする
 								</label>
 								<p className="text-xs text-gray-500 mt-1">
-									推奨: インポート前に現在のデータをエクスポートしてバックアップを作成します
+									推奨:
+									インポート前に現在のデータをエクスポートしてバックアップを作成します
 								</p>
 							</div>
 						</div>
@@ -235,7 +286,8 @@ export default function ImportConfirmModal({
 											className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
 										/>
 										<span className="ml-2 text-sm text-gray-700">
-											<strong>名前を変更してインポート</strong> - 競合するデータは「(インポート)」を付けて保存
+											<strong>名前を変更してインポート</strong> -
+											競合するデータは「(インポート)」を付けて保存
 										</span>
 									</label>
 									<label className="flex items-center">
@@ -249,7 +301,8 @@ export default function ImportConfirmModal({
 											className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
 										/>
 										<span className="ml-2 text-sm text-gray-700">
-											<strong>上書きしてインポート</strong> - 既存のデータを置き換える
+											<strong>上書きしてインポート</strong> -
+											既存のデータを置き換える
 										</span>
 									</label>
 									<label className="flex items-center">
@@ -263,7 +316,8 @@ export default function ImportConfirmModal({
 											className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
 										/>
 										<span className="ml-2 text-sm text-gray-700">
-											<strong>スキップ</strong> - 競合するデータはインポートしない
+											<strong>スキップ</strong> -
+											競合するデータはインポートしない
 										</span>
 									</label>
 								</div>
@@ -272,16 +326,21 @@ export default function ImportConfirmModal({
 					</div>
 
 					{/* 警告メッセージ */}
-					{validationResult.warnings && validationResult.warnings.length > 0 && (
-						<div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-							<h5 className="text-sm font-medium text-yellow-800 mb-1">警告:</h5>
-							<ul className="text-sm text-yellow-700 list-disc list-inside space-y-1">
-								{validationResult.warnings.map((warning: string, index: number) => (
-									<li key={index}>{warning}</li>
-								))}
-							</ul>
-						</div>
-					)}
+					{validationResult.warnings &&
+						validationResult.warnings.length > 0 && (
+							<div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+								<h5 className="text-sm font-medium text-yellow-800 mb-1">
+									警告:
+								</h5>
+								<ul className="text-sm text-yellow-700 list-disc list-inside space-y-1">
+									{validationResult.warnings.map(
+										(warning: string, index: number) => (
+											<li key={index}>{warning}</li>
+										),
+									)}
+								</ul>
+							</div>
+						)}
 
 					{/* 最終確認 */}
 					<div className="bg-red-50 border border-red-200 rounded-md p-4">
@@ -301,7 +360,8 @@ export default function ImportConfirmModal({
 							</div>
 							<div className="ml-3">
 								<p className="text-sm text-red-800">
-									<strong>重要:</strong> この操作により、現在のデータが変更される可能性があります。
+									<strong>重要:</strong>{' '}
+									この操作により、現在のデータが変更される可能性があります。
 									{mergeMode === 'replace' && ' 既存のデータが上書きされます。'}
 									実行前に必要なデータのバックアップを確認してください。
 								</p>

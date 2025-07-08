@@ -1,6 +1,6 @@
 /**
  * ステータスポイント計算ロジック
- * 
+ *
  * レベルに応じたステータスポイントの計算を行う
  * 詳細な計算式は docs/calculations/basic-stats.md を参照
  */
@@ -43,7 +43,8 @@ export function calculateStatPoints(
 	let usedPoints = 0
 	if (stats) {
 		usedPoints =
-			(stats.STR - 1) +
+			stats.STR -
+			1 +
 			(stats.INT - 1) +
 			(stats.VIT - 1) +
 			(stats.AGI - 1) +

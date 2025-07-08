@@ -22,9 +22,7 @@ export abstract class SkillHitCalculator {
 
 		const hit = skill.hits.find((h) => h.hitNumber === hitNumber)
 		if (!hit) {
-			throw new Error(
-				`Hit ${hitNumber} not found for skill: ${skillId}`,
-			)
+			throw new Error(`Hit ${hitNumber} not found for skill: ${skillId}`)
 		}
 
 		return hit

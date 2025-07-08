@@ -161,7 +161,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					PhysicalResistance_Rate: 40,
 					AilmentResistance_Rate: 20,
-					MotionSpeed_Rate: 10
+					MotionSpeed_Rate: 10,
 				},
 			},
 			{
@@ -171,7 +171,7 @@ export const equipmentsData: EquipmentsData = {
 					MP: 500,
 					MotionSpeed_Rate: 4,
 					Anticipate_Rate: 30,
-					AvoidRecharge_Rate: 20
+					AvoidRecharge_Rate: 20,
 				},
 			},
 			{
@@ -180,7 +180,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					MATK_Rate: 9,
 					INT_Rate: 9,
-					MagicalResistance_Rate: 9
+					MagicalResistance_Rate: 9,
 				},
 			},
 			{
@@ -190,7 +190,7 @@ export const equipmentsData: EquipmentsData = {
 					MATK_Rate: 11,
 					INT_Rate: 10,
 					HP: 9000,
-					DarkResistance_Rate: 8
+					DarkResistance_Rate: 8,
 				},
 			},
 			{
@@ -208,7 +208,7 @@ export const equipmentsData: EquipmentsData = {
 				name: 'くわえクナイ',
 				properties: {
 					PhysicalPenetration_Rate: 10,
-					MotionSpeed_Rate: 10
+					MotionSpeed_Rate: 10,
 				},
 			},
 			{
@@ -220,7 +220,7 @@ export const equipmentsData: EquipmentsData = {
 					LongRangeDamage_Rate: -10,
 					HP: -2000,
 					Dodge: 100,
-					AvoidRecharge_Rate: 10
+					AvoidRecharge_Rate: 10,
 				},
 			},
 			{
@@ -229,7 +229,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					STR_Rate: 5,
 					ShortRangeDamage_Rate: 6,
-					AttackSpeed: 400
+					AttackSpeed: 400,
 				},
 			},
 		],
@@ -259,7 +259,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					MP: 200,
 					Stability_Rate: 10,
-					MagicalPenetration_Rate: 5
+					MagicalPenetration_Rate: 5,
 				},
 			},
 			{
@@ -270,7 +270,7 @@ export const equipmentsData: EquipmentsData = {
 					ATK_Rate: 3,
 					Anticipate_Rate: 7,
 					PhysicalFollowup_Rate: 50,
-					BladeReduction_Rate: 10
+					BladeReduction_Rate: 10,
 				},
 			},
 			{
@@ -279,7 +279,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					MP: 300,
 					MagicalPenetration_Rate: 10,
-					NaturalMPRecovery_Rate: 20
+					NaturalMPRecovery_Rate: 20,
 				},
 			},
 			{
@@ -287,7 +287,7 @@ export const equipmentsData: EquipmentsData = {
 				name: '竜落子の腕輪',
 				properties: {
 					MP: 400,
-					Critical: 20
+					Critical: 20,
 				},
 			},
 			{
@@ -297,7 +297,7 @@ export const equipmentsData: EquipmentsData = {
 					MP: 200,
 					AttackSpeed: 750,
 					CastingSpeed: 750,
-					AilmentResistance_Rate: -8
+					AilmentResistance_Rate: -8,
 				},
 			},
 			{
@@ -305,7 +305,7 @@ export const equipmentsData: EquipmentsData = {
 				name: '熊戦士の帯',
 				properties: {
 					ShortRangeDamage_Rate: 2,
-					Critical: 15
+					Critical: 15,
 				},
 			},
 			{
@@ -313,7 +313,7 @@ export const equipmentsData: EquipmentsData = {
 				name: '熊戦士の帯(両手剣装備)',
 				properties: {
 					ShortRangeDamage_Rate: 2,
-					Critical: 30
+					Critical: 30,
 				},
 			},
 		],
@@ -344,7 +344,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					ElementAdvantage_Rate: 5,
 					WaterResistance_Rate: 10,
-					Aggro_Rate: -15
+					Aggro_Rate: -15,
 				},
 			},
 			{
@@ -353,7 +353,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					ElementAdvantage_Rate: 5,
 					EarthResistance_Rate: 10,
-					Aggro_Rate: -15
+					Aggro_Rate: -15,
 				},
 			},
 			{
@@ -362,7 +362,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					ElementAdvantage_Rate: 5,
 					WindResistance_Rate: 5,
-					AttackSpeed_Rate: 5
+					AttackSpeed_Rate: 5,
 				},
 			},
 			{
@@ -372,7 +372,7 @@ export const equipmentsData: EquipmentsData = {
 					ElementAdvantage_Rate: 5,
 					DarkResistance_Rate: 10,
 					AvoidRecharge_Rate: 15,
-					Dodge: 20
+					Dodge: 20,
 				},
 			},
 			{
@@ -381,7 +381,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					ElementAdvantage_Rate: 5,
 					Critical: 10,
-					AttackSpeed_Rate: 15
+					AttackSpeed_Rate: 15,
 				},
 			},
 			{
@@ -391,7 +391,7 @@ export const equipmentsData: EquipmentsData = {
 					ElementAdvantage_Rate: 5,
 					PhysicalPenetration_Rate: 5,
 					ArmorBreak_Rate: 5,
-					WaterResistance_Rate: -15
+					WaterResistance_Rate: -15,
 				},
 			},
 			{
@@ -400,7 +400,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					MATK_Rate: 4,
 					DEX_Rate: 2,
-					MotionSpeed_Rate: 2
+					MotionSpeed_Rate: 2,
 				},
 			},
 			{
@@ -409,10 +409,9 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					Stability_Rate: 10,
 					Critical: 10,
-					BladeReduction_Rate: 10
+					BladeReduction_Rate: 10,
 				},
 			},
-
 		],
 		fashion1: [
 			{

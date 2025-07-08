@@ -36,7 +36,7 @@ import { getAllDataSourceBonusesWithBuffSkills } from './dataSourceIntegration'
 export const calculateResults = (data: CalculatorData): CalculationResults => {
 	// 装備・クリスタ・料理・バフ・バフスキルからの補正値を統合
 	const initialBonuses = getAllDataSourceBonusesWithBuffSkills(data)
-	
+
 	// 全ての効果を統合した最終ボーナス値を作成
 	const allBonuses = { ...initialBonuses }
 
@@ -60,16 +60,14 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			(effect) => effect.type === 'physicalAttackUp' && effect.isEnabled,
 		)
 		if (physicalAttackUpEffect) {
-			allBonuses.ATK =
-				(allBonuses.ATK || 0) + physicalAttackUpEffect.level * 1
+			allBonuses.ATK = (allBonuses.ATK || 0) + physicalAttackUpEffect.level * 1
 		}
 
 		const magicAttackUpEffect = data.register.effects.find(
 			(effect) => effect.type === 'magicalAttackUp' && effect.isEnabled,
 		)
 		if (magicAttackUpEffect) {
-			allBonuses.MATK =
-				(allBonuses.MATK || 0) + magicAttackUpEffect.level * 1
+			allBonuses.MATK = (allBonuses.MATK || 0) + magicAttackUpEffect.level * 1
 		}
 
 		const accuracyUpEffect = data.register.effects.find(
@@ -84,8 +82,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			(effect) => effect.type === 'evasionUp' && effect.isEnabled,
 		)
 		if (evasionUpEffect) {
-			allBonuses.Dodge =
-				(allBonuses.Dodge || 0) + evasionUpEffect.level * 1
+			allBonuses.Dodge = (allBonuses.Dodge || 0) + evasionUpEffect.level * 1
 		}
 
 		const attackSpeedUpEffect = data.register.effects.find(
@@ -127,8 +124,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			(effect) => effect.type === 'freshFruitTrade' && effect.isEnabled,
 		)
 		if (freshFruitTradeEffect) {
-			allBonuses.MP =
-				(allBonuses.MP || 0) + freshFruitTradeEffect.level * 10
+			allBonuses.MP = (allBonuses.MP || 0) + freshFruitTradeEffect.level * 10
 		}
 	}
 
@@ -239,8 +235,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	)
 
 	// 11. 物理耐性計算
-	const physicalResistanceCalculation =
-		calculatePhysicalResistance(allBonuses)
+	const physicalResistanceCalculation = calculatePhysicalResistance(allBonuses)
 
 	// 12. 魔法耐性計算
 	const magicalResistanceCalculation = calculateMagicalResistance(allBonuses)
@@ -283,11 +278,13 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			MATK: matkCalculation.finalMATK,
 			baseMATK: matkCalculation.baseMATK,
 			stabilityRate: stabilityCalculation.finalStability,
-			subStabilityRate: subATKCalculation?.subStability || data.subWeapon.stability,
+			subStabilityRate:
+				subATKCalculation?.subStability || data.subWeapon.stability,
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
 			magicCriticalRate: 0, // 暫定
-			magicCriticalDamage: magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
+			magicCriticalDamage:
+				magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
 			totalElementAdvantage:
 				totalElementAdvantageCalculation.finalTotalElementAdvantage,
 			elementAwakeningAdvantage: 0, // 暫定

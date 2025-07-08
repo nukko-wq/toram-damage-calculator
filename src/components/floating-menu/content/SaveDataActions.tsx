@@ -6,7 +6,11 @@ import ExportModal from './modals/ExportModal'
 import ImportModal from './modals/ImportModal'
 import ImportConfirmModal from './modals/ImportConfirmModal'
 import { exportData, type ExportOptions } from '@/utils/exportManager'
-import { importData, type ImportValidationResult, type ImportOptions } from '@/utils/importManager'
+import {
+	importData,
+	type ImportValidationResult,
+	type ImportOptions,
+} from '@/utils/importManager'
 
 interface SaveDataActionsProps {
 	onCreateNew: () => void
@@ -15,12 +19,14 @@ interface SaveDataActionsProps {
 export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 	const { saveCurrentData, hasRealChanges, getUnsavedDataStatus } =
 		useCalculatorStore()
-	
+
 	// モーダル状態管理
 	const [isExportModalOpen, setIsExportModalOpen] = useState(false)
 	const [isImportModalOpen, setIsImportModalOpen] = useState(false)
-	const [isImportConfirmModalOpen, setIsImportConfirmModalOpen] = useState(false)
-	const [importValidationResult, setImportValidationResult] = useState<ImportValidationResult | null>(null)
+	const [isImportConfirmModalOpen, setIsImportConfirmModalOpen] =
+		useState(false)
+	const [importValidationResult, setImportValidationResult] =
+		useState<ImportValidationResult | null>(null)
 
 	// 現在のデータを保存
 	const handleSaveCurrentData = async () => {
@@ -60,17 +66,19 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 
 		try {
 			const result = await importData(importValidationResult.data, options)
-			
+
 			if (result.success) {
 				setIsImportConfirmModalOpen(false)
 				setImportValidationResult(null)
 				// 成功通知
 				console.log('インポート完了:', result)
-				
+
 				// ページリロードでデータを反映（将来的にはストア更新で対応）
-				if (result.importedCounts.saveData > 0 || 
-					result.importedCounts.customEquipment > 0 || 
-					result.importedCounts.customCrystals > 0) {
+				if (
+					result.importedCounts.saveData > 0 ||
+					result.importedCounts.customEquipment > 0 ||
+					result.importedCounts.customCrystals > 0
+				) {
 					setTimeout(() => {
 						window.location.reload()
 					}, 1000)

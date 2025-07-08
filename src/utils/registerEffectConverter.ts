@@ -2,7 +2,11 @@
  * レジスタ効果をEquipmentPropertiesに変換するユーティリティ関数
  */
 
-import type { RegisterFormData, RegisterEffect, EquipmentProperties } from '@/types/calculator'
+import type {
+	RegisterFormData,
+	RegisterEffect,
+	EquipmentProperties,
+} from '@/types/calculator'
 
 /**
  * レジスタ効果をEquipmentPropertiesに変換
@@ -10,7 +14,7 @@ import type { RegisterFormData, RegisterEffect, EquipmentProperties } from '@/ty
  * @returns 変換されたEquipmentProperties
  */
 export function convertRegisterEffectsToProperties(
-	registerData: RegisterFormData
+	registerData: RegisterFormData,
 ): Partial<EquipmentProperties> {
 	const properties: Partial<EquipmentProperties> = {}
 
@@ -21,56 +25,56 @@ export function convertRegisterEffectsToProperties(
 		switch (effect.type) {
 			case 'maxHpUp':
 				// 最大HPアップ: レベル × 10 を HP固定値に加算
-				properties.HP = (properties.HP || 0) + (effect.level * 10)
+				properties.HP = (properties.HP || 0) + effect.level * 10
 				break
-			
+
 			case 'maxMpUp':
 				// 最大MPアップ: レベル × 1 を MP固定値に加算
-				properties.MP = (properties.MP || 0) + (effect.level * 1)
+				properties.MP = (properties.MP || 0) + effect.level * 1
 				break
-			
+
 			case 'physicalAttackUp':
 				// 物理攻撃アップ: レベル × 1 を ATK固定値に加算
 				properties.ATK = (properties.ATK || 0) + effect.level
 				break
-			
+
 			case 'magicalAttackUp':
 				// 魔法攻撃アップ: レベル × 1 を MATK固定値に加算
 				properties.MATK = (properties.MATK || 0) + effect.level
 				break
-			
+
 			case 'accuracyUp':
 				// 命中アップ: レベル × 1 を Accuracy固定値に加算
 				properties.Accuracy = (properties.Accuracy || 0) + effect.level
 				break
-			
+
 			case 'evasionUp':
 				// 回避アップ: レベル × 1 を Dodge固定値に加算
 				properties.Dodge = (properties.Dodge || 0) + effect.level
 				break
-			
+
 			case 'attackSpeedUp':
 				// 攻撃速度アップ: レベル × 1 を AttackSpeed固定値に加算
 				properties.AttackSpeed = (properties.AttackSpeed || 0) + effect.level
 				break
-			
+
 			case 'magicalSpeedUp':
 				// 魔法速度アップ: レベル × 1 を CastingSpeed固定値に加算
 				properties.CastingSpeed = (properties.CastingSpeed || 0) + effect.level
 				break
-			
+
 			case 'fateCompanionship':
 				// 運命共同体: 特殊計算（レベル1固定 + パーティメンバー数効果）
 				if (effect.level === 1) {
 					const baseBonus = 5 // レベル1固定効果
 					const partyBonus = (effect.partyMembers || 1) * 3 // パーティメンバー数効果
 					const totalBonus = baseBonus + partyBonus
-					
+
 					properties.ATK = (properties.ATK || 0) + totalBonus
 					properties.MATK = (properties.MATK || 0) + totalBonus
 				}
 				break
-			
+
 			// 他の効果は将来実装
 			default:
 				break
@@ -88,12 +92,14 @@ export function convertRegisterEffectsToProperties(
  */
 export function getRegisterEffectValue(
 	registerData: RegisterFormData,
-	effectType: string
+	effectType: string,
 ): number {
-	const effect = registerData.effects.find(e => e.type === effectType && e.isEnabled)
-	
+	const effect = registerData.effects.find(
+		(e) => e.type === effectType && e.isEnabled,
+	)
+
 	if (!effect) return 0
-	
+
 	switch (effectType) {
 		case 'maxHpUp':
 			return effect.level * 10
@@ -130,7 +136,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			type: 'maxHpUp',
 			isEnabled: false,
 			level: 30,
-			maxLevel: 30
+			maxLevel: 30,
 		},
 		{
 			id: 'maxMpUp',
@@ -138,7 +144,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			type: 'maxMpUp',
 			isEnabled: false,
 			level: 30,
-			maxLevel: 30
+			maxLevel: 30,
 		},
 		{
 			id: 'physicalAttackUp',
@@ -146,7 +152,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			type: 'physicalAttackUp',
 			isEnabled: false,
 			level: 30,
-			maxLevel: 30
+			maxLevel: 30,
 		},
 		{
 			id: 'magicalAttackUp',
@@ -154,7 +160,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			type: 'magicalAttackUp',
 			isEnabled: false,
 			level: 30,
-			maxLevel: 30
+			maxLevel: 30,
 		},
 		{
 			id: 'accuracyUp',
@@ -162,7 +168,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			type: 'accuracyUp',
 			isEnabled: false,
 			level: 30,
-			maxLevel: 30
+			maxLevel: 30,
 		},
 		{
 			id: 'evasionUp',
@@ -170,7 +176,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			type: 'evasionUp',
 			isEnabled: false,
 			level: 30,
-			maxLevel: 30
+			maxLevel: 30,
 		},
 		{
 			id: 'attackSpeedUp',
@@ -178,7 +184,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			type: 'attackSpeedUp',
 			isEnabled: false,
 			level: 30,
-			maxLevel: 30
+			maxLevel: 30,
 		},
 		{
 			id: 'magicalSpeedUp',
@@ -186,7 +192,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			type: 'magicalSpeedUp',
 			isEnabled: false,
 			level: 30,
-			maxLevel: 30
+			maxLevel: 30,
 		},
 		{
 			id: 'fateCompanionship',
@@ -195,8 +201,8 @@ export function createInitialRegisterData(): RegisterFormData {
 			isEnabled: false,
 			level: 1, // 運命共同体は常にレベル1
 			maxLevel: 1,
-			partyMembers: 1 // デフォルトは1人（自分以外）
-		}
+			partyMembers: 1, // デフォルトは1人（自分以外）
+		},
 	]
 
 	return { effects }

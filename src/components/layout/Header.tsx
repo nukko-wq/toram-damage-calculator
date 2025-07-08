@@ -18,7 +18,6 @@ export default React.memo<HeaderProps>(function Header({ className = '' }) {
 				<div className="flex flex-col sm:gap-4 md:flex-row md:justify-between md:items-center">
 					{/* サイトタイトル */}
 					<HeaderTitle />
-
 				</div>
 			</div>
 		</header>

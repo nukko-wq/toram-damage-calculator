@@ -111,7 +111,9 @@ export function RegisterForm({ className }: RegisterFormProps) {
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 						{watchedData.effects
 							.filter((effect) =>
-								['deliciousIngredientTrade', 'freshFruitTrade'].includes(effect.type),
+								['deliciousIngredientTrade', 'freshFruitTrade'].includes(
+									effect.type,
+								),
 							)
 							.map((effect) => (
 								<RegisterEffectItem

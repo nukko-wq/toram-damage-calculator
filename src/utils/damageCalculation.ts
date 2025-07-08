@@ -206,7 +206,6 @@ export interface DamageCalculationSteps {
 		braveRate: number
 		result: number
 	}
-
 }
 
 // ============================================================================
@@ -217,7 +216,9 @@ export interface DamageCalculationSteps {
  * メインダメージ計算関数
  * Phase 3でステップ5-7まで実装完了
  */
-export function calculateDamage(input: DamageCalculationInput): DamageCalculationResult {
+export function calculateDamage(
+	input: DamageCalculationInput,
+): DamageCalculationResult {
 	const steps = {} as DamageCalculationSteps
 
 	console.log('=== 計算ステップ詳細 ===')
@@ -281,12 +282,15 @@ export function calculateDamage(input: DamageCalculationInput): DamageCalculatio
 	console.log('\n--- ステップ10: ブレイブ倍率補正 ---')
 	const baseDamage = applyBraveMultiplier(step9Result, input, steps)
 	console.log(`ステップ10結果: ${baseDamage}`)
-	
+
 	console.log('\n=== 最終結果 ===')
 	console.log('最終baseDamage:', baseDamage)
 
 	// 安定率適用
-	const stabilityResult = calculateStabilityDamage(baseDamage, input.stability.rate)
+	const stabilityResult = calculateStabilityDamage(
+		baseDamage,
+		input.stability.rate,
+	)
 
 	return {
 		baseDamage,
@@ -310,9 +314,10 @@ function calculateBaseDamage(
 		input.playerLevel + input.referenceStat - input.enemyLevel
 
 	// 耐性適用（小数点処理せずにそのまま保持）
-	const mainResistance = input.attackSkill.type === 'physical' 
-		? input.resistance.physical 
-		: input.resistance.magical
+	const mainResistance =
+		input.attackSkill.type === 'physical'
+			? input.resistance.physical
+			: input.resistance.magical
 	const weaponResistance = input.resistance.weapon
 
 	// (1 - 主耐性/100) × (1 - 武器耐性/100) の計算
@@ -478,7 +483,7 @@ function applyDistance(
 	// 距離補正の適用判定
 	if (input.userSettings.currentDistance !== 'disabled') {
 		const currentDistance = input.userSettings.currentDistance
-		
+
 		// 距離補正対応スキルかどうかをチェック
 		if (input.attackSkill.supportedDistances.includes(currentDistance)) {
 			if (currentDistance === 'short') {
@@ -491,23 +496,29 @@ function applyDistance(
 
 	// パッシブ倍率、ブレイブ倍率、クリティカル倍率がある場合は距離補正で小数点を保持
 	let result: number
-	const hasPassiveMultiplier = input.passiveMultiplier && input.passiveMultiplier > 0
+	const hasPassiveMultiplier =
+		input.passiveMultiplier && input.passiveMultiplier > 0
 	const hasBraveMultiplier = input.braveMultiplier && input.braveMultiplier > 0
 	const isCritical = input.userSettings.damageType === 'critical'
-	
-	const hasMultiplierAfterDistance = isCritical || hasPassiveMultiplier || hasBraveMultiplier
-	
+
+	const hasMultiplierAfterDistance =
+		isCritical || hasPassiveMultiplier || hasBraveMultiplier
+
 	if (hasMultiplierAfterDistance) {
 		// 後続に倍率補正がある場合：小数点を保持して次のステップに渡す
 		result = beforeDistance * (1 + distanceRate / 100)
 		console.log('=== 距離補正: 小数点保持 (後続倍率補正あり) ===')
-		console.log(`後続倍率: パッシブ(${input.passiveMultiplier}%) ブレイブ(${input.braveMultiplier}%) クリティカル(${isCritical})`)
+		console.log(
+			`後続倍率: パッシブ(${input.passiveMultiplier}%) ブレイブ(${input.braveMultiplier}%) クリティカル(${isCritical})`,
+		)
 		console.log(`${beforeDistance} × (1 + ${distanceRate}/100) = ${result}`)
 	} else {
 		// 後続に倍率補正がない場合：切り捨て
 		result = Math.floor(beforeDistance * (1 + distanceRate / 100))
 		console.log('=== 距離補正: 切り捨て (後続倍率補正なし) ===')
-		console.log(`Math.floor(${beforeDistance} × (1 + ${distanceRate}/100)) = ${result}`)
+		console.log(
+			`Math.floor(${beforeDistance} × (1 + ${distanceRate}/100)) = ${result}`,
+		)
 	}
 
 	// 計算過程を記録（表示用は切り捨て値）
@@ -537,24 +548,32 @@ function applyCombo(
 	console.log('comboRate (使用される倍率):', comboRate)
 
 	// パッシブ倍率、ブレイブ倍率、クリティカル倍率がある場合はコンボ補正で小数点を保持
-	const hasPassiveMultiplier = input.passiveMultiplier && input.passiveMultiplier > 0
+	const hasPassiveMultiplier =
+		input.passiveMultiplier && input.passiveMultiplier > 0
 	const hasBraveMultiplier = input.braveMultiplier && input.braveMultiplier > 0
 	const isCritical = input.userSettings.damageType === 'critical'
-	
-	const hasMultiplierAfterCombo = isCritical || hasPassiveMultiplier || hasBraveMultiplier
-	
+
+	const hasMultiplierAfterCombo =
+		isCritical || hasPassiveMultiplier || hasBraveMultiplier
+
 	let result: number
 	if (hasMultiplierAfterCombo) {
 		// 後続に倍率補正がある場合：小数点を保持
 		result = beforeCombo * (comboRate / 100)
 		console.log('=== コンボ補正: 小数点保持 (後続倍率補正あり) ===')
-		console.log(`後続倍率: パッシブ(${input.passiveMultiplier}%) ブレイブ(${input.braveMultiplier}%) クリティカル(${isCritical})`)
-		console.log(`計算式: ${beforeCombo} * ${comboRate}/100 = ${result} (小数点保持)`)
+		console.log(
+			`後続倍率: パッシブ(${input.passiveMultiplier}%) ブレイブ(${input.braveMultiplier}%) クリティカル(${isCritical})`,
+		)
+		console.log(
+			`計算式: ${beforeCombo} * ${comboRate}/100 = ${result} (小数点保持)`,
+		)
 	} else {
 		// 後続に倍率補正がない場合：切り捨て
 		result = Math.floor(beforeCombo * (comboRate / 100))
 		console.log('=== コンボ補正: 切り捨て (後続倍率補正なし) ===')
-		console.log(`計算式: Math.floor(${beforeCombo} * ${comboRate}/100) = ${result} (切り捨て)`)
+		console.log(
+			`計算式: Math.floor(${beforeCombo} * ${comboRate}/100) = ${result} (切り捨て)`,
+		)
 	}
 
 	console.log('result (コンボ適用後):', result)
@@ -587,7 +606,15 @@ function applyPassiveMultiplier(
 
 	// 現在ブレイブ倍率は未実装(0)なので、パッシブ倍率で最終切り捨てを行う
 	const result = Math.floor(beforePassive * (1 + passiveRate / 100))
-	console.log('計算式: Math.floor(' + beforePassive + ' * (1 + ' + passiveRate + '/100)) = ' + result + ' (最終切り捨て)')
+	console.log(
+		'計算式: Math.floor(' +
+			beforePassive +
+			' * (1 + ' +
+			passiveRate +
+			'/100)) = ' +
+			result +
+			' (最終切り捨て)',
+	)
 
 	console.log('result:', result)
 	console.log('===============================')
@@ -635,11 +662,11 @@ function applyCriticalDamage(
 ): number {
 	console.log('=== CRITICAL DAMAGE CALCULATION (Step 2a) ===')
 	console.log('step2Result (固定値適用後):', step2Result)
-	
+
 	// クリティカルダメージ倍率を取得
 	const criticalRate = input.critical.damage
 	console.log('criticalRate (クリティカルダメージ%):', criticalRate)
-	
+
 	// ステップ2a: 固定値加算の後、属性有利の前にクリティカル倍率を適用
 	console.log('=== ステップ2a: クリティカル倍率適用（属性有利の前） ===')
 	console.log(`固定値適用後: ${step2Result}`)
@@ -711,7 +738,6 @@ function processEnemyDefense(
 	// 小数点を保持したまま返す（Math.floorは基礎ダメージ計算で適用）
 	return processed
 }
-
 
 /**
  * 安定率ダメージ計算
@@ -850,12 +876,14 @@ export function logCalculationSteps(result: DamageCalculationResult): void {
 	console.log(`最小ダメージ: ${result.stabilityResult.minDamage}`)
 	console.log(`最大ダメージ: ${result.stabilityResult.maxDamage}`)
 	console.log(`平均ダメージ: ${result.stabilityResult.averageDamage}`)
-	
+
 	console.log('\n=== 計算過程 ===')
 	const steps = result.calculationSteps
 
 	console.log('ステップ1: 基礎ダメージ')
-	console.log(`  ${steps.step1_baseDamage.playerLevel} + ${steps.step1_baseDamage.referenceStat} - ${steps.step1_baseDamage.enemyLevel} = ${steps.step1_baseDamage.beforeResistance}`)
+	console.log(
+		`  ${steps.step1_baseDamage.playerLevel} + ${steps.step1_baseDamage.referenceStat} - ${steps.step1_baseDamage.enemyLevel} = ${steps.step1_baseDamage.beforeResistance}`,
+	)
 	console.log(`  耐性適用後: ${steps.step1_baseDamage.afterResistance}`)
 	console.log(`  敵防御力: ${steps.step1_baseDamage.enemyDEF}`)
 	console.log(`  結果: ${steps.step1_baseDamage.result}`)
@@ -865,12 +893,12 @@ export function logCalculationSteps(result: DamageCalculationResult): void {
 	console.log(`  抜刀固定値: ${steps.step2_fixedValues.unsheatheFixed}`)
 	console.log(`  スキル固定値: ${steps.step2_fixedValues.skillFixed}`)
 	console.log(`  結果: ${steps.step2_fixedValues.result}`)
-	
+
 	console.log('\nステップ3: 属性有利補正')
 	console.log(`  固定値適用後: ${steps.step3_elementAdvantage.beforeAdvantage}`)
 	console.log(`  属性有利: ${steps.step3_elementAdvantage.advantageRate}%`)
 	console.log(`  結果: ${steps.step3_elementAdvantage.result}`)
-	
+
 	console.log('\nステップ4: スキル倍率補正')
 	console.log(`  属性有利適用後: ${steps.step4_skillMultiplier.beforeSkill}`)
 	console.log(`  スキル倍率: ${steps.step4_skillMultiplier.skillRate}%`)

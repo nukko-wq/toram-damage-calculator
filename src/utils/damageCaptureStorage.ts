@@ -77,7 +77,7 @@ export const createCaptureData = (
 	averageStability: number,
 ): DamageCaptureData => {
 	const now = new Date().toISOString()
-	
+
 	return {
 		damageResult: {
 			minimum: {
