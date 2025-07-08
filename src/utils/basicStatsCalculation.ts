@@ -412,7 +412,8 @@ export interface ASPDCalculationSteps {
 	aspdBeforePercent: number // ASPD%適用前
 	aspdPercent: number // ASPD%補正値（装備等）
 	armorTypeBonus: number // ArmorType補正値（内部計算のみ）
-	effectiveASPDPercent: number // 実効ASPD%（ASPD% + ArmorType補正）
+	shieldTypeBonus: number // ShieldType補正値（内部計算のみ）
+	effectiveASPDPercent: number // 実効ASPD%（ASPD% + ArmorType補正 + ShieldType補正）
 	aspdAfterPercent: number // ASPD%適用後
 	aspdFixed: number // ASPD固定値
 	finalASPD: number // 最終ASPD
@@ -1002,9 +1003,10 @@ export function calculateSubATK(
 }
 
 /**
- * ASPD計算（武器種別対応、ArmorType補正対応）
- * ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorType補正)/100)) + ASPD固定値
+ * ASPD計算（武器種別対応、ArmorType補正・ShieldType補正対応）
+ * ASPD = INT((Lv + ステータスASPD + 武器補正値) × (1 + (ASPD% + ArmorType補正 + ShieldType補正)/100)) + ASPD固定値
  * ArmorType補正: 通常=0%, 軽量化=+50%, 重量化=-50%（内部計算のみ）
+ * ShieldType補正: 盾=-50%, その他=0%（内部計算のみ）
  */
 export function calculateASPD(
 	stats: BaseStats,
@@ -1012,6 +1014,7 @@ export function calculateASPD(
 	adjustedStats: AdjustedStatsCalculation,
 	bonuses: AllBonuses = {},
 	armorType: ArmorType = 'normal',
+	subWeaponType?: string | null,
 ): ASPDCalculationSteps {
 	// 1. 武器種別ステータスASPD計算
 	const weaponTypeKey = getWeaponTypeKey(weapon.weaponType)
@@ -1024,10 +1027,11 @@ export function calculateASPD(
 	// 3. ASPD%適用前の値計算
 	const aspdBeforePercent = stats.level + statusASPD + weaponTypeCorrection
 
-	// 4. ASPD%補正値とArmorType補正計算
+	// 4. ASPD%補正値とArmorType補正・ShieldType補正計算
 	const aspdPercent = bonuses.AttackSpeed_Rate || 0
 	const armorTypeBonus = getArmorTypeASPDBonus(armorType)
-	const effectiveASPDPercent = aspdPercent + armorTypeBonus
+	const shieldTypeBonus = getShieldTypeASPDBonus(subWeaponType)
+	const effectiveASPDPercent = aspdPercent + armorTypeBonus + shieldTypeBonus
 
 	// 5. 実効ASPD%補正適用
 	const aspdAfterPercent = Math.floor(
@@ -1045,6 +1049,7 @@ export function calculateASPD(
 		aspdBeforePercent,
 		aspdPercent,
 		armorTypeBonus,
+		shieldTypeBonus,
 		effectiveASPDPercent,
 		aspdAfterPercent,
 		aspdFixed,
@@ -1185,6 +1190,21 @@ export function getArmorTypeASPDBonus(armorType: ArmorType): number {
 		case 'normal':
 		default:
 			return 0 // 通常: +0%
+	}
+}
+
+/**
+ * サブ武器タイプによるASPD%補正を取得（内部計算のみ）
+ * @param subWeaponType サブ武器タイプ
+ * @returns ASPD%補正値（盾: -50%, その他: 0%）
+ */
+export function getShieldTypeASPDBonus(subWeaponType?: string | null): number {
+	switch (subWeaponType) {
+		case 'shield':
+		case '盾':
+			return -50 // 盾: -50%
+		default:
+			return 0 // その他: +0%
 	}
 }
 

@@ -313,6 +313,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation,
 				finalBonuses,
 				bodyArmorType,
+				data.subWeapon?.weaponType,
 			),
 			motionSpeedCalculation: (() => {
 				const aspd = calculateASPD(
@@ -321,6 +322,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					adjustedStatsCalculation,
 					finalBonuses,
 					bodyArmorType,
+					data.subWeapon?.weaponType,
 				).finalASPD
 				return calculateMotionSpeed(aspd, finalBonuses)
 			})(),
