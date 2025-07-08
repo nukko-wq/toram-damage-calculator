@@ -272,17 +272,30 @@ export default function CrystalCard({
 						return (
 							<div
 								key={`${crystal.id}-condition-${index}`}
-								className="space-y-1"
 							>
-								<div className="">{conditionText}：</div>
-								{effectTexts.map((effectText, effectIndex) => (
-									<div
-										key={`${crystal.id}-effect-${index}-${effectIndex}`}
-										className="ml-2"
-									>
-										{effectText}
-									</div>
-								))}
+								<div className="flex flex-wrap gap-1">
+									<div className="">{conditionText}：</div>
+									{effectTexts.length > 1 ? (
+										<div className="flex flex-wrap gap-1">
+											{effectTexts.map((effectText, effectIndex) => (
+												<div
+													key={`${crystal.id}-effect-${index}-${effectIndex}`}
+												>
+													{effectText}
+													{effectIndex < effectTexts.length - 1 && ' '}
+												</div>
+											))}
+										</div>
+									) : (
+										effectTexts.map((effectText, effectIndex) => (
+											<div
+												key={`${crystal.id}-effect-${index}-${effectIndex}`}
+											>
+												{effectText}
+											</div>
+										))
+									)}
+								</div>
 							</div>
 						)
 					})}
