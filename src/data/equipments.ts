@@ -155,6 +155,83 @@ export const equipmentsData: EquipmentsData = {
 					AbsoluteAccuracy_Rate: 5,
 				},
 			},
+			{
+				id: 'eq001-2345-6789-abcd-ef0123456789',
+				name: '魅力的なくちびる',
+				properties: {
+					PhysicalResistance_Rate: 40,
+					AilmentResistance_Rate: 20,
+					MotionSpeed_Rate: 10
+				},
+			},
+			{
+				id: 'eq002-3456-789a-bcde-f01234567890',
+				name: 'エクトピエズム(軽鎧装備)',
+				properties: {
+					MP: 500,
+					MotionSpeed_Rate: 4,
+					Anticipate_Rate: 30,
+					AvoidRecharge_Rate: 20
+				},
+			},
+			{
+				id: 'eq003-4567-89ab-cdef-012345678901',
+				name: 'シュメッタヘアピン',
+				properties: {
+					MATK_Rate: 9,
+					INT_Rate: 9,
+					MagicalResistance_Rate: 9
+				},
+			},
+			{
+				id: 'eq004-5678-9abc-def0-123456789012',
+				name: 'ジンジャーサンタ',
+				properties: {
+					MATK_Rate: 11,
+					INT_Rate: 10,
+					HP: 9000,
+					DarkResistance_Rate: 8
+				},
+			},
+			{
+				id: 'eq005-6789-abcd-ef01-234567890123',
+				name: 'エルモターバン',
+				properties: {
+					STR_Rate: 10,
+					INT_Rate: 10,
+					PhysicalPenetration_Rate: 10,
+					MagicalPenetration_Rate: 10,
+				},
+			},
+			{
+				id: 'eq006-789a-bcde-f012-345678901234',
+				name: 'くわえクナイ',
+				properties: {
+					PhysicalPenetration_Rate: 10,
+					MotionSpeed_Rate: 10
+				},
+			},
+			{
+				id: 'eq007-89ab-cdef-0123-456789012345',
+				name: 'ブルーローズウィング',
+				properties: {
+					ShortRangeDamage_Rate: 11,
+					AttackSpeed: 1000,
+					LongRangeDamage_Rate: -10,
+					HP: -2000,
+					Dodge: 100,
+					AvoidRecharge_Rate: 10
+				},
+			},
+			{
+				id: 'eq008-9abc-def0-1234-567890123456',
+				name: 'ほおひげ',
+				properties: {
+					STR_Rate: 5,
+					ShortRangeDamage_Rate: 6,
+					AttackSpeed: 400
+				},
+			},
 		],
 		special: [
 			{
@@ -174,6 +251,69 @@ export const equipmentsData: EquipmentsData = {
 					AttackSpeed: 1000,
 					PhysicalResistance_Rate: -9,
 					MagicalResistance_Rate: -9,
+				},
+			},
+			{
+				id: 'eq009-abcd-ef01-2345-678901234567',
+				name: '鮭トバのお守り',
+				properties: {
+					MP: 200,
+					Stability_Rate: 10,
+					MagicalPenetration_Rate: 5
+				},
+			},
+			{
+				id: 'eq010-bcde-f012-3456-789012345678',
+				name: '冥氷の指輪(力)',
+				properties: {
+					MP: 500,
+					ATK_Rate: 3,
+					Anticipate_Rate: 7,
+					PhysicalFollowup_Rate: 50,
+					BladeReduction_Rate: 10
+				},
+			},
+			{
+				id: 'eq011-cdef-0123-4567-890123456789',
+				name: '星詠みのランプ',
+				properties: {
+					MP: 300,
+					MagicalPenetration_Rate: 10,
+					NaturalMPRecovery_Rate: 20
+				},
+			},
+			{
+				id: 'eq012-def0-1234-5678-90123456789a',
+				name: '竜落子の腕輪',
+				properties: {
+					MP: 400,
+					Critical: 20
+				},
+			},
+			{
+				id: 'eq013-ef01-2345-6789-0123456789ab',
+				name: '爛漫の守石',
+				properties: {
+					MP: 200,
+					AttackSpeed: 750,
+					CastingSpeed: 750,
+					AilmentResistance_Rate: -8
+				},
+			},
+			{
+				id: 'eq014-f012-3456-789a-bcdef0123456',
+				name: '熊戦士の帯',
+				properties: {
+					ShortRangeDamage_Rate: 2,
+					Critical: 15
+				},
+			},
+			{
+				id: 'eq015-0123-4567-89ab-cdef01234567',
+				name: '熊戦士の帯(両手剣装備)',
+				properties: {
+					ShortRangeDamage_Rate: 2,
+					Critical: 30
 				},
 			},
 		],
@@ -198,6 +338,81 @@ export const equipmentsData: EquipmentsData = {
 					Aggro_Rate: -10,
 				},
 			},
+			{
+				id: 'eq016-1234-5678-9abc-def012345678',
+				name: '刺身包丁(水+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					WaterResistance_Rate: 10,
+					Aggro_Rate: -15
+				},
+			},
+			{
+				id: 'eq017-2345-6789-abcd-ef0123456789',
+				name: 'キッチンナイフ(地+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					EarthResistance_Rate: 10,
+					Aggro_Rate: -15
+				},
+			},
+			{
+				id: 'eq018-3456-789a-bcde-f01234567890',
+				name: '檎の枝剣(風+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					WindResistance_Rate: 5,
+					AttackSpeed_Rate: 5
+				},
+			},
+			{
+				id: 'eq019-4567-89ab-cdef-012345678901',
+				name: '白獣の短剣(闇+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					DarkResistance_Rate: 10,
+					AvoidRecharge_Rate: 15,
+					Dodge: 20
+				},
+			},
+			{
+				id: 'eq020-5678-9abc-def0-123456789012',
+				name: 'ツッパリダガー(光+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					Critical: 10,
+					AttackSpeed_Rate: 15
+				},
+			},
+			{
+				id: 'eq021-6789-abcd-ef01-234567890123',
+				name: '溶解ナイフ(無+)',
+				properties: {
+					ElementAdvantage_Rate: 5,
+					PhysicalPenetration_Rate: 5,
+					ArmorBreak_Rate: 5,
+					WaterResistance_Rate: -15
+				},
+			},
+			{
+				id: 'eq022-789a-bcde-f012-345678901234',
+				name: 'ムーンライトダガー',
+				properties: {
+					MATK_Rate: 4,
+					DEX_Rate: 2,
+					MotionSpeed_Rate: 2
+				},
+			},
+			{
+				id: 'eq023-89ab-cdef-0123-456789012345',
+				name: 'チューニングナイフ',
+				properties: {
+					Stability_Rate: 10,
+					Critical: 10,
+					BladeReduction_Rate: 10
+				},
+			},
+
 		],
 		fashion1: [
 			{
