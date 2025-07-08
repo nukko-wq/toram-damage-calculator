@@ -26,6 +26,7 @@ import {
 	getFurtherMagicEffects,
 	getGodspeedTrajectoryEffects,
 } from './buffSkillCalculation'
+import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 
 /**
  * プロパティ値のバリデーション
@@ -123,7 +124,62 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 }
 
 /**
- * クリスタルデータから補正値を取得
+ * クリスタルデータから補正値を取得（条件付き効果対応版）
+ */
+export function getCrystalBonusesWithConditionalEffects(data: CalculatorData): Partial<AllBonuses> {
+	try {
+		const bonuses: Partial<AllBonuses> = {}
+
+		// nullチェック
+		if (!data.crystals) return bonuses
+
+		// 8スロット分のクリスタルIDから実際のクリスタルデータを取得
+		const slotIds = [
+			data.crystals.weapon1,
+			data.crystals.weapon2,
+			data.crystals.armor1,
+			data.crystals.armor2,
+			data.crystals.additional1,
+			data.crystals.additional2,
+			data.crystals.special1,
+			data.crystals.special2,
+		].filter(Boolean)
+
+		for (const crystalId of slotIds) {
+			if (typeof crystalId !== 'string') continue
+
+			const crystal = getCrystalById(crystalId)
+			if (!crystal?.properties) continue
+
+			// 条件付き効果を適用した最終的なプロパティを取得
+			const effectiveProperties = applyConditionalCrystalEffects(
+				crystal,
+				data.equipment,
+				data.mainWeapon,
+				data.subWeapon
+			)
+
+			// 最終的なプロパティから補正値を計算
+			for (const [propertyKey, value] of Object.entries(effectiveProperties)) {
+				if (typeof value !== 'number' || value === 0) continue
+
+				const validatedValue = validatePropertyValue(value, propertyKey)
+
+				const normalizedKey = normalizePropertyKey(propertyKey)
+				bonuses[normalizedKey as keyof AllBonuses] =
+					(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
+			}
+		}
+
+		return bonuses
+	} catch (error) {
+		console.error('Error in getCrystalBonusesWithConditionalEffects:', error)
+		return {}
+	}
+}
+
+/**
+ * クリスタルデータから補正値を取得（従来版）
  */
 export function getCrystalBonuses(crystalData: any): Partial<AllBonuses> {
 	try {
@@ -150,7 +206,7 @@ export function getCrystalBonuses(crystalData: any): Partial<AllBonuses> {
 			const crystal = getCrystalById(crystalId)
 			if (!crystal?.properties) continue
 
-			// propertiesオブジェクトの各プロパティを処理
+			// 基本プロパティの処理
 			for (const [propertyKey, value] of Object.entries(crystal.properties)) {
 				if (typeof value !== 'number' || value === 0) continue
 
@@ -470,8 +526,13 @@ export function getAllDataSourceBonusesWithBuffSkills(
 ): Partial<AllBonuses> {
 	const bonuses: Partial<AllBonuses> = {}
 
-	// 従来の4つのデータソースを統合
-	const dataSources = getAllDataSourceBonuses(data)
+	// 従来の4つのデータソースを統合（クリスタルは条件付き効果対応版を使用）
+	const dataSources = {
+		equipment: getEquipmentBonuses(data.equipment),
+		crystal: getCrystalBonusesWithConditionalEffects(data),
+		food: getFoodBonuses(data.food),
+		buff: getBuffBonuses(data.buffItems),
+	}
 
 	// 各データソースの補正値を統合
 	for (const source of Object.values(dataSources)) {
