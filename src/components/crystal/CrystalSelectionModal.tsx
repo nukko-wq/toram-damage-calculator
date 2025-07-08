@@ -29,6 +29,7 @@ export default function CrystalSelectionModal({
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
 	const [isAnimating, setIsAnimating] = useState(false)
 	const [shouldRender, setShouldRender] = useState(false)
+	const [isClosing, setIsClosing] = useState(false)
 
 	// useMemoを使用してavailableCrystalsを同期的に取得
 	const availableCrystals = useMemo(() => {
@@ -58,6 +59,7 @@ export default function CrystalSelectionModal({
 	useEffect(() => {
 		if (isOpen) {
 			// モーダルを開く時
+			setIsClosing(false)
 			setShouldRender(true)
 			// 次のフレームでアニメーション開始（より確実に）
 			requestAnimationFrame(() => {
@@ -67,11 +69,13 @@ export default function CrystalSelectionModal({
 			})
 		} else {
 			// モーダルを閉じる時
+			setIsClosing(true)
 			setIsAnimating(false)
 			// アニメーション完了後にDOMから削除
 			const timer = setTimeout(() => {
 				setShouldRender(false)
-			}, 300) // 最長のアニメーション時間と同期
+				setIsClosing(false)
+			}, 250) // 閉じるアニメーションの時間と同期
 			return () => clearTimeout(timer)
 		}
 	}, [isOpen])
@@ -80,13 +84,16 @@ export default function CrystalSelectionModal({
 	const handleClose = useCallback(() => {
 		if (!isAnimating) return // 既にアニメーション中の場合は無視
 
-		// まずアニメーションを開始
+		console.log('🔄 Starting close animation...')
+		// 閉じるアニメーションを開始
+		setIsClosing(true)
 		setIsAnimating(false)
 		
 		// アニメーション完了後にonCloseを呼び出し
 		setTimeout(() => {
+			console.log('✅ Close animation completed, calling onClose')
 			onClose()
-		}, 300) // 最長のアニメーション時間と同期
+		}, 250) // 閉じるアニメーションの時間と同期
 	}, [isAnimating, onClose])
 
 	// ESCキーでモーダルを閉じる
@@ -187,11 +194,17 @@ export default function CrystalSelectionModal({
 			>
 				<div className="min-h-screen flex items-center justify-center p-4">
 					<div
-						className={`relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden transition-all duration-200 ease-out ${
+						className={`relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden ${
 							isAnimating 
-								? 'scale-100 opacity-100 translate-y-0' 
-								: 'scale-95 opacity-0 translate-y-2'
+								? 'scale-100 opacity-100 translate-y-0 transition-all duration-200 ease-out' 
+								: isClosing 
+									? 'scale-0 opacity-0 translate-y-0 origin-center transition-all duration-250 ease-in' 
+									: 'scale-95 opacity-0 translate-y-2 transition-all duration-200 ease-out'
 						}`}
+						style={{ 
+							// デバッグ用 - コンソールで状態を確認
+							...(console.log('🎬 Animation state:', { isAnimating, isClosing, shouldRender }), {})
+						}}
 						onClick={handleContentClick}
 						onKeyDown={handleContentKeyDown}
 						data-modal-content="true"
