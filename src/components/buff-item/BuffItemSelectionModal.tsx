@@ -7,6 +7,7 @@ import {
 	getPresetBuffItems,
 } from '@/utils/buffItemDatabase'
 import BuffItemCard from './BuffItemCard'
+import type { SlotInfo } from '@/types/damagePreview'
 
 interface BuffItemSelectionModalProps {
 	isOpen: boolean
@@ -15,6 +16,8 @@ interface BuffItemSelectionModalProps {
 	selectedBuffItemId: string | null
 	category: BuffItemCategory
 	title: string
+	// ダメージ差分表示用
+	slotInfo?: SlotInfo
 }
 
 export default function BuffItemSelectionModal({
@@ -24,6 +27,7 @@ export default function BuffItemSelectionModal({
 	selectedBuffItemId,
 	category,
 	title,
+	slotInfo,
 }: BuffItemSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | BuffItemCategory>(
 		'all',
@@ -217,6 +221,8 @@ export default function BuffItemSelectionModal({
 										buffItem={buffItem}
 										isSelected={selectedBuffItemId === buffItem.id}
 										onClick={() => handleSelect(buffItem.id)}
+										showDamageDifference={isOpen && !!slotInfo}
+										slotInfo={slotInfo}
 									/>
 								))}
 							</div>

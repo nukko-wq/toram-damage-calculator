@@ -84,24 +84,43 @@ export function useDamageDifferenceCorrect(
 		}
 
 		try {
-			// 現在装着中のクリスタルIDを確認
-			const currentSlotKey =
-				slotInfo.category && typeof slotInfo.slot === 'number'
-					? `${slotInfo.category}${slotInfo.slot + 1}`
-					: null
-			const currentEquippedCrystalId = currentSlotKey
-				? (currentData.crystals as unknown as Record<string, string | null>)[
-						currentSlotKey
-					]
-				: null
+			// 現在装着中のアイテムIDを確認
+			let currentEquippedItemId: string | null = null
+			let currentSlotKey: string | null = null
 
-			const isCurrentlyEquipped = currentEquippedCrystalId === item.id
+			if (slotInfo.type === 'crystal') {
+				// クリスタルの場合
+				currentSlotKey =
+					slotInfo.category && typeof slotInfo.slot === 'number'
+						? `${slotInfo.category}${slotInfo.slot + 1}`
+						: null
+				currentEquippedItemId = currentSlotKey
+					? (currentData.crystals as unknown as Record<string, string | null>)[
+							currentSlotKey
+						]
+					: null
+			} else if (slotInfo.type === 'equipment') {
+				// 装備の場合
+				if (slotInfo.slot && typeof slotInfo.slot === 'string') {
+					currentSlotKey = slotInfo.slot
+					currentEquippedItemId = (currentData.equipment as any)[currentSlotKey]?.id || null
+				}
+			} else if (slotInfo.type === 'buffItem') {
+				// バフアイテムの場合
+				if (slotInfo.category && typeof slotInfo.category === 'string') {
+					currentSlotKey = slotInfo.category
+					currentEquippedItemId = (currentData.buffItems as any)[currentSlotKey] || null
+				}
+			}
+
+			const isCurrentlyEquipped = currentEquippedItemId === item.id
 
 			if (options.debug) {
-				console.log('🔍 CRYSTAL EQUIP STATUS:', {
+				console.log('🔍 ITEM EQUIP STATUS:', {
+					slotInfoType: slotInfo.type,
 					currentSlotKey,
-					currentEquippedCrystalId,
-					targetCrystalId: item.id,
+					currentEquippedItemId,
+					targetItemId: item.id,
 					isCurrentlyEquipped,
 				})
 			}
@@ -330,19 +349,36 @@ function removeItemFromSlot(
 	// ディープコピーを作成
 	const resultData: CalculatorData = JSON.parse(JSON.stringify(currentData))
 
-	if (
-		slotInfo.type === 'crystal' &&
-		slotInfo.category &&
-		typeof slotInfo.slot === 'number'
-	) {
-		const slotNumber = slotInfo.slot + 1 // 0-based to 1-based
-		const slotKey = `${slotInfo.category}${slotNumber}`
+	if (slotInfo.type === 'crystal') {
+		// クリスタルの場合
+		if (slotInfo.category && typeof slotInfo.slot === 'number') {
+			const slotNumber = slotInfo.slot + 1 // 0-based to 1-based
+			const slotKey = `${slotInfo.category}${slotNumber}`
 
-		// クリスタルスロットを空にする
-		if (resultData.crystals) {
-			;(resultData.crystals as unknown as Record<string, string | null>)[
-				slotKey
-			] = null
+			// クリスタルスロットを空にする
+			if (resultData.crystals) {
+				;(resultData.crystals as unknown as Record<string, string | null>)[
+					slotKey
+				] = null
+			}
+		}
+	} else if (slotInfo.type === 'equipment') {
+		// 装備の場合
+		if (slotInfo.slot && typeof slotInfo.slot === 'string') {
+			const slotKey = slotInfo.slot
+			// 装備スロットを空にする
+			if (resultData.equipment) {
+				;(resultData.equipment as any)[slotKey] = null
+			}
+		}
+	} else if (slotInfo.type === 'buffItem') {
+		// バフアイテムの場合
+		if (slotInfo.category && typeof slotInfo.category === 'string') {
+			const category = slotInfo.category
+			// バフアイテムスロットを空にする
+			if (resultData.buffItems) {
+				;(resultData.buffItems as any)[category] = null
+			}
 		}
 	}
 

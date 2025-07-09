@@ -82,14 +82,67 @@ export function simulateItemEquipSimple(
 			}
 
 			case 'equipment': {
-				// 装備の場合（簡略実装）
-				// Equipment simulation not yet implemented
+				// 装備の場合
+				if (slotInfo.slot && typeof slotInfo.slot === 'string') {
+					const equipmentId = item.id
+					const slotKey = slotInfo.slot
+
+					console.log('🔧 EQUIPMENT SIMULATION START:', {
+						itemName: item.name,
+						equipmentId,
+						slotKey,
+						beforeUpdate: simulatedData.equipment[slotKey as keyof typeof simulatedData.equipment],
+						'item.properties': item.properties,
+					})
+
+					// 装備スロットを更新
+					if (simulatedData.equipment) {
+						;(simulatedData.equipment as any)[slotKey] = {
+							id: equipmentId,
+							name: item.name,
+							properties: item.properties || {},
+							refinement: 0,
+						}
+
+						console.log('🔧 EQUIPMENT SIMULATION EXECUTED:', {
+							itemName: item.name,
+							equipmentId,
+							slotKey,
+							afterUpdate: simulatedData.equipment[slotKey as keyof typeof simulatedData.equipment],
+							equipmentChangeSuccess: !!(simulatedData.equipment as any)[slotKey],
+						})
+					}
+				}
 				break
 			}
 
 			case 'buffItem': {
-				// バフアイテムの場合（簡略実装）
-				// BuffItem simulation not yet implemented
+				// バフアイテムの場合
+				if (slotInfo.category && typeof slotInfo.category === 'string') {
+					const buffItemId = item.id
+					const category = slotInfo.category
+
+					console.log('🔧 BUFF ITEM SIMULATION START:', {
+						itemName: item.name,
+						buffItemId,
+						category,
+						beforeUpdate: simulatedData.buffItems[category as keyof typeof simulatedData.buffItems],
+						'item.properties': item.properties,
+					})
+
+					// バフアイテムスロットを更新
+					if (simulatedData.buffItems) {
+						;(simulatedData.buffItems as any)[category] = buffItemId
+
+						console.log('🔧 BUFF ITEM SIMULATION EXECUTED:', {
+							itemName: item.name,
+							buffItemId,
+							category,
+							afterUpdate: simulatedData.buffItems[category as keyof typeof simulatedData.buffItems],
+							buffItemChangeSuccess: (simulatedData.buffItems as any)[category] === buffItemId,
+						})
+					}
+				}
 				break
 			}
 

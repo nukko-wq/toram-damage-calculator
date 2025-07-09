@@ -1042,6 +1042,10 @@ export default function EquipmentForm({
 						effectiveEquipment[activeTab as keyof EquipmentSlots]?.properties ||
 						{}
 					} // 現在のフォーム値を渡す
+					slotInfo={{
+						type: 'equipment' as const,
+						slot: activeTab as keyof EquipmentSlots,
+					}}
 				/>
 			)}
 

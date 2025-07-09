@@ -8,6 +8,7 @@ import type {
 } from '@/types/calculator'
 import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import EquipmentCard from './EquipmentCard'
+import type { SlotInfo } from '@/types/damagePreview'
 
 interface EquipmentSelectionModalProps {
 	isOpen: boolean
@@ -17,6 +18,8 @@ interface EquipmentSelectionModalProps {
 	category: EquipmentCategory
 	title: string
 	currentFormProperties?: Partial<EquipmentProperties> // 現在のフォーム値
+	// ダメージ差分表示用
+	slotInfo?: SlotInfo
 }
 
 export default function EquipmentSelectionModal({
@@ -27,6 +30,7 @@ export default function EquipmentSelectionModal({
 	category,
 	title,
 	currentFormProperties,
+	slotInfo,
 }: EquipmentSelectionModalProps) {
 	const [availableEquipments, setAvailableEquipments] = useState<Equipment[]>(
 		[],
@@ -200,6 +204,8 @@ export default function EquipmentSelectionModal({
 										equipment={equipment}
 										isSelected={selectedEquipmentId === equipment.id}
 										onClick={() => handleSelect(equipment.id)}
+										showDamageDifference={isOpen && !!slotInfo}
+										slotInfo={slotInfo}
 									/>
 								))}
 							</div>
