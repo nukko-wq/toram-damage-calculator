@@ -255,6 +255,19 @@ export type CrystalType =
 	| 'special'
 	| 'normal'
 
+// 装備条件の定義
+export type EquipmentCondition =
+	| { type: 'mainWeapon'; weaponType: WeaponType }
+	| { type: 'subWeapon'; weaponType: SubWeaponType }
+	| { type: 'armor'; armorType: ArmorType }
+
+// 条件付き効果の定義
+export interface ConditionalEffect {
+	condition: EquipmentCondition
+	properties: Partial<EquipmentProperties>
+	description: string
+}
+
 // プリセットクリスタル
 export interface PresetCrystal {
 	id: string
@@ -262,8 +275,7 @@ export interface PresetCrystal {
 	type: CrystalType
 	properties: Partial<EquipmentProperties>
 	description?: string
-	memo1?: string
-	memo2?: string
+	conditionalEffects?: ConditionalEffect[]
 }
 
 // 装備スロット
@@ -537,8 +549,6 @@ export interface LocalStorageCrystal
 	extends PresetCrystal,
 		LocalStoragePresetItemBase {
 	description?: string
-	memo1?: string
-	memo2?: string
 }
 
 // ローカルストレージ敵情報（プリセット由来）

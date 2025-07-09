@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { CrystalType, Crystal } from '@/types/calculator'
 import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
@@ -27,26 +27,13 @@ export default function CrystalSelectionModal({
 	slotInfo,
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
-	const [availableCrystals, setAvailableCrystals] = useState<Crystal[]>([])
+	const [isAnimating, setIsAnimating] = useState(false)
+	const [shouldRender, setShouldRender] = useState(false)
+	const [isClosing, setIsClosing] = useState(false)
 
-	// ESCキーでモーダルを閉じる
-	useEffect(() => {
-		if (!isOpen) return
-
-		const handleEscapeKey = (event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				onClose()
-			}
-		}
-
-		document.addEventListener('keydown', handleEscapeKey)
-		return () => {
-			document.removeEventListener('keydown', handleEscapeKey)
-		}
-	}, [isOpen, onClose])
-
-	useEffect(() => {
-		if (!isOpen) return
+	// useMemoを使用してavailableCrystalsを同期的に取得
+	const availableCrystals = useMemo(() => {
+		if (!isOpen) return []
 
 		// 許可されたタイプのクリスタ + ノーマルクリスタを取得
 		const allAllowedCrystals = [
@@ -55,13 +42,75 @@ export default function CrystalSelectionModal({
 		]
 
 		// 重複を除去
-		const uniqueCrystals = allAllowedCrystals.filter(
+		return allAllowedCrystals.filter(
 			(crystal, index, self) =>
 				index === self.findIndex((c) => c.id === crystal.id),
 		)
-
-		setAvailableCrystals(uniqueCrystals)
 	}, [isOpen, allowedTypes])
+
+	// モーダルが開かれるたびにフィルターを初期化
+	useEffect(() => {
+		if (isOpen) {
+			setActiveFilter('all')
+		}
+	}, [isOpen])
+
+	// アニメーション状態の管理
+	useEffect(() => {
+		if (isOpen) {
+			// モーダルを開く時
+			setIsClosing(false)
+			setShouldRender(true)
+			// 次のフレームでアニメーション開始（より確実に）
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					setIsAnimating(true)
+				})
+			})
+		} else {
+			// モーダルを閉じる時
+			setIsClosing(true)
+			setIsAnimating(false)
+			// アニメーション完了後にDOMから削除
+			const timer = setTimeout(() => {
+				setShouldRender(false)
+				setIsClosing(false)
+			}, 250) // 閉じるアニメーションの時間と同期
+			return () => clearTimeout(timer)
+		}
+	}, [isOpen])
+
+	// アニメーション付きでモーダルを閉じる関数
+	const handleClose = useCallback(() => {
+		if (!isAnimating) return // 既にアニメーション中の場合は無視
+
+		console.log('🔄 Starting close animation...')
+		// 閉じるアニメーションを開始
+		setIsClosing(true)
+		setIsAnimating(false)
+		
+		// アニメーション完了後にonCloseを呼び出し
+		setTimeout(() => {
+			console.log('✅ Close animation completed, calling onClose')
+			onClose()
+		}, 250) // 閉じるアニメーションの時間と同期
+	}, [isAnimating, onClose])
+
+	// ESCキーでモーダルを閉じる
+	useEffect(() => {
+		if (!isOpen) return
+
+		const handleEscapeKey = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				handleClose()
+			}
+		}
+
+		document.addEventListener('keydown', handleEscapeKey)
+		return () => {
+			document.removeEventListener('keydown', handleEscapeKey)
+		}
+	}, [isOpen, handleClose])
 
 	const filteredCrystals = availableCrystals.filter((crystal) => {
 		if (activeFilter === 'all') return true
@@ -89,27 +138,30 @@ export default function CrystalSelectionModal({
 
 	const handleSelect = (crystalId: string) => {
 		onSelect(crystalId)
-		onClose()
+		handleClose()
 	}
 
 	const handleRemove = () => {
 		onSelect(null)
-		onClose()
+		handleClose()
 	}
 
-	const handleBackgroundClick = (e: React.MouseEvent) => {
+	const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
+		// アニメーション中は無効化
+		if (!isAnimating) return
+
 		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
 		const modalContent = document.querySelector('[data-modal-content="true"]')
 		const target = e.target as Element
 
 		if (modalContent && !modalContent.contains(target)) {
-			onClose()
+			handleClose()
 		}
-	}
+	}, [isAnimating, handleClose])
 
 	const handleDialogKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Escape') {
-			onClose()
+			handleClose()
 		}
 		// EnterキーやSpaceキーで背景クリックと同様の動作をする場合
 		// (実際にはEscapeで十分なので、この部分は省略可能)
@@ -125,14 +177,16 @@ export default function CrystalSelectionModal({
 		e.stopPropagation()
 	}
 
-	if (!isOpen) return null
+	if (!shouldRender) return null
 
 	return (
 		<>
 			{/* モーダル */}
 			<dialog
-				open={isOpen}
-				className="fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-black/50 transition-opacity"
+				open={shouldRender}
+				className={`fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-black/50 transition-opacity duration-200 ease-out ${
+					isAnimating ? 'opacity-100' : 'opacity-0'
+				}`}
 				onKeyDown={handleDialogKeyDown}
 				onClick={handleBackgroundClick}
 				aria-labelledby="modal-title"
@@ -140,7 +194,17 @@ export default function CrystalSelectionModal({
 			>
 				<div className="min-h-screen flex items-center justify-center p-4">
 					<div
-						className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+						className={`relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden ${
+							isAnimating 
+								? 'scale-100 opacity-100 translate-y-0 transition-all duration-200 ease-out' 
+								: isClosing 
+									? 'scale-0 opacity-0 translate-y-0 origin-center transition-all duration-250 ease-in' 
+									: 'scale-95 opacity-0 translate-y-2 transition-all duration-200 ease-out'
+						}`}
+						style={{ 
+							// デバッグ用 - コンソールで状態を確認
+							...(console.log('🎬 Animation state:', { isAnimating, isClosing, shouldRender }), {})
+						}}
 						onClick={handleContentClick}
 						onKeyDown={handleContentKeyDown}
 						data-modal-content="true"
@@ -152,7 +216,7 @@ export default function CrystalSelectionModal({
 							</h2>
 							<button
 								type="button"
-								onClick={onClose}
+								onClick={handleClose}
 								className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
 								aria-label="モーダルを閉じる"
 							>
@@ -212,7 +276,9 @@ export default function CrystalSelectionModal({
 						</div>
 
 						{/* クリスタ一覧 */}
-						<div className="p-6 overflow-y-auto max-h-[60vh]">
+						<div className={`p-6 overflow-y-auto max-h-[60vh] transition-opacity duration-300 ease-out ${
+							isAnimating ? 'opacity-100' : 'opacity-0'
+						}`}>
 							{/* なしオプション */}
 							<div className="mb-6">
 								<button
@@ -278,7 +344,7 @@ export default function CrystalSelectionModal({
 						<div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
 							<button
 								type="button"
-								onClick={onClose}
+								onClick={handleClose}
 								className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
 							>
 								キャンセル
