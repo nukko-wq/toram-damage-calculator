@@ -29,19 +29,6 @@ export function simulateItemEquipSimple(
 					const slotNumber = slotInfo.slot + 1 // 0-based to 1-based
 					const slotKey = `${slotInfo.category}${slotNumber}`
 
-					// デバッグログ：更新前の状態
-					console.log('🔧 CRYSTAL SIMULATION START:', {
-						itemName: item.name,
-						crystalId,
-						slotCategory: slotInfo.category,
-						slotNumber: slotInfo.slot,
-						slotKey,
-						beforeUpdateCrystal: (
-							currentData.crystals as unknown as Record<string, string | null>
-						)[slotKey],
-						'currentData.crystals': currentData.crystals,
-						'item.properties': item.properties,
-					})
 
 					// crystalsオブジェクトを直接更新
 					if (simulatedData.crystals) {
@@ -50,30 +37,6 @@ export function simulateItemEquipSimple(
 							simulatedData.crystals as unknown as Record<string, string | null>
 						)[slotKey] = crystalId
 
-						// デバッグログ：更新後の状態
-						console.log('🔧 CRYSTAL SIMULATION EXECUTED:', {
-							itemName: item.name,
-							crystalId,
-							slotKey,
-							afterUpdateCrystal: (
-								simulatedData.crystals as unknown as Record<
-									string,
-									string | null
-								>
-							)[slotKey],
-							simulatedCrystals: JSON.stringify(
-								simulatedData.crystals,
-								null,
-								2,
-							),
-							crystalChangeSuccess:
-								(
-									simulatedData.crystals as unknown as Record<
-										string,
-										string | null
-									>
-								)[slotKey] === crystalId,
-						})
 					}
 
 					// Crystal slot updated successfully
@@ -87,13 +50,6 @@ export function simulateItemEquipSimple(
 					const equipmentId = item.id
 					const slotKey = slotInfo.slot
 
-					console.log('🔧 EQUIPMENT SIMULATION START:', {
-						itemName: item.name,
-						equipmentId,
-						slotKey,
-						beforeUpdate: simulatedData.equipment[slotKey as keyof typeof simulatedData.equipment],
-						'item.properties': item.properties,
-					})
 
 					// 装備スロットを更新
 					if (simulatedData.equipment) {
@@ -104,13 +60,6 @@ export function simulateItemEquipSimple(
 							refinement: 0,
 						}
 
-						console.log('🔧 EQUIPMENT SIMULATION EXECUTED:', {
-							itemName: item.name,
-							equipmentId,
-							slotKey,
-							afterUpdate: simulatedData.equipment[slotKey as keyof typeof simulatedData.equipment],
-							equipmentChangeSuccess: !!(simulatedData.equipment as any)[slotKey],
-						})
 					}
 				}
 				break
@@ -122,25 +71,11 @@ export function simulateItemEquipSimple(
 					const buffItemId = item.id
 					const category = slotInfo.category
 
-					console.log('🔧 BUFF ITEM SIMULATION START:', {
-						itemName: item.name,
-						buffItemId,
-						category,
-						beforeUpdate: simulatedData.buffItems[category as keyof typeof simulatedData.buffItems],
-						'item.properties': item.properties,
-					})
 
 					// バフアイテムスロットを更新
 					if (simulatedData.buffItems) {
 						;(simulatedData.buffItems as any)[category] = buffItemId
 
-						console.log('🔧 BUFF ITEM SIMULATION EXECUTED:', {
-							itemName: item.name,
-							buffItemId,
-							category,
-							afterUpdate: simulatedData.buffItems[category as keyof typeof simulatedData.buffItems],
-							buffItemChangeSuccess: (simulatedData.buffItems as any)[category] === buffItemId,
-						})
 					}
 				}
 				break

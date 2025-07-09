@@ -32,15 +32,6 @@ export function useDamageDifferenceCorrect(
 	const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
 
 	return useMemo(() => {
-		// 常にログを表示して、フックが呼ばれているかを確認
-		console.log('🔄 useDamageDifferenceCorrect called:', {
-			itemName: item?.name,
-			hasItem: !!item,
-			hasSlotInfo: !!slotInfo,
-			hasCurrentData: !!currentData,
-			hasCurrentResults: !!currentResults,
-			disabled: options.disabled,
-		})
 		// 初期値
 		const initialResult: DamageDifferenceResult = {
 			difference: 0,
@@ -57,31 +48,15 @@ export function useDamageDifferenceCorrect(
 
 		// アイテムまたはデータがない場合
 		if (!item || !currentData) {
-			if (options.debug) {
-				console.log('❌ Missing item or currentData:', {
-					item: !!item,
-					currentData: !!currentData,
-				})
-			}
 			return initialResult
 		}
 
 		// currentResultsがない場合は、その場で計算を実行
 		let effectiveCurrentResults = currentResults
 		if (!effectiveCurrentResults) {
-			if (options.debug) {
-				console.log('⚠️ calculationResults not available, calculating on-demand')
-			}
 			effectiveCurrentResults = calculateResults(currentData)
 		}
 
-		if (options.debug) {
-			console.log(
-				'✅ Starting correct damage difference calculation for:',
-				item.name,
-			)
-			console.log('🔍 Crystal properties:', item.properties)
-		}
 
 		try {
 			// 現在装着中のアイテムIDを確認
@@ -115,15 +90,6 @@ export function useDamageDifferenceCorrect(
 
 			const isCurrentlyEquipped = currentEquippedItemId === item.id
 
-			if (options.debug) {
-				console.log('🔍 ITEM EQUIP STATUS:', {
-					slotInfoType: slotInfo.type,
-					currentSlotKey,
-					currentEquippedItemId,
-					targetItemId: item.id,
-					isCurrentlyEquipped,
-				})
-			}
 
 			let baselineData: CalculatorData
 			let simulatedData: CalculatorData
@@ -162,155 +128,11 @@ export function useDamageDifferenceCorrect(
 			// 4. 平均ダメージの差分を使用
 			const averageDamageDifference = Math.round(averageDifference)
 
-			// デバッグログ: calculateResults実行後
-			if (options.debug) {
-				console.log('⚙️ CRYSTAL SIMULATION VERIFICATION:', {
-					'=== EXPECTED VALUES ===': '========================',
-					'Before (no crystal)': {
-						totalATK: 4873,
-						'equipmentBonus1.ATK_Rate': 0,
-						'equipmentBonus1.STR_Rate': 0,
-						'equipmentBonus1.criticalRate': 0,
-					},
-					'After (Don Profond)': {
-						totalATK: 5475,
-						'equipmentBonus1.ATK_Rate': 10,
-						'equipmentBonus1.STR_Rate': 7,
-						'equipmentBonus1.criticalRate': 8,
-					},
-					'=== ACTUAL BASELINE RESULTS ===': '================',
-					baselineTotalATK: baselineResults.basicStats.totalATK,
-					'baseline.equipmentBonus1.atkRate':
-						(baselineResults.equipmentBonus1 as any)?.atkRate || 0,
-					'baseline.equipmentBonus1.strRate':
-						(baselineResults.equipmentBonus1 as any)?.strRate || 0,
-					'baseline.equipmentBonus1.criticalRate':
-						baselineResults.equipmentBonus1?.criticalRate || 0,
-					'=== ACTUAL SIMULATED RESULTS ===': '================',
-					simulatedTotalATK: simulatedResults.basicStats.totalATK,
-					'simulated.equipmentBonus1.ATK_Rate':
-						(simulatedResults.equipmentBonus1 as any)?.ATK_Rate || 0,
-					'simulated.equipmentBonus1.STR_Rate':
-						(simulatedResults.equipmentBonus1 as any)?.STR_Rate || 0,
-					'simulated.equipmentBonus1.Critical_Rate':
-						(simulatedResults.equipmentBonus1 as any)?.Critical_Rate || 0,
-					'=== DIFFERENCES ===': '========================',
-					totalATKDiff:
-						simulatedResults.basicStats.totalATK -
-						baselineResults.basicStats.totalATK,
-					atkRateDiff:
-						((simulatedResults.equipmentBonus1 as any)?.ATK_Rate || 0) -
-						((baselineResults.equipmentBonus1 as any)?.ATK_Rate || 0),
-					strRateDiff:
-						((simulatedResults.equipmentBonus1 as any)?.STR_Rate || 0) -
-						((baselineResults.equipmentBonus1 as any)?.STR_Rate || 0),
-					criticalRateDiff:
-						((simulatedResults.equipmentBonus1 as any)?.Critical_Rate || 0) -
-						((baselineResults.equipmentBonus1 as any)?.Critical_Rate || 0),
-				})
 
-				console.log('🔍 CRYSTAL DATA VERIFICATION:', {
-					crystalName: item.name,
-					crystalProperties: item.properties,
-					expectedProperties: {
-						ATK_Rate: 10,
-						STR_Rate: 7,
-						Critical_Rate: 8,
-						DEF_Rate: -27,
-					},
-					propertiesMatch: {
-						ATK_Rate: (item.properties as any)?.ATK_Rate === 10,
-						STR_Rate: (item.properties as any)?.STR_Rate === 7,
-						Critical_Rate: (item.properties as any)?.Critical_Rate === 8,
-						DEF_Rate: (item.properties as any)?.DEF_Rate === -27,
-					},
-				})
-			}
-
-			// デバッグログ: ダメージ計算結果の詳細比較
-			if (options.debug) {
-				console.log('🎯 DAMAGE CALCULATION DETAILED COMPARISON:', {
-					'=== CURRENT (BASELINE) DAMAGES ===': '========================',
-					currentMin: currentDamageResult.normal.min,
-					currentMax: currentDamageResult.normal.max,
-					currentAverage: currentDamageResult.normal.average,
-					'=== SIMULATED DAMAGES ===': '========================',
-					simulatedMin: simulatedDamageResult.normal.min,
-					simulatedMax: simulatedDamageResult.normal.max,
-					simulatedAverage: simulatedDamageResult.normal.average,
-					'=== AVERAGE DAMAGE DIFFERENCE ===': '========================',
-					averageDifference: averageDifference,
-					'=== FINAL CALCULATION ===': '========================',
-					calculationMethod: 'Using average damage difference only',
-					finalRoundedDifference: averageDamageDifference,
-				})
-			}
 
 			// 5. 最終差分は平均差分を使用
 			const difference = averageDamageDifference
 
-			if (options.debug) {
-				console.log(
-					'🎯 Correct Damage Difference Calculation (Average Damage Only):',
-					{
-						currentMin: currentDamageResult.normal.min,
-						currentMax: currentDamageResult.normal.max,
-						currentAverage: currentDamageResult.normal.average,
-						simulatedMin: simulatedDamageResult.normal.min,
-						simulatedMax: simulatedDamageResult.normal.max,
-						simulatedAverage: simulatedDamageResult.normal.average,
-						finalDifference: difference,
-						item: item.name,
-						slotInfo,
-						currentTotalATK: effectiveCurrentResults.basicStats.totalATK,
-						simulatedTotalATK: simulatedResults.basicStats.totalATK,
-					},
-				)
-
-				// 詳細デバッグ: クリスタル装着前後の比較
-				console.log('📊 DETAILED DAMAGE DIFFERENCE DEBUG:', {
-					'=== CRYSTAL SIMULATION ===': '=================',
-					itemName: item.name,
-					slotCategory: slotInfo.category,
-					slotNumber: slotInfo.slot,
-					'=== CURRENT DATA ===': '=================',
-					currentCrystals: currentData.crystals,
-					currentTotalATK: effectiveCurrentResults.basicStats.totalATK,
-					currentDamages: currentDamageResult.normal,
-					'=== SIMULATED DATA ===': '=================',
-					simulatedCrystals: simulatedData.crystals,
-					simulatedTotalATK: simulatedResults.basicStats.totalATK,
-					simulatedDamages: simulatedDamageResult.normal,
-					'=== DIFFERENCE ===': '=================',
-					attackDifference:
-						simulatedResults.basicStats.totalATK -
-						effectiveCurrentResults.basicStats.totalATK,
-					damageDifferenceAverage: difference,
-					'=== BONUS COMPARISON ===': '=================',
-					currentEquipmentBonus1: effectiveCurrentResults.equipmentBonus1,
-					simulatedEquipmentBonus1: simulatedResults.equipmentBonus1,
-				})
-
-				// クリスタル装着シミュレーションの詳細確認
-				console.log('🔍 CRYSTAL EQUIP SIMULATION DETAILS:')
-				console.log('slotInfo:', slotInfo)
-				if (slotInfo.category && typeof slotInfo.slot === 'number') {
-					const slotKey = `${slotInfo.category}${slotInfo.slot + 1}`
-					console.log('Expected slot key:', slotKey)
-					console.log(
-						'Current crystal in slot:',
-						(currentData.crystals as unknown as Record<string, string | null>)[
-							slotKey
-						],
-					)
-					console.log(
-						'Simulated crystal in slot:',
-						(
-							simulatedData.crystals as unknown as Record<string, string | null>
-						)[slotKey],
-					)
-				}
-			}
 
 			return {
 				difference,
@@ -320,9 +142,6 @@ export function useDamageDifferenceCorrect(
 				simulatedDamage: simulatedDamageResult.normal.max,
 			}
 		} catch (error) {
-			if (options.debug) {
-				console.error('Correct damage difference calculation failed:', error)
-			}
 			return {
 				...initialResult,
 				error: error as Error,

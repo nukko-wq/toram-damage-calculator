@@ -40,10 +40,6 @@ export default function CrystalCard({
 					{showDamageDifference && slotInfo && !isSelected && (
 						<div className="inline-block">
 							{(() => {
-								console.log(
-									'🔧 About to render DamageDifferenceDisplayCorrect for:',
-									crystal.name,
-								)
 								try {
 									return (
 										<DamageDifferenceDisplayCorrect
@@ -51,14 +47,10 @@ export default function CrystalCard({
 											slotInfo={slotInfo}
 											size="sm"
 											className="px-1 py-0.5"
-											options={{ debug: true }}
+											options={{ debug: false }}
 										/>
 									)
 								} catch (error) {
-									console.error(
-										'🔧 Error rendering DamageDifferenceDisplayCorrect:',
-										error,
-									)
 									return (
 										<div className="bg-red-100 text-red-600 text-xs p-1">
 											Error

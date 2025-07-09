@@ -29,28 +29,13 @@ export function DamageDifferenceDisplayCorrect({
 	options = {},
 	size = 'sm',
 }: DamageDifferenceDisplayCorrectProps) {
-	// 強制的にログを表示
-	console.log('🎨 DamageDifferenceDisplayCorrect CALLED!', item.name)
-	console.log('🎨 Props:', { item, slotInfo, options })
 
 	const { difference, isCalculating, error } = useDamageDifferenceCorrect(
 		item,
 		slotInfo,
 		options,
 	)
-	console.log('🎨 Hook result:', { difference, isCalculating, error })
 
-	// デバッグモード時のみログ出力
-	if (options.debug) {
-		console.log('🎨 DamageDifferenceDisplayCorrect render:', {
-			itemName: item.name,
-			difference,
-			isCalculating,
-			error: !!error,
-			className,
-			size,
-		})
-	}
 
 	// サイズ別のクラス
 	const sizeClasses = {
