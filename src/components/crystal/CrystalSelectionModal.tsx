@@ -84,14 +84,12 @@ export default function CrystalSelectionModal({
 	const handleClose = useCallback(() => {
 		if (!isAnimating) return // 既にアニメーション中の場合は無視
 
-		console.log('🔄 Starting close animation...')
 		// 閉じるアニメーションを開始
 		setIsClosing(true)
 		setIsAnimating(false)
 		
 		// アニメーション完了後にonCloseを呼び出し
 		setTimeout(() => {
-			console.log('✅ Close animation completed, calling onClose')
 			onClose()
 		}, 250) // 閉じるアニメーションの時間と同期
 	}, [isAnimating, onClose])
@@ -201,10 +199,7 @@ export default function CrystalSelectionModal({
 									? 'scale-0 opacity-0 translate-y-0 origin-center transition-all duration-250 ease-in' 
 									: 'scale-95 opacity-0 translate-y-2 transition-all duration-200 ease-out'
 						}`}
-						style={{ 
-							// デバッグ用 - コンソールで状態を確認
-							...(console.log('🎬 Animation state:', { isAnimating, isClosing, shouldRender }), {})
-						}}
+						style={{}}
 						onClick={handleContentClick}
 						onKeyDown={handleContentKeyDown}
 						data-modal-content="true"

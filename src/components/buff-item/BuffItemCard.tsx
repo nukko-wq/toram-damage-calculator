@@ -1,17 +1,24 @@
 'use client'
 
 import type { PresetBuffItem } from '@/types/calculator'
+import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import type { SlotInfo } from '@/types/damagePreview'
 
 interface BuffItemCardProps {
 	buffItem: PresetBuffItem
 	isSelected: boolean
 	onClick: () => void
+	// ダメージ差分表示用の追加プロパティ
+	showDamageDifference?: boolean
+	slotInfo?: SlotInfo
 }
 
 export default function BuffItemCard({
 	buffItem,
 	isSelected,
 	onClick,
+	showDamageDifference = false,
+	slotInfo,
 }: BuffItemCardProps) {
 	const getCategoryLabel = (category: string) => {
 		switch (category) {
@@ -200,24 +207,62 @@ export default function BuffItemCard({
 				}
 			`}
 		>
-			{/* 選択状態のチェックマーク */}
-			{isSelected && (
-				<div className="absolute top-2 right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-					<svg
-						className="w-4 h-4 text-white"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d="M5 13l4 4L19 7"
-						/>
-					</svg>
+			{/* 上部エリア：ダメージ差分表示と選択マーク */}
+			<div className="flex justify-between items-start mb-2 min-h-[24px]">
+				{/* ダメージ差分表示 - 現在選択中のバフアイテムには表示しない */}
+				<div className="flex-1">
+					{showDamageDifference && slotInfo && !isSelected && (
+						<div className="inline-block">
+							{(() => {
+								console.log(
+									'🔧 About to render DamageDifferenceDisplayCorrect for:',
+									buffItem.name,
+								)
+								try {
+									return (
+										<DamageDifferenceDisplayCorrect
+											item={buffItem as any}
+											slotInfo={slotInfo}
+											size="sm"
+											className="px-1 py-0.5"
+											options={{ debug: true }}
+										/>
+									)
+								} catch (error) {
+									console.error(
+										'🔧 Error rendering DamageDifferenceDisplayCorrect:',
+										error,
+									)
+									return (
+										<div className="bg-red-100 text-red-600 text-xs p-1">
+											Error
+										</div>
+									)
+								}
+							})()}
+						</div>
+					)}
 				</div>
-			)}
+
+				{/* 選択状態のチェックマーク */}
+				{isSelected && (
+					<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+						<svg
+							className="w-4 h-4 text-white"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M5 13l4 4L19 7"
+							/>
+						</svg>
+					</div>
+				)}
+			</div>
 
 			{/* カテゴリバッジ */}
 			<div className="mb-2">
@@ -229,7 +274,7 @@ export default function BuffItemCard({
 			</div>
 
 			{/* バフアイテム名 */}
-			<h3 className="font-semibold text-gray-900 mb-2 pr-8">{buffItem.name}</h3>
+			<h3 className="font-semibold text-gray-900 mb-2">{buffItem.name}</h3>
 
 			{/* プロパティ */}
 			{formatProperties().length > 0 && (

@@ -29,19 +29,6 @@ export function simulateItemEquipSimple(
 					const slotNumber = slotInfo.slot + 1 // 0-based to 1-based
 					const slotKey = `${slotInfo.category}${slotNumber}`
 
-					// デバッグログ：更新前の状態
-					console.log('🔧 CRYSTAL SIMULATION START:', {
-						itemName: item.name,
-						crystalId,
-						slotCategory: slotInfo.category,
-						slotNumber: slotInfo.slot,
-						slotKey,
-						beforeUpdateCrystal: (
-							currentData.crystals as unknown as Record<string, string | null>
-						)[slotKey],
-						'currentData.crystals': currentData.crystals,
-						'item.properties': item.properties,
-					})
 
 					// crystalsオブジェクトを直接更新
 					if (simulatedData.crystals) {
@@ -50,30 +37,6 @@ export function simulateItemEquipSimple(
 							simulatedData.crystals as unknown as Record<string, string | null>
 						)[slotKey] = crystalId
 
-						// デバッグログ：更新後の状態
-						console.log('🔧 CRYSTAL SIMULATION EXECUTED:', {
-							itemName: item.name,
-							crystalId,
-							slotKey,
-							afterUpdateCrystal: (
-								simulatedData.crystals as unknown as Record<
-									string,
-									string | null
-								>
-							)[slotKey],
-							simulatedCrystals: JSON.stringify(
-								simulatedData.crystals,
-								null,
-								2,
-							),
-							crystalChangeSuccess:
-								(
-									simulatedData.crystals as unknown as Record<
-										string,
-										string | null
-									>
-								)[slotKey] === crystalId,
-						})
 					}
 
 					// Crystal slot updated successfully
@@ -82,14 +45,39 @@ export function simulateItemEquipSimple(
 			}
 
 			case 'equipment': {
-				// 装備の場合（簡略実装）
-				// Equipment simulation not yet implemented
+				// 装備の場合
+				if (slotInfo.slot && typeof slotInfo.slot === 'string') {
+					const equipmentId = item.id
+					const slotKey = slotInfo.slot
+
+
+					// 装備スロットを更新
+					if (simulatedData.equipment) {
+						;(simulatedData.equipment as any)[slotKey] = {
+							id: equipmentId,
+							name: item.name,
+							properties: item.properties || {},
+							refinement: 0,
+						}
+
+					}
+				}
 				break
 			}
 
 			case 'buffItem': {
-				// バフアイテムの場合（簡略実装）
-				// BuffItem simulation not yet implemented
+				// バフアイテムの場合
+				if (slotInfo.category && typeof slotInfo.category === 'string') {
+					const buffItemId = item.id
+					const category = slotInfo.category
+
+
+					// バフアイテムスロットを更新
+					if (simulatedData.buffItems) {
+						;(simulatedData.buffItems as any)[category] = buffItemId
+
+					}
+				}
 				break
 			}
 

@@ -286,6 +286,10 @@ export default function BuffItemForm({ onBuffItemsChange }: BuffItemFormProps) {
 					selectedBuffItemId={effectiveBuffItems[modalState.category]}
 					category={modalState.category}
 					title={modalState.title}
+					slotInfo={{
+						type: 'buffItem' as const,
+						category: modalState.category,
+					}}
 				/>
 			)}
 		</div>
