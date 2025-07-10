@@ -46,6 +46,9 @@ export function calculateDamageWithService(
 	options: DamageCalculationOptions = {},
 ): DamageCalculationServiceResult {
 	const { debug = false, powerOptions = createInitialPowerOptions() } = options
+	
+	// デバッグログを一時的に無効化
+	const debugEnabled = false
 
 	try {
 		// 基本的な計算入力データを作成
@@ -61,7 +64,7 @@ export function calculateDamageWithService(
 			calculatorData.mainWeapon?.weaponType || null,
 		)
 
-		if (debug) {
+		if (debugEnabled && debug && process.env.NODE_ENV === 'development') {
 			console.log('=== DamageCalculationService 中央集約計算結果 ===')
 			console.log('calculationResults?.basicStats.totalATK:', totalATK)
 			console.log(
@@ -209,7 +212,7 @@ export function calculateDamageWithService(
 			},
 		}
 
-		if (debug) {
+		if (debugEnabled && debug && process.env.NODE_ENV === 'development') {
 			console.log('=== DamageCalculationService Input ===')
 			console.log('playerLevel:', input.playerLevel)
 			console.log('referenceStat (totalATK):', input.referenceStat)
@@ -388,7 +391,7 @@ export function calculateDamageWithService(
 
 		const attackResult = totalAttackResult
 
-		if (debug) {
+		if (debugEnabled && debug && process.env.NODE_ENV === 'development') {
 			console.log('=== DamageCalculationService RESULTS ===')
 			console.log('baseDamage:', attackResult.baseDamage)
 			console.log('stabilityResult:', attackResult.stabilityResult)
@@ -534,7 +537,7 @@ export function calculateDamageWithService(
 
 		const damageDisplay = getDamageByType()
 
-		if (debug) {
+		if (debugEnabled && debug && process.env.NODE_ENV === 'development') {
 			console.log('=== DamageCalculationService FINAL DISPLAY VALUES ===')
 			console.log('damageType:', powerOptions.damageType)
 			console.log('表示される最小ダメージ:', damageDisplay.min)
