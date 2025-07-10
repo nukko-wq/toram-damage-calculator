@@ -29,14 +29,12 @@ export function simulateItemEquipSimple(
 					const slotNumber = slotInfo.slot + 1 // 0-based to 1-based
 					const slotKey = `${slotInfo.category}${slotNumber}`
 
-
 					// crystalsオブジェクトを直接更新
 					if (simulatedData.crystals) {
 						// 型安全性のため、unknownを経由してキャスト
 						;(
 							simulatedData.crystals as unknown as Record<string, string | null>
 						)[slotKey] = crystalId
-
 					}
 
 					// Crystal slot updated successfully
@@ -50,7 +48,6 @@ export function simulateItemEquipSimple(
 					const equipmentId = item.id
 					const slotKey = slotInfo.slot
 
-
 					// 装備スロットを更新
 					if (simulatedData.equipment) {
 						;(simulatedData.equipment as any)[slotKey] = {
@@ -59,7 +56,6 @@ export function simulateItemEquipSimple(
 							properties: item.properties || {},
 							refinement: 0,
 						}
-
 					}
 				}
 				break
@@ -71,11 +67,9 @@ export function simulateItemEquipSimple(
 					const buffItemId = item.id
 					const category = slotInfo.category
 
-
 					// バフアイテムスロットを更新
 					if (simulatedData.buffItems) {
 						;(simulatedData.buffItems as any)[category] = buffItemId
-
 					}
 				}
 				break

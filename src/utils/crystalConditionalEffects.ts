@@ -1,6 +1,6 @@
 /**
  * クリスタル条件付き効果システム
- * 
+ *
  * 装備条件に基づいてクリスタルの効果を自動適用する機能
  */
 
@@ -27,15 +27,15 @@ export function checkEquipmentCondition(
 	condition: EquipmentCondition,
 	equipmentState: EquipmentSlots,
 	mainWeapon: MainWeapon,
-	subWeapon: SubWeapon
+	subWeapon: SubWeapon,
 ): boolean {
 	switch (condition.type) {
 		case 'mainWeapon':
-			return mainWeapon.weaponType === condition.weaponType
+			return mainWeapon?.weaponType === condition.weaponType
 		case 'subWeapon':
-			return subWeapon.weaponType === condition.weaponType
+			return subWeapon?.weaponType === condition.weaponType
 		case 'armor':
-			return equipmentState.body.armorType === condition.armorType
+			return equipmentState?.body?.armorType === condition.armorType
 		default:
 			return false
 	}
@@ -49,10 +49,10 @@ export function checkEquipmentCondition(
  */
 export function mergeProperties(
 	base: Partial<EquipmentProperties>,
-	additional: Partial<EquipmentProperties>
+	additional: Partial<EquipmentProperties>,
 ): Partial<EquipmentProperties> {
 	const result = { ...base }
-	
+
 	// 各プロパティを加算
 	for (const [key, value] of Object.entries(additional)) {
 		const typedKey = key as keyof EquipmentProperties
@@ -60,7 +60,7 @@ export function mergeProperties(
 			result[typedKey] = (result[typedKey] || 0) + value
 		}
 	}
-	
+
 	return result
 }
 
@@ -76,18 +76,28 @@ export function applyConditionalCrystalEffects(
 	crystal: PresetCrystal,
 	equipmentState: EquipmentSlots,
 	mainWeapon: MainWeapon,
-	subWeapon: SubWeapon
+	subWeapon: SubWeapon,
 ): Partial<EquipmentProperties> {
 	let effectiveProperties = { ...crystal.properties }
-	
+
 	if (crystal.conditionalEffects) {
 		for (const effect of crystal.conditionalEffects) {
-			if (checkEquipmentCondition(effect.condition, equipmentState, mainWeapon, subWeapon)) {
-				effectiveProperties = mergeProperties(effectiveProperties, effect.properties)
+			if (
+				checkEquipmentCondition(
+					effect.condition,
+					equipmentState,
+					mainWeapon,
+					subWeapon,
+				)
+			) {
+				effectiveProperties = mergeProperties(
+					effectiveProperties,
+					effect.properties,
+				)
 			}
 		}
 	}
-	
+
 	return effectiveProperties
 }
 
@@ -103,10 +113,10 @@ export function recalculateCrystalEffects(
 	crystals: CrystalSlots,
 	equipmentState: EquipmentSlots,
 	mainWeapon: MainWeapon,
-	subWeapon: SubWeapon
+	subWeapon: SubWeapon,
 ): Partial<EquipmentProperties> {
 	let totalEffects: Partial<EquipmentProperties> = {}
-	
+
 	// 各スロットのクリスタルを処理
 	const crystalIds = [
 		crystals.weapon1,
@@ -118,16 +128,21 @@ export function recalculateCrystalEffects(
 		crystals.special1,
 		crystals.special2,
 	]
-	
+
 	for (const crystalId of crystalIds) {
 		if (crystalId) {
 			const crystal = getCrystalById(crystalId)
 			if (crystal) {
-				const effectiveProperties = applyConditionalCrystalEffects(crystal, equipmentState, mainWeapon, subWeapon)
+				const effectiveProperties = applyConditionalCrystalEffects(
+					crystal,
+					equipmentState,
+					mainWeapon,
+					subWeapon,
+				)
 				totalEffects = mergeProperties(totalEffects, effectiveProperties)
 			}
 		}
 	}
-	
+
 	return totalEffects
 }

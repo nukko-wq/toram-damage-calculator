@@ -5,7 +5,11 @@
  * EquipmentPropertiesインターフェースによる厳密な型チェック
  */
 
-import type { EquipmentProperties, ArmorType } from '@/types/calculator'
+import type {
+	EquipmentProperties,
+	ArmorType,
+	ConditionalEffect,
+} from '@/types/calculator'
 
 // 装備アイテムの型定義（JSONデータ構造に合わせて簡略化）
 interface EquipmentItem {
@@ -22,6 +26,7 @@ interface EquipmentItem {
 		slot2?: string | null
 	}
 	armorType?: ArmorType // 防具の改造タイプ（体装備のみ使用）
+	conditionalEffects?: ConditionalEffect[] // 条件付き効果
 }
 
 // 装備カテゴリの型定義
@@ -138,6 +143,13 @@ export const equipmentsData: EquipmentsData = {
 					Anticipate_Rate: 20,
 					DarkResistance_Rate: 30,
 				},
+				conditionalEffects: [
+					{
+						condition: { type: 'mainWeapon', weaponType: '両手剣' },
+						properties: { MP: 200 },
+						description: '両手剣装備時: MP+200',
+					},
+				],
 				armorType: 'normal',
 			},
 		],

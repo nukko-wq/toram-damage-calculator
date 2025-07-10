@@ -29,13 +29,11 @@ export function DamageDifferenceDisplayCorrect({
 	options = {},
 	size = 'sm',
 }: DamageDifferenceDisplayCorrectProps) {
-
 	const { difference, isCalculating, error } = useDamageDifferenceCorrect(
 		item,
 		slotInfo,
 		options,
 	)
-
 
 	// サイズ別のクラス
 	const sizeClasses = {

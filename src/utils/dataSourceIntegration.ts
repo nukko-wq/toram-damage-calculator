@@ -27,6 +27,7 @@ import {
 	getGodspeedTrajectoryEffects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
+import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
 
 /**
  * プロパティ値のバリデーション
@@ -72,7 +73,49 @@ function normalizePropertyKey(propertyKey: string): string {
 }
 
 /**
- * 装備品データから補正値を取得
+ * 装備品データから補正値を取得（条件付き効果対応版）
+ */
+export function getEquipmentBonusesWithConditionalEffects(
+	data: CalculatorData,
+): Partial<AllBonuses> {
+	try {
+		const bonuses: Partial<AllBonuses> = {}
+
+		// nullチェック
+		if (!data.equipment) return bonuses
+
+		// 条件付き効果を適用した最終的なプロパティを取得
+		const effectiveProperties = recalculateEquipmentEffects(
+			data.equipment,
+			data.mainWeapon,
+			data.subWeapon,
+		)
+
+		// 最終的なプロパティから補正値を計算
+		for (const [propertyKey, value] of Object.entries(effectiveProperties)) {
+			if (typeof value !== 'number' || value === 0) continue
+
+			const validatedValue = validatePropertyValue(value, propertyKey)
+
+			const normalizedKey = normalizePropertyKey(propertyKey)
+			bonuses[normalizedKey as keyof AllBonuses] =
+				(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
+		}
+
+		// Debug log only if MP bonus is found
+		if (bonuses.MP) {
+			console.log('🔮 EQUIPMENT MP BONUS FOUND:', bonuses.MP)
+		}
+
+		return bonuses
+	} catch (error) {
+		console.error('Error in getEquipmentBonusesWithConditionalEffects:', error)
+		return {}
+	}
+}
+
+/**
+ * 装備品データから補正値を取得（従来版）
  */
 export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 	try {
@@ -126,7 +169,9 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 /**
  * クリスタルデータから補正値を取得（条件付き効果対応版）
  */
-export function getCrystalBonusesWithConditionalEffects(data: CalculatorData): Partial<AllBonuses> {
+export function getCrystalBonusesWithConditionalEffects(
+	data: CalculatorData,
+): Partial<AllBonuses> {
 	try {
 		const bonuses: Partial<AllBonuses> = {}
 
@@ -156,7 +201,7 @@ export function getCrystalBonusesWithConditionalEffects(data: CalculatorData): P
 				crystal,
 				data.equipment,
 				data.mainWeapon,
-				data.subWeapon
+				data.subWeapon,
 			)
 
 			// 最終的なプロパティから補正値を計算
@@ -526,9 +571,9 @@ export function getAllDataSourceBonusesWithBuffSkills(
 ): Partial<AllBonuses> {
 	const bonuses: Partial<AllBonuses> = {}
 
-	// 従来の4つのデータソースを統合（クリスタルは条件付き効果対応版を使用）
+	// 従来の4つのデータソースを統合（装備・クリスタルは条件付き効果対応版を使用）
 	const dataSources = {
-		equipment: getEquipmentBonuses(data.equipment),
+		equipment: getEquipmentBonusesWithConditionalEffects(data),
 		crystal: getCrystalBonusesWithConditionalEffects(data),
 		food: getFoodBonuses(data.food),
 		buff: getBuffBonuses(data.buffItems),
@@ -642,7 +687,9 @@ export function getAllDataSourceBonusesWithBuffSkills(
 /**
  * 装備スロット別の補正値を取得
  */
-export function getEquipmentSlotBonuses(equipmentData: any): Record<string, Partial<AllBonuses>> {
+export function getEquipmentSlotBonuses(
+	equipmentData: any,
+): Record<string, Partial<AllBonuses>> {
 	try {
 		const bonuses: Record<string, Partial<AllBonuses>> = {
 			main: {},
@@ -680,11 +727,14 @@ export function getEquipmentSlotBonuses(equipmentData: any): Record<string, Part
 
 		for (const slot of slots) {
 			if (slot.data?.properties) {
-				for (const [propertyKey, value] of Object.entries(slot.data.properties)) {
+				for (const [propertyKey, value] of Object.entries(
+					slot.data.properties,
+				)) {
 					if (typeof value === 'number' && value !== 0) {
 						const validatedValue = validatePropertyValue(value, propertyKey)
 						const normalizedKey = normalizePropertyKey(propertyKey)
-						bonuses[slot.key][normalizedKey as keyof AllBonuses] = validatedValue
+						bonuses[slot.key][normalizedKey as keyof AllBonuses] =
+							validatedValue
 					}
 				}
 			}
@@ -715,11 +765,15 @@ export function getEquipmentSlotBonuses(equipmentData: any): Record<string, Part
 export function getEnchantmentBonuses(equipmentData: any): Partial<AllBonuses> {
 	try {
 		const bonuses: Partial<AllBonuses> = {}
-		
+
 		// nullチェック
 		if (!equipmentData) return bonuses
 
-		const slots = [equipmentData.fashion1, equipmentData.fashion2, equipmentData.fashion3]
+		const slots = [
+			equipmentData.fashion1,
+			equipmentData.fashion2,
+			equipmentData.fashion3,
+		]
 
 		for (const slot of slots) {
 			if (slot?.properties) {
@@ -727,7 +781,7 @@ export function getEnchantmentBonuses(equipmentData: any): Partial<AllBonuses> {
 					if (typeof value === 'number' && value !== 0) {
 						const validatedValue = validatePropertyValue(value, propertyKey)
 						const normalizedKey = normalizePropertyKey(propertyKey)
-						bonuses[normalizedKey as keyof AllBonuses] = 
+						bonuses[normalizedKey as keyof AllBonuses] =
 							(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
 					}
 				}
@@ -744,10 +798,12 @@ export function getEnchantmentBonuses(equipmentData: any): Partial<AllBonuses> {
 /**
  * データソース別補正値を一括取得
  */
-export function getDetailedDataSourceBonuses(data: CalculatorData): DetailedDataSourceBonuses {
+export function getDetailedDataSourceBonuses(
+	data: CalculatorData,
+): DetailedDataSourceBonuses {
 	try {
 		const equipmentSlots = getEquipmentSlotBonuses(data.equipment)
-		
+
 		return {
 			equipment: {
 				main: equipmentSlots.main,
@@ -766,7 +822,10 @@ export function getDetailedDataSourceBonuses(data: CalculatorData): DetailedData
 			crystal: getCrystalBonuses(data.crystals),
 			food: getFoodBonuses(data.food),
 			buffItems: getBuffBonuses(data.buffItems),
-			buffSkills: getBuffSkillBonuses(data.buffSkills?.skills || null, data.mainWeapon?.weaponType || null),
+			buffSkills: getBuffSkillBonuses(
+				data.buffSkills?.skills || null,
+				data.mainWeapon?.weaponType || null,
+			),
 		}
 	} catch (error) {
 		console.error('Detailed data source bonuses calculation error:', error)

@@ -666,7 +666,7 @@ function applyPassiveMultiplier(
 
 	// 現在ブレイブ倍率は未実装(0)なので、パッシブ倍率で最終切り捨てを行う
 	const result = Math.floor(beforePassive * (1 + passiveRate / 100))
-	
+
 	if (process.env.NODE_ENV === 'development') {
 		console.log(
 			'計算式: Math.floor(' +
@@ -730,7 +730,7 @@ function applyCriticalDamage(
 
 	// クリティカルダメージ倍率を取得
 	const criticalRate = input.critical.damage
-	
+
 	if (process.env.NODE_ENV === 'development') {
 		console.log('criticalRate (クリティカルダメージ%):', criticalRate)
 
@@ -742,9 +742,9 @@ function applyCriticalDamage(
 		console.log(`= Math.floor(${step2Result} * ${criticalRate / 100})`)
 		console.log(`= Math.floor(${step2Result * (criticalRate / 100)})`)
 	}
-	
+
 	const result = Math.floor(step2Result * (criticalRate / 100))
-	
+
 	if (process.env.NODE_ENV === 'development') {
 		console.log('result (クリティカル適用後):', result)
 	}
@@ -968,7 +968,9 @@ export function logCalculationSteps(result: DamageCalculationResult): void {
 		console.log(`  結果: ${steps.step2_fixedValues.result}`)
 
 		console.log('\nステップ3: 属性有利補正')
-		console.log(`  固定値適用後: ${steps.step3_elementAdvantage.beforeAdvantage}`)
+		console.log(
+			`  固定値適用後: ${steps.step3_elementAdvantage.beforeAdvantage}`,
+		)
 		console.log(`  属性有利: ${steps.step3_elementAdvantage.advantageRate}%`)
 		console.log(`  結果: ${steps.step3_elementAdvantage.result}`)
 

@@ -102,7 +102,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// レスポンシブ表示制御
 	const [isMobile, setIsMobile] = useState(false)
-	const [activeSection, setActiveSection] = useState<keyof typeof visibleSections | null>('basicStats')
+	const [activeSection, setActiveSection] = useState<
+		keyof typeof visibleSections | null
+	>('basicStats')
 
 	// セクション表示の切り替え
 	const toggleSection = (section: keyof typeof visibleSections) => {
@@ -130,7 +132,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				})
 			}
 		}
-		
+
 		handleChange() // 初期状態設定
 		mediaQuery.addEventListener('change', handleChange)
 		return () => mediaQuery.removeEventListener('change', handleChange)
@@ -158,7 +160,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				equipmentBonus2: false,
 				equipmentBonus3: false,
 			})
-			setVisibleSections(prev => ({
+			setVisibleSections((prev) => ({
 				...prev,
 				[section]: true,
 			}))
@@ -178,7 +180,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
-
 
 	// 統合計算のメモ化
 	const calculationResults = useMemo(() => {
@@ -582,9 +583,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				<div className="mb-3 flex flex-wrap gap-2">
 					<button
 						type="button"
-						onClick={() => isMobile ? handleMobileSectionChange('basicStats') : toggleSection('basicStats')}
+						onClick={() =>
+							isMobile
+								? handleMobileSectionChange('basicStats')
+								: toggleSection('basicStats')
+						}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							(isMobile ? activeSection === 'basicStats' : visibleSections.basicStats)
+							(
+								isMobile
+									? activeSection === 'basicStats'
+									: visibleSections.basicStats
+							)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -593,9 +602,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => isMobile ? handleMobileSectionChange('adjustedStats') : toggleSection('adjustedStats')}
+						onClick={() =>
+							isMobile
+								? handleMobileSectionChange('adjustedStats')
+								: toggleSection('adjustedStats')
+						}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							(isMobile ? activeSection === 'adjustedStats' : visibleSections.adjustedStats)
+							(
+								isMobile
+									? activeSection === 'adjustedStats'
+									: visibleSections.adjustedStats
+							)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -604,9 +621,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => isMobile ? handleMobileSectionChange('equipmentBonus1') : toggleSection('equipmentBonus1')}
+						onClick={() =>
+							isMobile
+								? handleMobileSectionChange('equipmentBonus1')
+								: toggleSection('equipmentBonus1')
+						}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							(isMobile ? activeSection === 'equipmentBonus1' : visibleSections.equipmentBonus1)
+							(
+								isMobile
+									? activeSection === 'equipmentBonus1'
+									: visibleSections.equipmentBonus1
+							)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -615,9 +640,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => isMobile ? handleMobileSectionChange('equipmentBonus2') : toggleSection('equipmentBonus2')}
+						onClick={() =>
+							isMobile
+								? handleMobileSectionChange('equipmentBonus2')
+								: toggleSection('equipmentBonus2')
+						}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							(isMobile ? activeSection === 'equipmentBonus2' : visibleSections.equipmentBonus2)
+							(
+								isMobile
+									? activeSection === 'equipmentBonus2'
+									: visibleSections.equipmentBonus2
+							)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -626,9 +659,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => isMobile ? handleMobileSectionChange('equipmentBonus3') : toggleSection('equipmentBonus3')}
+						onClick={() =>
+							isMobile
+								? handleMobileSectionChange('equipmentBonus3')
+								: toggleSection('equipmentBonus3')
+						}
 						className={`px-3 py-1 text-xs md:text-sm rounded transition-colors cursor-pointer ${
-							(isMobile ? activeSection === 'equipmentBonus3' : visibleSections.equipmentBonus3)
+							(
+								isMobile
+									? activeSection === 'equipmentBonus3'
+									: visibleSections.equipmentBonus3
+							)
 								? 'bg-blue-500 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
@@ -637,7 +678,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					</button>
 				</div>
 				{/* レスポンシブグリッドレイアウト - 5つのセクション */}
-				<div className={`flex gap-6 flex-wrap justify-center ${isMobile ? 'flex-col items-center' : ''}`}>
+				<div
+					className={`flex gap-6 flex-wrap justify-center ${isMobile ? 'flex-col items-center' : ''}`}
+				>
 					{/* 基本ステータス (30項目) */}
 					{visibleSections.basicStats && (
 						<StatSection

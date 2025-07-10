@@ -262,9 +262,7 @@ export default function CrystalCard({
 						const { conditionText, effectTexts } =
 							formatConditionalEffect(effect)
 						return (
-							<div
-								key={`${crystal.id}-condition-${index}`}
-							>
+							<div key={`${crystal.id}-condition-${index}`}>
 								<div className="flex flex-wrap gap-1">
 									<div className="">{conditionText}：</div>
 									{effectTexts.length > 1 ? (
@@ -280,9 +278,7 @@ export default function CrystalCard({
 										</div>
 									) : (
 										effectTexts.map((effectText, effectIndex) => (
-											<div
-												key={`${crystal.id}-effect-${index}-${effectIndex}`}
-											>
+											<div key={`${crystal.id}-effect-${index}-${effectIndex}`}>
 												{effectText}
 											</div>
 										))

@@ -1,8 +1,9 @@
 'use client'
 
-import type { PresetEquipment } from '@/types/calculator'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import type { PresetEquipment } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
+import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
 
 interface EquipmentCardProps {
 	equipment: PresetEquipment
@@ -284,6 +285,44 @@ export default function EquipmentCard({
 					</div>
 				</div>
 			)}
+
+			{/* 条件付き効果 */}
+			{equipment.conditionalEffects &&
+				equipment.conditionalEffects.length > 0 && (
+					<div className="text-sm text-blue-600 space-y-1 mb-2">
+						{equipment.conditionalEffects.map((effect, index) => {
+							const { conditionText, effectTexts } =
+								formatConditionalEffect(effect)
+							return (
+								<div key={`${equipment.id}-condition-${index}`}>
+									<div className="flex flex-wrap gap-1">
+										<div className="">{conditionText}：</div>
+										{effectTexts.length > 1 ? (
+											<div className="flex flex-wrap gap-1">
+												{effectTexts.map((effectText, effectIndex) => (
+													<div
+														key={`${equipment.id}-effect-${index}-${effectIndex}`}
+													>
+														{effectText}
+														{effectIndex < effectTexts.length - 1 && ' '}
+													</div>
+												))}
+											</div>
+										) : (
+											effectTexts.map((effectText, effectIndex) => (
+												<div
+													key={`${equipment.id}-effect-${index}-${effectIndex}`}
+												>
+													{effectText}
+												</div>
+											))
+										)}
+									</div>
+								</div>
+							)
+						})}
+					</div>
+				)}
 
 			{/* 説明 */}
 			{equipment.description && (

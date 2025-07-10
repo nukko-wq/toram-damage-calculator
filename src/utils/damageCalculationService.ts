@@ -46,7 +46,7 @@ export function calculateDamageWithService(
 	options: DamageCalculationOptions = {},
 ): DamageCalculationServiceResult {
 	const { debug = false, powerOptions = createInitialPowerOptions() } = options
-	
+
 	// デバッグログを一時的に無効化
 	const debugEnabled = false
 
