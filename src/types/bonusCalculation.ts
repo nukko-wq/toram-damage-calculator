@@ -102,10 +102,10 @@ export interface DetailedDataSourceBonuses {
 }
 
 // フィルターオプション型
-export type FilterOption = 
+export type FilterOption =
 	| 'all'
 	| 'main'
-	| 'subWeapon' 
+	| 'subWeapon'
 	| 'body'
 	| 'additional'
 	| 'special'

@@ -41,6 +41,9 @@ interface DamageResults {
 }
 
 export default function DamagePreview({ isVisible }: DamagePreviewProps) {
+	// デバッグログを一時的に無効化
+	const debugEnabled = false
+
 	// 威力オプション設定をZustandストアから取得（フォールバック付き）
 	const powerOptions =
 		useCalculatorStore((state) => state.data.powerOptions) ||
@@ -96,7 +99,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
 
 			// デバッグ: 中央集約された値を確認
-			if (process.env.NODE_ENV === 'development') {
+			if (debugEnabled && process.env.NODE_ENV === 'development') {
 				console.log('=== DamagePreview 中央集約計算結果 ===')
 				console.log('calculationResults?.basicStats.totalATK:', totalATK)
 				console.log(
@@ -120,7 +123,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 
 			// デバッグ用ログ - 実際の値を確認
-			if (process.env.NODE_ENV === 'development') {
+			if (debugEnabled && process.env.NODE_ENV === 'development') {
 				console.log('=== DamagePreview Debug ===')
 				console.log(
 					'calculatorData.baseStats.level:',
@@ -214,7 +217,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				calculatorData.mainWeapon?.weaponType || null,
 			)
 
-			if (process.env.NODE_ENV === 'development') {
+			if (debugEnabled && process.env.NODE_ENV === 'development') {
 				console.log('=== PASSIVE MULTIPLIER ACQUISITION DEBUG ===')
 				console.log(
 					'calculatorData.buffSkills?.skills:',
@@ -305,7 +308,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 
 			// ===== 詳細ダメージ計算確認ログ =====
-			if (process.env.NODE_ENV === 'development') {
+			if (debugEnabled && process.env.NODE_ENV === 'development') {
 				console.log('================================')
 				console.log('=== DAMAGE CALCULATION DEBUG ===')
 				console.log('================================')
@@ -355,7 +358,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					'  DEBUG: enemyInfo?.stats.magicalResistance:',
 					enemyInfo?.stats.magicalResistance,
 				)
-				console.log('  DEBUG: defaultInput.resistance:', defaultInput.resistance)
+				console.log(
+					'  DEBUG: defaultInput.resistance:',
+					defaultInput.resistance,
+				)
 
 				// 4. 敵のDEF/MDEF
 				console.log('4. 敵の防御力:')
@@ -581,7 +587,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					(hitMaxStabilityRate + baseStabilityRate) / 2,
 				)
 
-				if (process.env.NODE_ENV === 'development') {
+				if (debugEnabled && process.env.NODE_ENV === 'development') {
 					console.log('=== MULTI-HIT DAMAGE CALCULATION (New Method) ===')
 					attackResults.forEach((hit, index) => {
 						const hitMaxDamage = hit.result.baseDamage
@@ -630,7 +636,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const attackResult = totalAttackResult
 
 			// 計算結果の詳細ログ
-			if (process.env.NODE_ENV === 'development') {
+			if (debugEnabled && process.env.NODE_ENV === 'development') {
 				console.log('=== CALCULATION RESULTS ===')
 				console.log('damageType:', powerOptions.damageType)
 				console.log('最終ダメージ:', attackResult.baseDamage)
@@ -796,7 +802,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							(minStabilityRate + maxStabilityRate) / 2,
 						)
 
-						if (process.env.NODE_ENV === 'development') {
+						if (debugEnabled && process.env.NODE_ENV === 'development') {
 							console.log('=== CRITICAL DISPLAY DEBUG ===')
 							console.log('baseDamage (クリティカル計算済み):', baseDamage)
 							console.log('stabilityRate:', stabilityRate)
@@ -912,7 +918,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const damageDisplay = getDamageByType()
 
 			// 最終表示値とコンソールログとの対応確認
-			if (process.env.NODE_ENV === 'development') {
+			if (debugEnabled && process.env.NODE_ENV === 'development') {
 				console.log('=== FINAL DISPLAY VALUES ===')
 				console.log('damageType:', powerOptions.damageType)
 				console.log('表示される最小ダメージ:', damageDisplay.min)
@@ -987,7 +993,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// 状態を更新
 			setCaptureData(newCaptureData)
 
-			if (process.env.NODE_ENV === 'development') {
+			if (debugEnabled && process.env.NODE_ENV === 'development') {
 				console.log('ダメージをキャプチャしました:', newCaptureData)
 			}
 		} catch (error) {

@@ -1,0 +1,15 @@
+
+> toram-damage-calculator@0.1.0 dev
+> next dev --turbopack
+
+   ▲ Next.js 15.3.5 (Turbopack)
+   - Local:        http://localhost:3000
+   - Network:      http://10.255.255.254:3000
+
+ ✓ Starting...
+ ✓ Ready in 1085ms
+ ○ Compiling / ...
+ ✓ Compiled / in 3.6s
+ GET / 200 in 3990ms
+ GET / 200 in 686ms
+ GET / 200 in 519ms

@@ -245,6 +245,7 @@ export interface PresetEquipment {
 	description?: string
 	source?: string // 入手方法
 	armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
+	conditionalEffects?: ConditionalEffect[] // 条件付き効果
 }
 
 // クリスタル種別

@@ -57,7 +57,6 @@ export function useDamageDifferenceCorrect(
 			effectiveCurrentResults = calculateResults(currentData)
 		}
 
-
 		try {
 			// 現在装着中のアイテムIDを確認
 			let currentEquippedItemId: string | null = null
@@ -78,18 +77,19 @@ export function useDamageDifferenceCorrect(
 				// 装備の場合
 				if (slotInfo.slot && typeof slotInfo.slot === 'string') {
 					currentSlotKey = slotInfo.slot
-					currentEquippedItemId = (currentData.equipment as any)[currentSlotKey]?.id || null
+					currentEquippedItemId =
+						(currentData.equipment as any)[currentSlotKey]?.id || null
 				}
 			} else if (slotInfo.type === 'buffItem') {
 				// バフアイテムの場合
 				if (slotInfo.category && typeof slotInfo.category === 'string') {
 					currentSlotKey = slotInfo.category
-					currentEquippedItemId = (currentData.buffItems as any)[currentSlotKey] || null
+					currentEquippedItemId =
+						(currentData.buffItems as any)[currentSlotKey] || null
 				}
 			}
 
 			const isCurrentlyEquipped = currentEquippedItemId === item.id
-
 
 			let baselineData: CalculatorData
 			let simulatedData: CalculatorData
@@ -128,11 +128,8 @@ export function useDamageDifferenceCorrect(
 			// 4. 平均ダメージの差分を使用
 			const averageDamageDifference = Math.round(averageDifference)
 
-
-
 			// 5. 最終差分は平均差分を使用
 			const difference = averageDamageDifference
-
 
 			return {
 				difference,

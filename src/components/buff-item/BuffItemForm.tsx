@@ -282,7 +282,9 @@ export default function BuffItemForm({ onBuffItemsChange }: BuffItemFormProps) {
 				isOpen={modalState.isOpen}
 				onClose={handleCloseModal}
 				onSelect={handleSelectBuffItem}
-				selectedBuffItemId={modalState.category ? effectiveBuffItems[modalState.category] : null}
+				selectedBuffItemId={
+					modalState.category ? effectiveBuffItems[modalState.category] : null
+				}
 				category={modalState.category || 'physicalPower'}
 				title={modalState.title}
 				slotInfo={{
