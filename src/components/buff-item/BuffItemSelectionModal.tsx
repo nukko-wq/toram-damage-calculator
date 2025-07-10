@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import type { BuffItemCategory, PresetBuffItem } from '@/types/calculator'
 import {
 	getBuffItemsByCategory,
@@ -36,13 +37,18 @@ export default function BuffItemSelectionModal({
 		PresetBuffItem[]
 	>([])
 
+	// モーダルを閉じる関数
+	const handleClose = useCallback(() => {
+		onClose()
+	}, [onClose])
+
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
 		if (!isOpen) return
 
 		const handleEscapeKey = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-				onClose()
+				handleClose()
 			}
 		}
 
@@ -50,7 +56,7 @@ export default function BuffItemSelectionModal({
 		return () => {
 			document.removeEventListener('keydown', handleEscapeKey)
 		}
-	}, [isOpen, onClose])
+	}, [isOpen, handleClose])
 
 	useEffect(() => {
 		if (!isOpen) return
@@ -100,151 +106,161 @@ export default function BuffItemSelectionModal({
 
 	const handleSelect = (buffItemId: string) => {
 		onSelect(buffItemId)
-		onClose()
+		handleClose()
 	}
 
 	const handleRemove = () => {
 		onSelect(null)
-		onClose()
+		handleClose()
 	}
 
-	const handleBackgroundClick = (e: React.MouseEvent) => {
-		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
-		const modalContent = document.querySelector('[data-modal-content="true"]')
-		const target = e.target as Element
-
-		if (modalContent && !modalContent.contains(target)) {
-			onClose()
-		}
-	}
+	const handleBackgroundClick = useCallback(
+		(e: React.MouseEvent) => {
+			// クリックされた要素がモーダルコンテンツ内かどうかをチェック
+			if (e.target === e.currentTarget) {
+				handleClose()
+			}
+		},
+		[handleClose],
+	)
 
 	const handleContentClick = (e: React.MouseEvent) => {
 		// モーダル内のクリックは伝播を停止
 		e.stopPropagation()
 	}
 
-	if (!isOpen) return null
-
-	// 利用可能なカテゴリを取得（現在のカテゴリのみ）
-	const availableCategories = [category]
-
 	return (
-		<dialog
-			open={isOpen}
-			className="fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-black/50 transition-opacity"
-			onClick={handleBackgroundClick}
-			aria-labelledby="modal-title"
-			aria-modal="true"
-		>
-			<div className="min-h-screen flex items-center justify-center p-4">
-				<div
-					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden outline-none"
-					onClick={handleContentClick}
-					data-modal-content="true"
+		<AnimatePresence>
+			{isOpen && (
+				<motion.div
+					key="buff-item-modal-backdrop"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{ duration: 0.2 }}
+					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+					onClick={handleBackgroundClick}
+					aria-labelledby="modal-title"
+					aria-modal="true"
 				>
-					{/* ヘッダー */}
-					<div className="flex items-center justify-between p-6 border-b">
-						<h2 id="modal-title" className="text-xl font-bold text-gray-900">
-							{title}
-						</h2>
-						<button
-							type="button"
-							onClick={onClose}
-							className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-							aria-label="モーダルを閉じる"
-						>
-							<svg
-								className="w-6 h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<title>閉じる</title>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
-						</button>
-					</div>
-
-					{/* バフアイテム一覧 */}
-					<div className="p-6 overflow-y-auto max-h-[60vh]">
-						{/* なしオプション */}
-						<div className="mb-6">
+					<motion.div
+						key="buff-item-modal-content"
+						initial={{ opacity: 0, scale: 0.95, y: 8 }}
+						animate={{ opacity: 1, scale: 1, y: 0 }}
+						exit={{ opacity: 0, scale: 0, y: 0 }}
+						transition={{
+							type: 'spring',
+							damping: 25,
+							stiffness: 300,
+							duration: 0.3,
+						}}
+						className="absolute top-[30vh] bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[68vh] overflow-hidden h-fit"
+						onClick={handleContentClick}
+					>
+						{/* ヘッダー */}
+						<div className="flex items-center justify-between p-6 border-b">
+							<h2 id="modal-title" className="text-xl font-bold text-gray-900">
+								{title}
+							</h2>
 							<button
 								type="button"
-								onClick={handleRemove}
-								className={`
-									w-full p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
+								onClick={handleClose}
+								className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+								aria-label="モーダルを閉じる"
+							>
+								<svg
+									className="w-6 h-6"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<title>閉じる</title>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								</svg>
+							</button>
+						</div>
+
+						{/* バフアイテム一覧 */}
+						<div className="p-6 overflow-y-auto max-h-[60vh]">
+							{/* なしオプション */}
+							<div className="mb-6 text-center sm:text-left">
+								<button
+									type="button"
+									onClick={handleRemove}
+									className={`
+									w-[48%] min-w-[144px] max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
 									${
 										selectedBuffItemId === null
 											? 'border-blue-500 bg-blue-50 shadow-md'
 											: 'border-gray-200 bg-white hover:border-gray-300'
 									}
 								`}
-							>
-								<div className="flex items-center justify-between">
-									<span className="font-medium text-gray-900">
-										バフアイテムなし
-									</span>
-									{selectedBuffItemId === null && (
-										<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-											<svg
-												className="w-4 h-4 text-white"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<title>選択済み</title>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2}
-													d="M5 13l4 4L19 7"
-												/>
-											</svg>
-										</div>
-									)}
+								>
+									<div className="flex items-center justify-between">
+										<span className="font-medium text-gray-900">
+											バフアイテムなし
+										</span>
+										{selectedBuffItemId === null && (
+											<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+												<svg
+													className="w-4 h-4 text-white"
+													fill="none"
+													stroke="currentColor"
+													viewBox="0 0 24 24"
+												>
+													<title>選択済み</title>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														strokeWidth={2}
+														d="M5 13l4 4L19 7"
+													/>
+												</svg>
+											</div>
+										)}
+									</div>
+								</button>
+							</div>
+
+							{/* バフアイテムレイアウト */}
+							{filteredBuffItems.length > 0 ? (
+								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+									{filteredBuffItems.map((buffItem) => (
+										<BuffItemCard
+											key={buffItem.id}
+											buffItem={buffItem}
+											isSelected={selectedBuffItemId === buffItem.id}
+											onClick={() => handleSelect(buffItem.id)}
+											showDamageDifference={isOpen && !!slotInfo}
+											slotInfo={slotInfo}
+										/>
+									))}
 								</div>
-							</button>
+							) : (
+								<div className="text-center text-gray-500 py-8">
+									該当するバフアイテムがありません
+								</div>
+							)}
 						</div>
 
-						{/* バフアイテムグリッド */}
-						{filteredBuffItems.length > 0 ? (
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-								{filteredBuffItems.map((buffItem) => (
-									<BuffItemCard
-										key={buffItem.id}
-										buffItem={buffItem}
-										isSelected={selectedBuffItemId === buffItem.id}
-										onClick={() => handleSelect(buffItem.id)}
-										showDamageDifference={isOpen && !!slotInfo}
-										slotInfo={slotInfo}
-									/>
-								))}
-							</div>
-						) : (
-							<div className="text-center text-gray-500 py-8">
-								該当するバフアイテムがありません
-							</div>
-						)}
-					</div>
-
-					{/* フッター */}
-					<div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
-						<button
-							type="button"
-							onClick={onClose}
-							className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
-						>
-							キャンセル
-						</button>
-					</div>
-				</div>
-			</div>
-		</dialog>
+						{/* フッター */}
+						<div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
+							<button
+								type="button"
+								onClick={handleClose}
+								className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+							>
+								キャンセル
+							</button>
+						</div>
+					</motion.div>
+				</motion.div>
+			)}
+		</AnimatePresence>
 	)
 }

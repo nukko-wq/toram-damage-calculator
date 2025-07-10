@@ -278,20 +278,18 @@ export default function BuffItemForm({ onBuffItemsChange }: BuffItemFormProps) {
 			</div>
 
 			{/* バフアイテム選択モーダル */}
-			{modalState.category && (
-				<BuffItemSelectionModal
-					isOpen={modalState.isOpen}
-					onClose={handleCloseModal}
-					onSelect={handleSelectBuffItem}
-					selectedBuffItemId={effectiveBuffItems[modalState.category]}
-					category={modalState.category}
-					title={modalState.title}
-					slotInfo={{
-						type: 'buffItem' as const,
-						category: modalState.category,
-					}}
-				/>
-			)}
+			<BuffItemSelectionModal
+				isOpen={modalState.isOpen}
+				onClose={handleCloseModal}
+				onSelect={handleSelectBuffItem}
+				selectedBuffItemId={modalState.category ? effectiveBuffItems[modalState.category] : null}
+				category={modalState.category || 'physicalPower'}
+				title={modalState.title}
+				slotInfo={{
+					type: 'buffItem' as const,
+					category: modalState.category || 'physicalPower',
+				}}
+			/>
 		</div>
 	)
 }

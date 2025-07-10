@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import type { CrystalType, Crystal } from '@/types/calculator'
+import { motion, AnimatePresence } from 'motion/react'
+import type { CrystalType } from '@/types/calculator'
 import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
 import type { SlotInfo } from '@/types/damagePreview'
@@ -27,9 +28,6 @@ export default function CrystalSelectionModal({
 	slotInfo,
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
-	const [isAnimating, setIsAnimating] = useState(false)
-	const [shouldRender, setShouldRender] = useState(false)
-	const [isClosing, setIsClosing] = useState(false)
 
 	// useMemoを使用してavailableCrystalsを同期的に取得
 	const availableCrystals = useMemo(() => {
@@ -55,44 +53,10 @@ export default function CrystalSelectionModal({
 		}
 	}, [isOpen])
 
-	// アニメーション状態の管理
-	useEffect(() => {
-		if (isOpen) {
-			// モーダルを開く時
-			setIsClosing(false)
-			setShouldRender(true)
-			// 次のフレームでアニメーション開始（より確実に）
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
-					setIsAnimating(true)
-				})
-			})
-		} else {
-			// モーダルを閉じる時
-			setIsClosing(true)
-			setIsAnimating(false)
-			// アニメーション完了後にDOMから削除
-			const timer = setTimeout(() => {
-				setShouldRender(false)
-				setIsClosing(false)
-			}, 250) // 閉じるアニメーションの時間と同期
-			return () => clearTimeout(timer)
-		}
-	}, [isOpen])
-
-	// アニメーション付きでモーダルを閉じる関数
+	// モーダルを閉じる関数
 	const handleClose = useCallback(() => {
-		if (!isAnimating) return // 既にアニメーション中の場合は無視
-
-		// 閉じるアニメーションを開始
-		setIsClosing(true)
-		setIsAnimating(false)
-		
-		// アニメーション完了後にonCloseを呼び出し
-		setTimeout(() => {
-			onClose()
-		}, 250) // 閉じるアニメーションの時間と同期
-	}, [isAnimating, onClose])
+		onClose()
+	}, [onClose])
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
@@ -144,65 +108,48 @@ export default function CrystalSelectionModal({
 		handleClose()
 	}
 
-	const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
-		// アニメーション中は無効化
-		if (!isAnimating) return
-
-		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
-		const modalContent = document.querySelector('[data-modal-content="true"]')
-		const target = e.target as Element
-
-		if (modalContent && !modalContent.contains(target)) {
-			handleClose()
-		}
-	}, [isAnimating, handleClose])
-
-	const handleDialogKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === 'Escape') {
-			handleClose()
-		}
-		// EnterキーやSpaceキーで背景クリックと同様の動作をする場合
-		// (実際にはEscapeで十分なので、この部分は省略可能)
-	}
+	const handleBackgroundClick = useCallback(
+		(e: React.MouseEvent) => {
+			// クリックされた要素がモーダルコンテンツ内かどうかをチェック
+			if (e.target === e.currentTarget) {
+				handleClose()
+			}
+		},
+		[handleClose],
+	)
 
 	const handleContentClick = (e: React.MouseEvent) => {
 		// モーダル内のクリックは伝播を停止
 		e.stopPropagation()
 	}
 
-	const handleContentKeyDown = (e: React.KeyboardEvent) => {
-		// キーイベントの伝播を停止（必要に応じて）
-		e.stopPropagation()
-	}
-
-	if (!shouldRender) return null
-
 	return (
-		<>
-			{/* モーダル */}
-			<dialog
-				open={shouldRender}
-				className={`fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-black/50 transition-opacity duration-200 ease-out ${
-					isAnimating ? 'opacity-100' : 'opacity-0'
-				}`}
-				onKeyDown={handleDialogKeyDown}
-				onClick={handleBackgroundClick}
-				aria-labelledby="modal-title"
-				aria-modal="true"
-			>
-				<div className="min-h-screen flex items-center justify-center p-4">
-					<div
-						className={`relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden ${
-							isAnimating 
-								? 'scale-100 opacity-100 translate-y-0 transition-all duration-200 ease-out' 
-								: isClosing 
-									? 'scale-0 opacity-0 translate-y-0 origin-center transition-all duration-250 ease-in' 
-									: 'scale-95 opacity-0 translate-y-2 transition-all duration-200 ease-out'
-						}`}
-						style={{}}
+		<AnimatePresence>
+			{isOpen && (
+				<motion.div
+					key="modal-backdrop"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{ duration: 0.2 }}
+					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+					onClick={handleBackgroundClick}
+					aria-labelledby="modal-title"
+					aria-modal="true"
+				>
+					<motion.div
+						key="modal-content"
+						initial={{ opacity: 0, scale: 0.95, y: 8 }}
+						animate={{ opacity: 1, scale: 1, y: 0 }}
+						exit={{ opacity: 0, scale: 0, y: 0 }}
+						transition={{
+							type: 'spring',
+							damping: 25,
+							stiffness: 300,
+							duration: 0.3,
+						}}
+						className="absolute top-[30vh] bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[68vh] overflow-hidden h-fit"
 						onClick={handleContentClick}
-						onKeyDown={handleContentKeyDown}
-						data-modal-content="true"
 					>
 						{/* ヘッダー */}
 						<div className="flex items-center justify-between p-6 border-b">
@@ -271,16 +218,14 @@ export default function CrystalSelectionModal({
 						</div>
 
 						{/* クリスタ一覧 */}
-						<div className={`p-6 overflow-y-auto max-h-[60vh] transition-opacity duration-300 ease-out ${
-							isAnimating ? 'opacity-100' : 'opacity-0'
-						}`}>
+						<div className="p-6 overflow-y-auto max-h-[48vh]">
 							{/* なしオプション */}
-							<div className="mb-6">
+							<div className="mb-6 text-center sm:text-left">
 								<button
 									type="button"
 									onClick={handleRemove}
 									className={`
-										w-full p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
+										w-full min-w-[144px] max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
 										${
 											selectedCrystalId === null
 												? 'border-blue-500 bg-blue-50 shadow-md'
@@ -314,9 +259,9 @@ export default function CrystalSelectionModal({
 								</button>
 							</div>
 
-							{/* クリスタグリッド */}
+							{/* クリスタレイアウト */}
 							{filteredCrystals.length > 0 ? (
-								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
 									{filteredCrystals.map((crystal) => (
 										<CrystalCard
 											key={crystal.id}
@@ -345,9 +290,9 @@ export default function CrystalSelectionModal({
 								キャンセル
 							</button>
 						</div>
-					</div>
-				</div>
-			</dialog>
-		</>
+					</motion.div>
+				</motion.div>
+			)}
+		</AnimatePresence>
 	)
 }

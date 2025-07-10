@@ -199,7 +199,7 @@ export default function BuffItemCard({
 		<div
 			onClick={onClick}
 			className={`
-				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-[48%] min-w-[144px] max-w-[260px]
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md'

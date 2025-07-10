@@ -200,7 +200,7 @@ export default function EquipmentCard({
 		<div
 			onClick={onClick}
 			className={`
-				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-[48%] min-w-[144px] max-w-[260px]
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md'
@@ -266,9 +266,7 @@ export default function EquipmentCard({
 			</div>
 
 			{/* 装備名 */}
-			<h3 className="font-semibold text-gray-900 mb-2">
-				{equipment.name}
-			</h3>
+			<h3 className="font-semibold text-gray-900 mb-2">{equipment.name}</h3>
 
 			{/* 基本ステータス */}
 			{formatBaseStats() && (
