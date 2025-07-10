@@ -111,6 +111,35 @@ export const equipmentsData: EquipmentsData = {
 				},
 				armorType: 'normal',
 			},
+			{
+				id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+				name: '汎用A12%S10%CD21C25',
+				properties: {
+					ATK_Rate: 12,
+					STR_Rate: 10,
+					CriticalDamage_Rate: 21,
+					Critical: 25,
+					MATK_Rate: -12,
+					MagicalPenetration_Rate: -7,
+					Accuracy: -16,
+					Accuracy_Rate: -5,
+				},
+				armorType: 'normal',
+			},
+			{
+				id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+				name: '星辰の舟衣',
+				properties: {
+					HP: 7500,
+					Critical: 25,
+					ShortRangeDamage_Rate: 10,
+					PhysicalPenetration_Rate: 5,
+					MagicalPenetration_Rate: 5,
+					Anticipate_Rate: 20,
+					DarkResistance_Rate: 30,
+				},
+				armorType: 'normal',
+			},
 		],
 		additional: [
 			{
@@ -239,7 +268,7 @@ export const equipmentsData: EquipmentsData = {
 					Anticipate_Rate: 30,
 					ArmorBreak_Rate: 30,
 					Aggro_Rate: 50,
-					NeutralResistance_Rate: 40
+					NeutralResistance_Rate: 40,
 				},
 			},
 		],
