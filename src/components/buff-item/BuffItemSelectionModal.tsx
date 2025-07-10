@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import type { BuffItemCategory, PresetBuffItem } from '@/types/calculator'
 import {
 	getBuffItemsByCategory,
@@ -36,13 +37,18 @@ export default function BuffItemSelectionModal({
 		PresetBuffItem[]
 	>([])
 
+	// モーダルを閉じる関数
+	const handleClose = useCallback(() => {
+		onClose()
+	}, [onClose])
+
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
 		if (!isOpen) return
 
 		const handleEscapeKey = (event: KeyboardEvent) => {
 			if (event.key === 'Escape') {
-				onClose()
+				handleClose()
 			}
 		}
 
@@ -50,7 +56,7 @@ export default function BuffItemSelectionModal({
 		return () => {
 			document.removeEventListener('keydown', handleEscapeKey)
 		}
-	}, [isOpen, onClose])
+	}, [isOpen, handleClose])
 
 	useEffect(() => {
 		if (!isOpen) return
@@ -100,48 +106,57 @@ export default function BuffItemSelectionModal({
 
 	const handleSelect = (buffItemId: string) => {
 		onSelect(buffItemId)
-		onClose()
+		handleClose()
 	}
 
 	const handleRemove = () => {
 		onSelect(null)
-		onClose()
+		handleClose()
 	}
 
-	const handleBackgroundClick = (e: React.MouseEvent) => {
-		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
-		const modalContent = document.querySelector('[data-modal-content="true"]')
-		const target = e.target as Element
-
-		if (modalContent && !modalContent.contains(target)) {
-			onClose()
-		}
-	}
+	const handleBackgroundClick = useCallback(
+		(e: React.MouseEvent) => {
+			// クリックされた要素がモーダルコンテンツ内かどうかをチェック
+			if (e.target === e.currentTarget) {
+				handleClose()
+			}
+		},
+		[handleClose],
+	)
 
 	const handleContentClick = (e: React.MouseEvent) => {
 		// モーダル内のクリックは伝播を停止
 		e.stopPropagation()
 	}
 
-	if (!isOpen) return null
-
-	// 利用可能なカテゴリを取得（現在のカテゴリのみ）
-	const availableCategories = [category]
-
 	return (
-		<dialog
-			open={isOpen}
-			className="fixed inset-0 z-50 overflow-y-auto p-0 m-0 w-full h-full bg-black/50 transition-opacity"
-			onClick={handleBackgroundClick}
-			aria-labelledby="modal-title"
-			aria-modal="true"
-		>
-			<div className="min-h-screen flex items-center justify-center p-4">
-				<div
-					className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden outline-none"
-					onClick={handleContentClick}
-					data-modal-content="true"
+		<AnimatePresence>
+			{isOpen && (
+				<motion.div
+					key="modal-backdrop"
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					transition={{ duration: 0.2 }}
+					className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+					onClick={handleBackgroundClick}
+					aria-labelledby="modal-title"
+					aria-modal="true"
 				>
+					<motion.div
+						key="modal-content"
+						initial={{ opacity: 0, scale: 0.95, y: 8 }}
+						animate={{ opacity: 1, scale: 1, y: 0 }}
+						exit={{ opacity: 0, scale: 0, y: 0 }}
+						transition={{
+							type: "spring",
+							damping: 25,
+							stiffness: 300,
+							duration: 0.3
+						}}
+						className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+						onClick={handleContentClick}
+					>
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b">
 						<h2 id="modal-title" className="text-xl font-bold text-gray-900">
@@ -149,7 +164,7 @@ export default function BuffItemSelectionModal({
 						</h2>
 						<button
 							type="button"
-							onClick={onClose}
+							onClick={handleClose}
 							className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
 							aria-label="モーダルを閉じる"
 						>
@@ -237,14 +252,15 @@ export default function BuffItemSelectionModal({
 					<div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
 						<button
 							type="button"
-							onClick={onClose}
+							onClick={handleClose}
 							className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
 						>
 							キャンセル
 						</button>
 					</div>
-				</div>
-			</div>
-		</dialog>
+					</motion.div>
+				</motion.div>
+			)}
+		</AnimatePresence>
 	)
 }
