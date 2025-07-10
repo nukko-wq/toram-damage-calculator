@@ -215,10 +215,6 @@ export default function EquipmentCard({
 					{showDamageDifference && slotInfo && !isSelected && (
 						<div className="inline-block">
 							{(() => {
-								console.log(
-									'🔧 About to render DamageDifferenceDisplayCorrect for:',
-									equipment.name,
-								)
 								try {
 									return (
 										<DamageDifferenceDisplayCorrect
@@ -229,11 +225,7 @@ export default function EquipmentCard({
 											options={{ debug: true }}
 										/>
 									)
-								} catch (error) {
-									console.error(
-										'🔧 Error rendering DamageDifferenceDisplayCorrect:',
-										error,
-									)
+								} catch {
 									return (
 										<div className="bg-red-100 text-red-600 text-xs p-1">
 											Error
