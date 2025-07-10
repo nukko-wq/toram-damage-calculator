@@ -137,113 +137,113 @@ export default function EquipmentSelectionModal({
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0, y: 0 }}
 						transition={{
-							type: "spring",
+							type: 'spring',
 							damping: 25,
 							stiffness: 300,
-							duration: 0.3
+							duration: 0.3,
 						}}
-						className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+						className="absolute top-[30vh] bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[68vh] overflow-hidden h-fit"
 						onClick={handleContentClick}
 					>
-					{/* ヘッダー */}
-					<div className="flex items-center justify-between p-6 border-b">
-						<h2 id="modal-title" className="text-xl font-bold text-gray-900">
-							{title}
-						</h2>
-						<button
-							type="button"
-							onClick={handleClose}
-							className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-							aria-label="モーダルを閉じる"
-						>
-							<svg
-								className="w-6 h-6"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<title>閉じる</title>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
-						</button>
-					</div>
-
-					{/* 装備一覧 */}
-					<div className="p-6 overflow-y-auto max-h-[60vh]">
-						{/* なしオプション */}
-						<div className="mb-6">
+						{/* ヘッダー */}
+						<div className="flex items-center justify-between p-6 border-b">
+							<h2 id="modal-title" className="text-xl font-bold text-gray-900">
+								{title}
+							</h2>
 							<button
 								type="button"
-								onClick={handleRemove}
-								className={`
-									w-full p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
+								onClick={handleClose}
+								className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
+								aria-label="モーダルを閉じる"
+							>
+								<svg
+									className="w-6 h-6"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<title>閉じる</title>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								</svg>
+							</button>
+						</div>
+
+						{/* 装備一覧 */}
+						<div className="p-6 overflow-y-auto max-h-[48vh]">
+							{/* なしオプション */}
+							<div className="mb-6 text-center sm:text-left">
+								<button
+									type="button"
+									onClick={handleRemove}
+									className={`
+									w-[48%] min-w-[144px] max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
 									${
 										selectedEquipmentId === null
 											? 'border-blue-500 bg-blue-50 shadow-md'
 											: 'border-gray-200 bg-white hover:border-gray-300'
 									}
 								`}
-							>
-								<div className="flex items-center justify-between">
-									<span className="font-medium text-gray-900">装備なし</span>
-									{selectedEquipmentId === null && (
-										<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-											<svg
-												className="w-4 h-4 text-white"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<title>選択済み</title>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2}
-													d="M5 13l4 4L19 7"
-												/>
-											</svg>
-										</div>
-									)}
+								>
+									<div className="flex items-center justify-between">
+										<span className="font-medium text-gray-900">装備なし</span>
+										{selectedEquipmentId === null && (
+											<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+												<svg
+													className="w-4 h-4 text-white"
+													fill="none"
+													stroke="currentColor"
+													viewBox="0 0 24 24"
+												>
+													<title>選択済み</title>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														strokeWidth={2}
+														d="M5 13l4 4L19 7"
+													/>
+												</svg>
+											</div>
+										)}
+									</div>
+								</button>
+							</div>
+
+							{/* 装備レイアウト */}
+							{filteredEquipments.length > 0 ? (
+								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+									{filteredEquipments.map((equipment) => (
+										<EquipmentCard
+											key={equipment.id}
+											equipment={equipment}
+											isSelected={selectedEquipmentId === equipment.id}
+											onClick={() => handleSelect(equipment.id)}
+											showDamageDifference={isOpen && !!slotInfo}
+											slotInfo={slotInfo}
+										/>
+									))}
 								</div>
-							</button>
+							) : (
+								<div className="text-center text-gray-500 py-8">
+									該当する装備がありません
+								</div>
+							)}
 						</div>
 
-						{/* 装備グリッド */}
-						{filteredEquipments.length > 0 ? (
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-								{filteredEquipments.map((equipment) => (
-									<EquipmentCard
-										key={equipment.id}
-										equipment={equipment}
-										isSelected={selectedEquipmentId === equipment.id}
-										onClick={() => handleSelect(equipment.id)}
-										showDamageDifference={isOpen && !!slotInfo}
-										slotInfo={slotInfo}
-									/>
-								))}
-							</div>
-						) : (
-							<div className="text-center text-gray-500 py-8">
-								該当する装備がありません
-							</div>
-						)}
-					</div>
-
-					{/* フッター */}
-					<div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
-						<button
-							type="button"
-							onClick={handleClose}
-							className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
-						>
-							キャンセル
-						</button>
-					</div>
+						{/* フッター */}
+						<div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
+							<button
+								type="button"
+								onClick={handleClose}
+								className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors cursor-pointer"
+							>
+								キャンセル
+							</button>
+						</div>
 					</motion.div>
 				</motion.div>
 			)}

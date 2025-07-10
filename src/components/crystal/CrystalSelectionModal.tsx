@@ -53,7 +53,6 @@ export default function CrystalSelectionModal({
 		}
 	}, [isOpen])
 
-
 	// モーダルを閉じる関数
 	const handleClose = useCallback(() => {
 		onClose()
@@ -119,13 +118,10 @@ export default function CrystalSelectionModal({
 		[handleClose],
 	)
 
-
 	const handleContentClick = (e: React.MouseEvent) => {
 		// モーダル内のクリックは伝播を停止
 		e.stopPropagation()
 	}
-
-
 
 	return (
 		<AnimatePresence>
@@ -141,20 +137,20 @@ export default function CrystalSelectionModal({
 					aria-labelledby="modal-title"
 					aria-modal="true"
 				>
-						<motion.div
-							key="modal-content"
-							initial={{ opacity: 0, scale: 0.95, y: 8 }}
-							animate={{ opacity: 1, scale: 1, y: 0 }}
-							exit={{ opacity: 0, scale: 0, y: 0 }}
-							transition={{
-								type: "spring",
-								damping: 25,
-								stiffness: 300,
-								duration: 0.3
-							}}
-							className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
-							onClick={handleContentClick}
-						>
+					<motion.div
+						key="modal-content"
+						initial={{ opacity: 0, scale: 0.95, y: 8 }}
+						animate={{ opacity: 1, scale: 1, y: 0 }}
+						exit={{ opacity: 0, scale: 0, y: 0 }}
+						transition={{
+							type: 'spring',
+							damping: 25,
+							stiffness: 300,
+							duration: 0.3,
+						}}
+						className="absolute top-[30vh] bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[68vh] overflow-hidden h-fit"
+						onClick={handleContentClick}
+					>
 						{/* ヘッダー */}
 						<div className="flex items-center justify-between p-6 border-b">
 							<h2 id="modal-title" className="text-xl font-bold text-gray-900">
@@ -222,14 +218,14 @@ export default function CrystalSelectionModal({
 						</div>
 
 						{/* クリスタ一覧 */}
-						<div className="p-6 overflow-y-auto max-h-[60vh]">
+						<div className="p-6 overflow-y-auto max-h-[48vh]">
 							{/* なしオプション */}
-							<div className="mb-6">
+							<div className="mb-6 text-center sm:text-left">
 								<button
 									type="button"
 									onClick={handleRemove}
 									className={`
-										w-full p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
+										w-full min-w-[144px] max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
 										${
 											selectedCrystalId === null
 												? 'border-blue-500 bg-blue-50 shadow-md'
@@ -263,9 +259,9 @@ export default function CrystalSelectionModal({
 								</button>
 							</div>
 
-							{/* クリスタグリッド */}
+							{/* クリスタレイアウト */}
 							{filteredCrystals.length > 0 ? (
-								<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
 									{filteredCrystals.map((crystal) => (
 										<CrystalCard
 											key={crystal.id}
@@ -294,7 +290,7 @@ export default function CrystalSelectionModal({
 								キャンセル
 							</button>
 						</div>
-						</motion.div>
+					</motion.div>
 				</motion.div>
 			)}
 		</AnimatePresence>
