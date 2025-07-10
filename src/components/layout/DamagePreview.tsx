@@ -96,20 +96,22 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
 
 			// デバッグ: 中央集約された値を確認
-			console.log('=== DamagePreview 中央集約計算結果 ===')
-			console.log('calculationResults?.basicStats.totalATK:', totalATK)
-			console.log(
-				'calculationResults?.basicStats.stabilityRate:',
-				stabilityRate,
-			)
-			console.log(
-				'calculationResults?.equipmentBonus1.physicalPenetration:',
-				calculationResults?.equipmentBonus1.physicalPenetration,
-			)
-			console.log(
-				'calculationResults?.equipmentBonus1.magicalPenetration:',
-				calculationResults?.equipmentBonus1.magicalPenetration,
-			)
+			if (process.env.NODE_ENV === 'development') {
+				console.log('=== DamagePreview 中央集約計算結果 ===')
+				console.log('calculationResults?.basicStats.totalATK:', totalATK)
+				console.log(
+					'calculationResults?.basicStats.stabilityRate:',
+					stabilityRate,
+				)
+				console.log(
+					'calculationResults?.equipmentBonus1.physicalPenetration:',
+					calculationResults?.equipmentBonus1.physicalPenetration,
+				)
+				console.log(
+					'calculationResults?.equipmentBonus1.magicalPenetration:',
+					calculationResults?.equipmentBonus1.magicalPenetration,
+				)
+			}
 
 			// 敵情報を取得
 			let enemyInfo = null
@@ -118,27 +120,29 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 
 			// デバッグ用ログ - 実際の値を確認
-			console.log('=== DamagePreview Debug ===')
-			console.log(
-				'calculatorData.baseStats.level:',
-				calculatorData.baseStats.level,
-			)
-			console.log('totalATK:', totalATK)
-			console.log('stabilityRate:', stabilityRate)
-			console.log(
-				'calculationResults?.basicStats:',
-				calculationResults?.basicStats,
-			)
-			console.log('calculatorData.enemy:', calculatorData.enemy)
-			console.log(
-				'calculatorData.enemy.selectedEnemyId:',
-				calculatorData.enemy?.selectedEnemyId,
-			)
-			console.log('enemyInfo:', enemyInfo)
-			if (enemyInfo) {
-				console.log('enemyInfo.stats:', enemyInfo.stats)
-				console.log('enemyInfo.stats.DEF:', enemyInfo.stats.DEF)
-				console.log('enemyInfo.stats.MDEF:', enemyInfo.stats.MDEF)
+			if (process.env.NODE_ENV === 'development') {
+				console.log('=== DamagePreview Debug ===')
+				console.log(
+					'calculatorData.baseStats.level:',
+					calculatorData.baseStats.level,
+				)
+				console.log('totalATK:', totalATK)
+				console.log('stabilityRate:', stabilityRate)
+				console.log(
+					'calculationResults?.basicStats:',
+					calculationResults?.basicStats,
+				)
+				console.log('calculatorData.enemy:', calculatorData.enemy)
+				console.log(
+					'calculatorData.enemy.selectedEnemyId:',
+					calculatorData.enemy?.selectedEnemyId,
+				)
+				console.log('enemyInfo:', enemyInfo)
+				if (enemyInfo) {
+					console.log('enemyInfo.stats:', enemyInfo.stats)
+					console.log('enemyInfo.stats.DEF:', enemyInfo.stats.DEF)
+					console.log('enemyInfo.stats.MDEF:', enemyInfo.stats.MDEF)
+				}
 			}
 
 			// PowerOptionsに基づく属性攻撃設定
@@ -210,17 +214,19 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				calculatorData.mainWeapon?.weaponType || null,
 			)
 
-			console.log('=== PASSIVE MULTIPLIER ACQUISITION DEBUG ===')
-			console.log(
-				'calculatorData.buffSkills?.skills:',
-				calculatorData.buffSkills?.skills,
-			)
-			console.log(
-				'calculatorData.mainWeapon?.weaponType:',
-				calculatorData.mainWeapon?.weaponType,
-			)
-			console.log('passiveMultiplier:', passiveMultiplier)
-			console.log('==============================================')
+			if (process.env.NODE_ENV === 'development') {
+				console.log('=== PASSIVE MULTIPLIER ACQUISITION DEBUG ===')
+				console.log(
+					'calculatorData.buffSkills?.skills:',
+					calculatorData.buffSkills?.skills,
+				)
+				console.log(
+					'calculatorData.mainWeapon?.weaponType:',
+					calculatorData.mainWeapon?.weaponType,
+				)
+				console.log('passiveMultiplier:', passiveMultiplier)
+				console.log('==============================================')
+			}
 
 			const input: DamageCalculationInput = {
 				...defaultInput,
@@ -299,105 +305,107 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 
 			// ===== 詳細ダメージ計算確認ログ =====
-			console.log('================================')
-			console.log('=== DAMAGE CALCULATION DEBUG ===')
-			console.log('================================')
+			if (process.env.NODE_ENV === 'development') {
+				console.log('================================')
+				console.log('=== DAMAGE CALCULATION DEBUG ===')
+				console.log('================================')
 
-			// 1. レベル
-			console.log('1. レベル情報:')
-			console.log('  自Lv (playerLevel):', input.playerLevel)
-			console.log('  敵Lv (enemyLevel):', input.enemyLevel)
+				// 1. レベル
+				console.log('1. レベル情報:')
+				console.log('  自Lv (playerLevel):', input.playerLevel)
+				console.log('  敵Lv (enemyLevel):', input.enemyLevel)
 
-			// 2. 参照ステータス
-			console.log('2. 参照ステータス:')
-			console.log('  総ATK (referenceStat):', input.referenceStat)
-			console.log('  参照タイプ:', input.referenceStatType)
+				// 2. 参照ステータス
+				console.log('2. 参照ステータス:')
+				console.log('  総ATK (referenceStat):', input.referenceStat)
+				console.log('  参照タイプ:', input.referenceStatType)
 
-			// 3. ダメージタイプとクリティカル設定
-			console.log('3. ダメージタイプ設定:')
-			console.log('  ダメージタイプ:', powerOptions.damageType)
-			console.log(
-				'  input.userSettings.damageType:',
-				input.userSettings.damageType,
-			)
-			console.log(
-				'  クリティカルダメージ input.critical.damage:',
-				input.critical.damage,
-			)
-			console.log(
-				'  元データ calculationResults?.basicStats.criticalDamage:',
-				calculationResults?.basicStats.criticalDamage,
-			)
-			console.log(
-				'  クリティカル判定:',
-				input.userSettings.damageType === 'critical'
-					? 'クリティカル計算を実行'
-					: '通常計算を実行',
-			)
+				// 3. ダメージタイプとクリティカル設定
+				console.log('3. ダメージタイプ設定:')
+				console.log('  ダメージタイプ:', powerOptions.damageType)
+				console.log(
+					'  input.userSettings.damageType:',
+					input.userSettings.damageType,
+				)
+				console.log(
+					'  クリティカルダメージ input.critical.damage:',
+					input.critical.damage,
+				)
+				console.log(
+					'  元データ calculationResults?.basicStats.criticalDamage:',
+					calculationResults?.basicStats.criticalDamage,
+				)
+				console.log(
+					'  クリティカル判定:',
+					input.userSettings.damageType === 'critical'
+						? 'クリティカル計算を実行'
+						: '通常計算を実行',
+				)
 
-			// 3. 敵の耐性
-			console.log('3. 敵の耐性:')
-			console.log('  物理耐性 (%):', input.resistance.physical)
-			console.log('  魔法耐性 (%):', input.resistance.magical)
-			console.log('  武器耐性 (%):', input.resistance.weapon)
-			console.log(
-				'  DEBUG: enemyInfo?.stats.physicalResistance:',
-				enemyInfo?.stats.physicalResistance,
-			)
-			console.log(
-				'  DEBUG: enemyInfo?.stats.magicalResistance:',
-				enemyInfo?.stats.magicalResistance,
-			)
-			console.log('  DEBUG: defaultInput.resistance:', defaultInput.resistance)
+				// 3. 敵の耐性
+				console.log('3. 敵の耐性:')
+				console.log('  物理耐性 (%):', input.resistance.physical)
+				console.log('  魔法耐性 (%):', input.resistance.magical)
+				console.log('  武器耐性 (%):', input.resistance.weapon)
+				console.log(
+					'  DEBUG: enemyInfo?.stats.physicalResistance:',
+					enemyInfo?.stats.physicalResistance,
+				)
+				console.log(
+					'  DEBUG: enemyInfo?.stats.magicalResistance:',
+					enemyInfo?.stats.magicalResistance,
+				)
+				console.log('  DEBUG: defaultInput.resistance:', defaultInput.resistance)
 
-			// 4. 敵のDEF/MDEF
-			console.log('4. 敵の防御力:')
-			console.log('  敵DEF:', input.enemy.DEF)
-			console.log('  敵MDEF:', input.enemy.MDEF)
+				// 4. 敵のDEF/MDEF
+				console.log('4. 敵の防御力:')
+				console.log('  敵DEF:', input.enemy.DEF)
+				console.log('  敵MDEF:', input.enemy.MDEF)
 
-			// 5. 貫通値
-			console.log('5. 貫通値:')
-			console.log('  物理貫通:', input.penetration.physical)
-			console.log('  魔法貫通:', input.penetration.magical)
+				// 5. 貫通値
+				console.log('5. 貫通値:')
+				console.log('  物理貫通:', input.penetration.physical)
+				console.log('  魔法貫通:', input.penetration.magical)
 
-			// 6. 固定値
-			console.log('6. 固定値:')
-			console.log('  抜刀固定値:', input.unsheathe.fixedDamage)
-			console.log('  スキル固定値:', input.attackSkill.fixedDamage)
-			console.log('  抜刀有効:', input.unsheathe.isActive)
+				// 6. 固定値
+				console.log('6. 固定値:')
+				console.log('  抜刀固定値:', input.unsheathe.fixedDamage)
+				console.log('  スキル固定値:', input.attackSkill.fixedDamage)
+				console.log('  抜刀有効:', input.unsheathe.isActive)
 
-			// 7. 属性有利
-			console.log('7. 属性有利:')
-			console.log('  総属性有利 (%):', input.elementAdvantage.total)
-			console.log('  属性覚醒有利 (%):', input.elementAdvantage.awakening)
-			console.log('  属性攻撃有効:', input.elementAdvantage.isActive)
-			console.log(
-				'  DEBUG: calculationResults?.basicStats?.totalElementAdvantage:',
-				calculationResults?.basicStats?.totalElementAdvantage,
-			)
-			console.log(
-				'  DEBUG: calculationResults?.basicStats?.elementAwakeningAdvantage:',
-				calculationResults?.basicStats?.elementAwakeningAdvantage,
-			)
+				// 7. 属性有利
+				console.log('7. 属性有利:')
+				console.log('  総属性有利 (%):', input.elementAdvantage.total)
+				console.log('  属性覚醒有利 (%):', input.elementAdvantage.awakening)
+				console.log('  属性攻撃有効:', input.elementAdvantage.isActive)
+				console.log(
+					'  DEBUG: calculationResults?.basicStats?.totalElementAdvantage:',
+					calculationResults?.basicStats?.totalElementAdvantage,
+				)
+				console.log(
+					'  DEBUG: calculationResults?.basicStats?.elementAwakeningAdvantage:',
+					calculationResults?.basicStats?.elementAwakeningAdvantage,
+				)
 
-			// 8. スキル倍率
-			console.log('8. スキル倍率:')
-			console.log('  スキル倍率 (%):', input.attackSkill.multiplier)
-			console.log('  攻撃タイプ:', input.attackSkill.type)
+				// 8. スキル倍率
+				console.log('8. スキル倍率:')
+				console.log('  スキル倍率 (%):', input.attackSkill.multiplier)
+				console.log('  攻撃タイプ:', input.attackSkill.type)
 
-			// 9. 距離威力
-			console.log('9. 距離威力:')
-			console.log('  近距離威力 (%):', input.distance.shortRange)
-			console.log('  遠距離威力 (%):', input.distance.longRange)
-			console.log('  現在の距離判定:', input.userSettings.currentDistance)
+				// 9. 距離威力
+				console.log('9. 距離威力:')
+				console.log('  近距離威力 (%):', input.distance.shortRange)
+				console.log('  遠距離威力 (%):', input.distance.longRange)
+				console.log('  現在の距離判定:', input.userSettings.currentDistance)
 
-			// 10. その他重要な値
-			console.log('10. その他:')
-			console.log('  安定率 (%):', input.stability.rate)
-			console.log('  抜刀% (%):', input.unsheathe.rateBonus)
-			console.log('  慣れ (%):', input.userSettings.familiarity)
+				// 10. その他重要な値
+				console.log('10. その他:')
+				console.log('  安定率 (%):', input.stability.rate)
+				console.log('  抜刀% (%):', input.unsheathe.rateBonus)
+				console.log('  慣れ (%):', input.userSettings.familiarity)
 
-			console.log('================================')
+				console.log('================================')
+			}
 
 			// 攻撃スキルが選択されている場合は、スキルの計算結果を使用
 			const attackResults: Array<{
@@ -573,37 +581,39 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					(hitMaxStabilityRate + baseStabilityRate) / 2,
 				)
 
-				console.log('=== MULTI-HIT DAMAGE CALCULATION (New Method) ===')
-				attackResults.forEach((hit, index) => {
-					const hitMaxDamage = hit.result.baseDamage
-					const hitMaxStabilityRate = 100
-					const hitAverageStabilityRate = Math.floor(
-						(hitMaxStabilityRate + baseStabilityRate) / 2,
-					)
-					const hitMinDamage = Math.floor(
-						(hitMaxDamage * baseStabilityRate) / 100,
-					)
-					const hitAverageDamage = Math.floor(
-						(hitMaxDamage * hitAverageStabilityRate) / 100,
-					)
+				if (process.env.NODE_ENV === 'development') {
+					console.log('=== MULTI-HIT DAMAGE CALCULATION (New Method) ===')
+					attackResults.forEach((hit, index) => {
+						const hitMaxDamage = hit.result.baseDamage
+						const hitMaxStabilityRate = 100
+						const hitAverageStabilityRate = Math.floor(
+							(hitMaxStabilityRate + baseStabilityRate) / 2,
+						)
+						const hitMinDamage = Math.floor(
+							(hitMaxDamage * baseStabilityRate) / 100,
+						)
+						const hitAverageDamage = Math.floor(
+							(hitMaxDamage * hitAverageStabilityRate) / 100,
+						)
 
-					console.log(`${index + 1}撃目:`)
-					console.log(`  最大ダメージ: ${hitMaxDamage}`)
-					console.log(`  最小安定率: ${baseStabilityRate}%`)
-					console.log(
-						`  平均安定率: ${hitAverageStabilityRate}% = (${hitMaxStabilityRate} + ${baseStabilityRate}) / 2`,
-					)
-					console.log(
-						`  最小ダメージ: ${hitMaxDamage} × ${baseStabilityRate}% = ${hitMinDamage}`,
-					)
-					console.log(
-						`  平均ダメージ: ${hitMaxDamage} × ${hitAverageStabilityRate}% = ${hitAverageDamage}`,
-					)
-				})
-				console.log(`合計最大ダメージ: ${totalMaxDamage}`)
-				console.log(`合計最小ダメージ: ${totalMinDamage}`)
-				console.log(`合計平均ダメージ: ${totalAverageDamage}`)
-				console.log(`全体平均安定率: ${overallAverageStabilityRate}%`)
+						console.log(`${index + 1}撃目:`)
+						console.log(`  最大ダメージ: ${hitMaxDamage}`)
+						console.log(`  最小安定率: ${baseStabilityRate}%`)
+						console.log(
+							`  平均安定率: ${hitAverageStabilityRate}% = (${hitMaxStabilityRate} + ${baseStabilityRate}) / 2`,
+						)
+						console.log(
+							`  最小ダメージ: ${hitMaxDamage} × ${baseStabilityRate}% = ${hitMinDamage}`,
+						)
+						console.log(
+							`  平均ダメージ: ${hitMaxDamage} × ${hitAverageStabilityRate}% = ${hitAverageDamage}`,
+						)
+					})
+					console.log(`合計最大ダメージ: ${totalMaxDamage}`)
+					console.log(`合計最小ダメージ: ${totalMinDamage}`)
+					console.log(`合計平均ダメージ: ${totalAverageDamage}`)
+					console.log(`全体平均安定率: ${overallAverageStabilityRate}%`)
+				}
 
 				return {
 					baseDamage: totalMaxDamage,
@@ -620,127 +630,129 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const attackResult = totalAttackResult
 
 			// 計算結果の詳細ログ
-			console.log('=== CALCULATION RESULTS ===')
-			console.log('damageType:', powerOptions.damageType)
-			console.log('最終ダメージ:', attackResult.baseDamage)
-			console.log('最小ダメージ:', attackResult.stabilityResult.minDamage)
-			console.log('最大ダメージ:', attackResult.stabilityResult.maxDamage)
-			console.log('平均ダメージ:', attackResult.stabilityResult.averageDamage)
-			console.log('')
-			console.log('=== CALCULATION STEPS ===')
+			if (process.env.NODE_ENV === 'development') {
+				console.log('=== CALCULATION RESULTS ===')
+				console.log('damageType:', powerOptions.damageType)
+				console.log('最終ダメージ:', attackResult.baseDamage)
+				console.log('最小ダメージ:', attackResult.stabilityResult.minDamage)
+				console.log('最大ダメージ:', attackResult.stabilityResult.maxDamage)
+				console.log('平均ダメージ:', attackResult.stabilityResult.averageDamage)
+				console.log('')
+				console.log('=== CALCULATION STEPS ===')
 
-			// クリティカル計算が実行されたかチェック（ステップ2a）
-			if (attackResult.calculationSteps.step2a_critical) {
-				const step2a = attackResult.calculationSteps.step2a_critical
-				console.log('ステップ2a クリティカルダメージ:')
-				console.log('  固定値適用後:', step2a.beforeCritical)
-				console.log('  クリティカル倍率:', step2a.criticalRate + '%')
-				console.log('  クリティカル適用後:', step2a.result)
-			}
+				// クリティカル計算が実行されたかチェック（ステップ2a）
+				if (attackResult.calculationSteps.step2a_critical) {
+					const step2a = attackResult.calculationSteps.step2a_critical
+					console.log('ステップ2a クリティカルダメージ:')
+					console.log('  固定値適用後:', step2a.beforeCritical)
+					console.log(`  クリティカル倍率: ${step2a.criticalRate}%`)
+					console.log('  クリティカル適用後:', step2a.result)
+				}
 
-			// ブレイブ倍率ステップ
-			if (attackResult.calculationSteps.step10_brave) {
-				const step10 = attackResult.calculationSteps.step10_brave
-				console.log('ステップ10 ブレイブ倍率:')
-				console.log('  適用前:', step10.beforeBrave)
-				console.log('  ブレイブ倍率:', step10.braveRate + '%')
-				console.log('  適用後:', step10.result)
-			}
+				// ブレイブ倍率ステップ
+				if (attackResult.calculationSteps.step10_brave) {
+					const step10 = attackResult.calculationSteps.step10_brave
+					console.log('ステップ10 ブレイブ倍率:')
+					console.log('  適用前:', step10.beforeBrave)
+					console.log(`  ブレイブ倍率: ${step10.braveRate}%`)
+					console.log('  適用後:', step10.result)
+				}
 
-			if (attackResult.calculationSteps.step1_baseDamage) {
-				const step1 = attackResult.calculationSteps.step1_baseDamage
-				console.log('ステップ1 基礎ダメージ:')
-				console.log(
-					'  計算前:',
-					step1.beforeResistance,
-					'= (自Lv',
-					step1.playerLevel,
-					'+ 参照ステータス',
-					step1.referenceStat,
-					'- 敵Lv',
-					step1.enemyLevel,
-					')',
-				)
-				console.log('  物理耐性率:', step1.physicalResistanceRate, '%')
-				console.log('  魔法耐性率:', step1.magicalResistanceRate, '%')
-				console.log('  武器耐性率:', step1.weaponResistanceRate, '%')
-				console.log(
-					'  耐性倍率計算:',
-					`(1 - ${step1.physicalResistanceRate || step1.magicalResistanceRate}/100) = ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100}`,
-				)
-				console.log(
-					'  耐性適用計算:',
-					`${step1.beforeResistance} × ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100} = ${step1.beforeResistance * (1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100)}`,
-				)
-				console.log('  耐性適用後:', step1.afterResistance)
-				console.log('  敵防御力:', step1.enemyDEF)
-				console.log(
-					'  DEBUG: 元の敵DEF/MDEF:',
-					input.attackSkill.type === 'physical'
-						? input.enemy.DEF
-						: input.enemy.MDEF,
-				)
-				console.log(
-					'  DEBUG: 適用された貫通率(%):',
-					input.attackSkill.type === 'physical'
-						? input.penetration.physical
-						: input.penetration.magical,
-				)
-				const originalDef =
-					input.attackSkill.type === 'physical'
-						? input.enemy.DEF
-						: input.enemy.MDEF
-				const penetrationRate =
-					input.attackSkill.type === 'physical'
-						? input.penetration.physical
-						: input.penetration.magical
-				const penetrationMultiplier = 1 - penetrationRate / 100
-				console.log(
-					'  DEBUG: 貫通適用計算:',
-					`${originalDef} × (1 - ${penetrationRate}/100) = ${originalDef} × ${penetrationMultiplier} = ${originalDef * penetrationMultiplier} → Math.floor = ${Math.floor(originalDef * penetrationMultiplier)}`,
-				)
-				console.log('  Math.floor前:', step1.afterResistance - step1.enemyDEF)
-				console.log('  結果:', step1.result)
+				if (attackResult.calculationSteps.step1_baseDamage) {
+					const step1 = attackResult.calculationSteps.step1_baseDamage
+					console.log('ステップ1 基礎ダメージ:')
+					console.log(
+						'  計算前:',
+						step1.beforeResistance,
+						'= (自Lv',
+						step1.playerLevel,
+						'+ 参照ステータス',
+						step1.referenceStat,
+						'- 敵Lv',
+						step1.enemyLevel,
+						')',
+					)
+					console.log('  物理耐性率:', step1.physicalResistanceRate, '%')
+					console.log('  魔法耐性率:', step1.magicalResistanceRate, '%')
+					console.log('  武器耐性率:', step1.weaponResistanceRate, '%')
+					console.log(
+						'  耐性倍率計算:',
+						`(1 - ${step1.physicalResistanceRate || step1.magicalResistanceRate}/100) = ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100}`,
+					)
+					console.log(
+						'  耐性適用計算:',
+						`${step1.beforeResistance} × ${1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100} = ${step1.beforeResistance * (1 - (step1.physicalResistanceRate || step1.magicalResistanceRate) / 100)}`,
+					)
+					console.log('  耐性適用後:', step1.afterResistance)
+					console.log('  敵防御力:', step1.enemyDEF)
+					console.log(
+						'  DEBUG: 元の敵DEF/MDEF:',
+						input.attackSkill.type === 'physical'
+							? input.enemy.DEF
+							: input.enemy.MDEF,
+					)
+					console.log(
+						'  DEBUG: 適用された貫通率(%):',
+						input.attackSkill.type === 'physical'
+							? input.penetration.physical
+							: input.penetration.magical,
+					)
+					const originalDef =
+						input.attackSkill.type === 'physical'
+							? input.enemy.DEF
+							: input.enemy.MDEF
+					const penetrationRate =
+						input.attackSkill.type === 'physical'
+							? input.penetration.physical
+							: input.penetration.magical
+					const penetrationMultiplier = 1 - penetrationRate / 100
+					console.log(
+						'  DEBUG: 貫通適用計算:',
+						`${originalDef} × (1 - ${penetrationRate}/100) = ${originalDef} × ${penetrationMultiplier} = ${originalDef * penetrationMultiplier} → Math.floor = ${Math.floor(originalDef * penetrationMultiplier)}`,
+					)
+					console.log('  Math.floor前:', step1.afterResistance - step1.enemyDEF)
+					console.log('  結果:', step1.result)
+				}
+				if (attackResult.calculationSteps.step2_fixedValues) {
+					const step2 = attackResult.calculationSteps.step2_fixedValues
+					console.log('ステップ2 固定値加算:')
+					console.log('  基礎ダメージ:', step2.baseDamage)
+					console.log('  抜刀固定値:', step2.unsheatheFixed)
+					console.log('  スキル固定値:', step2.skillFixed)
+					console.log('  結果:', step2.result)
+				}
+				if (attackResult.calculationSteps.step3_elementAdvantage) {
+					const step3 = attackResult.calculationSteps.step3_elementAdvantage
+					console.log('ステップ3 属性有利:')
+					console.log('  適用前:', step3.beforeAdvantage)
+					console.log('  属性有利率:', step3.advantageRate, '%')
+					console.log(
+						'  計算式:',
+						`${step3.beforeAdvantage} × (1 + ${step3.advantageRate}/100) = ${step3.beforeAdvantage} × ${1 + step3.advantageRate / 100} = ${step3.beforeAdvantage * (1 + step3.advantageRate / 100)}`,
+					)
+					console.log(
+						'  Math.floor前:',
+						step3.beforeAdvantage * (1 + step3.advantageRate / 100),
+					)
+					console.log('  結果:', step3.result)
+				}
+				if (attackResult.calculationSteps.step4_skillMultiplier) {
+					const step4 = attackResult.calculationSteps.step4_skillMultiplier
+					console.log('ステップ4 スキル倍率:')
+					console.log('  適用前:', step4.beforeSkill)
+					console.log('  スキル倍率:', step4.skillRate, '%')
+					console.log(
+						'  計算式:',
+						`${step4.beforeSkill} × ${step4.skillRate}/100 = ${(step4.beforeSkill * step4.skillRate) / 100}`,
+					)
+					console.log(
+						'  Math.floor前:',
+						(step4.beforeSkill * step4.skillRate) / 100,
+					)
+					console.log('  結果:', step4.result)
+				}
+				console.log('================================')
 			}
-			if (attackResult.calculationSteps.step2_fixedValues) {
-				const step2 = attackResult.calculationSteps.step2_fixedValues
-				console.log('ステップ2 固定値加算:')
-				console.log('  基礎ダメージ:', step2.baseDamage)
-				console.log('  抜刀固定値:', step2.unsheatheFixed)
-				console.log('  スキル固定値:', step2.skillFixed)
-				console.log('  結果:', step2.result)
-			}
-			if (attackResult.calculationSteps.step3_elementAdvantage) {
-				const step3 = attackResult.calculationSteps.step3_elementAdvantage
-				console.log('ステップ3 属性有利:')
-				console.log('  適用前:', step3.beforeAdvantage)
-				console.log('  属性有利率:', step3.advantageRate, '%')
-				console.log(
-					'  計算式:',
-					`${step3.beforeAdvantage} × (1 + ${step3.advantageRate}/100) = ${step3.beforeAdvantage} × ${1 + step3.advantageRate / 100} = ${step3.beforeAdvantage * (1 + step3.advantageRate / 100)}`,
-				)
-				console.log(
-					'  Math.floor前:',
-					step3.beforeAdvantage * (1 + step3.advantageRate / 100),
-				)
-				console.log('  結果:', step3.result)
-			}
-			if (attackResult.calculationSteps.step4_skillMultiplier) {
-				const step4 = attackResult.calculationSteps.step4_skillMultiplier
-				console.log('ステップ4 スキル倍率:')
-				console.log('  適用前:', step4.beforeSkill)
-				console.log('  スキル倍率:', step4.skillRate, '%')
-				console.log(
-					'  計算式:',
-					`${step4.beforeSkill} × ${step4.skillRate}/100 = ${(step4.beforeSkill * step4.skillRate) / 100}`,
-				)
-				console.log(
-					'  Math.floor前:',
-					(step4.beforeSkill * step4.skillRate) / 100,
-				)
-				console.log('  結果:', step4.result)
-			}
-			console.log('================================')
 
 			// ダメージ判定タイプに応じて表示するダメージを決定
 			const getDamageByType = () => {
@@ -784,18 +796,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							(minStabilityRate + maxStabilityRate) / 2,
 						)
 
-						console.log('=== CRITICAL DISPLAY DEBUG ===')
-						console.log('baseDamage (クリティカル計算済み):', baseDamage)
-						console.log('stabilityRate:', stabilityRate)
-						console.log(
-							'計算される最小ダメージ:',
-							Math.floor((baseDamage * stabilityRate) / 100),
-						)
-						console.log('計算される最大ダメージ:', baseDamage)
-						console.log(
-							'計算される平均ダメージ:',
-							Math.floor((baseDamage * averageStabilityRate) / 100),
-						)
+						if (process.env.NODE_ENV === 'development') {
+							console.log('=== CRITICAL DISPLAY DEBUG ===')
+							console.log('baseDamage (クリティカル計算済み):', baseDamage)
+							console.log('stabilityRate:', stabilityRate)
+							console.log(
+								'計算される最小ダメージ:',
+								Math.floor((baseDamage * stabilityRate) / 100),
+							)
+							console.log('計算される最大ダメージ:', baseDamage)
+							console.log(
+								'計算される平均ダメージ:',
+								Math.floor((baseDamage * averageStabilityRate) / 100),
+							)
+						}
 
 						// 多撃の場合は既に計算済みの値を使用
 						if (isMultiHit) {
@@ -898,27 +912,29 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			const damageDisplay = getDamageByType()
 
 			// 最終表示値とコンソールログとの対応確認
-			console.log('=== FINAL DISPLAY VALUES ===')
-			console.log('damageType:', powerOptions.damageType)
-			console.log('表示される最小ダメージ:', damageDisplay.min)
-			console.log('表示される最大ダメージ:', damageDisplay.max)
-			console.log('表示される平均ダメージ:', damageDisplay.average)
-			console.log('表示される安定率:', damageDisplay.stability)
-			console.log('表示される平均安定率:', damageDisplay.averageStability)
-			console.log('コンソールログの最終ダメージ:', attackResult.baseDamage)
-			console.log(
-				'コンソールログの最小ダメージ:',
-				attackResult.stabilityResult.minDamage,
-			)
-			console.log(
-				'コンソールログの最大ダメージ:',
-				attackResult.stabilityResult.maxDamage,
-			)
-			console.log(
-				'コンソールログの平均ダメージ:',
-				attackResult.stabilityResult.averageDamage,
-			)
-			console.log('============================')
+			if (process.env.NODE_ENV === 'development') {
+				console.log('=== FINAL DISPLAY VALUES ===')
+				console.log('damageType:', powerOptions.damageType)
+				console.log('表示される最小ダメージ:', damageDisplay.min)
+				console.log('表示される最大ダメージ:', damageDisplay.max)
+				console.log('表示される平均ダメージ:', damageDisplay.average)
+				console.log('表示される安定率:', damageDisplay.stability)
+				console.log('表示される平均安定率:', damageDisplay.averageStability)
+				console.log('コンソールログの最終ダメージ:', attackResult.baseDamage)
+				console.log(
+					'コンソールログの最小ダメージ:',
+					attackResult.stabilityResult.minDamage,
+				)
+				console.log(
+					'コンソールログの最大ダメージ:',
+					attackResult.stabilityResult.maxDamage,
+				)
+				console.log(
+					'コンソールログの平均ダメージ:',
+					attackResult.stabilityResult.averageDamage,
+				)
+				console.log('============================')
+			}
 
 			return {
 				normal: damageDisplay,
@@ -971,7 +987,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			// 状態を更新
 			setCaptureData(newCaptureData)
 
-			console.log('ダメージをキャプチャしました:', newCaptureData)
+			if (process.env.NODE_ENV === 'development') {
+				console.log('ダメージをキャプチャしました:', newCaptureData)
+			}
 		} catch (error) {
 			console.error('キャプチャに失敗しました:', error)
 			alert('キャプチャに失敗しました')
