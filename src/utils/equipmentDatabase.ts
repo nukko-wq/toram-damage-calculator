@@ -59,6 +59,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: item.weaponStats || {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
+				conditionalEffects: item.conditionalEffects,
 			})
 		}
 	}
@@ -74,6 +75,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
+				conditionalEffects: item.conditionalEffects,
 			})
 		}
 	}
@@ -89,6 +91,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
+				conditionalEffects: item.conditionalEffects,
 			})
 		}
 	}
@@ -104,6 +107,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
+				conditionalEffects: item.conditionalEffects,
 			})
 		}
 	}
@@ -119,6 +123,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
+				conditionalEffects: item.conditionalEffects,
 			})
 		}
 	}
@@ -134,6 +139,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
+				conditionalEffects: item.conditionalEffects,
 			})
 		}
 	}
@@ -149,6 +155,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
+				conditionalEffects: item.conditionalEffects,
 			})
 		}
 	}
@@ -164,6 +171,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
+				conditionalEffects: item.conditionalEffects,
 			})
 		}
 	}
@@ -445,7 +453,7 @@ export function createCustomEquipment(
 	name: string,
 ): UserEquipment {
 	const now = new Date().toISOString()
-	const id = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+	const id = `custom_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
 	const customEquipment: UserEquipment = {
 		id,
