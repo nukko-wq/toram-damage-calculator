@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import type { BuffItemCategory, PresetBuffItem } from '@/types/calculator'
 import {
@@ -66,10 +66,12 @@ export default function BuffItemSelectionModal({
 		setAvailableBuffItems(categoryItems)
 	}, [isOpen, category])
 
-	const filteredBuffItems = availableBuffItems.filter((buffItem) => {
-		if (activeFilter === 'all') return true
-		return buffItem.category === activeFilter
-	})
+	const filteredBuffItems = useMemo(() => {
+		return availableBuffItems.filter((buffItem) => {
+			if (activeFilter === 'all') return true
+			return buffItem.category === activeFilter
+		})
+	}, [availableBuffItems, activeFilter])
 
 	const getCategoryLabel = (categoryValue: string) => {
 		switch (categoryValue) {
@@ -104,15 +106,15 @@ export default function BuffItemSelectionModal({
 		}
 	}
 
-	const handleSelect = (buffItemId: string) => {
+	const handleSelect = useCallback((buffItemId: string) => {
 		onSelect(buffItemId)
 		handleClose()
-	}
+	}, [onSelect, handleClose])
 
-	const handleRemove = () => {
+	const handleRemove = useCallback(() => {
 		onSelect(null)
 		handleClose()
-	}
+	}, [onSelect, handleClose])
 
 	const handleBackgroundClick = useCallback(
 		(e: React.MouseEvent) => {
@@ -124,10 +126,10 @@ export default function BuffItemSelectionModal({
 		[handleClose],
 	)
 
-	const handleContentClick = (e: React.MouseEvent) => {
+	const handleContentClick = useCallback((e: React.MouseEvent) => {
 		// モーダル内のクリックは伝播を停止
 		e.stopPropagation()
-	}
+	}, [])
 
 	return (
 		<AnimatePresence>
@@ -149,12 +151,12 @@ export default function BuffItemSelectionModal({
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0, y: 0 }}
 						transition={{
-							type: 'spring',
-							damping: 25,
-							stiffness: 300,
-							duration: 0.3,
+							type: 'tween',
+							ease: 'easeOut',
+							duration: 0.2,
 						}}
-						className="absolute top-[30vh] bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[68vh] overflow-hidden h-fit"
+						style={{ willChange: 'transform' }}
+						className="bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[68vh] overflow-hidden h-fit"
 						onClick={handleContentClick}
 					>
 						{/* ヘッダー */}
