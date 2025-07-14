@@ -316,6 +316,20 @@ export function calculateAccuracyUpEffects(
 }
 
 /**
+ * 回避UP(exFREE)の効果計算関数
+ */
+export function calculateDodgeUpEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	// Dodge = skillLevel
+	return {
+		Dodge: skillLevel,
+	}
+}
+
+/**
  * 魔法力up(exMATK1)の効果計算関数
  */
 export function calculateMagicUpEffects(
@@ -642,6 +656,33 @@ export function getAccuracyUpEffects(
 	const accuracyUp = buffSkillData['exHIT']
 	if (accuracyUp?.isEnabled && accuracyUp.level) {
 		const effects = calculateAccuracyUpEffects(accuracyUp.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから回避UPの効果を取得
+ */
+export function getDodgeUpEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 回避UP(exFREE)の処理
+	const dodgeUp = buffSkillData['exFREE']
+	if (dodgeUp?.isEnabled && dodgeUp.level) {
+		const effects = calculateDodgeUpEffects(dodgeUp.level)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {

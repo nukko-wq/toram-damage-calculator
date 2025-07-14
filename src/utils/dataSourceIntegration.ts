@@ -26,6 +26,7 @@ import {
 	getFurtherMagicEffects,
 	getGodspeedTrajectoryEffects,
 	getAccuracyUpEffects,
+	getDodgeUpEffects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
@@ -688,6 +689,18 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(accuracyUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 回避UPスキルの補正値を追加
+	const dodgeUpBonuses = getDodgeUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(dodgeUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
