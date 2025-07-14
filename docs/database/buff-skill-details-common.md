@@ -483,6 +483,7 @@ function calculateCamouflageEffects(
 - 17.3 魔法力up (exMATK1) - プレイヤーレベル依存MATK計算
 - 17.4 驚異の威力 (exATK2) - 攻撃力upと同じ計算式
 - 17.5 更なる魔力 (exMATK2) - 魔法力upと同じ計算式
+- 17.6 命中UP (exHIT) - Accuracy = skillLevel
 
 ### 15. ペット使用スキル系統
 
