@@ -479,10 +479,10 @@ function calculateCamouflageEffects(
 
 **含まれるスキル:**
 - 17.1 クリティカルup (oh1) - Critical+5, CriticalDamage_Rate+5
-- 17.2 攻撃力up (exATK1) - プレイヤーレベル依存ATK計算
-- 17.3 魔法力up (exMATK1) - プレイヤーレベル依存MATK計算
-- 17.4 驚異の威力 (exATK2) - 攻撃力upと同じ計算式
-- 17.5 更なる魔力 (exMATK2) - 魔法力upと同じ計算式
+- 17.2 攻撃力UP (exATK1) - プレイヤーレベル依存ATK計算
+- 17.3 魔法力UP (exMATK1) - プレイヤーレベル依存MATK計算
+- 17.4 驚異の威力 (exATK2) - 攻撃力UPと同じ計算式
+- 17.5 更なる魔力 (exMATK2) - 魔法力UPと同じ計算式
 - 17.6 命中UP (exHIT) - Accuracy = skillLevel
 - 17.7 回避UP (exFREE) - Dodge = skillLevel
 

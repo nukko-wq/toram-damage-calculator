@@ -285,7 +285,7 @@ export function calculateTwoHandsEffects(
 }
 
 /**
- * 攻撃力up(exATK1)の効果計算関数
+ * 攻撃力UP(exATK1)の効果計算関数
  */
 export function calculateAttackUpEffects(
 	skillLevel: number,
@@ -330,7 +330,7 @@ export function calculateDodgeUpEffects(
 }
 
 /**
- * 魔法力up(exMATK1)の効果計算関数
+ * 魔法力UP(exMATK1)の効果計算関数
  */
 export function calculateMagicUpEffects(
 	skillLevel: number,
@@ -615,7 +615,7 @@ export function getBuffSkillBonuses(
 }
 
 /**
- * バフスキルデータから攻撃力upの効果を取得（プレイヤーレベルが必要）
+ * バフスキルデータから攻撃力UPの効果を取得（プレイヤーレベルが必要）
  */
 export function getAttackUpEffects(
 	buffSkillData: Record<string, BuffSkillState> | null,
@@ -625,7 +625,7 @@ export function getAttackUpEffects(
 
 	if (!buffSkillData) return bonuses
 
-	// 攻撃力up(exATK1)の処理
+	// 攻撃力UP(exATK1)の処理
 	const attackUp = buffSkillData['exATK1']
 	if (attackUp?.isEnabled && attackUp.level) {
 		const effects = calculateAttackUpEffects(attackUp.level, playerLevel)
@@ -697,7 +697,7 @@ export function getDodgeUpEffects(
 }
 
 /**
- * バフスキルデータから魔法力upの効果を取得（プレイヤーレベルが必要）
+ * バフスキルデータから魔法力UPの効果を取得（プレイヤーレベルが必要）
  */
 export function getMagicUpEffects(
 	buffSkillData: Record<string, BuffSkillState> | null,
@@ -707,7 +707,7 @@ export function getMagicUpEffects(
 
 	if (!buffSkillData) return bonuses
 
-	// 魔法力up(exMATK1)の処理
+	// 魔法力UP(exMATK1)の処理
 	const magicUp = buffSkillData['exMATK1']
 	if (magicUp?.isEnabled && magicUp.level) {
 		const effects = calculateMagicUpEffects(magicUp.level, playerLevel)
@@ -738,7 +738,7 @@ export function getThreatPowerEffects(
 	// 驚異の威力(exATK2)の処理
 	const threatPower = buffSkillData['exATK2']
 	if (threatPower?.isEnabled && threatPower.level) {
-		// 攻撃力upと同じ計算式を使用
+		// 攻撃力UPと同じ計算式を使用
 		const effects = calculateAttackUpEffects(threatPower.level, playerLevel)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
@@ -767,7 +767,7 @@ export function getFurtherMagicEffects(
 	// 更なる魔力(exMATK2)の処理
 	const furtherMagic = buffSkillData['exMATK2']
 	if (furtherMagic?.isEnabled && furtherMagic.level) {
-		// 魔法力upと同じ計算式を使用
+		// 魔法力UPと同じ計算式を使用
 		const effects = calculateMagicUpEffects(furtherMagic.level, playerLevel)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合

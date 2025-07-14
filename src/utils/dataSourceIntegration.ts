@@ -618,7 +618,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
-	// 攻撃力upスキルの補正値を追加（プレイヤーレベルが必要）
+	// 攻撃力UPスキルの補正値を追加（プレイヤーレベルが必要）
 	const attackUpBonuses = getAttackUpEffects(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,
@@ -631,7 +631,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
-	// 魔法力upスキルの補正値を追加（プレイヤーレベルが必要）
+	// 魔法力UPスキルの補正値を追加（プレイヤーレベルが必要）
 	const magicUpBonuses = getMagicUpEffects(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,

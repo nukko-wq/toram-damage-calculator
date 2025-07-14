@@ -315,7 +315,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 	},
 	{
 		id: 'exATK1',
-		name: '攻撃力up',
+		name: '攻撃力UP',
 		category: 'battle',
 		type: 'level',
 		maxLevel: 10,
@@ -331,7 +331,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 	},
 	{
 		id: 'exMATK1',
-		name: '魔法力up',
+		name: '魔法力UP',
 		category: 'battle',
 		type: 'level',
 		maxLevel: 10,
