@@ -27,6 +27,7 @@ import {
 	getGodspeedTrajectoryEffects,
 	getAccuracyUpEffects,
 	getDodgeUpEffects,
+	getCamouflageEffects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
@@ -701,6 +702,20 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(dodgeUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// カムフラージュスキルの補正値を追加（基本ステータスレベルと武器タイプが必要）
+	const camouflageBonuses = getCamouflageEffects(
+		data.buffSkills?.skills || null,
+		data.baseStats?.level || 1,
+		data.mainWeapon?.weaponType || null,
+	)
+
+	for (const [key, value] of Object.entries(camouflageBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

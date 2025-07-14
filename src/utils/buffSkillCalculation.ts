@@ -330,6 +330,29 @@ export function calculateDodgeUpEffects(
 }
 
 /**
+ * カムフラージュ(hunter5-2)の効果計算関数
+ */
+export function calculateCamouflageEffects(
+	skillLevel: number,
+	baseStatsLevel: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	const isBowWeapon = weaponType === 'bow' || weaponType === 'bowgun'
+
+	// ATK計算：弓系は基本ステータスレベル × スキルレベル ÷ 10、その他は基本ステータスレベル ÷ 2 × スキルレベル ÷ 10（小数点切り捨て）
+	const atkBonus = isBowWeapon
+		? Math.floor((baseStatsLevel * skillLevel) / 10)
+		: Math.floor(((baseStatsLevel / 2) * skillLevel) / 10)
+
+	return {
+		ATK: atkBonus,
+		Critical: skillLevel * 4,
+	}
+}
+
+/**
  * 魔法力UP(exMATK1)の効果計算関数
  */
 export function calculateMagicUpEffects(
@@ -683,6 +706,40 @@ export function getDodgeUpEffects(
 	const dodgeUp = buffSkillData['exFREE']
 	if (dodgeUp?.isEnabled && dodgeUp.level) {
 		const effects = calculateDodgeUpEffects(dodgeUp.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータからカムフラージュの効果を取得（基本ステータスレベルと武器タイプが必要）
+ */
+export function getCamouflageEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	baseStatsLevel: number,
+	weaponType: WeaponType | null,
+): Partial<AllBonuses> {
+	const convertedWeaponType = convertWeaponType(weaponType)
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// カムフラージュ(hunter5-2)の処理
+	const camouflage = buffSkillData['hunter5-2']
+	if (camouflage?.isEnabled && camouflage.level) {
+		const effects = calculateCamouflageEffects(
+			camouflage.level,
+			baseStatsLevel,
+			convertedWeaponType,
+		)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
