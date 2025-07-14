@@ -358,14 +358,13 @@ export const equipmentsData: EquipmentsData = {
 					ShortRangeDamage_Rate: 2,
 					Critical: 15,
 				},
-			},
-			{
-				id: 'eq015-0123-4567-89ab-cdef01234567',
-				name: '熊戦士の帯(両手剣装備)',
-				properties: {
-					ShortRangeDamage_Rate: 2,
-					Critical: 30,
-				},
+				conditionalEffects: [
+					{
+						condition: { type: 'mainWeapon', weaponType: '両手剣' },
+						properties: { Critical: 15 },
+						description: '両手剣装備時: クリティカル率+15',
+					},
+				],
 			},
 		],
 		subWeapon: [

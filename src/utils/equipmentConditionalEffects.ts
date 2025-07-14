@@ -158,9 +158,9 @@ export function getSlotEffectiveProperties(
 	if (slot?.name && slot?.properties) {
 		console.log('📦 Found equipment with direct properties:', slot.name)
 		
-		// 星辰の舟衣の場合、条件付き効果をチェック
-		if (slot.name === '星辰の舟衣') {
-			console.log('⭐ 星辰の舟衣 found in direct slot data!')
+		// 条件付き効果を持つ装備の場合、条件付き効果をチェック
+		if (slot.name === '星辰の舟衣' || slot.name === '熊戦士の帯') {
+			console.log(`⭐ ${slot.name} found in direct slot data!`)
 			
 			// IDがある場合はデータベースから完全なデータを取得して条件付き効果を適用
 			if (slot.id) {
@@ -178,23 +178,29 @@ export function getSlotEffectiveProperties(
 			}
 			
 			// IDがない場合でも、装備データベースから名前で検索を試みる
-			// 星辰の舟衣のIDは固定なので直接取得
-			const knownId = '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
-			console.log('🔗 Looking up 星辰の舟衣 by known ID:', knownId)
-			const equipment = getCombinedEquipmentById(knownId)
-			if (equipment && equipment.conditionalEffects) {
-				console.log('⭐ 星辰の舟衣 found with conditional effects:', {
-					name: equipment.name,
-					hasConditionalEffects: !!equipment.conditionalEffects,
-					mainWeaponType: mainWeapon?.weaponType,
-					conditionalEffects: equipment.conditionalEffects
-				})
-				return applyConditionalEquipmentEffects(
-					equipment,
-					equipmentState,
-					mainWeapon,
-					subWeapon,
-				)
+			// 固定IDで直接取得
+			const knownIds: Record<string, string> = {
+				'星辰の舟衣': '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+				'熊戦士の帯': 'eq014-f012-3456-789a-bcdef0123456'
+			}
+			const knownId = knownIds[slot.name]
+			if (knownId) {
+				console.log(`🔗 Looking up ${slot.name} by known ID:`, knownId)
+				const equipment = getCombinedEquipmentById(knownId)
+				if (equipment && equipment.conditionalEffects) {
+					console.log(`⭐ ${slot.name} found with conditional effects:`, {
+						name: equipment.name,
+						hasConditionalEffects: !!equipment.conditionalEffects,
+						mainWeaponType: mainWeapon?.weaponType,
+						conditionalEffects: equipment.conditionalEffects
+					})
+					return applyConditionalEquipmentEffects(
+						equipment,
+						equipmentState,
+						mainWeapon,
+						subWeapon,
+					)
+				}
 			}
 		}
 		
