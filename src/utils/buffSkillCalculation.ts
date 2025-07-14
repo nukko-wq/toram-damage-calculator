@@ -302,6 +302,20 @@ export function calculateAttackUpEffects(
 }
 
 /**
+ * 命中UP(exHIT)の効果計算関数
+ */
+export function calculateAccuracyUpEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	// Accuracy = skillLevel
+	return {
+		Accuracy: skillLevel,
+	}
+}
+
+/**
  * 魔法力up(exMATK1)の効果計算関数
  */
 export function calculateMagicUpEffects(
@@ -601,6 +615,33 @@ export function getAttackUpEffects(
 	const attackUp = buffSkillData['exATK1']
 	if (attackUp?.isEnabled && attackUp.level) {
 		const effects = calculateAttackUpEffects(attackUp.level, playerLevel)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから命中UPの効果を取得
+ */
+export function getAccuracyUpEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 命中UP(exHIT)の処理
+	const accuracyUp = buffSkillData['exHIT']
+	if (accuracyUp?.isEnabled && accuracyUp.level) {
+		const effects = calculateAccuracyUpEffects(accuracyUp.level)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
