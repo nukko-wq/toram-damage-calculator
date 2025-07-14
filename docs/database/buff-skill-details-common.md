@@ -484,6 +484,7 @@ function calculateCamouflageEffects(
 - 17.4 驚異の威力 (exATK2) - 攻撃力upと同じ計算式
 - 17.5 更なる魔力 (exMATK2) - 魔法力upと同じ計算式
 - 17.6 命中UP (exHIT) - Accuracy = skillLevel
+- 17.7 回避UP (exFREE) - Dodge = skillLevel
 
 ### 15. ペット使用スキル系統
 

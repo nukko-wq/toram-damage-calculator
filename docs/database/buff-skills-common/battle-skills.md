@@ -304,6 +304,49 @@ function calculateAccuracyUpEffects(
 }
 ```
 
+### 17.7 回避UP (exFREE)
+```typescript
+{
+  id: 'exFREE',
+  name: '回避UP',
+  category: 'battle',
+  type: 'level',
+  order: 2209,
+  maxLevel: 10,
+  description: 'すべての武器で回避を上昇させる',
+  effects: [
+    {
+      property: 'Dodge',
+      formula: 'skillLevel',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'Dodge = skillLevel',
+  example: {
+    skillLevel: 10,
+    calculation: 'Dodge = 10',
+    result: 'Dodge +10'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateDodgeUpEffects(
+  skillLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  return {
+    Dodge: skillLevel
+  }
+}
+```
+
 ## 実装ステータス
 
 - [x] クリティカルup (oh1) - 設計・実装完了
@@ -312,13 +355,14 @@ function calculateAccuracyUpEffects(
 - [x] 驚異の威力 (exATK2) - 設計・実装完了
 - [x] 更なる魔力 (exMATK2) - 設計・実装完了
 - [x] 命中UP (exHIT) - 設計・実装完了
+- [x] 回避UP (exFREE) - 設計・実装完了
 
 ## 特徴
 
 - **プレイヤーレベル依存**: 攻撃力up系・魔法力up系スキルはプレイヤーレベルに依存
 - **共通計算式**: 同系統のスキル（攻撃力up/驚異の威力、魔法力up/更なる魔力）は同じ計算式
 - **瞬間効果**: クリティカルupは固定値による即座の効果
-- **スキルレベル依存**: 命中UPはスキルレベルに比例した単純な加算効果
+- **スキルレベル依存**: 命中UP・回避UPはスキルレベルに比例した単純な加算効果
 
 ## 関連ファイル
 
