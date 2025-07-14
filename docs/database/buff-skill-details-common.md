@@ -315,7 +315,7 @@ interface UISettings {
     bow: {
       conditions: ['メイン武器が弓または自動弓'],
       effects: [
-        { property: 'ATK', formula: 'Math.floor(baseStatsLevel)' },
+        { property: 'ATK', formula: 'Math.floor(baseStatsLevel * skillLevel / 10)' },
         { property: 'Critical', formula: 'skillLevel * 4' }
       ]
     },
@@ -323,25 +323,25 @@ interface UISettings {
     default: {
       conditions: ['メイン武器が弓・自動弓以外'],
       effects: [
-        { property: 'ATK', formula: 'Math.floor(baseStatsLevel / 2)' },
+        { property: 'ATK', formula: 'Math.floor(baseStatsLevel / 2 * skillLevel / 10)' },
         { property: 'Critical', formula: 'skillLevel * 4' }
       ]
     }
   },
   calculationFormula: `
     弓・自動弓装備時:
-    - ATK = Math.floor(基本ステータスレベル)
-    - クリティカル = skillLevel × 4
+    - ATK = Math.floor(基本ステータスレベル × スキルレベル ÷ 10)
+    - クリティカル = スキルレベル × 4
     
     その他武器装備時:
-    - ATK = Math.floor(基本ステータスレベル ÷ 2)
-    - クリティカル = skillLevel × 4
+    - ATK = Math.floor(基本ステータスレベル ÷ 2 × スキルレベル ÷ 10)
+    - クリティカル = スキルレベル × 4
   `,
   example: {
     baseStatsLevel: 305,
     skillLevel: 10,
-    bowCalculation: 'ATK = Math.floor(305) = 305, Critical = 10 × 4 = 40',
-    otherCalculation: 'ATK = Math.floor(305 ÷ 2) = Math.floor(152.5) = 152, Critical = 10 × 4 = 40',
+    bowCalculation: 'ATK = Math.floor(305 × 10 ÷ 10) = Math.floor(305) = 305, Critical = 10 × 4 = 40',
+    otherCalculation: 'ATK = Math.floor(305 ÷ 2 × 10 ÷ 10) = Math.floor(152.5 × 1) = Math.floor(152.5) = 152, Critical = 10 × 4 = 40',
     bowResult: 'ATK +305, Critical +40',
     otherResult: 'ATK +152, Critical +40'
   },
@@ -363,10 +363,10 @@ function calculateCamouflageEffects(
   
   const isBowWeapon = weaponType === 'bow' || weaponType === 'bowgun'
   
-  // ATK計算：弓系は基本ステータスレベル、その他は半分（小数点切り捨て）
+  // ATK計算：弓系は基本ステータスレベル × スキルレベル ÷ 10、その他は基本ステータスレベル ÷ 2 × スキルレベル ÷ 10（小数点切り捨て）
   const atkBonus = isBowWeapon 
-    ? Math.floor(baseStatsLevel)
-    : Math.floor(baseStatsLevel / 2)
+    ? Math.floor(baseStatsLevel * skillLevel / 10)
+    : Math.floor(baseStatsLevel / 2 * skillLevel / 10)
   
   return {
     ATK: atkBonus,
@@ -479,10 +479,12 @@ function calculateCamouflageEffects(
 
 **含まれるスキル:**
 - 17.1 クリティカルup (oh1) - Critical+5, CriticalDamage_Rate+5
-- 17.2 攻撃力up (exATK1) - プレイヤーレベル依存ATK計算
-- 17.3 魔法力up (exMATK1) - プレイヤーレベル依存MATK計算
-- 17.4 驚異の威力 (exATK2) - 攻撃力upと同じ計算式
-- 17.5 更なる魔力 (exMATK2) - 魔法力upと同じ計算式
+- 17.2 攻撃力UP (exATK1) - プレイヤーレベル依存ATK計算
+- 17.3 魔法力UP (exMATK1) - プレイヤーレベル依存MATK計算
+- 17.4 驚異の威力 (exATK2) - 攻撃力UPと同じ計算式
+- 17.5 更なる魔力 (exMATK2) - 魔法力UPと同じ計算式
+- 17.6 命中UP (exHIT) - Accuracy = skillLevel
+- 17.7 回避UP (exFREE) - Dodge = skillLevel
 
 ### 15. ペット使用スキル系統
 

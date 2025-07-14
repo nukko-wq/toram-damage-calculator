@@ -285,7 +285,7 @@ export function calculateTwoHandsEffects(
 }
 
 /**
- * 攻撃力up(exATK1)の効果計算関数
+ * 攻撃力UP(exATK1)の効果計算関数
  */
 export function calculateAttackUpEffects(
 	skillLevel: number,
@@ -302,7 +302,58 @@ export function calculateAttackUpEffects(
 }
 
 /**
- * 魔法力up(exMATK1)の効果計算関数
+ * 命中UP(exHIT)の効果計算関数
+ */
+export function calculateAccuracyUpEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	// Accuracy = skillLevel
+	return {
+		Accuracy: skillLevel,
+	}
+}
+
+/**
+ * 回避UP(exFREE)の効果計算関数
+ */
+export function calculateDodgeUpEffects(
+	skillLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	// Dodge = skillLevel
+	return {
+		Dodge: skillLevel,
+	}
+}
+
+/**
+ * カムフラージュ(hunter5-2)の効果計算関数
+ */
+export function calculateCamouflageEffects(
+	skillLevel: number,
+	baseStatsLevel: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	const isBowWeapon = weaponType === 'bow' || weaponType === 'bowgun'
+
+	// ATK計算：弓系は基本ステータスレベル × スキルレベル ÷ 10、その他は基本ステータスレベル ÷ 2 × スキルレベル ÷ 10（小数点切り捨て）
+	const atkBonus = isBowWeapon
+		? Math.floor((baseStatsLevel * skillLevel) / 10)
+		: Math.floor(((baseStatsLevel / 2) * skillLevel) / 10)
+
+	return {
+		ATK: atkBonus,
+		Critical: skillLevel * 4,
+	}
+}
+
+/**
+ * 魔法力UP(exMATK1)の効果計算関数
  */
 export function calculateMagicUpEffects(
 	skillLevel: number,
@@ -587,7 +638,7 @@ export function getBuffSkillBonuses(
 }
 
 /**
- * バフスキルデータから攻撃力upの効果を取得（プレイヤーレベルが必要）
+ * バフスキルデータから攻撃力UPの効果を取得（プレイヤーレベルが必要）
  */
 export function getAttackUpEffects(
 	buffSkillData: Record<string, BuffSkillState> | null,
@@ -597,7 +648,7 @@ export function getAttackUpEffects(
 
 	if (!buffSkillData) return bonuses
 
-	// 攻撃力up(exATK1)の処理
+	// 攻撃力UP(exATK1)の処理
 	const attackUp = buffSkillData['exATK1']
 	if (attackUp?.isEnabled && attackUp.level) {
 		const effects = calculateAttackUpEffects(attackUp.level, playerLevel)
@@ -615,7 +666,95 @@ export function getAttackUpEffects(
 }
 
 /**
- * バフスキルデータから魔法力upの効果を取得（プレイヤーレベルが必要）
+ * バフスキルデータから命中UPの効果を取得
+ */
+export function getAccuracyUpEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 命中UP(exHIT)の処理
+	const accuracyUp = buffSkillData['exHIT']
+	if (accuracyUp?.isEnabled && accuracyUp.level) {
+		const effects = calculateAccuracyUpEffects(accuracyUp.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから回避UPの効果を取得
+ */
+export function getDodgeUpEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 回避UP(exFREE)の処理
+	const dodgeUp = buffSkillData['exFREE']
+	if (dodgeUp?.isEnabled && dodgeUp.level) {
+		const effects = calculateDodgeUpEffects(dodgeUp.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータからカムフラージュの効果を取得（基本ステータスレベルと武器タイプが必要）
+ */
+export function getCamouflageEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	baseStatsLevel: number,
+	weaponType: WeaponType | null,
+): Partial<AllBonuses> {
+	const convertedWeaponType = convertWeaponType(weaponType)
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// カムフラージュ(hunter5-2)の処理
+	const camouflage = buffSkillData['hunter5-2']
+	if (camouflage?.isEnabled && camouflage.level) {
+		const effects = calculateCamouflageEffects(
+			camouflage.level,
+			baseStatsLevel,
+			convertedWeaponType,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから魔法力UPの効果を取得（プレイヤーレベルが必要）
  */
 export function getMagicUpEffects(
 	buffSkillData: Record<string, BuffSkillState> | null,
@@ -625,7 +764,7 @@ export function getMagicUpEffects(
 
 	if (!buffSkillData) return bonuses
 
-	// 魔法力up(exMATK1)の処理
+	// 魔法力UP(exMATK1)の処理
 	const magicUp = buffSkillData['exMATK1']
 	if (magicUp?.isEnabled && magicUp.level) {
 		const effects = calculateMagicUpEffects(magicUp.level, playerLevel)
@@ -656,7 +795,7 @@ export function getThreatPowerEffects(
 	// 驚異の威力(exATK2)の処理
 	const threatPower = buffSkillData['exATK2']
 	if (threatPower?.isEnabled && threatPower.level) {
-		// 攻撃力upと同じ計算式を使用
+		// 攻撃力UPと同じ計算式を使用
 		const effects = calculateAttackUpEffects(threatPower.level, playerLevel)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
@@ -685,7 +824,7 @@ export function getFurtherMagicEffects(
 	// 更なる魔力(exMATK2)の処理
 	const furtherMagic = buffSkillData['exMATK2']
 	if (furtherMagic?.isEnabled && furtherMagic.level) {
-		// 魔法力upと同じ計算式を使用
+		// 魔法力UPと同じ計算式を使用
 		const effects = calculateMagicUpEffects(furtherMagic.level, playerLevel)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合

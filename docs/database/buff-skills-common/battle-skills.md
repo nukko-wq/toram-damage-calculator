@@ -67,11 +67,11 @@ function calculateCriticalUpEffects(
 }
 ```
 
-### 17.2 攻撃力up (exATK1)
+### 17.2 攻撃力UP (exATK1)
 ```typescript
 {
   id: 'exATK1',
-  name: '攻撃力up',
+  name: '攻撃力UP',
   category: 'battle',
   type: 'level',
   order: 2204,
@@ -115,11 +115,11 @@ function calculateAttackUpEffects(
 }
 ```
 
-### 17.3 魔法力up (exMATK1)
+### 17.3 魔法力UP (exMATK1)
 ```typescript
 {
   id: 'exMATK1',
-  name: '魔法力up',
+  name: '魔法力UP',
   category: 'battle',
   type: 'level',
   order: 2206,
@@ -172,7 +172,7 @@ function calculateMagicUpEffects(
   type: 'level',
   order: 2205,
   maxLevel: 10,
-  description: 'プレイヤーレベルに比例してATKを上昇させる（攻撃力upより高い効果）',
+  description: 'プレイヤーレベルに比例してATKを上昇させる（攻撃力UPより高い効果）',
   effects: [
     {
       property: 'ATK',
@@ -187,7 +187,7 @@ function calculateMagicUpEffects(
     calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
     result: 'ATK +76'
   },
-  note: '攻撃力up (exATK1) と同じ計算式を使用',
+  note: '攻撃力UP (exATK1) と同じ計算式を使用',
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
@@ -221,7 +221,7 @@ function calculateThreatPowerEffects(
   type: 'level',
   order: 2207,
   maxLevel: 10,
-  description: 'プレイヤーレベルに比例してMATKを上昇させる（魔法力upより高い効果）',
+  description: 'プレイヤーレベルに比例してMATKを上昇させる（魔法力UPより高い効果）',
   effects: [
     {
       property: 'MATK',
@@ -236,7 +236,7 @@ function calculateThreatPowerEffects(
     calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
     result: 'MATK +76'
   },
-  note: '魔法力up (exMATK1) と同じ計算式を使用',
+  note: '魔法力UP (exMATK1) と同じ計算式を使用',
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
@@ -261,19 +261,108 @@ function calculateFurtherMagicEffects(
 }
 ```
 
+### 17.6 命中UP (exHIT)
+```typescript
+{
+  id: 'exHIT',
+  name: '命中UP',
+  category: 'battle',
+  type: 'level',
+  order: 2208,
+  maxLevel: 10,
+  description: 'すべての武器で命中を上昇させる',
+  effects: [
+    {
+      property: 'Accuracy',
+      formula: 'skillLevel',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'Accuracy = skillLevel',
+  example: {
+    skillLevel: 10,
+    calculation: 'Accuracy = 10',
+    result: 'Accuracy +10'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateAccuracyUpEffects(
+  skillLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  return {
+    Accuracy: skillLevel
+  }
+}
+```
+
+### 17.7 回避UP (exFREE)
+```typescript
+{
+  id: 'exFREE',
+  name: '回避UP',
+  category: 'battle',
+  type: 'level',
+  order: 2209,
+  maxLevel: 10,
+  description: 'すべての武器で回避を上昇させる',
+  effects: [
+    {
+      property: 'Dodge',
+      formula: 'skillLevel',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'Dodge = skillLevel',
+  example: {
+    skillLevel: 10,
+    calculation: 'Dodge = 10',
+    result: 'Dodge +10'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateDodgeUpEffects(
+  skillLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  return {
+    Dodge: skillLevel
+  }
+}
+```
+
 ## 実装ステータス
 
 - [x] クリティカルup (oh1) - 設計・実装完了
-- [x] 攻撃力up (exATK1) - 設計・実装完了
-- [x] 魔法力up (exMATK1) - 設計・実装完了
+- [x] 攻撃力UP (exATK1) - 設計・実装完了
+- [x] 魔法力UP (exMATK1) - 設計・実装完了
 - [x] 驚異の威力 (exATK2) - 設計・実装完了
 - [x] 更なる魔力 (exMATK2) - 設計・実装完了
+- [x] 命中UP (exHIT) - 設計・実装完了
+- [x] 回避UP (exFREE) - 設計・実装完了
 
 ## 特徴
 
-- **プレイヤーレベル依存**: 攻撃力up系・魔法力up系スキルはプレイヤーレベルに依存
-- **共通計算式**: 同系統のスキル（攻撃力up/驚異の威力、魔法力up/更なる魔力）は同じ計算式
+- **プレイヤーレベル依存**: 攻撃力UP系・魔法力UP系スキルはプレイヤーレベルに依存
+- **共通計算式**: 同系統のスキル（攻撃力UP/驚異の威力、魔法力UP/更なる魔力）は同じ計算式
 - **瞬間効果**: クリティカルupは固定値による即座の効果
+- **スキルレベル依存**: 命中UP・回避UPはスキルレベルに比例した単純な加算効果
 
 ## 関連ファイル
 

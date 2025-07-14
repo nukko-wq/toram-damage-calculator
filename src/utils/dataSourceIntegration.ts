@@ -25,6 +25,9 @@ import {
 	getThreatPowerEffects,
 	getFurtherMagicEffects,
 	getGodspeedTrajectoryEffects,
+	getAccuracyUpEffects,
+	getDodgeUpEffects,
+	getCamouflageEffects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
@@ -616,7 +619,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
-	// 攻撃力upスキルの補正値を追加（プレイヤーレベルが必要）
+	// 攻撃力UPスキルの補正値を追加（プレイヤーレベルが必要）
 	const attackUpBonuses = getAttackUpEffects(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,
@@ -629,7 +632,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
-	// 魔法力upスキルの補正値を追加（プレイヤーレベルが必要）
+	// 魔法力UPスキルの補正値を追加（プレイヤーレベルが必要）
 	const magicUpBonuses = getMagicUpEffects(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,
@@ -675,6 +678,44 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(godspeedTrajectoryBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 命中UPスキルの補正値を追加
+	const accuracyUpBonuses = getAccuracyUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(accuracyUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 回避UPスキルの補正値を追加
+	const dodgeUpBonuses = getDodgeUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(dodgeUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// カムフラージュスキルの補正値を追加（基本ステータスレベルと武器タイプが必要）
+	const camouflageBonuses = getCamouflageEffects(
+		data.buffSkills?.skills || null,
+		data.baseStats?.level || 1,
+		data.mainWeapon?.weaponType || null,
+	)
+
+	for (const [key, value] of Object.entries(camouflageBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
