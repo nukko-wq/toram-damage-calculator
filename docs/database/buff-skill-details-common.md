@@ -273,34 +273,7 @@ interface UISettings {
 
 ### 9. ハンタースキル系統
 
-#### 9.1 レンジャーズサイト (hunter1)
-```typescript
-{
-  id: 'hunter1',
-  name: 'レンジャーズサイト',
-  category: 'hunter',
-  type: 'level',
-  order: 1301,
-  maxLevel: 10,
-  description: '命中を上昇させる',
-  effects: [
-    {
-      property: 'Accuracy_Rate',
-      formula: 'skillLevel * 10',
-      conditions: []
-    }
-  ],
-  calculationFormula: '命中% = skillLevel × 10',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 9.2 カムフラージュ (hunter5-2)
+#### 9.1 カムフラージュ (hunter5-2)
 ```typescript
 {
   id: 'hunter5-2',
