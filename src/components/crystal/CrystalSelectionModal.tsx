@@ -188,7 +188,7 @@ export default function CrystalSelectionModal({
 						</div>
 
 						{/* フィルタータブ */}
-						<div className="px-4 sm:px-6 py-4 border-b bg-gray-50">
+						<div className="px-4 sm:px-6 py-2 sm:py-4 border-b bg-gray-50">
 							<div className="flex flex-wrap gap-2">
 								<button
 									type="button"
