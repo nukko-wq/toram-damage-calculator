@@ -23,15 +23,15 @@ export class LBoomerang3Calculator extends SkillHitCalculator {
 			}
 
 			case 2: {
-				// 2撃目: |1500+基礎DEX|%
-				const multiplierValue = 1500 + playerStats.baseDEX
+				// 2撃目: |1350+基礎DEX|%
+				const multiplierValue = 1350 + playerStats.baseDEX
 				const multiplier = Math.abs(multiplierValue)
 
 				return {
 					hitNumber: 2,
 					calculatedMultiplier: multiplier,
 					calculatedFixedDamage: 400,
-					calculationProcess: `|1500+${playerStats.baseDEX}(基礎DEX)| = |${multiplierValue}| = ${multiplier}%`,
+					calculationProcess: `|1350+${playerStats.baseDEX}(基礎DEX)| = |${multiplierValue}| = ${multiplier}%`,
 				}
 			}
 

@@ -174,14 +174,14 @@ export default function EquipmentSelectionModal({
 						</div>
 
 						{/* 装備一覧 */}
-						<div className="p-6 overflow-y-auto max-h-[48vh]">
+						<div className="p-4 sm:p-6 overflow-y-auto max-h-[48vh]">
 							{/* なしオプション */}
-							<div className="mb-6 text-center sm:text-left">
+							<div className="mb-4 sm:mb-6 text-center sm:text-left">
 								<button
 									type="button"
 									onClick={handleRemove}
 									className={`
-									w-[48%] min-w-[144px] max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
+									w-full sm:min-w-[144px] max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
 									${
 										selectedEquipmentId === null
 											? 'border-blue-500 bg-blue-50 shadow-md'

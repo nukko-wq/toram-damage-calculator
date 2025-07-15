@@ -25,7 +25,7 @@ export default function CrystalCard({
 		<div
 			onClick={onClick}
 			className={`
-				p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md max-w-[260px]
+				p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-full max-w-[100%] sm:max-w-[260px]
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md'

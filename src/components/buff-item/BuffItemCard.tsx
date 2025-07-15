@@ -199,7 +199,7 @@ export default function BuffItemCard({
 		<div
 			onClick={onClick}
 			className={`
-				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-[48%] min-w-[144px] max-w-[260px]
+				p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-full max-w-[100%] sm:max-w-[260px]
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md'
@@ -214,25 +214,23 @@ export default function BuffItemCard({
 					{showDamageDifference && slotInfo && !isSelected && (
 						<div className="inline-block">
 							{(() => {
-								console.log(
-									'🔧 About to render DamageDifferenceDisplayCorrect for:',
-									buffItem.name,
-								)
 								try {
 									return (
 										<DamageDifferenceDisplayCorrect
-											item={buffItem as any}
+											item={{
+												...buffItem,
+												isPreset: true,
+												isFavorite: false,
+												createdAt: new Date().toISOString(),
+												updatedAt: new Date().toISOString(),
+											}}
 											slotInfo={slotInfo}
 											size="sm"
 											className="px-1 py-0.5"
-											options={{ debug: true }}
+											options={{ debug: false }}
 										/>
 									)
-								} catch (error) {
-									console.error(
-										'🔧 Error rendering DamageDifferenceDisplayCorrect:',
-										error,
-									)
+								} catch {
 									return (
 										<div className="bg-red-100 text-red-600 text-xs p-1">
 											Error
@@ -278,11 +276,9 @@ export default function BuffItemCard({
 
 			{/* プロパティ */}
 			{formatProperties().length > 0 && (
-				<div className="text-sm text-gray-600 mb-2 min-h-[1.25rem]">
+				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1">
 					{formatProperties().map((row) => (
-						<div key={row} className="flex flex-wrap gap-x-3">
-							{row}
-						</div>
+						<span key={row}>{row}</span>
 					))}
 				</div>
 			)}

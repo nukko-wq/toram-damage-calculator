@@ -201,7 +201,7 @@ export default function EquipmentCard({
 		<div
 			onClick={onClick}
 			className={`
-				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-[48%] min-w-[144px] max-w-[260px]
+				p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-full max-w-[100%] sm:max-w-[260px]
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md'
@@ -270,19 +270,15 @@ export default function EquipmentCard({
 
 			{/* プロパティ */}
 			{getPropertyList().length > 0 && (
-				<div className="text-sm mb-2 min-h-[1.25rem]">
-					<div className="flex flex-wrap gap-x-3">
-						{getPropertyList().map((property) => (
-							<span
-								key={property.text}
-								className={
-									property.isNegative ? 'text-red-500' : 'text-gray-600'
-								}
-							>
-								{property.text}
-							</span>
-						))}
-					</div>
+				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1">
+					{getPropertyList().map((property) => (
+						<span
+							key={property.text}
+							className={property.isNegative ? 'text-red-500' : ''}
+						>
+							{property.text}
+						</span>
+					))}
 				</div>
 			)}
 
