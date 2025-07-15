@@ -184,6 +184,23 @@ export default function AttackSkillForm({
 		}
 	}
 
+	// 距離威力の表示テキストを決定
+	const getDistancePowerDisplayText = (hit: CalculatedHit) => {
+		const canShort = hit.canUseShortRangePower
+		const canLong = hit.canUseLongRangePower
+
+		if (canShort && canLong) {
+			return '○' // 近距離と遠距離両方有効
+		}
+		if (canShort && !canLong) {
+			return '近距離○' // 近距離のみ有効
+		}
+		if (!canShort && canLong) {
+			return '遠距離○' // 遠距離のみ有効（稀）
+		}
+		return '×' // 両方無効
+	}
+
 	// 系統別にスキルをグループ化
 	const skillGroups = useMemo(() => {
 		const groups: { [key: string]: typeof attackSkillsData } = {}
@@ -351,37 +368,29 @@ export default function AttackSkillForm({
 										</div>
 									</div>
 
-									{/* 3行目: 3列表示 (近距離威力、遠距離威力、抜刀威力) */}
+									{/* 3行目: 3列表示 (距離威力、抜刀威力、ロングレンジ) */}
 									<div className="border-b border-gray-300 grid grid-cols-3">
 										<div className="px-3 py-2 border-r border-gray-300">
-											<span className="text-gray-600">近距離威力:</span>{' '}
+											<span className="text-gray-600">距離威力:</span>{' '}
 											<span className="text-gray-700">
-												{currentHit.canUseShortRangePower ? '○' : '×'}
+												{getDistancePowerDisplayText(currentHit)}
 											</span>
 										</div>
 										<div className="px-3 py-2 border-r border-gray-300">
-											<span className="text-gray-600">遠距離威力:</span>{' '}
-											<span className="text-gray-700">
-												{currentHit.canUseLongRangePower ? '○' : '×'}
-											</span>
-										</div>
-										<div className="px-3 py-2">
 											<span className="text-gray-600">抜刀威力:</span>{' '}
 											<span className="text-gray-700">
 												{currentHit.canUseUnsheathePower ? '○' : '×'}
 											</span>
 										</div>
+										<div className="px-3 py-2">
+											<span className="text-gray-600">ロングレンジ:</span>{' '}
+											<span className="text-gray-700">
+												{currentHit.canUseLongRange ? '○' : '×'}
+											</span>
+										</div>
 									</div>
 
-									{/* 4行目: 1列表示 (ロングレンジ) */}
-									<div className="border-b border-gray-300 px-3 py-2">
-										<span className="text-gray-600">ロングレンジ:</span>{' '}
-										<span className="text-gray-700">
-											{currentHit.canUseLongRange ? '○' : '×'}
-										</span>
-									</div>
-
-									{/* 5行目: 1列表示 (威力参照) */}
+									{/* 4行目: 1列表示 (威力参照) */}
 									<div className="px-3 py-2">
 										<span className="text-gray-700">威力参照/攻撃力:</span>{' '}
 										<span className="text-gray-700">
