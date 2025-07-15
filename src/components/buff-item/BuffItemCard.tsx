@@ -20,67 +20,6 @@ export default function BuffItemCard({
 	showDamageDifference = false,
 	slotInfo,
 }: BuffItemCardProps) {
-	const getCategoryLabel = (category: string) => {
-		switch (category) {
-			case 'physicalPower':
-				return '物理威力'
-			case 'magicalPower':
-				return '魔法威力'
-			case 'physicalDefense':
-				return '物理防御'
-			case 'magicalDefense':
-				return '魔法防御'
-			case 'elementalAttack':
-				return '属性攻撃'
-			case 'elementalDefense':
-				return '属性防御'
-			case 'speed':
-				return '速度'
-			case 'casting':
-				return '詠唱'
-			case 'mp':
-				return 'MP'
-			case 'hp':
-				return 'HP'
-			case 'accuracy':
-				return '命中'
-			case 'evasion':
-				return '回避'
-			default:
-				return category
-		}
-	}
-
-	const getCategoryColor = (category: string) => {
-		switch (category) {
-			case 'physicalPower':
-				return 'bg-red-100 text-red-800'
-			case 'magicalPower':
-				return 'bg-purple-100 text-purple-800'
-			case 'physicalDefense':
-				return 'bg-blue-100 text-blue-800'
-			case 'magicalDefense':
-				return 'bg-indigo-100 text-indigo-800'
-			case 'elementalAttack':
-				return 'bg-orange-100 text-orange-800'
-			case 'elementalDefense':
-				return 'bg-emerald-100 text-emerald-800'
-			case 'speed':
-				return 'bg-yellow-100 text-yellow-800'
-			case 'casting':
-				return 'bg-cyan-100 text-cyan-800'
-			case 'mp':
-				return 'bg-blue-100 text-blue-800'
-			case 'hp':
-				return 'bg-green-100 text-green-800'
-			case 'accuracy':
-				return 'bg-amber-100 text-amber-800'
-			case 'evasion':
-				return 'bg-pink-100 text-pink-800'
-			default:
-				return 'bg-gray-100 text-gray-800'
-		}
-	}
 
 	const formatProperties = () => {
 		// 装備フォームと同じプロパティ名マッピング
@@ -260,15 +199,6 @@ export default function BuffItemCard({
 						</svg>
 					</div>
 				)}
-			</div>
-
-			{/* カテゴリバッジ */}
-			<div className="mb-2">
-				<span
-					className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(buffItem.category)}`}
-				>
-					{getCategoryLabel(buffItem.category)}
-				</span>
 			</div>
 
 			{/* バフアイテム名 */}
