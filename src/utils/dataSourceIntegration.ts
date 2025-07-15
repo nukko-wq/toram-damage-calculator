@@ -105,10 +105,6 @@ export function getEquipmentBonusesWithConditionalEffects(
 				(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
 		}
 
-		// Debug log only if MP bonus is found
-		if (bonuses.MP) {
-			console.log('🔮 EQUIPMENT MP BONUS FOUND:', bonuses.MP)
-		}
 
 		return bonuses
 	} catch (error) {
