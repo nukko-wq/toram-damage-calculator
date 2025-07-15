@@ -51,6 +51,14 @@ export const buffItemsData: BuffItemsData = {
 					UnsheatheAttack_Rate: 5,
 				},
 			},
+			{
+				id: '248471e1-6c31-4ac1-adc8-c4764849d1c9',
+				name: 'パンプソンパフェ',
+				category: 'physicalPower',
+				properties: {
+					ATK_Rate: 6,
+				},
+			},
 		],
 		magicalPower: [
 			{

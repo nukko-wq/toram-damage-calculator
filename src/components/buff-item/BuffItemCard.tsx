@@ -217,14 +217,20 @@ export default function BuffItemCard({
 								try {
 									return (
 										<DamageDifferenceDisplayCorrect
-											item={buffItem}
+											item={{
+												...buffItem,
+												isPreset: true,
+												isFavorite: false,
+												createdAt: new Date().toISOString(),
+												updatedAt: new Date().toISOString(),
+											}}
 											slotInfo={slotInfo}
 											size="sm"
 											className="px-1 py-0.5"
 											options={{ debug: false }}
 										/>
 									)
-								} catch (error) {
+								} catch {
 									return (
 										<div className="bg-red-100 text-red-600 text-xs p-1">
 											Error
