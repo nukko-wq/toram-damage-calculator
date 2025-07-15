@@ -420,8 +420,8 @@ export default function AttackSkillForm({
 									</div>
 								)}
 
-								{/* 計算過程表示（特殊計算がある場合） */}
-								{currentHit.calculationProcess && (
+								{/* 計算過程表示（開発環境のみ、特殊計算がある場合） */}
+								{process.env.NODE_ENV === 'development' && currentHit.calculationProcess && (
 									<div className="space-y-2 p-3 rounded border border-gray-300 bg-blue-50">
 										<div className="text-xs sm:text-sm">
 											<span className="text-gray-600">計算過程:</span>
