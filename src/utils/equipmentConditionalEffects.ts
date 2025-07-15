@@ -32,17 +32,7 @@ export function checkEquipmentCondition(
 ): boolean {
 	switch (condition.type) {
 		case 'mainWeapon': {
-			const result = mainWeapon?.weaponType === condition.weaponType
-			// Debug log only for 両手剣 condition
-			if (condition.weaponType === '両手剣') {
-				console.log('🗡️ 両手剣 CONDITION CHECK:', {
-					condition,
-					mainWeaponType: mainWeapon?.weaponType,
-					result,
-					stack: new Error().stack?.split('\n').slice(1, 4)
-				})
-			}
-			return result
+			return mainWeapon?.weaponType === condition.weaponType
 		}
 		case 'subWeapon':
 			return subWeapon?.weaponType === condition.weaponType
@@ -92,15 +82,6 @@ export function applyConditionalEquipmentEffects(
 ): Partial<EquipmentProperties> {
 	let effectiveProperties = { ...equipment.properties }
 
-	// TEST: Log all equipment that has conditional effects
-	if (equipment.conditionalEffects && equipment.conditionalEffects.length > 0) {
-		console.log('🔧 Processing equipment with conditional effects:', {
-			name: equipment.name,
-			id: equipment.id,
-			effectsCount: equipment.conditionalEffects.length,
-			mainWeaponType: mainWeapon?.weaponType
-		})
-	}
 
 	if (equipment.conditionalEffects) {
 		for (const effect of equipment.conditionalEffects) {
@@ -112,14 +93,6 @@ export function applyConditionalEquipmentEffects(
 			)
 			
 			if (conditionMet) {
-				// Debug log only for MP bonuses
-				if (effect.properties.MP) {
-					console.log('🎉 MP BONUS APPLIED:', {
-						equipment: equipment.name,
-						effect: effect.properties,
-						condition: effect.condition
-					})
-				}
 				effectiveProperties = mergeProperties(
 					effectiveProperties,
 					effect.properties,
@@ -145,29 +118,15 @@ export function getSlotEffectiveProperties(
 	mainWeapon: MainWeapon,
 	subWeapon: SubWeapon,
 ): Partial<EquipmentProperties> {
-	console.log('🔍 getSlotEffectiveProperties called with slot:', {
-		slotName: slot?.name,
-		hasProperties: !!slot?.properties,
-		hasId: !!slot?.id,
-		slotId: slot?.id,
-		isPreset: slot?.isPreset
-	})
-
 	// スロットが装備データを直接持っている場合（プリセット装備など）
 	// nameとpropertiesがあり、conditionalEffectsがある可能性を確認
 	if (slot?.name && slot?.properties) {
-		console.log('📦 Found equipment with direct properties:', slot.name)
-		
 		// 条件付き効果を持つ装備の場合、条件付き効果をチェック
 		if (slot.name === '星辰の舟衣' || slot.name === '熊戦士の帯') {
-			console.log(`⭐ ${slot.name} found in direct slot data!`)
-			
 			// IDがある場合はデータベースから完全なデータを取得して条件付き効果を適用
 			if (slot.id) {
-				console.log('🔗 Looking up complete equipment data by ID:', slot.id)
 				const equipment = getCombinedEquipmentById(slot.id)
-				if (equipment && equipment.conditionalEffects) {
-					console.log('📋 Found complete equipment with conditional effects')
+				if (equipment?.conditionalEffects) {
 					return applyConditionalEquipmentEffects(
 						equipment,
 						equipmentState,
@@ -185,15 +144,8 @@ export function getSlotEffectiveProperties(
 			}
 			const knownId = knownIds[slot.name]
 			if (knownId) {
-				console.log(`🔗 Looking up ${slot.name} by known ID:`, knownId)
 				const equipment = getCombinedEquipmentById(knownId)
-				if (equipment && equipment.conditionalEffects) {
-					console.log(`⭐ ${slot.name} found with conditional effects:`, {
-						name: equipment.name,
-						hasConditionalEffects: !!equipment.conditionalEffects,
-						mainWeaponType: mainWeapon?.weaponType,
-						conditionalEffects: equipment.conditionalEffects
-					})
+				if (equipment?.conditionalEffects) {
 					return applyConditionalEquipmentEffects(
 						equipment,
 						equipmentState,
@@ -210,14 +162,7 @@ export function getSlotEffectiveProperties(
 
 	// スロットにIDがある場合、データベースから装備を取得
 	if (slot?.id) {
-		console.log('🔗 Looking up equipment by ID:', slot.id)
 		const equipment = getCombinedEquipmentById(slot.id)
-		console.log('📋 Equipment lookup result:', {
-			found: !!equipment,
-			name: equipment?.name,
-			id: equipment?.id,
-			hasConditionalEffects: !!equipment?.conditionalEffects
-		})
 		
 		if (equipment) {
 			return applyConditionalEquipmentEffects(
@@ -227,9 +172,6 @@ export function getSlotEffectiveProperties(
 				subWeapon,
 			)
 		}
-			console.log('❌ Equipment not found for ID:', slot.id)
-	} else {
-		console.log('❌ No valid slot data provided')
 	}
 
 	return {}
@@ -247,13 +189,6 @@ export function recalculateEquipmentEffects(
 	mainWeapon: MainWeapon,
 	subWeapon: SubWeapon,
 ): Partial<EquipmentProperties> {
-	console.log('🔄 recalculateEquipmentEffects called with:', {
-		hasEquipmentState: !!equipmentState,
-		mainWeaponType: mainWeapon?.weaponType,
-		bodySlot: equipmentState?.body,
-		bodySlotId: equipmentState?.body?.id,
-	})
-
 	let totalEffects: Partial<EquipmentProperties> = {}
 
 	// 11スロット分の装備を処理（従来8スロット + 自由入力3スロット）
@@ -271,8 +206,6 @@ export function recalculateEquipmentEffects(
 		equipmentState.freeInput3,
 	].filter(Boolean)
 
-	console.log('🎯 Processing slots:', allSlots.map(slot => ({ id: slot?.id, name: slot?.name })))
-
 	for (const slot of allSlots) {
 		const effectiveProperties = getSlotEffectiveProperties(
 			slot,
@@ -281,12 +214,6 @@ export function recalculateEquipmentEffects(
 			subWeapon,
 		)
 		totalEffects = mergeProperties(totalEffects, effectiveProperties)
-	}
-
-	// Debug log total effects
-	console.log('💎 FINAL TOTAL EFFECTS:', totalEffects)
-	if (totalEffects.MP) {
-		console.log('🔮 EQUIPMENT MP BONUS FOUND:', totalEffects.MP)
 	}
 
 	return totalEffects
