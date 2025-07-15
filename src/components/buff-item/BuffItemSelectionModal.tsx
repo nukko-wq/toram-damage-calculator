@@ -106,10 +106,13 @@ export default function BuffItemSelectionModal({
 		}
 	}
 
-	const handleSelect = useCallback((buffItemId: string) => {
-		onSelect(buffItemId)
-		handleClose()
-	}, [onSelect, handleClose])
+	const handleSelect = useCallback(
+		(buffItemId: string) => {
+			onSelect(buffItemId)
+			handleClose()
+		},
+		[onSelect, handleClose],
+	)
 
 	const handleRemove = useCallback(() => {
 		onSelect(null)
@@ -156,7 +159,7 @@ export default function BuffItemSelectionModal({
 							duration: 0.2,
 						}}
 						style={{ willChange: 'transform' }}
-						className="bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[68vh] overflow-hidden h-fit"
+						className="bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[78vh] sm:max-h-[68vh] overflow-hidden h-fit"
 						onClick={handleContentClick}
 					>
 						{/* ヘッダー */}

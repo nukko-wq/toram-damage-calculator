@@ -137,7 +137,7 @@ export default function CrystalSelectionModal({
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.2 }}
-					className="fixed inset-0 z-50 flex items-end justify-center p-4 bg-black/50"
+					className="fixed inset-0 z-[10000] flex items-end justify-center p-4 bg-black/50"
 					onClick={handleBackgroundClick}
 					aria-labelledby="modal-title"
 					aria-modal="true"
@@ -153,7 +153,7 @@ export default function CrystalSelectionModal({
 							duration: 0.2,
 						}}
 						style={{ willChange: 'transform' }}
-						className="bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[68vh] overflow-hidden h-fit"
+						className="bg-white rounded-lg shadow-xl w-[calc(100%-1rem)] max-h-[78vh] sm:max-h-[68vh] overflow-hidden h-fit"
 						onClick={handleContentClick}
 					>
 						{/* ヘッダー */}
