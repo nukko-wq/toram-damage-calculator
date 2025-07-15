@@ -323,9 +323,9 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
 				powerReference: 'totalATK',
-				multiplier: 1500, // 表示用（実際の計算は外部）
+				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
-				multiplierFormula: '威力:+基礎DEX%',
+				multiplierFormula: '威力+基礎DEX%',
 				familiarity: 'normal',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
