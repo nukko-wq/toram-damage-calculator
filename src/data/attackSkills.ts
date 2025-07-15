@@ -286,6 +286,56 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// 両手剣スキル（Lブーメラン\u2162）
+	{
+		id: 'l_boomerang_3',
+		name: 'Lブーメラン\u2162',
+		order: 103,
+		systemGroup: 'sword',
+		category: 'partizan',
+		weaponTypeRequirements: ['両手剣'],
+		mpCost: 400,
+		multiplierFormula: '特殊計算',
+		fixedDamageFormula: '400',
+		specialEffects: [
+			'貫通ボーナス50%',
+		],
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 1350, // 表示用（実際の計算は外部）
+				fixedDamage: 400,
+				multiplierFormula: '威力+基礎DEX%',
+				familiarity: 'normal',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: false,
+				canUseLongRangePower: false,
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 1500, // 表示用（実際の計算は外部）
+				fixedDamage: 400,
+				multiplierFormula: '威力:+基礎DEX%',
+				familiarity: 'normal',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: false,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// 双剣スキル（多段攻撃の例）
 	{
 		id: 'dual_strike',

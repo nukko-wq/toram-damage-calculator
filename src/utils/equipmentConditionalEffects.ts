@@ -226,9 +226,8 @@ export function getSlotEffectiveProperties(
 				mainWeapon,
 				subWeapon,
 			)
-		} else {
-			console.log('❌ Equipment not found for ID:', slot.id)
 		}
+			console.log('❌ Equipment not found for ID:', slot.id)
 	} else {
 		console.log('❌ No valid slot data provided')
 	}

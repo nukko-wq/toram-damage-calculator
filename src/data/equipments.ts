@@ -84,6 +84,68 @@ export const equipmentsData: EquipmentsData = {
 					Dodge: -16,
 				},
 			},
+			{
+				id: '0b54f5ce-8be9-428c-8229-b51f6db9773b',
+				name: '槍汎用A15%S10%',
+				weaponStats: {
+					ATK: 927,
+					stability: 60,
+					refinement: 15,
+				},
+				properties: {
+					ATK_Rate: 15,
+					STR_Rate: 10,
+					NaturalHPRecovery: -30,
+					Dodge: -16,
+				},
+			},
+			{
+				id: '5e9e7299-a596-46ab-9cfe-72b69423bdc4',
+				name: '両手有利23%A15%S10%',
+				properties: {
+					ATK_Rate: 15,
+					ElementAdvantage_Rate: 23,
+					STR_Rate: 10,
+					NaturalHPRecovery: -30,
+					Dodge: -16,
+				},
+				crystalSlots: {
+					slot1: null,
+					slot2: null,
+				},
+			},
+			{
+				id: '9ce5ed42-1857-4145-86f5-c95882bae220',
+				name: '両手有利23%A10%S10%C30',
+				weaponStats: {
+					ATK: 927,
+					stability: 60,
+					refinement: 15,
+				},
+				properties: {
+					ElementAdvantage_Rate: 23,
+					CriticalDamage_Rate: 10,
+					STR_Rate: 10,
+					Critical: 30,
+					NaturalHPRecovery: -30,
+					Dodge: -16,
+				},
+			},
+			{
+				id: '57b356a8-661e-4ab1-9af6-bbfa1f5ad08b',
+				name: '両手汎用A15%S10%',
+				weaponStats: {
+					ATK: 927,
+					stability: 60,
+					refinement: 15,
+				},
+				properties: {
+					ATK_Rate: 15,
+					STR_Rate: 10,
+					NaturalHPRecovery: -30,
+					Dodge: -16,
+				},
+			},
 		],
 		body: [
 			{

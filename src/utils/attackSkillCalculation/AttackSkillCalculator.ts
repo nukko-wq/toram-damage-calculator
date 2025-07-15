@@ -1,11 +1,12 @@
 import { getAttackSkillById } from '@/data/attackSkills'
 import {
+	LBoomerang3Calculator,
+	MagicArrowCalculator,
 	MoonSlashCalculator,
 	type SkillHitCalculator,
 	StandardCalculator,
-	StrikeStabCalculator,
 	StrikeStabAilmentCalculator,
-	MagicArrowCalculator,
+	StrikeStabCalculator,
 } from './calculators'
 import type {
 	EquipmentContext,
@@ -54,6 +55,8 @@ export class AttackSkillCalculator {
 	 */
 	private getCalculatorForSkill(skillId: string): SkillHitCalculator {
 		switch (skillId) {
+			case 'l_boomerang_3':
+				return new LBoomerang3Calculator()
 			case 'moon_slash':
 				return new MoonSlashCalculator()
 			case 'strike_stab':

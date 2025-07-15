@@ -87,7 +87,7 @@ export default function SkillCard({ skill }: SkillCardProps) {
 
 			case 'multiParam':
 				if (skill.id === 'IsBrave') {
-					return `${skill.name}/${(level || 2) === 1 ? '使用者' : '使用者以外'}`
+					return `${skill.name}/${(level || 2) === 1 ? '使用者' : '非使用者'}`
 				}
 				return `${skill.name}/${level || 1}`
 
