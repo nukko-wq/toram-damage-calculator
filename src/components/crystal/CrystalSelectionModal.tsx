@@ -201,7 +201,7 @@ export default function CrystalSelectionModal({
 								>
 									全て ({availableCrystals.length})
 								</button>
-								{(['normal', ...allowedTypes] as CrystalType[]).map((type) => {
+								{([...allowedTypes, 'normal'] as CrystalType[]).map((type) => {
 									const count = availableCrystals.filter(
 										(c) => c.type === type,
 									).length
