@@ -164,7 +164,10 @@ export default function BuffItemSelectionModal({
 					>
 						{/* ヘッダー */}
 						<div className="flex items-center justify-between p-6 border-b">
-							<h2 id="modal-title" className="text-xl font-bold text-gray-900">
+							<h2
+								id="modal-title"
+								className="text-lg sm:text-xl font-bold text-gray-900"
+							>
 								{title}
 							</h2>
 							<button

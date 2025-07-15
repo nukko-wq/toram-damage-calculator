@@ -158,7 +158,10 @@ export default function CrystalSelectionModal({
 					>
 						{/* ヘッダー */}
 						<div className="flex items-center justify-between p-6 border-b">
-							<h2 id="modal-title" className="text-xl font-bold text-gray-900">
+							<h2
+								id="modal-title"
+								className="text-lg sm:text-xl font-bold text-gray-900"
+							>
 								{title}
 							</h2>
 							<button
@@ -185,7 +188,7 @@ export default function CrystalSelectionModal({
 						</div>
 
 						{/* フィルタータブ */}
-						<div className="px-6 py-4 border-b bg-gray-50">
+						<div className="px-4 sm:px-6 py-4 border-b bg-gray-50">
 							<div className="flex flex-wrap gap-2">
 								<button
 									type="button"
