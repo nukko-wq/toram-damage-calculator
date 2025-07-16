@@ -106,7 +106,6 @@ export function getEquipmentBonusesWithConditionalEffects(
 				(bonuses[normalizedKey as keyof AllBonuses] || 0) + validatedValue
 		}
 
-
 		return bonuses
 	} catch (error) {
 		console.error('Error in getEquipmentBonusesWithConditionalEffects:', error)
@@ -694,9 +693,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	}
 
 	// 回避UPスキルの補正値を追加
-	const dodgeUpBonuses = getDodgeUpEffects(
-		data.buffSkills?.skills || null,
-	)
+	const dodgeUpBonuses = getDodgeUpEffects(data.buffSkills?.skills || null)
 
 	for (const [key, value] of Object.entries(dodgeUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {

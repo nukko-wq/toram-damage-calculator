@@ -12,7 +12,11 @@ import { getAttackSkillById } from '@/data/attackSkills'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
-import { getBuffSkillPassiveMultiplier, getBuffSkillPassiveMultiplierWithSkillCategory, getBuffSkillBraveMultiplier } from '@/utils/buffSkillCalculation'
+import {
+	getBuffSkillPassiveMultiplier,
+	getBuffSkillPassiveMultiplierWithSkillCategory,
+	getBuffSkillBraveMultiplier,
+} from '@/utils/buffSkillCalculation'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import { createInitialPowerOptions } from '@/utils/initialData'
 

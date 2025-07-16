@@ -20,7 +20,6 @@ export default function BuffItemCard({
 	showDamageDifference = false,
 	slotInfo,
 }: BuffItemCardProps) {
-
 	const formatProperties = () => {
 		// 装備フォームと同じプロパティ名マッピング
 		const propertyNameMap: Record<string, string> = {

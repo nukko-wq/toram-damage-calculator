@@ -297,9 +297,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 400,
 		multiplierFormula: '特殊計算',
 		fixedDamageFormula: '400',
-		specialEffects: [
-			'貫通ボーナス50%',
-		],
+		specialEffects: ['貫通ボーナス50%'],
 		hits: [
 			{
 				hitNumber: 1,

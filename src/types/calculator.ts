@@ -141,7 +141,7 @@ export interface EquipmentProperties {
 	ItemCooldown: number // 道具速度
 	AbsoluteAccuracy_Rate: number // 絶対命中%
 	AbsoluteDodge_Rate: number // 絶対回避%
-	
+
 	// ダメージ計算系
 	BraveMultiplier: number // ブレイブ倍率%
 

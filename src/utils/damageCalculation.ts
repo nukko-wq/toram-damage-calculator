@@ -373,7 +373,9 @@ function calculateBaseDamage(
 		console.log(`自レベル: ${input.playerLevel}`)
 		console.log(`参照ステータス: ${input.referenceStat}`)
 		console.log(`敵レベル: ${input.enemyLevel}`)
-		console.log(`耐性適用前: ${beforeResistance} = ${input.playerLevel} + ${input.referenceStat} - ${input.enemyLevel}`)
+		console.log(
+			`耐性適用前: ${beforeResistance} = ${input.playerLevel} + ${input.referenceStat} - ${input.enemyLevel}`,
+		)
 		console.log(`攻撃タイプ: ${input.attackSkill.type}`)
 		console.log(`主耐性: ${mainResistance}%`)
 		console.log(`武器耐性: ${weaponResistance}%`)
@@ -386,14 +388,20 @@ function calculateBaseDamage(
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log(`主耐性倍率: ${mainMultiplier} = (100 - ${mainResistance})/100`)
-		console.log(`武器耐性倍率: ${weaponMultiplier} = (100 - ${weaponResistance})/100`)
-		console.log(`合成耐性倍率: ${combinedMultiplier} = ${mainMultiplier} × ${weaponMultiplier}`)
+		console.log(
+			`武器耐性倍率: ${weaponMultiplier} = (100 - ${weaponResistance})/100`,
+		)
+		console.log(
+			`合成耐性倍率: ${combinedMultiplier} = ${mainMultiplier} × ${weaponMultiplier}`,
+		)
 	}
 
 	const afterResistance = beforeResistance * combinedMultiplier
 
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`耐性適用後: ${afterResistance} = ${beforeResistance} × ${combinedMultiplier}`)
+		console.log(
+			`耐性適用後: ${afterResistance} = ${beforeResistance} × ${combinedMultiplier}`,
+		)
 	}
 
 	// 敵防御力処理
@@ -412,7 +420,9 @@ function calculateBaseDamage(
 	const result = Math.floor(afterResistance - processedDefense)
 
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`最終結果: ${result} = Math.floor(${afterResistance} - ${processedDefense})`)
+		console.log(
+			`最終結果: ${result} = Math.floor(${afterResistance} - ${processedDefense})`,
+		)
 		console.log(`最低保証後: ${Math.max(1, result)}`)
 		console.log('======================================')
 	}
@@ -453,7 +463,9 @@ function applyFixedValues(
 		console.log(`抜刀アクティブ: ${input.unsheathe.isActive}`)
 		console.log(`抜刀固定値: ${unsheatheFixed}`)
 		console.log(`スキル固定値: ${skillFixed}`)
-		console.log(`計算式: Math.floor(${baseDamage} + ${unsheatheFixed} + ${skillFixed})`)
+		console.log(
+			`計算式: Math.floor(${baseDamage} + ${unsheatheFixed} + ${skillFixed})`,
+		)
 	}
 
 	const result = Math.floor(baseDamage + unsheatheFixed + skillFixed)
@@ -493,7 +505,9 @@ function applyElementAdvantage(
 		console.log(`総属性有利: ${input.elementAdvantage.total}%`)
 		console.log(`属性覚醒有利: ${input.elementAdvantage.awakening}%`)
 		console.log(`合計属性有利: ${advantageRate}%`)
-		console.log(`計算式: Math.floor(${beforeAdvantage} × (1 + ${advantageRate}/100))`)
+		console.log(
+			`計算式: Math.floor(${beforeAdvantage} × (1 + ${advantageRate}/100))`,
+		)
 	}
 
 	const result = Math.floor(beforeAdvantage * (1 + advantageRate / 100))
@@ -564,7 +578,9 @@ function applyUnsheatheRate(
 		console.log('=== ステップ5: 抜刀%補正詳細 ===')
 		console.log(`抜刀アクティブ: ${input.unsheathe.isActive}`)
 		console.log(`抜刀%ボーナス: ${unsheatheRate}%`)
-		console.log(`計算式: Math.floor(${beforeUnsheathe} × (1 + ${unsheatheRate}/100))`)
+		console.log(
+			`計算式: Math.floor(${beforeUnsheathe} × (1 + ${unsheatheRate}/100))`,
+		)
 	}
 
 	const result = Math.floor(beforeUnsheathe * (1 + unsheatheRate / 100))
@@ -598,7 +614,9 @@ function applyFamiliarity(
 	if (process.env.NODE_ENV === 'development') {
 		console.log('=== ステップ6: 慣れ補正詳細 ===')
 		console.log(`慣れ値: ${familiarityRate}%`)
-		console.log(`計算式: Math.floor(${beforeFamiliarity} × ${familiarityRate}/100)`)
+		console.log(
+			`計算式: Math.floor(${beforeFamiliarity} × ${familiarityRate}/100)`,
+		)
 	}
 
 	const result = Math.floor(beforeFamiliarity * (familiarityRate / 100))
@@ -903,29 +921,43 @@ function processEnemyDefense(
 	let penetrationRate = 0
 	if (defenseType === 'DEF') {
 		penetrationRate = input.penetration.physical
-		
+
 		// スキル固有の貫通ボーナス適用
-		const skillPenetrationBonus = getSkillPenetrationBonus(input.attackSkill.skillId, input.attackSkill.hitNumber, 'physical')
+		const skillPenetrationBonus = getSkillPenetrationBonus(
+			input.attackSkill.skillId,
+			input.attackSkill.hitNumber,
+			'physical',
+		)
 		penetrationRate += skillPenetrationBonus
-		
+
 		if (process.env.NODE_ENV === 'development' && skillPenetrationBonus > 0) {
-			console.log(`スキル固有貫通ボーナス: +${skillPenetrationBonus}% (スキルID: ${input.attackSkill.skillId})`)
+			console.log(
+				`スキル固有貫通ボーナス: +${skillPenetrationBonus}% (スキルID: ${input.attackSkill.skillId})`,
+			)
 		}
 	} else if (defenseType === 'MDEF') {
 		penetrationRate = input.penetration.magical
-		
+
 		// スキル固有の貫通ボーナス適用
-		const skillPenetrationBonus = getSkillPenetrationBonus(input.attackSkill.skillId, input.attackSkill.hitNumber, 'magical')
+		const skillPenetrationBonus = getSkillPenetrationBonus(
+			input.attackSkill.skillId,
+			input.attackSkill.hitNumber,
+			'magical',
+		)
 		penetrationRate += skillPenetrationBonus
-		
+
 		if (process.env.NODE_ENV === 'development' && skillPenetrationBonus > 0) {
-			console.log(`スキル固有貫通ボーナス: +${skillPenetrationBonus}% (スキルID: ${input.attackSkill.skillId})`)
+			console.log(
+				`スキル固有貫通ボーナス: +${skillPenetrationBonus}% (スキルID: ${input.attackSkill.skillId})`,
+			)
 		}
 	}
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log('貫通計算詳細:')
-		console.log(`  基本貫通: ${defenseType === 'DEF' ? input.penetration.physical : input.penetration.magical}%`)
+		console.log(
+			`  基本貫通: ${defenseType === 'DEF' ? input.penetration.physical : input.penetration.magical}%`,
+		)
 		console.log(`  合計貫通: ${penetrationRate}%`)
 		console.log(`  計算式: ${processed} × (1 - ${penetrationRate}/100)`)
 	}
@@ -947,7 +979,7 @@ function processEnemyDefense(
 function getSkillPenetrationBonus(
 	skillId?: string,
 	_hitNumber?: number,
-	penetrationType?: 'physical' | 'magical'
+	penetrationType?: 'physical' | 'magical',
 ): number {
 	if (!skillId || _hitNumber === undefined || penetrationType !== 'physical') {
 		return 0
@@ -959,7 +991,7 @@ function getSkillPenetrationBonus(
 	}
 
 	// 他のスキル固有効果を追加する場合はここに記述
-	
+
 	return 0
 }
 
