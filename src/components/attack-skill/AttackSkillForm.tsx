@@ -423,10 +423,22 @@ export default function AttackSkillForm({
 											</div>
 										)}
 										{currentHit.multiplierFormula && (
-											<div className="flex items-center text-sm">
-												<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500 text-xs sm:text-sm">
-													{currentHit.multiplierFormula}
-												</span>
+											<div className="space-y-1">
+												{Array.isArray(currentHit.multiplierFormula) ? (
+													currentHit.multiplierFormula.map((formula) => (
+														<div key={formula} className="flex items-center text-sm">
+															<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500 text-xs sm:text-sm">
+																{formula}
+															</span>
+														</div>
+													))
+												) : (
+													<div className="flex items-center text-sm">
+														<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500 text-xs sm:text-sm">
+															{currentHit.multiplierFormula}
+														</span>
+													</div>
+												)}
 											</div>
 										)}
 										{currentHit.fixedDamageFormula && (

@@ -29,8 +29,10 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'totalATK',
 				multiplier: 750, // 表示用の値
 				fixedDamage: 300, // 表示用の値
-				multiplierFormula: '750% + 武器種別補正',
-				fixedDamageFormula: '300',
+				multiplierFormula: [
+					'片手剣装備時：威力+基礎DEX/2%',
+					'両手剣装備時：威力+基礎STR%',
+				],
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,

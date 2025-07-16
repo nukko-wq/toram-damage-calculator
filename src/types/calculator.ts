@@ -857,7 +857,7 @@ export interface AttackHit {
 	fixedDamage: number // 固定ダメージ（表示値、実際の計算は別途）
 
 	// 計算式説明（各撃ごとに設定可能）
-	multiplierFormula?: string // 倍率の計算式説明（例: "1000%", "|補正後STR|%"）
+	multiplierFormula?: string | string[] // 倍率の計算式説明（例: "1000%", "|補正後STR|%"、または武器種別ごとの複数式）
 	fixedDamageFormula?: string // 固定値の計算式説明（例: "400", "基礎INT/2"）
 
 	// 補正適用
@@ -915,7 +915,7 @@ export interface CalculatedHit {
 	fixedDamage: number // 表示用固定値
 
 	// 計算式説明
-	multiplierFormula?: string // 倍率の計算式説明
+	multiplierFormula?: string | string[] // 倍率の計算式説明
 	fixedDamageFormula?: string // 固定値の計算式説明
 
 	// 慣れ情報

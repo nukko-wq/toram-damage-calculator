@@ -1,5 +1,6 @@
 export { SkillHitCalculator } from './SkillHitCalculator'
 export { StandardCalculator } from './StandardCalculator'
+export { BusterBladeCalculator } from './BusterBladeCalculator'
 export { MoonSlashCalculator } from './MoonSlashCalculator'
 export { StrikeStabCalculator } from './StrikeStabCalculator'
 export { StrikeStabAilmentCalculator } from './StrikeStabAilmentCalculator'
