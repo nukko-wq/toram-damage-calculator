@@ -302,6 +302,27 @@ export function calculateAttackUpEffects(
 }
 
 /**
+ * ブレイブオーラ(IsBrave)の効果計算関数
+ */
+export function calculateBraveAuraEffects(
+	buffUserType: number, // 1: バフ使用者, 2: バフ非使用者
+): Partial<EquipmentProperties> {
+	if (!buffUserType || (buffUserType !== 1 && buffUserType !== 2)) return {}
+
+	const effects: Partial<EquipmentProperties> = {
+		WeaponATK_Rate: 30, // 全タイプ共通: 武器ATK+30%
+		// TODO: ブレイブ倍率+20%は後で実装
+	}
+
+	// バフ使用者の場合は命中率低下も追加
+	if (buffUserType === 1) {
+		effects.Accuracy_Rate = -50 // 命中率-50%
+	}
+
+	return effects
+}
+
+/**
  * 命中UP(exHIT)の効果計算関数
  */
 export function calculateAccuracyUpEffects(
@@ -624,6 +645,20 @@ export function getBuffSkillBonuses(
 	const hpBoost = buffSkillData['oh4']
 	if (hpBoost?.isEnabled && hpBoost.level) {
 		const effects = calculateHPBoostEffects(hpBoost.level)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	// ブレイブオーラの処理
+	const braveAura = buffSkillData['IsBrave']
+	if (braveAura?.isEnabled && braveAura.multiParam1) {
+		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {

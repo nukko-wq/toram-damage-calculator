@@ -438,6 +438,90 @@ function calculateCamouflageEffects(
 }
 ```
 
+#### 12.2 ブレイブオーラ (IsBrave)
+```typescript
+{
+  id: 'IsBrave',
+  name: 'ブレイブオーラ',
+  category: 'support',
+  type: 'multiParam',
+  order: 2001,
+  multiParams: {
+    param1: {
+      name: 'バフ使用者タイプ',
+      min: 1,
+      max: 2,
+      default: 2,
+      unit: ''
+    }
+  },
+  description: '全武器種で使用可能な攻撃力向上スキル。バフ使用者かどうかで効果が変動',
+  effects: [
+    {
+      property: 'WeaponATK_Rate',
+      formula: '+30',
+      conditions: ['全バフ使用者タイプ共通']
+    },
+    {
+      property: 'Accuracy_Rate',
+      formula: 'param1 === 1 ? -50 : 0',
+      conditions: ['バフ使用者(1)の場合のみ']
+    },
+    {
+      property: 'BraveMultiplier',
+      formula: '+20',
+      conditions: ['全バフ使用者タイプ共通']
+    }
+  ],
+  calculationFormula: `
+    バフ使用者(1)の場合:
+    - WeaponATK_Rate: +30%
+    - Accuracy_Rate: -50%
+    - ブレイブ倍率: +20%
+    
+    バフ非使用者(2)の場合:
+    - WeaponATK_Rate: +30%
+    - ブレイブ倍率: +20%
+  `,
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  damageCalculationIntegration: {
+    braveMultiplier: 'damageCalculationService.tsでブレイブ倍率として使用される',
+    applicationTiming: 'ダメージ計算のステップ10で適用'
+  },
+  uiSettings: {
+    parameterName: 'バフ使用者タイプ',
+    parameterUnit: '',
+    showInModal: true,
+    quickToggle: false,
+    parameterOptions: [
+      { value: 1, label: 'バフ使用者', description: 'ATK+30%, 命中-50%, ブレイブ倍率+20%' },
+      { value: 2, label: 'バフ非使用者', description: 'ATK+30%, ブレイブ倍率+20%' }
+    ]
+  }
+}
+
+// 実装用の効果計算関数
+function calculateBraveAuraEffects(
+  param1: number // バフ使用者タイプ (1: 使用者, 2: 非使用者)
+): Partial<EquipmentProperties> {
+  if (!param1 || (param1 !== 1 && param1 !== 2)) return {}
+  
+  const effects: Partial<EquipmentProperties> = {
+    WeaponATK_Rate: 30,
+    BraveMultiplier: 20
+  }
+  
+  // バフ使用者の場合は命中率低下も追加
+  if (param1 === 1) {
+    effects.Accuracy_Rate = -50
+  }
+  
+  return effects
+}
+```
+
 ### 13. サバイバルスキル系統
 
 詳細は [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) を参照してください。
