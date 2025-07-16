@@ -467,6 +467,57 @@ interface UISettings {
 }
 ```
 
+#### 18.2 前線維持Ⅱ (pal1)
+```typescript
+{
+  id: 'pal1',
+  name: '前線維持Ⅱ',
+  category: 'partisan',
+  type: 'level',
+  order: 2501,
+  maxLevel: 10,
+  description: '基本ステータスのレベルとスキルレベルに応じてHPを大幅に上昇させる',
+  effects: [
+    {
+      property: 'HP',
+      formula: '10 * (skillLevel * 10 + baseStatsLevel)',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)',
+  example: {
+    baseStatsLevel: 305,
+    skillLevel: 10,
+    calculation: 'HP = 10 × (10 × 10 + 305) = 10 × (100 + 305) = 10 × 405 = 4050',
+    result: 'HP +4050'
+  },
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateFrontlineMaintenance2Effects(
+  skillLevel: number,
+  baseStatsLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  // HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)
+  const hpBonus = 10 * (skillLevel * 10 + baseStatsLevel)
+  
+  return {
+    HP: hpBonus
+  }
+}
+```
+
 ## スキルタイプ別UI仕様
 
 ### toggleタイプ

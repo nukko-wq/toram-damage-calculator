@@ -336,6 +336,23 @@ export function calculateManaRechargeEffects(
 }
 
 /**
+ * 前線維持Ⅱ(pal1)の効果計算関数
+ */
+export function calculateFrontlineMaintenance2Effects(
+	skillLevel: number,
+	baseStatsLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	// HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)
+	const hpBonus = 10 * (skillLevel * 10 + baseStatsLevel)
+
+	return {
+		HP: hpBonus,
+	}
+}
+
+/**
  * 命中UP(exHIT)の効果計算関数
  */
 export function calculateAccuracyUpEffects(
@@ -669,9 +686,40 @@ export function getBuffSkillBonuses(
 	}
 
 	// ブレイブオーラの処理
-	const braveAura = buffSkillData['IsBrave']
+	const braveAura = buffSkillData.IsBrave
 	if (braveAura?.isEnabled && braveAura.multiParam1) {
 		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから前線維持Ⅱの効果を取得（基本ステータスレベルが必要）
+ */
+export function getFrontlineMaintenance2Effects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	baseStatsLevel: number,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 前線維持Ⅱ(pal1)の処理
+	const frontlineMaintenance2 = buffSkillData.pal1
+	if (frontlineMaintenance2?.isEnabled && frontlineMaintenance2.level) {
+		const effects = calculateFrontlineMaintenance2Effects(
+			frontlineMaintenance2.level,
+			baseStatsLevel,
+		)
 
 		// EquipmentPropertiesをAllBonusesに変換して統合
 		for (const [key, value] of Object.entries(effects)) {
