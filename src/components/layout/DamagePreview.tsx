@@ -17,7 +17,7 @@ import {
 	loadCaptureData,
 	createCaptureData,
 } from '@/utils/damageCaptureStorage'
-import { getBuffSkillPassiveMultiplier } from '@/utils/buffSkillCalculation'
+import { getBuffSkillPassiveMultiplier, getBuffSkillPassiveMultiplierWithSkillCategory } from '@/utils/buffSkillCalculation'
 import type { PowerOptions } from '@/types/calculator'
 import { createInitialPowerOptions } from '@/utils/initialData'
 
@@ -470,7 +470,12 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								originalHit.powerReference === 'MATK'
 									? calculationResults?.basicStats.MATK || 1500
 									: totalATK,
-							passiveMultiplier: passiveMultiplier, // パッシブ倍率をスキル攻撃にも適用
+							// スキルカテゴリを考慮したパッシブ倍率を適用
+							passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
+								calculatorData.buffSkills?.skills || null,
+								calculatorData.mainWeapon?.weaponType || null,
+								selectedSkill.category,
+							),
 							attackSkill: {
 								type: originalHit.attackType,
 								multiplier: hitResult.calculatedMultiplier,
@@ -482,6 +487,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									return distances
 								})(),
 								canUseLongRange: originalHit.canUseLongRange,
+								skillId: selectedSkill.id,
+								hitNumber: hitResult.hitNumber,
 							},
 							// スキルでも距離・抜刀・慣れ設定を適用
 							unsheathe: {

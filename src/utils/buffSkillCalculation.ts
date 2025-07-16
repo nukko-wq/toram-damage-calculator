@@ -928,3 +928,28 @@ export function getBuffSkillPassiveMultiplier(
 
 	return totalPassiveMultiplier
 }
+
+/**
+ * バフスキルデータからパッシブ倍率を取得（攻撃スキルカテゴリ考慮版）
+ */
+export function getBuffSkillPassiveMultiplierWithSkillCategory(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	weaponType: WeaponType | null,
+	attackSkillCategory?: string,
+): number {
+	const convertedWeaponType = convertWeaponType(weaponType)
+	let totalPassiveMultiplier = 0
+
+	if (!buffSkillData) return totalPassiveMultiplier
+
+	// 匠の剣術(sm4)の処理 - bladeカテゴリのスキル使用時のみ適用
+	const takumiKenjutsu = buffSkillData.sm4
+	if (takumiKenjutsu?.isEnabled && attackSkillCategory === 'blade') {
+		totalPassiveMultiplier += calculateTakumiKenjutsuPassiveMultiplier(
+			takumiKenjutsu.isEnabled,
+			convertedWeaponType,
+		)
+	}
+
+	return totalPassiveMultiplier
+}

@@ -12,7 +12,7 @@ import { getAttackSkillById } from '@/data/attackSkills'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
-import { getBuffSkillPassiveMultiplier } from '@/utils/buffSkillCalculation'
+import { getBuffSkillPassiveMultiplier, getBuffSkillPassiveMultiplierWithSkillCategory } from '@/utils/buffSkillCalculation'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import { createInitialPowerOptions } from '@/utils/initialData'
 
@@ -59,6 +59,7 @@ export function calculateDamageWithService(
 		const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
 
 		// バフスキルからパッシブ倍率を取得
+		// 通常攻撃時は攻撃スキルカテゴリがないため、従来の関数を使用
 		const passiveMultiplier = getBuffSkillPassiveMultiplier(
 			calculatorData.buffSkills?.skills || null,
 			calculatorData.mainWeapon?.weaponType || null,
@@ -277,7 +278,12 @@ export function calculateDamageWithService(
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
 								: totalATK,
-						passiveMultiplier: passiveMultiplier, // パッシブ倍率をスキル攻撃にも適用
+						// スキルカテゴリを考慮したパッシブ倍率を適用
+						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
+							calculatorData.buffSkills?.skills || null,
+							calculatorData.mainWeapon?.weaponType || null,
+							selectedSkill.category,
+						),
 						attackSkill: {
 							type: originalHit.attackType,
 							multiplier: hitResult.calculatedMultiplier,
@@ -289,6 +295,8 @@ export function calculateDamageWithService(
 								return distances
 							})(),
 							canUseLongRange: originalHit.canUseLongRange,
+							skillId: selectedSkill.id,
+							hitNumber: hitResult.hitNumber,
 						},
 						// スキルでも距離・抜刀・慣れ設定を適用
 						unsheathe: {
