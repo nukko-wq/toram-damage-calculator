@@ -807,6 +807,7 @@ export type AttackSkillCategory =
 	| 'knuckle' // 拳甲
 	| 'halberd' // 旋棍
 	| 'katana' // 刀
+	| 'hunter' // ハンタースキル
 	| 'dualSword' // 双剣
 	| 'martialArts' // 格闘
 	// 新スキルツリー分類

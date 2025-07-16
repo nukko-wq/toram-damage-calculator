@@ -287,6 +287,38 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// サイクロンアロー（ハンタースキル）
+	{
+		id: 'cyclone_arrow',
+		name: 'サイクロンアロー',
+		order: 502,
+		systemGroup: 'bow',
+		category: 'hunter',
+		weaponTypeRequirements: ['弓'],
+		mpCost: 100,
+		multiplierFormula: '100% + 矢装備時補正後DEX/2%',
+		fixedDamageFormula: '100',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 100,
+				fixedDamage: 100,
+				multiplierFormula: '100% + 矢装備時補正後DEX/2%',
+				fixedDamageFormula: '100',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
+
 	// 両手剣スキル（Lブーメラン\u2162）
 	{
 		id: 'l_boomerang_3',
