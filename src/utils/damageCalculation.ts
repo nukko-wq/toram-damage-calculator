@@ -24,6 +24,8 @@ export interface DamageCalculationInput {
 		fixedDamage: number // スキル固定値
 		supportedDistances: ('short' | 'long')[] // 対応距離（距離補正有効な距離）
 		canUseLongRange: boolean // ロングレンジバフの適用可否
+		skillId?: string // スキルID（スキル固有効果用）
+		hitNumber?: number // ヒット番号（スキル固有効果用）
 	}
 
 	// 耐性・防御力
@@ -800,8 +802,14 @@ function processEnemyDefense(
 	let penetrationRate = 0
 	if (defenseType === 'DEF') {
 		penetrationRate = input.penetration.physical
+		
+		// スキル固有の貫通ボーナス適用
+		penetrationRate += getSkillPenetrationBonus(input.attackSkill.skillId, input.attackSkill.hitNumber, 'physical')
 	} else if (defenseType === 'MDEF') {
 		penetrationRate = input.penetration.magical
+		
+		// スキル固有の貫通ボーナス適用
+		penetrationRate += getSkillPenetrationBonus(input.attackSkill.skillId, input.attackSkill.hitNumber, 'magical')
 	}
 
 	// 貫通計算（小数点を保持したまま返す）
@@ -809,6 +817,28 @@ function processEnemyDefense(
 
 	// 小数点を保持したまま返す（Math.floorは基礎ダメージ計算で適用）
 	return processed
+}
+
+/**
+ * スキル固有の貫通ボーナスを取得
+ */
+function getSkillPenetrationBonus(
+	skillId?: string,
+	hitNumber?: number,
+	penetrationType?: 'physical' | 'magical'
+): number {
+	if (!skillId || hitNumber === undefined || penetrationType !== 'physical') {
+		return 0
+	}
+
+	// Lブーメラン3の物理貫通+50%ボーナス
+	if (skillId === 'l_boomerang_3') {
+		return 50
+	}
+
+	// 他のスキル固有効果を追加する場合はここに記述
+	
+	return 0
 }
 
 /**
