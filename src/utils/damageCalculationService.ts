@@ -12,7 +12,7 @@ import { getAttackSkillById } from '@/data/attackSkills'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
-import { getBuffSkillPassiveMultiplier, getBuffSkillPassiveMultiplierWithSkillCategory } from '@/utils/buffSkillCalculation'
+import { getBuffSkillPassiveMultiplier, getBuffSkillPassiveMultiplierWithSkillCategory, getBuffSkillBraveMultiplier } from '@/utils/buffSkillCalculation'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import { createInitialPowerOptions } from '@/utils/initialData'
 
@@ -65,6 +65,11 @@ export function calculateDamageWithService(
 			calculatorData.mainWeapon?.weaponType || null,
 		)
 
+		// バフスキルからブレイブ倍率を取得
+		const braveMultiplier = getBuffSkillBraveMultiplier(
+			calculatorData.buffSkills?.skills || null,
+		)
+
 		if (debugEnabled && debug && process.env.NODE_ENV === 'development') {
 			console.log('=== DamageCalculationService 中央集約計算結果 ===')
 			console.log('calculationResults?.basicStats.totalATK:', totalATK)
@@ -73,6 +78,7 @@ export function calculateDamageWithService(
 				stabilityRate,
 			)
 			console.log('passiveMultiplier:', passiveMultiplier)
+			console.log('braveMultiplier:', braveMultiplier)
 		}
 
 		// 敵情報を取得
@@ -143,6 +149,7 @@ export function calculateDamageWithService(
 			playerLevel: calculatorData.baseStats.level,
 			referenceStat: totalATK, // 計算済みの総ATKを使用
 			passiveMultiplier: passiveMultiplier, // バフスキルから取得したパッシブ倍率を適用
+			braveMultiplier: braveMultiplier, // バフスキルから取得したブレイブ倍率を適用
 			// 敵情報を実際のデータに基づいて設定
 			enemyLevel: finalEnemyLevel,
 			stability: {
@@ -284,6 +291,8 @@ export function calculateDamageWithService(
 							calculatorData.mainWeapon?.weaponType || null,
 							selectedSkill.category,
 						),
+						// ブレイブ倍率はスキル攻撃でも同じ値を使用
+						braveMultiplier: braveMultiplier,
 						attackSkill: {
 							type: originalHit.attackType,
 							multiplier: hitResult.calculatedMultiplier,

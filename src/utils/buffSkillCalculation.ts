@@ -311,7 +311,7 @@ export function calculateBraveAuraEffects(
 
 	const effects: Partial<EquipmentProperties> = {
 		WeaponATK_Rate: 30, // 全タイプ共通: 武器ATK+30%
-		// TODO: ブレイブ倍率+20%は後で実装
+		BraveMultiplier: 20, // ブレイブ倍率+20%
 	}
 
 	// バフ使用者の場合は命中率低下も追加
@@ -987,4 +987,28 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
 	}
 
 	return totalPassiveMultiplier
+}
+
+/**
+ * バフスキルデータからブレイブ倍率を取得
+ * 複数のブレイブ倍率スキルを加算して合計値を返す
+ */
+export function getBuffSkillBraveMultiplier(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): number {
+	let braveMultiplier = 0
+
+	if (!buffSkillData) return braveMultiplier
+
+	// ブレイブオーラ（IsBrave）の処理
+	const braveAura = buffSkillData['IsBrave']
+	if (braveAura?.isEnabled && braveAura.multiParam1) {
+		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
+		braveMultiplier += effects.BraveMultiplier || 0
+	}
+
+	// 今後、他のブレイブ倍率スキルも追加予定
+	// マナリチャージ、獅子奮闘・極、オーラブレード、アシュラオーラ、エンハンス等
+
+	return braveMultiplier
 }

@@ -803,8 +803,8 @@ function applyBraveMultiplier(
 	input: DamageCalculationInput,
 	steps: DamageCalculationSteps,
 ): number {
-	// Phase 3ではプレースホルダー実装（倍率は適用せず）
-	const braveRate = 0 // input.braveMultiplier
+	// ブレイブ倍率を適用
+	const braveRate = input.braveMultiplier
 
 	const result = Math.floor(beforeBrave * (1 + braveRate / 100))
 
