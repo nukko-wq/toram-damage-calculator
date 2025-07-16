@@ -323,6 +323,19 @@ export function calculateBraveAuraEffects(
 }
 
 /**
+ * マナリチャージ(IsManaReCharge)の効果計算関数
+ */
+export function calculateManaRechargeEffects(
+	isEnabled: boolean,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+
+	return {
+		BraveMultiplier: -25, // ブレイブ倍率-25%
+	}
+}
+
+/**
  * 命中UP(exHIT)の効果計算関数
  */
 export function calculateAccuracyUpEffects(
@@ -1001,14 +1014,21 @@ export function getBuffSkillBraveMultiplier(
 	if (!buffSkillData) return braveMultiplier
 
 	// ブレイブオーラ（IsBrave）の処理
-	const braveAura = buffSkillData['IsBrave']
+	const braveAura = buffSkillData.IsBrave
 	if (braveAura?.isEnabled && braveAura.multiParam1) {
 		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
 		braveMultiplier += effects.BraveMultiplier || 0
 	}
 
+	// マナリチャージ（IsManaReCharge）の処理
+	const manaRecharge = buffSkillData.IsManaReCharge
+	if (manaRecharge?.isEnabled) {
+		const effects = calculateManaRechargeEffects(manaRecharge.isEnabled)
+		braveMultiplier += effects.BraveMultiplier || 0
+	}
+
 	// 今後、他のブレイブ倍率スキルも追加予定
-	// マナリチャージ、獅子奮闘・極、オーラブレード、アシュラオーラ、エンハンス等
+	// 獅子奮闘・極、オーラブレード、アシュラオーラ、エンハンス等
 
 	return braveMultiplier
 }

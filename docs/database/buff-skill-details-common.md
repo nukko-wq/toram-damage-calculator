@@ -522,6 +522,52 @@ function calculateBraveAuraEffects(
 }
 ```
 
+#### 12.3 マナリチャージ (IsManaReCharge)
+```typescript
+{
+  id: 'IsManaReCharge',
+  name: 'マナリチャージ',
+  category: 'support',
+  type: 'toggle',
+  order: 2004,
+  description: '全武器種で使用可能なブレイブ倍率低下スキル。マナ回復効果と引き換えにダメージが減少',
+  effects: [
+    {
+      property: 'BraveMultiplier',
+      formula: '-25',
+      conditions: ['ON時のみ']
+    }
+  ],
+  calculationFormula: `
+    ON時:
+    - ブレイブ倍率: -25%
+  `,
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  damageCalculationIntegration: {
+    braveMultiplier: 'damageCalculationService.tsでブレイブ倍率として使用される（負の値）',
+    applicationTiming: 'ダメージ計算のステップ10で適用'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+
+// 実装用の効果計算関数
+function calculateManaRechargeEffects(
+  isEnabled: boolean
+): Partial<EquipmentProperties> {
+  if (!isEnabled) return {}
+  
+  return {
+    BraveMultiplier: -25 // ブレイブ倍率-25%
+  }
+}
+```
+
 ### 13. サバイバルスキル系統
 
 詳細は [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) を参照してください。
