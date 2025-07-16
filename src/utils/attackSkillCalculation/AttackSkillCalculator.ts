@@ -65,7 +65,7 @@ export class AttackSkillCalculator {
 				return new StrikeStabAilmentCalculator()
 			case 'magic_arrow':
 				return new MagicArrowCalculator()
-			case 'slash':
+			case 'buster_blade':
 			case 'power_shot':
 			case 'dual_strike':
 				return new StandardCalculator()

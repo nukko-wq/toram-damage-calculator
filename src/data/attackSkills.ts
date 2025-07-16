@@ -16,9 +16,9 @@ const attackSkillsRawData: AttackSkill[] = [
 		order: 101,
 		systemGroup: 'sword',
 		category: 'blade',
-		weaponTypeRequirements: ['片手剣'],
+		weaponTypeRequirements: ['片手剣', '両手剣', '双剣'],
 		mpCost: 300,
-		multiplierFormula: '特殊計算',
+		multiplierFormula: '750% + 武器種別補正',
 		fixedDamageFormula: '300',
 		hits: [
 			{
@@ -27,12 +27,12 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
 				powerReference: 'totalATK',
-				multiplier: 125, // 表示用の値
-				fixedDamage: 0, // 表示用の値
-				multiplierFormula: '125%',
-				fixedDamageFormula: '0',
+				multiplier: 750, // 表示用の値
+				fixedDamage: 300, // 表示用の値
+				multiplierFormula: '750% + 武器種別補正',
+				fixedDamageFormula: '300',
 				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
