@@ -13,6 +13,7 @@
 - **モノノフスキル系統**: [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) ✅
 - **サバイバルスキル系統**: [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) ✅
 - **バトルスキル系統**: [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) ✅
+- **ハンタースキル系統**: [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills-common/README.md](./buff-skills-common/README.md) を参照してください。
@@ -273,80 +274,10 @@ interface UISettings {
 
 ### 9. ハンタースキル系統
 
-#### 9.1 カムフラージュ (hunter5-2)
-```typescript
-{
-  id: 'hunter5-2',
-  name: 'カムフラージュ',
-  category: 'hunter',
-  type: 'level',
-  order: 1701,
-  maxLevel: 10,
-  description: '基本ステータスのレベルとスキルレベルに応じてATKとクリティカルを上昇させる',
-  weaponConditionalEffects: {
-    // 弓・自動弓の場合
-    bow: {
-      conditions: ['メイン武器が弓または自動弓'],
-      effects: [
-        { property: 'ATK', formula: 'Math.floor(baseStatsLevel * skillLevel / 10)' },
-        { property: 'Critical', formula: 'skillLevel * 4' }
-      ]
-    },
-    // その他の武器の場合
-    default: {
-      conditions: ['メイン武器が弓・自動弓以外'],
-      effects: [
-        { property: 'ATK', formula: 'Math.floor(baseStatsLevel / 2 * skillLevel / 10)' },
-        { property: 'Critical', formula: 'skillLevel * 4' }
-      ]
-    }
-  },
-  calculationFormula: `
-    弓・自動弓装備時:
-    - ATK = Math.floor(基本ステータスレベル × スキルレベル ÷ 10)
-    - クリティカル = スキルレベル × 4
-    
-    その他武器装備時:
-    - ATK = Math.floor(基本ステータスレベル ÷ 2 × スキルレベル ÷ 10)
-    - クリティカル = スキルレベル × 4
-  `,
-  example: {
-    baseStatsLevel: 305,
-    skillLevel: 10,
-    bowCalculation: 'ATK = Math.floor(305 × 10 ÷ 10) = Math.floor(305) = 305, Critical = 10 × 4 = 40',
-    otherCalculation: 'ATK = Math.floor(305 ÷ 2 × 10 ÷ 10) = Math.floor(152.5 × 1) = Math.floor(152.5) = 152, Critical = 10 × 4 = 40',
-    bowResult: 'ATK +305, Critical +40',
-    otherResult: 'ATK +152, Critical +40'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
+詳細は [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) を参照してください。
 
-// 実装用の効果計算関数
-function calculateCamouflageEffects(
-  skillLevel: number,
-  baseStatsLevel: number,
-  weaponType: MainWeaponType | null
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  const isBowWeapon = weaponType === 'bow' || weaponType === 'bowgun'
-  
-  // ATK計算：弓系は基本ステータスレベル × スキルレベル ÷ 10、その他は基本ステータスレベル ÷ 2 × スキルレベル ÷ 10（小数点切り捨て）
-  const atkBonus = isBowWeapon 
-    ? Math.floor(baseStatsLevel * skillLevel / 10)
-    : Math.floor(baseStatsLevel / 2 * skillLevel / 10)
-  
-  return {
-    ATK: atkBonus,
-    Critical: skillLevel * 4
-  }
-}
-```
+**含まれるスキル:**
+- 9.1 カムフラージュ (hunter5-2) - 基本ステータスレベル依存ATK・クリティカル上昇（武器種別効果）
 
 ### 10. アサシンスキル系統
 
