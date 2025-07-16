@@ -14,6 +14,8 @@
 - **サバイバルスキル系統**: [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) ✅
 - **バトルスキル系統**: [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) ✅
 - **ハンタースキル系統**: [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) ✅
+- **デュアルソードスキル系統**: [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) ✅
+- **サポートスキル系統**: [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills-common/README.md](./buff-skills-common/README.md) を参照してください。
@@ -342,162 +344,11 @@ interface UISettings {
 
 ### 12. サポートスキル系統
 
-#### 12.1 ファーストエイド (support1)
-```typescript
-{
-  id: 'support1',
-  name: 'ファーストエイド',
-  category: 'support',
-  type: 'level',
-  order: 1601,
-  maxLevel: 10,
-  description: '最大HPを上昇させる',
-  effects: [
-    {
-      property: 'HP_Rate',
-      formula: 'skillLevel * 5',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'HP% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+詳細は [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) を参照してください。
 
-#### 12.2 ブレイブオーラ (IsBrave)
-```typescript
-{
-  id: 'IsBrave',
-  name: 'ブレイブオーラ',
-  category: 'support',
-  type: 'multiParam',
-  order: 2001,
-  multiParams: {
-    param1: {
-      name: 'バフ使用者タイプ',
-      min: 1,
-      max: 2,
-      default: 2,
-      unit: ''
-    }
-  },
-  description: '全武器種で使用可能な攻撃力向上スキル。バフ使用者かどうかで効果が変動',
-  effects: [
-    {
-      property: 'WeaponATK_Rate',
-      formula: '+30',
-      conditions: ['全バフ使用者タイプ共通']
-    },
-    {
-      property: 'Accuracy_Rate',
-      formula: 'param1 === 1 ? -50 : 0',
-      conditions: ['バフ使用者(1)の場合のみ']
-    },
-    {
-      property: 'BraveMultiplier',
-      formula: '+20',
-      conditions: ['全バフ使用者タイプ共通']
-    }
-  ],
-  calculationFormula: `
-    バフ使用者(1)の場合:
-    - WeaponATK_Rate: +30%
-    - Accuracy_Rate: -50%
-    - ブレイブ倍率: +20%
-    
-    バフ非使用者(2)の場合:
-    - WeaponATK_Rate: +30%
-    - ブレイブ倍率: +20%
-  `,
-  weaponRequirement: {
-    description: 'すべての武器で効果があります'
-  },
-  damageCalculationIntegration: {
-    braveMultiplier: 'damageCalculationService.tsでブレイブ倍率として使用される',
-    applicationTiming: 'ダメージ計算のステップ10で適用'
-  },
-  uiSettings: {
-    parameterName: 'バフ使用者タイプ',
-    parameterUnit: '',
-    showInModal: true,
-    quickToggle: false,
-    parameterOptions: [
-      { value: 1, label: 'バフ使用者', description: 'ATK+30%, 命中-50%, ブレイブ倍率+20%' },
-      { value: 2, label: 'バフ非使用者', description: 'ATK+30%, ブレイブ倍率+20%' }
-    ]
-  }
-}
-
-// 実装用の効果計算関数
-function calculateBraveAuraEffects(
-  param1: number // バフ使用者タイプ (1: 使用者, 2: 非使用者)
-): Partial<EquipmentProperties> {
-  if (!param1 || (param1 !== 1 && param1 !== 2)) return {}
-  
-  const effects: Partial<EquipmentProperties> = {
-    WeaponATK_Rate: 30,
-    BraveMultiplier: 20
-  }
-  
-  // バフ使用者の場合は命中率低下も追加
-  if (param1 === 1) {
-    effects.Accuracy_Rate = -50
-  }
-  
-  return effects
-}
-```
-
-#### 12.3 マナリチャージ (IsManaReCharge)
-```typescript
-{
-  id: 'IsManaReCharge',
-  name: 'マナリチャージ',
-  category: 'support',
-  type: 'toggle',
-  order: 2004,
-  description: '全武器種で使用可能なブレイブ倍率低下スキル。マナ回復効果と引き換えにダメージが減少',
-  effects: [
-    {
-      property: 'BraveMultiplier',
-      formula: '-25',
-      conditions: ['ON時のみ']
-    }
-  ],
-  calculationFormula: `
-    ON時:
-    - ブレイブ倍率: -25%
-  `,
-  weaponRequirement: {
-    description: 'すべての武器で効果があります'
-  },
-  damageCalculationIntegration: {
-    braveMultiplier: 'damageCalculationService.tsでブレイブ倍率として使用される（負の値）',
-    applicationTiming: 'ダメージ計算のステップ10で適用'
-  },
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-
-// 実装用の効果計算関数
-function calculateManaRechargeEffects(
-  isEnabled: boolean
-): Partial<EquipmentProperties> {
-  if (!isEnabled) return {}
-  
-  return {
-    BraveMultiplier: -25 // ブレイブ倍率-25%
-  }
-}
-```
+**含まれるスキル:**
+- 12.1 ブレイブオーラ (IsBrave) - 武器ATK+30%、ブレイブ倍率+20%（バフ使用者時命中率-50%）
+- 12.2 マナリチャージ (IsManaReCharge) - ブレイブ倍率-25%
 
 ### 13. サバイバルスキル系統
 
@@ -549,65 +400,10 @@ function calculateManaRechargeEffects(
 
 ### 16. デュアルソードスキル系統
 
-#### 16.1 神速の軌跡 (ds1-2)
-```typescript
-{
-  id: 'ds1-2',
-  name: '神速の軌跡',
-  category: 'dualSword',
-  type: 'level',
-  order: 801,
-  maxLevel: 10,
-  description: 'AGIと抜刀威力を上昇させる（双剣装備時は抜刀威力がより大きく上昇）',
-  effects: [
-    {
-      property: 'AGI',
-      formula: 'skillLevel + Math.max(skillLevel - 5, 0)',
-      conditions: []
-    },
-    {
-      property: 'UnsheatheAttack',
-      formula: 'mainWeapon === "dualSword" ? (15 + skillLevel) : (5 + skillLevel)',
-      conditions: ['武器種によって効果値変動']
-    }
-  ],
-  calculationFormula: 'AGI = スキルレベル + MAX(スキルレベル - 5, 0)\n双剣以外: 抜刀威力 = 5 + スキルレベル\n双剣装備時: 抜刀威力 = 15 + スキルレベル',
-  example: {
-    skillLevel: 10,
-    calculation: 'AGI = 10 + MAX(10 - 5, 0) = 10 + 5 = 15\n双剣以外: 抜刀威力 = 5 + 10 = 15\n双剣装備時: 抜刀威力 = 15 + 10 = 25',
-    result: 'AGI +15, 抜刀威力 +15(双剣以外) / +25(双剣)'
-  },
-  weaponRequirement: {
-    description: '全武器種で使用可能、双剣装備時は抜刀威力の効果が強化される'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
+詳細は [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) を参照してください。
 
-// 実装用の効果計算関数
-function calculateGodspeedTrajectoryEffects(
-  skillLevel: number,
-  mainWeaponType: MainWeaponType | null
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  // AGI = スキルレベル + MAX(スキルレベル - 5, 0)
-  const agiBonus = skillLevel + Math.max(skillLevel - 5, 0)
-  
-  // 抜刀威力 = 双剣装備時は15+スキルレベル、それ以外は5+スキルレベル
-  const isDualSword = mainWeaponType === 'dualSword'
-  const unsheatheAttackBonus = isDualSword ? (15 + skillLevel) : (5 + skillLevel)
-  
-  return {
-    AGI: agiBonus,
-    UnsheatheAttack: unsheatheAttackBonus
-  }
-}
-```
+**含まれるスキル:**
+- 16.1 神速の軌跡 (ds1-2) - AGI・抜刀威力上昇（双剣装備時抜刀威力強化）
 
 ### 17. ミンストレルスキル系統
 
