@@ -57,8 +57,8 @@ interface AttackSkill {
   // 多段攻撃設定
   hits: AttackHit[]                   // 1〜6撃目の情報配列
   
-  // 特殊効果
-  specialEffects?: string[] // 特殊効果の説明文配列
+  // 特殊効果（スキル全体）
+  specialEffects?: string[] // スキル全体の特殊効果（非推奨、後方互換性のため保持）
   
   // メタ情報
   notes?: string                     // 実装・使用上の注意
@@ -144,6 +144,9 @@ interface AttackHit {
   canUseLongRange: boolean             // ロングレンジ適用可否
   canUseDistancePower: boolean         // 距離威力適用可否
   
+  // 特殊効果（撃数別）
+  specialEffects?: string[]            // 各撃数に固有の特殊効果
+  
   // 特殊設定
   notes?: string                       // 備考
 }
@@ -197,6 +200,9 @@ interface CalculatedHit {
   canUseUnsheathePower: boolean
   canUseLongRange: boolean
   canUseDistancePower: boolean
+  
+  // 特殊効果（撃数別）
+  specialEffects?: string[]           // 各撃数に固有の特殊効果
   
   // 計算過程（詳細表示用）
   calculationDetails?: CalculationDetails
@@ -327,6 +333,7 @@ interface MultiHitDisplay {
   fixedDamage: number                 // 表示用固定値
   multiplierFormula?: string          // 倍率の計算式説明
   fixedDamageFormula?: string         // 固定値の計算式説明
+  specialEffects?: string[]           // 各撃数に固有の特殊効果
 }
 ```
 
@@ -359,7 +366,10 @@ function getSkillDisplayData(skill: AttackSkill): CalculatedHit[] {
     familiarityGrant: hit.familiarityGrant,
     canUseUnsheathePower: hit.canUseUnsheathePower,
     canUseLongRange: hit.canUseLongRange,
-    canUseDistancePower: hit.canUseDistancePower
+    canUseDistancePower: hit.canUseDistancePower,
+    
+    // 特殊効果（撃数別）
+    specialEffects: hit.specialEffects
   }))
 }
 
@@ -409,9 +419,6 @@ export const attackSkillsData: AttackSkill[] = [
     mpCost: 8,
     multiplierFormula: "125%",
     fixedDamageFormula: "0",
-    specialEffects: [
-      "物理貫通ボーナス: +20%"
-    ],
     hits: [{
       hitNumber: 1,
       attackType: 'physical',
@@ -426,7 +433,10 @@ export const attackSkillsData: AttackSkill[] = [
       familiarityGrant: 'physical',
       canUseUnsheathePower: true,
       canUseLongRange: false,
-      canUseDistancePower: true
+      canUseDistancePower: true,
+      specialEffects: [
+        "物理貫通ボーナス: +20%"
+      ]
     }]
   },
   
@@ -440,11 +450,6 @@ export const attackSkillsData: AttackSkill[] = [
     mpCost: 400,
     multiplierFormula: "特殊計算",
     fixedDamageFormula: "特殊計算",
-    specialEffects: [
-      "距離威力: ○",
-      "抜刀威力: ×",
-      "ロングレンジ: ×"
-    ],
     hits: [
       {
         hitNumber: 1,
@@ -460,7 +465,12 @@ export const attackSkillsData: AttackSkill[] = [
         familiarityGrant: 'physical',
         canUseUnsheathePower: false,
         canUseLongRange: false,
-        canUseDistancePower: true
+        canUseDistancePower: true,
+        specialEffects: [
+          "距離威力: ○",
+          "抜刀威力: ×",
+          "ロングレンジ: ×"
+        ]
       },
       {
         hitNumber: 2,
@@ -476,7 +486,12 @@ export const attackSkillsData: AttackSkill[] = [
         familiarityGrant: 'physical',
         canUseUnsheathePower: false,
         canUseLongRange: false,
-        canUseDistancePower: true
+        canUseDistancePower: true,
+        specialEffects: [
+          "距離威力: ○",
+          "抜刀威力: ×",
+          "ロングレンジ: ×"
+        ]
       }
     ]
   }

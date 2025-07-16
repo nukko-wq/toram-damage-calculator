@@ -20,7 +20,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 300,
 		multiplierFormula: '特殊計算',
 		fixedDamageFormula: '300',
-		specialEffects: ['確定クリティカル'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -38,6 +37,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: true,
 				canUseLongRangePower: false,
+				specialEffects: ['確定クリティカル'],
 			},
 		],
 	},
@@ -166,7 +166,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 200,
 		multiplierFormula: '400+補正後STR/5%',
 		fixedDamageFormula: '100 (旋風槍装備時+100)',
-		specialEffects: ['距離威力: ○', '抜刀威力: ×', 'ロングレンジ: ×'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -264,7 +263,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 10,
 		multiplierFormula: '150%',
 		fixedDamageFormula: '0',
-		specialEffects: ['ロングレンジ対応'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -282,6 +280,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: true,
 				canUseShortRangePower: true,
 				canUseLongRangePower: true,
+				specialEffects: ['ロングレンジ対応'],
 			},
 		],
 	},
@@ -297,7 +296,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 400,
 		multiplierFormula: '特殊計算',
 		fixedDamageFormula: '400',
-		specialEffects: ['貫通ボーナス50%'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -314,6 +312,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: false,
 				canUseLongRangePower: false,
+				specialEffects: ['貫通ボーナス50%'],
 			},
 			{
 				hitNumber: 2,
@@ -330,6 +329,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: false,
 				canUseLongRangePower: false,
+				specialEffects: ['貫通ボーナス50%'],
 			},
 		],
 	},
@@ -345,7 +345,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 15,
 		multiplierFormula: '各撃で異なる',
 		fixedDamageFormula: '0',
-		specialEffects: ['連続攻撃', 'クリティカル率+5%'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -363,6 +362,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: true,
 				canUseLongRangePower: true,
+				specialEffects: ['連続攻撃', 'クリティカル率+5%'],
 			},
 			{
 				hitNumber: 2,
@@ -380,6 +380,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: false,
 				canUseLongRangePower: false,
+				specialEffects: ['連続攻撃'],
 			},
 		],
 	},

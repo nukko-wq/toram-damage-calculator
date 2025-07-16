@@ -868,6 +868,9 @@ export interface AttackHit {
 	canUseShortRangePower: boolean // 近距離威力適用可否
 	canUseLongRangePower: boolean // 遠距離威力適用可否
 
+	// 特殊効果（撃数別）
+	specialEffects?: string[] // 各撃数に固有の特殊効果
+
 	// 特殊設定
 	notes?: string // 備考
 }
@@ -924,6 +927,9 @@ export interface CalculatedHit {
 	canUseLongRange: boolean
 	canUseShortRangePower: boolean
 	canUseLongRangePower: boolean
+
+	// 特殊効果（撃数別）
+	specialEffects?: string[] // 各撃数に固有の特殊効果
 
 	// 計算過程（特殊計算の場合）
 	calculationProcess?: string
