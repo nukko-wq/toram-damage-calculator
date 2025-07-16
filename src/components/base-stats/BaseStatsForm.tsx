@@ -4,17 +4,11 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { baseStatsSchema, type BaseStatsFormData } from '@/schemas/baseStats'
 import type { BaseStats } from '@/types/calculator'
-import { useEffect, useCallback, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
 import { calculateStatPoints } from '@/utils/statPointCalculation'
 
-interface BaseStatsFormProps {
-	// Zustand移行後は不要（後方互換性のため残存）
-	stats?: BaseStats
-	onChange?: (stats: BaseStats) => void
-}
-
-export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
+export default function BaseStatsForm() {
 	// 初期化状態管理
 	const [isInitialized, setIsInitialized] = useState(false)
 
@@ -28,7 +22,6 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 	const {
 		register,
 		watch,
-		formState: { errors },
 		setValue,
 		getValues,
 	} = useForm<BaseStatsFormData>({
@@ -84,10 +77,8 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 		// 次のティックで再有効化（ちらつき最小化）
 		const timer = setTimeout(() => setIsInitialized(true), 30)
 		return () => clearTimeout(timer)
-	}, [effectiveStats])
+	}, [])
 
-	// 後方互換性のためのonChange（省略可能）
-	const stableOnChange = useCallback(onChange || (() => {}), [onChange])
 
 	// フォームの値変更を監視して親に通知
 	useEffect(() => {
@@ -97,23 +88,17 @@ export default function BaseStatsForm({ stats, onChange }: BaseStatsFormProps) {
 				return
 			}
 
-			// 全ての値が有効な数値の場合のみonChangeを呼ぶ
+			// 全ての値が有効な数値の場合のみZustandストアを更新
 			const isAllValid = Object.values(value).every(
 				(v) => typeof v === 'number' && !Number.isNaN(v) && v >= 1,
 			)
 
 			if (isAllValid) {
-				// Zustandストアを更新（完全移行）
 				updateBaseStats(value as BaseStats)
-
-				// 後方互換性のため従来のonChangeも呼び出し
-				if (onChange) {
-					stableOnChange(value as BaseStats)
-				}
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watch, stableOnChange, isInitialized, updateBaseStats])
+	}, [watch, isInitialized, updateBaseStats])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-1 md:row-end-2 xl:col-start-1 xl:col-end-3 xl:row-start-1 xl:row-end-2">

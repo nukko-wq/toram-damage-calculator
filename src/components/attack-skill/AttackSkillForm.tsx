@@ -411,9 +411,9 @@ export default function AttackSkillForm({
 											<div className="space-y-1">
 												<div className="text-sm text-gray-600 font-medium">特殊効果:</div>
 												<div className="flex flex-wrap gap-1">
-													{currentHit.specialEffects.map((effect, index) => (
+													{currentHit.specialEffects.map((effect) => (
 														<span
-															key={index}
+															key={effect}
 															className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full border border-blue-200"
 														>
 															{effect}
