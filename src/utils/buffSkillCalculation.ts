@@ -302,6 +302,57 @@ export function calculateAttackUpEffects(
 }
 
 /**
+ * ブレイブオーラ(IsBrave)の効果計算関数
+ */
+export function calculateBraveAuraEffects(
+	buffUserType: number, // 1: バフ使用者, 2: バフ非使用者
+): Partial<EquipmentProperties> {
+	if (!buffUserType || (buffUserType !== 1 && buffUserType !== 2)) return {}
+
+	const effects: Partial<EquipmentProperties> = {
+		WeaponATK_Rate: 30, // 全タイプ共通: 武器ATK+30%
+		BraveMultiplier: 20, // ブレイブ倍率+20%
+	}
+
+	// バフ使用者の場合は命中率低下も追加
+	if (buffUserType === 1) {
+		effects.Accuracy_Rate = -50 // 命中率-50%
+	}
+
+	return effects
+}
+
+/**
+ * マナリチャージ(IsManaReCharge)の効果計算関数
+ */
+export function calculateManaRechargeEffects(
+	isEnabled: boolean,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+
+	return {
+		BraveMultiplier: -25, // ブレイブ倍率-25%
+	}
+}
+
+/**
+ * 前線維持Ⅱ(pal1)の効果計算関数
+ */
+export function calculateFrontlineMaintenance2Effects(
+	skillLevel: number,
+	baseStatsLevel: number,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	// HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)
+	const hpBonus = 10 * (skillLevel * 10 + baseStatsLevel)
+
+	return {
+		HP: hpBonus,
+	}
+}
+
+/**
  * 命中UP(exHIT)の効果計算関数
  */
 export function calculateAccuracyUpEffects(
@@ -634,6 +685,51 @@ export function getBuffSkillBonuses(
 		}
 	}
 
+	// ブレイブオーラの処理
+	const braveAura = buffSkillData.IsBrave
+	if (braveAura?.isEnabled && braveAura.multiParam1) {
+		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
+ * バフスキルデータから前線維持Ⅱの効果を取得（基本ステータスレベルが必要）
+ */
+export function getFrontlineMaintenance2Effects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	baseStatsLevel: number,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// 前線維持Ⅱ(pal1)の処理
+	const frontlineMaintenance2 = buffSkillData.pal1
+	if (frontlineMaintenance2?.isEnabled && frontlineMaintenance2.level) {
+		const effects = calculateFrontlineMaintenance2Effects(
+			frontlineMaintenance2.level,
+			baseStatsLevel,
+		)
+
+		// EquipmentPropertiesをAllBonusesに変換して統合
+		for (const [key, value] of Object.entries(effects)) {
+			if (typeof value === 'number' && value !== 0) {
+				bonuses[key as keyof AllBonuses] =
+					(bonuses[key as keyof AllBonuses] || 0) + value
+			}
+		}
+	}
+
 	return bonuses
 }
 
@@ -927,4 +1023,60 @@ export function getBuffSkillPassiveMultiplier(
 	}
 
 	return totalPassiveMultiplier
+}
+
+/**
+ * バフスキルデータからパッシブ倍率を取得（攻撃スキルカテゴリ考慮版）
+ */
+export function getBuffSkillPassiveMultiplierWithSkillCategory(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	weaponType: WeaponType | null,
+	attackSkillCategory?: string,
+): number {
+	const convertedWeaponType = convertWeaponType(weaponType)
+	let totalPassiveMultiplier = 0
+
+	if (!buffSkillData) return totalPassiveMultiplier
+
+	// 匠の剣術(sm4)の処理 - bladeカテゴリのスキル使用時のみ適用
+	const takumiKenjutsu = buffSkillData.sm4
+	if (takumiKenjutsu?.isEnabled && attackSkillCategory === 'blade') {
+		totalPassiveMultiplier += calculateTakumiKenjutsuPassiveMultiplier(
+			takumiKenjutsu.isEnabled,
+			convertedWeaponType,
+		)
+	}
+
+	return totalPassiveMultiplier
+}
+
+/**
+ * バフスキルデータからブレイブ倍率を取得
+ * 複数のブレイブ倍率スキルを加算して合計値を返す
+ */
+export function getBuffSkillBraveMultiplier(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): number {
+	let braveMultiplier = 0
+
+	if (!buffSkillData) return braveMultiplier
+
+	// ブレイブオーラ（IsBrave）の処理
+	const braveAura = buffSkillData.IsBrave
+	if (braveAura?.isEnabled && braveAura.multiParam1) {
+		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
+		braveMultiplier += effects.BraveMultiplier || 0
+	}
+
+	// マナリチャージ（IsManaReCharge）の処理
+	const manaRecharge = buffSkillData.IsManaReCharge
+	if (manaRecharge?.isEnabled) {
+		const effects = calculateManaRechargeEffects(manaRecharge.isEnabled)
+		braveMultiplier += effects.BraveMultiplier || 0
+	}
+
+	// 今後、他のブレイブ倍率スキルも追加予定
+	// 獅子奮闘・極、オーラブレード、アシュラオーラ、エンハンス等
+
+	return braveMultiplier
 }

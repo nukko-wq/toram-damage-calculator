@@ -13,6 +13,9 @@
 - **モノノフスキル系統**: [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) ✅
 - **サバイバルスキル系統**: [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) ✅
 - **バトルスキル系統**: [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) ✅
+- **ハンタースキル系統**: [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) ✅
+- **デュアルソードスキル系統**: [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) ✅
+- **サポートスキル系統**: [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills-common/README.md](./buff-skills-common/README.md) を参照してください。
@@ -273,80 +276,10 @@ interface UISettings {
 
 ### 9. ハンタースキル系統
 
-#### 9.1 カムフラージュ (hunter5-2)
-```typescript
-{
-  id: 'hunter5-2',
-  name: 'カムフラージュ',
-  category: 'hunter',
-  type: 'level',
-  order: 1701,
-  maxLevel: 10,
-  description: '基本ステータスのレベルとスキルレベルに応じてATKとクリティカルを上昇させる',
-  weaponConditionalEffects: {
-    // 弓・自動弓の場合
-    bow: {
-      conditions: ['メイン武器が弓または自動弓'],
-      effects: [
-        { property: 'ATK', formula: 'Math.floor(baseStatsLevel * skillLevel / 10)' },
-        { property: 'Critical', formula: 'skillLevel * 4' }
-      ]
-    },
-    // その他の武器の場合
-    default: {
-      conditions: ['メイン武器が弓・自動弓以外'],
-      effects: [
-        { property: 'ATK', formula: 'Math.floor(baseStatsLevel / 2 * skillLevel / 10)' },
-        { property: 'Critical', formula: 'skillLevel * 4' }
-      ]
-    }
-  },
-  calculationFormula: `
-    弓・自動弓装備時:
-    - ATK = Math.floor(基本ステータスレベル × スキルレベル ÷ 10)
-    - クリティカル = スキルレベル × 4
-    
-    その他武器装備時:
-    - ATK = Math.floor(基本ステータスレベル ÷ 2 × スキルレベル ÷ 10)
-    - クリティカル = スキルレベル × 4
-  `,
-  example: {
-    baseStatsLevel: 305,
-    skillLevel: 10,
-    bowCalculation: 'ATK = Math.floor(305 × 10 ÷ 10) = Math.floor(305) = 305, Critical = 10 × 4 = 40',
-    otherCalculation: 'ATK = Math.floor(305 ÷ 2 × 10 ÷ 10) = Math.floor(152.5 × 1) = Math.floor(152.5) = 152, Critical = 10 × 4 = 40',
-    bowResult: 'ATK +305, Critical +40',
-    otherResult: 'ATK +152, Critical +40'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
+詳細は [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) を参照してください。
 
-// 実装用の効果計算関数
-function calculateCamouflageEffects(
-  skillLevel: number,
-  baseStatsLevel: number,
-  weaponType: MainWeaponType | null
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  const isBowWeapon = weaponType === 'bow' || weaponType === 'bowgun'
-  
-  // ATK計算：弓系は基本ステータスレベル × スキルレベル ÷ 10、その他は基本ステータスレベル ÷ 2 × スキルレベル ÷ 10（小数点切り捨て）
-  const atkBonus = isBowWeapon 
-    ? Math.floor(baseStatsLevel * skillLevel / 10)
-    : Math.floor(baseStatsLevel / 2 * skillLevel / 10)
-  
-  return {
-    ATK: atkBonus,
-    Critical: skillLevel * 4
-  }
-}
-```
+**含まれるスキル:**
+- 9.1 カムフラージュ (hunter5-2) - 基本ステータスレベル依存ATK・クリティカル上昇（武器種別効果）
 
 ### 10. アサシンスキル系統
 
@@ -411,32 +344,11 @@ function calculateCamouflageEffects(
 
 ### 12. サポートスキル系統
 
-#### 12.1 ファーストエイド (support1)
-```typescript
-{
-  id: 'support1',
-  name: 'ファーストエイド',
-  category: 'support',
-  type: 'level',
-  order: 1601,
-  maxLevel: 10,
-  description: '最大HPを上昇させる',
-  effects: [
-    {
-      property: 'HP_Rate',
-      formula: 'skillLevel * 5',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'HP% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+詳細は [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) を参照してください。
+
+**含まれるスキル:**
+- 12.1 ブレイブオーラ (IsBrave) - 武器ATK+30%、ブレイブ倍率+20%（バフ使用者時命中率-50%）
+- 12.2 マナリチャージ (IsManaReCharge) - ブレイブ倍率-25%
 
 ### 13. サバイバルスキル系統
 
@@ -488,65 +400,10 @@ function calculateCamouflageEffects(
 
 ### 16. デュアルソードスキル系統
 
-#### 16.1 神速の軌跡 (ds1-2)
-```typescript
-{
-  id: 'ds1-2',
-  name: '神速の軌跡',
-  category: 'dualSword',
-  type: 'level',
-  order: 801,
-  maxLevel: 10,
-  description: 'AGIと抜刀威力を上昇させる（双剣装備時は抜刀威力がより大きく上昇）',
-  effects: [
-    {
-      property: 'AGI',
-      formula: 'skillLevel + Math.max(skillLevel - 5, 0)',
-      conditions: []
-    },
-    {
-      property: 'UnsheatheAttack',
-      formula: 'mainWeapon === "dualSword" ? (15 + skillLevel) : (5 + skillLevel)',
-      conditions: ['武器種によって効果値変動']
-    }
-  ],
-  calculationFormula: 'AGI = スキルレベル + MAX(スキルレベル - 5, 0)\n双剣以外: 抜刀威力 = 5 + スキルレベル\n双剣装備時: 抜刀威力 = 15 + スキルレベル',
-  example: {
-    skillLevel: 10,
-    calculation: 'AGI = 10 + MAX(10 - 5, 0) = 10 + 5 = 15\n双剣以外: 抜刀威力 = 5 + 10 = 15\n双剣装備時: 抜刀威力 = 15 + 10 = 25',
-    result: 'AGI +15, 抜刀威力 +15(双剣以外) / +25(双剣)'
-  },
-  weaponRequirement: {
-    description: '全武器種で使用可能、双剣装備時は抜刀威力の効果が強化される'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
+詳細は [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) を参照してください。
 
-// 実装用の効果計算関数
-function calculateGodspeedTrajectoryEffects(
-  skillLevel: number,
-  mainWeaponType: MainWeaponType | null
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  // AGI = スキルレベル + MAX(スキルレベル - 5, 0)
-  const agiBonus = skillLevel + Math.max(skillLevel - 5, 0)
-  
-  // 抜刀威力 = 双剣装備時は15+スキルレベル、それ以外は5+スキルレベル
-  const isDualSword = mainWeaponType === 'dualSword'
-  const unsheatheAttackBonus = isDualSword ? (15 + skillLevel) : (5 + skillLevel)
-  
-  return {
-    AGI: agiBonus,
-    UnsheatheAttack: unsheatheAttackBonus
-  }
-}
-```
+**含まれるスキル:**
+- 16.1 神速の軌跡 (ds1-2) - AGI・抜刀威力上昇（双剣装備時抜刀威力強化）
 
 ### 17. ミンストレルスキル系統
 
@@ -606,6 +463,57 @@ function calculateGodspeedTrajectoryEffects(
     parameterUnit: 'Lv',
     showInModal: true,
     quickToggle: false
+  }
+}
+```
+
+#### 18.2 前線維持Ⅱ (pal1)
+```typescript
+{
+  id: 'pal1',
+  name: '前線維持Ⅱ',
+  category: 'partisan',
+  type: 'level',
+  order: 2501,
+  maxLevel: 10,
+  description: '基本ステータスのレベルとスキルレベルに応じてHPを大幅に上昇させる',
+  effects: [
+    {
+      property: 'HP',
+      formula: '10 * (skillLevel * 10 + baseStatsLevel)',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)',
+  example: {
+    baseStatsLevel: 305,
+    skillLevel: 10,
+    calculation: 'HP = 10 × (10 × 10 + 305) = 10 × (100 + 305) = 10 × 405 = 4050',
+    result: 'HP +4050'
+  },
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateFrontlineMaintenance2Effects(
+  skillLevel: number,
+  baseStatsLevel: number
+): Partial<EquipmentProperties> {
+  if (!skillLevel || skillLevel === 0) return {}
+  
+  // HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)
+  const hpBonus = 10 * (skillLevel * 10 + baseStatsLevel)
+  
+  return {
+    HP: hpBonus
   }
 }
 ```

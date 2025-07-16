@@ -15,8 +15,10 @@ buff-skills-common/
 ├── mononofu-skills.md          # モノノフスキル系統
 ├── survival-skills.md          # サバイバルスキル系統
 ├── battle-skills.md            # バトルスキル系統
+├── hunter-skills.md            # ハンタースキル系統
+├── dualsword-skills.md         # デュアルソードスキル系統
+├── support-skills.md           # サポートスキル系統
 ├── shoot-skills.md             # シュートスキル系統（予定）
-├── dualSword-skills.md         # デュアルソードスキル系統（予定）
 └── ... (他の系統)
 ```
 
@@ -61,6 +63,22 @@ buff-skills-common/
   - 魔法力up (exMATK1)
   - 驚異の威力 (exATK2)
   - 更なる魔力 (exMATK2)
+
+### ✅ hunter-skills.md
+- **スキル系統**: ハンタースキル (category: 'hunter')
+- **含まれるスキル**: 1スキル
+  - カムフラージュ (hunter5-2)
+
+### ✅ dualsword-skills.md
+- **スキル系統**: デュアルソードスキル (category: 'dualSword')
+- **含まれるスキル**: 1スキル
+  - 神速の軌跡 (ds1-2)
+
+### ✅ support-skills.md
+- **スキル系統**: サポートスキル (category: 'support')
+- **含まれるスキル**: 2スキル
+  - ブレイブオーラ (IsBrave)
+  - マナリチャージ (IsManaReCharge)
 
 ## 使用方法
 

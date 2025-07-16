@@ -28,6 +28,7 @@ import {
 	getAccuracyUpEffects,
 	getDodgeUpEffects,
 	getCamouflageEffects,
+	getFrontlineMaintenance2Effects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
@@ -712,6 +713,19 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(camouflageBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 前線維持Ⅱスキルの補正値を追加（基本ステータスレベルが必要）
+	const frontlineMaintenance2Bonuses = getFrontlineMaintenance2Effects(
+		data.buffSkills?.skills || null,
+		data.baseStats?.level || 1,
+	)
+
+	for (const [key, value] of Object.entries(frontlineMaintenance2Bonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
