@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import type { MenuSection } from './hooks/useFloatingMenu'
 import SaveDataContent from './content/SaveDataContent'
 
