@@ -223,7 +223,7 @@ export const equipmentsData: EquipmentsData = {
 					ATK_Rate: 10,
 					STR_Rate: 10,
 					Critical: 10,
-					MP: -100,
+					MP: -300,
 				},
 			},
 			{
