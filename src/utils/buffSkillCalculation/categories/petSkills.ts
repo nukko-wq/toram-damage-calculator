@@ -51,6 +51,20 @@ export function calculatePetMindUpEffects(
 }
 
 /**
+ * ペットカットアップの効果計算関数
+ */
+export function calculatePetCutUpEffects(
+	isEnabled: boolean,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+
+	return {
+		PhysicalResistance_Rate: 35, // PhysicalResistance%+35
+		MagicalResistance_Rate: 35, // MagicalResistance%+35
+	}
+}
+
+/**
  * ペットクリティカルアップの効果を取得
  */
 export function getPetCriticalUpEffects(
@@ -93,6 +107,22 @@ export function getPetMindUpEffects(
 	const petMindUp = buffSkillData.IsPetMind
 	if (petMindUp?.isEnabled) {
 		return calculatePetMindUpEffects(petMindUp.isEnabled)
+	}
+
+	return {}
+}
+
+/**
+ * ペットカットアップの効果を取得
+ */
+export function getPetCutUpEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): Partial<EquipmentProperties> {
+	if (!buffSkillData) return {}
+
+	const petCutUp = buffSkillData.IsPetCut
+	if (petCutUp?.isEnabled) {
+		return calculatePetCutUpEffects(petCutUp.isEnabled)
 	}
 
 	return {}

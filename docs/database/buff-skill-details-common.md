@@ -377,7 +377,8 @@ interface UISettings {
 **含まれるスキル:**
 - 15.1 ブレイブアップ (IsPetBrave) - ATK%+10%, ATK+75, AttackSpeed%+20%, AttackSpeed+300
 - 15.2 マインドアップ (IsPetMind) - MATK%+10%, MATK+75, CastingSpeed%+20%, CastingSpeed+300
-- 15.3 クリティカルアップ (IsPetCri) - CriticalDamage+12
+- 15.3 カットアップ (IsPetCut) - PhysicalResistance%+35%, MagicalResistance%+35%
+- 15.4 クリティカルアップ (IsPetCri) - CriticalDamage+12
 
 #### 15.1 ブレイブアップ (IsPetBrave)
 ```typescript
@@ -465,7 +466,40 @@ interface UISettings {
 }
 ```
 
-#### 15.3 クリティカルアップ (IsPetCri)
+#### 15.3 カットアップ (IsPetCut)
+```typescript
+{
+  id: 'IsPetCut',
+  name: 'カットアップ',
+  category: 'pet',
+  type: 'toggle',
+  order: 2303,
+  description: 'ペットによる物理・魔法耐性の複合強化',
+  effects: [
+    {
+      property: 'PhysicalResistance_Rate',
+      formula: '+35',
+      conditions: []
+    },
+    {
+      property: 'MagicalResistance_Rate',
+      formula: '+35',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'PhysicalResistance% = base + 35, MagicalResistance% = base + 35',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+```
+
+#### 15.4 クリティカルアップ (IsPetCri)
 ```typescript
 {
   id: 'IsPetCri',

@@ -21,7 +21,7 @@ export {
 } from './integration/mainIntegrator'
 
 // 個別計算関数のエクスポート（必要に応じて）
-export { getPetCriticalUpEffects, getPetBraveUpEffects, getPetMindUpEffects } from './categories/petSkills'
+export { getPetCriticalUpEffects, getPetBraveUpEffects, getPetMindUpEffects, getPetCutUpEffects } from './categories/petSkills'
 
 // 共通ユーティリティ
 export { convertWeaponType, integrateEffects } from './types'
