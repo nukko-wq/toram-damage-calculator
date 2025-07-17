@@ -29,6 +29,7 @@ import {
 	getDodgeUpEffects,
 	getCamouflageEffects,
 	getFrontlineMaintenance2Effects,
+	getPetCriticalUpEffects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
@@ -723,6 +724,18 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(frontlineMaintenance2Bonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// ペットクリティカルアップスキルの補正値を追加
+	const petCriticalUpBonuses = getPetCriticalUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(petCriticalUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

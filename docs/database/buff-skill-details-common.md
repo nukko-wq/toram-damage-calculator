@@ -399,6 +399,34 @@ interface UISettings {
 }
 ```
 
+#### 15.2 クリティカルアップ (IsPetCri)
+```typescript
+{
+  id: 'IsPetCri',
+  name: 'クリティカルアップ',
+  category: 'pet',
+  type: 'toggle',
+  order: 2304,
+  description: 'ペットによるクリティカルダメージ強化',
+  effects: [
+    {
+      property: 'CriticalDamage',
+      formula: '+12',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'CriticalDamage = base + 12',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+```
+
 ### 16. デュアルソードスキル系統
 
 詳細は [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) を参照してください。
