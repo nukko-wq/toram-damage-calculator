@@ -374,23 +374,45 @@ interface UISettings {
 
 ### 15. ペット使用スキル系統
 
-#### 15.1 アニマル (pet1)
+**含まれるスキル:**
+- 15.1 ブレイブアップ (IsPetBrave) - ATK%+10%, ATK+75, AttackSpeed%+20%, AttackSpeed+300
+- 15.2 クリティカルアップ (IsPetCri) - CriticalDamage+12
+
+#### 15.1 ブレイブアップ (IsPetBrave)
 ```typescript
 {
-  id: 'pet1',
-  name: 'アニマル',
+  id: 'IsPetBrave',
+  name: 'ブレイブアップ',
   category: 'pet',
   type: 'toggle',
-  order: 1901,
-  description: 'ペット召喚による補助効果',
+  order: 2301,
+  description: 'ペットによる攻撃力と攻撃速度の複合強化',
   effects: [
     {
       property: 'ATK_Rate',
       formula: '+10',
       conditions: []
+    },
+    {
+      property: 'ATK',
+      formula: '+75',
+      conditions: []
+    },
+    {
+      property: 'AttackSpeed_Rate',
+      formula: '+20',
+      conditions: []
+    },
+    {
+      property: 'AttackSpeed',
+      formula: '+300',
+      conditions: []
     }
   ],
-  calculationFormula: 'ATK% = base + 10',
+  calculationFormula: 'ATK% = base + 10, ATK = base + 75, AttackSpeed% = base + 20, AttackSpeed = base + 300',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
   uiSettings: {
     parameterName: 'ON/OFF',
     showInModal: false,
