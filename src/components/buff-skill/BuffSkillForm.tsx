@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react'
 import { getAvailableSkills, sortSkills } from '@/utils/buffSkillUtils'
-import type { BuffSkillDefinition } from '@/types/buffSkill'
 import { useCalculatorData } from '@/hooks/useCalculatorData'
 import type { MainWeaponType, SubWeaponType } from '@/types/buffSkill'
 import type {

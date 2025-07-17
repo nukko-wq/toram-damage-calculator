@@ -50,7 +50,7 @@ export default function CrystalCard({
 											options={{ debug: false }}
 										/>
 									)
-								} catch (error) {
+								} catch (_error) {
 									return (
 										<div className="bg-red-100 text-red-600 text-xs p-1">
 											Error

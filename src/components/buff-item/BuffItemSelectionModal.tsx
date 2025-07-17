@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'motion/react'
 import type { BuffItemCategory, PresetBuffItem } from '@/types/calculator'
 import {
 	getBuffItemsByCategory,
-	getPresetBuffItems,
 } from '@/utils/buffItemDatabase'
 import BuffItemCard from './BuffItemCard'
 import type { SlotInfo } from '@/types/damagePreview'
@@ -30,7 +29,7 @@ export default function BuffItemSelectionModal({
 	title,
 	slotInfo,
 }: BuffItemSelectionModalProps) {
-	const [activeFilter, setActiveFilter] = useState<'all' | BuffItemCategory>(
+	const [activeFilter, _setActiveFilter] = useState<'all' | BuffItemCategory>(
 		'all',
 	)
 	const [availableBuffItems, setAvailableBuffItems] = useState<
@@ -73,7 +72,7 @@ export default function BuffItemSelectionModal({
 		})
 	}, [availableBuffItems, activeFilter])
 
-	const getCategoryLabel = (categoryValue: string) => {
+	const _getCategoryLabel = (categoryValue: string) => {
 		switch (categoryValue) {
 			case 'all':
 				return '全て'

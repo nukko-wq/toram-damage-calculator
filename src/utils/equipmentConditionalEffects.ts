@@ -82,7 +82,6 @@ export function applyConditionalEquipmentEffects(
 ): Partial<EquipmentProperties> {
 	let effectiveProperties = { ...equipment.properties }
 
-
 	if (equipment.conditionalEffects) {
 		for (const effect of equipment.conditionalEffects) {
 			const conditionMet = checkEquipmentCondition(
@@ -91,7 +90,7 @@ export function applyConditionalEquipmentEffects(
 				mainWeapon,
 				subWeapon,
 			)
-			
+
 			if (conditionMet) {
 				effectiveProperties = mergeProperties(
 					effectiveProperties,
@@ -135,12 +134,12 @@ export function getSlotEffectiveProperties(
 					)
 				}
 			}
-			
+
 			// IDがない場合でも、装備データベースから名前で検索を試みる
 			// 固定IDで直接取得
 			const knownIds: Record<string, string> = {
-				'星辰の舟衣': '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-				'熊戦士の帯': 'eq014-f012-3456-789a-bcdef0123456'
+				星辰の舟衣: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+				熊戦士の帯: 'eq014-f012-3456-789a-bcdef0123456',
 			}
 			const knownId = knownIds[slot.name]
 			if (knownId) {
@@ -155,7 +154,7 @@ export function getSlotEffectiveProperties(
 				}
 			}
 		}
-		
+
 		// 条件付き効果がない場合は直接のプロパティを使用
 		return { ...slot.properties }
 	}
@@ -163,7 +162,7 @@ export function getSlotEffectiveProperties(
 	// スロットにIDがある場合、データベースから装備を取得
 	if (slot?.id) {
 		const equipment = getCombinedEquipmentById(slot.id)
-		
+
 		if (equipment) {
 			return applyConditionalEquipmentEffects(
 				equipment,

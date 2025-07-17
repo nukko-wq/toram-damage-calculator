@@ -98,7 +98,7 @@ export default function ImportModal({
 
 	// インポート実行
 	const handleImport = () => {
-		if (validationResult && validationResult.isValid) {
+		if (validationResult?.isValid) {
 			onImport(validationResult)
 		}
 	}

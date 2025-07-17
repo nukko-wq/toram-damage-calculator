@@ -141,7 +141,7 @@ export interface EquipmentProperties {
 	ItemCooldown: number // 道具速度
 	AbsoluteAccuracy_Rate: number // 絶対命中%
 	AbsoluteDodge_Rate: number // 絶対回避%
-	
+
 	// ダメージ計算系
 	BraveMultiplier: number // ブレイブ倍率%
 
@@ -807,6 +807,7 @@ export type AttackSkillCategory =
 	| 'knuckle' // 拳甲
 	| 'halberd' // 旋棍
 	| 'katana' // 刀
+	| 'hunter' // ハンタースキル
 	| 'dualSword' // 双剣
 	| 'martialArts' // 格闘
 	// 新スキルツリー分類
@@ -857,7 +858,7 @@ export interface AttackHit {
 	fixedDamage: number // 固定ダメージ（表示値、実際の計算は別途）
 
 	// 計算式説明（各撃ごとに設定可能）
-	multiplierFormula?: string // 倍率の計算式説明（例: "1000%", "|補正後STR|%"）
+	multiplierFormula?: string | string[] // 倍率の計算式説明（例: "1000%", "|補正後STR|%"、または武器種別ごとの複数式）
 	fixedDamageFormula?: string // 固定値の計算式説明（例: "400", "基礎INT/2"）
 
 	// 補正適用
@@ -867,6 +868,9 @@ export interface AttackHit {
 	canUseLongRange: boolean // ロングレンジ適用可否
 	canUseShortRangePower: boolean // 近距離威力適用可否
 	canUseLongRangePower: boolean // 遠距離威力適用可否
+
+	// 特殊効果（撃数別）
+	specialEffects?: string[] // 各撃数に固有の特殊効果
 
 	// 特殊設定
 	notes?: string // 備考
@@ -912,7 +916,7 @@ export interface CalculatedHit {
 	fixedDamage: number // 表示用固定値
 
 	// 計算式説明
-	multiplierFormula?: string // 倍率の計算式説明
+	multiplierFormula?: string | string[] // 倍率の計算式説明
 	fixedDamageFormula?: string // 固定値の計算式説明
 
 	// 慣れ情報
@@ -924,6 +928,9 @@ export interface CalculatedHit {
 	canUseLongRange: boolean
 	canUseShortRangePower: boolean
 	canUseLongRangePower: boolean
+
+	// 特殊効果（撃数別）
+	specialEffects?: string[] // 各撃数に固有の特殊効果
 
 	// 計算過程（特殊計算の場合）
 	calculationProcess?: string

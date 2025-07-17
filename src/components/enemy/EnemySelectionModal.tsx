@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from 'react'
 import type { EnemyCategory, PresetEnemy } from '@/types/calculator'
 import {
 	getPresetEnemies,
-	getPresetEnemiesByCategory,
 } from '@/utils/enemyDatabase'
 import EnemyCard from './EnemyCard'
 

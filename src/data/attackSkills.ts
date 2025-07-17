@@ -16,11 +16,10 @@ const attackSkillsRawData: AttackSkill[] = [
 		order: 101,
 		systemGroup: 'sword',
 		category: 'blade',
-		weaponTypeRequirements: ['片手剣'],
+		weaponTypeRequirements: ['片手剣', '両手剣', '双剣'],
 		mpCost: 300,
-		multiplierFormula: '特殊計算',
+		multiplierFormula: '750% + 武器種別補正',
 		fixedDamageFormula: '300',
-		specialEffects: ['確定クリティカル'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -28,16 +27,19 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
 				powerReference: 'totalATK',
-				multiplier: 125, // 表示用の値
-				fixedDamage: 0, // 表示用の値
-				multiplierFormula: '125%',
-				fixedDamageFormula: '0',
+				multiplier: 750, // 表示用の値
+				fixedDamage: 300, // 表示用の値
+				multiplierFormula: [
+					'片手剣装備時：威力+基礎DEX/2%',
+					'両手剣装備時：威力+基礎STR%',
+				],
 				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
 				canUseLongRangePower: false,
+				specialEffects: ['確定クリティカル'],
 			},
 		],
 	},
@@ -166,7 +168,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 200,
 		multiplierFormula: '400+補正後STR/5%',
 		fixedDamageFormula: '100 (旋風槍装備時+100)',
-		specialEffects: ['距離威力: ○', '抜刀威力: ×', 'ロングレンジ: ×'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -264,7 +265,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 10,
 		multiplierFormula: '150%',
 		fixedDamageFormula: '0',
-		specialEffects: ['ロングレンジ対応'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -279,6 +279,38 @@ const attackSkillsRawData: AttackSkill[] = [
 				familiarity: 'physical',
 				familiarityGrant: 'normal',
 				canUseUnsheathePower: true,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['ロングレンジ対応'],
+			},
+		],
+	},
+
+	// サイクロンアロー（ハンタースキル）
+	{
+		id: 'cyclone_arrow',
+		name: 'サイクロンアロー',
+		order: 502,
+		systemGroup: 'bow',
+		category: 'hunter',
+		weaponTypeRequirements: ['弓'],
+		mpCost: 100,
+		multiplierFormula: '100% + 矢装備時補正後DEX/2%',
+		fixedDamageFormula: '100',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'totalATK',
+				multiplier: 100,
+				fixedDamage: 100,
+				multiplierFormula: '矢装備時：威力+補正後DEX/2%',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
 				canUseLongRangePower: true,
@@ -297,9 +329,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 400,
 		multiplierFormula: '特殊計算',
 		fixedDamageFormula: '400',
-		specialEffects: [
-			'貫通ボーナス50%',
-		],
 		hits: [
 			{
 				hitNumber: 1,
@@ -316,6 +345,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: false,
 				canUseLongRangePower: false,
+				specialEffects: ['貫通ボーナス50%'],
 			},
 			{
 				hitNumber: 2,
@@ -332,6 +362,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: false,
 				canUseLongRangePower: false,
+				specialEffects: ['貫通ボーナス50%'],
 			},
 		],
 	},
@@ -347,7 +378,6 @@ const attackSkillsRawData: AttackSkill[] = [
 		mpCost: 15,
 		multiplierFormula: '各撃で異なる',
 		fixedDamageFormula: '0',
-		specialEffects: ['連続攻撃', 'クリティカル率+5%'],
 		hits: [
 			{
 				hitNumber: 1,
@@ -365,6 +395,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: true,
 				canUseLongRangePower: true,
+				specialEffects: ['連続攻撃', 'クリティカル率+5%'],
 			},
 			{
 				hitNumber: 2,
@@ -382,6 +413,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: false,
 				canUseShortRangePower: false,
 				canUseLongRangePower: false,
+				specialEffects: ['連続攻撃'],
 			},
 		],
 	},

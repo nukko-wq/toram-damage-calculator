@@ -1,5 +1,7 @@
 import { getAttackSkillById } from '@/data/attackSkills'
 import {
+	BusterBladeCalculator,
+	CycloneArrowCalculator,
 	LBoomerang3Calculator,
 	MagicArrowCalculator,
 	MoonSlashCalculator,
@@ -65,7 +67,10 @@ export class AttackSkillCalculator {
 				return new StrikeStabAilmentCalculator()
 			case 'magic_arrow':
 				return new MagicArrowCalculator()
-			case 'slash':
+			case 'buster_blade':
+				return new BusterBladeCalculator()
+			case 'cyclone_arrow':
+				return new CycloneArrowCalculator()
 			case 'power_shot':
 			case 'dual_strike':
 				return new StandardCalculator()

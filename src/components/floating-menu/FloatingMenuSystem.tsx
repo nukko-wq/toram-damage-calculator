@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import FloatingMenuButton from './FloatingMenuButton'
 import MenuPanel from './MenuPanel'
 import { useFloatingMenu } from './hooks/useFloatingMenu'
