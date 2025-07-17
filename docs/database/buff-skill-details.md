@@ -78,6 +78,7 @@ interface WeaponRequirement {
 詳細は [buff-skills/blade-skills.md](./buff-skills/blade-skills.md) を参照してください。
 
 **含まれるスキル:**
+- 0.1 ブレードマスタリ (Ms-blade) - WeaponATK% = skillLevel × 3, ATK% = Lv1-2:1, Lv3-7:2, Lv8-10:3（片手剣・両手剣・双剣装備時）
 - 1.1 ウォークライ (IsWarcry) - ATK+300, 行動速度%+50
 
 ### 2. シュートスキル系統
