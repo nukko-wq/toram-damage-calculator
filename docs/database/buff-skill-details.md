@@ -1,30 +1,37 @@
-# 共通バフスキル詳細設計書
+# バフスキル詳細設計書
 
 ## 概要
 
-全武器種で使用可能な共通バフスキル（35個）の詳細仕様を記述します。
+全てのバフスキルの詳細仕様を記述します。
 各スキルの効果計算式、パラメータ、UI表示形式を定義します。
+
+### バフスキルの分類
+
+1. **共通バフスキル（35個）**: 全武器種で使用可能
+2. **ほぼ共通バフスキル（1個）**: 素手以外の全武器種で使用可能
+3. **武器固有バフスキル**: 特定の武器種でのみ使用可能
+4. **サブ武器バフスキル**: サブ武器に依存するバフスキル
 
 **📁 分割ファイル構造**
 
 スキル系統ごとに詳細仕様を分割整理しています：
-- **ブレードスキル系統**: [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) ✅
-- **ハルバードスキル系統**: [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) ✅
-- **モノノフスキル系統**: [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) ✅
-- **サバイバルスキル系統**: [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) ✅
-- **バトルスキル系統**: [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) ✅
-- **ハンタースキル系統**: [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) ✅
-- **デュアルソードスキル系統**: [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) ✅
-- **サポートスキル系統**: [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) ✅
-- **パルチザンスキル系統**: [buff-skills-common/partisan-skills.md](./buff-skills-common/partisan-skills.md) ✅
+- **ブレードスキル系統**: [buff-skills/blade-skills.md](./buff-skills/blade-skills.md) ✅
+- **ハルバードスキル系統**: [buff-skills/halberd-skills.md](./buff-skills/halberd-skills.md) ✅
+- **モノノフスキル系統**: [buff-skills/mononofu-skills.md](./buff-skills/mononofu-skills.md) ✅
+- **サバイバルスキル系統**: [buff-skills/survival-skills.md](./buff-skills/survival-skills.md) ✅
+- **バトルスキル系統**: [buff-skills/battle-skills.md](./buff-skills/battle-skills.md) ✅
+- **ハンタースキル系統**: [buff-skills/hunter-skills.md](./buff-skills/hunter-skills.md) ✅
+- **デュアルソードスキル系統**: [buff-skills/dualsword-skills.md](./buff-skills/dualsword-skills.md) ✅
+- **サポートスキル系統**: [buff-skills/support-skills.md](./buff-skills/support-skills.md) ✅
+- **パルチザンスキル系統**: [buff-skills/partisan-skills.md](./buff-skills/partisan-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
-詳細な分割状況は [buff-skills-common/README.md](./buff-skills-common/README.md) を参照してください。
+詳細な分割状況は [buff-skills/README.md](./buff-skills/README.md) を参照してください。
 
 ## データ構造
 
 ```typescript
-interface CommonBuffSkillDetail {
+interface BuffSkillDetail {
   id: string                    // data-key値
   name: string                 // 表示名
   category: BuffSkillCategory  // スキル系統
@@ -36,6 +43,7 @@ interface CommonBuffSkillDetail {
   effects: SkillEffect[]      // 効果リスト
   calculationFormula: string  // 計算式
   uiSettings: UISettings      // UI表示設定
+  weaponRequirements?: WeaponRequirement[]  // 武器制限
 }
 
 interface SkillEffect {
@@ -50,13 +58,23 @@ interface UISettings {
   showInModal: boolean        // モーダル表示可否
   quickToggle: boolean        // クイックトグル対応
 }
+
+interface WeaponRequirement {
+  weaponType: WeaponType      // 対象武器種
+  include?: boolean           // true: 含む, false: 除く (デフォルト: true)
+  subWeaponType?: SubWeaponType  // サブ武器制限
+}
 ```
 
-## 共通バフスキル一覧
+## バフスキル一覧
+
+### A. 共通バフスキル（35個）
+
+全武器種で使用可能なバフスキルです。
 
 ### 1. ブレードスキル系統
 
-詳細は [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) を参照してください。
+詳細は [buff-skills/blade-skills.md](./buff-skills/blade-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 1.1 ウォークライ (IsWarcry) - ATK+300, 行動速度%+50
@@ -126,7 +144,7 @@ interface UISettings {
 
 ### 3. ハルバードスキル系統
 
-詳細は [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) を参照してください。
+詳細は [buff-skills/halberd-skills.md](./buff-skills/halberd-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 3.1 クイックオーラ (hb1) - 攻撃速度 = skillLevel × 50, 攻撃速度% = Math.floor(skillLevel × 2.5)
@@ -134,7 +152,7 @@ interface UISettings {
 
 ### 4. モノノフスキル系統
 
-詳細は [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) を参照してください。
+詳細は [buff-skills/mononofu-skills.md](./buff-skills/mononofu-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 4.1 武士道 (Mononof) - クリティカル率% = skillLevel × 3
@@ -310,7 +328,7 @@ interface UISettings {
 
 ### 9. ハンタースキル系統
 
-詳細は [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) を参照してください。
+詳細は [buff-skills/hunter-skills.md](./buff-skills/hunter-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 9.1 カムフラージュ (hunter5-2) - 基本ステータスレベル依存ATK・クリティカル上昇（武器種別効果）
@@ -378,7 +396,7 @@ interface UISettings {
 
 ### 12. サポートスキル系統
 
-詳細は [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) を参照してください。
+詳細は [buff-skills/support-skills.md](./buff-skills/support-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 12.1 ブレイブオーラ (IsBrave) - 武器ATK+30%、ブレイブ倍率+20%（バフ使用者時命中率-50%）
@@ -386,7 +404,7 @@ interface UISettings {
 
 ### 13. サバイバルスキル系統
 
-詳細は [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) を参照してください。
+詳細は [buff-skills/survival-skills.md](./buff-skills/survival-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 13.1 HPブースト (oh4) - HP = skillLevel × 100, HP% = skillLevel × 2
@@ -394,7 +412,7 @@ interface UISettings {
 
 ### 14. バトルスキル系統
 
-詳細は [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) を参照してください。
+詳細は [buff-skills/battle-skills.md](./buff-skills/battle-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 17.1 クリティカルup (oh1) - Critical+5, CriticalDamage_Rate+5
@@ -562,7 +580,7 @@ interface UISettings {
 
 ### 16. デュアルソードスキル系統
 
-詳細は [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) を参照してください。
+詳細は [buff-skills/dualsword-skills.md](./buff-skills/dualsword-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 16.1 神速の軌跡 (ds1-2) - AGI・抜刀威力上昇（双剣装備時抜刀威力強化）
