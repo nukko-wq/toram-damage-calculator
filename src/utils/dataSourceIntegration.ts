@@ -33,6 +33,7 @@ import {
 	getPetBraveUpEffects,
 	getPetMindUpEffects,
 	getPetCutUpEffects,
+	getArcheryEffects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
@@ -775,6 +776,22 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(petCutUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 武士弓術スキルの補正値を追加
+	const archeryBonuses = getArcheryEffects(
+		data.buffSkills?.skills || null,
+		data.mainWeapon?.weaponType || null,
+		data.subWeapon?.weaponType || null,
+		data.subWeapon?.ATK || 0,
+		data.subWeapon?.stability || 0,
+	)
+
+	for (const [key, value] of Object.entries(archeryBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

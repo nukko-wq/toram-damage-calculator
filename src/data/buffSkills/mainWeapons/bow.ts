@@ -11,14 +11,7 @@ export const bowSkills: BuffSkillDefinition[] = [
 		order: 101,
 	},
 
-	// シュートスキル
-	{
-		id: 'ar2',
-		name: '武士弓術',
-		category: 'shoot',
-		type: 'toggle',
-		order: 302,
-	},
+	// シュートスキル (武士弓術はcommon.tsのar1に統一)
 	{
 		id: 'ar3',
 		name: 'パワーショット',

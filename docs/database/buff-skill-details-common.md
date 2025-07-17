@@ -90,6 +90,39 @@ interface UISettings {
 }
 ```
 
+#### 2.2 武士弓術 (ar1)
+```typescript
+{
+  id: 'ar1',
+  name: '武士弓術',
+  category: 'shoot',
+  type: 'toggle',
+  order: 301,
+  description: 'サブ武器の抜刀剣による武器ATKと安定率の向上',
+  effects: [
+    {
+      property: 'WeaponATK',
+      formula: 'subWeaponATK',
+      conditions: ['メイン武器が弓', 'サブ武器が抜刀剣']
+    },
+    {
+      property: 'Stability_Rate',
+      formula: 'Math.floor(subWeaponStability / 4)',
+      conditions: ['メイン武器が弓', 'サブ武器が抜刀剣']
+    }
+  ],
+  calculationFormula: 'WeaponATK = base + サブ武器の武器ATK, Stability% = base + Math.floor(サブ武器の安定率 / 4)',
+  weaponRequirement: {
+    description: 'メイン武器が弓でサブ武器が抜刀剣で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+```
+
 
 ### 3. ハルバードスキル系統
 
