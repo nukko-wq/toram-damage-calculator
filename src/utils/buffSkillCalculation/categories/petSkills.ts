@@ -35,6 +35,22 @@ export function calculatePetBraveUpEffects(
 }
 
 /**
+ * ペットマインドアップの効果計算関数
+ */
+export function calculatePetMindUpEffects(
+	isEnabled: boolean,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+
+	return {
+		MATK_Rate: 10, // MATK%+10
+		MATK: 75, // MATK+75
+		CastingSpeed_Rate: 20, // CastingSpeed%+20
+		CastingSpeed: 300, // CastingSpeed+300
+	}
+}
+
+/**
  * ペットクリティカルアップの効果を取得
  */
 export function getPetCriticalUpEffects(
@@ -61,6 +77,22 @@ export function getPetBraveUpEffects(
 	const petBraveUp = buffSkillData.IsPetBrave
 	if (petBraveUp?.isEnabled) {
 		return calculatePetBraveUpEffects(petBraveUp.isEnabled)
+	}
+
+	return {}
+}
+
+/**
+ * ペットマインドアップの効果を取得
+ */
+export function getPetMindUpEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): Partial<EquipmentProperties> {
+	if (!buffSkillData) return {}
+
+	const petMindUp = buffSkillData.IsPetMind
+	if (petMindUp?.isEnabled) {
+		return calculatePetMindUpEffects(petMindUp.isEnabled)
 	}
 
 	return {}

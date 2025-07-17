@@ -31,6 +31,7 @@ import {
 	getFrontlineMaintenance2Effects,
 	getPetCriticalUpEffects,
 	getPetBraveUpEffects,
+	getPetMindUpEffects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
@@ -749,6 +750,18 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(petBraveUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// ペットマインドアップスキルの補正値を追加
+	const petMindUpBonuses = getPetMindUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(petMindUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
