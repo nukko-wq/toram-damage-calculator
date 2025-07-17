@@ -31,23 +31,48 @@ export function getBuffSkillBonuses(
 
 	// マスタリスキル
 	const masteryBonuses = getMasterySkillBonuses(buffSkillData, weaponType)
-	Object.assign(bonuses, masteryBonuses)
+	for (const [key, value] of Object.entries(masteryBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
 
 	// ブレードスキル
 	const bladeBonuses = getBladeSkillBonuses(buffSkillData, weaponType)
-	Object.assign(bonuses, bladeBonuses)
+	for (const [key, value] of Object.entries(bladeBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
 
 	// ハルバードスキル
 	const halberdBonuses = getHalberdSkillBonuses(buffSkillData, weaponType)
-	Object.assign(bonuses, halberdBonuses)
+	for (const [key, value] of Object.entries(halberdBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
 
 	// バトルスキル（基本）
 	const battleBonuses = getBattleSkillBonuses(buffSkillData)
-	Object.assign(bonuses, battleBonuses)
+	for (const [key, value] of Object.entries(battleBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
 
 	// サバイバルスキル
 	const survivalBonuses = getSurvivalSkillBonuses(buffSkillData)
-	Object.assign(bonuses, survivalBonuses)
+	for (const [key, value] of Object.entries(survivalBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
 
 	return bonuses
 }
