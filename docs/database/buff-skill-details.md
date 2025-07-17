@@ -157,7 +157,7 @@ interface WeaponRequirement {
 詳細は [buff-skills/mononofu-skills.md](./buff-skills/mononofu-skills.md) を参照してください。
 
 **含まれるスキル:**
-- 4.1 武士道 (Mononof) - クリティカル率% = skillLevel × 3
+- 4.1 武士道 (Mononof) - HP = skillLevel × 10, MP = skillLevel × 10, Accuracy = skillLevel（全武器）。抜刀剣装備時追加：ATK% = Math.floor((skillLevel - 3) / 5) + 2, WeaponATK% = skillLevel × 3
 - 4.2 明鏡止水 (mf1-1) - 回避% = skillLevel × 10
 - 4.3 怪力乱神 (mf1) - ATK = skillLevel × 10, AttackMPRecovery = 5 + skillLevel + Math.floor(skillLevel / 5) × 5（すべての武器で効果有）
 - 4.4 両手持ち (sm1-1) - 武器依存の複合効果（トグル型）
