@@ -29,6 +29,11 @@ import {
 	getDodgeUpEffects,
 	getCamouflageEffects,
 	getFrontlineMaintenance2Effects,
+	getPetCriticalUpEffects,
+	getPetBraveUpEffects,
+	getPetMindUpEffects,
+	getPetCutUpEffects,
+	getArcheryEffects,
 } from './buffSkillCalculation'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
@@ -723,6 +728,72 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(frontlineMaintenance2Bonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// ペットクリティカルアップスキルの補正値を追加
+	const petCriticalUpBonuses = getPetCriticalUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(petCriticalUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// ペットブレイブアップスキルの補正値を追加
+	const petBraveUpBonuses = getPetBraveUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(petBraveUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// ペットマインドアップスキルの補正値を追加
+	const petMindUpBonuses = getPetMindUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(petMindUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// ペットカットアップスキルの補正値を追加
+	const petCutUpBonuses = getPetCutUpEffects(
+		data.buffSkills?.skills || null,
+	)
+
+	for (const [key, value] of Object.entries(petCutUpBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 怪力乱神スキルの補正値は getTwoHandsEffects 内で統合処理されるため、ここでは追加しない
+
+	// 武士弓術スキルの補正値を追加
+	const archeryBonuses = getArcheryEffects(
+		data.buffSkills?.skills || null,
+		data.mainWeapon?.weaponType || null,
+		data.subWeapon?.weaponType || null,
+		data.subWeapon?.ATK || 0,
+		data.subWeapon?.stability || 0,
+	)
+
+	for (const [key, value] of Object.entries(archeryBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

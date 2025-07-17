@@ -34,15 +34,44 @@ interface MononofuBuffSkillDetail {
   type: 'level',
   order: 601,
   maxLevel: 10,
-  description: 'クリティカル率を上昇させる',
+  description: 'HPとMPと命中を上昇させる。抜刀剣装備時は追加で武器ATK%とATK%が上昇する',
   effects: [
     {
-      property: 'Critical_Rate',
-      formula: 'skillLevel * 3',
+      property: 'HP',
+      formula: 'skillLevel * 10',
       conditions: []
+    },
+    {
+      property: 'MP',
+      formula: 'skillLevel * 10',
+      conditions: []
+    },
+    {
+      property: 'Accuracy',
+      formula: 'skillLevel',
+      conditions: []
+    },
+    {
+      property: 'ATK_Rate',
+      formula: 'Math.floor((skillLevel - 3) / 5) + 2',
+      conditions: ['メイン武器が抜刀剣']
+    },
+    {
+      property: 'WeaponATK_Rate',
+      formula: 'skillLevel * 3',
+      conditions: ['メイン武器が抜刀剣']
     }
   ],
-  calculationFormula: 'クリティカル率% = skillLevel × 3',
+  calculationFormula: `
+    全武器共通: HP = base + (skillLevel × 10), MP = base + (skillLevel × 10), Accuracy = base + skillLevel
+    
+    抜刀剣装備時の追加効果:
+    - ATK% = base + (Math.floor((skillLevel - 3) / 5) + 2)
+    - WeaponATK% = base + (skillLevel × 3)
+  `,
+  weaponRequirement: {
+    description: 'すべての武器で効果があります。抜刀剣装備時は追加効果があります'
+  },
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
@@ -53,13 +82,27 @@ interface MononofuBuffSkillDetail {
 
 // 実装用の効果計算関数
 function calculateBushidoEffects(
-  skillLevel: number
+  skillLevel: number,
+  mainWeaponType: WeaponType | null
 ): Partial<EquipmentProperties> {
   if (!skillLevel || skillLevel === 0) return {}
   
-  return {
-    Critical_Rate: skillLevel * 3
+  const baseEffects = {
+    HP: skillLevel * 10,
+    MP: skillLevel * 10,
+    Accuracy: skillLevel
   }
+  
+  // メイン武器が抜刀剣の場合の追加効果
+  if (mainWeaponType === '抜刀剣') {
+    return {
+      ...baseEffects,
+      ATK_Rate: Math.floor((skillLevel - 3) / 5) + 2,
+      WeaponATK_Rate: skillLevel * 3
+    }
+  }
+  
+  return baseEffects
 }
 ```
 
@@ -108,17 +151,25 @@ function calculateClearMindEffects(
   name: '怪力乱神',
   category: 'mononofu',
   type: 'level',
-  order: 603,
+  order: 704,
   maxLevel: 10,
-  description: '攻撃力を上昇させる',
+  description: '攻撃力と攻撃MP回復を上昇させる',
   effects: [
     {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 5',
+      property: 'ATK',
+      formula: 'skillLevel * 10',
+      conditions: []
+    },
+    {
+      property: 'AttackMPRecovery',
+      formula: '5 + skillLevel + Math.floor(skillLevel / 5) * 5',
       conditions: []
     }
   ],
-  calculationFormula: 'ATK% = skillLevel × 5',
+  calculationFormula: 'ATK = base + (skillLevel × 10), AttackMPRecovery = base + (5 + skillLevel + Math.floor(skillLevel / 5) × 5)',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
@@ -133,8 +184,15 @@ function calculateSupernaturalPowerEffects(
 ): Partial<EquipmentProperties> {
   if (!skillLevel || skillLevel === 0) return {}
   
+  // ATK = スキルレベル × 10
+  const atkBonus = skillLevel * 10
+  
+  // 攻撃MP回復 = 5 + スキルレベル + (スキルレベル / 5) × 5（小数点以下切り捨て）
+  const attackMPRecovery = 5 + skillLevel + Math.floor(skillLevel / 5) * 5
+  
   return {
-    ATK_Rate: skillLevel * 5
+    ATK: atkBonus,
+    AttackMPRecovery: attackMPRecovery
   }
 }
 ```
@@ -237,8 +295,8 @@ function calculateTwoHandsEffects(
 ## 特徴
 
 - **武器条件依存**: 両手持ちは装備武器とサブ武器の組み合わせによって効果が変化
-- **抜刀剣特例**: 抜刀剣は巻物装備時も両手持ち効果が適用される
-- **クリティカル系強化**: 武士道でクリティカル率、両手持ちでクリティカル値を向上
+- **抜刀剣特例**: 抜刀剣は巻物装備時も両手持ち効果が適用される、武士道でも抜刀剣装備時に追加効果
+- **複合効果**: 武士道は基本効果に加えて抜刀剣装備時の追加効果を持つ
 - **バランス型**: 攻撃・防御・命中など多方面の能力向上
 
 ## 関連ファイル

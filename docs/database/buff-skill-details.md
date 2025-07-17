@@ -1,29 +1,38 @@
-# 共通バフスキル詳細設計書
+# バフスキル詳細設計書
 
 ## 概要
 
-全武器種で使用可能な共通バフスキル（35個）の詳細仕様を記述します。
+全てのバフスキルの詳細仕様を記述します。
 各スキルの効果計算式、パラメータ、UI表示形式を定義します。
+
+### バフスキルの分類
+
+1. **共通バフスキル（35個）**: 全武器種で使用可能
+2. **ほぼ共通バフスキル（1個）**: 素手以外の全武器種で使用可能
+3. **武器固有バフスキル**: 特定の武器種でのみ使用可能
+4. **サブ武器バフスキル**: サブ武器に依存するバフスキル
 
 **📁 分割ファイル構造**
 
 スキル系統ごとに詳細仕様を分割整理しています：
-- **ブレードスキル系統**: [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) ✅
-- **ハルバードスキル系統**: [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) ✅
-- **モノノフスキル系統**: [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) ✅
-- **サバイバルスキル系統**: [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) ✅
-- **バトルスキル系統**: [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) ✅
-- **ハンタースキル系統**: [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) ✅
-- **デュアルソードスキル系統**: [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) ✅
-- **サポートスキル系統**: [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) ✅
+- **ブレードスキル系統**: [buff-skills/blade-skills.md](./buff-skills/blade-skills.md) ✅
+- **ハルバードスキル系統**: [buff-skills/halberd-skills.md](./buff-skills/halberd-skills.md) ✅
+- **モノノフスキル系統**: [buff-skills/mononofu-skills.md](./buff-skills/mononofu-skills.md) ✅
+- **サバイバルスキル系統**: [buff-skills/survival-skills.md](./buff-skills/survival-skills.md) ✅
+- **バトルスキル系統**: [buff-skills/battle-skills.md](./buff-skills/battle-skills.md) ✅
+- **ハンタースキル系統**: [buff-skills/hunter-skills.md](./buff-skills/hunter-skills.md) ✅
+- **デュアルソードスキル系統**: [buff-skills/dualsword-skills.md](./buff-skills/dualsword-skills.md) ✅
+- **サポートスキル系統**: [buff-skills/support-skills.md](./buff-skills/support-skills.md) ✅
+- **パルチザンスキル系統**: [buff-skills/partisan-skills.md](./buff-skills/partisan-skills.md) ✅
+- **ペット使用スキル系統**: [buff-skills/pet-skills.md](./buff-skills/pet-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
-詳細な分割状況は [buff-skills-common/README.md](./buff-skills-common/README.md) を参照してください。
+詳細な分割状況は [buff-skills/README.md](./buff-skills/README.md) を参照してください。
 
 ## データ構造
 
 ```typescript
-interface CommonBuffSkillDetail {
+interface BuffSkillDetail {
   id: string                    // data-key値
   name: string                 // 表示名
   category: BuffSkillCategory  // スキル系統
@@ -35,6 +44,7 @@ interface CommonBuffSkillDetail {
   effects: SkillEffect[]      // 効果リスト
   calculationFormula: string  // 計算式
   uiSettings: UISettings      // UI表示設定
+  weaponRequirements?: WeaponRequirement[]  // 武器制限
 }
 
 interface SkillEffect {
@@ -49,15 +59,26 @@ interface UISettings {
   showInModal: boolean        // モーダル表示可否
   quickToggle: boolean        // クイックトグル対応
 }
+
+interface WeaponRequirement {
+  weaponType: WeaponType      // 対象武器種
+  include?: boolean           // true: 含む, false: 除く (デフォルト: true)
+  subWeaponType?: SubWeaponType  // サブ武器制限
+}
 ```
 
-## 共通バフスキル一覧
+## バフスキル一覧
+
+### A. 共通バフスキル（35個）
+
+全武器種で使用可能なバフスキルです。
 
 ### 1. ブレードスキル系統
 
-詳細は [buff-skills-common/blade-skills.md](./buff-skills-common/blade-skills.md) を参照してください。
+詳細は [buff-skills/blade-skills.md](./buff-skills/blade-skills.md) を参照してください。
 
 **含まれるスキル:**
+- 0.1 ブレードマスタリ (Ms-blade) - WeaponATK% = skillLevel × 3, ATK% = Lv1-2:1, Lv3-7:2, Lv8-10:3（片手剣・両手剣・双剣装備時）
 - 1.1 ウォークライ (IsWarcry) - ATK+300, 行動速度%+50
 
 ### 2. シュートスキル系統
@@ -89,10 +110,43 @@ interface UISettings {
 }
 ```
 
+#### 2.2 武士弓術 (ar1)
+```typescript
+{
+  id: 'ar1',
+  name: '武士弓術',
+  category: 'shoot',
+  type: 'toggle',
+  order: 301,
+  description: 'サブ武器の抜刀剣による武器ATKと安定率の向上',
+  effects: [
+    {
+      property: 'WeaponATK',
+      formula: 'subWeaponATK',
+      conditions: ['メイン武器が弓', 'サブ武器が抜刀剣']
+    },
+    {
+      property: 'Stability_Rate',
+      formula: 'Math.floor(subWeaponStability / 4)',
+      conditions: ['メイン武器が弓', 'サブ武器が抜刀剣']
+    }
+  ],
+  calculationFormula: 'WeaponATK = base + サブ武器の武器ATK, Stability% = base + Math.floor(サブ武器の安定率 / 4)',
+  weaponRequirement: {
+    description: 'メイン武器が弓でサブ武器が抜刀剣で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+```
+
 
 ### 3. ハルバードスキル系統
 
-詳細は [buff-skills-common/halberd-skills.md](./buff-skills-common/halberd-skills.md) を参照してください。
+詳細は [buff-skills/halberd-skills.md](./buff-skills/halberd-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 3.1 クイックオーラ (hb1) - 攻撃速度 = skillLevel × 50, 攻撃速度% = Math.floor(skillLevel × 2.5)
@@ -100,12 +154,12 @@ interface UISettings {
 
 ### 4. モノノフスキル系統
 
-詳細は [buff-skills-common/mononofu-skills.md](./buff-skills-common/mononofu-skills.md) を参照してください。
+詳細は [buff-skills/mononofu-skills.md](./buff-skills/mononofu-skills.md) を参照してください。
 
 **含まれるスキル:**
-- 4.1 武士道 (Mononof) - クリティカル率% = skillLevel × 3
+- 4.1 武士道 (Mononof) - HP = skillLevel × 10, MP = skillLevel × 10, Accuracy = skillLevel（全武器）。抜刀剣装備時追加：ATK% = Math.floor((skillLevel - 3) / 5) + 2, WeaponATK% = skillLevel × 3
 - 4.2 明鏡止水 (mf1-1) - 回避% = skillLevel × 10
-- 4.3 怪力乱神 (mf1) - ATK% = skillLevel × 5
+- 4.3 怪力乱神 (mf1) - ATK = skillLevel × 10, AttackMPRecovery = 5 + skillLevel + Math.floor(skillLevel / 5) × 5（すべての武器で効果有）
 - 4.4 両手持ち (sm1-1) - 武器依存の複合効果（トグル型）
 
 ### 5. スプライトスキル系統
@@ -276,7 +330,7 @@ interface UISettings {
 
 ### 9. ハンタースキル系統
 
-詳細は [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) を参照してください。
+詳細は [buff-skills/hunter-skills.md](./buff-skills/hunter-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 9.1 カムフラージュ (hunter5-2) - 基本ステータスレベル依存ATK・クリティカル上昇（武器種別効果）
@@ -344,7 +398,7 @@ interface UISettings {
 
 ### 12. サポートスキル系統
 
-詳細は [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) を参照してください。
+詳細は [buff-skills/support-skills.md](./buff-skills/support-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 12.1 ブレイブオーラ (IsBrave) - 武器ATK+30%、ブレイブ倍率+20%（バフ使用者時命中率-50%）
@@ -352,7 +406,7 @@ interface UISettings {
 
 ### 13. サバイバルスキル系統
 
-詳細は [buff-skills-common/survival-skills.md](./buff-skills-common/survival-skills.md) を参照してください。
+詳細は [buff-skills/survival-skills.md](./buff-skills/survival-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 13.1 HPブースト (oh4) - HP = skillLevel × 100, HP% = skillLevel × 2
@@ -360,7 +414,7 @@ interface UISettings {
 
 ### 14. バトルスキル系統
 
-詳細は [buff-skills-common/battle-skills.md](./buff-skills-common/battle-skills.md) を参照してください。
+詳細は [buff-skills/battle-skills.md](./buff-skills/battle-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 17.1 クリティカルup (oh1) - Critical+5, CriticalDamage_Rate+5
@@ -373,34 +427,17 @@ interface UISettings {
 
 ### 15. ペット使用スキル系統
 
-#### 15.1 アニマル (pet1)
-```typescript
-{
-  id: 'pet1',
-  name: 'アニマル',
-  category: 'pet',
-  type: 'toggle',
-  order: 1901,
-  description: 'ペット召喚による補助効果',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: '+10',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'ATK% = base + 10',
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
+詳細は [buff-skills/pet-skills.md](./buff-skills/pet-skills.md) を参照してください。
+
+**含まれるスキル:**
+- 15.1 ブレイブアップ (IsPetBrave) - ATK%+10%, ATK+75, AttackSpeed%+20%, AttackSpeed+300
+- 15.2 マインドアップ (IsPetMind) - MATK%+10%, MATK+75, CastingSpeed%+20%, CastingSpeed+300
+- 15.3 カットアップ (IsPetCut) - PhysicalResistance%+35%, MagicalResistance%+35%
+- 15.4 クリティカルアップ (IsPetCri) - CriticalDamage+12
 
 ### 16. デュアルソードスキル系統
 
-詳細は [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) を参照してください。
+詳細は [buff-skills/dualsword-skills.md](./buff-skills/dualsword-skills.md) を参照してください。
 
 **含まれるスキル:**
 - 16.1 神速の軌跡 (ds1-2) - AGI・抜刀威力上昇（双剣装備時抜刀威力強化）
@@ -438,85 +475,6 @@ interface UISettings {
 }
 ```
 
-### 18. パルチザンスキル系統
-
-#### 18.1 ガード (partisan1)
-```typescript
-{
-  id: 'partisan1',
-  name: 'ガード',
-  category: 'partisan',
-  type: 'level',
-  order: 2101,
-  maxLevel: 10,
-  description: '物理防御力を上昇させる',
-  effects: [
-    {
-      property: 'DEF_Rate',
-      formula: 'skillLevel * 5',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'DEF% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 18.2 前線維持Ⅱ (pal1)
-```typescript
-{
-  id: 'pal1',
-  name: '前線維持Ⅱ',
-  category: 'partisan',
-  type: 'level',
-  order: 2501,
-  maxLevel: 10,
-  description: '基本ステータスのレベルとスキルレベルに応じてHPを大幅に上昇させる',
-  effects: [
-    {
-      property: 'HP',
-      formula: '10 * (skillLevel * 10 + baseStatsLevel)',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)',
-  example: {
-    baseStatsLevel: 305,
-    skillLevel: 10,
-    calculation: 'HP = 10 × (10 × 10 + 305) = 10 × (100 + 305) = 10 × 405 = 4050',
-    result: 'HP +4050'
-  },
-  weaponRequirement: {
-    description: 'すべての武器で効果があります'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-
-// 実装用の効果計算関数
-function calculateFrontlineMaintenance2Effects(
-  skillLevel: number,
-  baseStatsLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  // HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)
-  const hpBonus = 10 * (skillLevel * 10 + baseStatsLevel)
-  
-  return {
-    HP: hpBonus
-  }
-}
-```
 
 ## スキルタイプ別UI仕様
 

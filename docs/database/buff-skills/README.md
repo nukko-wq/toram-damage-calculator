@@ -8,7 +8,7 @@
 ## ファイル構造
 
 ```
-buff-skills-common/
+buff-skills/
 ├── README.md                    # このファイル
 ├── blade-skills.md             # ブレードスキル系統
 ├── halberd-skills.md           # ハルバードスキル系統
@@ -18,6 +18,7 @@ buff-skills-common/
 ├── hunter-skills.md            # ハンタースキル系統
 ├── dualsword-skills.md         # デュアルソードスキル系統
 ├── support-skills.md           # サポートスキル系統
+├── partisan-skills.md          # パルチザンスキル系統
 ├── shoot-skills.md             # シュートスキル系統（予定）
 └── ... (他の系統)
 ```
@@ -80,9 +81,14 @@ buff-skills-common/
   - ブレイブオーラ (IsBrave)
   - マナリチャージ (IsManaReCharge)
 
+### ✅ partisan-skills.md
+- **スキル系統**: パルチザンスキル (category: 'partisan')
+- **含まれるスキル**: 1スキル
+  - 前線維持Ⅱ (pal1)
+
 ## 使用方法
 
-1. **メインドキュメント**: `../buff-skill-details-common.md` で全体構造を確認
+1. **メインドキュメント**: `../buff-skill-details.md` で全体構造を確認
 2. **詳細確認**: 各系統の詳細は個別ファイルで確認
 3. **実装時**: 各ファイル内の実装用関数を参考に実装
 
@@ -94,7 +100,7 @@ buff-skills-common/
 
 ## 関連ファイル
 
-- **メインドキュメント**: `../buff-skill-details-common.md`
+- **メインドキュメント**: `../buff-skill-details.md`
 - **実装ファイル**: `../../src/utils/buffSkillCalculation.ts`
 - **データ定義**: `../../src/data/buffSkills.ts`
 - **型定義**: `../../src/types/buffSkill.ts`
