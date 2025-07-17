@@ -16,6 +16,7 @@
 - **ハンタースキル系統**: [buff-skills-common/hunter-skills.md](./buff-skills-common/hunter-skills.md) ✅
 - **デュアルソードスキル系統**: [buff-skills-common/dualsword-skills.md](./buff-skills-common/dualsword-skills.md) ✅
 - **サポートスキル系統**: [buff-skills-common/support-skills.md](./buff-skills-common/support-skills.md) ✅
+- **パルチザンスキル系統**: [buff-skills-common/partisan-skills.md](./buff-skills-common/partisan-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills-common/README.md](./buff-skills-common/README.md) を参照してください。
@@ -438,85 +439,6 @@ interface UISettings {
 }
 ```
 
-### 18. パルチザンスキル系統
-
-#### 18.1 ガード (partisan1)
-```typescript
-{
-  id: 'partisan1',
-  name: 'ガード',
-  category: 'partisan',
-  type: 'level',
-  order: 2101,
-  maxLevel: 10,
-  description: '物理防御力を上昇させる',
-  effects: [
-    {
-      property: 'DEF_Rate',
-      formula: 'skillLevel * 5',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'DEF% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 18.2 前線維持Ⅱ (pal1)
-```typescript
-{
-  id: 'pal1',
-  name: '前線維持Ⅱ',
-  category: 'partisan',
-  type: 'level',
-  order: 2501,
-  maxLevel: 10,
-  description: '基本ステータスのレベルとスキルレベルに応じてHPを大幅に上昇させる',
-  effects: [
-    {
-      property: 'HP',
-      formula: '10 * (skillLevel * 10 + baseStatsLevel)',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)',
-  example: {
-    baseStatsLevel: 305,
-    skillLevel: 10,
-    calculation: 'HP = 10 × (10 × 10 + 305) = 10 × (100 + 305) = 10 × 405 = 4050',
-    result: 'HP +4050'
-  },
-  weaponRequirement: {
-    description: 'すべての武器で効果があります'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-
-// 実装用の効果計算関数
-function calculateFrontlineMaintenance2Effects(
-  skillLevel: number,
-  baseStatsLevel: number
-): Partial<EquipmentProperties> {
-  if (!skillLevel || skillLevel === 0) return {}
-  
-  // HP = 10 × (スキルレベル × 10 + 基本ステータスレベル)
-  const hpBonus = 10 * (skillLevel * 10 + baseStatsLevel)
-  
-  return {
-    HP: hpBonus
-  }
-}
-```
 
 ## スキルタイプ別UI仕様
 

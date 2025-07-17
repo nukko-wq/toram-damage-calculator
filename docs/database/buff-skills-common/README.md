@@ -18,6 +18,7 @@ buff-skills-common/
 ├── hunter-skills.md            # ハンタースキル系統
 ├── dualsword-skills.md         # デュアルソードスキル系統
 ├── support-skills.md           # サポートスキル系統
+├── partisan-skills.md          # パルチザンスキル系統
 ├── shoot-skills.md             # シュートスキル系統（予定）
 └── ... (他の系統)
 ```
@@ -79,6 +80,11 @@ buff-skills-common/
 - **含まれるスキル**: 2スキル
   - ブレイブオーラ (IsBrave)
   - マナリチャージ (IsManaReCharge)
+
+### ✅ partisan-skills.md
+- **スキル系統**: パルチザンスキル (category: 'partisan')
+- **含まれるスキル**: 1スキル
+  - 前線維持Ⅱ (pal1)
 
 ## 使用方法
 
