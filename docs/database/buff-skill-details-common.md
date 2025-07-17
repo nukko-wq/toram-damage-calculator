@@ -376,7 +376,8 @@ interface UISettings {
 
 **含まれるスキル:**
 - 15.1 ブレイブアップ (IsPetBrave) - ATK%+10%, ATK+75, AttackSpeed%+20%, AttackSpeed+300
-- 15.2 クリティカルアップ (IsPetCri) - CriticalDamage+12
+- 15.2 マインドアップ (IsPetMind) - MATK%+10%, MATK+75, CastingSpeed%+20%, CastingSpeed+300
+- 15.3 クリティカルアップ (IsPetCri) - CriticalDamage+12
 
 #### 15.1 ブレイブアップ (IsPetBrave)
 ```typescript
@@ -421,7 +422,50 @@ interface UISettings {
 }
 ```
 
-#### 15.2 クリティカルアップ (IsPetCri)
+#### 15.2 マインドアップ (IsPetMind)
+```typescript
+{
+  id: 'IsPetMind',
+  name: 'マインドアップ',
+  category: 'pet',
+  type: 'toggle',
+  order: 2302,
+  description: 'ペットによる魔法攻撃力と詠唱速度の複合強化',
+  effects: [
+    {
+      property: 'MATK_Rate',
+      formula: '+10',
+      conditions: []
+    },
+    {
+      property: 'MATK',
+      formula: '+75',
+      conditions: []
+    },
+    {
+      property: 'CastingSpeed_Rate',
+      formula: '+20',
+      conditions: []
+    },
+    {
+      property: 'CastingSpeed',
+      formula: '+300',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'MATK% = base + 10, MATK = base + 75, CastingSpeed% = base + 20, CastingSpeed = base + 300',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+```
+
+#### 15.3 クリティカルアップ (IsPetCri)
 ```typescript
 {
   id: 'IsPetCri',
