@@ -139,7 +139,7 @@ interface UISettings {
 **含まれるスキル:**
 - 4.1 武士道 (Mononof) - クリティカル率% = skillLevel × 3
 - 4.2 明鏡止水 (mf1-1) - 回避% = skillLevel × 10
-- 4.3 怪力乱神 (mf1) - ATK% = skillLevel × 5
+- 4.3 怪力乱神 (mf1) - ATK = skillLevel × 10, AttackMPRecovery = 5 + skillLevel + Math.floor(skillLevel / 5) × 5（すべての武器で効果有）
 - 4.4 両手持ち (sm1-1) - 武器依存の複合効果（トグル型）
 
 ### 5. スプライトスキル系統

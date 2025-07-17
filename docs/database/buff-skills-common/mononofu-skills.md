@@ -108,17 +108,25 @@ function calculateClearMindEffects(
   name: '怪力乱神',
   category: 'mononofu',
   type: 'level',
-  order: 603,
+  order: 704,
   maxLevel: 10,
-  description: '攻撃力を上昇させる',
+  description: '攻撃力と攻撃MP回復を上昇させる',
   effects: [
     {
-      property: 'ATK_Rate',
-      formula: 'skillLevel * 5',
+      property: 'ATK',
+      formula: 'skillLevel * 10',
+      conditions: []
+    },
+    {
+      property: 'AttackMPRecovery',
+      formula: '5 + skillLevel + Math.floor(skillLevel / 5) * 5',
       conditions: []
     }
   ],
-  calculationFormula: 'ATK% = skillLevel × 5',
+  calculationFormula: 'ATK = base + (skillLevel × 10), AttackMPRecovery = base + (5 + skillLevel + Math.floor(skillLevel / 5) × 5)',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
@@ -133,8 +141,15 @@ function calculateSupernaturalPowerEffects(
 ): Partial<EquipmentProperties> {
   if (!skillLevel || skillLevel === 0) return {}
   
+  // ATK = スキルレベル × 10
+  const atkBonus = skillLevel * 10
+  
+  // 攻撃MP回復 = 5 + スキルレベル + (スキルレベル / 5) × 5（小数点以下切り捨て）
+  const attackMPRecovery = 5 + skillLevel + Math.floor(skillLevel / 5) * 5
+  
   return {
-    ATK_Rate: skillLevel * 5
+    ATK: atkBonus,
+    AttackMPRecovery: attackMPRecovery
   }
 }
 ```

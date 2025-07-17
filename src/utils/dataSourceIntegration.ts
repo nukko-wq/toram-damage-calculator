@@ -782,6 +782,8 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
+	// 怪力乱神スキルの補正値は getTwoHandsEffects 内で統合処理されるため、ここでは追加しない
+
 	// 武士弓術スキルの補正値を追加
 	const archeryBonuses = getArcheryEffects(
 		data.buffSkills?.skills || null,
