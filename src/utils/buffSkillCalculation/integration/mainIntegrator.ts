@@ -18,6 +18,7 @@ import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
 import { getSupportSkillBraveMultiplier } from '../categories/supportSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
 import { getShieldSkillBonuses } from '../categories/shieldSkills'
+import { getAssassinSkillBonuses } from '../categories/assassinSkills'
 
 /**
  * バフスキルデータから全体の補正値を取得（基本版）
@@ -266,4 +267,14 @@ export function getBuffSkillBraveMultiplier(
 	buffSkillData: Record<string, BuffSkillState> | null,
 ): number {
 	return getSupportSkillBraveMultiplier(buffSkillData)
+}
+
+/**
+ * バフスキルデータからアサシンスキルの効果を取得（サブ武器情報が必要）
+ */
+export function getAssassinSkillEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	subWeaponType: SubWeaponType | null,
+): Partial<AllBonuses> {
+	return getAssassinSkillBonuses(buffSkillData, subWeaponType)
 }

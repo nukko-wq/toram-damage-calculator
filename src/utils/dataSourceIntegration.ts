@@ -28,6 +28,7 @@ import {
 	getPetMindUpEffects,
 	getPetCutUpEffects,
 	getArcheryEffects,
+	getAssassinSkillEffects,
 } from './buffSkillCalculation'
 import { getBattleSkillBonusesWithPlayerLevel } from './buffSkillCalculation/categories/battleSkills'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
@@ -728,6 +729,19 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(archeryBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// アサシンスキルの補正値を追加（サブ武器情報が必要）
+	const assassinSkillBonuses = getAssassinSkillEffects(
+		data.buffSkills?.skills || null,
+		data.subWeapon?.weaponType || null,
+	)
+
+	for (const [key, value] of Object.entries(assassinSkillBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
