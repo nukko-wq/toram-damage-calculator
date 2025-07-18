@@ -274,30 +274,63 @@ interface WeaponRequirement {
 
 ### 7. ダークパワースキル系統
 
-#### 7.1 ダークパワー (DarkPower)
+#### 7.1 エターナルナイトメア (dp1)
 ```typescript
 {
-  id: 'DarkPower',
-  name: 'ダークパワー',
+  id: 'dp1',
+  name: 'エターナルナイトメア',
   category: 'darkPower',
-  type: 'level',
-  order: 1001,
-  maxLevel: 10,
-  description: '魔法攻撃力を上昇させる',
+  type: 'multiParam',
+  order: 1401,
+  description: 'スキルレベルとスキルポイント合計でHP率と属性耐性を上昇させる',
+  multiParams: {
+    param1: {
+      name: 'スキルレベル',
+      min: 1,
+      max: 10,
+      default: 10,
+      unit: 'Lv'
+    },
+    param2: {
+      name: 'スキルポイント合計',
+      min: 25,
+      max: 80,
+      default: 80,
+      unit: 'pt'
+    }
+  },
   effects: [
     {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 5',
+      property: 'HP_Rate',
+      formula: 'Math.abs(2 * skillLevel)',
+      conditions: []
+    },
+    {
+      property: 'DarkResistance_Rate',
+      formula: '+5',
+      conditions: []
+    },
+    {
+      property: 'LightResistance_Rate',
+      formula: '+5',
       conditions: []
     }
   ],
-  calculationFormula: 'MATK% = skillLevel × 5',
+  calculationFormula: 'HP% = |2 × スキルレベル|, 闇耐性% = base + 5, 光耐性% = base + 5',
+  enemyDebuffFormula: '敵DEF・MDEF低下 = スキルポイント合計 × (スキルレベル × 0.5)',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
   uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
+    parameterName: 'スキルレベル・スキルポイント',
     showInModal: true,
     quickToggle: false
-  }
+  },
+  specialNotes: [
+    'HP率の計算は絶対値を使用（|2 × スキルレベル|%）',
+    '敵DEF・MDEF低下効果は将来実装予定',
+    'ダークパワー系統の全習得スキルポイントが必要'
+  ]
 }
 ```
 
