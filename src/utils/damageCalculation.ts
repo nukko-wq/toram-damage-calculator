@@ -906,11 +906,20 @@ function processEnemyDefense(
 	}
 
 	// 3. エターナルナイトメア減算
-	// Phase 3では未実装
 	if (input.buffSkills.eternalNightmare.isEnabled) {
-		// const eternalReduction = input.buffSkills.eternalNightmare.level * input.buffSkills.totalDarkPowerLevel * 0.5
-		// processed = Math.max(0, processed - eternalReduction)
-		// Phase 3では無視
+		const calculatedReduction = input.buffSkills.eternalNightmare.level * input.buffSkills.totalDarkPowerLevel * 0.5
+		const halfDefense = processed * 0.5
+		const eternalReduction = Math.min(calculatedReduction, halfDefense)
+		console.log('エターナルナイトメア減算:', {
+			skillLevel: input.buffSkills.eternalNightmare.level,
+			totalDarkPowerLevel: input.buffSkills.totalDarkPowerLevel,
+			calculatedReduction: calculatedReduction,
+			halfDefense: halfDefense,
+			finalReduction: eternalReduction,
+			beforeReduction: processed,
+			afterReduction: Math.max(0, processed - eternalReduction)
+		})
+		processed = Math.max(0, processed - eternalReduction)
 	}
 
 	// 4. 貫通による低下（%計算、小数点以下切り捨て）

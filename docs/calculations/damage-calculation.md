@@ -223,20 +223,27 @@ if (enemy.hasDestruction) {
 if (buffSkills.eternalNightmare.isEnabled) {
   const eternalNightmareReduction = calculateEternalNightmareReduction(
     buffSkills.eternalNightmare.level,
-    buffSkills.getTotalDarkPowerLevel()
+    buffSkills.getTotalDarkPowerLevel(),
+    processedDEF
   )
   processedDEF = processedDEF - eternalNightmareReduction
 }
 
 function calculateEternalNightmareReduction(
   eternalNightmareLevel: number,
-  totalDarkPowerLevel: number
+  totalDarkPowerLevel: number,
+  currentDefense: number
 ): number {
-  return eternalNightmareLevel * totalDarkPowerLevel * 0.5
+  const calculatedReduction = eternalNightmareLevel * totalDarkPowerLevel * 0.5
+  const halfDefense = currentDefense * 0.5
+  return Math.min(calculatedReduction, halfDefense)
 }
 ```
-**計算例**: エターナルナイトメアLv10 × ダークパワー合計Lv80 × 0.5 = 400  
-**実装状況**: 仕様確定、実装予定
+**計算例**: 
+- エターナルナイトメアLv10 × ダークパワー合計Lv80 × 0.5 = 400
+- 敵DEF 143 × 0.5 = 71.5
+- 減算量 = Math.min(400, 71.5) = 71.5  
+**実装状況**: 実装済み
 
 ##### 3. 貫通による低下
 ```typescript

@@ -18,6 +18,7 @@ import {
 	getBuffSkillBraveMultiplier,
 } from '@/utils/buffSkillCalculation'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
+import type { BuffSkillState } from '@/types/buffSkill'
 import { createInitialPowerOptions } from '@/utils/initialData'
 
 // ダメージ表示結果の型定義
@@ -39,6 +40,30 @@ export interface DamageCalculationServiceResult {
 export interface DamageCalculationOptions {
 	debug?: boolean
 	powerOptions?: PowerOptions
+}
+
+/**
+ * エターナルナイトメアのレベルを取得
+ */
+function getEternalNightmareLevel(skill: BuffSkillState | undefined): number {
+	if (!skill?.isEnabled) return 0
+	
+	// multiParam型の場合はmultiParam1、level型の場合はlevel、specialParamの場合はspecialParamを使用
+	return skill.multiParam1 || skill.level || skill.specialParam || 0
+}
+
+/**
+ * ダークパワースキルの合計レベルを計算
+ * エターナルナイトメアの場合、multiParam2がダークパワー全習得スキルポイント
+ */
+function calculateTotalDarkPowerLevel(buffSkills: Record<string, BuffSkillState>): number {
+	const eternalNightmare = buffSkills.dp1
+	if (eternalNightmare?.isEnabled) {
+		// multiParam2がダークパワー全習得スキルポイント（25-80）
+		return eternalNightmare.multiParam2 || eternalNightmare.specialParam || 80 // デフォルト80
+	}
+	
+	return 80 // デフォルト値
 }
 
 /**
@@ -158,6 +183,21 @@ export function calculateDamageWithService(
 			enemyLevel: finalEnemyLevel,
 			stability: {
 				rate: stabilityRate, // 計算済みの安定率を使用
+			},
+			// バフスキル情報を追加
+			buffSkills: {
+				eternalNightmare: {
+					isEnabled: calculatorData.buffSkills?.skills?.dp1?.isEnabled ?? false,
+					level: getEternalNightmareLevel(calculatorData.buffSkills?.skills?.dp1),
+				},
+				totalDarkPowerLevel: (() => {
+					const totalLevel = calculateTotalDarkPowerLevel(calculatorData.buffSkills?.skills ?? {})
+					console.log('ダークパワー全スキルポイント取得デバッグ:', {
+						dp1: calculatorData.buffSkills?.skills?.dp1,
+						totalDarkPowerLevel: totalLevel
+					})
+					return totalLevel
+				})(),
 			},
 			// PowerOptionsに基づいた設定
 			elementAdvantage: {
