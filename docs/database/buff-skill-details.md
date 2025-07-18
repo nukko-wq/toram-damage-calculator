@@ -317,7 +317,7 @@ interface WeaponRequirement {
     }
   ],
   calculationFormula: 'HP% = |2 × スキルレベル|, 闇耐性% = base + 5, 光耐性% = base - 5',
-  enemyDebuffFormula: '敵DEF・MDEF低下 = スキルポイント合計 × (スキルレベル × 0.5)',
+  enemyDebuffFormula: '敵DEF・MDEF低下 = Math.min(スキルポイント合計 × (スキルレベル × 0.5), Normal難易度DEF/MDEF × 0.5)',
   weaponRequirement: {
     description: 'すべての武器で効果があります'
   },
@@ -328,8 +328,9 @@ interface WeaponRequirement {
   },
   specialNotes: [
     'HP率の計算は絶対値を使用（|2 × スキルレベル|%）',
-    '敵DEF・MDEF低下効果は将来実装予定',
-    'ダークパワー系統の全習得スキルポイントが必要'
+    '敵DEF・MDEF低下効果は実装済み',
+    'ダークパワー系統の全習得スキルポイントが必要',
+    'ボス戦時の減算計算ではNormal難易度のDEF/MDEFを参照（例: Hard難易度でもNormal値の半分で上限計算）'
   ]
 }
 ```

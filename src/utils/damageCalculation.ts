@@ -44,6 +44,9 @@ export interface DamageCalculationInput {
 		raidBossLevel?: number // raidBoss カテゴリのみ
 		hasDestruction: boolean // 破壊状態異常
 		guaranteedCritical: number // 確定クリティカル (0-999)
+		// エターナルナイトメア用: Normal難易度のDEF/MDEF（ボス戦時の減算上限計算用）
+		normalDEF?: number
+		normalMDEF?: number
 	}
 
 	// 貫通・固定値
@@ -908,16 +911,29 @@ function processEnemyDefense(
 	// 3. エターナルナイトメア減算
 	if (input.buffSkills.eternalNightmare.isEnabled) {
 		const calculatedReduction = input.buffSkills.eternalNightmare.level * input.buffSkills.totalDarkPowerLevel * 0.5
-		const halfDefense = processed * 0.5
+		
+		// ボス戦の場合はNormal難易度のDEF/MDEFを参照、そうでなければ現在の値を使用
+		let referenceDef = processed
+		if (input.enemy.category === 'boss' && input.enemy.difficulty !== 'normal') {
+			referenceDef = defenseType === 'DEF' 
+				? (input.enemy.normalDEF ?? processed)
+				: (input.enemy.normalMDEF ?? processed)
+		}
+		
+		const halfDefense = referenceDef * 0.5
 		const eternalReduction = Math.min(calculatedReduction, halfDefense)
 		console.log('エターナルナイトメア減算:', {
 			skillLevel: input.buffSkills.eternalNightmare.level,
 			totalDarkPowerLevel: input.buffSkills.totalDarkPowerLevel,
 			calculatedReduction: calculatedReduction,
+			defenseType: defenseType,
+			currentDefense: processed,
+			referenceDefense: referenceDef,
 			halfDefense: halfDefense,
 			finalReduction: eternalReduction,
 			beforeReduction: processed,
-			afterReduction: Math.max(0, processed - eternalReduction)
+			afterReduction: Math.max(0, processed - eternalReduction),
+			isBossWithDifficulty: input.enemy.category === 'boss' && input.enemy.difficulty !== 'normal'
 		})
 		processed = Math.max(0, processed - eternalReduction)
 	}

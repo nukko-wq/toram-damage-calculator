@@ -157,6 +157,10 @@ export function calculateDamageWithService(
 		let finalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
 		let finalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
 		let finalEnemyLevel = enemyInfo?.level ?? defaultInput.enemy.level
+		
+		// Normal難易度のDEF/MDEFを保持（エターナルナイトメア減算用）
+		const normalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
+		const normalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
 
 		// ボス系敵かつ難易度がnormal以外の場合、難易度調整を適用
 		if (
@@ -232,6 +236,9 @@ export function calculateDamageWithService(
 				level: finalEnemyLevel,
 				category: enemyInfo?.category ?? defaultInput.enemy.category,
 				difficulty: powerOptions.bossDifficulty,
+				// エターナルナイトメア減算用にNormal難易度のDEF/MDEFを設定
+				normalDEF: normalEnemyDEF,
+				normalMDEF: normalEnemyMDEF,
 			},
 			// 耐性設定も実際のデータに基づいて更新
 			resistance: {
