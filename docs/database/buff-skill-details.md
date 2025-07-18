@@ -370,6 +370,39 @@ interface WeaponRequirement {
 }
 ```
 
+#### 10.2 イージス (IsAegis)
+```typescript
+{
+  id: 'IsAegis',
+  name: 'イージス',
+  category: 'shield',
+  type: 'toggle',
+  order: 1502,
+  description: '魔法耐性を大幅に上昇させるが物理耐性が低下する',
+  effects: [
+    {
+      property: 'PhysicalResistance_Rate',
+      formula: '-15',
+      conditions: []
+    },
+    {
+      property: 'MagicalResistance_Rate',
+      formula: '+30',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'PhysicalResistance% = base - 15, MagicalResistance% = base + 30',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+```
+
 ### 11. アサシンスキル系統
 
 #### 11.1 ヴァニッシュ (vanish1)

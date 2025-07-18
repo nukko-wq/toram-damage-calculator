@@ -36,19 +36,21 @@ export function getProtectionEffects(
 }
 
 /**
- * イージスの効果計算関数（将来実装用）
+ * イージスの効果計算関数
  */
 export function calculateAegisEffects(
 	isEnabled: boolean,
 ): Partial<EquipmentProperties> {
 	if (!isEnabled) return {}
 
-	// TODO: イージスの効果を実装
-	return {}
+	return {
+		PhysicalResistance_Rate: -15, // 物理耐性%-15
+		MagicalResistance_Rate: 30, // 魔法耐性%+30
+	}
 }
 
 /**
- * イージスの効果を取得（将来実装用）
+ * イージスの効果を取得
  */
 export function getAegisEffects(
 	buffSkillData: Record<string, BuffSkillState> | null,
@@ -61,4 +63,35 @@ export function getAegisEffects(
 	}
 
 	return {}
+}
+
+/**
+ * シールドスキル系統の統合効果を取得
+ */
+export function getShieldSkillBonuses(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): Partial<EquipmentProperties> {
+	const bonuses: Partial<EquipmentProperties> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// プロテクションの効果を統合
+	const protectionBonuses = getProtectionEffects(buffSkillData)
+	for (const [key, value] of Object.entries(protectionBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof EquipmentProperties] =
+				(bonuses[key as keyof EquipmentProperties] || 0) + value
+		}
+	}
+
+	// イージスの効果を統合
+	const aegisBonuses = getAegisEffects(buffSkillData)
+	for (const [key, value] of Object.entries(aegisBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof EquipmentProperties] =
+				(bonuses[key as keyof EquipmentProperties] || 0) + value
+		}
+	}
+
+	return bonuses
 }
