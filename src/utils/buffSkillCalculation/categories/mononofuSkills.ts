@@ -12,6 +12,49 @@ import type { AllBonuses } from '../../basicStatsCalculation'
 import { convertWeaponType, integrateEffects } from '../types'
 
 /**
+ * 武士道の効果計算関数
+ */
+export function calculateBushidoEffects(
+	skillLevel: number,
+	mainWeaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (!skillLevel || skillLevel === 0) return {}
+
+	// 基本効果（全武器共通）
+	const baseEffects = {
+		HP: skillLevel * 10,
+		MP: skillLevel * 10,
+		Accuracy: skillLevel,
+	}
+
+	// メイン武器が抜刀剣の場合の追加効果
+	if (mainWeaponType === 'katana') {
+		return {
+			...baseEffects,
+			ATK_Rate: Math.floor((skillLevel - 3) / 5) + 2,
+			WeaponATK_Rate: skillLevel * 3,
+		}
+	}
+
+	return baseEffects
+}
+
+/**
+ * 武士道の効果を取得
+ */
+export function getBushidoEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	mainWeaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (!buffSkillData) return {}
+
+	const skill = buffSkillData.Mononof
+	if (!skill?.isEnabled || !skill.level) return {}
+
+	return calculateBushidoEffects(skill.level, mainWeaponType)
+}
+
+/**
  * 怪力乱神の効果計算関数
  */
 export function calculateSupernaturalPowerEffects(
@@ -95,6 +138,13 @@ export function getMononofuSkillBonuses(
 	const bonuses: Partial<AllBonuses> = {}
 
 	if (!buffSkillData) return bonuses
+
+	// 武士道(Mononof)の処理
+	const bushido = buffSkillData.Mononof
+	if (bushido?.isEnabled && bushido.level) {
+		const effects = calculateBushidoEffects(bushido.level, convertedWeaponType)
+		integrateEffects(effects, bonuses)
+	}
 
 	// 怪力乱神(mf1)の処理
 	const supernaturalPower = buffSkillData.mf1
