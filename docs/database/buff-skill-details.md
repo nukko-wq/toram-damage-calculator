@@ -343,23 +343,35 @@ interface WeaponRequirement {
 
 ### 11. アサシンスキル系統
 
-#### 11.1 ヴァニッシュ (vanish1)
+#### 11.1 シーカーリウス (oh1-2)
 ```typescript
 {
-  id: 'vanish1',
-  name: 'ヴァニッシュ',
+  id: 'oh1-2',
+  name: 'シーカーリウス',
   category: 'assassin',
   type: 'toggle',
-  order: 1401,
-  description: '回避を上昇させる',
+  order: 1801,
+  description: 'サブ武器の種類によって攻撃力と物理貫通の効果が変化する',
   effects: [
     {
-      property: 'Dodge_Rate',
-      formula: '+100',
-      conditions: []
+      property: 'ATK',
+      formula: 'subWeapon === "ナイフ" || subWeapon === "巻物" ? +100 : +50',
+      conditions: ['サブ武器による効果変化']
+    },
+    {
+      property: 'PhysicalPenetration_Rate',
+      formula: 'subWeapon === "ナイフ" || subWeapon === "巻物" ? +25 : +10',
+      conditions: ['サブ武器による効果変化']
     }
   ],
-  calculationFormula: '回避% = base + 100',
+  calculationFormula: 'ナイフ・巻物装備時: ATK = base + 100, 物理貫通% = base + 25 / その他: ATK = base + 50, 物理貫通% = base + 10',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります',
+    subWeaponConditions: {
+      enhanced: ['ナイフ', '巻物'],
+      normal: ['その他のサブ武器']
+    }
+  },
   uiSettings: {
     parameterName: 'ON/OFF',
     showInModal: false,
