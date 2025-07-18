@@ -335,9 +335,44 @@ interface WeaponRequirement {
 **含まれるスキル:**
 - 9.1 カムフラージュ (hunter5-2) - 基本ステータスレベル依存ATK・クリティカル上昇（武器種別効果）
 
-### 10. アサシンスキル系統
+### 10. シールドスキル系統
 
-#### 10.1 ヴァニッシュ (vanish1)
+#### 10.1 プロテクション (IsProtect)
+```typescript
+{
+  id: 'IsProtect',
+  name: 'プロテクション',
+  category: 'shield',
+  type: 'toggle',
+  order: 1501,
+  description: '物理耐性を大幅に上昇させるが魔法耐性が低下する',
+  effects: [
+    {
+      property: 'PhysicalResistance_Rate',
+      formula: '+30',
+      conditions: []
+    },
+    {
+      property: 'MagicalResistance_Rate',
+      formula: '-15',
+      conditions: []
+    }
+  ],
+  calculationFormula: 'PhysicalResistance% = base + 30, MagicalResistance% = base - 15',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+```
+
+### 11. アサシンスキル系統
+
+#### 11.1 ヴァニッシュ (vanish1)
 ```typescript
 {
   id: 'vanish1',

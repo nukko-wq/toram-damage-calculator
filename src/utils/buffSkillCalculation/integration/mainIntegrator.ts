@@ -17,6 +17,7 @@ import { getHunterSkillBonuses } from '../categories/hunterSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
 import { getSupportSkillBraveMultiplier } from '../categories/supportSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
+import { getProtectionEffects } from '../categories/shieldSkills'
 
 /**
  * バフスキルデータから全体の補正値を取得（基本版）
@@ -68,6 +69,15 @@ export function getBuffSkillBonuses(
 	// サバイバルスキル
 	const survivalBonuses = getSurvivalSkillBonuses(buffSkillData)
 	for (const [key, value] of Object.entries(survivalBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// シールドスキル
+	const shieldBonuses = getProtectionEffects(buffSkillData)
+	for (const [key, value] of Object.entries(shieldBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
