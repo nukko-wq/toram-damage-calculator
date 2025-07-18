@@ -336,72 +336,10 @@ interface WeaponRequirement {
 - 9.1 カムフラージュ (hunter5-2) - 基本ステータスレベル依存ATK・クリティカル上昇（武器種別効果）
 
 ### 10. シールドスキル系統
-
-#### 10.1 プロテクション (IsProtect)
-```typescript
-{
-  id: 'IsProtect',
-  name: 'プロテクション',
-  category: 'shield',
-  type: 'toggle',
-  order: 1501,
-  description: '物理耐性を大幅に上昇させるが魔法耐性が低下する',
-  effects: [
-    {
-      property: 'PhysicalResistance_Rate',
-      formula: '+30',
-      conditions: []
-    },
-    {
-      property: 'MagicalResistance_Rate',
-      formula: '-15',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'PhysicalResistance% = base + 30, MagicalResistance% = base - 15',
-  weaponRequirement: {
-    description: 'すべての武器で効果があります'
-  },
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
-
-#### 10.2 イージス (IsAegis)
-```typescript
-{
-  id: 'IsAegis',
-  name: 'イージス',
-  category: 'shield',
-  type: 'toggle',
-  order: 1502,
-  description: '魔法耐性を大幅に上昇させるが物理耐性が低下する',
-  effects: [
-    {
-      property: 'PhysicalResistance_Rate',
-      formula: '-15',
-      conditions: []
-    },
-    {
-      property: 'MagicalResistance_Rate',
-      formula: '+30',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'PhysicalResistance% = base - 15, MagicalResistance% = base + 30',
-  weaponRequirement: {
-    description: 'すべての武器で効果があります'
-  },
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
+詳細は [buff-skills/shield-skills.md](./buff-skills/shield-skills.md) を参照してください。
+**含まれるスキル:**
+- 10.1 プロテクション (IsProtect) - 物理耐性+30%, 魔法耐性-15%（全武器種対応）
+- 10.2 イージス (IsAegis) - 物理耐性-15%, 魔法耐性+30%（全武器種対応）
 
 ### 11. アサシンスキル系統
 
