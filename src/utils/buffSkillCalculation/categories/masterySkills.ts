@@ -128,6 +128,34 @@ export function calculateMartialMasteryEffects(
 }
 
 /**
+ * 武士道マスタリの効果計算関数
+ */
+export function calculateBushidoMasteryEffects(
+	skillLevel: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (weaponType !== 'katana' || skillLevel <= 0) return {}
+
+	// 基本効果（全武器共通部分）
+	const baseEffects = {
+		HP: skillLevel * 10,
+		MP: skillLevel * 10,
+		Accuracy: skillLevel,
+	}
+
+	// 抜刀剣装備時の追加効果
+	const additionalEffects = {
+		ATK_Rate: Math.floor((skillLevel - 3) / 5) + 2,
+		WeaponATK_Rate: skillLevel * 3,
+	}
+
+	return {
+		...baseEffects,
+		...additionalEffects,
+	}
+}
+
+/**
  * マジックマスタリの効果計算関数
  */
 export function calculateMagicMasteryEffects(
@@ -204,6 +232,16 @@ export function getMasterySkillBonuses(
 	if (martialMastery?.isEnabled && martialMastery.level) {
 		const effects = calculateMartialMasteryEffects(
 			martialMastery.level,
+			convertedWeaponType,
+		)
+		integrateEffects(effects, bonuses)
+	}
+
+	// 武士道マスタリの処理
+	const bushidoMastery = buffSkillData['Ms-Mononof']
+	if (bushidoMastery?.isEnabled && bushidoMastery.level) {
+		const effects = calculateBushidoMasteryEffects(
+			bushidoMastery.level,
 			convertedWeaponType,
 		)
 		integrateEffects(effects, bonuses)

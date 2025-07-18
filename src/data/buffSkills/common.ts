@@ -47,6 +47,13 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		type: 'level',
 		maxLevel: 10,
 		order: 601,
+		requirements: [
+			{
+				exclude: {
+					mainWeapon: ['katana'],
+				},
+			},
+		],
 	},
 	{
 		id: 'mf1-1',

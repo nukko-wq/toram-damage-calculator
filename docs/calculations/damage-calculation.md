@@ -223,20 +223,38 @@ if (enemy.hasDestruction) {
 if (buffSkills.eternalNightmare.isEnabled) {
   const eternalNightmareReduction = calculateEternalNightmareReduction(
     buffSkills.eternalNightmare.level,
-    buffSkills.getTotalDarkPowerLevel()
+    buffSkills.getTotalDarkPowerLevel(),
+    processedDEF,
+    enemy // 敵情報を追加
   )
   processedDEF = processedDEF - eternalNightmareReduction
 }
 
 function calculateEternalNightmareReduction(
   eternalNightmareLevel: number,
-  totalDarkPowerLevel: number
+  totalDarkPowerLevel: number,
+  currentDefense: number,
+  enemy: EnemyInfo
 ): number {
-  return eternalNightmareLevel * totalDarkPowerLevel * 0.5
+  const calculatedReduction = eternalNightmareLevel * totalDarkPowerLevel * 0.5
+  
+  // ボス戦の場合はNormal難易度のDEF/MDEFを参照
+  let referenceDef = currentDefense
+  if (enemy.category === 'boss' && enemy.difficulty !== 'normal') {
+    // Normal難易度のDEF/MDEFを取得
+    const normalStats = getEnemyNormalStats(enemy.id)
+    referenceDef = normalStats.DEF // または normalStats.MDEF（攻撃タイプに応じて）
+  }
+  
+  const halfDefense = referenceDef * 0.5
+  return Math.min(calculatedReduction, halfDefense)
 }
 ```
-**計算例**: エターナルナイトメアLv10 × ダークパワー合計Lv80 × 0.5 = 400  
-**実装状況**: 仕様確定、実装予定
+**計算例**: 
+- エターナルナイトメアLv10 × ダークパワー合計Lv80 × 0.5 = 400
+- 通常戦: 敵DEF 143 × 0.5 = 71.5 → 減算量 = Math.min(400, 71.5) = 71.5
+- ボス戦Hard (DEF 800): Normal DEF 400 × 0.5 = 200 → 減算量 = Math.min(400, 200) = 200
+**実装状況**: 実装済み（ボス戦対応含む）
 
 ##### 3. 貫通による低下
 ```typescript

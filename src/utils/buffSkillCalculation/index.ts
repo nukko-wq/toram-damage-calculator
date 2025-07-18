@@ -18,6 +18,7 @@ export {
 	getBuffSkillPassiveMultiplier,
 	getBuffSkillPassiveMultiplierWithSkillCategory,
 	getBuffSkillBraveMultiplier,
+	getAssassinSkillEffects,
 } from './integration/mainIntegrator'
 
 // 個別計算関数のエクスポート（必要に応じて）
@@ -40,3 +41,6 @@ export * from './categories/supportSkills'
 export * from './categories/partisanSkills'
 export * from './categories/petSkills'
 export * from './categories/shootSkills'
+export * from './categories/shieldSkills'
+export * from './categories/assassinSkills'
+export * from './categories/darkPowerSkills'

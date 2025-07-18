@@ -17,6 +17,9 @@ import { getHunterSkillBonuses } from '../categories/hunterSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
 import { getSupportSkillBraveMultiplier } from '../categories/supportSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
+import { getShieldSkillBonuses } from '../categories/shieldSkills'
+import { getAssassinSkillBonuses } from '../categories/assassinSkills'
+import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 
 /**
  * バフスキルデータから全体の補正値を取得（基本版）
@@ -68,6 +71,24 @@ export function getBuffSkillBonuses(
 	// サバイバルスキル
 	const survivalBonuses = getSurvivalSkillBonuses(buffSkillData)
 	for (const [key, value] of Object.entries(survivalBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// シールドスキル
+	const shieldBonuses = getShieldSkillBonuses(buffSkillData)
+	for (const [key, value] of Object.entries(shieldBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// ダークパワースキル
+	const darkPowerBonuses = getDarkPowerSkillBonuses(buffSkillData)
+	for (const [key, value] of Object.entries(darkPowerBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
@@ -257,3 +278,14 @@ export function getBuffSkillBraveMultiplier(
 ): number {
 	return getSupportSkillBraveMultiplier(buffSkillData)
 }
+
+/**
+ * バフスキルデータからアサシンスキルの効果を取得（サブ武器情報が必要）
+ */
+export function getAssassinSkillEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	subWeaponType: SubWeaponType | null,
+): Partial<AllBonuses> {
+	return getAssassinSkillBonuses(buffSkillData, subWeaponType)
+}
+

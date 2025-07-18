@@ -20,13 +20,7 @@ import { getCrystalById } from './crystalDatabase'
 import {
 	getBuffSkillBonuses,
 	getTwoHandsEffects,
-	getAttackUpEffects,
-	getMagicUpEffects,
-	getThreatPowerEffects,
-	getFurtherMagicEffects,
 	getGodspeedTrajectoryEffects,
-	getAccuracyUpEffects,
-	getDodgeUpEffects,
 	getCamouflageEffects,
 	getFrontlineMaintenance2Effects,
 	getPetCriticalUpEffects,
@@ -34,7 +28,9 @@ import {
 	getPetMindUpEffects,
 	getPetCutUpEffects,
 	getArcheryEffects,
+	getAssassinSkillEffects,
 } from './buffSkillCalculation'
+import { getBattleSkillBonusesWithPlayerLevel } from './buffSkillCalculation/categories/battleSkills'
 import { applyConditionalCrystalEffects } from './crystalConditionalEffects'
 import { recalculateEquipmentEffects } from './equipmentConditionalEffects'
 
@@ -620,52 +616,13 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
-	// 攻撃力UPスキルの補正値を追加（プレイヤーレベルが必要）
-	const attackUpBonuses = getAttackUpEffects(
+	// バトルスキル（プレイヤーレベル依存）の補正値を追加
+	const battleSkillBonuses = getBattleSkillBonusesWithPlayerLevel(
 		data.buffSkills?.skills || null,
 		data.baseStats?.level || 1,
 	)
 
-	for (const [key, value] of Object.entries(attackUpBonuses)) {
-		if (typeof value === 'number' && value !== 0) {
-			bonuses[key as keyof AllBonuses] =
-				(bonuses[key as keyof AllBonuses] || 0) + value
-		}
-	}
-
-	// 魔法力UPスキルの補正値を追加（プレイヤーレベルが必要）
-	const magicUpBonuses = getMagicUpEffects(
-		data.buffSkills?.skills || null,
-		data.baseStats?.level || 1,
-	)
-
-	for (const [key, value] of Object.entries(magicUpBonuses)) {
-		if (typeof value === 'number' && value !== 0) {
-			bonuses[key as keyof AllBonuses] =
-				(bonuses[key as keyof AllBonuses] || 0) + value
-		}
-	}
-
-	// 驚異の威力スキルの補正値を追加（プレイヤーレベルが必要）
-	const threatPowerBonuses = getThreatPowerEffects(
-		data.buffSkills?.skills || null,
-		data.baseStats?.level || 1,
-	)
-
-	for (const [key, value] of Object.entries(threatPowerBonuses)) {
-		if (typeof value === 'number' && value !== 0) {
-			bonuses[key as keyof AllBonuses] =
-				(bonuses[key as keyof AllBonuses] || 0) + value
-		}
-	}
-
-	// 更なる魔力スキルの補正値を追加（プレイヤーレベルが必要）
-	const furtherMagicBonuses = getFurtherMagicEffects(
-		data.buffSkills?.skills || null,
-		data.baseStats?.level || 1,
-	)
-
-	for (const [key, value] of Object.entries(furtherMagicBonuses)) {
+	for (const [key, value] of Object.entries(battleSkillBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
@@ -679,28 +636,6 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(godspeedTrajectoryBonuses)) {
-		if (typeof value === 'number' && value !== 0) {
-			bonuses[key as keyof AllBonuses] =
-				(bonuses[key as keyof AllBonuses] || 0) + value
-		}
-	}
-
-	// 命中UPスキルの補正値を追加
-	const accuracyUpBonuses = getAccuracyUpEffects(
-		data.buffSkills?.skills || null,
-	)
-
-	for (const [key, value] of Object.entries(accuracyUpBonuses)) {
-		if (typeof value === 'number' && value !== 0) {
-			bonuses[key as keyof AllBonuses] =
-				(bonuses[key as keyof AllBonuses] || 0) + value
-		}
-	}
-
-	// 回避UPスキルの補正値を追加
-	const dodgeUpBonuses = getDodgeUpEffects(data.buffSkills?.skills || null)
-
-	for (const [key, value] of Object.entries(dodgeUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
@@ -794,6 +729,19 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	)
 
 	for (const [key, value] of Object.entries(archeryBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// アサシンスキルの補正値を追加（サブ武器情報が必要）
+	const assassinSkillBonuses = getAssassinSkillEffects(
+		data.buffSkills?.skills || null,
+		data.subWeapon?.weaponType || null,
+	)
+
+	for (const [key, value] of Object.entries(assassinSkillBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

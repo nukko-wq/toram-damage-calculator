@@ -274,30 +274,64 @@ interface WeaponRequirement {
 
 ### 7. ダークパワースキル系統
 
-#### 7.1 ダークパワー (DarkPower)
+#### 7.1 エターナルナイトメア (dp1)
 ```typescript
 {
-  id: 'DarkPower',
-  name: 'ダークパワー',
+  id: 'dp1',
+  name: 'エターナルナイトメア',
   category: 'darkPower',
-  type: 'level',
-  order: 1001,
-  maxLevel: 10,
-  description: '魔法攻撃力を上昇させる',
+  type: 'multiParam',
+  order: 1401,
+  description: 'スキルレベルとスキルポイント合計でHP率と属性耐性を上昇させる',
+  multiParams: {
+    param1: {
+      name: 'スキルレベル',
+      min: 1,
+      max: 10,
+      default: 10,
+      unit: 'Lv'
+    },
+    param2: {
+      name: 'スキルポイント合計',
+      min: 25,
+      max: 80,
+      default: 80,
+      unit: 'pt'
+    }
+  },
   effects: [
     {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 5',
+      property: 'HP_Rate',
+      formula: 'Math.abs(2 * skillLevel)',
+      conditions: []
+    },
+    {
+      property: 'DarkResistance_Rate',
+      formula: '+5',
+      conditions: []
+    },
+    {
+      property: 'LightResistance_Rate',
+      formula: '-5',
       conditions: []
     }
   ],
-  calculationFormula: 'MATK% = skillLevel × 5',
+  calculationFormula: 'HP% = |2 × スキルレベル|, 闇耐性% = base + 5, 光耐性% = base - 5',
+  enemyDebuffFormula: '敵DEF・MDEF低下 = Math.min(スキルポイント合計 × (スキルレベル × 0.5), Normal難易度DEF/MDEF × 0.5)',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
   uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
+    parameterName: 'スキルレベル・スキルポイント',
     showInModal: true,
     quickToggle: false
-  }
+  },
+  specialNotes: [
+    'HP率の計算は絶対値を使用（|2 × スキルレベル|%）',
+    '敵DEF・MDEF低下効果は実装済み',
+    'ダークパワー系統の全習得スキルポイントが必要',
+    'ボス戦時の減算計算ではNormal難易度のDEF/MDEFを参照（例: Hard難易度でもNormal値の半分で上限計算）'
+  ]
 }
 ```
 
@@ -335,25 +369,43 @@ interface WeaponRequirement {
 **含まれるスキル:**
 - 9.1 カムフラージュ (hunter5-2) - 基本ステータスレベル依存ATK・クリティカル上昇（武器種別効果）
 
-### 10. アサシンスキル系統
+### 10. シールドスキル系統
+詳細は [buff-skills/shield-skills.md](./buff-skills/shield-skills.md) を参照してください。
+**含まれるスキル:**
+- 10.1 プロテクション (IsProtect) - 物理耐性+30%, 魔法耐性-15%（全武器種対応）
+- 10.2 イージス (IsAegis) - 物理耐性-15%, 魔法耐性+30%（全武器種対応）
 
-#### 10.1 ヴァニッシュ (vanish1)
+### 11. アサシンスキル系統
+
+#### 11.1 シーカーリウス (oh1-2)
 ```typescript
 {
-  id: 'vanish1',
-  name: 'ヴァニッシュ',
+  id: 'oh1-2',
+  name: 'シーカーリウス',
   category: 'assassin',
   type: 'toggle',
-  order: 1401,
-  description: '回避を上昇させる',
+  order: 1801,
+  description: 'サブ武器の種類によって攻撃力と物理貫通の効果が変化する',
   effects: [
     {
-      property: 'Dodge_Rate',
-      formula: '+100',
-      conditions: []
+      property: 'ATK',
+      formula: 'subWeapon === "ナイフ" || subWeapon === "巻物" ? +100 : +50',
+      conditions: ['サブ武器による効果変化']
+    },
+    {
+      property: 'PhysicalPenetration_Rate',
+      formula: 'subWeapon === "ナイフ" || subWeapon === "巻物" ? +25 : +10',
+      conditions: ['サブ武器による効果変化']
     }
   ],
-  calculationFormula: '回避% = base + 100',
+  calculationFormula: 'ナイフ・巻物装備時: ATK = base + 100, 物理貫通% = base + 25 / その他: ATK = base + 50, 物理貫通% = base + 10',
+  weaponRequirement: {
+    description: 'すべての武器で効果があります',
+    subWeaponConditions: {
+      enhanced: ['ナイフ', '巻物'],
+      normal: ['その他のサブ武器']
+    }
+  },
   uiSettings: {
     parameterName: 'ON/OFF',
     showInModal: false,
