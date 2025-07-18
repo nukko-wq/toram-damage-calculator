@@ -186,6 +186,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const calculationResults = useMemo(() => {
 		// バフスキルを含む全データソースのボーナスを取得（計算用は常に全合計値）
 		const allBonuses = getAllDataSourceBonusesWithBuffSkills(data)
+		console.log('Final bonuses in StatusPreview:', allBonuses)
 
 		// 全ての効果を統合した最終ボーナス値を作成
 		const finalBonuses = { ...allBonuses }

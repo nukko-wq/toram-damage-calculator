@@ -312,11 +312,11 @@ interface WeaponRequirement {
     },
     {
       property: 'LightResistance_Rate',
-      formula: '+5',
+      formula: '-5',
       conditions: []
     }
   ],
-  calculationFormula: 'HP% = |2 × スキルレベル|, 闇耐性% = base + 5, 光耐性% = base + 5',
+  calculationFormula: 'HP% = |2 × スキルレベル|, 闇耐性% = base + 5, 光耐性% = base - 5',
   enemyDebuffFormula: '敵DEF・MDEF低下 = スキルポイント合計 × (スキルレベル × 0.5)',
   weaponRequirement: {
     description: 'すべての武器で効果があります'

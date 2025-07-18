@@ -19,6 +19,7 @@ import { getSupportSkillBraveMultiplier } from '../categories/supportSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
 import { getShieldSkillBonuses } from '../categories/shieldSkills'
 import { getAssassinSkillBonuses } from '../categories/assassinSkills'
+import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 
 /**
  * バフスキルデータから全体の補正値を取得（基本版）
@@ -79,6 +80,15 @@ export function getBuffSkillBonuses(
 	// シールドスキル
 	const shieldBonuses = getShieldSkillBonuses(buffSkillData)
 	for (const [key, value] of Object.entries(shieldBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// ダークパワースキル
+	const darkPowerBonuses = getDarkPowerSkillBonuses(buffSkillData)
+	for (const [key, value] of Object.entries(darkPowerBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
@@ -278,3 +288,4 @@ export function getAssassinSkillEffects(
 ): Partial<AllBonuses> {
 	return getAssassinSkillBonuses(buffSkillData, subWeaponType)
 }
+
