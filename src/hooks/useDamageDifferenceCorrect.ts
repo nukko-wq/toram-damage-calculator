@@ -30,6 +30,9 @@ export function useDamageDifferenceCorrect(
 	const currentData = useCalculatorStore((state) => state.data)
 	const currentResults = useCalculatorStore((state) => state.calculationResults)
 	const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
+	
+	// キャッシュされた基準ダメージ結果を取得
+	const baselineDamageResult = useCalculatorStore((state) => state.baselineDamageResult)
 
 	return useMemo(() => {
 		// 初期値
@@ -91,28 +94,38 @@ export function useDamageDifferenceCorrect(
 
 			const isCurrentlyEquipped = currentEquippedItemId === item.id
 
-			let baselineData: CalculatorData
-			let simulatedData: CalculatorData
-
+			// 基準ダメージの取得/計算
+			let calculatedBaselineDamageResult
 			if (isCurrentlyEquipped) {
-				// 現在装着中のクリスタルの場合：外した状態を基準にして差分を計算
-				baselineData = removeItemFromSlot(currentData, slotInfo)
-				simulatedData = currentData // 現在の状態が装着状態
+				// 現在装着中のアイテムの場合：外した状態のダメージを計算
+				const baselineData = removeItemFromSlot(currentData, slotInfo)
+				const baselineResults = calculateResults(baselineData)
+				calculatedBaselineDamageResult = calculateDamageWithService(
+					baselineData,
+					baselineResults,
+					{ debug: options.debug, powerOptions: powerOptions || {} },
+				)
 			} else {
-				// 装着していないクリスタルの場合：現在の状態を基準にして装着後の差分を計算
-				baselineData = currentData
-				simulatedData = simulateItemEquipSimple(currentData, item, slotInfo)
+				// 装着していないアイテムの場合：キャッシュされた基準ダメージを使用
+				if (!baselineDamageResult) {
+					// キャッシュがない場合は従来の方法で計算
+					const baselineResults = calculateResults(currentData)
+					calculatedBaselineDamageResult = calculateDamageWithService(
+						currentData,
+						baselineResults,
+						{ debug: options.debug, powerOptions: powerOptions || {} },
+					)
+				} else {
+					// キャッシュされた基準ダメージを使用
+					calculatedBaselineDamageResult = baselineDamageResult
+				}
 			}
 
-			// 1. 基準状態のダメージを計算（共通サービスを使用）
-			const baselineResults = calculateResults(baselineData)
-			const currentDamageResult = calculateDamageWithService(
-				baselineData,
-				baselineResults,
-				{ debug: options.debug, powerOptions: powerOptions || {} },
-			)
-
-			// 2. シミュレーション後のステータスを計算（共通サービスを使用）
+			// シミュレーション後のダメージを計算
+			const simulatedData = isCurrentlyEquipped 
+				? currentData // 現在装着中の場合は現在のデータ
+				: simulateItemEquipSimple(currentData, item, slotInfo) // 装着していない場合は装着後をシミュレート
+			
 			const simulatedResults = calculateResults(simulatedData)
 			const simulatedDamageResult = calculateDamageWithService(
 				simulatedData,
@@ -120,22 +133,19 @@ export function useDamageDifferenceCorrect(
 				{ debug: options.debug, powerOptions: powerOptions || {} },
 			)
 
-			// 3. 平均ダメージの差分を計算
+			// 平均ダメージの差分を計算
 			const averageDifference =
 				simulatedDamageResult.normal.average -
-				currentDamageResult.normal.average
+				calculatedBaselineDamageResult.normal.average
 
-			// 4. 平均ダメージの差分を使用
-			const averageDamageDifference = Math.round(averageDifference)
-
-			// 5. 最終差分は平均差分を使用
-			const difference = averageDamageDifference
+			// 最終差分は平均差分を使用
+			const difference = Math.round(averageDifference)
 
 			return {
 				difference,
 				isCalculating: false,
 				error: null,
-				currentDamage: currentDamageResult.normal.max,
+				currentDamage: calculatedBaselineDamageResult.normal.max,
 				simulatedDamage: simulatedDamageResult.normal.max,
 			}
 		} catch (error) {
@@ -152,6 +162,7 @@ export function useDamageDifferenceCorrect(
 		slotInfo,
 		options.disabled,
 		options.debug,
+		baselineDamageResult,
 	])
 }
 

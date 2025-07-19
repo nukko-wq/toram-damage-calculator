@@ -21,6 +21,10 @@ import {
 } from '@/utils/saveDataManager'
 import { calculateResults } from '@/utils/calculationEngine'
 import {
+	calculateDamageWithService,
+	type DamageCalculationServiceResult,
+} from '@/utils/damageCalculationService'
+import {
 	CALC_RESULT_SETTINGS_KEY,
 	type CalculationResultSettings,
 } from '@/types/calculationResult'
@@ -69,11 +73,13 @@ const createDataUpdateWithDifferenceCheck = (set: any, get: any) => {
 				// データ更新時に計算結果も自動更新
 				const results = calculateResults(newData)
 
+				// 基準ダメージ計算結果をクリア（次回アクセス時に再計算）
 				return {
 					data: newData,
 					hasUnsavedChanges: hasChanges, // 実際に差分がある場合のみtrueに設定
 					hasRealChanges: hasChanges,
 					calculationResults: results, // 計算結果を自動更新
+					baselineDamageResult: null, // データ更新時はクリア
 				}
 			},
 			false,
@@ -101,6 +107,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			// ===== ステータス計算結果表示 =====
 			calculationResults: null,
 			isCalculationResultVisible: false,
+
+			// ===== ダメージ計算結果キャッシュ =====
+			baselineDamageResult: null,
 
 			// ===== 基本アクション =====
 			updateData: (updates) => {
@@ -807,6 +816,34 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					console.warn('計算結果表示設定の読み込みに失敗:', error)
 					// デフォルトは非表示
 					set({ isCalculationResultVisible: false })
+				}
+			},
+
+			// ===== ダメージ計算結果キャッシュアクション =====
+			updateBaselineDamageResult: () => {
+				const { data, calculationResults } = get()
+				
+				if (!calculationResults) {
+					// 基本計算結果がない場合は先に計算
+					const results = calculateResults(data)
+					set({ calculationResults: results })
+				}
+
+				try {
+					// powerOptionsを取得（フォールバック付き）
+					const powerOptions = data.powerOptions || createInitialPowerOptions()
+					
+					// 基準ダメージを計算してキャッシュ
+					const damageResult = calculateDamageWithService(
+						data,
+						get().calculationResults || calculateResults(data),
+						{ powerOptions, debug: false }
+					)
+					
+					set({ baselineDamageResult: damageResult })
+				} catch (error) {
+					console.error('基準ダメージ計算エラー:', error)
+					set({ baselineDamageResult: null })
 				}
 			},
 
