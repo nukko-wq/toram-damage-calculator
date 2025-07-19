@@ -6,7 +6,18 @@ export interface EquipmentFavorite {
 	addedAt: string // ISO string
 }
 
+export interface CrystalFavorite {
+	crystalId: string
+	isFavorite: boolean
+	addedAt: string // ISO string
+}
+
 export interface FavoritesData {
 	equipments: Record<string, EquipmentFavorite>
+	lastUpdated: string
+}
+
+export interface CrystalFavoritesData {
+	crystals: Record<string, CrystalFavorite>
 	lastUpdated: string
 }

@@ -6,6 +6,7 @@ import type { CrystalType } from '@/types/calculator'
 import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
 import type { SlotInfo } from '@/types/damagePreview'
+import { CrystalFavoritesManager } from '@/utils/crystalFavorites'
 
 interface CrystalSelectionModalProps {
 	isOpen: boolean
@@ -28,6 +29,7 @@ export default function CrystalSelectionModal({
 	slotInfo,
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
+	const [favoritesChanged, setFavoritesChanged] = useState(0)
 
 	// useMemoを使用してavailableCrystalsを同期的に取得
 	const availableCrystals = useMemo(() => {
@@ -58,6 +60,22 @@ export default function CrystalSelectionModal({
 		onClose()
 	}, [onClose])
 
+	// お気に入り変更ハンドラー
+	const handleFavoriteChange = useCallback(
+		(crystalId: string, isFavorite: boolean) => {
+			// お気に入り状態変更時の処理
+			setFavoritesChanged((prev) => prev + 1) // 再レンダリングトリガー
+
+			// 必要に応じて親コンポーネントに通知
+			if (process.env.NODE_ENV === 'development') {
+				console.log(
+					`Crystal ${crystalId} favorite state changed to ${isFavorite}`,
+				)
+			}
+		},
+		[],
+	)
+
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
 		if (!isOpen) return
@@ -74,12 +92,25 @@ export default function CrystalSelectionModal({
 		}
 	}, [isOpen, handleClose])
 
-	const filteredCrystals = useMemo(() => {
-		return availableCrystals.filter((crystal) => {
+	// フィルタリング+お気に入り順ソート
+	const sortedCrystals = useMemo(() => {
+		// 1. タイプフィルタリング
+		const filtered = availableCrystals.filter((crystal) => {
 			if (activeFilter === 'all') return true
 			return crystal.type === activeFilter
 		})
-	}, [availableCrystals, activeFilter])
+
+		// 2. お気に入り順ソート
+		const favoriteIds = CrystalFavoritesManager.getFavoriteCrystalIds()
+		const favoriteSet = new Set(favoriteIds)
+
+		const favorites = filtered.filter((crystal) =>
+			favoriteSet.has(crystal.id),
+		)
+		const others = filtered.filter((crystal) => !favoriteSet.has(crystal.id))
+
+		return [...favorites, ...others]
+	}, [availableCrystals, activeFilter, favoritesChanged])
 
 	const getFilterLabel = (filter: string) => {
 		switch (filter) {
@@ -268,9 +299,9 @@ export default function CrystalSelectionModal({
 							</div>
 
 							{/* クリスタレイアウト */}
-							{filteredCrystals.length > 0 ? (
+							{sortedCrystals.length > 0 ? (
 								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-									{filteredCrystals.map((crystal) => (
+									{sortedCrystals.map((crystal) => (
 										<CrystalCard
 											key={crystal.id}
 											crystal={crystal}
@@ -278,6 +309,8 @@ export default function CrystalSelectionModal({
 											onClick={() => handleSelect(crystal.id)}
 											showDamageDifference={isOpen && !!slotInfo}
 											slotInfo={slotInfo}
+											showFavoriteButton={true}
+											onFavoriteChange={handleFavoriteChange}
 										/>
 									))}
 								</div>
