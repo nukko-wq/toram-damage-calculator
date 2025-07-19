@@ -10,6 +10,7 @@ import type {
 import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import EquipmentCard from './EquipmentCard'
 import type { SlotInfo } from '@/types/damagePreview'
+import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
 
 interface EquipmentSelectionModalProps {
 	isOpen: boolean
@@ -36,11 +37,28 @@ export default function EquipmentSelectionModal({
 	const [availableEquipments, setAvailableEquipments] = useState<Equipment[]>(
 		[],
 	)
+	const [favoritesChanged, setFavoritesChanged] = useState(0)
 
 	// モーダルを閉じる関数
 	const handleClose = useCallback(() => {
 		onClose()
 	}, [onClose])
+
+	// お気に入り変更ハンドラー
+	const handleFavoriteChange = useCallback(
+		(equipmentId: string, isFavorite: boolean) => {
+			// お気に入り状態変更時の処理
+			setFavoritesChanged((prev) => prev + 1) // 再レンダリングトリガー
+
+			// 必要に応じて親コンポーネントに通知
+			if (process.env.NODE_ENV === 'development') {
+				console.log(
+					`Equipment ${equipmentId} favorite state changed to ${isFavorite}`,
+				)
+			}
+		},
+		[],
+	)
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
@@ -90,10 +108,18 @@ export default function EquipmentSelectionModal({
 		setAvailableEquipments(equipments)
 	}, [isOpen, category, selectedEquipmentId, currentFormProperties])
 
-	const filteredEquipments = useMemo(
-		() => availableEquipments,
-		[availableEquipments],
-	)
+	// 装備リストの表示順序: お気に入り → 通常
+	const sortedEquipments = useMemo(() => {
+		const favoriteIds = EquipmentFavoritesManager.getFavoriteEquipmentIds()
+		const favoriteSet = new Set(favoriteIds)
+
+		const favorites = availableEquipments.filter((eq) =>
+			favoriteSet.has(eq.id),
+		)
+		const others = availableEquipments.filter((eq) => !favoriteSet.has(eq.id))
+
+		return [...favorites, ...others]
+	}, [availableEquipments, favoritesChanged])
 
 	const handleSelect = useCallback(
 		(equipmentId: string) => {
@@ -223,9 +249,9 @@ export default function EquipmentSelectionModal({
 							</div>
 
 							{/* 装備レイアウト */}
-							{filteredEquipments.length > 0 ? (
+							{sortedEquipments.length > 0 ? (
 								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-									{filteredEquipments.map((equipment) => (
+									{sortedEquipments.map((equipment) => (
 										<EquipmentCard
 											key={equipment.id}
 											equipment={equipment}
@@ -233,6 +259,8 @@ export default function EquipmentSelectionModal({
 											onClick={() => handleSelect(equipment.id)}
 											showDamageDifference={isOpen && !!slotInfo}
 											slotInfo={slotInfo}
+											showFavoriteButton={true}
+											onFavoriteChange={handleFavoriteChange}
 										/>
 									))}
 								</div>

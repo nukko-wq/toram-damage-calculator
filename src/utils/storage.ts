@@ -16,6 +16,9 @@ export const STORAGE_KEYS = {
 	// アプリケーション設定
 	APP_SETTINGS: 'toram_app_settings',
 	VERSION: 'toram_storage_version',
+
+	// お気に入り機能
+	EQUIPMENT_FAVORITES: 'toram_equipment_favorites',
 } as const
 
 // 安全なLocalStorage操作のヘルパー関数

@@ -1,9 +1,11 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
 import type { PresetEquipment } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
+import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
 
 interface EquipmentCardProps {
 	equipment: PresetEquipment
@@ -12,6 +14,9 @@ interface EquipmentCardProps {
 	// ダメージ差分表示用の追加プロパティ
 	showDamageDifference?: boolean
 	slotInfo?: SlotInfo
+	// お気に入り機能用の新規プロパティ
+	showFavoriteButton?: boolean
+	onFavoriteChange?: (equipmentId: string, isFavorite: boolean) => void
 }
 
 export default function EquipmentCard({
@@ -20,7 +25,31 @@ export default function EquipmentCard({
 	onClick,
 	showDamageDifference = false,
 	slotInfo,
+	showFavoriteButton = true,
+	onFavoriteChange,
 }: EquipmentCardProps) {
+	const [isFavorite, setIsFavorite] = useState(() =>
+		EquipmentFavoritesManager.isFavorite(equipment.id),
+	)
+
+	const handleFavoriteClick = useCallback(
+		(e: React.MouseEvent) => {
+			e.stopPropagation() // 装備選択イベントの阻止
+
+			const newFavoriteState = !isFavorite
+			const success = EquipmentFavoritesManager.setFavorite(
+				equipment.id,
+				newFavoriteState,
+			)
+
+			if (success) {
+				setIsFavorite(newFavoriteState)
+				onFavoriteChange?.(equipment.id, newFavoriteState)
+			}
+		},
+		[equipment.id, isFavorite, onFavoriteChange],
+	)
+
 	const formatBaseStats = () => {
 		const stats = Object.entries(equipment.baseStats)
 			.filter(([_, value]) => value !== undefined && value !== 0)
@@ -201,7 +230,7 @@ export default function EquipmentCard({
 		<div
 			onClick={onClick}
 			className={`
-				p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-full max-w-[100%] sm:max-w-[260px]
+				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-full max-w-[100%] sm:max-w-[260px]
 				${
 					isSelected
 						? 'border-blue-500 bg-blue-50 shadow-md'
@@ -209,6 +238,38 @@ export default function EquipmentCard({
 				}
 			`}
 		>
+			{/* お気に入りボタン - 右下に絶対配置 */}
+			{showFavoriteButton && (
+				<button
+					type="button"
+					onClick={handleFavoriteClick}
+					className={`
+						absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 cursor-pointer
+						${
+							isFavorite
+								? 'text-red-500 hover:text-red-600'
+								: 'text-gray-300 hover:text-red-400'
+						}
+					`}
+					aria-label={isFavorite ? 'お気に入りから削除' : 'お気に入りに追加'}
+				>
+					<svg
+						className="w-5 h-5"
+						fill={isFavorite ? 'currentColor' : 'none'}
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<title>{isFavorite ? 'お気に入り済み' : 'お気に入りに追加'}</title>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={isFavorite ? 0 : 2}
+							d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+						/>
+					</svg>
+				</button>
+			)}
+
 			{/* 上部エリア：ダメージ差分表示と選択マーク */}
 			<div className="flex justify-between items-start mb-2 min-h-[24px]">
 				{/* ダメージ差分表示 - 現在選択中の装備には表示しない */}
@@ -237,6 +298,20 @@ export default function EquipmentCard({
 						</div>
 					)}
 				</div>
+
+				{/* お気に入りマーク（アイコン表示時） */}
+				{isFavorite && (
+					<div className="w-4 h-4 text-red-500 ml-2">
+						<svg
+							className="w-full h-full"
+							fill="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<title>お気に入り</title>
+							<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+						</svg>
+					</div>
+				)}
 
 				{/* 選択状態のチェックマーク */}
 				{isSelected && (
