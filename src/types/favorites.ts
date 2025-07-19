@@ -21,3 +21,14 @@ export interface CrystalFavoritesData {
 	crystals: Record<string, CrystalFavorite>
 	lastUpdated: string
 }
+
+export interface BuffItemFavorite {
+	buffItemId: string
+	isFavorite: boolean
+	addedAt: string // ISO string
+}
+
+export interface BuffItemFavoritesData {
+	buffItems: Record<string, BuffItemFavorite>
+	lastUpdated: string
+}

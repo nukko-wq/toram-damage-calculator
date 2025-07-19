@@ -8,6 +8,7 @@ import {
 } from '@/utils/buffItemDatabase'
 import BuffItemCard from './BuffItemCard'
 import type { SlotInfo } from '@/types/damagePreview'
+import { BuffItemFavoritesManager } from '@/utils/buffItemFavorites'
 
 interface BuffItemSelectionModalProps {
 	isOpen: boolean
@@ -35,11 +36,28 @@ export default function BuffItemSelectionModal({
 	const [availableBuffItems, setAvailableBuffItems] = useState<
 		PresetBuffItem[]
 	>([])
+	const [favoritesChanged, setFavoritesChanged] = useState(0)
 
 	// モーダルを閉じる関数
 	const handleClose = useCallback(() => {
 		onClose()
 	}, [onClose])
+
+	// お気に入り変更ハンドラー
+	const handleFavoriteChange = useCallback(
+		(buffItemId: string, isFavorite: boolean) => {
+			// お気に入り状態変更時の処理
+			setFavoritesChanged((prev) => prev + 1) // 再レンダリングトリガー
+
+			// 必要に応じて親コンポーネントに通知
+			if (process.env.NODE_ENV === 'development') {
+				console.log(
+					`BuffItem ${buffItemId} favorite state changed to ${isFavorite}`,
+				)
+			}
+		},
+		[],
+	)
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
@@ -65,12 +83,22 @@ export default function BuffItemSelectionModal({
 		setAvailableBuffItems(categoryItems)
 	}, [isOpen, category])
 
-	const filteredBuffItems = useMemo(() => {
-		return availableBuffItems.filter((buffItem) => {
-			if (activeFilter === 'all') return true
-			return buffItem.category === activeFilter
-		})
-	}, [availableBuffItems, activeFilter])
+	// お気に入り優先ソート
+	const sortedBuffItems = useMemo(() => {
+		// 指定されたカテゴリのアイテムをフィルタリング（activeFilter は使用しない）
+		const filtered = availableBuffItems
+
+		// お気に入り順ソート
+		const favoriteIds = BuffItemFavoritesManager.getFavoriteBuffItemIds()
+		const favoriteSet = new Set(favoriteIds)
+
+		const favorites = filtered.filter((buffItem) =>
+			favoriteSet.has(buffItem.id),
+		)
+		const others = filtered.filter((buffItem) => !favoriteSet.has(buffItem.id))
+
+		return [...favorites, ...others]
+	}, [availableBuffItems, favoritesChanged])
 
 	const _getCategoryLabel = (categoryValue: string) => {
 		switch (categoryValue) {
@@ -235,9 +263,9 @@ export default function BuffItemSelectionModal({
 							</div>
 
 							{/* バフアイテムレイアウト */}
-							{filteredBuffItems.length > 0 ? (
+							{sortedBuffItems.length > 0 ? (
 								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-									{filteredBuffItems.map((buffItem) => (
+									{sortedBuffItems.map((buffItem) => (
 										<BuffItemCard
 											key={buffItem.id}
 											buffItem={buffItem}
@@ -245,6 +273,8 @@ export default function BuffItemSelectionModal({
 											onClick={() => handleSelect(buffItem.id)}
 											showDamageDifference={isOpen && !!slotInfo}
 											slotInfo={slotInfo}
+											showFavoriteButton={true}
+											onFavoriteChange={handleFavoriteChange}
 										/>
 									))}
 								</div>

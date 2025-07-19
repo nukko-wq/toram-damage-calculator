@@ -20,6 +20,7 @@ export const STORAGE_KEYS = {
 	// お気に入り機能
 	EQUIPMENT_FAVORITES: 'toram_equipment_favorites',
 	CRYSTAL_FAVORITES: 'toram_crystal_favorites',
+	BUFF_ITEM_FAVORITES: 'toram_buff_item_favorites',
 } as const
 
 // 安全なLocalStorage操作のヘルパー関数
