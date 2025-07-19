@@ -222,13 +222,14 @@ export default function BuffItemSelectionModal({
 
 						{/* バフアイテム一覧 */}
 						<div className="p-4 sm:p-6 overflow-y-auto max-h-[48vh]">
-							{/* なしオプション */}
-							<div className="mb-4 sm:mb-6 text-center sm:text-left">
+							{/* バフアイテムレイアウト（なしオプション含む） */}
+							<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+								{/* なしオプション */}
 								<button
 									type="button"
 									onClick={handleRemove}
 									className={`
-									w-full sm:min-w-[144px] max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
+									w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
 									${
 										selectedBuffItemId === null
 											? 'border-blue-500 bg-blue-50 shadow-md'
@@ -260,12 +261,10 @@ export default function BuffItemSelectionModal({
 										)}
 									</div>
 								</button>
-							</div>
 
-							{/* バフアイテムレイアウト */}
-							{sortedBuffItems.length > 0 ? (
-								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-									{sortedBuffItems.map((buffItem) => (
+								{/* バフアイテムカード */}
+								{sortedBuffItems.length > 0 ? (
+									sortedBuffItems.map((buffItem) => (
 										<BuffItemCard
 											key={buffItem.id}
 											buffItem={buffItem}
@@ -276,13 +275,13 @@ export default function BuffItemSelectionModal({
 											showFavoriteButton={true}
 											onFavoriteChange={handleFavoriteChange}
 										/>
-									))}
-								</div>
-							) : (
-								<div className="text-center text-gray-500 py-8">
-									該当するバフアイテムがありません
-								</div>
-							)}
+									))
+								) : (
+									<div className="w-full text-center text-gray-500 py-8">
+										該当するバフアイテムがありません
+									</div>
+								)}
+							</div>
 						</div>
 
 						{/* フッター */}

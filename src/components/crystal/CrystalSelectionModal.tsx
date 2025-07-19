@@ -258,13 +258,14 @@ export default function CrystalSelectionModal({
 
 						{/* クリスタ一覧 */}
 						<div className="p-4 sm:p-6 overflow-y-auto max-h-[48vh]">
-							{/* なしオプション */}
-							<div className="mb-4 sm:mb-6 text-center sm:text-left">
+							{/* クリスタレイアウト（なしオプション含む） */}
+							<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+								{/* なしオプション */}
 								<button
 									type="button"
 									onClick={handleRemove}
 									className={`
-										w-full sm:min-w-[144px] max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
+										w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md text-left
 										${
 											selectedCrystalId === null
 												? 'border-blue-500 bg-blue-50 shadow-md'
@@ -296,12 +297,10 @@ export default function CrystalSelectionModal({
 										)}
 									</div>
 								</button>
-							</div>
 
-							{/* クリスタレイアウト */}
-							{sortedCrystals.length > 0 ? (
-								<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-									{sortedCrystals.map((crystal) => (
+								{/* クリスタカード */}
+								{sortedCrystals.length > 0 ? (
+									sortedCrystals.map((crystal) => (
 										<CrystalCard
 											key={crystal.id}
 											crystal={crystal}
@@ -312,13 +311,13 @@ export default function CrystalSelectionModal({
 											showFavoriteButton={true}
 											onFavoriteChange={handleFavoriteChange}
 										/>
-									))}
-								</div>
-							) : (
-								<div className="text-center text-gray-500 py-8">
-									該当するクリスタがありません
-								</div>
-							)}
+									))
+								) : (
+									<div className="w-full text-center text-gray-500 py-8">
+										該当するクリスタがありません
+									</div>
+								)}
+							</div>
 						</div>
 
 						{/* フッター */}
