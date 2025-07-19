@@ -18,6 +18,7 @@ import type {
 } from './calculator'
 import type { CalculationResults } from './calculationResult'
 import type { BuffSkillFormData } from './buffSkill'
+import type { DamageCalculationServiceResult } from '@/utils/damageCalculationService'
 
 // ===== 計算結果関連（将来実装）=====
 export interface DamageCalculationResult {
@@ -65,6 +66,9 @@ export interface CalculatorStore {
 	// ===== ステータス計算結果表示 =====
 	calculationResults: CalculationResults | null
 	isCalculationResultVisible: boolean
+
+	// ===== ダメージ計算結果キャッシュ =====
+	baselineDamageResult: DamageCalculationServiceResult | null
 
 	// ===== 基本アクション =====
 	updateData: (updates: Partial<CalculatorData>) => void
@@ -149,6 +153,9 @@ export interface CalculatorStore {
 	updateCalculationResults: () => void
 	toggleCalculationResultVisibility: () => void
 	initializeCalculationResultVisibility: () => void
+
+	// ===== ダメージ計算結果キャッシュアクション =====
+	updateBaselineDamageResult: () => void
 
 	// ===== 初期化 =====
 	initialize: () => Promise<void>

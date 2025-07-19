@@ -47,12 +47,25 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		(state) => state.updateCalculationResults,
 	)
 
+	// 基準ダメージ結果更新用のアクション
+	const updateBaselineDamageResult = useCalculatorStore(
+		(state) => state.updateBaselineDamageResult,
+	)
+
 	// 計算結果を更新
 	useEffect(() => {
 		if (!calculationResults) {
 			updateCalculationResults()
 		}
 	}, [calculationResults, updateCalculationResults])
+
+	// ダメージ計算結果を更新（DamagePreviewでの計算後にキャッシュとして保存）
+	useEffect(() => {
+		// 計算結果が取得できた場合、基準ダメージをキャッシュに保存
+		if (calculationResults) {
+			updateBaselineDamageResult()
+		}
+	}, [calculationResults, updateBaselineDamageResult])
 
 	// 選択されている敵の名前を取得
 	const getSelectedEnemyName = (): string => {
