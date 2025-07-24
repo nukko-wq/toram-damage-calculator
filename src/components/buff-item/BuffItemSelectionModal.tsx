@@ -9,6 +9,7 @@ import {
 import BuffItemCard from './BuffItemCard'
 import type { SlotInfo } from '@/types/damagePreview'
 import { BuffItemFavoritesManager } from '@/utils/buffItemFavorites'
+import { useBuffItemDamageSorting } from '@/hooks/useBuffItemDamageSorting'
 
 interface BuffItemSelectionModalProps {
 	isOpen: boolean
@@ -115,25 +116,29 @@ export default function BuffItemSelectionModal({
 		setAvailableBuffItems(categoryItems)
 	}, [isOpen, category])
 
-	// バフアイテムリストの分別: お気に入り / その他
-	const { favoriteBuffItems, otherBuffItems } = useMemo(() => {
-		// 指定されたカテゴリのアイテムをフィルタリング（activeFilter は使用しない）
-		const filtered = availableBuffItems
+	// ダメージ差分順でソート
+	const { sortedBuffItems, isCalculating: isSorting } = useBuffItemDamageSorting(
+		availableBuffItems,
+		slotInfo,
+		isOpen && !!slotInfo
+	)
 
+	// バフアイテムリストの分別: お気に入り / その他（ソート済みのバフアイテムから）
+	const { favoriteBuffItems, otherBuffItems } = useMemo(() => {
 		// お気に入り分別
 		const favoriteIds = BuffItemFavoritesManager.getFavoriteBuffItemIds()
 		const favoriteSet = new Set(favoriteIds)
 
-		const favorites = filtered.filter((buffItem) =>
+		const favorites = sortedBuffItems.filter((buffItem) =>
 			favoriteSet.has(buffItem.id),
 		)
-		const others = filtered.filter((buffItem) => !favoriteSet.has(buffItem.id))
+		const others = sortedBuffItems.filter((buffItem) => !favoriteSet.has(buffItem.id))
 
 		return {
 			favoriteBuffItems: favorites,
 			otherBuffItems: others
 		}
-	}, [availableBuffItems, favoritesChanged])
+	}, [sortedBuffItems, favoritesChanged])
 
 	const _getCategoryLabel = (categoryValue: string) => {
 		switch (categoryValue) {
@@ -257,6 +262,16 @@ export default function BuffItemSelectionModal({
 
 						{/* バフアイテム一覧 */}
 						<div className="p-4 sm:p-6 overflow-y-auto max-h-[48vh]">
+							{/* ダメージ差分計算中の表示 */}
+							{isSorting && slotInfo && (
+								<div className="flex items-center justify-center py-4 mb-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
+									<svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									</svg>
+									ダメージ差分を計算中...
+								</div>
+							)}
 							{/* お気に入りバフアイテムセクション */}
 							{(favoriteBuffItems.length > 0 || isNoneFavorite) && (
 								<div className="mb-6">
