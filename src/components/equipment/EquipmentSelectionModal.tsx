@@ -11,6 +11,7 @@ import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import EquipmentCard from './EquipmentCard'
 import type { SlotInfo } from '@/types/damagePreview'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
+import { useEquipmentDamageSorting } from '@/hooks/useEquipmentDamageSorting'
 
 interface EquipmentSelectionModalProps {
 	isOpen: boolean
@@ -140,21 +141,28 @@ export default function EquipmentSelectionModal({
 		setAvailableEquipments(equipments)
 	}, [isOpen, category, selectedEquipmentId, currentFormProperties])
 
-	// 装備リストの分別: お気に入り / その他
+	// ダメージ差分順でソート
+	const { sortedEquipments, isCalculating: isSorting } = useEquipmentDamageSorting(
+		availableEquipments,
+		slotInfo,
+		isOpen && !!slotInfo
+	)
+
+	// 装備リストの分別: お気に入り / その他（ソート済みの装備から）
 	const { favoriteEquipments, otherEquipments } = useMemo(() => {
 		const favoriteIds = EquipmentFavoritesManager.getFavoriteEquipmentIds()
 		const favoriteSet = new Set(favoriteIds)
 
-		const favorites = availableEquipments.filter((eq) =>
+		const favorites = sortedEquipments.filter((eq) =>
 			favoriteSet.has(eq.id),
 		)
-		const others = availableEquipments.filter((eq) => !favoriteSet.has(eq.id))
+		const others = sortedEquipments.filter((eq) => !favoriteSet.has(eq.id))
 
 		return {
 			favoriteEquipments: favorites,
 			otherEquipments: others
 		}
-	}, [availableEquipments, favoritesChanged])
+	}, [sortedEquipments, favoritesChanged])
 
 	const handleSelect = useCallback(
 		(equipmentId: string) => {
@@ -245,6 +253,16 @@ export default function EquipmentSelectionModal({
 
 						{/* 装備一覧 */}
 						<div className="p-4 sm:p-6 overflow-y-auto max-h-[48vh]">
+							{/* ダメージ差分計算中の表示 */}
+							{isSorting && slotInfo && (
+								<div className="flex items-center justify-center py-4 mb-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
+									<svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									</svg>
+									ダメージ差分を計算中...
+								</div>
+							)}
 							{/* お気に入り装備セクション */}
 							{(favoriteEquipments.length > 0 || isNoneFavorite) && (
 								<div className="mb-6">
