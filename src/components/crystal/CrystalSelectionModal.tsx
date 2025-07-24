@@ -7,6 +7,7 @@ import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
 import type { SlotInfo } from '@/types/damagePreview'
 import { CrystalFavoritesManager } from '@/utils/crystalFavorites'
+import { useCrystalDamageSorting } from '@/hooks/useCrystalDamageSorting'
 
 interface CrystalSelectionModalProps {
 	isOpen: boolean
@@ -124,28 +125,34 @@ export default function CrystalSelectionModal({
 		}
 	}, [isOpen, handleClose])
 
-	// フィルタリング+お気に入り分別
-	const { favoriteCrystals, otherCrystals } = useMemo(() => {
-		// 1. タイプフィルタリング
-		const filtered = availableCrystals.filter((crystal) => {
-			if (activeFilter === 'all') return true
-			return crystal.type === activeFilter
-		})
+	// フィルタリング
+	const filteredCrystals = useMemo(() => {
+		if (activeFilter === 'all') return availableCrystals
+		return availableCrystals.filter((crystal) => crystal.type === activeFilter)
+	}, [availableCrystals, activeFilter])
 
-		// 2. お気に入り分別
+	// ダメージ差分順でソート
+	const { sortedCrystals, isCalculating: isSorting } = useCrystalDamageSorting(
+		filteredCrystals,
+		slotInfo,
+		isOpen && !!slotInfo
+	)
+
+	// お気に入り分別（ソート済みのクリスタルから）
+	const { favoriteCrystals, otherCrystals } = useMemo(() => {
 		const favoriteIds = CrystalFavoritesManager.getFavoriteCrystalIds()
 		const favoriteSet = new Set(favoriteIds)
 
-		const favorites = filtered.filter((crystal) =>
+		const favorites = sortedCrystals.filter((crystal) =>
 			favoriteSet.has(crystal.id),
 		)
-		const others = filtered.filter((crystal) => !favoriteSet.has(crystal.id))
+		const others = sortedCrystals.filter((crystal) => !favoriteSet.has(crystal.id))
 
 		return {
 			favoriteCrystals: favorites,
 			otherCrystals: others
 		}
-	}, [availableCrystals, activeFilter, favoritesChanged])
+	}, [sortedCrystals, favoritesChanged])
 
 	const getFilterLabel = (filter: string) => {
 		switch (filter) {
@@ -293,6 +300,16 @@ export default function CrystalSelectionModal({
 
 						{/* クリスタ一覧 */}
 						<div className="p-4 sm:p-6 overflow-y-auto max-h-[48vh]">
+							{/* ダメージ差分計算中の表示 */}
+							{isSorting && slotInfo && (
+								<div className="flex items-center justify-center py-4 mb-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
+									<svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									</svg>
+									ダメージ差分を計算中...
+								</div>
+							)}
 							{/* お気に入りクリスタセクション */}
 							{(favoriteCrystals.length > 0 || isNoneFavorite) && (
 								<div className="mb-6">
