@@ -84,7 +84,7 @@ const PropertyDoubleDisplay: React.FC<PropertyDoubleDisplayProps> = ({
 
 	return (
 		<div
-			className={`grid grid-cols-[80px_40px_40px_80px_40px_40px] md:grid-cols-[80px_40px_40px_80px_40px_40px] items-center gap-2 py-0.5 px-2 hover:bg-blue-100/80 rounded border-b border-blue-200 ${className}`}
+			className={`grid grid-cols-[80px_40px_40px_80px_40px_40px] sm:grid-cols-[80px_40px_40px_80px_40px_40px] md:grid-cols-[80px_40px_40px_80px_40px_40px] items-center gap-1 sm:gap-2 py-0.5 px-0.5 sm:px-2 hover:bg-blue-100/80 rounded border-b border-blue-200 ${className}`}
 		>
 			{/* プロパティ1 */}
 			{renderProperty(property1)}

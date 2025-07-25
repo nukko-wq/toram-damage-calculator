@@ -583,7 +583,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	return (
 		<div className="">
-			<div className="flex flex-col items-center px-4 pt-2">
+			<div className="flex flex-col items-center px-1 sm:px-4 py-2">
 				{/* セクション表示切り替えボタン */}
 				<div className="mb-3 flex flex-wrap gap-2">
 					<button

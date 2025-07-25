@@ -157,7 +157,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	}
 
 	return (
-		<div className="bg-blue-50 py-2">
+		<div className="bg-blue-50 py-1 sm:py-2">
 			<div className="container mx-auto px-4">
 				{/* ダメージ表示テーブル */}
 				<div className="overflow-x-auto">
@@ -287,9 +287,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* 慣れ倍率スライダー（後で実装予定の枠） */}
-				<div className="p-1 sm:p-2 flex items-center">
+				<div className="sm:p-2 flex items-center">
 					<div className="text-xs sm:text-[13px] font-medium text-gray-700">
-						慣れ倍率（後で実装）
+						慣れ倍率
 					</div>
 					<div className="h-8 bg-gray-100 rounded flex items-center justify-center">
 						<span className="text-xs text-gray-500">スライダー実装予定</span>
@@ -297,7 +297,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* 敵情報 */}
-				<div className="p-1 sm:p-2 flex items-center gap-2">
+				<div className="pb-1 sm:p-2 flex items-center gap-2">
 					<p className="text-sm font-medium text-gray-700">
 						敵：{getSelectedEnemyName()}
 					</p>
