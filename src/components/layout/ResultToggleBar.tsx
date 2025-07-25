@@ -209,7 +209,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					style={{ top: `${toggleBarHeight}px` }}
 				>
 					<div
-						className="overflow-y-auto bg-blue-50 h-full"
+						className="overflow-y-auto bg-blue-50"
 						id="status-preview"
 						aria-labelledby="status-toggle"
 					>
