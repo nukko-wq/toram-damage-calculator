@@ -41,7 +41,7 @@ export default function EquipmentSelectionModal({
 	const [availableEquipments, setAvailableEquipments] = useState<Equipment[]>(
 		[],
 	)
-	const [favoritesChanged, setFavoritesChanged] = useState(0)
+	const [_favoritesChanged, setFavoritesChanged] = useState(0)
 	
 	// 「装備なし」の特別なID
 	const EQUIPMENT_NONE_ID = '__equipment_none__'
@@ -59,7 +59,8 @@ export default function EquipmentSelectionModal({
 		if (!slotInfo || !currentData) return false
 		
 		if (slotInfo.type === 'equipment' && slotInfo.slot && typeof slotInfo.slot === 'string') {
-			const currentEquipment = (currentData.equipment as any)[slotInfo.slot]
+			const slotKey = slotInfo.slot as keyof typeof currentData.equipment
+			const currentEquipment = currentData.equipment[slotKey]
 			return currentEquipment !== null && currentEquipment !== undefined
 		}
 		
@@ -89,7 +90,7 @@ export default function EquipmentSelectionModal({
 				)
 			}
 		},
-		[EQUIPMENT_NONE_ID],
+		[],
 	)
 	
 	// 「装備なし」のお気に入りクリックハンドラー
@@ -108,7 +109,7 @@ export default function EquipmentSelectionModal({
 				setFavoritesChanged((prev) => prev + 1)
 			}
 		},
-		[EQUIPMENT_NONE_ID, isNoneFavorite],
+		[isNoneFavorite],
 	)
 
 	// ESCキーでモーダルを閉じる
@@ -180,7 +181,7 @@ export default function EquipmentSelectionModal({
 			favoriteEquipments: favorites,
 			otherEquipments: others
 		}
-	}, [sortedEquipments, favoritesChanged])
+	}, [sortedEquipments])
 
 	const handleSelect = useCallback(
 		(equipmentId: string) => {

@@ -34,13 +34,13 @@ export default function BuffItemSelectionModal({
 	title,
 	slotInfo,
 }: BuffItemSelectionModalProps) {
-	const [activeFilter, _setActiveFilter] = useState<'all' | BuffItemCategory>(
+	const [_activeFilter, _setActiveFilter] = useState<'all' | BuffItemCategory>(
 		'all',
 	)
 	const [availableBuffItems, setAvailableBuffItems] = useState<
 		PresetBuffItem[]
 	>([])
-	const [favoritesChanged, setFavoritesChanged] = useState(0)
+	const [_favoritesChanged, setFavoritesChanged] = useState(0)
 	
 	// 「バフアイテムなし」の特別なID
 	const BUFF_ITEM_NONE_ID = '__buff_item_none__'
@@ -58,7 +58,8 @@ export default function BuffItemSelectionModal({
 		if (!slotInfo || !currentData) return false
 		
 		if (slotInfo.type === 'buffItem' && slotInfo.category && typeof slotInfo.category === 'string') {
-			const currentBuffItem = (currentData.buffItems as any)[slotInfo.category]
+			const categoryKey = slotInfo.category as keyof typeof currentData.buffItems
+			const currentBuffItem = currentData.buffItems[categoryKey]
 			return currentBuffItem !== null && currentBuffItem !== undefined
 		}
 		
@@ -88,7 +89,7 @@ export default function BuffItemSelectionModal({
 				)
 			}
 		},
-		[BUFF_ITEM_NONE_ID],
+		[],
 	)
 	
 	// 「バフアイテムなし」のお気に入りクリックハンドラー
@@ -107,7 +108,7 @@ export default function BuffItemSelectionModal({
 				setFavoritesChanged((prev) => prev + 1)
 			}
 		},
-		[BUFF_ITEM_NONE_ID, isNoneFavorite],
+		[isNoneFavorite],
 	)
 
 	// ESCキーでモーダルを閉じる
@@ -156,7 +157,7 @@ export default function BuffItemSelectionModal({
 			favoriteBuffItems: favorites,
 			otherBuffItems: others
 		}
-	}, [sortedBuffItems, favoritesChanged])
+	}, [sortedBuffItems])
 
 	const _getCategoryLabel = (categoryValue: string) => {
 		switch (categoryValue) {
@@ -370,6 +371,7 @@ export default function BuffItemSelectionModal({
 															try {
 																return (
 																	<DamageDifferenceDisplayCorrect
+																		// biome-ignore lint/suspicious/noExplicitAny: Special none item requires type assertion
 																		item={BUFF_ITEM_NONE_ITEM as any}
 																		slotInfo={slotInfo}
 																		size="sm"
@@ -482,6 +484,7 @@ export default function BuffItemSelectionModal({
 															try {
 																return (
 																	<DamageDifferenceDisplayCorrect
+																		// biome-ignore lint/suspicious/noExplicitAny: Special none item requires type assertion
 																		item={BUFF_ITEM_NONE_ITEM as any}
 																		slotInfo={slotInfo}
 																		size="sm"

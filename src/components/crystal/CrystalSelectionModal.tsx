@@ -33,7 +33,7 @@ export default function CrystalSelectionModal({
 	slotInfo,
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
-	const [favoritesChanged, setFavoritesChanged] = useState(0)
+	const [_favoritesChanged, setFavoritesChanged] = useState(0)
 	
 	// 「クリスタなし」の特別なID
 	const CRYSTAL_NONE_ID = '__crystal_none__'
@@ -106,7 +106,7 @@ export default function CrystalSelectionModal({
 				)
 			}
 		},
-		[CRYSTAL_NONE_ID],
+		[],
 	)
 	
 	// 「クリスタなし」のお気に入りクリックハンドラー
@@ -125,7 +125,7 @@ export default function CrystalSelectionModal({
 				setFavoritesChanged((prev) => prev + 1)
 			}
 		},
-		[CRYSTAL_NONE_ID, isNoneFavorite],
+		[isNoneFavorite],
 	)
 
 	// ESCキーでモーダルを閉じる
@@ -171,7 +171,7 @@ export default function CrystalSelectionModal({
 			favoriteCrystals: favorites,
 			otherCrystals: others
 		}
-	}, [sortedCrystals, favoritesChanged])
+	}, [sortedCrystals])
 
 	const getFilterLabel = (filter: string) => {
 		switch (filter) {
