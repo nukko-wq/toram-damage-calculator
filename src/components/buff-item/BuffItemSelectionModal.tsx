@@ -11,7 +11,7 @@ import type { SlotInfo } from '@/types/damagePreview'
 import { BUFF_ITEM_NONE_ITEM } from '@/types/damagePreview'
 import { BuffItemFavoritesManager } from '@/utils/buffItemFavorites'
 import { useBuffItemDamageSorting } from '@/hooks/useBuffItemDamageSorting'
-import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface BuffItemSelectionModalProps {
@@ -142,22 +142,70 @@ export default function BuffItemSelectionModal({
 		isOpen && !!slotInfo
 	)
 
+	// 「バフアイテムなし」のダメージ差分を計算
+	const buffItemNoneDamageResult = useDamageDifferenceCorrect(
+		// biome-ignore lint/suspicious/noExplicitAny: BuffItem typeと互換性のないNone用の仮想アイテム
+		BUFF_ITEM_NONE_ITEM as any,
+		slotInfo || { type: 'buffItem', category: 'physicalPower' },
+		{ debug: false }
+	)
+	const buffItemNoneDamageDifference = slotInfo ? buffItemNoneDamageResult.difference || 0 : 0
+
 	// バフアイテムリストの分別: お気に入り / その他（ソート済みのバフアイテムから）
 	const { favoriteBuffItems, otherBuffItems } = useMemo(() => {
-		// お気に入り分別
 		const favoriteIds = BuffItemFavoritesManager.getFavoriteBuffItemIds()
 		const favoriteSet = new Set(favoriteIds)
 
+		// 通常のバフアイテムを分別
 		const favorites = sortedBuffItems.filter((buffItem) =>
 			favoriteSet.has(buffItem.id),
 		)
 		const others = sortedBuffItems.filter((buffItem) => !favoriteSet.has(buffItem.id))
 
+		// 「バフアイテムなし」をダメージ差分に基づいて適切な位置に挿入
+		if (hasCurrentlyEquippedBuffItem && slotInfo) {
+			// biome-ignore lint/suspicious/noExplicitAny: BuffItem typeと互換性のないNone用の仮想アイテム
+			const buffItemNoneWithDamage: any = {
+				id: BUFF_ITEM_NONE_ID,
+				name: 'バフアイテムなし',
+				category: 'physicalPower',
+				effects: {},
+				damageDifference: buffItemNoneDamageDifference
+			}
+
+			// お気に入りかどうかで分岐
+			if (isNoneFavorite) {
+				// お気に入りリストに挿入（ダメージ差分順）
+				const insertIndex = favorites.findIndex(buffItem => {
+					// biome-ignore lint/suspicious/noExplicitAny: BuffItemWithDamageタイプのダメージ差分プロパティアクセス
+					const buffItemDamage = 'damageDifference' in buffItem && typeof (buffItem as any).damageDifference === 'number' ? (buffItem as any).damageDifference : 0
+					return buffItemNoneWithDamage.damageDifference > buffItemDamage
+				})
+				if (insertIndex === -1) {
+					favorites.push(buffItemNoneWithDamage)
+				} else {
+					favorites.splice(insertIndex, 0, buffItemNoneWithDamage)
+				}
+			} else {
+				// その他リストに挿入（ダメージ差分順）
+				const insertIndex = others.findIndex(buffItem => {
+					// biome-ignore lint/suspicious/noExplicitAny: BuffItemWithDamageタイプのダメージ差分プロパティアクセス
+					const buffItemDamage = 'damageDifference' in buffItem && typeof (buffItem as any).damageDifference === 'number' ? (buffItem as any).damageDifference : 0
+					return buffItemNoneWithDamage.damageDifference > buffItemDamage
+				})
+				if (insertIndex === -1) {
+					others.push(buffItemNoneWithDamage)
+				} else {
+					others.splice(insertIndex, 0, buffItemNoneWithDamage)
+				}
+			}
+		}
+
 		return {
 			favoriteBuffItems: favorites,
 			otherBuffItems: others
 		}
-	}, [sortedBuffItems])
+	}, [sortedBuffItems, isNoneFavorite, buffItemNoneDamageDifference, hasCurrentlyEquippedBuffItem, slotInfo])
 
 	const _getCategoryLabel = (categoryValue: string) => {
 		switch (categoryValue) {
@@ -292,236 +340,210 @@ export default function BuffItemSelectionModal({
 								</div>
 							)}
 							{/* お気に入りバフアイテムセクション */}
-							{(favoriteBuffItems.length > 0 || isNoneFavorite) && (
+							{favoriteBuffItems.length > 0 && (
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
 										<svg className="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 24 24">
 											<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 										</svg>
-										お気に入り ({favoriteBuffItems.length + (isNoneFavorite ? 1 : 0)})
+										お気に入り ({favoriteBuffItems.length})
 									</h3>
 									<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-										{/* お気に入りの「バフアイテムなし」 */}
-										{isNoneFavorite && (
-											<div
-												onClick={handleRemove}
-												className={`
-													relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
-													${
-														selectedBuffItemId === null
-															? 'border-blue-500 bg-blue-50 shadow-md'
-															: 'border-gray-200 bg-white hover:border-gray-300'
-													}
-												`}
-											>
-												{/* お気に入りボタン - 右下に絶対配置 */}
-												<button
-													type="button"
-													onClick={handleNoneFavoriteClick}
-													className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-red-500 hover:text-red-600"
-													aria-label="お気に入りから削除"
-												>
-													<svg
-														className="w-5 h-5"
-														fill="currentColor"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<title>お気に入り済み</title>
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={0}
-															d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-														/>
-													</svg>
-												</button>
-
-												{/* 上部エリア：選択マーク */}
-												<div className="flex justify-between items-start mb-2 min-h-[24px]">
-													<div className="flex-1" />
-
-													{/* 選択状態のチェックマーク */}
-													{selectedBuffItemId === null && (
-														<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-															<svg
-																className="w-4 h-4 text-white"
-																fill="none"
-																stroke="currentColor"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																	strokeWidth={2}
-																	d="M5 13l4 4L19 7"
-																/>
-															</svg>
-														</div>
-													)}
-												</div>
-
-												{/* バフアイテムなし名 */}
-												<h3 className="font-semibold text-gray-900 mb-2">バフアイテムなし</h3>
-
-												{/* ダメージ差分表示 */}
-												{slotInfo && hasCurrentlyEquippedBuffItem && selectedBuffItemId !== null && (
-													<div className="mb-1 sm:mb-2">
-														{(() => {
-															try {
-																return (
-																	<DamageDifferenceDisplayCorrect
-																		// biome-ignore lint/suspicious/noExplicitAny: Special none item requires type assertion
-																		item={BUFF_ITEM_NONE_ITEM as any}
-																		slotInfo={slotInfo}
-																		size="sm"
-																		className=""
-																		options={{ debug: false }}
-																	/>
-																)
-															} catch (_error) {
-																return (
-																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
-																)
+										{favoriteBuffItems.map((buffItem) => {
+											// 「バフアイテムなし」の場合は専用カードを表示
+											if (buffItem.id === BUFF_ITEM_NONE_ID) {
+												return (
+													<div
+														key={buffItem.id}
+														onClick={handleRemove}
+														className={`
+															relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+															${
+																selectedBuffItemId === null
+																	? 'border-blue-500 bg-blue-50 shadow-md'
+																	: 'border-gray-200 bg-white hover:border-gray-300'
 															}
-														})()}
+														`}
+													>
+														{/* お気に入りボタン */}
+														<button
+															type="button"
+															onClick={handleNoneFavoriteClick}
+															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-red-500 hover:text-red-600"
+															aria-label="お気に入りから削除"
+														>
+															<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+																<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+															</svg>
+														</button>
+														
+														{/* 選択マーク */}
+														<div className="flex justify-between items-start mb-2 min-h-[24px]">
+															<div className="flex-1" />
+															{selectedBuffItemId === null && (
+																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	</svg>
+																</div>
+															)}
+														</div>
+														
+														<h3 className="font-semibold text-gray-900 mb-2">バフアイテムなし</h3>
+														
+														{/* ダメージ差分表示（他のバフアイテムと同じ形式） */}
+														{slotInfo && hasCurrentlyEquippedBuffItem && (
+															<div className="mb-1 sm:mb-2">
+																<div className="font-medium">
+																	<span className={`mr-3 text-sm ${
+																		buffItemNoneDamageDifference > 0 
+																			? 'text-blue-500' 
+																			: buffItemNoneDamageDifference < 0 
+																				? 'text-red-500' 
+																				: 'text-gray-400'
+																	}`}>
+																		ダメージ：
+																	</span>
+																	<span className={`text-sm ${
+																		buffItemNoneDamageDifference > 0 
+																			? 'text-blue-600' 
+																			: buffItemNoneDamageDifference < 0 
+																				? 'text-red-600' 
+																				: 'text-gray-500'
+																	}`}>
+																		{buffItemNoneDamageDifference === 0 
+																			? '±0' 
+																			: buffItemNoneDamageDifference > 0 
+																				? `+${buffItemNoneDamageDifference.toLocaleString()}` 
+																				: buffItemNoneDamageDifference.toLocaleString()}
+																	</span>
+																</div>
+															</div>
+														)}
 													</div>
-												)}
-											</div>
-										)}
-
-										{/* お気に入りバフアイテムカード */}
-										{favoriteBuffItems.map((buffItem) => (
-											<BuffItemCard
-												key={buffItem.id}
-												buffItem={buffItem}
-												isSelected={selectedBuffItemId === buffItem.id}
-												onClick={() => handleSelect(buffItem.id)}
-												showDamageDifference={isOpen && !!slotInfo}
-												slotInfo={slotInfo}
-												showFavoriteButton={true}
-												onFavoriteChange={handleFavoriteChange}
-											/>
-										))}
+												)
+											}
+											
+											// 通常のバフアイテムカード
+											return (
+												<BuffItemCard
+													key={buffItem.id}
+													buffItem={buffItem}
+													isSelected={selectedBuffItemId === buffItem.id}
+													onClick={() => handleSelect(buffItem.id)}
+													showDamageDifference={isOpen && !!slotInfo}
+													slotInfo={slotInfo}
+													showFavoriteButton={true}
+													onFavoriteChange={handleFavoriteChange}
+												/>
+											)
+										})}
 									</div>
 								</div>
 							)}
 
 							{/* その他のバフアイテムセクション */}
-							{(otherBuffItems.length > 0 || !isNoneFavorite) && (
+							{otherBuffItems.length > 0 && (
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3">
-										その他 ({otherBuffItems.length + (!isNoneFavorite ? 1 : 0)})
+										その他 ({otherBuffItems.length})
 									</h3>
 									<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-										{/* その他の「バフアイテムなし」 */}
-										{!isNoneFavorite && (
-											<div
-												onClick={handleRemove}
-												className={`
-													relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
-													${
-														selectedBuffItemId === null
-															? 'border-blue-500 bg-blue-50 shadow-md'
-															: 'border-gray-200 bg-white hover:border-gray-300'
-													}
-												`}
-											>
-												{/* お気に入りボタン - 右下に絶対配置 */}
-												<button
-													type="button"
-													onClick={handleNoneFavoriteClick}
-													className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-gray-300 hover:text-red-400"
-													aria-label="お気に入りに追加"
-												>
-													<svg
-														className="w-5 h-5"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<title>お気に入りに追加</title>
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={2}
-															d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-														/>
-													</svg>
-												</button>
-
-												{/* 上部エリア：選択マーク */}
-												<div className="flex justify-between items-start mb-2 min-h-[24px]">
-													<div className="flex-1" />
-
-													{/* 選択状態のチェックマーク */}
-													{selectedBuffItemId === null && (
-														<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-															<svg
-																className="w-4 h-4 text-white"
-																fill="none"
-																stroke="currentColor"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																	strokeWidth={2}
-																	d="M5 13l4 4L19 7"
-																/>
-															</svg>
-														</div>
-													)}
-												</div>
-
-												{/* バフアイテムなし名 */}
-												<h3 className="font-semibold text-gray-900 mb-2">バフアイテムなし</h3>
-
-												{/* ダメージ差分表示 */}
-												{slotInfo && hasCurrentlyEquippedBuffItem && selectedBuffItemId !== null && (
-													<div className="mb-1 sm:mb-2">
-														{(() => {
-															try {
-																return (
-																	<DamageDifferenceDisplayCorrect
-																		// biome-ignore lint/suspicious/noExplicitAny: Special none item requires type assertion
-																		item={BUFF_ITEM_NONE_ITEM as any}
-																		slotInfo={slotInfo}
-																		size="sm"
-																		className=""
-																		options={{ debug: false }}
-																	/>
-																)
-															} catch (_error) {
-																return (
-																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
-																)
+										{otherBuffItems.map((buffItem) => {
+											// 「バフアイテムなし」の場合は専用カードを表示
+											if (buffItem.id === BUFF_ITEM_NONE_ID) {
+												return (
+													<div
+														key={buffItem.id}
+														onClick={handleRemove}
+														className={`
+															relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+															${
+																selectedBuffItemId === null
+																	? 'border-blue-500 bg-blue-50 shadow-md'
+																	: 'border-gray-200 bg-white hover:border-gray-300'
 															}
-														})()}
+														`}
+													>
+														{/* お気に入りボタン */}
+														<button
+															type="button"
+															onClick={handleNoneFavoriteClick}
+															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-gray-300 hover:text-red-400"
+															aria-label="お気に入りに追加"
+														>
+															<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+															</svg>
+														</button>
+														
+														{/* 選択マーク */}
+														<div className="flex justify-between items-start mb-2 min-h-[24px]">
+															<div className="flex-1" />
+															{selectedBuffItemId === null && (
+																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	</svg>
+																</div>
+															)}
+														</div>
+														
+														<h3 className="font-semibold text-gray-900 mb-2">バフアイテムなし</h3>
+														
+														{/* ダメージ差分表示（他のバフアイテムと同じ形式） */}
+														{slotInfo && hasCurrentlyEquippedBuffItem && (
+															<div className="mb-1 sm:mb-2">
+																<div className="font-medium">
+																	<span className={`mr-3 text-sm ${
+																		buffItemNoneDamageDifference > 0 
+																			? 'text-blue-500' 
+																			: buffItemNoneDamageDifference < 0 
+																				? 'text-red-500' 
+																				: 'text-gray-400'
+																	}`}>
+																		ダメージ：
+																	</span>
+																	<span className={`text-sm ${
+																		buffItemNoneDamageDifference > 0 
+																			? 'text-blue-600' 
+																			: buffItemNoneDamageDifference < 0 
+																				? 'text-red-600' 
+																				: 'text-gray-500'
+																	}`}>
+																		{buffItemNoneDamageDifference === 0 
+																			? '±0' 
+																			: buffItemNoneDamageDifference > 0 
+																				? `+${buffItemNoneDamageDifference.toLocaleString()}` 
+																				: buffItemNoneDamageDifference.toLocaleString()}
+																	</span>
+																</div>
+															</div>
+														)}
 													</div>
-												)}
-											</div>
-										)}
-
-										{/* その他のバフアイテムカード */}
-										{otherBuffItems.map((buffItem) => (
-											<BuffItemCard
-												key={buffItem.id}
-												buffItem={buffItem}
-												isSelected={selectedBuffItemId === buffItem.id}
-												onClick={() => handleSelect(buffItem.id)}
-												showDamageDifference={isOpen && !!slotInfo}
-												slotInfo={slotInfo}
-												showFavoriteButton={true}
-												onFavoriteChange={handleFavoriteChange}
-											/>
-										))}
+												)
+											}
+											
+											// 通常のバフアイテムカード
+											return (
+												<BuffItemCard
+													key={buffItem.id}
+													buffItem={buffItem}
+													isSelected={selectedBuffItemId === buffItem.id}
+													onClick={() => handleSelect(buffItem.id)}
+													showDamageDifference={isOpen && !!slotInfo}
+													slotInfo={slotInfo}
+													showFavoriteButton={true}
+													onFavoriteChange={handleFavoriteChange}
+												/>
+											)
+										})}
 									</div>
 								</div>
 							)}
 
 							{/* アイテムが見つからない場合 */}
-							{favoriteBuffItems.length === 0 && otherBuffItems.length === 0 && !isNoneFavorite && (
+							{favoriteBuffItems.length === 0 && otherBuffItems.length === 0 && !hasCurrentlyEquippedBuffItem && (
 								<div className="text-center text-gray-500 py-8">
 									該当するバフアイテムがありません
 								</div>
