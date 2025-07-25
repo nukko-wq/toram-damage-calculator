@@ -430,16 +430,33 @@ export default function CrystalSelectionModal({
 														
 														<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
 														
-														{/* ダメージ差分表示 */}
+														{/* ダメージ差分表示（他のクリスタルと同じ形式） */}
 														{slotInfo && hasCurrentlyEquippedCrystal && (
 															<div className="mb-1 sm:mb-2">
-																<DamageDifferenceDisplayCorrect
-																	item={CRYSTAL_NONE_ITEM}
-																	slotInfo={slotInfo}
-																	size="sm"
-																	className=""
-																	options={{ debug: false }}
-																/>
+																<div className="font-medium">
+																	<span className={`mr-3 text-sm ${
+																		crystalNoneDamageDifference > 0 
+																			? 'text-blue-500' 
+																			: crystalNoneDamageDifference < 0 
+																				? 'text-red-500' 
+																				: 'text-gray-400'
+																	}`}>
+																		ダメージ：
+																	</span>
+																	<span className={`text-sm ${
+																		crystalNoneDamageDifference > 0 
+																			? 'text-blue-600' 
+																			: crystalNoneDamageDifference < 0 
+																				? 'text-red-600' 
+																				: 'text-gray-500'
+																	}`}>
+																		{crystalNoneDamageDifference === 0 
+																			? '±0' 
+																			: crystalNoneDamageDifference > 0 
+																				? `+${crystalNoneDamageDifference.toLocaleString()}` 
+																				: crystalNoneDamageDifference.toLocaleString()}
+																	</span>
+																</div>
 															</div>
 														)}
 													</div>
@@ -513,16 +530,33 @@ export default function CrystalSelectionModal({
 														
 														<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
 														
-														{/* ダメージ差分表示 */}
+														{/* ダメージ差分表示（他のクリスタルと同じ形式） */}
 														{slotInfo && hasCurrentlyEquippedCrystal && (
 															<div className="mb-1 sm:mb-2">
-																<DamageDifferenceDisplayCorrect
-																	item={CRYSTAL_NONE_ITEM}
-																	slotInfo={slotInfo}
-																	size="sm"
-																	className=""
-																	options={{ debug: false }}
-																/>
+																<div className="font-medium">
+																	<span className={`mr-3 text-sm ${
+																		crystalNoneDamageDifference > 0 
+																			? 'text-blue-500' 
+																			: crystalNoneDamageDifference < 0 
+																				? 'text-red-500' 
+																				: 'text-gray-400'
+																	}`}>
+																		ダメージ：
+																	</span>
+																	<span className={`text-sm ${
+																		crystalNoneDamageDifference > 0 
+																			? 'text-blue-600' 
+																			: crystalNoneDamageDifference < 0 
+																				? 'text-red-600' 
+																				: 'text-gray-500'
+																	}`}>
+																		{crystalNoneDamageDifference === 0 
+																			? '±0' 
+																			: crystalNoneDamageDifference > 0 
+																				? `+${crystalNoneDamageDifference.toLocaleString()}` 
+																				: crystalNoneDamageDifference.toLocaleString()}
+																	</span>
+																</div>
 															</div>
 														)}
 													</div>
