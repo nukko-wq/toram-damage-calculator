@@ -327,7 +327,7 @@ export default function EquipmentCard({
 
 			{/* プロパティ */}
 			{getPropertyList().length > 0 && (
-				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1">
+				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1 pr-6">
 					{getPropertyList().map((property) => (
 						<span
 							key={property.text}
@@ -342,7 +342,7 @@ export default function EquipmentCard({
 			{/* 条件付き効果 */}
 			{equipment.conditionalEffects &&
 				equipment.conditionalEffects.length > 0 && (
-					<div className="text-sm text-blue-600 space-y-1 mb-2">
+					<div className="text-sm text-blue-600 space-y-1 mb-2 pr-6">
 						{equipment.conditionalEffects.map((effect, index) => {
 							const { conditionText, effectTexts } =
 								formatConditionalEffect(effect)

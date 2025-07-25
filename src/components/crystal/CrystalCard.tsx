@@ -143,7 +143,7 @@ export default function CrystalCard({
 			{/* プロパティ */}
 			{Object.entries(crystal.properties).filter(([_, value]) => value !== 0)
 				.length > 0 && (
-				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1 pr-8">
+				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1 pr-6">
 					{Object.entries(crystal.properties)
 						.filter(([_, value]) => value !== 0)
 						.slice(0, 8)
@@ -312,7 +312,7 @@ export default function CrystalCard({
 
 			{/* 条件付き効果 */}
 			{crystal.conditionalEffects && crystal.conditionalEffects.length > 0 && (
-				<div className="text-sm text-blue-600 space-y-1 pr-8">
+				<div className="text-sm text-blue-600 space-y-1 pr-6">
 					{crystal.conditionalEffects.map((effect, index) => {
 						const { conditionText, effectTexts } =
 							formatConditionalEffect(effect)

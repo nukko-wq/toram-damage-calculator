@@ -205,42 +205,9 @@ export default function BuffItemCard({
 				</button>
 			)}
 
-			{/* 上部エリア：ダメージ差分表示と選択マーク */}
-			<div className="flex justify-between items-start mb-2 min-h-[24px]">
-				{/* ダメージ差分表示 - 現在選択中のバフアイテムには表示しない */}
-				<div className="flex-1">
-					{showDamageDifference && slotInfo && !isSelected && (
-						<div className="inline-block">
-							{(() => {
-								try {
-									return (
-										<DamageDifferenceDisplayCorrect
-											item={{
-												...buffItem,
-												isPreset: true,
-												isFavorite: false,
-												createdAt: new Date().toISOString(),
-												updatedAt: new Date().toISOString(),
-											}}
-											slotInfo={slotInfo}
-											size="sm"
-											className="px-1 py-0.5"
-											options={{ debug: false }}
-										/>
-									)
-								} catch {
-									return (
-										<div className="bg-red-100 text-red-600 text-xs p-1">
-											Error
-										</div>
-									)
-								}
-							})()}
-						</div>
-					)}
-				</div>
-
-
+			{/* バフアイテム名と選択マーク */}
+			<div className="flex justify-between items-center mb-1 sm:mb-2">
+				<h3 className="font-semibold text-gray-900">{buffItem.name}</h3>
 				{/* 選択状態のチェックマーク */}
 				{isSelected && (
 					<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
@@ -261,12 +228,40 @@ export default function BuffItemCard({
 				)}
 			</div>
 
-			{/* バフアイテム名 */}
-			<h3 className="font-semibold text-gray-900 mb-2">{buffItem.name}</h3>
+			{/* ダメージ差分表示 - バフアイテム名の下に配置 */}
+			{showDamageDifference && slotInfo && !isSelected && (
+				<div className="mb-1 sm:mb-2">
+					{(() => {
+						try {
+							return (
+								<DamageDifferenceDisplayCorrect
+									item={{
+										...buffItem,
+										isPreset: true,
+										isFavorite: false,
+										createdAt: new Date().toISOString(),
+										updatedAt: new Date().toISOString(),
+									}}
+									slotInfo={slotInfo}
+									size="sm"
+									className="inline-block"
+									options={{ debug: false }}
+								/>
+							)
+						} catch {
+							return (
+								<div className="bg-red-100 text-red-600 text-xs p-1 rounded">
+									Error
+								</div>
+							)
+						}
+					})()}
+				</div>
+			)}
 
 			{/* プロパティ */}
 			{formatProperties().length > 0 && (
-				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1">
+				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1 pr-6">
 					{formatProperties().map((row) => (
 						<span key={row}>{row}</span>
 					))}
