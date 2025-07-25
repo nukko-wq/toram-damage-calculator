@@ -28,10 +28,12 @@ export default React.memo<StatSectionProps>(
 		propertyOrder,
 	}) => {
 		return (
-			<div className={`p-2 ${className}`}>
-				<h3 className="font-semibold text-center md:text-left text-gray-900 mb-1 pb-2">
-					{title}
-				</h3>
+			<div className={`sm:p-2 ${className}`}>
+				{title && (
+					<h3 className="font-semibold text-center md:text-left text-gray-900 mb-1 sm:mb-2">
+						{title}
+					</h3>
+				)}
 
 				{displayMode === 'property' ? (
 					<div>
