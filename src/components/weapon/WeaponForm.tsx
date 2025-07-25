@@ -12,7 +12,6 @@ import type {
 	MainWeapon,
 	SubWeapon,
 	WeaponType,
-	SubWeaponType,
 } from '@/types/calculator'
 import { useEffect, useState, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
@@ -28,20 +27,7 @@ import {
 	type RefinementDisplay,
 } from '@/utils/refinementUtils'
 
-interface WeaponFormProps {
-	// Zustand移行後は不要（後方互換性のため残存）
-	mainWeapon?: MainWeapon
-	subWeapon?: SubWeapon
-	onMainWeaponChange?: (weapon: MainWeapon) => void
-	onSubWeaponChange?: (weapon: SubWeapon) => void
-}
-
-export default function WeaponForm({
-	mainWeapon,
-	subWeapon,
-	onMainWeaponChange,
-	onSubWeaponChange,
-}: WeaponFormProps) {
+export default function WeaponForm() {
 	// Zustandストアから武器データを取得
 	const storeMainWeapon = useCalculatorStore((state) => state.data.mainWeapon)
 	const storeSubWeapon = useCalculatorStore((state) => state.data.subWeapon)
@@ -80,10 +66,12 @@ export default function WeaponForm({
 
 	// 精錬値変換ヘルパー関数
 	const getCurrentMainRefinementDisplay = (): RefinementDisplay => {
+		// biome-ignore lint/suspicious/noExplicitAny: refinement型の互換性のため
 		return refinementValueToDisplay(effectiveMainWeapon.refinement as any)
 	}
 
 	const getCurrentSubRefinementDisplay = (): RefinementDisplay => {
+		// biome-ignore lint/suspicious/noExplicitAny: refinement型の互換性のため
 		return refinementValueToDisplay(effectiveSubWeapon.refinement as any)
 	}
 
@@ -140,7 +128,7 @@ export default function WeaponForm({
 	const {
 		register: registerMain,
 		watch: watchMain,
-		formState: { errors: errorsMain },
+		formState: { errors: _errorsMain },
 		setValue: setValueMain,
 		getValues: getValuesMain,
 	} = useForm<MainWeaponFormData>({
@@ -153,7 +141,7 @@ export default function WeaponForm({
 	const {
 		register: registerSub,
 		watch: watchSub,
-		formState: { errors: errorsSub },
+		formState: { errors: _errorsSub },
 		setValue: setValueSub,
 		getValues: getValuesSub,
 	} = useForm<SubWeaponFormData>({
@@ -210,7 +198,7 @@ export default function WeaponForm({
 		setIsInitialized(false)
 		const timer = setTimeout(() => setIsInitialized(true), 30)
 		return () => clearTimeout(timer)
-	}, [effectiveMainWeapon, effectiveSubWeapon])
+	}, [])
 
 	// フォーム値変更を監視してZustandストアに通知（メイン武器）
 	useEffect(() => {
@@ -244,17 +232,11 @@ export default function WeaponForm({
 
 				// Zustandストアを更新
 				updateMainWeapon(value as MainWeapon)
-
-				// 後方互換性のため従来のonChangeも呼び出し
-				if (onMainWeaponChange) {
-					onMainWeaponChange(value as MainWeapon)
-				}
 			}
 		})
 		return () => subscription.unsubscribe()
 	}, [
 		watchMain,
-		onMainWeaponChange,
 		isInitialized,
 		updateMainWeapon,
 		updateSubWeapon,
@@ -272,15 +254,10 @@ export default function WeaponForm({
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
 				// Zustandストアを更新
 				updateSubWeapon(value as SubWeapon)
-
-				// 後方互換性のため従来のonChangeも呼び出し
-				if (onSubWeaponChange) {
-					onSubWeaponChange(value as SubWeapon)
-				}
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watchSub, onSubWeaponChange, isInitialized, updateSubWeapon])
+	}, [watchSub, isInitialized, updateSubWeapon])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-5 md:col-end-9 md:row-start-1 md:row-end-2 xl:col-start-1 xl:col-end-3 xl:row-start-2 xl:row-end-3">

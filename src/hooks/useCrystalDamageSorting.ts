@@ -7,15 +7,18 @@ import type { Crystal } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import { calculateResults } from '@/utils/calculationEngine'
-import { calculateDamageWithService } from '@/utils/damageCalculationService'
+import { calculateDamageWithService, type DamageCalculationServiceResult } from '@/utils/damageCalculationService'
 import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
 
 interface CrystalWithDamage {
 	id: string
 	name: string
+	// biome-ignore lint/suspicious/noExplicitAny: Crystal typeは複雑な型のため一時的にanyを使用
 	type: any
+	// biome-ignore lint/suspicious/noExplicitAny: Crystal propertiesは複雑な型のため一時的にanyを使用
 	properties: any
 	description?: string
+	// biome-ignore lint/suspicious/noExplicitAny: conditionalEffectsは複雑な型のため一時的にanyを使用
 	conditionalEffects?: any[]
 	isCustom?: boolean
 	createdAt?: string
@@ -65,7 +68,7 @@ export function useCrystalDamageSorting(
 					effectiveCurrentResults = calculateResults(currentData)
 				}
 
-				let calculatedBaselineDamageResult
+				let calculatedBaselineDamageResult: DamageCalculationServiceResult
 				if (baselineDamageResult) {
 					calculatedBaselineDamageResult = baselineDamageResult
 				} else {
@@ -102,7 +105,7 @@ export function useCrystalDamageSorting(
 								isCalculating: false,
 								hasError: false
 							}
-						} catch (error) {
+						} catch (_error) {
 							return {
 								...crystal,
 								damageDifference: 0,
@@ -114,7 +117,7 @@ export function useCrystalDamageSorting(
 				)
 
 				setCrystalsWithDamage(results)
-			} catch (error) {
+			} catch (_error) {
 				// エラー時は元の配列を返す
 				setCrystalsWithDamage(crystals.map(crystal => ({
 					...crystal,

@@ -24,6 +24,7 @@ export const STORAGE_KEYS = {
 } as const
 
 // 安全なLocalStorage操作のヘルパー関数
+// biome-ignore lint/complexity/noStaticOnlyClass: LocalStorage操作の名前空間として使用
 export class StorageHelper {
 	/**
 	 * LocalStorageからデータを安全に取得
@@ -174,7 +175,8 @@ export async function validateStorageIntegrity(): Promise<boolean> {
 
 		if (
 			currentSaveId &&
-			!saveDataList.find((save: any) => save.id === currentSaveId)
+			// biome-ignore lint/suspicious/noExplicitAny: SaveData型の互換性のため
+		!saveDataList.find((save: any) => save.id === currentSaveId)
 		) {
 			console.warn('Current save ID not found in save data list')
 			return false

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { ExportType, ExportOptions } from '@/utils/exportManager'
 import {
 	generateDefaultFilename,
@@ -32,6 +32,16 @@ export default function ExportModal({
 		hasSettings: false,
 	})
 
+	// プレビュー更新
+	const updatePreview = useCallback(async (type: ExportType) => {
+		try {
+			const newPreview = await generateExportPreview(type)
+			setPreview(newPreview)
+		} catch (err) {
+			console.error('Preview generation error:', err)
+		}
+	}, [])
+
 	// モーダルが開いたときの初期化
 	useEffect(() => {
 		if (isOpen) {
@@ -40,7 +50,7 @@ export default function ExportModal({
 			setIsExporting(false)
 			updatePreview('full')
 		}
-	}, [isOpen])
+	}, [isOpen, updatePreview])
 
 	// ESCキーでモーダルを閉じる
 	useEffect(() => {
@@ -53,16 +63,6 @@ export default function ExportModal({
 		document.addEventListener('keydown', handleKeyDown)
 		return () => document.removeEventListener('keydown', handleKeyDown)
 	}, [isOpen, onClose])
-
-	// プレビュー更新
-	const updatePreview = async (type: ExportType) => {
-		try {
-			const newPreview = await generateExportPreview(type)
-			setPreview(newPreview)
-		} catch (err) {
-			console.error('Preview generation error:', err)
-		}
-	}
 
 	// エクスポート種別変更
 	const handleExportTypeChange = (type: ExportType) => {

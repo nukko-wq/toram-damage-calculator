@@ -26,7 +26,7 @@ export function RegisterForm({ className }: RegisterFormProps) {
 	const watchedData = form.watch()
 
 	// フォームデータが変更されたときにストアを更新
-	const handleFormChange = () => {
+	const _handleFormChange = () => {
 		const formData = form.getValues()
 		updateRegister(formData)
 	}

@@ -14,7 +14,7 @@ import type {
 import type { CalculatorData } from '@/types/calculator'
 import { calculateResults } from '@/utils/calculationEngine'
 import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
-import { calculateDamageWithService } from '@/utils/damageCalculationService'
+import { calculateDamageWithService, type DamageCalculationServiceResult } from '@/utils/damageCalculationService'
 
 /**
  * 正しい方法によるダメージ差分計算フック
@@ -25,7 +25,7 @@ export function useDamageDifferenceCorrect(
 	options: DamageDifferenceOptions = {},
 ): DamageDifferenceResult {
 	// 強制的な再計算用のタイムスタンプ
-	const [, forceUpdate] = useState(0)
+	const [, _forceUpdate] = useState(0)
 	// 現在のデータと計算結果を取得
 	const currentData = useCalculatorStore((state) => state.data)
 	const currentResults = useCalculatorStore((state) => state.calculationResults)
@@ -186,6 +186,7 @@ export function useDamageDifferenceCorrect(
 				if (slotInfo.slot && typeof slotInfo.slot === 'string') {
 					currentSlotKey = slotInfo.slot
 					currentEquippedItemId =
+						// biome-ignore lint/suspicious/noExplicitAny: 動的スロットキーアクセスのための型アサーション
 						(currentData.equipment as any)[currentSlotKey]?.id || null
 				}
 			} else if (slotInfo.type === 'buffItem') {
@@ -193,6 +194,7 @@ export function useDamageDifferenceCorrect(
 				if (slotInfo.category && typeof slotInfo.category === 'string') {
 					currentSlotKey = slotInfo.category
 					currentEquippedItemId =
+						// biome-ignore lint/suspicious/noExplicitAny: 動的スロットキーアクセスのための型アサーション
 						(currentData.buffItems as any)[currentSlotKey] || null
 				}
 			}
@@ -200,7 +202,7 @@ export function useDamageDifferenceCorrect(
 			const isCurrentlyEquipped = currentEquippedItemId === item.id
 
 			// 基準ダメージの取得/計算
-			let calculatedBaselineDamageResult
+			let calculatedBaselineDamageResult: DamageCalculationServiceResult
 			if (isCurrentlyEquipped) {
 				// 現在装着中のアイテムの場合：外した状態のダメージを計算
 				const baselineData = removeItemFromSlot(currentData, slotInfo)
@@ -300,6 +302,7 @@ function removeItemFromSlot(
 			const slotKey = slotInfo.slot
 			// 装備スロットを空にする
 			if (resultData.equipment) {
+				// biome-ignore lint/suspicious/noExplicitAny: 動的スロットキーアクセスのための型アサーション
 				;(resultData.equipment as any)[slotKey] = null
 			}
 		}
@@ -309,6 +312,7 @@ function removeItemFromSlot(
 			const category = slotInfo.category
 			// バフアイテムスロットを空にする
 			if (resultData.buffItems) {
+				// biome-ignore lint/suspicious/noExplicitAny: 動的スロットキーアクセスのための型アサーション
 				;(resultData.buffItems as any)[category] = null
 			}
 		}
