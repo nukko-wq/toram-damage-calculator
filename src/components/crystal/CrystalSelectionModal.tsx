@@ -221,7 +221,7 @@ export default function CrystalSelectionModal({
 			favoriteCrystals: favorites,
 			otherCrystals: others
 		}
-	}, [sortedCrystals, isNoneFavorite, crystalNoneDamageDifference, hasCurrentlyEquippedCrystal, slotInfo])
+	}, [sortedCrystals, isNoneFavorite, crystalNoneDamageDifference])
 
 	const getFilterLabel = (filter: string) => {
 		switch (filter) {
