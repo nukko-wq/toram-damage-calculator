@@ -11,7 +11,7 @@ export class CrystalFavoritesManager {
 	 * クリスタお気に入りデータを取得
 	 */
 	static getFavorites(): CrystalFavoritesData {
-		return StorageHelper.get(this.STORAGE_KEY, {
+		return StorageHelper.get(CrystalFavoritesManager.STORAGE_KEY, {
 			crystals: {},
 			lastUpdated: new Date().toISOString(),
 		})
@@ -21,7 +21,7 @@ export class CrystalFavoritesManager {
 	 * クリスタのお気に入り状態を取得
 	 */
 	static isFavorite(crystalId: string): boolean {
-		const favorites = this.getFavorites()
+		const favorites = CrystalFavoritesManager.getFavorites()
 		return favorites.crystals[crystalId]?.isFavorite ?? false
 	}
 
@@ -29,7 +29,7 @@ export class CrystalFavoritesManager {
 	 * クリスタのお気に入り状態を設定
 	 */
 	static setFavorite(crystalId: string, isFavorite: boolean): boolean {
-		const favorites = this.getFavorites()
+		const favorites = CrystalFavoritesManager.getFavorites()
 
 		if (isFavorite) {
 			favorites.crystals[crystalId] = {
@@ -42,22 +42,22 @@ export class CrystalFavoritesManager {
 		}
 
 		favorites.lastUpdated = new Date().toISOString()
-		return StorageHelper.set(this.STORAGE_KEY, favorites)
+		return StorageHelper.set(CrystalFavoritesManager.STORAGE_KEY, favorites)
 	}
 
 	/**
 	 * クリスタのお気に入り状態をトグル
 	 */
 	static toggleFavorite(crystalId: string): boolean {
-		const currentState = this.isFavorite(crystalId)
-		return this.setFavorite(crystalId, !currentState)
+		const currentState = CrystalFavoritesManager.isFavorite(crystalId)
+		return CrystalFavoritesManager.setFavorite(crystalId, !currentState)
 	}
 
 	/**
 	 * お気に入りクリスタIDリストを取得（新しく追加された順）
 	 */
 	static getFavoriteCrystalIds(): string[] {
-		const favorites = this.getFavorites()
+		const favorites = CrystalFavoritesManager.getFavorites()
 		return Object.keys(favorites.crystals)
 			.filter((id) => favorites.crystals[id].isFavorite)
 			.sort((a, b) => {
@@ -71,7 +71,7 @@ export class CrystalFavoritesManager {
 	 * お気に入りクリスタデータをクリア
 	 */
 	static clearFavorites(): boolean {
-		return StorageHelper.set(this.STORAGE_KEY, {
+		return StorageHelper.set(CrystalFavoritesManager.STORAGE_KEY, {
 			crystals: {},
 			lastUpdated: new Date().toISOString(),
 		})
@@ -81,7 +81,7 @@ export class CrystalFavoritesManager {
 	 * お気に入りクリスタ件数を取得
 	 */
 	static getFavoriteCount(): number {
-		const favorites = this.getFavorites()
+		const favorites = CrystalFavoritesManager.getFavorites()
 		return Object.keys(favorites.crystals).filter(
 			(id) => favorites.crystals[id].isFavorite,
 		).length
@@ -94,7 +94,7 @@ export class CrystalFavoritesManager {
 		crystals: Crystal[],
 		type: CrystalType | 'all',
 	): number {
-		const favoriteIds = this.getFavoriteCrystalIds()
+		const favoriteIds = CrystalFavoritesManager.getFavoriteCrystalIds()
 		const favoriteSet = new Set(favoriteIds)
 
 		return crystals.filter((crystal) => {
@@ -108,7 +108,7 @@ export class CrystalFavoritesManager {
 	 * 特定のクリスタがお気に入りに追加された日時を取得
 	 */
 	static getFavoriteAddedAt(crystalId: string): Date | null {
-		const favorites = this.getFavorites()
+		const favorites = CrystalFavoritesManager.getFavorites()
 		const favorite = favorites.crystals[crystalId]
 		if (favorite?.isFavorite) {
 			return new Date(favorite.addedAt)

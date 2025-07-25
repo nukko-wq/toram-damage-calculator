@@ -13,8 +13,8 @@ export function calculateArcheryEffects(
 	isEnabled: boolean,
 	mainWeaponType: string | null,
 	subWeaponType: string | null,
-	subWeaponATK: number = 0,
-	subWeaponStability: number = 0,
+	subWeaponATK = 0,
+	subWeaponStability = 0,
 ): Partial<EquipmentProperties> {
 	if (!isEnabled) return {}
 	
@@ -36,8 +36,8 @@ export function getArcheryEffects(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	mainWeaponType: string | null,
 	subWeaponType: string | null,
-	subWeaponATK: number = 0,
-	subWeaponStability: number = 0,
+	subWeaponATK = 0,
+	subWeaponStability = 0,
 ): Partial<EquipmentProperties> {
 	if (!buffSkillData) return {}
 

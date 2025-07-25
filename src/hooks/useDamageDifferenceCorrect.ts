@@ -61,6 +61,41 @@ export function useDamageDifferenceCorrect(
 		}
 
 		try {
+			// 「クリスタなし」の特殊処理
+			if (item.id === '__crystal_none__') {
+				// 「クリスタなし」の場合は、現在装着中のクリスタルを外した状態のダメージを計算
+				const baselineData = currentData // 現在の状態を基準
+				const simulatedData = removeItemFromSlot(currentData, slotInfo) // クリスタルを外した状態
+				
+				// 基準ダメージ（現在の状態）を計算
+				const baselineResults = calculateResults(baselineData)
+				const currentDamageResult = calculateDamageWithService(
+					baselineData,
+					baselineResults,
+					{ debug: options.debug, powerOptions: powerOptions || {} }
+				)
+				
+				// シミュレーション後（クリスタル外した状態）のダメージを計算
+				const simulatedResults = calculateResults(simulatedData)
+				const simulatedDamageResult = calculateDamageWithService(
+					simulatedData,
+					simulatedResults,
+					{ debug: options.debug, powerOptions: powerOptions || {} }
+				)
+				
+				// 差分を計算（外した状態 - 現在の状態）
+				const averageDifference = simulatedDamageResult.normal.average - currentDamageResult.normal.average
+				const difference = Math.round(averageDifference)
+				
+				return {
+					difference,
+					isCalculating: false,
+					error: null,
+					currentDamage: currentDamageResult.normal.max,
+					simulatedDamage: simulatedDamageResult.normal.max,
+				}
+			}
+
 			// 現在装着中のアイテムIDを確認
 			let currentEquippedItemId: string | null = null
 			let currentSlotKey: string | null = null

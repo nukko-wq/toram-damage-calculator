@@ -6,8 +6,11 @@ import type { CrystalType } from '@/types/calculator'
 import { getCrystalsByType } from '@/utils/crystalDatabase'
 import CrystalCard from './CrystalCard'
 import type { SlotInfo } from '@/types/damagePreview'
+import { CRYSTAL_NONE_ITEM } from '@/types/damagePreview'
 import { CrystalFavoritesManager } from '@/utils/crystalFavorites'
 import { useCrystalDamageSorting } from '@/hooks/useCrystalDamageSorting'
+import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface CrystalSelectionModalProps {
 	isOpen: boolean
@@ -39,6 +42,22 @@ export default function CrystalSelectionModal({
 	const [isNoneFavorite, setIsNoneFavorite] = useState(
 		() => CrystalFavoritesManager.isFavorite(CRYSTAL_NONE_ID),
 	)
+
+	// 現在のクリスタルデータを取得
+	const currentData = useCalculatorStore((state) => state.data)
+
+	// 現在装着中のクリスタルがあるかどうかを判定
+	const hasCurrentlyEquippedCrystal = useMemo(() => {
+		if (!slotInfo || !currentData) return false
+		
+		if (slotInfo.type === 'crystal' && slotInfo.category && typeof slotInfo.slot === 'number') {
+			const slotKey = `${slotInfo.category}${slotInfo.slot + 1}`
+			const currentCrystalId = (currentData.crystals as unknown as Record<string, string | null>)[slotKey]
+			return currentCrystalId !== null && currentCrystalId !== undefined
+		}
+		
+		return false
+	}, [slotInfo, currentData])
 
 	// useMemoを使用してavailableCrystalsを同期的に取得
 	const availableCrystals = useMemo(() => {
@@ -304,8 +323,8 @@ export default function CrystalSelectionModal({
 							{isSorting && slotInfo && (
 								<div className="flex items-center justify-center py-4 mb-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
 									<svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
-										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
 									</svg>
 									ダメージ差分を計算中...
 								</div>
@@ -382,6 +401,29 @@ export default function CrystalSelectionModal({
 
 												{/* クリスタなし名 */}
 												<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
+
+												{/* ダメージ差分表示 */}
+												{slotInfo && hasCurrentlyEquippedCrystal && selectedCrystalId !== null && (
+													<div className="mb-1 sm:mb-2">
+														{(() => {
+															try {
+																return (
+																	<DamageDifferenceDisplayCorrect
+																		item={CRYSTAL_NONE_ITEM}
+																		slotInfo={slotInfo}
+																		size="sm"
+																		className=""
+																		options={{ debug: false }}
+																	/>
+																)
+															} catch (_error) {
+																return (
+																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
+																)
+															}
+														})()}
+													</div>
+												)}
 											</div>
 										)}
 
@@ -471,6 +513,29 @@ export default function CrystalSelectionModal({
 
 												{/* クリスタなし名 */}
 												<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
+
+												{/* ダメージ差分表示 */}
+												{slotInfo && hasCurrentlyEquippedCrystal && selectedCrystalId !== null && (
+													<div className="mb-1 sm:mb-2">
+														{(() => {
+															try {
+																return (
+																	<DamageDifferenceDisplayCorrect
+																		item={CRYSTAL_NONE_ITEM}
+																		slotInfo={slotInfo}
+																		size="sm"
+																		className=""
+																		options={{ debug: false }}
+																	/>
+																)
+															} catch (_error) {
+																return (
+																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
+																)
+															}
+														})()}
+													</div>
+												)}
 											</div>
 										)}
 

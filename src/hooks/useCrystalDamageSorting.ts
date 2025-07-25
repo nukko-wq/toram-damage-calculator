@@ -32,7 +32,7 @@ interface CrystalWithDamage {
 export function useCrystalDamageSorting(
 	crystals: Crystal[],
 	slotInfo: SlotInfo | undefined,
-	enabled: boolean = true
+	enabled = true
 ) {
 	const currentData = useCalculatorStore((state) => state.data)
 	const currentResults = useCalculatorStore((state) => state.calculationResults)

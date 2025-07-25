@@ -11,7 +11,7 @@ export class BuffItemFavoritesManager {
 	 * バフアイテムお気に入りデータを取得
 	 */
 	static getFavorites(): BuffItemFavoritesData {
-		return StorageHelper.get(this.STORAGE_KEY, {
+		return StorageHelper.get(BuffItemFavoritesManager.STORAGE_KEY, {
 			buffItems: {},
 			lastUpdated: new Date().toISOString(),
 		})
@@ -21,7 +21,7 @@ export class BuffItemFavoritesManager {
 	 * バフアイテムのお気に入り状態を取得
 	 */
 	static isFavorite(buffItemId: string): boolean {
-		const favorites = this.getFavorites()
+		const favorites = BuffItemFavoritesManager.getFavorites()
 		return favorites.buffItems[buffItemId]?.isFavorite ?? false
 	}
 
@@ -29,7 +29,7 @@ export class BuffItemFavoritesManager {
 	 * バフアイテムのお気に入り状態を設定
 	 */
 	static setFavorite(buffItemId: string, isFavorite: boolean): boolean {
-		const favorites = this.getFavorites()
+		const favorites = BuffItemFavoritesManager.getFavorites()
 
 		if (isFavorite) {
 			favorites.buffItems[buffItemId] = {
@@ -42,22 +42,22 @@ export class BuffItemFavoritesManager {
 		}
 
 		favorites.lastUpdated = new Date().toISOString()
-		return StorageHelper.set(this.STORAGE_KEY, favorites)
+		return StorageHelper.set(BuffItemFavoritesManager.STORAGE_KEY, favorites)
 	}
 
 	/**
 	 * バフアイテムのお気に入り状態をトグル
 	 */
 	static toggleFavorite(buffItemId: string): boolean {
-		const currentState = this.isFavorite(buffItemId)
-		return this.setFavorite(buffItemId, !currentState)
+		const currentState = BuffItemFavoritesManager.isFavorite(buffItemId)
+		return BuffItemFavoritesManager.setFavorite(buffItemId, !currentState)
 	}
 
 	/**
 	 * お気に入りバフアイテムIDリストを取得（新しく追加された順）
 	 */
 	static getFavoriteBuffItemIds(): string[] {
-		const favorites = this.getFavorites()
+		const favorites = BuffItemFavoritesManager.getFavorites()
 		return Object.keys(favorites.buffItems)
 			.filter((id) => favorites.buffItems[id].isFavorite)
 			.sort((a, b) => {
@@ -71,7 +71,7 @@ export class BuffItemFavoritesManager {
 	 * お気に入りバフアイテムデータをクリア
 	 */
 	static clearFavorites(): boolean {
-		return StorageHelper.set(this.STORAGE_KEY, {
+		return StorageHelper.set(BuffItemFavoritesManager.STORAGE_KEY, {
 			buffItems: {},
 			lastUpdated: new Date().toISOString(),
 		})
@@ -81,7 +81,7 @@ export class BuffItemFavoritesManager {
 	 * お気に入りバフアイテム件数を取得
 	 */
 	static getFavoriteCount(): number {
-		const favorites = this.getFavorites()
+		const favorites = BuffItemFavoritesManager.getFavorites()
 		return Object.keys(favorites.buffItems).filter(
 			(id) => favorites.buffItems[id].isFavorite,
 		).length
@@ -94,7 +94,7 @@ export class BuffItemFavoritesManager {
 		buffItems: PresetBuffItem[],
 		category: BuffItemCategory,
 	): number {
-		const favoriteIds = this.getFavoriteBuffItemIds()
+		const favoriteIds = BuffItemFavoritesManager.getFavoriteBuffItemIds()
 		const favoriteSet = new Set(favoriteIds)
 
 		return buffItems.filter((buffItem) => {
@@ -107,7 +107,7 @@ export class BuffItemFavoritesManager {
 	 * 特定のバフアイテムがお気に入りに追加された日時を取得
 	 */
 	static getFavoriteAddedAt(buffItemId: string): Date | null {
-		const favorites = this.getFavorites()
+		const favorites = BuffItemFavoritesManager.getFavorites()
 		const favorite = favorites.buffItems[buffItemId]
 		if (favorite?.isFavorite) {
 			return new Date(favorite.addedAt)

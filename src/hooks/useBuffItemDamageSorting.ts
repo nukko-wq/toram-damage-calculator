@@ -27,7 +27,7 @@ interface BuffItemWithDamage {
 export function useBuffItemDamageSorting(
 	buffItems: PresetBuffItem[],
 	slotInfo: SlotInfo | undefined,
-	enabled: boolean = true
+	enabled = true
 ) {
 	const currentData = useCalculatorStore((state) => state.data)
 	const currentResults = useCalculatorStore((state) => state.calculationResults)

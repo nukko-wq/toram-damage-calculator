@@ -69,3 +69,14 @@ export interface DamageDifferenceOptions {
 	 */
 	debug?: boolean
 }
+
+/**
+ * 「クリスタなし」を表す特殊なクリスタルアイテム
+ */
+export const CRYSTAL_NONE_ITEM: Crystal = {
+	id: '__crystal_none__',
+	name: 'クリスタなし',
+	type: 'normal',
+	properties: {},
+	conditionalEffects: [],
+}

@@ -10,7 +10,7 @@ export class EquipmentFavoritesManager {
 	 * お気に入りデータを取得
 	 */
 	static getFavorites(): FavoritesData {
-		return StorageHelper.get(this.STORAGE_KEY, {
+		return StorageHelper.get(EquipmentFavoritesManager.STORAGE_KEY, {
 			equipments: {},
 			lastUpdated: new Date().toISOString(),
 		})
@@ -20,7 +20,7 @@ export class EquipmentFavoritesManager {
 	 * 装備のお気に入り状態を取得
 	 */
 	static isFavorite(equipmentId: string): boolean {
-		const favorites = this.getFavorites()
+		const favorites = EquipmentFavoritesManager.getFavorites()
 		return favorites.equipments[equipmentId]?.isFavorite ?? false
 	}
 
@@ -28,7 +28,7 @@ export class EquipmentFavoritesManager {
 	 * 装備のお気に入り状態を設定
 	 */
 	static setFavorite(equipmentId: string, isFavorite: boolean): boolean {
-		const favorites = this.getFavorites()
+		const favorites = EquipmentFavoritesManager.getFavorites()
 
 		if (isFavorite) {
 			favorites.equipments[equipmentId] = {
@@ -41,22 +41,22 @@ export class EquipmentFavoritesManager {
 		}
 
 		favorites.lastUpdated = new Date().toISOString()
-		return StorageHelper.set(this.STORAGE_KEY, favorites)
+		return StorageHelper.set(EquipmentFavoritesManager.STORAGE_KEY, favorites)
 	}
 
 	/**
 	 * 装備のお気に入り状態をトグル
 	 */
 	static toggleFavorite(equipmentId: string): boolean {
-		const currentState = this.isFavorite(equipmentId)
-		return this.setFavorite(equipmentId, !currentState)
+		const currentState = EquipmentFavoritesManager.isFavorite(equipmentId)
+		return EquipmentFavoritesManager.setFavorite(equipmentId, !currentState)
 	}
 
 	/**
 	 * お気に入り装備IDリストを取得（新しく追加された順）
 	 */
 	static getFavoriteEquipmentIds(): string[] {
-		const favorites = this.getFavorites()
+		const favorites = EquipmentFavoritesManager.getFavorites()
 		return Object.keys(favorites.equipments)
 			.filter((id) => favorites.equipments[id].isFavorite)
 			.sort((a, b) => {
@@ -70,7 +70,7 @@ export class EquipmentFavoritesManager {
 	 * お気に入りデータをクリア
 	 */
 	static clearFavorites(): boolean {
-		return StorageHelper.set(this.STORAGE_KEY, {
+		return StorageHelper.set(EquipmentFavoritesManager.STORAGE_KEY, {
 			equipments: {},
 			lastUpdated: new Date().toISOString(),
 		})
@@ -80,7 +80,7 @@ export class EquipmentFavoritesManager {
 	 * お気に入り件数を取得
 	 */
 	static getFavoriteCount(): number {
-		const favorites = this.getFavorites()
+		const favorites = EquipmentFavoritesManager.getFavorites()
 		return Object.keys(favorites.equipments).filter(
 			(id) => favorites.equipments[id].isFavorite,
 		).length
@@ -90,7 +90,7 @@ export class EquipmentFavoritesManager {
 	 * 特定の装備がお気に入りに追加された日時を取得
 	 */
 	static getFavoriteAddedAt(equipmentId: string): Date | null {
-		const favorites = this.getFavorites()
+		const favorites = EquipmentFavoritesManager.getFavorites()
 		const favorite = favorites.equipments[equipmentId]
 		if (favorite?.isFavorite) {
 			return new Date(favorite.addedAt)
