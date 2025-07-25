@@ -10,6 +10,7 @@ import { CRYSTAL_NONE_ITEM } from '@/types/damagePreview'
 import { CrystalFavoritesManager } from '@/utils/crystalFavorites'
 import { useCrystalDamageSorting } from '@/hooks/useCrystalDamageSorting'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface CrystalSelectionModalProps {
@@ -150,28 +151,76 @@ export default function CrystalSelectionModal({
 		return availableCrystals.filter((crystal) => crystal.type === activeFilter)
 	}, [availableCrystals, activeFilter])
 
-	// ダメージ差分順でソート
+	// ダメージ差分順でソート（クリスタなしを含む）
 	const { sortedCrystals, isCalculating: isSorting } = useCrystalDamageSorting(
 		filteredCrystals,
 		slotInfo,
 		isOpen && !!slotInfo
 	)
 
+	// 「クリスタなし」のダメージ差分を計算
+	const crystalNoneDamageResult = useDamageDifferenceCorrect(
+		CRYSTAL_NONE_ITEM,
+		slotInfo,
+		{ debug: false }
+	)
+	const crystalNoneDamageDifference = crystalNoneDamageResult.difference || 0
+
 	// お気に入り分別（ソート済みのクリスタルから）
 	const { favoriteCrystals, otherCrystals } = useMemo(() => {
 		const favoriteIds = CrystalFavoritesManager.getFavoriteCrystalIds()
 		const favoriteSet = new Set(favoriteIds)
 
+		// 通常のクリスタルを分別
 		const favorites = sortedCrystals.filter((crystal) =>
 			favoriteSet.has(crystal.id),
 		)
 		const others = sortedCrystals.filter((crystal) => !favoriteSet.has(crystal.id))
 
+		// 「クリスタなし」をダメージ差分に基づいて適切な位置に挿入
+		if (hasCurrentlyEquippedCrystal && slotInfo) {
+			// biome-ignore lint/suspicious/noExplicitAny: Crystal typeと互換性のないNone用の仮想アイテム
+			const crystalNoneWithDamage: any = {
+				id: CRYSTAL_NONE_ID,
+				name: 'クリスタなし',
+				type: 'normal',
+				properties: {},
+				conditionalEffects: [],
+				damageDifference: crystalNoneDamageDifference
+			}
+
+			// お気に入りかどうかで分岐
+			if (isNoneFavorite) {
+				// お気に入りリストに挿入（ダメージ差分順）
+				const insertIndex = favorites.findIndex(crystal => {
+					// CrystalWithDamageかどうかを確認し、damageDifferenceプロパティを取得
+					const crystalDamage = 'damageDifference' in crystal ? crystal.damageDifference : 0
+					return crystalNoneWithDamage.damageDifference > crystalDamage
+				})
+				if (insertIndex === -1) {
+					favorites.push(crystalNoneWithDamage)
+				} else {
+					favorites.splice(insertIndex, 0, crystalNoneWithDamage)
+				}
+			} else {
+				// その他リストに挿入（ダメージ差分順）
+				const insertIndex = others.findIndex(crystal => {
+					const crystalDamage = 'damageDifference' in crystal ? crystal.damageDifference : 0
+					return crystalNoneWithDamage.damageDifference > crystalDamage
+				})
+				if (insertIndex === -1) {
+					others.push(crystalNoneWithDamage)
+				} else {
+					others.splice(insertIndex, 0, crystalNoneWithDamage)
+				}
+			}
+		}
+
 		return {
 			favoriteCrystals: favorites,
 			otherCrystals: others
 		}
-	}, [sortedCrystals])
+	}, [sortedCrystals, isNoneFavorite, crystalNoneDamageDifference, hasCurrentlyEquippedCrystal, slotInfo])
 
 	const getFilterLabel = (filter: string) => {
 		switch (filter) {
@@ -330,234 +379,176 @@ export default function CrystalSelectionModal({
 								</div>
 							)}
 							{/* お気に入りクリスタセクション */}
-							{(favoriteCrystals.length > 0 || isNoneFavorite) && (
+							{favoriteCrystals.length > 0 && (
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
 										<svg className="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 24 24">
 											<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 										</svg>
-										お気に入り ({favoriteCrystals.length + (isNoneFavorite ? 1 : 0)})
+										お気に入り ({favoriteCrystals.length})
 									</h3>
 									<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-										{/* お気に入りの「クリスタなし」 */}
-										{isNoneFavorite && (
-											<div
-												onClick={handleRemove}
-												className={`
-													relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
-													${
-														selectedCrystalId === null
-															? 'border-blue-500 bg-blue-50 shadow-md'
-															: 'border-gray-200 bg-white hover:border-gray-300'
-													}
-												`}
-											>
-												{/* お気に入りボタン - 右下に絶対配置 */}
-												<button
-													type="button"
-													onClick={handleNoneFavoriteClick}
-													className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-red-500 hover:text-red-600"
-													aria-label="お気に入りから削除"
-												>
-													<svg
-														className="w-5 h-5"
-														fill="currentColor"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<title>お気に入り済み</title>
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={0}
-															d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-														/>
-													</svg>
-												</button>
-
-												{/* 上部エリア：選択マーク */}
-												<div className="flex justify-between items-start mb-2 min-h-[24px]">
-													<div className="flex-1" />
-
-													{/* 選択状態のチェックマーク */}
-													{selectedCrystalId === null && (
-														<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-															<svg
-																className="w-4 h-4 text-white"
-																fill="none"
-																stroke="currentColor"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																	strokeWidth={2}
-																	d="M5 13l4 4L19 7"
-																/>
-															</svg>
-														</div>
-													)}
-												</div>
-
-												{/* クリスタなし名 */}
-												<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
-
-												{/* ダメージ差分表示 */}
-												{slotInfo && hasCurrentlyEquippedCrystal && selectedCrystalId !== null && (
-													<div className="mb-1 sm:mb-2">
-														{(() => {
-															try {
-																return (
-																	<DamageDifferenceDisplayCorrect
-																		item={CRYSTAL_NONE_ITEM}
-																		slotInfo={slotInfo}
-																		size="sm"
-																		className=""
-																		options={{ debug: false }}
-																	/>
-																)
-															} catch (_error) {
-																return (
-																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
-																)
+										{favoriteCrystals.map((crystal) => {
+											// 「クリスタなし」の場合は専用カードを表示
+											if (crystal.id === CRYSTAL_NONE_ID) {
+												return (
+													<div
+														key={crystal.id}
+														onClick={handleRemove}
+														className={`
+															relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+															${
+																selectedCrystalId === null
+																	? 'border-blue-500 bg-blue-50 shadow-md'
+																	: 'border-gray-200 bg-white hover:border-gray-300'
 															}
-														})()}
+														`}
+													>
+														{/* お気に入りボタン */}
+														<button
+															type="button"
+															onClick={handleNoneFavoriteClick}
+															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-red-500 hover:text-red-600"
+															aria-label="お気に入りから削除"
+														>
+															<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+																<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+															</svg>
+														</button>
+														
+														{/* 選択マーク */}
+														<div className="flex justify-between items-start mb-2 min-h-[24px]">
+															<div className="flex-1" />
+															{selectedCrystalId === null && (
+																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	</svg>
+																</div>
+															)}
+														</div>
+														
+														<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
+														
+														{/* ダメージ差分表示 */}
+														{slotInfo && hasCurrentlyEquippedCrystal && (
+															<div className="mb-1 sm:mb-2">
+																<DamageDifferenceDisplayCorrect
+																	item={CRYSTAL_NONE_ITEM}
+																	slotInfo={slotInfo}
+																	size="sm"
+																	className=""
+																	options={{ debug: false }}
+																/>
+															</div>
+														)}
 													</div>
-												)}
-											</div>
-										)}
-
-										{/* お気に入りクリスタカード */}
-										{favoriteCrystals.map((crystal) => (
-											<CrystalCard
-												key={crystal.id}
-												crystal={crystal}
-												isSelected={selectedCrystalId === crystal.id}
-												onClick={() => handleSelect(crystal.id)}
-												showDamageDifference={isOpen && !!slotInfo}
-												slotInfo={slotInfo}
-												showFavoriteButton={true}
-												onFavoriteChange={handleFavoriteChange}
-											/>
-										))}
+												)
+											}
+											
+											// 通常のクリスタルカード
+											return (
+												<CrystalCard
+													key={crystal.id}
+													crystal={crystal}
+													isSelected={selectedCrystalId === crystal.id}
+													onClick={() => handleSelect(crystal.id)}
+													showDamageDifference={isOpen && !!slotInfo}
+													slotInfo={slotInfo}
+													showFavoriteButton={true}
+													onFavoriteChange={handleFavoriteChange}
+												/>
+											)
+										})}
 									</div>
 								</div>
 							)}
 
 							{/* その他のクリスタセクション */}
-							{(otherCrystals.length > 0 || !isNoneFavorite) && (
+							{otherCrystals.length > 0 && (
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3">
-										その他 ({otherCrystals.length + (!isNoneFavorite ? 1 : 0)})
+										その他 ({otherCrystals.length})
 									</h3>
 									<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-										{/* その他の「クリスタなし」 */}
-										{!isNoneFavorite && (
-											<div
-												onClick={handleRemove}
-												className={`
-													relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
-													${
-														selectedCrystalId === null
-															? 'border-blue-500 bg-blue-50 shadow-md'
-															: 'border-gray-200 bg-white hover:border-gray-300'
-													}
-												`}
-											>
-												{/* お気に入りボタン - 右下に絶対配置 */}
-												<button
-													type="button"
-													onClick={handleNoneFavoriteClick}
-													className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-gray-300 hover:text-red-400"
-													aria-label="お気に入りに追加"
-												>
-													<svg
-														className="w-5 h-5"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<title>お気に入りに追加</title>
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={2}
-															d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-														/>
-													</svg>
-												</button>
-
-												{/* 上部エリア：選択マーク */}
-												<div className="flex justify-between items-start mb-2 min-h-[24px]">
-													<div className="flex-1" />
-
-													{/* 選択状態のチェックマーク */}
-													{selectedCrystalId === null && (
-														<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-															<svg
-																className="w-4 h-4 text-white"
-																fill="none"
-																stroke="currentColor"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																	strokeWidth={2}
-																	d="M5 13l4 4L19 7"
-																/>
-															</svg>
-														</div>
-													)}
-												</div>
-
-												{/* クリスタなし名 */}
-												<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
-
-												{/* ダメージ差分表示 */}
-												{slotInfo && hasCurrentlyEquippedCrystal && selectedCrystalId !== null && (
-													<div className="mb-1 sm:mb-2">
-														{(() => {
-															try {
-																return (
-																	<DamageDifferenceDisplayCorrect
-																		item={CRYSTAL_NONE_ITEM}
-																		slotInfo={slotInfo}
-																		size="sm"
-																		className=""
-																		options={{ debug: false }}
-																	/>
-																)
-															} catch (_error) {
-																return (
-																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
-																)
+										{otherCrystals.map((crystal) => {
+											// 「クリスタなし」の場合は専用カードを表示
+											if (crystal.id === CRYSTAL_NONE_ID) {
+												return (
+													<div
+														key={crystal.id}
+														onClick={handleRemove}
+														className={`
+															relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+															${
+																selectedCrystalId === null
+																	? 'border-blue-500 bg-blue-50 shadow-md'
+																	: 'border-gray-200 bg-white hover:border-gray-300'
 															}
-														})()}
+														`}
+													>
+														{/* お気に入りボタン */}
+														<button
+															type="button"
+															onClick={handleNoneFavoriteClick}
+															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-gray-300 hover:text-red-400"
+															aria-label="お気に入りに追加"
+														>
+															<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+															</svg>
+														</button>
+														
+														{/* 選択マーク */}
+														<div className="flex justify-between items-start mb-2 min-h-[24px]">
+															<div className="flex-1" />
+															{selectedCrystalId === null && (
+																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	</svg>
+																</div>
+															)}
+														</div>
+														
+														<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
+														
+														{/* ダメージ差分表示 */}
+														{slotInfo && hasCurrentlyEquippedCrystal && (
+															<div className="mb-1 sm:mb-2">
+																<DamageDifferenceDisplayCorrect
+																	item={CRYSTAL_NONE_ITEM}
+																	slotInfo={slotInfo}
+																	size="sm"
+																	className=""
+																	options={{ debug: false }}
+																/>
+															</div>
+														)}
 													</div>
-												)}
-											</div>
-										)}
-
-										{/* その他のクリスタカード */}
-										{otherCrystals.map((crystal) => (
-											<CrystalCard
-												key={crystal.id}
-												crystal={crystal}
-												isSelected={selectedCrystalId === crystal.id}
-												onClick={() => handleSelect(crystal.id)}
-												showDamageDifference={isOpen && !!slotInfo}
-												slotInfo={slotInfo}
-												showFavoriteButton={true}
-												onFavoriteChange={handleFavoriteChange}
-											/>
-										))}
+												)
+											}
+											
+											// 通常のクリスタルカード
+											return (
+												<CrystalCard
+													key={crystal.id}
+													crystal={crystal}
+													isSelected={selectedCrystalId === crystal.id}
+													onClick={() => handleSelect(crystal.id)}
+													showDamageDifference={isOpen && !!slotInfo}
+													slotInfo={slotInfo}
+													showFavoriteButton={true}
+													onFavoriteChange={handleFavoriteChange}
+												/>
+											)
+										})}
 									</div>
 								</div>
 							)}
 
 							{/* アイテムが見つからない場合 */}
-							{favoriteCrystals.length === 0 && otherCrystals.length === 0 && !isNoneFavorite && (
+							{favoriteCrystals.length === 0 && otherCrystals.length === 0 && (
 								<div className="text-center text-gray-500 py-8">
 									該当するクリスタがありません
 								</div>
