@@ -788,20 +788,35 @@ function applyPassiveMultiplier(
 		console.log('passiveRate:', passiveRate)
 	}
 
-	// 現在ブレイブ倍率は未実装(0)なので、パッシブ倍率で最終切り捨てを行う
-	const result = Math.floor(beforePassive * (1 + passiveRate / 100))
+	// ブレイブ倍率がある場合は小数点を保持、ない場合は切り捨て
+	const hasBreaveMultiplier = input.braveMultiplier > 0
+	const calculationResult = beforePassive * (1 + passiveRate / 100)
+	const result = hasBreaveMultiplier ? calculationResult : Math.floor(calculationResult)
 
 	if (process.env.NODE_ENV === 'development') {
-		console.log(
-			'計算式: Math.floor(' +
-				beforePassive +
-				' * (1 + ' +
-				passiveRate +
-				'/100)) = ' +
-				result +
-				' (最終切り捨て)',
-		)
-
+		if (hasBreaveMultiplier) {
+			console.log(
+				'計算式: ' +
+					beforePassive +
+					' * (1 + ' +
+					passiveRate +
+					'/100) = ' +
+					result +
+					' (小数点保持: ブレイブ倍率' +
+					input.braveMultiplier +
+					'%あり)',
+			)
+		} else {
+			console.log(
+				'計算式: Math.floor(' +
+					beforePassive +
+					' * (1 + ' +
+					passiveRate +
+					'/100)) = ' +
+					result +
+					' (最終切り捨て: ブレイブ倍率なし)',
+			)
+		}
 		console.log('result:', result)
 		console.log('===============================')
 	}
