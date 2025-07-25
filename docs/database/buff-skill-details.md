@@ -192,7 +192,57 @@ interface WeaponRequirement {
 }
 ```
 
-#### 5.2 ヒール (heal1)
+#### 5.2 エンハンス (IsEnhance)
+```typescript
+{
+  id: 'IsEnhance',
+  name: 'エンハンス',
+  category: 'sprite',
+  type: 'toggle',
+  order: 801,
+  description: 'ブレイブ倍率を上昇、ATK・MATKを敵の防御力に応じて上昇',
+  effects: [
+    {
+      property: 'BraveMultiplier',
+      formula: '+10',
+      conditions: ['全武器種共通']
+    },
+    {
+      property: 'ATK',
+      formula: 'Math.min(Math.floor(敵Normal難易度DEF / 2), 敵Normal難易度レベル)',
+      conditions: ['Normal難易度の敵防御力依存、上限は敵レベル']
+    },
+    {
+      property: 'MATK',
+      formula: 'Math.min(Math.floor(敵Normal難易度MDEF / 2), 敵Normal難易度レベル)',
+      conditions: ['Normal難易度の敵魔法防御力依存、上限は敵レベル']
+    }
+  ],
+  calculationFormula: `
+    ブレイブ倍率% = base + 10
+    ATK = base + Math.min(Math.floor(敵Normal難易度DEF / 2), 敵Normal難易度レベル)
+    MATK = base + Math.min(Math.floor(敵Normal難易度MDEF / 2), 敵Normal難易度レベル)
+  `,
+  weaponRequirement: {
+    description: 'すべての武器で効果があります'
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  },
+  specialNotes: [
+    'ATK・MATK計算で小数点以下は切り捨て（Math.floor使用）',
+    '敵DEF・MDEF・レベルは常にNormal難易度の値を参照（プリセット敵データのそのままの値）',
+    '難易度設定に関係なく、選択された敵のプリセットデータ値から計算',
+    'エターナルナイトメアと同様の方式でNormal難易度データを参照',
+    'ブレイブ倍率の実装はブレイブオーラ（BraveMultiplier）と同じ仕組み',
+    '実装: getPresetEnemyById → enemyData.stats.DEF/MDEF, enemyData.level'
+  ]
+}
+```
+
+#### 5.3 ヒール (heal1)
 ```typescript
 {
   id: 'heal1',

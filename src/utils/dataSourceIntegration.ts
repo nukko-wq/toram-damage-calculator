@@ -17,6 +17,7 @@ import type {
 } from '@/types/bonusCalculation'
 import type { CalculatorData } from '@/types/calculator'
 import { getCrystalById } from './crystalDatabase'
+import { getPresetEnemyById } from './enemyDatabase'
 import {
 	getBuffSkillBonuses,
 	getTwoHandsEffects,
@@ -564,6 +565,36 @@ export function getAllDataSourceBonuses(
 }
 
 /**
+ * エンハンススキル計算用のNormal難易度敵データを取得
+ * @param data 計算機データ
+ * @returns Normal難易度の敵データ（DEF, MDEF, Level）
+ */
+function getNormalDifficultyEnemyData(data: CalculatorData): {
+	level: number
+	DEF: number
+	MDEF: number
+} | null {
+	// 選択されている敵IDを取得
+	const selectedEnemyId = data.enemy?.selectedEnemyId
+	if (!selectedEnemyId) {
+		return null
+	}
+
+	// プリセット敵データを取得
+	const enemyData = getPresetEnemyById(selectedEnemyId)
+	if (!enemyData) {
+		return null
+	}
+
+	// Normal難易度の値を返す（プリセットデータそのまま）
+	return {
+		level: enemyData.level,
+		DEF: enemyData.stats.DEF,
+		MDEF: enemyData.stats.MDEF,
+	}
+}
+
+/**
  * バフスキルを含む全データソースを一括取得するヘルパー
  */
 export function getAllDataSourceBonusesWithBuffSkills(
@@ -589,10 +620,26 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
-	// バフスキルの補正値を追加
+	// 敵情報を取得（エンハンス等で使用）
+	let enemyDEF = 1000
+	let enemyMDEF = 1000
+	let enemyLevel = 100
+	
+	// 実際の敵データを取得してNormal難易度の値を使用
+	const normalEnemyData = getNormalDifficultyEnemyData(data)
+	if (normalEnemyData) {
+		enemyDEF = normalEnemyData.DEF
+		enemyMDEF = normalEnemyData.MDEF
+		enemyLevel = normalEnemyData.level
+	}
+
+	// バフスキルの補正値を追加（敵情報を渡す）
 	const buffSkillBonuses = getBuffSkillBonuses(
 		data.buffSkills?.skills || null,
 		data.mainWeapon?.weaponType || null,
+		enemyDEF,
+		enemyMDEF,
+		enemyLevel,
 	)
 
 	for (const [key, value] of Object.entries(buffSkillBonuses)) {
