@@ -270,36 +270,9 @@ export default function EquipmentCard({
 				</button>
 			)}
 
-			{/* 上部エリア：ダメージ差分表示と選択マーク */}
-			<div className="flex justify-between items-start mb-2 min-h-[24px]">
-				{/* ダメージ差分表示 - 現在選択中の装備には表示しない */}
-				<div className="flex-1">
-					{showDamageDifference && slotInfo && !isSelected && (
-						<div className="inline-block">
-							{(() => {
-								try {
-									return (
-										<DamageDifferenceDisplayCorrect
-											item={equipment}
-											slotInfo={slotInfo}
-											size="sm"
-											className="px-1 py-0.5"
-											options={{ debug: true }}
-										/>
-									)
-								} catch {
-									return (
-										<div className="bg-red-100 text-red-600 text-xs p-1">
-											Error
-										</div>
-									)
-								}
-							})()}
-						</div>
-					)}
-				</div>
-
-
+			{/* 装備名と選択マーク */}
+			<div className="flex justify-between items-center mb-1 sm:mb-2">
+				<h3 className="font-semibold text-gray-900">{equipment.name}</h3>
 				{/* 選択状態のチェックマーク */}
 				{isSelected && (
 					<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
@@ -320,8 +293,30 @@ export default function EquipmentCard({
 				)}
 			</div>
 
-			{/* 装備名 */}
-			<h3 className="font-semibold text-gray-900 mb-2">{equipment.name}</h3>
+			{/* ダメージ差分表示 - 装備名の下に配置 */}
+			{showDamageDifference && slotInfo && !isSelected && (
+				<div className="mb-1 sm:mb-2">
+					{(() => {
+						try {
+							return (
+								<DamageDifferenceDisplayCorrect
+									item={equipment}
+									slotInfo={slotInfo}
+									size="sm"
+									className="inline-block"
+									options={{ debug: false }}
+								/>
+							)
+						} catch {
+							return (
+								<div className="bg-red-100 text-red-600 text-xs p-1 rounded">
+									Error
+								</div>
+							)
+						}
+					})()}
+				</div>
+			)}
 
 			{/* 基本ステータス */}
 			{formatBaseStats() && (

@@ -370,9 +370,9 @@ export default function EquipmentSelectionModal({
 															</svg>
 														</button>
 														
-														{/* 選択マーク */}
-														<div className="flex justify-between items-start mb-2 min-h-[24px]">
-															<div className="flex-1" />
+														{/* 装備なしと選択マーク */}
+														<div className="flex justify-between items-center mb-1 sm:mb-2">
+															<h3 className="font-semibold text-gray-900">装備なし</h3>
 															{selectedEquipmentId === null && (
 																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
 																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -381,8 +381,6 @@ export default function EquipmentSelectionModal({
 																</div>
 															)}
 														</div>
-														
-														<h3 className="font-semibold text-gray-900 mb-2">装備なし</h3>
 														
 														{/* ダメージ差分表示（他の装備と同じ形式） */}
 														{slotInfo && hasCurrentlyEquippedItem && (
@@ -470,9 +468,9 @@ export default function EquipmentSelectionModal({
 															</svg>
 														</button>
 														
-														{/* 選択マーク */}
-														<div className="flex justify-between items-start mb-2 min-h-[24px]">
-															<div className="flex-1" />
+														{/* 装備なしと選択マーク */}
+														<div className="flex justify-between items-center mb-1 sm:mb-2">
+															<h3 className="font-semibold text-gray-900">装備なし</h3>
 															{selectedEquipmentId === null && (
 																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
 																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -481,8 +479,6 @@ export default function EquipmentSelectionModal({
 																</div>
 															)}
 														</div>
-														
-														<h3 className="font-semibold text-gray-900 mb-2">装備なし</h3>
 														
 														{/* ダメージ差分表示（他の装備と同じ形式） */}
 														{slotInfo && hasCurrentlyEquippedItem && (
