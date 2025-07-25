@@ -13,7 +13,7 @@ import type { SlotInfo } from '@/types/damagePreview'
 import { EQUIPMENT_NONE_ITEM } from '@/types/damagePreview'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
 import { useEquipmentDamageSorting } from '@/hooks/useEquipmentDamageSorting'
-import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface EquipmentSelectionModalProps {
@@ -167,21 +167,71 @@ export default function EquipmentSelectionModal({
 		isOpen && !!slotInfo
 	)
 
+	// 「装備なし」のダメージ差分を計算
+	const equipmentNoneDamageResult = useDamageDifferenceCorrect(
+		EQUIPMENT_NONE_ITEM,
+		slotInfo || { type: 'equipment', slot: 'main' },
+		{ debug: false }
+	)
+	const equipmentNoneDamageDifference = slotInfo ? equipmentNoneDamageResult.difference || 0 : 0
+
 	// 装備リストの分別: お気に入り / その他（ソート済みの装備から）
 	const { favoriteEquipments, otherEquipments } = useMemo(() => {
 		const favoriteIds = EquipmentFavoritesManager.getFavoriteEquipmentIds()
 		const favoriteSet = new Set(favoriteIds)
 
+		// 通常の装備を分別
 		const favorites = sortedEquipments.filter((eq) =>
 			favoriteSet.has(eq.id),
 		)
 		const others = sortedEquipments.filter((eq) => !favoriteSet.has(eq.id))
 
+		// 「装備なし」をダメージ差分に基づいて適切な位置に挿入
+		if (hasCurrentlyEquippedItem && slotInfo) {
+			// biome-ignore lint/suspicious/noExplicitAny: Equipment typeと互換性のないNone用の仮想アイテム
+			const equipmentNoneWithDamage: any = {
+				id: EQUIPMENT_NONE_ID,
+				name: '装備なし',
+				type: 'weapon',
+				category: ['main'],
+				baseStats: {},
+				properties: {},
+				damageDifference: equipmentNoneDamageDifference
+			}
+
+			// お気に入りかどうかで分岐
+			if (isNoneFavorite) {
+				// お気に入りリストに挿入（ダメージ差分順）
+				const insertIndex = favorites.findIndex(equipment => {
+					// biome-ignore lint/suspicious/noExplicitAny: EquipmentWithDamageタイプのダメージ差分プロパティアクセス
+					const equipmentDamage = 'damageDifference' in equipment && typeof (equipment as any).damageDifference === 'number' ? (equipment as any).damageDifference : 0
+					return equipmentNoneWithDamage.damageDifference > equipmentDamage
+				})
+				if (insertIndex === -1) {
+					favorites.push(equipmentNoneWithDamage)
+				} else {
+					favorites.splice(insertIndex, 0, equipmentNoneWithDamage)
+				}
+			} else {
+				// その他リストに挿入（ダメージ差分順）
+				const insertIndex = others.findIndex(equipment => {
+					// biome-ignore lint/suspicious/noExplicitAny: EquipmentWithDamageタイプのダメージ差分プロパティアクセス
+					const equipmentDamage = 'damageDifference' in equipment && typeof (equipment as any).damageDifference === 'number' ? (equipment as any).damageDifference : 0
+					return equipmentNoneWithDamage.damageDifference > equipmentDamage
+				})
+				if (insertIndex === -1) {
+					others.push(equipmentNoneWithDamage)
+				} else {
+					others.splice(insertIndex, 0, equipmentNoneWithDamage)
+				}
+			}
+		}
+
 		return {
 			favoriteEquipments: favorites,
 			otherEquipments: others
 		}
-	}, [sortedEquipments])
+	}, [sortedEquipments, isNoneFavorite, equipmentNoneDamageDifference, hasCurrentlyEquippedItem, slotInfo])
 
 	const handleSelect = useCallback(
 		(equipmentId: string) => {
@@ -283,234 +333,210 @@ export default function EquipmentSelectionModal({
 								</div>
 							)}
 							{/* お気に入り装備セクション */}
-							{(favoriteEquipments.length > 0 || isNoneFavorite) && (
+							{favoriteEquipments.length > 0 && (
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
 										<svg className="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 24 24">
 											<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 										</svg>
-										お気に入り ({favoriteEquipments.length + (isNoneFavorite ? 1 : 0)})
+										お気に入り ({favoriteEquipments.length})
 									</h3>
 									<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-										{/* お気に入りの「装備なし」 */}
-										{isNoneFavorite && (
-											<div
-												onClick={handleRemove}
-												className={`
-													relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
-													${
-														selectedEquipmentId === null
-															? 'border-blue-500 bg-blue-50 shadow-md'
-															: 'border-gray-200 bg-white hover:border-gray-300'
-													}
-												`}
-											>
-												{/* お気に入りボタン - 右下に絶対配置 */}
-												<button
-													type="button"
-													onClick={handleNoneFavoriteClick}
-													className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-red-500 hover:text-red-600"
-													aria-label="お気に入りから削除"
-												>
-													<svg
-														className="w-5 h-5"
-														fill="currentColor"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<title>お気に入り済み</title>
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={0}
-															d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-														/>
-													</svg>
-												</button>
-
-												{/* 上部エリア：選択マーク */}
-												<div className="flex justify-between items-start mb-2 min-h-[24px]">
-													<div className="flex-1" />
-
-													{/* 選択状態のチェックマーク */}
-													{selectedEquipmentId === null && (
-														<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-															<svg
-																className="w-4 h-4 text-white"
-																fill="none"
-																stroke="currentColor"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																	strokeWidth={2}
-																	d="M5 13l4 4L19 7"
-																/>
-															</svg>
-														</div>
-													)}
-												</div>
-
-												{/* 装備なし名 */}
-												<h3 className="font-semibold text-gray-900 mb-2">装備なし</h3>
-
-												{/* ダメージ差分表示 */}
-												{slotInfo && hasCurrentlyEquippedItem && selectedEquipmentId !== null && (
-													<div className="mb-1 sm:mb-2">
-														{(() => {
-															try {
-																return (
-																	<DamageDifferenceDisplayCorrect
-																		item={EQUIPMENT_NONE_ITEM}
-																		slotInfo={slotInfo}
-																		size="sm"
-																		className=""
-																		options={{ debug: false }}
-																	/>
-																)
-															} catch (_error) {
-																return (
-																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
-																)
+										{favoriteEquipments.map((equipment) => {
+											// 「装備なし」の場合は専用カードを表示
+											if (equipment.id === EQUIPMENT_NONE_ID) {
+												return (
+													<div
+														key={equipment.id}
+														onClick={handleRemove}
+														className={`
+															relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+															${
+																selectedEquipmentId === null
+																	? 'border-blue-500 bg-blue-50 shadow-md'
+																	: 'border-gray-200 bg-white hover:border-gray-300'
 															}
-														})()}
+														`}
+													>
+														{/* お気に入りボタン */}
+														<button
+															type="button"
+															onClick={handleNoneFavoriteClick}
+															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-red-500 hover:text-red-600"
+															aria-label="お気に入りから削除"
+														>
+															<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+																<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+															</svg>
+														</button>
+														
+														{/* 選択マーク */}
+														<div className="flex justify-between items-start mb-2 min-h-[24px]">
+															<div className="flex-1" />
+															{selectedEquipmentId === null && (
+																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	</svg>
+																</div>
+															)}
+														</div>
+														
+														<h3 className="font-semibold text-gray-900 mb-2">装備なし</h3>
+														
+														{/* ダメージ差分表示（他の装備と同じ形式） */}
+														{slotInfo && hasCurrentlyEquippedItem && (
+															<div className="mb-1 sm:mb-2">
+																<div className="font-medium">
+																	<span className={`mr-3 text-sm ${
+																		equipmentNoneDamageDifference > 0 
+																			? 'text-blue-500' 
+																			: equipmentNoneDamageDifference < 0 
+																				? 'text-red-500' 
+																				: 'text-gray-400'
+																	}`}>
+																		ダメージ：
+																	</span>
+																	<span className={`text-sm ${
+																		equipmentNoneDamageDifference > 0 
+																			? 'text-blue-600' 
+																			: equipmentNoneDamageDifference < 0 
+																				? 'text-red-600' 
+																				: 'text-gray-500'
+																	}`}>
+																		{equipmentNoneDamageDifference === 0 
+																			? '±0' 
+																			: equipmentNoneDamageDifference > 0 
+																				? `+${equipmentNoneDamageDifference.toLocaleString()}` 
+																				: equipmentNoneDamageDifference.toLocaleString()}
+																	</span>
+																</div>
+															</div>
+														)}
 													</div>
-												)}
-											</div>
-										)}
-
-										{/* お気に入り装備カード */}
-										{favoriteEquipments.map((equipment) => (
-											<EquipmentCard
-												key={equipment.id}
-												equipment={equipment}
-												isSelected={selectedEquipmentId === equipment.id}
-												onClick={() => handleSelect(equipment.id)}
-												showDamageDifference={isOpen && !!slotInfo}
-												slotInfo={slotInfo}
-												showFavoriteButton={true}
-												onFavoriteChange={handleFavoriteChange}
-											/>
-										))}
+												)
+											}
+											
+											// 通常の装備カード
+											return (
+												<EquipmentCard
+													key={equipment.id}
+													equipment={equipment}
+													isSelected={selectedEquipmentId === equipment.id}
+													onClick={() => handleSelect(equipment.id)}
+													showDamageDifference={isOpen && !!slotInfo}
+													slotInfo={slotInfo}
+													showFavoriteButton={true}
+													onFavoriteChange={handleFavoriteChange}
+												/>
+											)
+										})}
 									</div>
 								</div>
 							)}
 
 							{/* その他の装備セクション */}
-							{(otherEquipments.length > 0 || !isNoneFavorite) && (
+							{otherEquipments.length > 0 && (
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3">
-										その他 ({otherEquipments.length + (!isNoneFavorite ? 1 : 0)})
+										その他 ({otherEquipments.length})
 									</h3>
 									<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
-										{/* その他の「装備なし」 */}
-										{!isNoneFavorite && (
-											<div
-												onClick={handleRemove}
-												className={`
-													relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
-													${
-														selectedEquipmentId === null
-															? 'border-blue-500 bg-blue-50 shadow-md'
-															: 'border-gray-200 bg-white hover:border-gray-300'
-													}
-												`}
-											>
-												{/* お気に入りボタン - 右下に絶対配置 */}
-												<button
-													type="button"
-													onClick={handleNoneFavoriteClick}
-													className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-gray-300 hover:text-red-400"
-													aria-label="お気に入りに追加"
-												>
-													<svg
-														className="w-5 h-5"
-														fill="none"
-														stroke="currentColor"
-														viewBox="0 0 24 24"
-													>
-														<title>お気に入りに追加</title>
-														<path
-															strokeLinecap="round"
-															strokeLinejoin="round"
-															strokeWidth={2}
-															d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-														/>
-													</svg>
-												</button>
-
-												{/* 上部エリア：選択マーク */}
-												<div className="flex justify-between items-start mb-2 min-h-[24px]">
-													<div className="flex-1" />
-
-													{/* 選択状態のチェックマーク */}
-													{selectedEquipmentId === null && (
-														<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-															<svg
-																className="w-4 h-4 text-white"
-																fill="none"
-																stroke="currentColor"
-																viewBox="0 0 24 24"
-															>
-																<path
-																	strokeLinecap="round"
-																	strokeLinejoin="round"
-																	strokeWidth={2}
-																	d="M5 13l4 4L19 7"
-																/>
-															</svg>
-														</div>
-													)}
-												</div>
-
-												{/* 装備なし名 */}
-												<h3 className="font-semibold text-gray-900 mb-2">装備なし</h3>
-
-												{/* ダメージ差分表示 */}
-												{slotInfo && hasCurrentlyEquippedItem && selectedEquipmentId !== null && (
-													<div className="mb-1 sm:mb-2">
-														{(() => {
-															try {
-																return (
-																	<DamageDifferenceDisplayCorrect
-																		item={EQUIPMENT_NONE_ITEM}
-																		slotInfo={slotInfo}
-																		size="sm"
-																		className=""
-																		options={{ debug: false }}
-																	/>
-																)
-															} catch (_error) {
-																return (
-																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
-																)
+										{otherEquipments.map((equipment) => {
+											// 「装備なし」の場合は専用カードを表示
+											if (equipment.id === EQUIPMENT_NONE_ID) {
+												return (
+													<div
+														key={equipment.id}
+														onClick={handleRemove}
+														className={`
+															relative w-full max-w-[100%] sm:max-w-[260px] p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md
+															${
+																selectedEquipmentId === null
+																	? 'border-blue-500 bg-blue-50 shadow-md'
+																	: 'border-gray-200 bg-white hover:border-gray-300'
 															}
-														})()}
+														`}
+													>
+														{/* お気に入りボタン */}
+														<button
+															type="button"
+															onClick={handleNoneFavoriteClick}
+															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-gray-300 hover:text-red-400"
+															aria-label="お気に入りに追加"
+														>
+															<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+															</svg>
+														</button>
+														
+														{/* 選択マーク */}
+														<div className="flex justify-between items-start mb-2 min-h-[24px]">
+															<div className="flex-1" />
+															{selectedEquipmentId === null && (
+																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	</svg>
+																</div>
+															)}
+														</div>
+														
+														<h3 className="font-semibold text-gray-900 mb-2">装備なし</h3>
+														
+														{/* ダメージ差分表示（他の装備と同じ形式） */}
+														{slotInfo && hasCurrentlyEquippedItem && (
+															<div className="mb-1 sm:mb-2">
+																<div className="font-medium">
+																	<span className={`mr-3 text-sm ${
+																		equipmentNoneDamageDifference > 0 
+																			? 'text-blue-500' 
+																			: equipmentNoneDamageDifference < 0 
+																				? 'text-red-500' 
+																				: 'text-gray-400'
+																	}`}>
+																		ダメージ：
+																	</span>
+																	<span className={`text-sm ${
+																		equipmentNoneDamageDifference > 0 
+																			? 'text-blue-600' 
+																			: equipmentNoneDamageDifference < 0 
+																				? 'text-red-600' 
+																				: 'text-gray-500'
+																	}`}>
+																		{equipmentNoneDamageDifference === 0 
+																			? '±0' 
+																			: equipmentNoneDamageDifference > 0 
+																				? `+${equipmentNoneDamageDifference.toLocaleString()}` 
+																				: equipmentNoneDamageDifference.toLocaleString()}
+																	</span>
+																</div>
+															</div>
+														)}
 													</div>
-												)}
-											</div>
-										)}
-
-										{/* その他の装備カード */}
-										{otherEquipments.map((equipment) => (
-											<EquipmentCard
-												key={equipment.id}
-												equipment={equipment}
-												isSelected={selectedEquipmentId === equipment.id}
-												onClick={() => handleSelect(equipment.id)}
-												showDamageDifference={isOpen && !!slotInfo}
-												slotInfo={slotInfo}
-												showFavoriteButton={true}
-												onFavoriteChange={handleFavoriteChange}
-											/>
-										))}
+												)
+											}
+											
+											// 通常の装備カード
+											return (
+												<EquipmentCard
+													key={equipment.id}
+													equipment={equipment}
+													isSelected={selectedEquipmentId === equipment.id}
+													onClick={() => handleSelect(equipment.id)}
+													showDamageDifference={isOpen && !!slotInfo}
+													slotInfo={slotInfo}
+													showFavoriteButton={true}
+													onFavoriteChange={handleFavoriteChange}
+												/>
+											)
+										})}
 									</div>
 								</div>
 							)}
 
 							{/* アイテムが見つからない場合 */}
-							{favoriteEquipments.length === 0 && otherEquipments.length === 0 && !isNoneFavorite && (
+							{favoriteEquipments.length === 0 && otherEquipments.length === 0 && !hasCurrentlyEquippedItem && (
 								<div className="text-center text-gray-500 py-8">
 									該当する装備がありません
 								</div>
