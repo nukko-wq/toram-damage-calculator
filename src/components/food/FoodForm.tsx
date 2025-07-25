@@ -44,7 +44,7 @@ const FOOD_OPTIONS: { value: FoodType; label: string }[] = Object.entries(
 	label,
 }))
 
-export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
+export default function FoodForm({ food: _food, onFoodChange }: FoodFormProps) {
 	// Zustandストアから料理データを取得
 	const storeFood = useCalculatorStore((state) => state.data.food)
 	const updateFood = useCalculatorStore((state) => state.updateFood)
@@ -70,7 +70,7 @@ export default function FoodForm({ food, onFoodChange }: FoodFormProps) {
 		setIsInitialized(false)
 		const timer = setTimeout(() => setIsInitialized(true), 30)
 		return () => clearTimeout(timer)
-	}, [effectiveFood])
+	}, [])
 
 	React.useEffect(() => {
 		const subscription = watch((value, { name, type }) => {

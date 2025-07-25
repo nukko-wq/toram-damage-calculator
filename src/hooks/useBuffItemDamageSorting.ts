@@ -3,18 +3,18 @@
  */
 
 import { useMemo, useState, useEffect } from 'react'
-import type { PresetBuffItem } from '@/types/calculator'
+import type { PresetBuffItem, BuffItemCategory, EquipmentProperties } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import { calculateResults } from '@/utils/calculationEngine'
-import { calculateDamageWithService } from '@/utils/damageCalculationService'
+import { calculateDamageWithService, type DamageCalculationServiceResult } from '@/utils/damageCalculationService'
 import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
 
 interface BuffItemWithDamage {
 	id: string
 	name: string
-	category: any
-	properties: any
+	category: BuffItemCategory
+	properties: Partial<EquipmentProperties>
 	description?: string
 	damageDifference: number
 	isCalculating: boolean
@@ -60,7 +60,7 @@ export function useBuffItemDamageSorting(
 					effectiveCurrentResults = calculateResults(currentData)
 				}
 
-				let calculatedBaselineDamageResult
+				let calculatedBaselineDamageResult: DamageCalculationServiceResult
 				if (baselineDamageResult) {
 					calculatedBaselineDamageResult = baselineDamageResult
 				} else {
@@ -76,6 +76,7 @@ export function useBuffItemDamageSorting(
 					buffItems.map(async (buffItem) => {
 						try {
 							// シミュレーション後のダメージを計算
+							// biome-ignore lint/suspicious/noExplicitAny: simulateItemEquipSimpleの型互換性のため
 							const simulatedData = simulateItemEquipSimple(currentData, buffItem as any, slotInfo)
 							const simulatedResults = calculateResults(simulatedData)
 							const simulatedDamageResult = calculateDamageWithService(
@@ -97,7 +98,7 @@ export function useBuffItemDamageSorting(
 								isCalculating: false,
 								hasError: false
 							}
-						} catch (error) {
+						} catch (_error) {
 							return {
 								...buffItem,
 								damageDifference: 0,
@@ -109,7 +110,7 @@ export function useBuffItemDamageSorting(
 				)
 
 				setBuffItemsWithDamage(results)
-			} catch (error) {
+			} catch (_error) {
 				// エラー時は元の配列を返す
 				setBuffItemsWithDamage(buffItems.map(buffItem => ({
 					...buffItem,

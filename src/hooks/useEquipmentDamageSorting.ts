@@ -7,20 +7,24 @@ import type { Equipment } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import { calculateResults } from '@/utils/calculationEngine'
-import { calculateDamageWithService } from '@/utils/damageCalculationService'
+import { calculateDamageWithService, type DamageCalculationServiceResult } from '@/utils/damageCalculationService'
 import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
 
 interface EquipmentWithDamage {
 	id: string
 	name: string
+	// biome-ignore lint/suspicious/noExplicitAny: Equipment typeは複雑な型のため一時的にanyを使用
 	type: any
+	// biome-ignore lint/suspicious/noExplicitAny: Equipment propertiesは複雑な型のため一時的にanyを使用
 	properties: any
 	description?: string
+	// biome-ignore lint/suspicious/noExplicitAny: conditionalEffectsは複雑な型のため一時的にanyを使用
 	conditionalEffects?: any[]
 	isCustom?: boolean
 	createdAt?: string
 	updatedAt?: string
 	isFavorite?: boolean
+	// biome-ignore lint/suspicious/noExplicitAny: Equipment categoryは複雑な型のため一時的にanyを使用
 	category?: any
 	refinement?: number
 	damageDifference: number
@@ -67,7 +71,7 @@ export function useEquipmentDamageSorting(
 					effectiveCurrentResults = calculateResults(currentData)
 				}
 
-				let calculatedBaselineDamageResult
+				let calculatedBaselineDamageResult: DamageCalculationServiceResult
 				if (baselineDamageResult) {
 					calculatedBaselineDamageResult = baselineDamageResult
 				} else {
@@ -104,7 +108,7 @@ export function useEquipmentDamageSorting(
 								isCalculating: false,
 								hasError: false
 							}
-						} catch (error) {
+						} catch (_error) {
 							return {
 								...equipment,
 								damageDifference: 0,
@@ -116,7 +120,7 @@ export function useEquipmentDamageSorting(
 				)
 
 				setEquipmentsWithDamage(results)
-			} catch (error) {
+			} catch (_error) {
 				// エラー時は元の配列を返す
 				setEquipmentsWithDamage(equipments.map(equipment => ({
 					...equipment,

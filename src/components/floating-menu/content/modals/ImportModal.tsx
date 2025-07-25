@@ -409,8 +409,8 @@ export default function ImportModal({
 							{validationResult.warnings &&
 								validationResult.warnings.length > 0 && (
 									<div className="space-y-1">
-										{validationResult.warnings.map((warning, index) => (
-											<div key={index} className="text-sm text-yellow-600">
+										{validationResult.warnings.map((warning) => (
+											<div key={warning} className="text-sm text-yellow-600">
 												⚠️ {warning}
 											</div>
 										))}
@@ -420,8 +420,8 @@ export default function ImportModal({
 							{validationResult.errors &&
 								validationResult.errors.length > 0 && (
 									<div className="space-y-1">
-										{validationResult.errors.map((error, index) => (
-											<div key={index} className="text-sm text-red-600">
+										{validationResult.errors.map((error) => (
+											<div key={error} className="text-sm text-red-600">
 												❌ {error}
 											</div>
 										))}

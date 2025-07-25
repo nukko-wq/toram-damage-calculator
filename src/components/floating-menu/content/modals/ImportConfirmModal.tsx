@@ -281,7 +281,7 @@ export default function ImportConfirmModal({
 											name="mergeMode"
 											value="merge"
 											checked={mergeMode === 'merge'}
-											onChange={(e) => setMergeMode(e.target.value as any)}
+											onChange={(e) => setMergeMode(e.target.value as 'merge' | 'replace')}
 											disabled={isImporting}
 											className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
 										/>
@@ -296,7 +296,7 @@ export default function ImportConfirmModal({
 											name="mergeMode"
 											value="replace"
 											checked={mergeMode === 'replace'}
-											onChange={(e) => setMergeMode(e.target.value as any)}
+											onChange={(e) => setMergeMode(e.target.value as 'merge' | 'replace')}
 											disabled={isImporting}
 											className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
 										/>
@@ -311,7 +311,7 @@ export default function ImportConfirmModal({
 											name="mergeMode"
 											value="skip"
 											checked={mergeMode === 'skip'}
-											onChange={(e) => setMergeMode(e.target.value as any)}
+											onChange={(e) => setMergeMode(e.target.value as 'merge' | 'replace')}
 											disabled={isImporting}
 											className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
 										/>
@@ -334,8 +334,8 @@ export default function ImportConfirmModal({
 								</h5>
 								<ul className="text-sm text-yellow-700 list-disc list-inside space-y-1">
 									{validationResult.warnings.map(
-										(warning: string, index: number) => (
-											<li key={index}>{warning}</li>
+										(warning: string) => (
+											<li key={warning}>{warning}</li>
 										),
 									)}
 								</ul>

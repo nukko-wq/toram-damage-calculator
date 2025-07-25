@@ -706,7 +706,7 @@ export default function EquipmentForm({
 	const renderPropertyInputs = (
 		item: Equipment,
 		slotKey: keyof EquipmentSlots,
-		onPropertyChange: (
+		_onPropertyChange: (
 			property: keyof EquipmentProperties,
 			value: string,
 		) => void,

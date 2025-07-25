@@ -15,7 +15,7 @@ export default function RenameEquipmentModal({
 	onClose,
 	onConfirm,
 	currentName,
-	equipmentId,
+	equipmentId: _equipmentId,
 }: RenameEquipmentModalProps) {
 	const [newName, setNewName] = useState('')
 	const [isSubmitting, setIsSubmitting] = useState(false)
