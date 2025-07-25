@@ -8,8 +8,11 @@ import {
 } from '@/utils/buffItemDatabase'
 import BuffItemCard from './BuffItemCard'
 import type { SlotInfo } from '@/types/damagePreview'
+import { BUFF_ITEM_NONE_ITEM } from '@/types/damagePreview'
 import { BuffItemFavoritesManager } from '@/utils/buffItemFavorites'
 import { useBuffItemDamageSorting } from '@/hooks/useBuffItemDamageSorting'
+import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface BuffItemSelectionModalProps {
 	isOpen: boolean
@@ -46,6 +49,21 @@ export default function BuffItemSelectionModal({
 	const [isNoneFavorite, setIsNoneFavorite] = useState(
 		() => BuffItemFavoritesManager.isFavorite(BUFF_ITEM_NONE_ID),
 	)
+
+	// 現在のバフアイテムデータを取得
+	const currentData = useCalculatorStore((state) => state.data)
+
+	// 現在装着中のバフアイテムがあるかどうかを判定
+	const hasCurrentlyEquippedBuffItem = useMemo(() => {
+		if (!slotInfo || !currentData) return false
+		
+		if (slotInfo.type === 'buffItem' && slotInfo.category && typeof slotInfo.category === 'string') {
+			const currentBuffItem = (currentData.buffItems as any)[slotInfo.category]
+			return currentBuffItem !== null && currentBuffItem !== undefined
+		}
+		
+		return false
+	}, [slotInfo, currentData])
 
 	// モーダルを閉じる関数
 	const handleClose = useCallback(() => {
@@ -344,6 +362,29 @@ export default function BuffItemSelectionModal({
 
 												{/* バフアイテムなし名 */}
 												<h3 className="font-semibold text-gray-900 mb-2">バフアイテムなし</h3>
+
+												{/* ダメージ差分表示 */}
+												{slotInfo && hasCurrentlyEquippedBuffItem && selectedBuffItemId !== null && (
+													<div className="mb-1 sm:mb-2">
+														{(() => {
+															try {
+																return (
+																	<DamageDifferenceDisplayCorrect
+																		item={BUFF_ITEM_NONE_ITEM as any}
+																		slotInfo={slotInfo}
+																		size="sm"
+																		className=""
+																		options={{ debug: false }}
+																	/>
+																)
+															} catch (_error) {
+																return (
+																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
+																)
+															}
+														})()}
+													</div>
+												)}
 											</div>
 										)}
 
@@ -433,6 +474,29 @@ export default function BuffItemSelectionModal({
 
 												{/* バフアイテムなし名 */}
 												<h3 className="font-semibold text-gray-900 mb-2">バフアイテムなし</h3>
+
+												{/* ダメージ差分表示 */}
+												{slotInfo && hasCurrentlyEquippedBuffItem && selectedBuffItemId !== null && (
+													<div className="mb-1 sm:mb-2">
+														{(() => {
+															try {
+																return (
+																	<DamageDifferenceDisplayCorrect
+																		item={BUFF_ITEM_NONE_ITEM as any}
+																		slotInfo={slotInfo}
+																		size="sm"
+																		className=""
+																		options={{ debug: false }}
+																	/>
+																)
+															} catch (_error) {
+																return (
+																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
+																)
+															}
+														})()}
+													</div>
+												)}
 											</div>
 										)}
 

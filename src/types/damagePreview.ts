@@ -7,6 +7,7 @@ import type {
 	EquipmentSlots,
 	BuffItemCategory,
 	BuffItem as CalculatorBuffItem,
+	PresetBuffItem,
 } from './calculator'
 
 // クリスタルエイリアス
@@ -79,4 +80,26 @@ export const CRYSTAL_NONE_ITEM: Crystal = {
 	type: 'normal',
 	properties: {},
 	conditionalEffects: [],
+}
+
+/**
+ * 「装備なし」を表す特殊な装備アイテム
+ */
+export const EQUIPMENT_NONE_ITEM: Equipment = {
+	id: '__equipment_none__',
+	name: '装備なし',
+	type: 'weapon',
+	category: ['main'], // ダミーカテゴリ
+	baseStats: {},
+	properties: {},
+}
+
+/**
+ * 「バフアイテムなし」を表す特殊なバフアイテム
+ */
+export const BUFF_ITEM_NONE_ITEM: PresetBuffItem = {
+	id: '__buff_item_none__',
+	name: 'バフアイテムなし',
+	category: 'physicalPower', // ダミーカテゴリ
+	properties: {},
 }

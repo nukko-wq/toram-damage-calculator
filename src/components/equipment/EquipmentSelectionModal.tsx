@@ -10,8 +10,11 @@ import type {
 import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import EquipmentCard from './EquipmentCard'
 import type { SlotInfo } from '@/types/damagePreview'
+import { EQUIPMENT_NONE_ITEM } from '@/types/damagePreview'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
 import { useEquipmentDamageSorting } from '@/hooks/useEquipmentDamageSorting'
+import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface EquipmentSelectionModalProps {
 	isOpen: boolean
@@ -47,6 +50,21 @@ export default function EquipmentSelectionModal({
 	const [isNoneFavorite, setIsNoneFavorite] = useState(
 		() => EquipmentFavoritesManager.isFavorite(EQUIPMENT_NONE_ID),
 	)
+
+	// 現在の装備データを取得
+	const currentData = useCalculatorStore((state) => state.data)
+
+	// 現在装着中の装備があるかどうかを判定
+	const hasCurrentlyEquippedItem = useMemo(() => {
+		if (!slotInfo || !currentData) return false
+		
+		if (slotInfo.type === 'equipment' && slotInfo.slot && typeof slotInfo.slot === 'string') {
+			const currentEquipment = (currentData.equipment as any)[slotInfo.slot]
+			return currentEquipment !== null && currentEquipment !== undefined
+		}
+		
+		return false
+	}, [slotInfo, currentData])
 
 	// モーダルを閉じる関数
 	const handleClose = useCallback(() => {
@@ -335,6 +353,29 @@ export default function EquipmentSelectionModal({
 
 												{/* 装備なし名 */}
 												<h3 className="font-semibold text-gray-900 mb-2">装備なし</h3>
+
+												{/* ダメージ差分表示 */}
+												{slotInfo && hasCurrentlyEquippedItem && selectedEquipmentId !== null && (
+													<div className="mb-1 sm:mb-2">
+														{(() => {
+															try {
+																return (
+																	<DamageDifferenceDisplayCorrect
+																		item={EQUIPMENT_NONE_ITEM}
+																		slotInfo={slotInfo}
+																		size="sm"
+																		className=""
+																		options={{ debug: false }}
+																	/>
+																)
+															} catch (_error) {
+																return (
+																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
+																)
+															}
+														})()}
+													</div>
+												)}
 											</div>
 										)}
 
@@ -424,6 +465,29 @@ export default function EquipmentSelectionModal({
 
 												{/* 装備なし名 */}
 												<h3 className="font-semibold text-gray-900 mb-2">装備なし</h3>
+
+												{/* ダメージ差分表示 */}
+												{slotInfo && hasCurrentlyEquippedItem && selectedEquipmentId !== null && (
+													<div className="mb-1 sm:mb-2">
+														{(() => {
+															try {
+																return (
+																	<DamageDifferenceDisplayCorrect
+																		item={EQUIPMENT_NONE_ITEM}
+																		slotInfo={slotInfo}
+																		size="sm"
+																		className=""
+																		options={{ debug: false }}
+																	/>
+																)
+															} catch (_error) {
+																return (
+																	<div className="bg-red-100 text-red-600 text-xs p-1">Error</div>
+																)
+															}
+														})()}
+													</div>
+												)}
 											</div>
 										)}
 
