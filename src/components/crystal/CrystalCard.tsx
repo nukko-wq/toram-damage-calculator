@@ -95,7 +95,7 @@ export default function CrystalCard({
 			)}
 
 			{/* クリスタ名と選択マーク */}
-			<div className="flex justify-between items-center mb-2">
+			<div className="flex justify-between items-center mb-1 sm:mb-2">
 				<h3 className="font-semibold text-gray-900">{crystal.name}</h3>
 				{/* 選択状態のチェックマーク */}
 				{isSelected && (
@@ -119,7 +119,7 @@ export default function CrystalCard({
 
 			{/* ダメージ差分表示 - クリスタ名の下に移動 */}
 			{showDamageDifference && slotInfo && !isSelected && (
-				<div className="mb-2">
+				<div className="mb-1 sm:mb-2">
 					{(() => {
 						try {
 							return (
@@ -127,7 +127,7 @@ export default function CrystalCard({
 									item={crystal}
 									slotInfo={slotInfo}
 									size="sm"
-									className="px-1 py-0.5"
+									className=""
 									options={{ debug: false }}
 								/>
 							)
@@ -143,7 +143,7 @@ export default function CrystalCard({
 			{/* プロパティ */}
 			{Object.entries(crystal.properties).filter(([_, value]) => value !== 0)
 				.length > 0 && (
-				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1">
+				<div className="text-sm text-gray-700 mb-2 min-h-[1.25rem] flex flex-wrap gap-x-3 gap-y-1 pr-8">
 					{Object.entries(crystal.properties)
 						.filter(([_, value]) => value !== 0)
 						.slice(0, 8)
@@ -312,7 +312,7 @@ export default function CrystalCard({
 
 			{/* 条件付き効果 */}
 			{crystal.conditionalEffects && crystal.conditionalEffects.length > 0 && (
-				<div className="text-sm text-blue-600 space-y-1">
+				<div className="text-sm text-blue-600 space-y-1 pr-8">
 					{crystal.conditionalEffects.map((effect, index) => {
 						const { conditionText, effectTexts } =
 							formatConditionalEffect(effect)
