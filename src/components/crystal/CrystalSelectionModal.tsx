@@ -9,7 +9,6 @@ import type { SlotInfo } from '@/types/damagePreview'
 import { CRYSTAL_NONE_ITEM } from '@/types/damagePreview'
 import { CrystalFavoritesManager } from '@/utils/crystalFavorites'
 import { useCrystalDamageSorting } from '@/hooks/useCrystalDamageSorting'
-import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
 import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 
@@ -161,10 +160,10 @@ export default function CrystalSelectionModal({
 	// 「クリスタなし」のダメージ差分を計算
 	const crystalNoneDamageResult = useDamageDifferenceCorrect(
 		CRYSTAL_NONE_ITEM,
-		slotInfo,
+		slotInfo || { type: 'crystal', category: 'normal', slot: 0 },
 		{ debug: false }
 	)
-	const crystalNoneDamageDifference = crystalNoneDamageResult.difference || 0
+	const crystalNoneDamageDifference = slotInfo ? crystalNoneDamageResult.difference || 0 : 0
 
 	// お気に入り分別（ソート済みのクリスタルから）
 	const { favoriteCrystals, otherCrystals } = useMemo(() => {
@@ -193,8 +192,8 @@ export default function CrystalSelectionModal({
 			if (isNoneFavorite) {
 				// お気に入りリストに挿入（ダメージ差分順）
 				const insertIndex = favorites.findIndex(crystal => {
-					// CrystalWithDamageかどうかを確認し、damageDifferenceプロパティを取得
-					const crystalDamage = 'damageDifference' in crystal ? crystal.damageDifference : 0
+					// biome-ignore lint/suspicious/noExplicitAny: CrystalWithDamageタイプのダメージ差分プロパティアクセス
+					const crystalDamage = 'damageDifference' in crystal && typeof (crystal as any).damageDifference === 'number' ? (crystal as any).damageDifference : 0
 					return crystalNoneWithDamage.damageDifference > crystalDamage
 				})
 				if (insertIndex === -1) {
@@ -205,7 +204,8 @@ export default function CrystalSelectionModal({
 			} else {
 				// その他リストに挿入（ダメージ差分順）
 				const insertIndex = others.findIndex(crystal => {
-					const crystalDamage = 'damageDifference' in crystal ? crystal.damageDifference : 0
+					// biome-ignore lint/suspicious/noExplicitAny: CrystalWithDamageタイプのダメージ差分プロパティアクセス
+					const crystalDamage = 'damageDifference' in crystal && typeof (crystal as any).damageDifference === 'number' ? (crystal as any).damageDifference : 0
 					return crystalNoneWithDamage.damageDifference > crystalDamage
 				})
 				if (insertIndex === -1) {
