@@ -177,7 +177,8 @@ export default function CrystalSelectionModal({
 		const others = sortedCrystals.filter((crystal) => !favoriteSet.has(crystal.id))
 
 		// 「クリスタなし」をダメージ差分に基づいて適切な位置に挿入
-		if (hasCurrentlyEquippedCrystal && slotInfo) {
+		// クリスタが装着されていない場合でも「クリスタなし」カードを表示
+		{
 			// biome-ignore lint/suspicious/noExplicitAny: Crystal typeと互換性のないNone用の仮想アイテム
 			const crystalNoneWithDamage: any = {
 				id: CRYSTAL_NONE_ID,
@@ -416,9 +417,9 @@ export default function CrystalSelectionModal({
 															</svg>
 														</button>
 														
-														{/* 選択マーク */}
-														<div className="flex justify-between items-start mb-2 min-h-[24px]">
-															<div className="flex-1" />
+														{/* クリスタなしと選択マーク */}
+														<div className="flex justify-between items-center mb-1 sm:mb-2">
+															<h3 className="font-semibold text-gray-900">クリスタなし</h3>
 															{selectedCrystalId === null && (
 																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
 																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -428,10 +429,8 @@ export default function CrystalSelectionModal({
 															)}
 														</div>
 														
-														<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
-														
 														{/* ダメージ差分表示（他のクリスタルと同じ形式） */}
-														{slotInfo && hasCurrentlyEquippedCrystal && (
+														{slotInfo && (
 															<div className="mb-1 sm:mb-2">
 																<div className="font-medium">
 																	<span className={`mr-3 text-sm ${
@@ -516,9 +515,9 @@ export default function CrystalSelectionModal({
 															</svg>
 														</button>
 														
-														{/* 選択マーク */}
-														<div className="flex justify-between items-start mb-2 min-h-[24px]">
-															<div className="flex-1" />
+														{/* クリスタなしと選択マーク */}
+														<div className="flex justify-between items-center mb-1 sm:mb-2">
+															<h3 className="font-semibold text-gray-900">クリスタなし</h3>
 															{selectedCrystalId === null && (
 																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
 																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -528,10 +527,8 @@ export default function CrystalSelectionModal({
 															)}
 														</div>
 														
-														<h3 className="font-semibold text-gray-900 mb-2">クリスタなし</h3>
-														
 														{/* ダメージ差分表示（他のクリスタルと同じ形式） */}
-														{slotInfo && hasCurrentlyEquippedCrystal && (
+														{slotInfo && (
 															<div className="mb-1 sm:mb-2">
 																<div className="font-medium">
 																	<span className={`mr-3 text-sm ${
@@ -581,8 +578,9 @@ export default function CrystalSelectionModal({
 								</div>
 							)}
 
-							{/* アイテムが見つからない場合 */}
-							{favoriteCrystals.length === 0 && otherCrystals.length === 0 && (
+							{/* アイテムが見つからない場合 - クリスタなしを除いて判定 */}
+							{favoriteCrystals.filter(c => c.id !== CRYSTAL_NONE_ID).length === 0 && 
+							 otherCrystals.filter(c => c.id !== CRYSTAL_NONE_ID).length === 0 && (
 								<div className="text-center text-gray-500 py-8">
 									該当するクリスタがありません
 								</div>
