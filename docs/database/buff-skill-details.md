@@ -25,6 +25,9 @@
 - **サポートスキル系統**: [buff-skills/support-skills.md](./buff-skills/support-skills.md) ✅
 - **パルチザンスキル系統**: [buff-skills/partisan-skills.md](./buff-skills/partisan-skills.md) ✅
 - **ペット使用スキル系統**: [buff-skills/pet-skills.md](./buff-skills/pet-skills.md) ✅
+- **ダークパワースキル系統**: [buff-skills/darkpower-skills.md](./buff-skills/darkpower-skills.md) ✅
+- **アサシンスキル系統**: [buff-skills/assassin-skills.md](./buff-skills/assassin-skills.md) ✅
+- **スプライトスキル系統**: [buff-skills/sprite-skills.md](./buff-skills/sprite-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills/README.md](./buff-skills/README.md) を参照してください。
@@ -165,109 +168,10 @@ interface WeaponRequirement {
 
 ### 5. スプライトスキル系統
 
-#### 5.1 パワーウェーブ (sprite1)
-```typescript
-{
-  id: 'sprite1',
-  name: 'パワーウェーブ',
-  category: 'sprite',
-  type: 'level',
-  order: 701,
-  maxLevel: 10,
-  description: '魔法攻撃力を上昇させる',
-  effects: [
-    {
-      property: 'MATK_Rate',
-      formula: 'skillLevel * 5',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'MATK% = skillLevel × 5',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+詳細は [buff-skills/sprite-skills.md](./buff-skills/sprite-skills.md) を参照してください。
 
-#### 5.2 エンハンス (IsEnhance)
-```typescript
-{
-  id: 'IsEnhance',
-  name: 'エンハンス',
-  category: 'sprite',
-  type: 'toggle',
-  order: 801,
-  description: 'ブレイブ倍率を上昇、ATK・MATKを敵の防御力に応じて上昇',
-  effects: [
-    {
-      property: 'BraveMultiplier',
-      formula: '+10',
-      conditions: ['全武器種共通']
-    },
-    {
-      property: 'ATK',
-      formula: 'Math.min(Math.floor(敵Normal難易度DEF / 2), 敵Normal難易度レベル)',
-      conditions: ['Normal難易度の敵防御力依存、上限は敵レベル']
-    },
-    {
-      property: 'MATK',
-      formula: 'Math.min(Math.floor(敵Normal難易度MDEF / 2), 敵Normal難易度レベル)',
-      conditions: ['Normal難易度の敵魔法防御力依存、上限は敵レベル']
-    }
-  ],
-  calculationFormula: `
-    ブレイブ倍率% = base + 10
-    ATK = base + Math.min(Math.floor(敵Normal難易度DEF / 2), 敵Normal難易度レベル)
-    MATK = base + Math.min(Math.floor(敵Normal難易度MDEF / 2), 敵Normal難易度レベル)
-  `,
-  weaponRequirement: {
-    description: 'すべての武器で効果があります'
-  },
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  },
-  specialNotes: [
-    'ATK・MATK計算で小数点以下は切り捨て（Math.floor使用）',
-    '敵DEF・MDEF・レベルは常にNormal難易度の値を参照（プリセット敵データのそのままの値）',
-    '難易度設定に関係なく、選択された敵のプリセットデータ値から計算',
-    'エターナルナイトメアと同様の方式でNormal難易度データを参照',
-    'ブレイブ倍率の実装はブレイブオーラ（BraveMultiplier）と同じ仕組み',
-    '実装: getPresetEnemyById → enemyData.stats.DEF/MDEF, enemyData.level'
-  ]
-}
-```
-
-#### 5.3 ヒール (heal1)
-```typescript
-{
-  id: 'heal1',
-  name: 'ヒール',
-  category: 'sprite',
-  type: 'level',
-  order: 702,
-  maxLevel: 10,
-  description: '最大HPを上昇させる',
-  effects: [
-    {
-      property: 'HP_Rate',
-      formula: 'skillLevel * 10',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'HP% = skillLevel × 10',
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
+**含まれるスキル:**
+- 5.1 エンハンス (IsEnhance) - ブレイブ倍率+10%、ATK・MATKを敵の防御力に応じて上昇
 
 ### 6. プリーストスキル系統
 
@@ -325,66 +229,10 @@ interface WeaponRequirement {
 
 ### 7. ダークパワースキル系統
 
-#### 7.1 エターナルナイトメア (dp1)
-```typescript
-{
-  id: 'dp1',
-  name: 'エターナルナイトメア',
-  category: 'darkPower',
-  type: 'multiParam',
-  order: 1401,
-  description: 'スキルレベルとスキルポイント合計でHP率と属性耐性を上昇させる',
-  multiParams: {
-    param1: {
-      name: 'スキルレベル',
-      min: 1,
-      max: 10,
-      default: 10,
-      unit: 'Lv'
-    },
-    param2: {
-      name: 'スキルポイント合計',
-      min: 25,
-      max: 80,
-      default: 80,
-      unit: 'pt'
-    }
-  },
-  effects: [
-    {
-      property: 'HP_Rate',
-      formula: 'Math.abs(2 * skillLevel)',
-      conditions: []
-    },
-    {
-      property: 'DarkResistance_Rate',
-      formula: '+5',
-      conditions: []
-    },
-    {
-      property: 'LightResistance_Rate',
-      formula: '-5',
-      conditions: []
-    }
-  ],
-  calculationFormula: 'HP% = |2 × スキルレベル|, 闇耐性% = base + 5, 光耐性% = base - 5',
-  enemyDebuffFormula: '敵DEF・MDEF低下 = Math.min(スキルポイント合計 × (スキルレベル × 0.5), Normal難易度DEF/MDEF × 0.5)',
-  weaponRequirement: {
-    description: 'すべての武器で効果があります'
-  },
-  uiSettings: {
-    parameterName: 'スキルレベル・スキルポイント',
-    showInModal: true,
-    quickToggle: false
-  },
-  specialNotes: [
-    'HP率の計算は絶対値を使用（|2 × スキルレベル|%）',
-    '敵DEF・MDEF低下効果は実装済み',
-    'ダークパワー系統の全習得スキルポイントが必要',
-    'ボス戦時の減算計算ではNormal難易度のDEF/MDEFを参照（例: Hard難易度でもNormal値の半分で上限計算）'
-  ]
-}
-```
+詳細は [buff-skills/darkpower-skills.md](./buff-skills/darkpower-skills.md) を参照してください。
+
+**含まれるスキル:**
+- 7.1 エターナルナイトメア (dp1) - 複雑パラメータ（スキルレベル・スキルポイント合計）による HP率・属性耐性・敵DEF/MDEF減算効果
 
 ### 8. ナイトスキル系統
 
@@ -428,42 +276,11 @@ interface WeaponRequirement {
 
 ### 11. アサシンスキル系統
 
-#### 11.1 シーカーリウス (oh1-2)
-```typescript
-{
-  id: 'oh1-2',
-  name: 'シーカーリウス',
-  category: 'assassin',
-  type: 'toggle',
-  order: 1801,
-  description: 'サブ武器の種類によって攻撃力と物理貫通の効果が変化する',
-  effects: [
-    {
-      property: 'ATK',
-      formula: 'subWeapon === "ナイフ" || subWeapon === "巻物" ? +100 : +50',
-      conditions: ['サブ武器による効果変化']
-    },
-    {
-      property: 'PhysicalPenetration_Rate',
-      formula: 'subWeapon === "ナイフ" || subWeapon === "巻物" ? +25 : +10',
-      conditions: ['サブ武器による効果変化']
-    }
-  ],
-  calculationFormula: 'ナイフ・巻物装備時: ATK = base + 100, 物理貫通% = base + 25 / その他: ATK = base + 50, 物理貫通% = base + 10',
-  weaponRequirement: {
-    description: 'すべての武器で効果があります',
-    subWeaponConditions: {
-      enhanced: ['ナイフ', '巻物'],
-      normal: ['その他のサブ武器']
-    }
-  },
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
+詳細は [buff-skills/assassin-skills.md](./buff-skills/assassin-skills.md) を参照してください。
+
+**含まれるスキル:**
+- 11.1 シーカーリウス (oh1-2) - サブ武器によるATK・物理貫通率変動（ナイフ・巻物で強化効果）
+- 11.2 暗殺の極意 (assassin5-1) - クリティカル+25、クリティカルダメージ率+50%
 
 ### 11. ニンジャスキル系統
 
