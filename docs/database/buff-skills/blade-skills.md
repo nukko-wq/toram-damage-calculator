@@ -100,38 +100,70 @@ function calculateBladeMasteryEffects(
   id: 'IsWarcry',
   name: 'ウォークライ',
   category: 'blade',
-  type: 'toggle',
+  type: 'multiParam',
+  multiParams: {
+    param1: {
+      name: '武器タイプ',
+      min: 1,
+      max: 2,
+      default: 2,
+      unit: ''
+    }
+  },
   order: 201,
-  description: '攻撃力と移動速度を上昇させる',
+  description: '武器タイプに応じて攻撃力と魔法力を上昇させる',
   effects: [
     {
       property: 'ATK',
-      formula: '+300',
-      conditions: []
+      formula: 'param1 === 1 ? +10 : +5',
+      conditions: ['両手剣(1): +10, 両手剣以外(2): +5']
     },
     {
-      property: 'MotionSpeed_Rate',
-      formula: '+50',
-      conditions: []
+      property: 'MATK',
+      formula: 'param1 === 1 ? +10 : +5',
+      conditions: ['両手剣(1): +10, 両手剣以外(2): +5']
     }
   ],
-  calculationFormula: 'ATK = base + 300, 行動速度% = base + 50',
+  calculationFormula: `
+    両手剣(1)の場合:
+    - ATK: +10
+    - MATK: +10
+    
+    両手剣以外(2)の場合:
+    - ATK: +5
+    - MATK: +5
+  `,
   uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
+    parameterName: '武器タイプ',
+    parameterUnit: '',
+    showInModal: true,
+    quickToggle: false,
+    parameterOptions: [
+      { value: 1, label: '両手剣', description: 'ATK+10, MATK+10' },
+      { value: 2, label: '両手剣以外', description: 'ATK+5, MATK+5' }
+    ]
   }
 }
 
 // 実装用の効果計算関数
-function calculateWarcryEffects(
-  isEnabled: boolean
+function calculateWarCryEffects(
+  weaponTypeParam: number // 1: 両手剣, 2: 両手剣以外
 ): Partial<EquipmentProperties> {
-  if (!isEnabled) return {}
-  
-  return {
-    ATK: 300,
-    MotionSpeed_Rate: 50
+  if (!weaponTypeParam || (weaponTypeParam !== 1 && weaponTypeParam !== 2)) return {}
+
+  // 武器タイプに応じた効果
+  if (weaponTypeParam === 1) {
+    // 両手剣の場合
+    return {
+      ATK: 10,
+      MATK: 10,
+    }
+  } else {
+    // 両手剣以外の場合
+    return {
+      ATK: 5,
+      MATK: 5,
+    }
   }
 }
 ```
@@ -233,14 +265,16 @@ function calculateBerserkEffects(
 ## 実装ステータス
 
 - [x] ブレードマスタリ (Ms-blade) - 設計・実装完了
-- [x] ウォークライ (IsWarcry) - 設計完了
-- [x] バーサーク (Berserk) - 設計完了
+- [x] ウォークライ (IsWarcry) - 設計・実装完了（multiParam対応）
+- [x] バーサーク (Berserk) - 設計・実装完了
 
 ## 特徴
 
 - **武器種制限**: ブレードマスタリは片手剣・両手剣・双剣装備時のみ効果発動
 - **段階的効果**: ブレードマスタリのATK%効果はスキルレベル帯によって段階的に変化
-- **固定効果**: ウォークライは武器種に関係なく固定値で効果発動
+- **パラメータ選択効果**: ウォークライは武器タイプパラメータ（両手剣 or 両手剣以外）により効果が変動
+  - 両手剣(1): ATK+10, MATK+10
+  - 両手剣以外(2): ATK+5, MATK+5（デフォルト）
 - **武器種別効果変動**: バーサークは武器種により効果が変化
   - 片手剣・双剣: 安定率減少が軽減 (-25%)
   - 両手剣: クリティカル増加が強化 (+50)

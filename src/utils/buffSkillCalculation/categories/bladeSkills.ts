@@ -46,6 +46,30 @@ export function calculateTakumiKenjutsuPassiveMultiplier(
 }
 
 /**
+ * ウォークライの効果計算関数
+ */
+export function calculateWarCryEffects(
+	weaponTypeParam: number, // 1: 両手剣, 2: 両手剣以外
+): Partial<EquipmentProperties> {
+	if (!weaponTypeParam || (weaponTypeParam !== 1 && weaponTypeParam !== 2)) return {}
+
+	// 武器タイプに応じた効果
+	if (weaponTypeParam === 1) {
+		// 両手剣の場合
+		return {
+			ATK: 10,
+			MATK: 10,
+		}
+	} else {
+		// 両手剣以外の場合
+		return {
+			ATK: 5,
+			MATK: 5,
+		}
+	}
+}
+
+/**
  * バーサークの効果計算関数
  */
 export function calculateBerserkEffects(
@@ -108,6 +132,13 @@ export function getBladeSkillBonuses(
 			quickSlash.level,
 			convertedWeaponType,
 		)
+		integrateEffects(effects, bonuses)
+	}
+
+	// ウォークライの処理
+	const warCry = buffSkillData['IsWarcry']
+	if (warCry?.isEnabled && warCry.multiParam1) {
+		const effects = calculateWarCryEffects(warCry.multiParam1)
 		integrateEffects(effects, bonuses)
 	}
 

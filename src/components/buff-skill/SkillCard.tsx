@@ -89,6 +89,9 @@ export default function SkillCard({ skill }: SkillCardProps) {
 				if (skill.id === 'IsBrave') {
 					return `${skill.name}/${(level || 2) === 1 ? '使用者' : '非使用者'}`
 				}
+				if (skill.id === 'IsWarcry') {
+					return `${skill.name}/${(level || 2) === 1 ? '両手剣' : '両手剣以外'}`
+				}
 				return `${skill.name}/${level || 1}`
 
 			default:

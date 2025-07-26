@@ -15,7 +15,7 @@ import { getBattleSkillBonuses, getBattleSkillBonusesWithPlayerLevel } from '../
 import { getSurvivalSkillBonuses } from '../categories/survivalSkills'
 import { getHunterSkillBonuses } from '../categories/hunterSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
-import { getSupportSkillBraveMultiplier } from '../categories/supportSkills'
+import { getSupportSkillBraveMultiplier, getSupportSkillBonuses } from '../categories/supportSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
 import { getShieldSkillBonuses } from '../categories/shieldSkills'
 import { getAssassinSkillBonuses } from '../categories/assassinSkills'
@@ -93,6 +93,15 @@ export function getBuffSkillBonuses(
 	// ダークパワースキル
 	const darkPowerBonuses = getDarkPowerSkillBonuses(buffSkillData)
 	for (const [key, value] of Object.entries(darkPowerBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// サポートスキル
+	const supportBonuses = getSupportSkillBonuses(buffSkillData)
+	for (const [key, value] of Object.entries(supportBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

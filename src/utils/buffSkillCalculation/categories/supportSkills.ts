@@ -4,6 +4,8 @@
 
 import type { BuffSkillState } from '@/types/buffSkill'
 import type { EquipmentProperties } from '@/types/calculator'
+import type { AllBonuses } from '../../basicStatsCalculation'
+import { integrateEffects } from '../types'
 
 /**
  * ブレイブオーラ(IsBrave)の効果計算関数
@@ -65,4 +67,31 @@ export function getSupportSkillBraveMultiplier(
 	}
 
 	return braveMultiplier
+}
+
+/**
+ * サポートスキル系統の統合効果取得
+ */
+export function getSupportSkillBonuses(
+	buffSkillData: Record<string, BuffSkillState> | null,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!buffSkillData) return bonuses
+
+	// ブレイブオーラ（IsBrave）の処理
+	const braveAura = buffSkillData.IsBrave
+	if (braveAura?.isEnabled && braveAura.multiParam1) {
+		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
+		integrateEffects(effects, bonuses)
+	}
+
+	// マナリチャージ（IsManaReCharge）の処理
+	const manaRecharge = buffSkillData.IsManaReCharge
+	if (manaRecharge?.isEnabled) {
+		const effects = calculateManaRechargeEffects(manaRecharge.isEnabled)
+		integrateEffects(effects, bonuses)
+	}
+
+	return bonuses
 }

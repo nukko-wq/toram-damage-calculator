@@ -222,6 +222,14 @@ export default function MultiParamModal({
 										<br />
 										使用者以外の場合: 2
 									</>
+								) : skill.id === 'IsWarcry' ? (
+									<>
+										いずれかを選択して下さい。
+										<br />
+										両手剣の場合: 1
+										<br />
+										両手剣以外の場合: 2
+									</>
 								) : (
 									`${skill.multiParams.param1.name}を入力してください。`
 								)
@@ -236,7 +244,11 @@ export default function MultiParamModal({
 								onClick={() =>
 									handleLevelChange((currentState.level || 10) - 10)
 								}
-								disabled={currentState.level <= 1}
+								disabled={currentState.level <= (
+									skill.type === 'multiParam' && skill.multiParams
+										? skill.multiParams.param1.min
+										: 1
+								)}
 								className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 							>
 								-10
@@ -248,15 +260,21 @@ export default function MultiParamModal({
 								onClick={() =>
 									handleLevelChange((currentState.level || 10) - 1)
 								}
-								disabled={currentState.level <= 1}
+								disabled={currentState.level <= (
+									skill.type === 'multiParam' && skill.multiParams
+										? skill.multiParams.param1.min
+										: 1
+								)}
 								className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 							>
 								-1
 							</button>
 
 							{/* レベル表示 */}
-							<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded w-[80px] text-center">
+							<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded w-[120px] text-center">
 								{skill.id === 'IsBrave'
+									? currentState.level || 2
+									: skill.id === 'IsWarcry'
 									? currentState.level || 2
 									: `Lv.${currentState.level || 10}`}
 							</div>
@@ -267,7 +285,11 @@ export default function MultiParamModal({
 								onClick={() =>
 									handleLevelChange((currentState.level || 10) + 1)
 								}
-								disabled={currentState.level >= (skill.maxLevel || 10)}
+								disabled={currentState.level >= (
+									skill.type === 'multiParam' && skill.multiParams
+										? skill.multiParams.param1.max
+										: skill.maxLevel || 10
+								)}
 								className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 							>
 								+1
@@ -279,7 +301,11 @@ export default function MultiParamModal({
 								onClick={() =>
 									handleLevelChange((currentState.level || 10) + 10)
 								}
-								disabled={currentState.level >= (skill.maxLevel || 10)}
+								disabled={currentState.level >= (
+									skill.type === 'multiParam' && skill.multiParams
+										? skill.multiParams.param1.max
+										: skill.maxLevel || 10
+								)}
 								className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 							>
 								+10
@@ -288,7 +314,7 @@ export default function MultiParamModal({
 					</div>
 
 					{/* 重ねがけ数設定 */}
-					{skill.id !== 'IsBrave' && (
+					{skill.id !== 'IsBrave' && skill.id !== 'IsWarcry' && (
 						<div>
 							<div className="text-sm text-gray-600 mb-3">
 								{skill.type === 'multiParam' && skill.multiParams
@@ -520,7 +546,8 @@ export default function MultiParamModal({
 					{skill.id !== 'dp1' &&
 						skill.id !== 'mg4' &&
 						skill.id !== 'knight5-3' &&
-						skill.id !== 'IsBrave' && (
+						skill.id !== 'IsBrave' &&
+						skill.id !== 'IsWarcry' && (
 							<div className="text-xs text-gray-500 text-center">
 								{skill.name}はカウント数1-{skill.maxStack || 10}まで設定可能です
 							</div>

@@ -7,7 +7,16 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		id: 'IsWarcry',
 		name: 'ウォークライ',
 		category: 'blade',
-		type: 'toggle',
+		type: 'multiParam',
+		multiParams: {
+			param1: {
+				name: '武器タイプ',
+				min: 1,
+				max: 2,
+				default: 2,
+				unit: '',
+			},
+		},
 		order: 201,
 	},
 
