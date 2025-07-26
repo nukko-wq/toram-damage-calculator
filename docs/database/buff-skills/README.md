@@ -19,6 +19,9 @@ buff-skills/
 ├── dualsword-skills.md         # デュアルソードスキル系統
 ├── support-skills.md           # サポートスキル系統
 ├── partisan-skills.md          # パルチザンスキル系統
+├── darkpower-skills.md         # ダークパワースキル系統
+├── assassin-skills.md          # アサシンスキル系統
+├── sprite-skills.md            # スプライトスキル系統
 ├── shoot-skills.md             # シュートスキル系統（予定）
 └── ... (他の系統)
 ```
@@ -85,6 +88,22 @@ buff-skills/
 - **スキル系統**: パルチザンスキル (category: 'partisan')
 - **含まれるスキル**: 1スキル
   - 前線維持Ⅱ (pal1)
+
+### ✅ darkpower-skills.md
+- **スキル系統**: ダークパワースキル (category: 'darkPower')
+- **含まれるスキル**: 1スキル
+  - エターナルナイトメア (dp1)
+
+### ✅ assassin-skills.md
+- **スキル系統**: アサシンスキル (category: 'assassin')
+- **含まれるスキル**: 2スキル
+  - シーカーリウス (oh1-2)
+  - 暗殺の極意 (assassin5-1)
+
+### ✅ sprite-skills.md
+- **スキル系統**: スプライトスキル (category: 'sprite')
+- **含まれるスキル**: 1スキル
+  - エンハンス (IsEnhance)
 
 ## 使用方法
 
