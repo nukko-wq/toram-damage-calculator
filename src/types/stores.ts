@@ -56,6 +56,7 @@ export interface CalculatorStore {
 
 	// ===== 差分検知システム =====
 	lastSavedData: CalculatorData | null
+	lastSavedUIState: { statusPreviewCategory: string } | null
 	hasRealChanges: boolean
 
 	// ===== 将来の計算結果 =====
@@ -79,12 +80,14 @@ export interface CalculatorStore {
 
 	// ===== 差分検知メソッド =====
 	updateLastSavedData: (data: CalculatorData) => void
+	updateLastSavedUIState: (saveId: string) => void
 	checkForRealChanges: () => boolean
 	setHasRealChanges: (value: boolean) => void
 
 	// ===== セーブデータ管理 =====
 	loadSaveData: (data: CalculatorData) => Promise<void>
 	saveCurrentData: () => Promise<void>
+	checkUIChanges: (saveId: string) => void
 
 	// ===== 個別フォーム更新 =====
 	updateBaseStats: (stats: BaseStats) => void
@@ -170,12 +173,19 @@ export interface UIStore {
 	showStatusPreview: boolean
 	showDamagePreview: boolean
 
+	// セーブデータごとの基本ステータスカテゴリ表示状態
+	statusPreviewCategories: Record<string, 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'>
+
 	setShowSaveManager: (value: boolean) => void
 	setShowUpdateNotifications: (value: boolean) => void
 	setShowStatusPreview: (show: boolean) => void
 	setShowDamagePreview: (show: boolean) => void
 	toggleStatusPreview: () => void
 	toggleDamagePreview: () => void
+
+	// セーブデータごとの基本ステータスカテゴリ管理
+	getStatusPreviewCategory: (saveId: string) => 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'
+	setStatusPreviewCategory: (saveId: string, category: 'base' | 'physical' | 'magical' | 'hybrid' | 'tank') => void
 }
 
 // ===== セーブデータストア =====

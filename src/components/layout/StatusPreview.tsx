@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react'
-import { useCalculatorStore } from '@/stores'
+import { useCalculatorStore, useSaveDataStore, useUIStore } from '@/stores'
 import type { FilterOption } from '@/types/bonusCalculation'
 import {
 	calculateHP,
@@ -99,6 +99,8 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 
 export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const { data } = useCalculatorStore()
+	const { currentSaveId } = useSaveDataStore()
+	const { getStatusPreviewCategory, setStatusPreviewCategory } = useUIStore()
 
 	// 表示状態管理
 	const [visibleSections, setVisibleSections] = useState({
@@ -109,8 +111,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		equipmentBonus3: false,
 	})
 
-	// 基本ステータスカテゴリ状態管理
-	const [basicStatsCategory, setBasicStatsCategory] = useState<BasicStatsDisplayCategory['value']>('base')
+	// 基本ステータスカテゴリ状態管理（UIStoreから取得）
+	const basicStatsCategory = getStatusPreviewCategory(currentSaveId)
+	const handleBasicStatsCategoryChange = (category: BasicStatsDisplayCategory['value']) => {
+		setStatusPreviewCategory(currentSaveId, category)
+	}
 
 	// フィルター状態管理
 	const [filters, setFilters] = useState({
@@ -1090,7 +1095,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								<h3 className="text-sm font-semibold">基本ステータス</h3>
 								<select 
 									value={basicStatsCategory}
-									onChange={(e) => setBasicStatsCategory(e.target.value as BasicStatsDisplayCategory['value'])}
+									onChange={(e) => handleBasicStatsCategoryChange(e.target.value as BasicStatsDisplayCategory['value'])}
 									className="ml-2 px-2 py-1 text-xs border border-gray-300 rounded outline-none"
 								>
 									{BASIC_STATS_CATEGORIES.map(category => (

@@ -102,6 +102,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			// ===== 差分検知システム =====
 			lastSavedData: null,
+			lastSavedUIState: null,
 			hasRealChanges: false,
 
 			// ===== ステータス計算結果表示 =====
@@ -168,6 +169,19 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				}
 			},
 
+			updateLastSavedUIState: (saveId) => {
+				// UIStoreから現在の状態を取得してスナップショットを作成
+				if (typeof window !== 'undefined') {
+					const { useUIStore } = require('./uiStore')
+					const currentCategory = useUIStore.getState().getStatusPreviewCategory(saveId)
+					set(
+						{ lastSavedUIState: { statusPreviewCategory: currentCategory } },
+						false,
+						'updateLastSavedUIState',
+					)
+				}
+			},
+
 			setHasRealChanges: (value) => {
 				set({ hasRealChanges: value }, false, 'setHasRealChanges')
 			},
@@ -212,6 +226,17 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					calculationResults: results, // 計算結果も更新
 				})
 
+				// UIStateのスナップショットも更新（セーブデータ読み込み時）
+				if (typeof window !== 'undefined') {
+					try {
+						const { useSaveDataStore } = require('./saveDataStore')
+						const currentSaveId = useSaveDataStore.getState().currentSaveId
+						get().updateLastSavedUIState(currentSaveId)
+					} catch (error) {
+						console.warn('UIState snapshot update failed during loadSaveData:', error)
+					}
+				}
+
 				// フォームの変更検知を同期的に無効化（遅延によるちらつきを防止）
 				// setTimeout削除により、より予測可能な状態管理を実現
 			},
@@ -232,9 +257,40 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						hasUnsavedChanges: false,
 						hasRealChanges: false,
 					})
+
+					// UIStateのスナップショットも更新（保存時）
+					if (typeof window !== 'undefined') {
+						try {
+							const { useSaveDataStore } = require('./saveDataStore')
+							const currentSaveId = useSaveDataStore.getState().currentSaveId
+							get().updateLastSavedUIState(currentSaveId)
+						} catch (error) {
+							console.warn('UIState snapshot update failed during saveCurrentData:', error)
+						}
+					}
 				} catch (error) {
 					console.error('データ保存エラー:', error)
 					throw error
+				}
+			},
+
+			checkUIChanges: (saveId) => {
+				// UIStoreの現在の状態と保存時の状態を比較
+				const { lastSavedUIState } = get()
+				
+				if (typeof window !== 'undefined' && lastSavedUIState) {
+					const { useUIStore } = require('./uiStore')
+					const currentCategory = useUIStore.getState().getStatusPreviewCategory(saveId)
+					const savedCategory = lastSavedUIState.statusPreviewCategory
+					
+					// UI状態に変更があるかチェック
+					const hasUIChanges = currentCategory !== savedCategory
+					
+					// データの変更もチェック
+					const hasDataChanges = get().checkForRealChanges()
+					
+					// どちらかに変更があれば保存ボタンを有効化
+					set({ hasRealChanges: hasUIChanges || hasDataChanges }, false, 'checkUIChanges')
 				}
 			},
 
@@ -884,6 +940,13 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						isInitialized: true,
 						isLoading: false,
 					})
+
+					// UIStateのスナップショットも設定（初期化時）
+					try {
+						get().updateLastSavedUIState(currentSave.id)
+					} catch (error) {
+						console.warn('UIState snapshot update failed during initialization:', error)
+					}
 
 					// 計算結果表示設定の初期化（将来実装）
 					// const store = get()
