@@ -40,24 +40,556 @@
 └─────────────────────────────────────┘
 ```
 
-### 基本ステータス（30項目）
+### 基本ステータス（カテゴリ別表示対応）
+
+タイトル右側にカテゴリ選択ドロップダウンを配置し、表示内容を用途別に絞り込み可能。
+
+#### カテゴリ定義
+
+**ベース（デフォルト）** - 全28項目表示
 ```
-┌─────── 基本ステータス ─────────┐
-│ HP 14,413      MP 459         │
-│ ATK 2,341      基礎ATK 1,890   │
-│ サブATK 156    サブ基礎ATK 0   │
+┌─ 基本ステータス [ベース ▼] ─┐
+│ HP 14,413      MP 459        │
+│ ATK 2,341      基礎ATK 1,890  │
+│ サブATK 156    サブ基礎ATK 0  │
 │ 総ATK 2,497    ブリンガーAM 124│
-│ MATK 1,876     基本MATK 1,542 │
-│ 安定率 85%     サブ安定率 75%  │
-│ クリ率 12%     クリダメ 150%   │
-│ 魔クリ率 8%    魔クリダメ 193% │
-│ 総属性有利 25% 属性覚醒 15%    │
-│ ASPD 1,200     CSPD 890       │
-│ HIT 234        FLEE 189       │
-│ 物理耐性 15%   魔法耐性 12%    │
-│ 異常耐性 8%    行動速度 18%    │
-│ 防御崩し 5%    先読み 3%       │
+│ MATK 1,876     基本MATK 1,542│
+│ 安定率 85%     サブ安定率 75% │
+│ クリ率 12%     クリダメ 150%  │
+│ 魔クリ率 8%    魔クリダメ 193%│
+│ 総属性有利 25% 属性覚醒 15%   │
+│ ASPD 1,200     CSPD 890      │
+│ HIT 234        FLEE 189      │
+│ 物理耐性 15%   魔法耐性 12%   │
+│ 異常耐性 8%    行動速度 18%   │
+│ 防御崩し 5%    先読み 3%      │
 └─────────────────────────────┘
+```
+
+**物理** - 物理攻撃特化17項目表示
+```
+┌─ 基本ステータス [物理 ▼] ───┐
+│ HP 2,380       MP 2,155      │
+│ ATK 10,177     基礎ATK 6,058 │
+│ サブATK -      サブ基礎ATK - │
+│ 総ATK 10,177   BringerA/M -  │
+│ 安定率(%) 100  サブ安定率(%) 60│
+│ ｸﾘﾃｨｶﾙ率 109    ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ 338│
+│ 総属性有利(%) 86 属性覚醒有利(%) 25│
+│ 近距離の威力(%) 37 遠距離の威力(%) -18│
+│ 物理貫通(%) 15 魔法貫通(%) - │
+│ 抜刀威力(%) -  防御崩し(%) - │
+│ 先読み(%) -    行動速度(%) 46│
+│ ASPD 4,889     CSPD 294     │
+│ HIT 613        FLEE 407     │
+└─────────────────────────────┘
+```
+
+#### 物理カテゴリ項目詳細（17項目）
+
+**基本項目（4項目）**
+- `HP`: HP計算結果（基本ステータスと同じ）
+- `MP`: MP計算結果（基本ステータスと同じ）
+- `ATK`: ATK計算結果（基本ステータスと同じ）
+- `基礎ATK`: 基礎ATK計算結果（基本ステータスと同じ）
+
+**サブ武器関連（2項目）**
+- `サブATK`: サブATK計算結果（双剣時のみ数値、他は「-」表示）
+- `サブ基礎ATK`: サブ基礎ATK計算結果（双剣時のみ数値、他は「-」表示）
+
+**攻撃力関連（1項目）**
+- `総ATK`: 総ATK計算結果（基本ステータスと同じ）
+- `BringerA/M`: ブリンガーAM計算結果（基本ステータスと同じ）
+
+**安定率関連（2項目）**
+- `安定率(%)`: 安定率計算結果（基本ステータスと同じ）
+- `サブ安定率(%)`: サブ安定率計算結果（双剣時のみ数値、他は「-」表示）
+
+**クリティカル関連（2項目）**
+- `ｸﾘﾃｨｶﾙ率`: クリティカル率計算結果（基本ステータスと同じ）
+- `ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ`: クリティカルダメージ計算結果（基本ステータスと同じ）
+
+**属性関連（2項目）**
+- `総属性有利(%)`: 総属性有利計算結果（基本ステータスと同じ）
+- `属性覚醒有利(%)`: 属性覚醒有利計算結果（基本ステータスと同じ）
+
+**威力・貫通関連（4項目）** ※装備品補正値1から取得
+- `近距離の威力(%)`: **データソース**: 装備品補正値1の`shortRangeDamage`（%のみ）
+- `遠距離の威力(%)`: **データソース**: 装備品補正値1の`longRangeDamage`（%のみ）
+- `物理貫通(%)`: **データソース**: 装備品補正値1の`physicalPenetration`（%のみ）
+- `魔法貫通(%)`: **データソース**: 装備品補正値1の`magicalPenetration`（%のみ）
+
+**抜刀関連（2項目）** ※装備品補正値1から取得
+- `抜刀威力(%)`: **データソース**: 装備品補正値1の`unsheatheAttack`（%のみ）
+- `抜刀威力+`: **データソース**: 装備品補正値1の`unsheatheAttack`（固定値のみ）
+
+**戦術関連（2項目）**
+- `防御崩し(%)`: 防御崩し計算結果（基本ステータスと同じ）
+- `先読み(%)`: 先読み計算結果（基本ステータスと同じ）
+
+**速度関連（3項目）**
+- `行動速度(%)`: 行動速度計算結果（基本ステータスと同じ）
+- `ASPD`: ASPD計算結果（基本ステータスと同じ）
+- `CSPD`: CSPD計算結果（基本ステータスと同じ）
+
+**命中・回避（2項目）**
+- `HIT`: HIT計算結果（基本ステータスと同じ）
+- `FLEE`: FLEE計算結果（基本ステータスと同じ）
+
+**魔法** - 魔法攻撃特化18項目表示
+```
+┌─ 基本ステータス [魔法 ▼] ───┐
+│ HP 2,380       MP 2,155      │
+│ MATK 514       基礎MATK 535  │
+│ 安定率(%) 100  サブ安定率(%) 60│
+│ 魔法ｸﾘﾃｨｶﾙ率 -   魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ 219│
+│ 総属性有利(%) 86 属性覚醒有利(%) 25│
+│ 近距離の威力(%) 37 遠距離の威力(%) -18│
+│ 物理貫通(%) 15 魔法貫通(%) - │
+│ 抜刀威力(%) -  抜刀威力+ -   │
+│ 防御崩し(%) -  先読み(%) -   │
+│ 行動速度(%) 46              │
+│ ASPD 4,889     CSPD 294     │
+│ HIT 613        FLEE 407     │
+└─────────────────────────────┘
+```
+
+#### 魔法カテゴリ項目詳細（18項目）
+
+**基本項目（4項目）**
+- `HP`: HP計算結果（基本ステータスと同じ）
+- `MP`: MP計算結果（基本ステータスと同じ）
+- `MATK`: MATK計算結果（基本ステータスと同じ）
+- `基礎MATK`: 基礎MATK計算結果（基本ステータスと同じ）
+
+**安定率関連（2項目）**
+- `安定率(%)`: 安定率計算結果（基本ステータスと同じ）
+- `サブ安定率(%)`: サブ安定率計算結果（双剣時のみ数値、他は「-」表示）
+
+**魔法クリティカル関連（2項目）**
+- `魔法ｸﾘﾃｨｶﾙ率`: 魔法クリティカル率計算結果（基本ステータスと同じ）
+- `魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ`: 魔法クリティカルダメージ計算結果（基本ステータスと同じ）
+
+**属性関連（2項目）**
+- `総属性有利(%)`: 総属性有利計算結果（基本ステータスと同じ）
+- `属性覚醒有利(%)`: 属性覚醒有利計算結果（基本ステータスと同じ）
+
+**威力・貫通関連（4項目）** ※装備品補正値1から取得
+- `近距離の威力(%)`: **データソース**: 装備品補正値1の`shortRangeDamage`（%のみ）
+- `遠距離の威力(%)`: **データソース**: 装備品補正値1の`longRangeDamage`（%のみ）
+- `物理貫通(%)`: **データソース**: 装備品補正値1の`physicalPenetration`（%のみ）
+- `魔法貫通(%)`: **データソース**: 装備品補正値1の`magicalPenetration`（%のみ）
+
+**抜刀関連（2項目）** ※装備品補正値1から取得
+- `抜刀威力(%)`: **データソース**: 装備品補正値1の`unsheatheAttack`（%のみ）
+- `抜刀威力+`: **データソース**: 装備品補正値1の`unsheatheAttack`（固定値のみ）
+
+**戦術関連（2項目）**
+- `防御崩し(%)`: 防御崩し計算結果（基本ステータスと同じ）
+- `先読み(%)`: 先読み計算結果（基本ステータスと同じ）
+
+**速度関連（3項目）**
+- `行動速度(%)`: 行動速度計算結果（基本ステータスと同じ）
+- `ASPD`: ASPD計算結果（基本ステータスと同じ）
+- `CSPD`: CSPD計算結果（基本ステータスと同じ）
+
+**命中・回避（2項目）**
+- `HIT`: HIT計算結果（基本ステータスと同じ）
+- `FLEE`: FLEE計算結果（基本ステータスと同じ）
+
+**物理/魔法** - 物理魔法両対応表示22項目表示
+```
+┌─ 基本ステータス [物理/魔法 ▼] ──┐
+│ HP 2,380       MP 2,155         │
+│ ATK 10,177     基礎ATK 6,058    │
+│ サブATK -      サブ基礎ATK -    │
+│ 総ATK 10,177   BringerA/M -     │
+│ MATK 514       基礎MATK 535     │
+│ 槍MATK 298     槍基礎MATK 305   │
+│ 安定率(%) 100  サブ安定率(%) 60 │
+│ ｸﾘﾃｨｶﾙ率 109    ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ 338 │
+│ 魔法ｸﾘﾃｨｶﾙ率 -   魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ 219│
+│ 総属性有利(%) 86 属性覚醒有利(%) 25│
+│ 近距離の威力(%) 37 遠距離の威力(%) -18│
+│ 物理貫通(%) 15 魔法貫通(%) -    │
+│ 抜刀威力(%) -  抜刀威力+ -      │
+│ 防御崩し(%) -  先読み(%) -      │
+│ 行動速度(%) 46                 │
+│ ASPD 4,889     CSPD 294        │
+│ HIT 613        FLEE 407        │
+└────────────────────────────────┘
+```
+
+#### 物理/魔法カテゴリ項目詳細（22項目）
+
+**基本項目（2項目）**
+- `HP`: HP計算結果（基本ステータスと同じ）
+- `MP`: MP計算結果（基本ステータスと同じ）
+
+**物理攻撃関連（6項目）**
+- `ATK`: ATK計算結果（基本ステータスと同じ）
+- `基礎ATK`: 基礎ATK計算結果（基本ステータスと同じ）
+- `サブATK`: サブATK計算結果（双剣時のみ数値、他は「-」表示）
+- `サブ基礎ATK`: サブ基礎ATK計算結果（双剣時のみ数値、他は「-」表示）
+- `総ATK`: 総ATK計算結果（基本ステータスと同じ）
+- `BringerA/M`: ブリンガーAM計算結果（基本ステータスと同じ）
+
+**魔法攻撃関連（4項目）**
+- `MATK`: MATK計算結果（基本ステータスと同じ）
+- `基礎MATK`: 基礎MATK計算結果（基本ステータスと同じ）
+- `槍MATK`: **暫定**: 0表示（将来実装予定）
+- `槍基礎MATK`: **暫定**: 0表示（将来実装予定）
+
+**安定率関連（2項目）**
+- `安定率(%)`: 安定率計算結果（基本ステータスと同じ）
+- `サブ安定率(%)`: サブ安定率計算結果（双剣時のみ数値、他は「-」表示）
+
+**クリティカル関連（4項目）**
+- `ｸﾘﾃｨｶﾙ率`: クリティカル率計算結果（基本ステータスと同じ）
+- `ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ`: クリティカルダメージ計算結果（基本ステータスと同じ）
+- `魔法ｸﾘﾃｨｶﾙ率`: 魔法クリティカル率計算結果（基本ステータスと同じ）
+- `魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ`: 魔法クリティカルダメージ計算結果（基本ステータスと同じ）
+
+**属性関連（2項目）**
+- `総属性有利(%)`: 総属性有利計算結果（基本ステータスと同じ）
+- `属性覚醒有利(%)`: 属性覚醒有利計算結果（基本ステータスと同じ）
+
+**威力・貫通関連（4項目）** ※装備品補正値1から取得
+- `近距離の威力(%)`: **データソース**: 装備品補正値1の`shortRangeDamage`（%のみ）
+- `遠距離の威力(%)`: **データソース**: 装備品補正値1の`longRangeDamage`（%のみ）
+- `物理貫通(%)`: **データソース**: 装備品補正値1の`physicalPenetration`（%のみ）
+- `魔法貫通(%)`: **データソース**: 装備品補正値1の`magicalPenetration`（%のみ）
+
+**抜刀関連（2項目）** ※装備品補正値1から取得
+- `抜刀威力(%)`: **データソース**: 装備品補正値1の`unsheatheAttack`（%のみ）
+- `抜刀威力+`: **データソース**: 装備品補正値1の`unsheatheAttack`（固定値のみ）
+
+**戦術関連（2項目）**
+- `防御崩し(%)`: 防御崩し計算結果（基本ステータスと同じ）
+- `先読み(%)`: 先読み計算結果（基本ステータスと同じ）
+
+**速度関連（3項目）**
+- `行動速度(%)`: 行動速度計算結果（基本ステータスと同じ）
+- `ASPD`: ASPD計算結果（基本ステータスと同じ）
+- `CSPD`: CSPD計算結果（基本ステータスと同じ）
+
+**命中・回避（2項目）**
+- `HIT`: HIT計算結果（基本ステータスと同じ）
+- `FLEE`: FLEE計算結果（基本ステータスと同じ）
+
+**壁** - タンク特化表示18項目表示
+```
+┌─ 基本ステータス [壁 ▼] ─────┐
+│ HP 2,380       MP 2,155      │
+│ ASPD 4,889     CSPD 294     │
+│ HIT 613        FLEE 407     │
+│ ｸﾘﾃｨｶﾙ率 109    安定率(%) 100 │
+│ 物理耐性(%) -159 魔法耐性(%) -159│
+│ 異常耐性(%) -  行動速度(%) 46│
+│ 防御崩し(%) -  先読み(%) -   │
+│ 物理バリア -   魔法バリア -  │
+│ 割合バリア -   バリア速度(%) -│
+│ Guard力(%) -   Guard回復(%) -│
+│ ヘイト(%) -15  闇耐性(%) -   │
+└─────────────────────────────┘
+```
+
+#### 壁カテゴリ項目詳細（18項目）
+
+**基本項目（2項目）**
+- `HP`: HP計算結果（基本ステータスと同じ）
+- `MP`: MP計算結果（基本ステータスと同じ）
+
+**速度・命中関連（4項目）**
+- `ASPD`: ASPD計算結果（基本ステータスと同じ）
+- `CSPD`: CSPD計算結果（基本ステータスと同じ）
+- `HIT`: HIT計算結果（基本ステータスと同じ）
+- `FLEE`: FLEE計算結果（基本ステータスと同じ）
+
+**戦闘基本（2項目）**
+- `ｸﾘﾃｨｶﾙ率`: クリティカル率計算結果（基本ステータスと同じ）
+- `安定率(%)`: 安定率計算結果（基本ステータスと同じ）
+
+**耐性関連（3項目）**
+- `物理耐性(%)`: 物理耐性計算結果（基本ステータスと同じ）
+- `魔法耐性(%)`: 魔法耐性計算結果（基本ステータスと同じ）
+- `異常耐性(%)`: 異常耐性計算結果（基本ステータスと同じ）
+
+**機動性（1項目）**
+- `行動速度(%)`: 行動速度計算結果（基本ステータスと同じ）
+
+**戦術関連（2項目）**
+- `防御崩し(%)`: 防御崩し計算結果（基本ステータスと同じ）
+- `先読み(%)`: 先読み計算結果（基本ステータスと同じ）
+
+**バリア関連（4項目）** ※装備品補正値2から取得
+- `物理バリア`: **データソース**: 装備品補正値2の`physicalBarrier`（固定値のみ）
+- `魔法バリア`: **データソース**: 装備品補正値2の`magicalBarrier`（固定値のみ）
+- `割合バリア`: **データソース**: 装備品補正値2の`fractionalBarrier`（固定値のみ）
+- `バリア速度(%)`: **データソース**: 装備品補正値2の`barrierCooldown`（%のみ）
+
+**Guard関連（2項目）** ※将来実装予定
+- `Guard力(%)`: **暫定**: 0表示（将来実装予定）
+- `Guard回復(%)`: **暫定**: 0表示（将来実装予定）
+
+**ヘイト・属性（2項目）**
+- `ヘイト(%)`: **データソース**: 装備品補正値1の`aggro`（%のみ）
+- `闇耐性(%)`: **データソース**: 装備品補正値2の`darkResistance`（%のみ）
+
+## UIコンポーネント設計
+
+### カテゴリ選択ドロップダウン
+
+#### コンポーネント構造
+```tsx
+interface BasicStatsDisplayCategory {
+  value: 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'
+  label: string
+  itemCount: number
+}
+
+const BASIC_STATS_CATEGORIES: BasicStatsDisplayCategory[] = [
+  { value: 'base', label: 'ベース', itemCount: 28 },
+  { value: 'physical', label: '物理', itemCount: 18 },
+  { value: 'magical', label: '魔法', itemCount: 18 },
+  { value: 'hybrid', label: '物理/魔法', itemCount: 22 },
+  { value: 'tank', label: '壁', itemCount: 18 },
+]
+```
+
+#### UI配置
+```tsx
+<div className="stat-section">
+  <div className="flex items-center justify-between mb-2">
+    <h3 className="text-sm font-semibold">基本ステータス</h3>
+    <select 
+      value={selectedCategory}
+      onChange={(e) => setSelectedCategory(e.target.value)}
+      className="ml-2 px-2 py-1 text-xs border border-gray-300 rounded outline-none"
+    >
+      {BASIC_STATS_CATEGORIES.map(category => (
+        <option key={category.value} value={category.value}>
+          {category.label}
+        </option>
+      ))}
+    </select>
+  </div>
+  <StatSection /* カテゴリ別表示内容 */ />
+</div>
+```
+
+#### 状態管理
+```tsx
+// StatusPreview.tsxに追加する状態
+const [basicStatsCategory, setBasicStatsCategory] = useState<BasicStatsDisplayCategory['value']>('base')
+
+// カテゴリ変更ハンドラー
+const handleCategoryChange = (category: BasicStatsDisplayCategory['value']) => {
+  setBasicStatsCategory(category)
+}
+```
+
+### カテゴリ別データ取得
+
+#### データ統合関数
+```tsx
+// カテゴリに応じた表示データを生成
+const getBasicStatsByCategory = (
+  category: BasicStatsDisplayCategory['value'],
+  calculationResults: CalculationResults,
+  equipmentBonuses: EquipmentBonuses
+) => {
+  const baseStats = {
+    HP: calculationResults.hpCalculation.finalHP,
+    MP: calculationResults.mpCalculation.finalMP,
+    // ... 全基本ステータス
+  }
+
+  switch (category) {
+    case 'physical':
+      return {
+        HP: baseStats.HP,
+        MP: baseStats.MP,
+        ATK: baseStats.ATK,
+        baseATK: baseStats.baseATK,
+        subATK: baseStats.subATK,
+        subBaseATK: baseStats.subBaseATK,
+        totalATK: baseStats.totalATK,
+        bringerAM: baseStats.bringerAM,
+        stabilityRate: baseStats.stabilityRate,
+        subStabilityRate: baseStats.subStabilityRate,
+        criticalRate: baseStats.criticalRate,
+        criticalDamage: baseStats.criticalDamage,
+        totalElementAdvantage: baseStats.totalElementAdvantage,
+        elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
+        // 装備品補正値1から取得
+        shortRangeDamage: equipmentBonuses.equipmentBonus1.shortRangeDamage?.rate || 0,
+        longRangeDamage: equipmentBonuses.equipmentBonus1.longRangeDamage?.rate || 0,
+        physicalPenetration: equipmentBonuses.equipmentBonus1.physicalPenetration?.rate || 0,
+        magicalPenetration: equipmentBonuses.equipmentBonus1.magicalPenetration?.rate || 0,
+        unsheatheAttackRate: equipmentBonuses.equipmentBonus1.unsheatheAttack?.rate || 0,
+        unsheatheAttackFixed: equipmentBonuses.equipmentBonus1.unsheatheAttack?.fixed || 0,
+        armorBreak: baseStats.armorBreak,
+        anticipate: baseStats.anticipate,
+        motionSpeed: baseStats.motionSpeed,
+        ASPD: baseStats.ASPD,
+        CSPD: baseStats.CSPD,
+        HIT: baseStats.HIT,
+        FLEE: baseStats.FLEE,
+      }
+
+    case 'magical':
+      return {
+        HP: baseStats.HP,
+        MP: baseStats.MP,
+        MATK: baseStats.MATK,
+        baseMATK: baseStats.baseMATK,
+        stabilityRate: baseStats.stabilityRate,
+        subStabilityRate: baseStats.subStabilityRate,
+        magicCriticalRate: baseStats.magicCriticalRate,
+        magicCriticalDamage: baseStats.magicCriticalDamage,
+        totalElementAdvantage: baseStats.totalElementAdvantage,
+        elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
+        // 装備品補正値1から取得（物理と共通）
+        shortRangeDamage: equipmentBonuses.equipmentBonus1.shortRangeDamage?.rate || 0,
+        longRangeDamage: equipmentBonuses.equipmentBonus1.longRangeDamage?.rate || 0,
+        physicalPenetration: equipmentBonuses.equipmentBonus1.physicalPenetration?.rate || 0,
+        magicalPenetration: equipmentBonuses.equipmentBonus1.magicalPenetration?.rate || 0,
+        unsheatheAttackRate: equipmentBonuses.equipmentBonus1.unsheatheAttack?.rate || 0,
+        unsheatheAttackFixed: equipmentBonuses.equipmentBonus1.unsheatheAttack?.fixed || 0,
+        armorBreak: baseStats.armorBreak,
+        anticipate: baseStats.anticipate,
+        motionSpeed: baseStats.motionSpeed,
+        ASPD: baseStats.ASPD,
+        CSPD: baseStats.CSPD,
+        HIT: baseStats.HIT,
+        FLEE: baseStats.FLEE,
+      }
+
+    case 'hybrid':
+      return {
+        // 物理+魔法の全項目（22項目）
+        .../* 物理攻撃関連 */,
+        .../* 魔法攻撃関連 */,
+        spearMATK: 0, // 暫定値
+        spearBaseMATK: 0, // 暫定値
+        // 他の共通項目
+      }
+
+    case 'tank':
+      return {
+        HP: baseStats.HP,
+        MP: baseStats.MP,
+        ASPD: baseStats.ASPD,
+        CSPD: baseStats.CSPD,
+        HIT: baseStats.HIT,
+        FLEE: baseStats.FLEE,
+        criticalRate: baseStats.criticalRate,
+        stabilityRate: baseStats.stabilityRate,
+        physicalResistance: baseStats.physicalResistance,
+        magicalResistance: baseStats.magicalResistance,
+        ailmentResistance: baseStats.ailmentResistance,
+        motionSpeed: baseStats.motionSpeed,
+        armorBreak: baseStats.armorBreak,
+        anticipate: baseStats.anticipate,
+        // 装備品補正値2から取得
+        physicalBarrier: equipmentBonuses.equipmentBonus2.physicalBarrier?.fixed || 0,
+        magicalBarrier: equipmentBonuses.equipmentBonus2.magicalBarrier?.fixed || 0,
+        fractionalBarrier: equipmentBonuses.equipmentBonus2.fractionalBarrier?.fixed || 0,
+        barrierCooldown: equipmentBonuses.equipmentBonus2.barrierCooldown?.rate || 0,
+        guardPower: 0, // 暫定値
+        guardRecovery: 0, // 暫定値
+        // 装備品補正値1・2から取得
+        aggro: equipmentBonuses.equipmentBonus1.aggro?.rate || 0,
+        darkResistance: equipmentBonuses.equipmentBonus2.darkResistance?.rate || 0,
+      }
+
+    default: // 'base'
+      return baseStats
+  }
+}
+```
+
+### カテゴリ別ラベル定義
+
+#### 共通ラベル
+```tsx
+const BASE_LABELS = {
+  HP: 'HP',
+  MP: 'MP',
+  ASPD: 'ASPD',
+  CSPD: 'CSPD',
+  HIT: 'HIT',
+  FLEE: 'FLEE',
+  // ... 基本ラベル
+}
+
+const PHYSICAL_LABELS = {
+  ...BASE_LABELS,
+  ATK: 'ATK',
+  baseATK: '基礎ATK',
+  subATK: 'サブATK',
+  subBaseATK: 'サブ基礎ATK',
+  totalATK: '総ATK',
+  bringerAM: 'BringerA/M',
+  criticalRate: 'ｸﾘﾃｨｶﾙ率',
+  criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+  shortRangeDamage: '近距離の威力(%)',
+  longRangeDamage: '遠距離の威力(%)',
+  physicalPenetration: '物理貫通(%)',
+  magicalPenetration: '魔法貫通(%)',
+  unsheatheAttackRate: '抜刀威力(%)',
+  unsheatheAttackFixed: '抜刀威力+',
+  // ... 他の物理特化ラベル
+}
+
+const MAGICAL_LABELS = {
+  ...BASE_LABELS,
+  MATK: 'MATK',
+  baseMATK: '基礎MATK',
+  magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',
+  magicCriticalDamage: '魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+  // 威力・貫通は物理と共通
+  shortRangeDamage: '近距離の威力(%)',
+  longRangeDamage: '遠距離の威力(%)',
+  // ... 他の魔法特化ラベル
+}
+
+const TANK_LABELS = {
+  ...BASE_LABELS,
+  physicalResistance: '物理耐性(%)',
+  magicalResistance: '魔法耐性(%)',
+  physicalBarrier: '物理バリア',
+  magicalBarrier: '魔法バリア',
+  fractionalBarrier: '割合バリア',
+  barrierCooldown: 'バリア速度(%)',
+  aggro: 'ヘイト(%)',
+  darkResistance: '闇耐性(%)',
+  // ... 他のタンク特化ラベル
+}
+```
+
+### レスポンシブ対応
+
+#### モバイル表示調整
+```tsx
+// カテゴリ選択をモバイルでも操作しやすく
+const CategorySelector = ({ category, onChange, isMobile }) => (
+  <select 
+    value={category}
+    onChange={(e) => onChange(e.target.value)}
+    className={`
+      px-2 py-1 border border-gray-300 rounded outline-none
+      ${isMobile ? 'text-sm w-20' : 'text-xs ml-2'}
+    `}
+  >
+    {BASIC_STATS_CATEGORIES.map(cat => (
+      <option key={cat.value} value={cat.value}>
+        {isMobile ? cat.label : `${cat.label}(${cat.itemCount})`}
+      </option>
+    ))}
+  </select>
+)
 ```
 
 **サブ安定率表示仕様:**
