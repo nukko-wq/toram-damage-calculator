@@ -933,7 +933,7 @@ export function getDetailedDataSourceBonuses(
 				freeInput3: equipmentSlots.freeInput3,
 				enchantment: getEnchantmentBonuses(data.equipment),
 			},
-			crystal: getCrystalBonuses(data.crystals),
+			crystal: getCrystalBonusesWithConditionalEffects(data),
 			food: getFoodBonuses(data.food),
 			buffItems: getBuffBonuses(data.buffItems),
 			buffSkills: getBuffSkillBonuses(
