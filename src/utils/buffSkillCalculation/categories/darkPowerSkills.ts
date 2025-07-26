@@ -36,7 +36,6 @@ export function getEternalNightmareEffects(
 	if (!buffSkillData) return {}
 
 	const eternalNightmare = buffSkillData.dp1
-	console.log('EternalNightmare debug:', eternalNightmare)
 	
 	if (eternalNightmare?.isEnabled) {
 		// multiParam型の場合は multiParam1, multiParam2 を使用
@@ -54,7 +53,6 @@ export function getEternalNightmareEffects(
 		}
 		
 		const effects = calculateEternalNightmareEffects(skillLevel, skillPointTotal)
-		console.log('EternalNightmare effects:', effects, 'skillLevel:', skillLevel, 'skillPointTotal:', skillPointTotal)
 		return effects
 	}
 

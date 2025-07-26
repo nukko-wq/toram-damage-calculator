@@ -202,14 +202,7 @@ export function calculateDamageWithService(
 					isEnabled: calculatorData.buffSkills?.skills?.dp1?.isEnabled ?? false,
 					level: getEternalNightmareLevel(calculatorData.buffSkills?.skills?.dp1),
 				},
-				totalDarkPowerLevel: (() => {
-					const totalLevel = calculateTotalDarkPowerLevel(calculatorData.buffSkills?.skills ?? {})
-					console.log('ダークパワー全スキルポイント取得デバッグ:', {
-						dp1: calculatorData.buffSkills?.skills?.dp1,
-						totalDarkPowerLevel: totalLevel
-					})
-					return totalLevel
-				})(),
+				totalDarkPowerLevel: calculateTotalDarkPowerLevel(calculatorData.buffSkills?.skills ?? {}),
 			},
 			// PowerOptionsに基づいた設定
 			elementAdvantage: {
