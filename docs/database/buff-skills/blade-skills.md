@@ -111,27 +111,20 @@ function calculateBladeMasteryEffects(
     }
   },
   order: 201,
-  description: '武器タイプに応じて攻撃力と魔法力を上昇させる',
+  description: '武器タイプに応じて攻撃力率を上昇させる。全武器で効果があります',
   effects: [
     {
-      property: 'ATK',
-      formula: 'param1 === 1 ? +10 : +5',
-      conditions: ['両手剣(1): +10, 両手剣以外(2): +5']
-    },
-    {
-      property: 'MATK',
-      formula: 'param1 === 1 ? +10 : +5',
-      conditions: ['両手剣(1): +10, 両手剣以外(2): +5']
+      property: 'ATK_Rate',
+      formula: 'param1 === 1 ? +15 : +10',
+      conditions: ['両手剣(1): +15%, 両手剣以外(2): +10%']
     }
   ],
   calculationFormula: `
     両手剣(1)の場合:
-    - ATK: +10
-    - MATK: +10
+    - ATK_Rate: +15%
     
     両手剣以外(2)の場合:
-    - ATK: +5
-    - MATK: +5
+    - ATK_Rate: +10%
   `,
   uiSettings: {
     parameterName: '武器タイプ',
@@ -139,8 +132,8 @@ function calculateBladeMasteryEffects(
     showInModal: true,
     quickToggle: false,
     parameterOptions: [
-      { value: 1, label: '両手剣', description: 'ATK+10, MATK+10' },
-      { value: 2, label: '両手剣以外', description: 'ATK+5, MATK+5' }
+      { value: 1, label: '両手剣', description: 'ATK率+15%' },
+      { value: 2, label: '両手剣以外', description: 'ATK率+10%' }
     ]
   }
 }
@@ -155,14 +148,12 @@ function calculateWarCryEffects(
   if (weaponTypeParam === 1) {
     // 両手剣の場合
     return {
-      ATK: 10,
-      MATK: 10,
+      ATK_Rate: 15, // ATK率+15%
     }
   } else {
     // 両手剣以外の場合
     return {
-      ATK: 5,
-      MATK: 5,
+      ATK_Rate: 10, // ATK率+10%
     }
   }
 }
@@ -273,8 +264,8 @@ function calculateBerserkEffects(
 - **武器種制限**: ブレードマスタリは片手剣・両手剣・双剣装備時のみ効果発動
 - **段階的効果**: ブレードマスタリのATK%効果はスキルレベル帯によって段階的に変化
 - **パラメータ選択効果**: ウォークライは武器タイプパラメータ（両手剣 or 両手剣以外）により効果が変動
-  - 両手剣(1): ATK+10, MATK+10
-  - 両手剣以外(2): ATK+5, MATK+5（デフォルト）
+  - 両手剣(1): ATK率+15%
+  - 両手剣以外(2): ATK率+10%（デフォルト）
 - **武器種別効果変動**: バーサークは武器種により効果が変化
   - 片手剣・双剣: 安定率減少が軽減 (-25%)
   - 両手剣: クリティカル増加が強化 (+50)

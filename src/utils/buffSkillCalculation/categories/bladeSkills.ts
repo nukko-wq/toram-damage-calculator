@@ -51,21 +51,19 @@ export function calculateTakumiKenjutsuPassiveMultiplier(
 export function calculateWarCryEffects(
 	weaponTypeParam: number, // 1: 両手剣, 2: 両手剣以外
 ): Partial<EquipmentProperties> {
-	if (!weaponTypeParam || (weaponTypeParam !== 1 && weaponTypeParam !== 2)) return {}
+	if (!weaponTypeParam || (weaponTypeParam !== 1 && weaponTypeParam !== 2))
+		return {}
 
 	// 武器タイプに応じた効果
 	if (weaponTypeParam === 1) {
 		// 両手剣の場合
 		return {
-			ATK: 10,
-			MATK: 10,
+			ATK_Rate: 15, // ATK率+15%
 		}
-	} else {
-		// 両手剣以外の場合
-		return {
-			ATK: 5,
-			MATK: 5,
-		}
+	}
+	// 両手剣以外の場合
+	return {
+		ATK_Rate: 10, // ATK率+10%
 	}
 }
 
@@ -144,7 +142,7 @@ export function getBladeSkillBonuses(
 
 	// バーサークの処理（武器種別ごとに異なるID）
 	const berserkIds = ['sm3-1', 'sm3-2', 'sm3-3']
-	const activeBerserk = berserkIds.find(id => buffSkillData[id]?.isEnabled)
+	const activeBerserk = berserkIds.find((id) => buffSkillData[id]?.isEnabled)
 	if (activeBerserk) {
 		const effects = calculateBerserkEffects(true, convertedWeaponType)
 		integrateEffects(effects, bonuses)
