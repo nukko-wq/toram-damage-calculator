@@ -46,6 +46,72 @@ export function calculateTakumiKenjutsuPassiveMultiplier(
 }
 
 /**
+ * ウォークライの効果計算関数
+ */
+export function calculateWarCryEffects(
+	weaponTypeParam: number, // 1: 両手剣, 2: 両手剣以外
+): Partial<EquipmentProperties> {
+	if (!weaponTypeParam || (weaponTypeParam !== 1 && weaponTypeParam !== 2))
+		return {}
+
+	// 武器タイプに応じた効果
+	if (weaponTypeParam === 1) {
+		// 両手剣の場合
+		return {
+			ATK_Rate: 15, // ATK率+15%
+		}
+	}
+	// 両手剣以外の場合
+	return {
+		ATK_Rate: 10, // ATK率+10%
+	}
+}
+
+/**
+ * バーサークの効果計算関数
+ */
+export function calculateBerserkEffects(
+	isEnabled: boolean,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+
+	// 全武器種共通効果
+	const baseEffects: Partial<EquipmentProperties> = {
+		AttackSpeed: 1000,
+		AttackSpeed_Rate: 100,
+	}
+
+	// 武器種別効果計算
+	let weaponSpecificEffects: Partial<EquipmentProperties> = {}
+
+	if (weaponType === 'oneHandSword' || weaponType === 'dualSword') {
+		// 片手剣・双剣装備時
+		weaponSpecificEffects = {
+			Critical: 25,
+			Stability_Rate: -25,
+		}
+	} else if (weaponType === 'twoHandSword') {
+		// 両手剣装備時
+		weaponSpecificEffects = {
+			Critical: 50,
+			Stability_Rate: -25,
+		}
+	} else {
+		// その他の武器装備時
+		weaponSpecificEffects = {
+			Critical: 25,
+			Stability_Rate: -50,
+		}
+	}
+
+	return {
+		...baseEffects,
+		...weaponSpecificEffects,
+	}
+}
+
+/**
  * ブレードスキル系統の統合効果取得
  */
 export function getBladeSkillBonuses(
@@ -64,6 +130,21 @@ export function getBladeSkillBonuses(
 			quickSlash.level,
 			convertedWeaponType,
 		)
+		integrateEffects(effects, bonuses)
+	}
+
+	// ウォークライの処理
+	const warCry = buffSkillData['IsWarcry']
+	if (warCry?.isEnabled && warCry.multiParam1) {
+		const effects = calculateWarCryEffects(warCry.multiParam1)
+		integrateEffects(effects, bonuses)
+	}
+
+	// バーサークの処理（武器種別ごとに異なるID）
+	const berserkIds = ['sm3-1', 'sm3-2', 'sm3-3']
+	const activeBerserk = berserkIds.find((id) => buffSkillData[id]?.isEnabled)
+	if (activeBerserk) {
+		const effects = calculateBerserkEffects(true, convertedWeaponType)
 		integrateEffects(effects, bonuses)
 	}
 

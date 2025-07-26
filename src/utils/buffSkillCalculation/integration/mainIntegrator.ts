@@ -15,11 +15,12 @@ import { getBattleSkillBonuses, getBattleSkillBonusesWithPlayerLevel } from '../
 import { getSurvivalSkillBonuses } from '../categories/survivalSkills'
 import { getHunterSkillBonuses } from '../categories/hunterSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
-import { getSupportSkillBraveMultiplier } from '../categories/supportSkills'
+import { getSupportSkillBraveMultiplier, getSupportSkillBonuses } from '../categories/supportSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
 import { getShieldSkillBonuses } from '../categories/shieldSkills'
 import { getAssassinSkillBonuses } from '../categories/assassinSkills'
 import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
+import { getSpriteSkillBonuses, getSpriteSkillBraveMultiplier } from '../categories/spriteSkills'
 
 /**
  * バフスキルデータから全体の補正値を取得（基本版）
@@ -27,6 +28,9 @@ import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 export function getBuffSkillBonuses(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
+	enemyDEF?: number,
+	enemyMDEF?: number,
+	enemyLevel?: number,
 ): Partial<AllBonuses> {
 	const bonuses: Partial<AllBonuses> = {}
 
@@ -89,6 +93,29 @@ export function getBuffSkillBonuses(
 	// ダークパワースキル
 	const darkPowerBonuses = getDarkPowerSkillBonuses(buffSkillData)
 	for (const [key, value] of Object.entries(darkPowerBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// サポートスキル
+	const supportBonuses = getSupportSkillBonuses(buffSkillData)
+	for (const [key, value] of Object.entries(supportBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// スプライトスキル（敵情報があれば使用、なければデフォルト値）
+	const spriteBonuses = getSpriteSkillBonuses(
+		buffSkillData,
+		enemyDEF ?? 1000,
+		enemyMDEF ?? 1000,
+		enemyLevel ?? 100,
+	)
+	for (const [key, value] of Object.entries(spriteBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
@@ -275,8 +302,23 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
  */
 export function getBuffSkillBraveMultiplier(
 	buffSkillData: Record<string, BuffSkillState> | null,
+	enemyDEF?: number,
+	enemyMDEF?: number,
+	enemyLevel?: number,
 ): number {
-	return getSupportSkillBraveMultiplier(buffSkillData)
+	let totalBraveMultiplier = getSupportSkillBraveMultiplier(buffSkillData)
+	
+	// エンハンスのブレイブ倍率も追加
+	if (enemyDEF !== undefined && enemyMDEF !== undefined && enemyLevel !== undefined) {
+		totalBraveMultiplier += getSpriteSkillBraveMultiplier(
+			buffSkillData,
+			enemyDEF,
+			enemyMDEF,
+			enemyLevel,
+		)
+	}
+	
+	return totalBraveMultiplier
 }
 
 /**
@@ -287,5 +329,17 @@ export function getAssassinSkillEffects(
 	subWeaponType: SubWeaponType | null,
 ): Partial<AllBonuses> {
 	return getAssassinSkillBonuses(buffSkillData, subWeaponType)
+}
+
+/**
+ * バフスキルデータからエンハンスの効果を取得（敵情報が必要）
+ */
+export function getEnhanceSkillEffects(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	enemyDEF: number,
+	enemyMDEF: number,
+	enemyLevel: number,
+): Partial<AllBonuses> {
+	return getSpriteSkillBonuses(buffSkillData, enemyDEF, enemyMDEF, enemyLevel)
 }
 

@@ -162,6 +162,14 @@ export function calculateDamageWithService(
 		const normalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
 		const normalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
 
+		// エンハンススキルのブレイブ倍率を適用するため、敵情報を含めて再計算
+		const braveMultiplierWithEnemy = getBuffSkillBraveMultiplier(
+			calculatorData.buffSkills?.skills || null,
+			normalEnemyDEF,
+			normalEnemyMDEF,
+			finalEnemyLevel,
+		)
+
 		// ボス系敵かつ難易度がnormal以外の場合、難易度調整を適用
 		if (
 			enemyInfo?.category === 'boss' &&
@@ -182,7 +190,7 @@ export function calculateDamageWithService(
 			playerLevel: calculatorData.baseStats.level,
 			referenceStat: totalATK, // 計算済みの総ATKを使用
 			passiveMultiplier: passiveMultiplier, // バフスキルから取得したパッシブ倍率を適用
-			braveMultiplier: braveMultiplier, // バフスキルから取得したブレイブ倍率を適用
+			braveMultiplier: braveMultiplierWithEnemy, // エンハンス含むブレイブ倍率を適用
 			// 敵情報を実際のデータに基づいて設定
 			enemyLevel: finalEnemyLevel,
 			stability: {
@@ -342,8 +350,8 @@ export function calculateDamageWithService(
 							calculatorData.mainWeapon?.weaponType || null,
 							selectedSkill.category,
 						),
-						// ブレイブ倍率はスキル攻撃でも同じ値を使用
-						braveMultiplier: braveMultiplier,
+						// ブレイブ倍率はスキル攻撃でも同じ値を使用（エンハンス含む）
+						braveMultiplier: braveMultiplierWithEnemy,
 						attackSkill: {
 							type: originalHit.attackType,
 							multiplier: hitResult.calculatedMultiplier,
