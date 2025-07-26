@@ -143,33 +143,36 @@ export default React.memo<StatSectionProps>(
 				) : (
 					<div className="space-y-0">
 						{(() => {
-							const entries = Object.entries(stats)
+							// propertyOrderが指定されている場合はその順序で、そうでなければObject.entriesの順序で処理
+							const orderedKeys = propertyOrder || Object.keys(stats)
 							const rows: React.ReactElement[] = []
 
-							for (let i = 0; i < entries.length; i += 2) {
-								const [leftKey, leftValue] = entries[i]
-								const rightEntry = entries[i + 1]
+							for (let i = 0; i < orderedKeys.length; i += 2) {
+								const leftKey = orderedKeys[i]
+								const rightKey = orderedKeys[i + 1]
 
-								const leftStat = {
+								// 空文字列の場合はスペースとして扱う
+								const leftStat = leftKey && leftKey !== '' ? {
 									name: labels[leftKey] || leftKey,
-									value: leftValue,
+									value: stats[leftKey] ?? null,
+								} : undefined
+
+								const rightStat = rightKey && rightKey !== '' ? {
+									name: labels[rightKey] || rightKey,
+									value: stats[rightKey] ?? null,
+								} : undefined
+
+								// 左側が存在する場合、または右側のみが存在する場合に行を追加
+								if (leftStat || rightStat) {
+									rows.push(
+										<StatRow
+											key={`row-${i}`}
+											leftStat={leftStat}
+											rightStat={rightStat}
+											className=""
+										/>,
+									)
 								}
-
-								const rightStat = rightEntry
-									? {
-											name: labels[rightEntry[0]] || rightEntry[0],
-											value: rightEntry[1],
-										}
-									: undefined
-
-								rows.push(
-									<StatRow
-										key={`row-${i}`}
-										leftStat={leftStat}
-										rightStat={rightStat}
-										className=""
-									/>,
-								)
 							}
 
 							return rows

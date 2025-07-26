@@ -817,6 +817,95 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		}
 	}
 
+	// カテゴリ別表示順序定義
+	const getBasicStatsDisplayOrder = (category: BasicStatsDisplayCategory['value']): string[] => {
+		switch (category) {
+			case 'physical':
+				return [
+					'HP', 'MP',
+					'ATK', 'baseATK',
+					'subATK', 'subBaseATK',
+					'totalATK', 'bringerAM',
+					'stabilityRate', 'subStabilityRate',
+					'criticalRate', 'criticalDamage',
+					'totalElementAdvantage', 'elementAwakeningAdvantage',
+					'shortRangeDamage', 'longRangeDamage',
+					'physicalPenetration', 'magicalPenetration',
+					'unsheatheAttackRate', 'unsheatheAttackFixed',
+					'armorBreak', 'anticipate',
+					'motionSpeed', '', // 行動速度の右にスペース
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+				]
+			case 'magical':
+				return [
+					'HP', 'MP',
+					'MATK', 'baseMATK',
+					'stabilityRate', 'subStabilityRate',
+					'magicCriticalRate', 'magicCriticalDamage',
+					'totalElementAdvantage', 'elementAwakeningAdvantage',
+					'shortRangeDamage', 'longRangeDamage',
+					'physicalPenetration', 'magicalPenetration',
+					'unsheatheAttackRate', 'unsheatheAttackFixed',
+					'armorBreak', 'anticipate',
+					'motionSpeed', '',
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+				]
+			case 'hybrid':
+				return [
+					'HP', 'MP',
+					'ATK', 'baseATK',
+					'subATK', 'subBaseATK',
+					'totalATK', 'bringerAM',
+					'MATK', 'baseMATK',
+					'spearMATK', 'spearBaseMATK',
+					'stabilityRate', 'subStabilityRate',
+					'criticalRate', 'criticalDamage',
+					'magicCriticalRate', 'magicCriticalDamage',
+					'totalElementAdvantage', 'elementAwakeningAdvantage',
+					'shortRangeDamage', 'longRangeDamage',
+					'physicalPenetration', 'magicalPenetration',
+					'unsheatheAttackRate', 'unsheatheAttackFixed',
+					'armorBreak', 'anticipate',
+					'motionSpeed', '',
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+				]
+			case 'tank':
+				return [
+					'HP', 'MP',
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+					'criticalRate', 'stabilityRate',
+					'physicalResistance', 'magicalResistance',
+					'ailmentResistance', 'motionSpeed',
+					'armorBreak', 'anticipate',
+					'physicalBarrier', 'magicalBarrier',
+					'fractionalBarrier', 'barrierCooldown',
+					'guardPower', 'guardRecovery',
+					'aggro', 'darkResistance',
+				]
+			default: // 'base'
+				return [
+					'HP', 'MP',
+					'ATK', 'baseATK',
+					'subATK', 'subBaseATK',
+					'totalATK', 'bringerAM',
+					'MATK', 'baseMATK',
+					'stabilityRate', 'subStabilityRate',
+					'criticalRate', 'criticalDamage',
+					'magicCriticalRate', 'magicCriticalDamage',
+					'totalElementAdvantage', 'elementAwakeningAdvantage',
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+					'physicalResistance', 'magicalResistance',
+					'ailmentResistance', 'motionSpeed',
+					'armorBreak', 'anticipate',
+				]
+		}
+	}
+
 	// TODO: 将来的には全98項目の計算を実装
 	// 現在は基本的な項目のみ計算
 
@@ -1015,6 +1104,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 								title=""
 								stats={getBasicStatsByCategory(basicStatsCategory, calculationResults.equipmentBonuses)}
 								labels={getBasicStatsLabelsByCategory(basicStatsCategory)}
+								displayMode="normal"
+								propertyOrder={getBasicStatsDisplayOrder(basicStatsCategory)}
 								className=""
 							/>
 						</div>
