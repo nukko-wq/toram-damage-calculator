@@ -26,7 +26,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 750, // 表示用の値
 				fixedDamage: 300, // 表示用の値
 				multiplierFormula: [
@@ -61,7 +61,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 表示用（実際の計算は外部）
 				familiarity: 'physical',
@@ -76,7 +76,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 0, // 表示用（|補正後STR|%は外部計算）
 				fixedDamage: 0, // 表示用（基礎INT/2は外部計算）
 				multiplierFormula: '威力+補正後STR%',
@@ -108,7 +108,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
@@ -125,7 +125,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
@@ -142,7 +142,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
@@ -174,7 +174,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 400, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
@@ -191,7 +191,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 400, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
@@ -208,7 +208,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 400, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
