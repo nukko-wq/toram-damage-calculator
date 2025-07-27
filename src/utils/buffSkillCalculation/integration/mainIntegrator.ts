@@ -21,6 +21,7 @@ import { getShieldSkillBonuses } from '../categories/shieldSkills'
 import { getAssassinSkillBonuses } from '../categories/assassinSkills'
 import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 import { getSpriteSkillBonuses, getSpriteSkillBraveMultiplier } from '../categories/spriteSkills'
+import { calculateHotKnowsEffects } from '../categories/minstrelSkills'
 
 /**
  * バフスキルデータから全体の補正値を取得（基本版）

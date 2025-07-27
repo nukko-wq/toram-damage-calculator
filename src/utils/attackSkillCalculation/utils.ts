@@ -51,7 +51,7 @@ export class SkillCalculationUtils {
 			mainWeaponType: mainWeapon.weaponType,
 			subWeaponType: subWeapon.weaponType,
 			hasHalberdEquipped: mainWeapon.weaponType === '旋風槍',
-			hasStaffEquipped: mainWeapon.weaponType === '杖' || mainWeapon.weaponType === '魔導具',
+			hasStaffEquipped: mainWeapon.weaponType === '杖',
 		}
 	}
 
@@ -98,7 +98,7 @@ export class SkillCalculationUtils {
 			mainWeaponType: mainWeapon.weaponType,
 			subWeaponType: subWeapon.weaponType,
 			hasHalberdEquipped: mainWeapon.weaponType === '旋風槍',
-			hasStaffEquipped: mainWeapon.weaponType === '杖' || mainWeapon.weaponType === '魔導具',
+			hasStaffEquipped: mainWeapon.weaponType === '杖',
 		}
 	}
 }

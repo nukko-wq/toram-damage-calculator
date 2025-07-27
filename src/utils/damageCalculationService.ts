@@ -18,6 +18,7 @@ import {
 	getBuffSkillBraveMultiplier,
 } from '@/utils/buffSkillCalculation'
 import { calculateMagicalStability, calculateINTElementAdvantage, calculateTotalElementAdvantage } from '@/utils/basicStatsCalculation'
+import { calculateHotKnowsEffects } from '@/utils/buffSkillCalculation/categories/minstrelSkills'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import type { BuffSkillState } from '@/types/buffSkill'
 import { createInitialPowerOptions } from '@/utils/initialData'
@@ -169,6 +170,17 @@ export function calculateDamageWithService(
 			// INT補正を含む総属性有利を計算
 			const correctedTotalElementAdvantage = baseAdvantage + intElementAdvantageResult.intElementAdvantage
 
+			// 熱情の歌の効果を計算
+			const hotKnowsSkill = calculatorData.buffSkills?.skills?.IsHotKnows
+			let hotKnowsEffect = 0
+			if (hotKnowsSkill?.isEnabled && hotKnowsSkill.stackCount) {
+				const hotKnowsResult = calculateHotKnowsEffects(hotKnowsSkill.stackCount, powerOptions)
+				hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
+			}
+
+			// INT補正 + 熱情の歌補正を含む総属性有利を計算
+			const finalTotalElementAdvantage = correctedTotalElementAdvantage + hotKnowsEffect
+
 			// 属性威力オプションに応じて計算
 			switch (powerOptions.elementPower) {
 				case 'disabled':
@@ -176,11 +188,11 @@ export function calculateDamageWithService(
 				case 'awakeningOnly':
 					return 25 // 覚醒のみ時は25%固定
 				case 'advantageOnly':
-					return correctedTotalElementAdvantage // INT補正を含む総属性有利のみ
+					return finalTotalElementAdvantage // INT補正 + 熱情の歌補正を含む総属性有利のみ
 				case 'enabled':
-					return correctedTotalElementAdvantage + 25 // INT補正を含む総属性有利 + 属性覚醒25%
+					return finalTotalElementAdvantage + 25 // INT補正 + 熱情の歌補正を含む総属性有利 + 属性覚醒25%
 				default:
-					return correctedTotalElementAdvantage
+					return finalTotalElementAdvantage
 			}
 		}
 
