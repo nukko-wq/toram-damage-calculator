@@ -166,7 +166,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'],
 		mpCost: 200,
-		multiplierFormula: '400+補正後STR/5%',
+		multiplierFormula: '威力+補正後STR/5%',
 		fixedDamageFormula: '100 (旋風槍装備時+100)',
 		hits: [
 			{
@@ -175,7 +175,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
 				powerReference: 'ATK',
-				multiplier: 400, // 表示用（実際の計算は外部）
+				multiplier: 300, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
@@ -192,7 +192,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
 				powerReference: 'ATK',
-				multiplier: 400, // 表示用（実際の計算は外部）
+				multiplier: 300, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
@@ -209,7 +209,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
 				powerReference: 'ATK',
-				multiplier: 400, // 表示用（実際の計算は外部）
+				multiplier: 300, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
@@ -253,7 +253,6 @@ const attackSkillsRawData: AttackSkill[] = [
 			},
 		],
 	},
-
 
 	// サイクロンアロー（ハンタースキル）
 	{
