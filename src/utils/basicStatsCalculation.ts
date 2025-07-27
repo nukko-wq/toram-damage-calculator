@@ -610,7 +610,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		statusATKFormula: (stats) => stats.AGI * 2.0 + stats.INT * 2.0,
 		statusASPDFormula: (stats) => stats.AGI * 4.0 + stats.INT * 0.2,
 		statusStabilityFormula: (stats) => stats.DEX * 0.1,
-		aspdCorrection: 900,
+		aspdCorrection: 90,
 	},
 	knuckle: {
 		id: 'knuckle',
