@@ -889,6 +889,10 @@ export function calculateEquipmentBonuses(
 		fractionalBarrier: allBonuses.FractionalBarrier || 0,
 		barrierCooldown: 0, // バリア速度は%のみ
 		barrierCooldown_Rate: allBonuses.BarrierCooldown_Rate || 0,
+		guardPower: 0, // Guard力は%のみ
+		guardPower_Rate: allBonuses.GuardPower_Rate || 0,
+		guardRecovery: 0, // Guard回復は%のみ
+		guardRecovery_Rate: allBonuses.GuardRecharge_Rate || 0,
 	}
 
 	// 装備品補正値3 (8項目) - %と固定値の両方を含む
