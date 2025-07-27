@@ -332,11 +332,13 @@ export function calculateDamageWithService(
 
 					const skillInput = {
 						...input,
-						// スキルの場合はMATKまたはtotalATKを参照
+						// スキルの場合はMATK、ATK、またはtotalATKを参照
 						referenceStat:
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
-								: totalATK,
+								: originalHit.powerReference === 'ATK'
+									? calculationResults?.basicStats.ATK || 0
+									: totalATK,
 						// スキルカテゴリを考慮したパッシブ倍率を適用
 						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
 							calculatorData.buffSkills?.skills || null,

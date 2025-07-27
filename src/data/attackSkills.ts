@@ -303,7 +303,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
 				multiplierFormula: '威力+基礎DEX%',
@@ -320,7 +320,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
 				multiplierFormula: '威力+基礎DEX%',
@@ -453,6 +453,8 @@ export function getPowerReferenceDisplayText(
 	switch (powerRef) {
 		case 'totalATK':
 			return '総ATK'
+		case 'ATK':
+			return 'ATK'
 		case 'MATK':
 			return 'MATK'
 		default:
