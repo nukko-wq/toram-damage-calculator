@@ -160,11 +160,11 @@ export function calculateDamageWithService(
 			const baseAdvantage =
 				calculationResults?.basicStats?.totalElementAdvantage ?? 0
 
-			// INT属性有利補正を計算（属性攻撃が有利の場合のみ）
+			// INT属性有利補正を計算（有利・不利属性に対応）
 			const intElementAdvantageResult = calculateINTElementAdvantage(
 				calculatorData.baseStats.INT, // 基礎INT（装備・バフ補正を除く）
 				calculatorData.mainWeapon.weaponType,
-				powerOptions.elementAttack === 'advantageous'
+				powerOptions.elementAttack
 			)
 
 			// INT補正を含む総属性有利を計算
@@ -186,7 +186,11 @@ export function calculateDamageWithService(
 				case 'disabled':
 					return 0 // 属性威力無効時は0
 				case 'awakeningOnly':
-					return 25 // 覚醒のみ時は25%固定
+					// 覚醒のみ時: 25%固定 + 杖・魔導具装備時は有利・不利属性でINT補正も追加（2025年仕様変更）
+					if (powerOptions.elementAttack === 'advantageous' || powerOptions.elementAttack === 'disadvantageous') {
+						return 25 + intElementAdvantageResult.intElementAdvantage + hotKnowsEffect
+					}
+					return 25
 				case 'advantageOnly':
 					return finalTotalElementAdvantage // INT補正 + 熱情の歌補正を含む総属性有利のみ
 				case 'enabled':

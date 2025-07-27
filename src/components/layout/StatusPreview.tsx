@@ -406,7 +406,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				const intElementAdvantageResult = calculateINTElementAdvantage(
 					baseStats.INT, // 基礎INT（装備・バフ補正を除く）
 					data.mainWeapon.weaponType,
-					powerOptions?.elementAttack === 'advantageous'
+					powerOptions?.elementAttack || 'none'
 				)
 				
 				// 熱情の歌の効果を計算
