@@ -26,7 +26,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 750, // 表示用の値
 				fixedDamage: 300, // 表示用の値
 				multiplierFormula: [
@@ -61,7 +61,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 表示用（実際の計算は外部）
 				familiarity: 'physical',
@@ -76,7 +76,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 0, // 表示用（|補正後STR|%は外部計算）
 				fixedDamage: 0, // 表示用（基礎INT/2は外部計算）
 				multiplierFormula: '威力+補正後STR%',
@@ -108,7 +108,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
@@ -125,7 +125,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
@@ -142,7 +142,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
@@ -166,7 +166,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'],
 		mpCost: 200,
-		multiplierFormula: '400+補正後STR/5%',
+		multiplierFormula: '威力+補正後STR/5%',
 		fixedDamageFormula: '100 (旋風槍装備時+100)',
 		hits: [
 			{
@@ -174,8 +174,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
-				multiplier: 400, // 表示用（実際の計算は外部）
+				powerReference: 'ATK',
+				multiplier: 300, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
@@ -191,8 +191,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
-				multiplier: 400, // 表示用（実際の計算は外部）
+				powerReference: 'ATK',
+				multiplier: 300, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
@@ -208,8 +208,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
-				multiplier: 400, // 表示用（実際の計算は外部）
+				powerReference: 'ATK',
+				multiplier: 300, // 表示用（実際の計算は外部）
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
@@ -254,6 +254,36 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// 術式/ストーム（1/6hit）
+	{
+		id: 'storm_1_6hit',
+		name: '術式/ストーム(1/6hit)',
+		order: 602,
+		systemGroup: 'magic',
+		category: 'staff',
+		weaponTypeRequirements: ['杖', '魔導具'],
+		mpCost: 400,
+		multiplierFormula: '200% (杖装備時300%)',
+		fixedDamageFormula: '400',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'magical',
+				referenceDefense: 'MDEF',
+				referenceResistance: 'magical',
+				powerReference: 'MATK',
+				multiplier: 200, // 表示用（実際の計算は外部）
+				fixedDamage: 400, // 固定ダメージ400
+				multiplierFormula: '杖装備時：威力+100%',
+				familiarity: 'magical',
+				familiarityGrant: 'magical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
 
 	// サイクロンアロー（ハンタースキル）
 	{
@@ -303,7 +333,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
 				multiplierFormula: '威力+基礎DEX%',
@@ -320,7 +350,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				attackType: 'physical',
 				referenceDefense: 'DEF',
 				referenceResistance: 'physical',
-				powerReference: 'totalATK',
+				powerReference: 'ATK',
 				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
 				multiplierFormula: '威力+基礎DEX%',
@@ -453,6 +483,8 @@ export function getPowerReferenceDisplayText(
 	switch (powerRef) {
 		case 'totalATK':
 			return '総ATK'
+		case 'ATK':
+			return 'ATK'
 		case 'MATK':
 			return 'MATK'
 		default:

@@ -146,6 +146,15 @@ export const equipmentsData: EquipmentsData = {
 					Dodge: -16,
 				},
 			},
+			{
+				id: 'f8b2c4d6-e9a1-4c3b-8f2d-5e7a9b1c3d4f',
+				name: '10周年魔導具',
+				properties: {
+					MATK_Rate: 15,
+					INT_Rate: 10,
+					ElementAdvantage_Rate: 23,
+				},
+			},
 		],
 		body: [
 			{
@@ -212,6 +221,16 @@ export const equipmentsData: EquipmentsData = {
 						description: '両手剣装備時: MP+200',
 					},
 				],
+				armorType: 'normal',
+			},
+			{
+				id: 'a3e5f7b9-d1c2-4a6b-9e8f-2d4c6a8b0e2f',
+				name: '有利22%MATK10%INT10%',
+				properties: {
+					ElementAdvantage_Rate: 22,
+					MATK_Rate: 10,
+					INT_Rate: 10,
+				},
 				armorType: 'normal',
 			},
 		],
@@ -523,6 +542,20 @@ export const equipmentsData: EquipmentsData = {
 					Critical: 10,
 					BladeReduction_Rate: 10,
 				},
+			},
+			{
+				id: '7c9e1f3a-8b4d-4e2c-9a6f-1b3e5d7a9c2e',
+				name: '忍術巻物・雷遁',
+				properties: {
+					Stability_Rate: 5,
+				},
+				conditionalEffects: [
+					{
+						condition: { type: 'mainWeapon', weaponType: '抜刀剣' },
+						properties: { Accuracy_Rate: 10 },
+						description: '抜刀剣装備時: 命中+10%',
+					},
+				],
 			},
 		],
 		fashion1: [

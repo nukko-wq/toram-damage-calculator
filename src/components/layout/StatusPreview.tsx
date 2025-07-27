@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react'
-import { useCalculatorStore } from '@/stores'
+import { useCalculatorStore, useSaveDataStore, useUIStore } from '@/stores'
 import type { FilterOption } from '@/types/bonusCalculation'
 import {
 	calculateHP,
@@ -21,6 +21,7 @@ import {
 	calculateCSPD,
 	calculateFLEE,
 	calculateTotalElementAdvantage,
+	calculateINTElementAdvantage,
 	calculateStability,
 	calculateAdjustedStats,
 	calculateEquipmentBonuses,
@@ -36,6 +37,21 @@ import StatSection from './StatSection'
 interface StatusPreviewProps {
 	isVisible: boolean
 }
+
+// 基本ステータス表示カテゴリ定義
+interface BasicStatsDisplayCategory {
+	value: 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'
+	label: string
+	itemCount: number
+}
+
+const BASIC_STATS_CATEGORIES: BasicStatsDisplayCategory[] = [
+	{ value: 'base', label: 'ベース', itemCount: 28 },
+	{ value: 'physical', label: '物理', itemCount: 17 },
+	{ value: 'magical', label: '魔法', itemCount: 18 },
+	{ value: 'hybrid', label: '物理/魔法', itemCount: 22 },
+	{ value: 'tank', label: '壁', itemCount: 18 },
+]
 
 // フィルタードロップダウンコンポーネント
 interface FilterDropdownProps {
@@ -84,6 +100,8 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 
 export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const { data } = useCalculatorStore()
+	const { currentSaveId } = useSaveDataStore()
+	const { getStatusPreviewCategory, setStatusPreviewCategory } = useUIStore()
 
 	// 表示状態管理
 	const [visibleSections, setVisibleSections] = useState({
@@ -93,6 +111,12 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		equipmentBonus2: false,
 		equipmentBonus3: false,
 	})
+
+	// 基本ステータスカテゴリ状態管理（UIStoreから取得）
+	const basicStatsCategory = getStatusPreviewCategory(currentSaveId)
+	const handleBasicStatsCategoryChange = (category: BasicStatsDisplayCategory['value']) => {
+		setStatusPreviewCategory(currentSaveId, category)
+	}
 
 	// フィルター状態管理
 	const [filters, setFilters] = useState({
@@ -181,6 +205,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
+
+	// PowerOptionsを取得（DamagePreviewの設定を参照）
+	const powerOptions = data.powerOptions
 
 	// 統合計算のメモ化
 	const calculationResults = useMemo(() => {
@@ -374,8 +401,20 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.AGI,
 				finalBonuses,
 			),
-			totalElementAdvantageCalculation:
-				calculateTotalElementAdvantage(finalBonuses),
+			totalElementAdvantageCalculation: (() => {
+				// INT属性有利補正を計算
+				const intElementAdvantageResult = calculateINTElementAdvantage(
+					baseStats.INT, // 基礎INT（装備・バフ補正を除く）
+					data.mainWeapon.weaponType,
+					powerOptions?.elementAttack === 'advantageous'
+				)
+				
+				// 総属性有利を計算（INT補正を含む）
+				return calculateTotalElementAdvantage(
+					finalBonuses,
+					intElementAdvantageResult.intElementAdvantage
+				)
+			})(),
 			stabilityCalculation: calculateStability(
 				data.mainWeapon.stability,
 				data.mainWeapon.weaponType,
@@ -389,7 +428,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			adjustedStatsCalculation,
 		}
-	}, [data, baseStats])
+	}, [data, baseStats, powerOptions])
 
 	// 詳細データソースボーナス取得（フィルター表示用）
 	const detailedBonuses = useMemo(() => {
@@ -506,6 +545,386 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	if (!isVisible) {
 		return null
+	}
+
+	// カテゴリ別データ取得関数
+	const getBasicStatsByCategory = (
+		category: BasicStatsDisplayCategory['value'],
+		equipmentBonuses: ReturnType<typeof calculateEquipmentBonuses>
+	): Record<string, number | null> => {
+		const baseStats = {
+			HP: hpCalculation.finalHP,
+			MP: mpCalculation.finalMP,
+			ATK: atkCalculation.finalATK,
+			baseATK: Math.floor(atkCalculation.baseATK),
+			subATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation ? subATKCalculation.subFinalATK : null,
+			subBaseATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation ? Math.floor(subATKCalculation.subBaseATK) : null,
+			totalATK: totalATKCalculation.totalATK,
+			bringerAM: 0,
+			MATK: matkCalculation.finalMATK,
+			baseMATK: matkCalculation.baseMATK,
+			stabilityRate: stabilityCalculation.finalStability,
+			subStabilityRate: (() => {
+				if (data.mainWeapon.weaponType === '双剣' && subATKCalculation) {
+					return subATKCalculation.subStability
+				}
+				if (
+					(data.mainWeapon.weaponType === '弓' || data.mainWeapon.weaponType === '自動弓') &&
+					data.subWeapon.weaponType === '矢'
+				) {
+					return data.subWeapon.stability
+				}
+				return null
+			})(),
+			criticalRate: criticalRateCalculation.finalCriticalRate,
+			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
+			magicCriticalRate: 0,
+			magicCriticalDamage: magicalCriticalDamageCalculation.finalMagicalCriticalDamage,
+			totalElementAdvantage: totalElementAdvantageCalculation.finalTotalElementAdvantage,
+			elementAwakeningAdvantage: 0,
+			ASPD: aspdCalculation.finalASPD,
+			CSPD: cspdCalculation.finalCSPD,
+			HIT: hitCalculation.finalHIT,
+			FLEE: fleeCalculation.finalFLEE,
+			physicalResistance: physicalResistanceCalculation.finalPhysicalResistance,
+			magicalResistance: magicalResistanceCalculation.finalMagicalResistance,
+			ailmentResistance: ailmentResistanceCalculation,
+			motionSpeed: motionSpeedCalculation.finalMotionSpeed,
+			armorBreak: armorBreakCalculation.finalArmorBreak,
+			anticipate: anticipateCalculation.finalAnticipate,
+		}
+
+		switch (category) {
+			case 'physical':
+				return {
+					HP: baseStats.HP,
+					MP: baseStats.MP,
+					ATK: baseStats.ATK,
+					baseATK: baseStats.baseATK,
+					subATK: baseStats.subATK,
+					subBaseATK: baseStats.subBaseATK,
+					totalATK: baseStats.totalATK,
+					bringerAM: baseStats.bringerAM,
+					stabilityRate: baseStats.stabilityRate,
+					subStabilityRate: baseStats.subStabilityRate,
+					criticalRate: baseStats.criticalRate,
+					criticalDamage: baseStats.criticalDamage,
+					totalElementAdvantage: baseStats.totalElementAdvantage,
+					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
+					shortRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.shortRangeDamage || 0,
+					longRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.longRangeDamage || 0,
+					physicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.physicalPenetration || 0,
+					magicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.magicalPenetration || 0,
+					unsheatheAttackRate: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {rate?: number})?.rate || 0,
+					unsheatheAttackFixed: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {fixed?: number})?.fixed || 0,
+					armorBreak: baseStats.armorBreak,
+					anticipate: baseStats.anticipate,
+					motionSpeed: baseStats.motionSpeed,
+					ASPD: baseStats.ASPD,
+					CSPD: baseStats.CSPD,
+					HIT: baseStats.HIT,
+					FLEE: baseStats.FLEE,
+				} as Record<string, number | null>
+
+			case 'magical':
+				return {
+					HP: baseStats.HP,
+					MP: baseStats.MP,
+					MATK: baseStats.MATK,
+					baseMATK: baseStats.baseMATK,
+					stabilityRate: baseStats.stabilityRate,
+					subStabilityRate: baseStats.subStabilityRate,
+					magicCriticalRate: baseStats.magicCriticalRate,
+					magicCriticalDamage: baseStats.magicCriticalDamage,
+					totalElementAdvantage: baseStats.totalElementAdvantage,
+					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
+					shortRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.shortRangeDamage || 0,
+					longRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.longRangeDamage || 0,
+					physicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.physicalPenetration || 0,
+					magicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.magicalPenetration || 0,
+					unsheatheAttackRate: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {rate?: number})?.rate || 0,
+					unsheatheAttackFixed: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {fixed?: number})?.fixed || 0,
+					armorBreak: baseStats.armorBreak,
+					anticipate: baseStats.anticipate,
+					motionSpeed: baseStats.motionSpeed,
+					ASPD: baseStats.ASPD,
+					CSPD: baseStats.CSPD,
+					HIT: baseStats.HIT,
+					FLEE: baseStats.FLEE,
+				} as Record<string, number | null>
+
+			case 'hybrid':
+				return {
+					HP: baseStats.HP,
+					MP: baseStats.MP,
+					ATK: baseStats.ATK,
+					baseATK: baseStats.baseATK,
+					subATK: baseStats.subATK,
+					subBaseATK: baseStats.subBaseATK,
+					totalATK: baseStats.totalATK,
+					bringerAM: baseStats.bringerAM,
+					MATK: baseStats.MATK,
+					baseMATK: baseStats.baseMATK,
+					spearMATK: 0, // 暫定値
+					spearBaseMATK: 0, // 暫定値
+					stabilityRate: baseStats.stabilityRate,
+					subStabilityRate: baseStats.subStabilityRate,
+					criticalRate: baseStats.criticalRate,
+					criticalDamage: baseStats.criticalDamage,
+					magicCriticalRate: baseStats.magicCriticalRate,
+					magicCriticalDamage: baseStats.magicCriticalDamage,
+					totalElementAdvantage: baseStats.totalElementAdvantage,
+					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
+					shortRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.shortRangeDamage || 0,
+					longRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.longRangeDamage || 0,
+					physicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.physicalPenetration || 0,
+					magicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.magicalPenetration || 0,
+					unsheatheAttackRate: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {rate?: number})?.rate || 0,
+					unsheatheAttackFixed: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {fixed?: number})?.fixed || 0,
+					armorBreak: baseStats.armorBreak,
+					anticipate: baseStats.anticipate,
+					motionSpeed: baseStats.motionSpeed,
+					ASPD: baseStats.ASPD,
+					CSPD: baseStats.CSPD,
+					HIT: baseStats.HIT,
+					FLEE: baseStats.FLEE,
+				} as Record<string, number | null>
+
+			case 'tank':
+				return {
+					HP: baseStats.HP,
+					MP: baseStats.MP,
+					ASPD: baseStats.ASPD,
+					CSPD: baseStats.CSPD,
+					HIT: baseStats.HIT,
+					FLEE: baseStats.FLEE,
+					criticalRate: baseStats.criticalRate,
+					stabilityRate: baseStats.stabilityRate,
+					physicalResistance: baseStats.physicalResistance,
+					magicalResistance: baseStats.magicalResistance,
+					ailmentResistance: baseStats.ailmentResistance,
+					motionSpeed: baseStats.motionSpeed,
+					armorBreak: baseStats.armorBreak,
+					anticipate: baseStats.anticipate,
+					physicalBarrier: calculationResults.equipmentBonuses.equipmentBonus2.physicalBarrier || 0,
+					magicalBarrier: calculationResults.equipmentBonuses.equipmentBonus2.magicalBarrier || 0,
+					fractionalBarrier: calculationResults.equipmentBonuses.equipmentBonus2.fractionalBarrier || 0,
+					barrierCooldown: calculationResults.equipmentBonuses.equipmentBonus2.barrierCooldown_Rate || 0,
+					guardPower: calculationResults.equipmentBonuses.equipmentBonus2.guardPower_Rate || 0,
+					guardRecovery: calculationResults.equipmentBonuses.equipmentBonus2.guardRecovery_Rate || 0,
+					aggro: calculationResults.equipmentBonuses.equipmentBonus1.aggro_Rate || 0,
+					darkResistance: calculationResults.equipmentBonuses.equipmentBonus2.darkResistance_Rate || 0,
+				} as Record<string, number | null>
+
+			default: // 'base'
+				return baseStats as Record<string, number | null>
+		}
+	}
+
+	// カテゴリ別ラベル定義
+	const getBasicStatsLabelsByCategory = (category: BasicStatsDisplayCategory['value']) => {
+		const baseLabels = {
+			HP: 'HP',
+			MP: 'MP',
+			ASPD: 'ASPD',
+			CSPD: 'CSPD',
+			HIT: 'HIT',
+			FLEE: 'FLEE',
+			totalElementAdvantage: '総属性有利(%)',
+			elementAwakeningAdvantage: '属性覚醒有利(%)',
+			stabilityRate: '安定率(%)',
+			subStabilityRate: 'サブ安定率(%)',
+			motionSpeed: '行動速度(%)',
+			armorBreak: '防御崩し(%)',
+			anticipate: '先読み(%)',
+		}
+
+		switch (category) {
+			case 'physical':
+				return {
+					...baseLabels,
+					ATK: 'ATK',
+					baseATK: '基礎ATK',
+					subATK: 'サブATK',
+					subBaseATK: 'サブ基礎ATK',
+					totalATK: '総ATK',
+					bringerAM: 'BringerA/M',
+					criticalRate: 'ｸﾘﾃｨｶﾙ率',
+					criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+					shortRangeDamage: '近距離の威力(%)',
+					longRangeDamage: '遠距離の威力(%)',
+					physicalPenetration: '物理貫通(%)',
+					magicalPenetration: '魔法貫通(%)',
+					unsheatheAttackRate: '抜刀威力(%)',
+					unsheatheAttackFixed: '抜刀威力+',
+				}
+
+			case 'magical':
+				return {
+					...baseLabels,
+					MATK: 'MATK',
+					baseMATK: '基礎MATK',
+					magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',
+					magicCriticalDamage: '魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+					shortRangeDamage: '近距離の威力(%)',
+					longRangeDamage: '遠距離の威力(%)',
+					physicalPenetration: '物理貫通(%)',
+					magicalPenetration: '魔法貫通(%)',
+					unsheatheAttackRate: '抜刀威力(%)',
+					unsheatheAttackFixed: '抜刀威力+',
+				}
+
+			case 'hybrid':
+				return {
+					...baseLabels,
+					ATK: 'ATK',
+					baseATK: '基礎ATK',
+					subATK: 'サブATK',
+					subBaseATK: 'サブ基礎ATK',
+					totalATK: '総ATK',
+					bringerAM: 'BringerA/M',
+					MATK: 'MATK',
+					baseMATK: '基礎MATK',
+					spearMATK: '槍MATK',
+					spearBaseMATK: '槍基礎MATK',
+					criticalRate: 'ｸﾘﾃｨｶﾙ率',
+					criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+					magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',
+					magicCriticalDamage: '魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+					shortRangeDamage: '近距離の威力(%)',
+					longRangeDamage: '遠距離の威力(%)',
+					physicalPenetration: '物理貫通(%)',
+					magicalPenetration: '魔法貫通(%)',
+					unsheatheAttackRate: '抜刀威力(%)',
+					unsheatheAttackFixed: '抜刀威力+',
+				}
+
+			case 'tank':
+				return {
+					...baseLabels,
+					criticalRate: 'ｸﾘﾃｨｶﾙ率',
+					physicalResistance: '物理耐性(%)',
+					magicalResistance: '魔法耐性(%)',
+					ailmentResistance: '異常耐性(%)',
+					physicalBarrier: '物理バリア',
+					magicalBarrier: '魔法バリア',
+					fractionalBarrier: '割合バリア',
+					barrierCooldown: 'バリア速度(%)',
+					guardPower: 'Guard力(%)',
+					guardRecovery: 'Guard回復(%)',
+					aggro: 'ヘイト(%)',
+					darkResistance: '闇耐性(%)',
+				}
+
+			default: // 'base'
+				return {
+					...baseLabels,
+					ATK: 'ATK',
+					baseATK: '基礎ATK',
+					subATK: 'サブATK',
+					subBaseATK: 'サブ基礎ATK',
+					totalATK: '総ATK',
+					bringerAM: 'ブリンガーAM',
+					MATK: 'MATK',
+					baseMATK: '基本MATK',
+					criticalRate: 'ｸﾘﾃｨｶﾙ率',
+					criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+					magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',
+					magicCriticalDamage: '魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
+					physicalResistance: '物理耐性(%)',
+					magicalResistance: '魔法耐性(%)',
+					ailmentResistance: '異常耐性(%)',
+				}
+		}
+	}
+
+	// カテゴリ別表示順序定義
+	const getBasicStatsDisplayOrder = (category: BasicStatsDisplayCategory['value']): string[] => {
+		switch (category) {
+			case 'physical':
+				return [
+					'HP', 'MP',
+					'ATK', 'baseATK',
+					'subATK', 'subBaseATK',
+					'totalATK', 'bringerAM',
+					'stabilityRate', 'subStabilityRate',
+					'criticalRate', 'criticalDamage',
+					'totalElementAdvantage', 'elementAwakeningAdvantage',
+					'shortRangeDamage', 'longRangeDamage',
+					'physicalPenetration', 'magicalPenetration',
+					'unsheatheAttackRate', 'unsheatheAttackFixed',
+					'armorBreak', 'anticipate',
+					'motionSpeed', '', // 行動速度の右にスペース
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+				]
+			case 'magical':
+				return [
+					'HP', 'MP',
+					'MATK', 'baseMATK',
+					'stabilityRate', 'subStabilityRate',
+					'magicCriticalRate', 'magicCriticalDamage',
+					'totalElementAdvantage', 'elementAwakeningAdvantage',
+					'shortRangeDamage', 'longRangeDamage',
+					'physicalPenetration', 'magicalPenetration',
+					'unsheatheAttackRate', 'unsheatheAttackFixed',
+					'armorBreak', 'anticipate',
+					'motionSpeed', '',
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+				]
+			case 'hybrid':
+				return [
+					'HP', 'MP',
+					'ATK', 'baseATK',
+					'subATK', 'subBaseATK',
+					'totalATK', 'bringerAM',
+					'MATK', 'baseMATK',
+					'spearMATK', 'spearBaseMATK',
+					'stabilityRate', 'subStabilityRate',
+					'criticalRate', 'criticalDamage',
+					'magicCriticalRate', 'magicCriticalDamage',
+					'totalElementAdvantage', 'elementAwakeningAdvantage',
+					'shortRangeDamage', 'longRangeDamage',
+					'physicalPenetration', 'magicalPenetration',
+					'unsheatheAttackRate', 'unsheatheAttackFixed',
+					'armorBreak', 'anticipate',
+					'motionSpeed', '',
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+				]
+			case 'tank':
+				return [
+					'HP', 'MP',
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+					'criticalRate', 'stabilityRate',
+					'physicalResistance', 'magicalResistance',
+					'ailmentResistance', 'motionSpeed',
+					'armorBreak', 'anticipate',
+					'physicalBarrier', 'magicalBarrier',
+					'fractionalBarrier', 'barrierCooldown',
+					'guardPower', 'guardRecovery',
+					'aggro', 'darkResistance',
+				]
+			default: // 'base'
+				return [
+					'HP', 'MP',
+					'ATK', 'baseATK',
+					'subATK', 'subBaseATK',
+					'totalATK', 'bringerAM',
+					'MATK', 'baseMATK',
+					'stabilityRate', 'subStabilityRate',
+					'criticalRate', 'criticalDamage',
+					'magicCriticalRate', 'magicCriticalDamage',
+					'totalElementAdvantage', 'elementAwakeningAdvantage',
+					'ASPD', 'CSPD',
+					'HIT', 'FLEE',
+					'physicalResistance', 'magicalResistance',
+					'ailmentResistance', 'motionSpeed',
+					'armorBreak', 'anticipate',
+				]
+		}
 	}
 
 	// TODO: 将来的には全98項目の計算を実装
@@ -685,43 +1104,32 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				<div
 					className={`flex gap-6 flex-wrap justify-center ${isMobile ? 'flex-col items-center' : ''}`}
 				>
-					{/* 基本ステータス (30項目) */}
+					{/* 基本ステータス (カテゴリ別表示対応) */}
 					{visibleSections.basicStats && (
-						<StatSection
-							title="基本ステータス"
-							stats={basicStats}
-							labels={{
-								HP: 'HP',
-								MP: 'MP',
-								ATK: 'ATK',
-								baseATK: '基礎ATK',
-								subATK: 'サブATK', // 常時表示（ラベル位置統一のため）
-								subBaseATK: 'サブ基礎ATK', // 常時表示（ラベル位置統一のため）
-								totalATK: '総ATK',
-								bringerAM: 'ブリンガーAM',
-								MATK: 'MATK',
-								baseMATK: '基本MATK',
-								stabilityRate: '安定率(%)',
-								subStabilityRate: 'サブ安定率(%)', // 常時表示（ラベル位置統一のため）
-								criticalRate: 'ｸﾘﾃｨｶﾙ率',
-								criticalDamage: 'ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
-								magicCriticalRate: '魔法ｸﾘﾃｨｶﾙ率',
-								magicCriticalDamage: '魔法ｸﾘﾃｨｶﾙﾀﾞﾒｰｼﾞ',
-								totalElementAdvantage: '総属性有利(%)',
-								elementAwakeningAdvantage: '属性覚醒有利(%)',
-								ASPD: 'ASPD',
-								CSPD: 'CSPD',
-								HIT: 'HIT',
-								FLEE: 'FLEE',
-								physicalResistance: '物理耐性(%)',
-								magicalResistance: '魔法耐性(%)',
-								ailmentResistance: '異常耐性(%)',
-								motionSpeed: '行動速度(%)',
-								armorBreak: '防御崩し(%)',
-								anticipate: '先読み(%)',
-							}}
-							className=""
-						/>
+						<div className="stat-section">
+							<div className="flex items-center justify-between mb-2">
+								<h3 className="text-sm font-semibold">基本ステータス</h3>
+								<select 
+									value={basicStatsCategory}
+									onChange={(e) => handleBasicStatsCategoryChange(e.target.value as BasicStatsDisplayCategory['value'])}
+									className="ml-2 px-2 py-1 text-xs border border-gray-300 rounded outline-none"
+								>
+									{BASIC_STATS_CATEGORIES.map(category => (
+										<option key={category.value} value={category.value}>
+											{category.label}
+										</option>
+									))}
+								</select>
+							</div>
+							<StatSection
+								title=""
+								stats={getBasicStatsByCategory(basicStatsCategory, calculationResults.equipmentBonuses)}
+								labels={getBasicStatsLabelsByCategory(basicStatsCategory)}
+								displayMode="normal"
+								propertyOrder={getBasicStatsDisplayOrder(basicStatsCategory)}
+								className=""
+							/>
+						</div>
 					)}
 
 					{/* 補正後ステータス (8項目) */}

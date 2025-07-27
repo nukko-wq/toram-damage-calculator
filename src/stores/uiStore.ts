@@ -1,47 +1,97 @@
 import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
+import { devtools, persist } from 'zustand/middleware'
 import type { UIStore } from '@/types/stores'
+
+// ローカルストレージから初期カテゴリ状態を取得
+const getInitialStatusPreviewCategories = (): Record<string, 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'> => {
+	if (typeof window === 'undefined') return {}
+	
+	try {
+		const stored = localStorage.getItem('ui-store')
+		if (stored) {
+			const parsed = JSON.parse(stored)
+			return parsed.state?.statusPreviewCategories || {}
+		}
+	} catch (error) {
+		console.warn('Failed to load status preview categories from localStorage:', error)
+	}
+	return {}
+}
 
 export const useUIStore = create<UIStore>()(
 	devtools(
-		(set, get) => ({
-			// ===== 初期状態 =====
-			showSaveManager: false,
-			showUpdateNotifications: false,
-			showStatusPreview: false,
-			showDamagePreview: false,
+		persist(
+			(set, get) => ({
+				// ===== 初期状態 =====
+				showSaveManager: false,
+				showUpdateNotifications: false,
+				showStatusPreview: false,
+				showDamagePreview: false,
+				statusPreviewCategories: getInitialStatusPreviewCategories(),
 
-			// ===== アクション =====
-			setShowSaveManager: (value) => {
-				set({ showSaveManager: value }, false, 'setShowSaveManager')
-			},
+				// ===== アクション =====
+				setShowSaveManager: (value) => {
+					set({ showSaveManager: value }, false, 'setShowSaveManager')
+				},
 
-			setShowUpdateNotifications: (value) => {
-				set(
-					{ showUpdateNotifications: value },
-					false,
-					'setShowUpdateNotifications',
-				)
-			},
+				setShowUpdateNotifications: (value) => {
+					set(
+						{ showUpdateNotifications: value },
+						false,
+						'setShowUpdateNotifications',
+					)
+				},
 
-			setShowStatusPreview: (show) => {
-				set({ showStatusPreview: show }, false, 'setShowStatusPreview')
-			},
+				setShowStatusPreview: (show) => {
+					set({ showStatusPreview: show }, false, 'setShowStatusPreview')
+				},
 
-			setShowDamagePreview: (show) => {
-				set({ showDamagePreview: show }, false, 'setShowDamagePreview')
-			},
+				setShowDamagePreview: (show) => {
+					set({ showDamagePreview: show }, false, 'setShowDamagePreview')
+				},
 
-			toggleStatusPreview: () => {
-				const current = get().showStatusPreview
-				set({ showStatusPreview: !current }, false, 'toggleStatusPreview')
-			},
+				toggleStatusPreview: () => {
+					const current = get().showStatusPreview
+					set({ showStatusPreview: !current }, false, 'toggleStatusPreview')
+				},
 
-			toggleDamagePreview: () => {
-				const current = get().showDamagePreview
-				set({ showDamagePreview: !current }, false, 'toggleDamagePreview')
-			},
-		}),
+				toggleDamagePreview: () => {
+					const current = get().showDamagePreview
+					set({ showDamagePreview: !current }, false, 'toggleDamagePreview')
+				},
+
+				// ===== セーブデータごとの基本ステータスカテゴリ管理 =====
+				getStatusPreviewCategory: (saveId) => {
+					const categories = get().statusPreviewCategories
+					return categories[saveId] || 'base'
+				},
+
+				setStatusPreviewCategory: (saveId, category) => {
+					set(
+						(state) => ({
+							statusPreviewCategories: {
+								...state.statusPreviewCategories,
+								[saveId]: category,
+							},
+						}),
+						false,
+						'setStatusPreviewCategory'
+					)
+					
+					// calculatorStoreに変更をチェックしてもらい、差分があれば保存ボタンを有効化
+					if (typeof window !== 'undefined') {
+						const { useCalculatorStore } = require('./calculatorStore')
+						useCalculatorStore.getState().checkUIChanges(saveId)
+					}
+				},
+			}),
+			{
+				name: 'ui-store',
+				partialize: (state) => ({
+					statusPreviewCategories: state.statusPreviewCategories,
+				}),
+			}
+		),
 		{
 			name: 'ui-store',
 		},

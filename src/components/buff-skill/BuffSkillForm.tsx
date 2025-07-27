@@ -37,7 +37,7 @@ function convertSubWeaponType(
 		矢: 'arrow',
 		盾: 'shield',
 		手甲: 'knuckle',
-		魔道具: 'magicDevice',
+		魔導具: 'magicDevice',
 		巻物: 'scroll',
 		片手剣: 'knife', // 片手剣サブ武器はknife扱い
 		抜刀剣: 'knife', // 抜刀剣サブ武器もknife扱いに修正

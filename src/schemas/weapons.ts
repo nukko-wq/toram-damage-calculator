@@ -25,7 +25,7 @@ export const subWeaponTypeSchema = z.enum([
 	'ナイフ',
 	'矢',
 	'盾',
-	'魔道具',
+	'魔導具',
 	'手甲',
 	'巻物',
 	'片手剣',

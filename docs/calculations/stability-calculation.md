@@ -270,7 +270,120 @@ function calculateStability(
 }
 ```
 
-## 重要な制限事項
+## 魔法安定率計算
+
+魔法攻撃における安定率計算は、物理安定率を基に計算されます。
+
+### 基本計算式
+
+#### 魔法安定率（倍率下限）
+```
+魔法安定率下限(%) = MAX(0, MIN(90, INT((物理安定率 + 100) / 2)))
+```
+
+#### 魔法安定率（倍率上限）
+```
+魔法安定率上限(%) = MAX(100, MIN(110, 100 + INT((物理安定率 - 80) / 2)))
+```
+
+### 詳細計算
+
+#### 構成要素
+- **物理安定率**: 上記で計算した最終物理安定率（0-100%）
+- **魔法安定率下限**: 魔法ダメージの最低倍率
+- **魔法安定率上限**: 魔法ダメージの最高倍率
+
+#### 計算手順
+1. **物理安定率を取得**: 上記の物理安定率計算結果を使用
+2. **下限計算**: INT((物理安定率 + 100) / 2) を計算し、0-90%で制限
+3. **上限計算**: 100 + INT((物理安定率 - 80) / 2) を計算し、100-110%で制限
+4. **ダメージ倍率決定**: 実際の魔法ダメージ計算時に下限～上限の範囲から無作為に抽出
+
+### 計算例
+
+#### 例1: 標準的なケース
+**入力値:**
+- 物理安定率: 80%
+
+**計算手順:**
+1. 魔法安定率下限 = MAX(0, MIN(90, INT((80 + 100) / 2))) = MAX(0, MIN(90, INT(90))) = MAX(0, MIN(90, 90)) = 90%
+2. 魔法安定率上限 = MAX(100, MIN(110, 100 + INT((80 - 80) / 2))) = MAX(100, MIN(110, 100 + 0)) = 100%
+3. **魔法ダメージ倍率範囲**: 90% ～ 100%
+
+#### 例2: 高安定率ケース
+**入力値:**
+- 物理安定率: 100%
+
+**計算手順:**
+1. 魔法安定率下限 = MAX(0, MIN(90, INT((100 + 100) / 2))) = MAX(0, MIN(90, 100)) = 90%
+2. 魔法安定率上限 = MAX(100, MIN(110, 100 + INT((100 - 80) / 2))) = MAX(100, MIN(110, 110)) = 110%
+3. **魔法ダメージ倍率範囲**: 90% ～ 110%
+
+#### 例3: 低安定率ケース
+**入力値:**
+- 物理安定率: 40%
+
+**計算手順:**
+1. 魔法安定率下限 = MAX(0, MIN(90, INT((40 + 100) / 2))) = MAX(0, MIN(90, 70)) = 70%
+2. 魔法安定率上限 = MAX(100, MIN(110, 100 + INT((40 - 80) / 2))) = MAX(100, MIN(110, 80)) = 100%
+3. **魔法ダメージ倍率範囲**: 70% ～ 100%
+
+#### 例4: 極低安定率ケース
+**入力値:**
+- 物理安定率: 0%
+
+**計算手順:**
+1. 魔法安定率下限 = MAX(0, MIN(90, INT((0 + 100) / 2))) = MAX(0, MIN(90, 50)) = 50%
+2. 魔法安定率上限 = MAX(100, MIN(110, 100 + INT((0 - 80) / 2))) = MAX(100, MIN(110, 60)) = 100%
+3. **魔法ダメージ倍率範囲**: 50% ～ 100%
+
+### TypeScript実装例
+
+```typescript
+interface MagicalStabilityCalculationSteps {
+  physicalStability: number
+  lowerLimitCalculation: number
+  upperLimitCalculation: number
+  magicalStabilityLower: number
+  magicalStabilityUpper: number
+  damageMultiplierRange: string
+}
+
+function calculateMagicalStability(
+  physicalStability: number
+): MagicalStabilityCalculationSteps {
+  // 1. 下限計算
+  const lowerLimitCalculation = Math.floor((physicalStability + 100) / 2)
+  const magicalStabilityLower = Math.max(0, Math.min(90, lowerLimitCalculation))
+  
+  // 2. 上限計算
+  const upperLimitCalculation = 100 + Math.floor((physicalStability - 80) / 2)
+  const magicalStabilityUpper = Math.max(100, Math.min(110, upperLimitCalculation))
+  
+  // 3. ダメージ倍率範囲
+  const damageMultiplierRange = `${magicalStabilityLower}% ～ ${magicalStabilityUpper}%`
+  
+  return {
+    physicalStability,
+    lowerLimitCalculation,
+    upperLimitCalculation,
+    magicalStabilityLower,
+    magicalStabilityUpper,
+    damageMultiplierRange,
+  }
+}
+```
+
+### 重要な制限事項
+
+1. **物理安定率依存**: 魔法安定率は物理安定率の計算結果に完全に依存
+2. **下限制限**: 魔法安定率下限は0-90%の範囲で制限
+3. **上限制限**: 魔法安定率上限は100-110%の範囲で制限
+4. **INT()関数**: 各計算段階で小数点以下切り捨て処理
+5. **無作為抽出**: 実際のダメージ計算時は下限～上限の範囲から無作為に選択
+6. **魔法攻撃専用**: 物理攻撃には適用されない
+
+## 重要な制限事項（物理安定率）
 
 1. **上限・下限制限**: 0%～100%の範囲で制限される
 2. **MIN/MAX関数**: 上限・下限制限にMIN/MAX関数を使用

@@ -42,7 +42,7 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
       attackType: 'physical',
       referenceDefense: 'DEF',
       referenceResistance: 'physical',
-      powerReference: 'totalATK',
+      powerReference: 'ATK',
       
       // 表示用倍率・固定値
       multiplier: 1350,          // 表示用（実際の計算は外部）
@@ -66,7 +66,7 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
       attackType: 'physical',
       referenceDefense: 'DEF',
       referenceResistance: 'physical',
-      powerReference: 'totalATK',
+      powerReference: 'ATK',
       
       // 表示用倍率・固定値
       multiplier: 1350,          // 表示用（実際の計算は外部）
@@ -134,7 +134,7 @@ class StandardCalculator extends SkillHitCalculator {
 ```
 📊 Lブーメラン\u2162
 　　カテゴリ: 両手剣 | 消費MP: 400
-　　威力参照: 総ATK | タイプ: 物理スキル
+　　威力参照: ATK | タイプ: 物理スキル
 　　慣れ参照: 通常 | 慣れ付与: 物理
 　　参照防御力: DEF | 参照耐性: 物理
 　　距離威力: × | 抜刀威力: × | ロングレンジ: ×

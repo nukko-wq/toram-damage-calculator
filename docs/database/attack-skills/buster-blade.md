@@ -42,7 +42,7 @@ AttackSkillFormに新しい攻撃スキル「バスターブレード」を追�
       attackType: 'physical',
       referenceDefense: 'DEF',
       referenceResistance: 'physical',
-      powerReference: 'totalATK',
+      powerReference: 'ATK',
       
       // 表示用倍率・固定値
       multiplier: 750,           // 表示用（実際の計算は外部）
@@ -136,7 +136,7 @@ class BusterBladeCalculator extends SkillHitCalculator {
 ```
 📊 バスターブレード
 　　カテゴリ: 剣系 | 消費MP: 300
-　　威力参照: 総ATK | タイプ: 物理スキル
+　　威力参照: ATK | タイプ: 物理スキル
 　　慣れ参照: 物理 | 慣れ付与: 物理
 　　参照防御力: DEF | 参照耐性: 物理
 　　距離威力: 近距離○ | 抜刀威力: × | ロングレンジ: ×

@@ -248,7 +248,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									{damageResults.normal.max.toLocaleString()}
 								</td>
 								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
-									100%
+									{damageResults.normal.maxStability ? `${damageResults.normal.maxStability}%` : '100%'}
 								</td>
 								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-semibold text-gray-700 font-roboto">
 									{captureData

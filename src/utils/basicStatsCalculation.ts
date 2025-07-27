@@ -610,7 +610,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		statusATKFormula: (stats) => stats.AGI * 2.0 + stats.INT * 2.0,
 		statusASPDFormula: (stats) => stats.AGI * 4.0 + stats.INT * 0.2,
 		statusStabilityFormula: (stats) => stats.DEX * 0.1,
-		aspdCorrection: 900,
+		aspdCorrection: 90,
 	},
 	knuckle: {
 		id: 'knuckle',
@@ -889,6 +889,10 @@ export function calculateEquipmentBonuses(
 		fractionalBarrier: allBonuses.FractionalBarrier || 0,
 		barrierCooldown: 0, // バリア速度は%のみ
 		barrierCooldown_Rate: allBonuses.BarrierCooldown_Rate || 0,
+		guardPower: 0, // Guard力は%のみ
+		guardPower_Rate: allBonuses.GuardPower_Rate || 0,
+		guardRecovery: 0, // Guard回復は%のみ
+		guardRecovery_Rate: allBonuses.GuardRecharge_Rate || 0,
 	}
 
 	// 装備品補正値3 (8項目) - %と固定値の両方を含む
@@ -1618,20 +1622,106 @@ export function calculateCSPD(
  * 全ての属性攻撃に対して共通で適用される汎用的な属性有利補正
  *
  * @param bonuses 全補正値（4データソース統合済み）
+ * @param intElementAdvantage 基礎INT属性有利補正（オプション）
  * @returns 総属性有利計算の詳細ステップ
  */
 export function calculateTotalElementAdvantage(
 	bonuses: AllBonuses = {},
+	intElementAdvantage = 0,
 ): TotalElementAdvantageCalculationSteps {
 	// 属性有利%補正を取得（4データソース統合済み）
 	const elementAdvantageRate = bonuses.ElementAdvantage_Rate || 0
 
-	// 総属性有利は単純な%補正のみ（固定値補正は存在しない）
-	const finalTotalElementAdvantage = elementAdvantageRate
+	// 総属性有利 = 基本属性有利 + INT補正
+	const finalTotalElementAdvantage = elementAdvantageRate + intElementAdvantage
 
 	return {
 		elementAdvantageRate,
 		finalTotalElementAdvantage,
+	}
+}
+
+/**
+ * 魔法安定率計算
+ * 
+ * 物理安定率を基に魔法安定率の下限・上限を計算
+ * 
+ * @param physicalStability 物理安定率（0-100%）
+ * @returns 魔法安定率計算結果
+ */
+export interface MagicalStabilityCalculationSteps {
+	physicalStability: number
+	lowerLimitCalculation: number
+	upperLimitCalculation: number
+	magicalStabilityLower: number
+	magicalStabilityUpper: number
+	averageStability: number
+}
+
+export function calculateMagicalStability(
+	physicalStability: number,
+): MagicalStabilityCalculationSteps {
+	// 1. 下限計算
+	const lowerLimitCalculation = Math.floor((physicalStability + 100) / 2)
+	const magicalStabilityLower = Math.max(0, Math.min(90, lowerLimitCalculation))
+
+	// 2. 上限計算
+	const upperLimitCalculation = 100 + Math.floor((physicalStability - 80) / 2)
+	const magicalStabilityUpper = Math.max(100, Math.min(110, upperLimitCalculation))
+
+	// 3. 平均安定率（ダメージ計算で使用）
+	const averageStability = Math.floor((magicalStabilityLower + magicalStabilityUpper) / 2)
+
+	return {
+		physicalStability,
+		lowerLimitCalculation,
+		upperLimitCalculation,
+		magicalStabilityLower,
+		magicalStabilityUpper,
+		averageStability,
+	}
+}
+
+/**
+ * 基礎INT属性有利補正計算
+ * 
+ * メイン武器が杖・魔導具で属性攻撃が有利状態の場合、基礎INTによる属性有利補正を適用
+ * 
+ * @param baseINT 基礎INT（装備・バフ補正を除く素のINT値）
+ * @param weaponType メイン武器の種類
+ * @param isElementAdvantage 属性攻撃が有利状態かどうか
+ * @returns 基礎INT属性有利補正計算結果
+ */
+export interface INTElementAdvantageCalculationSteps {
+	baseINT: number
+	weaponType: WeaponTypeEnum
+	isElementAdvantage: boolean
+	isWeaponApplicable: boolean
+	isApplicable: boolean
+	intElementAdvantage: number
+}
+
+export function calculateINTElementAdvantage(
+	baseINT: number,
+	weaponType: WeaponTypeEnum,
+	isElementAdvantage: boolean,
+): INTElementAdvantageCalculationSteps {
+	// 1. 武器条件判定
+	const isWeaponApplicable = weaponType === '杖' || weaponType === '魔導具'
+	
+	// 2. 総合適用可否判定
+	const isApplicable = isWeaponApplicable && isElementAdvantage
+	
+	// 3. 基礎INT補正計算
+	const intElementAdvantage = isApplicable ? Math.floor(baseINT / 10) : 0
+	
+	return {
+		baseINT,
+		weaponType,
+		isElementAdvantage,
+		isWeaponApplicable,
+		isApplicable,
+		intElementAdvantage,
 	}
 }
 

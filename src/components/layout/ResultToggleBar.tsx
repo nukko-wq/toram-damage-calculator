@@ -203,7 +203,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 			{/* ステータスプレビュー */}
 			{showStatusPreview && (
 				<div
-					className={`sticky z-20 max-h-[80vh] col-start-1 col-end-5 row-start-3 row-end-4 ${
+					className={`sticky z-20 max-h-[80vh] col-start-1 col-end-5 row-start-3 row-end-4 bg-blue-50 ${
 						isMobile ? 'w-full' : 'w-[calc(100%-520px)] ml-[520px]'
 					}`}
 					style={{ top: `${toggleBarHeight}px` }}

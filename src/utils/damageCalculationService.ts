@@ -17,6 +17,7 @@ import {
 	getBuffSkillPassiveMultiplierWithSkillCategory,
 	getBuffSkillBraveMultiplier,
 } from '@/utils/buffSkillCalculation'
+import { calculateMagicalStability, calculateINTElementAdvantage, calculateTotalElementAdvantage } from '@/utils/basicStatsCalculation'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import type { BuffSkillState } from '@/types/buffSkill'
 import { createInitialPowerOptions } from '@/utils/initialData'
@@ -28,6 +29,7 @@ export interface DamageDisplayResult {
 	average: number
 	stability: number
 	averageStability: number
+	maxStability?: number // 魔法スキル用の最大安定率
 }
 
 // ダメージ計算結果の型定義
@@ -67,6 +69,19 @@ function calculateTotalDarkPowerLevel(buffSkills: Record<string, BuffSkillState>
 }
 
 /**
+ * 魔法攻撃スキルかどうかを判定
+ */
+function isMagicalAttackSkill(skillId: string | null): boolean {
+	if (!skillId) return false
+	
+	const skill = getAttackSkillById(skillId)
+	if (!skill) return false
+	
+	// 全ての撃が魔法攻撃の場合、魔法スキルと判定
+	return skill.hits.every(hit => hit.attackType === 'magical')
+}
+
+/**
  * DamagePreviewと同じ方法でダメージを計算する
  */
 export function calculateDamageWithService(
@@ -85,7 +100,24 @@ export function calculateDamageWithService(
 
 		// 中央集約された計算結果を使用
 		const totalATK = calculationResults?.basicStats.totalATK || 0
-		const stabilityRate = calculationResults?.basicStats.stabilityRate || 85
+		const physicalStabilityRate = calculationResults?.basicStats.stabilityRate || 85
+		
+		// 魔法スキル選択時は魔法安定率を計算
+		const isMagicalSkill = isMagicalAttackSkill(calculatorData.attackSkill?.selectedSkillId)
+		const stabilityInfo = isMagicalSkill 
+			? calculateMagicalStability(physicalStabilityRate)
+			: { averageStability: physicalStabilityRate, magicalStabilityLower: physicalStabilityRate, magicalStabilityUpper: 100 }
+		
+		const stabilityRate = isMagicalSkill ? stabilityInfo.averageStability : physicalStabilityRate
+		
+		// デバッグ情報
+		if (debugEnabled && debug && process.env.NODE_ENV === 'development' && isMagicalSkill) {
+			console.log('=== 魔法安定率計算 ===')
+			console.log('物理安定率:', physicalStabilityRate)
+			console.log('魔法安定率下限:', stabilityInfo.magicalStabilityLower)
+			console.log('魔法安定率上限:', stabilityInfo.magicalStabilityUpper)
+			console.log('魔法安定率平均:', stabilityInfo.averageStability)
+		}
 
 		// バフスキルからパッシブ倍率を取得
 		// 通常攻撃時は攻撃スキルカテゴリがないため、従来の関数を使用
@@ -127,6 +159,16 @@ export function calculateDamageWithService(
 			const baseAdvantage =
 				calculationResults?.basicStats?.totalElementAdvantage ?? 0
 
+			// INT属性有利補正を計算（属性攻撃が有利の場合のみ）
+			const intElementAdvantageResult = calculateINTElementAdvantage(
+				calculatorData.baseStats.INT, // 基礎INT（装備・バフ補正を除く）
+				calculatorData.mainWeapon.weaponType,
+				powerOptions.elementAttack === 'advantageous'
+			)
+
+			// INT補正を含む総属性有利を計算
+			const correctedTotalElementAdvantage = baseAdvantage + intElementAdvantageResult.intElementAdvantage
+
 			// 属性威力オプションに応じて計算
 			switch (powerOptions.elementPower) {
 				case 'disabled':
@@ -134,11 +176,11 @@ export function calculateDamageWithService(
 				case 'awakeningOnly':
 					return 25 // 覚醒のみ時は25%固定
 				case 'advantageOnly':
-					return baseAdvantage // 装備品補正値1の総属性有利のみ
+					return correctedTotalElementAdvantage // INT補正を含む総属性有利のみ
 				case 'enabled':
-					return baseAdvantage + 25 // 総属性有利 + 属性覚醒25%
+					return correctedTotalElementAdvantage + 25 // INT補正を含む総属性有利 + 属性覚醒25%
 				default:
-					return baseAdvantage
+					return correctedTotalElementAdvantage
 			}
 		}
 
@@ -332,11 +374,13 @@ export function calculateDamageWithService(
 
 					const skillInput = {
 						...input,
-						// スキルの場合はMATKまたはtotalATKを参照
+						// スキルの場合はMATK、ATK、またはtotalATKを参照
 						referenceStat:
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
-								: totalATK,
+								: originalHit.powerReference === 'ATK'
+									? calculationResults?.basicStats.ATK || 0
+									: totalATK,
 						// スキルカテゴリを考慮したパッシブ倍率を適用
 						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
 							calculatorData.buffSkills?.skills || null,
@@ -345,6 +389,12 @@ export function calculateDamageWithService(
 						),
 						// ブレイブ倍率はスキル攻撃でも同じ値を使用（エンハンス含む）
 						braveMultiplier: braveMultiplierWithEnemy,
+						// 攻撃タイプに応じてクリティカルダメージを選択
+						critical: {
+							damage: originalHit.attackType === 'magical'
+								? calculationResults?.basicStats.magicCriticalDamage ?? 100
+								: calculationResults?.basicStats.criticalDamage ?? 100,
+						},
 						attackSkill: {
 							type: originalHit.attackType,
 							multiplier: hitResult.calculatedMultiplier,
@@ -416,15 +466,19 @@ export function calculateDamageWithService(
 			)
 
 			// 基本ステータスの安定率を取得
-			const baseStabilityRate =
-				calculationResults?.basicStats.stabilityRate || 85
+			const baseStabilityRate = physicalStabilityRate
+
+			// 魔法スキルの場合は魔法安定率、物理スキルの場合は従来の安定率を使用
+			const effectiveMinStabilityRate = isMagicalSkill ? stabilityInfo.magicalStabilityLower : baseStabilityRate
+			const effectiveMaxStabilityRate = isMagicalSkill ? stabilityInfo.magicalStabilityUpper : 100
+			const effectiveAverageStabilityRate = isMagicalSkill ? stabilityInfo.averageStability : Math.floor((effectiveMaxStabilityRate + effectiveMinStabilityRate) / 2)
 
 			// 各撃の最小ダメージを個別に計算して合計
 			// 各撃: 最大ダメージ × 最小安定率（小数点切り捨て）
 			const totalMinDamage = attackResults.reduce((sum, hit) => {
 				const hitMaxDamage = hit.result.baseDamage
 				const hitMinDamage = Math.floor(
-					(hitMaxDamage * baseStabilityRate) / 100,
+					(hitMaxDamage * effectiveMinStabilityRate) / 100,
 				)
 				return sum + hitMinDamage
 			}, 0)
@@ -434,12 +488,8 @@ export function calculateDamageWithService(
 			// 各撃: 最大ダメージ × 平均安定率（小数点切り捨て）
 			const totalAverageDamage = attackResults.reduce((sum, hit) => {
 				const hitMaxDamage = hit.result.baseDamage
-				const hitMaxStabilityRate = 100
-				const hitAverageStabilityRate = Math.floor(
-					(hitMaxStabilityRate + baseStabilityRate) / 2,
-				)
 				const hitAverageDamage = Math.floor(
-					(hitMaxDamage * hitAverageStabilityRate) / 100,
+					(hitMaxDamage * effectiveAverageStabilityRate) / 100,
 				)
 				return sum + hitAverageDamage
 			}, 0)
@@ -452,7 +502,7 @@ export function calculateDamageWithService(
 					minDamage: totalMinDamage,
 					maxDamage: totalMaxDamage,
 					averageDamage: totalAverageDamage,
-					stabilityRate: baseStabilityRate, // 最小の安定率を使用
+					stabilityRate: effectiveMinStabilityRate, // 最小の安定率を使用
 				},
 				calculationSteps: attackResults[0].result.calculationSteps, // 最初の撃の計算過程を参考表示
 			}
@@ -470,135 +520,263 @@ export function calculateDamageWithService(
 		const getDamageByType = () => {
 			const baseDamage = attackResult.baseDamage // 白ダメ（基本ダメージ）
 			const stabilityResult = attackResult.stabilityResult
-			const stabilityRate = stabilityResult.stabilityRate
+			
+			// 魔法スキルの場合は魔法安定率を使用、物理スキルの場合は従来の安定率を使用
+			const minStabilityRate = isMagicalSkill ? stabilityInfo.magicalStabilityLower : stabilityResult.stabilityRate
+			const maxStabilityRate = isMagicalSkill ? stabilityInfo.magicalStabilityUpper : 100
+			const averageStabilityRate = isMagicalSkill ? stabilityInfo.averageStability : Math.floor((minStabilityRate + maxStabilityRate) / 2)
 
 			switch (powerOptions.damageType) {
 				case 'white': {
 					// 白ダメ：基本ダメージに対して安定率を適用
-					const minStabilityRate = stabilityRate
-					const maxStabilityRate = 100
-					const averageStabilityRate = Math.floor(
-						(minStabilityRate + maxStabilityRate) / 2,
-					)
-
 					// 多撃の場合は既に計算済みの値を使用
 					if (isMultiHit) {
+						// 多撃時も魔法安定率を適用するため再計算
+						if (isMagicalSkill) {
+							const totalMinDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitMinDamage = Math.floor((hitMaxDamage * minStabilityRate) / 100)
+								return sum + hitMinDamage
+							}, 0)
+							
+							const totalMaxDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitMaxDamageAdjusted = Math.floor((hitMaxDamage * maxStabilityRate) / 100)
+								return sum + hitMaxDamageAdjusted
+							}, 0)
+							
+							const totalAverageDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitAverageDamage = Math.floor((hitMaxDamage * averageStabilityRate) / 100)
+								return sum + hitAverageDamage
+							}, 0)
+							
+							return {
+								min: totalMinDamage,
+								max: totalMaxDamage,
+								average: totalAverageDamage,
+								stability: minStabilityRate,
+								averageStability: averageStabilityRate,
+								maxStability: maxStabilityRate,
+							}
+						}
+						
 						return {
 							min: stabilityResult.minDamage, // 既に計算済み
 							max: stabilityResult.maxDamage, // 既に計算済み
 							average: stabilityResult.averageDamage, // 既に計算済み
-							stability: stabilityRate,
+							stability: minStabilityRate,
 							averageStability: averageStabilityRate,
+							maxStability: maxStabilityRate,
 						}
 					}
 
 					return {
-						min: Math.floor((baseDamage * stabilityRate) / 100),
-						max: baseDamage,
+						min: Math.floor((baseDamage * minStabilityRate) / 100),
+						max: Math.floor((baseDamage * maxStabilityRate) / 100),
 						average: Math.floor((baseDamage * averageStabilityRate) / 100),
-						stability: stabilityRate,
+						stability: minStabilityRate,
 						averageStability: averageStabilityRate,
+						maxStability: maxStabilityRate,
 					}
 				}
 				case 'critical': {
 					// クリティカル：baseDamageがすでにクリティカル計算済み
-					const minStabilityRate = stabilityRate
-					const maxStabilityRate = 100
-					const averageStabilityRate = Math.floor(
-						(minStabilityRate + maxStabilityRate) / 2,
-					)
-
 					// 多撃の場合は既に計算済みの値を使用
 					if (isMultiHit) {
+						// 多撃時も魔法安定率を適用するため再計算
+						if (isMagicalSkill) {
+							const totalMinDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitMinDamage = Math.floor((hitMaxDamage * minStabilityRate) / 100)
+								return sum + hitMinDamage
+							}, 0)
+							
+							const totalMaxDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitMaxDamageAdjusted = Math.floor((hitMaxDamage * maxStabilityRate) / 100)
+								return sum + hitMaxDamageAdjusted
+							}, 0)
+							
+							const totalAverageDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitAverageDamage = Math.floor((hitMaxDamage * averageStabilityRate) / 100)
+								return sum + hitAverageDamage
+							}, 0)
+							
+							return {
+								min: totalMinDamage,
+								max: totalMaxDamage,
+								average: totalAverageDamage,
+								stability: minStabilityRate,
+								averageStability: averageStabilityRate,
+								maxStability: maxStabilityRate,
+							}
+						}
+						
 						return {
 							min: stabilityResult.minDamage, // 既に計算済み
 							max: stabilityResult.maxDamage, // 既に計算済み
 							average: stabilityResult.averageDamage, // 既に計算済み
-							stability: stabilityRate,
+							stability: minStabilityRate,
 							averageStability: averageStabilityRate,
+							maxStability: maxStabilityRate,
 						}
 					}
 
 					return {
-						min: Math.floor((baseDamage * stabilityRate) / 100),
-						max: baseDamage,
+						min: Math.floor((baseDamage * minStabilityRate) / 100),
+						max: Math.floor((baseDamage * maxStabilityRate) / 100),
 						average: Math.floor((baseDamage * averageStabilityRate) / 100),
-						stability: stabilityRate,
+						stability: minStabilityRate,
 						averageStability: averageStabilityRate,
+						maxStability: maxStabilityRate,
 					}
 				}
 				case 'graze': {
 					// グレイズ：後で実装予定
 					const grazeBaseDamage = Math.floor(baseDamage * 0.1)
-					const minStabilityRate = stabilityRate
-					const maxStabilityRate = 100
-					const averageStabilityRate = Math.floor(
-						(minStabilityRate + maxStabilityRate) / 2,
-					)
 
 					// 多撃の場合は既に計算済みの値を使用（グレイズ適用後）
 					if (isMultiHit) {
+						if (isMagicalSkill) {
+							const totalMinDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitGrazeMinDamage = Math.floor((hitMaxDamage * 0.1 * minStabilityRate) / 100)
+								return sum + hitGrazeMinDamage
+							}, 0)
+							
+							const totalMaxDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitGrazeMaxDamage = Math.floor((hitMaxDamage * 0.1 * maxStabilityRate) / 100)
+								return sum + hitGrazeMaxDamage
+							}, 0)
+							
+							const totalAverageDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitGrazeAverageDamage = Math.floor((hitMaxDamage * 0.1 * averageStabilityRate) / 100)
+								return sum + hitGrazeAverageDamage
+							}, 0)
+							
+							return {
+								min: totalMinDamage,
+								max: totalMaxDamage,
+								average: totalAverageDamage,
+								stability: minStabilityRate,
+								averageStability: averageStabilityRate,
+								maxStability: maxStabilityRate,
+							}
+						}
+						
 						return {
 							min: Math.floor(stabilityResult.minDamage * 0.1),
 							max: Math.floor(stabilityResult.maxDamage * 0.1),
 							average: Math.floor(stabilityResult.averageDamage * 0.1),
-							stability: stabilityRate,
+							stability: minStabilityRate,
 							averageStability: averageStabilityRate,
+							maxStability: maxStabilityRate,
 						}
 					}
 
 					return {
-						min: Math.floor((grazeBaseDamage * stabilityRate) / 100),
-						max: grazeBaseDamage,
+						min: Math.floor((grazeBaseDamage * minStabilityRate) / 100),
+						max: Math.floor((grazeBaseDamage * maxStabilityRate) / 100),
 						average: Math.floor((grazeBaseDamage * averageStabilityRate) / 100),
-						stability: stabilityRate,
+						stability: minStabilityRate,
 						averageStability: averageStabilityRate,
 					}
 				}
 				case 'expected': {
 					// 期待値（多撃の場合は既に計算済みの値を使用）
 					if (isMultiHit) {
+						if (isMagicalSkill) {
+							const totalAverageDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitAverageDamage = Math.floor((hitMaxDamage * averageStabilityRate) / 100)
+								return sum + hitAverageDamage
+							}, 0)
+							
+							return {
+								min: totalAverageDamage,
+								max: totalAverageDamage,
+								average: totalAverageDamage,
+								stability: averageStabilityRate,
+								averageStability: averageStabilityRate,
+								maxStability: maxStabilityRate,
+							}
+						}
+						
 						return {
 							min: stabilityResult.averageDamage,
 							max: stabilityResult.averageDamage,
 							average: stabilityResult.averageDamage,
-							stability: stabilityRate,
-							averageStability: stabilityRate,
+							stability: averageStabilityRate,
+							averageStability: averageStabilityRate,
+							maxStability: maxStabilityRate,
 						}
 					}
+					
+					const expectedDamage = Math.floor((baseDamage * averageStabilityRate) / 100)
 					return {
-						min: stabilityResult.averageDamage,
-						max: stabilityResult.averageDamage,
-						average: stabilityResult.averageDamage,
-						stability: stabilityRate,
-						averageStability: stabilityRate,
+						min: expectedDamage,
+						max: expectedDamage,
+						average: expectedDamage,
+						stability: averageStabilityRate,
+						averageStability: averageStabilityRate,
+						maxStability: maxStabilityRate,
 					}
 				}
 				default: {
 					// 通常ダメージ：最大=基本ダメージ、最小=基本ダメージ×安定率（小数点以下切り捨て）
-					const minStabilityRate = stabilityRate
-					const maxStabilityRate = 100
-					const averageStabilityRate = Math.floor(
-						(minStabilityRate + maxStabilityRate) / 2,
-					)
-
 					// 多撃の場合は既に計算済みの値を使用
 					if (isMultiHit) {
+						// 多撃時も魔法安定率を適用するため再計算
+						if (isMagicalSkill) {
+							const totalMinDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitMinDamage = Math.floor((hitMaxDamage * minStabilityRate) / 100)
+								return sum + hitMinDamage
+							}, 0)
+							
+							const totalMaxDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitMaxDamageAdjusted = Math.floor((hitMaxDamage * maxStabilityRate) / 100)
+								return sum + hitMaxDamageAdjusted
+							}, 0)
+							
+							const totalAverageDamage = attackResults.reduce((sum, hit) => {
+								const hitMaxDamage = hit.result.baseDamage
+								const hitAverageDamage = Math.floor((hitMaxDamage * averageStabilityRate) / 100)
+								return sum + hitAverageDamage
+							}, 0)
+							
+							return {
+								min: totalMinDamage,
+								max: totalMaxDamage,
+								average: totalAverageDamage,
+								stability: minStabilityRate,
+								averageStability: averageStabilityRate,
+								maxStability: maxStabilityRate,
+							}
+						}
+						
 						return {
 							min: stabilityResult.minDamage, // 既に計算済み
 							max: stabilityResult.maxDamage, // 既に計算済み
 							average: stabilityResult.averageDamage, // 既に計算済み
-							stability: stabilityRate,
+							stability: minStabilityRate,
 							averageStability: averageStabilityRate,
+							maxStability: maxStabilityRate,
 						}
 					}
 
 					return {
-						min: Math.floor((baseDamage * stabilityRate) / 100),
-						max: baseDamage,
+						min: Math.floor((baseDamage * minStabilityRate) / 100),
+						max: Math.floor((baseDamage * maxStabilityRate) / 100),
 						average: Math.floor((baseDamage * averageStabilityRate) / 100),
-						stability: stabilityRate,
+						stability: minStabilityRate,
 						averageStability: averageStabilityRate,
+						maxStability: maxStabilityRate,
 					}
 				}
 			}
