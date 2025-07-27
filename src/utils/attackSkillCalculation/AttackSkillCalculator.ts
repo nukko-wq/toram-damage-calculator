@@ -7,6 +7,7 @@ import {
 	MoonSlashCalculator,
 	type SkillHitCalculator,
 	StandardCalculator,
+	Storm1Hit6Calculator,
 	StrikeStabAilmentCalculator,
 	StrikeStabCalculator,
 } from './calculators'
@@ -67,6 +68,8 @@ export class AttackSkillCalculator {
 				return new StrikeStabAilmentCalculator()
 			case 'magic_arrow':
 				return new MagicArrowCalculator()
+			case 'storm_1_6hit':
+				return new Storm1Hit6Calculator()
 			case 'buster_blade':
 				return new BusterBladeCalculator()
 			case 'cyclone_arrow':
