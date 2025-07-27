@@ -21,6 +21,7 @@ import {
 	calculateCSPD,
 	calculateFLEE,
 	calculateTotalElementAdvantage,
+	calculateINTElementAdvantage,
 	calculateStability,
 	calculateAdjustedStats,
 	calculateEquipmentBonuses,
@@ -204,6 +205,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
+
+	// PowerOptionsを取得（DamagePreviewの設定を参照）
+	const powerOptions = data.powerOptions
 
 	// 統合計算のメモ化
 	const calculationResults = useMemo(() => {
@@ -397,8 +401,20 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				adjustedStatsCalculation.AGI,
 				finalBonuses,
 			),
-			totalElementAdvantageCalculation:
-				calculateTotalElementAdvantage(finalBonuses),
+			totalElementAdvantageCalculation: (() => {
+				// INT属性有利補正を計算
+				const intElementAdvantageResult = calculateINTElementAdvantage(
+					baseStats.INT, // 基礎INT（装備・バフ補正を除く）
+					data.mainWeapon.weaponType,
+					powerOptions?.elementAttack === 'advantageous'
+				)
+				
+				// 総属性有利を計算（INT補正を含む）
+				return calculateTotalElementAdvantage(
+					finalBonuses,
+					intElementAdvantageResult.intElementAdvantage
+				)
+			})(),
 			stabilityCalculation: calculateStability(
 				data.mainWeapon.stability,
 				data.mainWeapon.weaponType,
@@ -412,7 +428,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			),
 			adjustedStatsCalculation,
 		}
-	}, [data, baseStats])
+	}, [data, baseStats, powerOptions])
 
 	// 詳細データソースボーナス取得（フィルター表示用）
 	const detailedBonuses = useMemo(() => {

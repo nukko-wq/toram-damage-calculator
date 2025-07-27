@@ -17,7 +17,7 @@ import {
 	getBuffSkillPassiveMultiplierWithSkillCategory,
 	getBuffSkillBraveMultiplier,
 } from '@/utils/buffSkillCalculation'
-import { calculateMagicalStability } from '@/utils/basicStatsCalculation'
+import { calculateMagicalStability, calculateINTElementAdvantage, calculateTotalElementAdvantage } from '@/utils/basicStatsCalculation'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import type { BuffSkillState } from '@/types/buffSkill'
 import { createInitialPowerOptions } from '@/utils/initialData'
@@ -159,6 +159,16 @@ export function calculateDamageWithService(
 			const baseAdvantage =
 				calculationResults?.basicStats?.totalElementAdvantage ?? 0
 
+			// INT属性有利補正を計算（属性攻撃が有利の場合のみ）
+			const intElementAdvantageResult = calculateINTElementAdvantage(
+				calculatorData.baseStats.INT, // 基礎INT（装備・バフ補正を除く）
+				calculatorData.mainWeapon.weaponType,
+				powerOptions.elementAttack === 'advantageous'
+			)
+
+			// INT補正を含む総属性有利を計算
+			const correctedTotalElementAdvantage = baseAdvantage + intElementAdvantageResult.intElementAdvantage
+
 			// 属性威力オプションに応じて計算
 			switch (powerOptions.elementPower) {
 				case 'disabled':
@@ -166,11 +176,11 @@ export function calculateDamageWithService(
 				case 'awakeningOnly':
 					return 25 // 覚醒のみ時は25%固定
 				case 'advantageOnly':
-					return baseAdvantage // 装備品補正値1の総属性有利のみ
+					return correctedTotalElementAdvantage // INT補正を含む総属性有利のみ
 				case 'enabled':
-					return baseAdvantage + 25 // 総属性有利 + 属性覚醒25%
+					return correctedTotalElementAdvantage + 25 // INT補正を含む総属性有利 + 属性覚醒25%
 				default:
-					return baseAdvantage
+					return correctedTotalElementAdvantage
 			}
 		}
 

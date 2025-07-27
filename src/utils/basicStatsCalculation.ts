@@ -1622,16 +1622,18 @@ export function calculateCSPD(
  * 全ての属性攻撃に対して共通で適用される汎用的な属性有利補正
  *
  * @param bonuses 全補正値（4データソース統合済み）
+ * @param intElementAdvantage 基礎INT属性有利補正（オプション）
  * @returns 総属性有利計算の詳細ステップ
  */
 export function calculateTotalElementAdvantage(
 	bonuses: AllBonuses = {},
+	intElementAdvantage = 0,
 ): TotalElementAdvantageCalculationSteps {
 	// 属性有利%補正を取得（4データソース統合済み）
 	const elementAdvantageRate = bonuses.ElementAdvantage_Rate || 0
 
-	// 総属性有利は単純な%補正のみ（固定値補正は存在しない）
-	const finalTotalElementAdvantage = elementAdvantageRate
+	// 総属性有利 = 基本属性有利 + INT補正
+	const finalTotalElementAdvantage = elementAdvantageRate + intElementAdvantage
 
 	return {
 		elementAdvantageRate,
@@ -1677,6 +1679,49 @@ export function calculateMagicalStability(
 		magicalStabilityLower,
 		magicalStabilityUpper,
 		averageStability,
+	}
+}
+
+/**
+ * 基礎INT属性有利補正計算
+ * 
+ * メイン武器が杖・魔導具で属性攻撃が有利状態の場合、基礎INTによる属性有利補正を適用
+ * 
+ * @param baseINT 基礎INT（装備・バフ補正を除く素のINT値）
+ * @param weaponType メイン武器の種類
+ * @param isElementAdvantage 属性攻撃が有利状態かどうか
+ * @returns 基礎INT属性有利補正計算結果
+ */
+export interface INTElementAdvantageCalculationSteps {
+	baseINT: number
+	weaponType: WeaponTypeEnum
+	isElementAdvantage: boolean
+	isWeaponApplicable: boolean
+	isApplicable: boolean
+	intElementAdvantage: number
+}
+
+export function calculateINTElementAdvantage(
+	baseINT: number,
+	weaponType: WeaponTypeEnum,
+	isElementAdvantage: boolean,
+): INTElementAdvantageCalculationSteps {
+	// 1. 武器条件判定
+	const isWeaponApplicable = weaponType === '杖' || weaponType === '魔導具'
+	
+	// 2. 総合適用可否判定
+	const isApplicable = isWeaponApplicable && isElementAdvantage
+	
+	// 3. 基礎INT補正計算
+	const intElementAdvantage = isApplicable ? Math.floor(baseINT / 10) : 0
+	
+	return {
+		baseINT,
+		weaponType,
+		isElementAdvantage,
+		isWeaponApplicable,
+		isApplicable,
+		intElementAdvantage,
 	}
 }
 
