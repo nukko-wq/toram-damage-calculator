@@ -1640,6 +1640,47 @@ export function calculateTotalElementAdvantage(
 }
 
 /**
+ * 魔法安定率計算
+ * 
+ * 物理安定率を基に魔法安定率の下限・上限を計算
+ * 
+ * @param physicalStability 物理安定率（0-100%）
+ * @returns 魔法安定率計算結果
+ */
+export interface MagicalStabilityCalculationSteps {
+	physicalStability: number
+	lowerLimitCalculation: number
+	upperLimitCalculation: number
+	magicalStabilityLower: number
+	magicalStabilityUpper: number
+	averageStability: number
+}
+
+export function calculateMagicalStability(
+	physicalStability: number,
+): MagicalStabilityCalculationSteps {
+	// 1. 下限計算
+	const lowerLimitCalculation = Math.floor((physicalStability + 100) / 2)
+	const magicalStabilityLower = Math.max(0, Math.min(90, lowerLimitCalculation))
+
+	// 2. 上限計算
+	const upperLimitCalculation = 100 + Math.floor((physicalStability - 80) / 2)
+	const magicalStabilityUpper = Math.max(100, Math.min(110, upperLimitCalculation))
+
+	// 3. 平均安定率（ダメージ計算で使用）
+	const averageStability = Math.floor((magicalStabilityLower + magicalStabilityUpper) / 2)
+
+	return {
+		physicalStability,
+		lowerLimitCalculation,
+		upperLimitCalculation,
+		magicalStabilityLower,
+		magicalStabilityUpper,
+		averageStability,
+	}
+}
+
+/**
  * 魔法クリティカルダメージ計算
  * 魔法クリティカルダメージ = INT(100 + (クリティカルダメージ - 100) × (20 + スペルバーストslv) / 40)
  *
