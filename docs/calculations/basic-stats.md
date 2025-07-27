@@ -1293,6 +1293,7 @@ function calculateTotalATK(
 
 ## 関連ドキュメント
 - [HP・MP計算式](./hp-mp-calculation.md) - HP・MP計算の詳細
+- [MATK計算式](./matk-calculation.md) - MATK計算の詳細
 - [速度系計算式](./speed-calculations.md) - ASPD・CSPD・行動速度計算の詳細
 - [HIT・FLEE計算式](./hit-flee-calculation.md) - HIT・FLEE計算の詳細
 - [物理・魔法耐性計算式](./resistance-calculation.md) - 物理・魔法耐性計算の詳細
