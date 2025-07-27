@@ -379,6 +379,11 @@ export const crystalsData: CrystalsData = {
 						properties: { BladeReduction_Rate: 20 },
 						description: '魔導具装備時: 射刃軽減+20%',
 					},
+					{
+						condition: { type: 'subWeapon', weaponType: '魔導具' },
+						properties: { BladeReduction_Rate: 20 },
+						description: '魔導具装備時: 射刃軽減+20%',
+					},
 				],
 			},
 		],
