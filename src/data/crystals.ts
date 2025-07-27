@@ -139,6 +139,28 @@ export const crystalsData: CrystalsData = {
 					AttackSpeed_Rate: 7,
 				},
 			},
+			{
+				id: 'a55c4230-135b-4bbb-b089-5fc041c88c15',
+				name: '死霊使いウササマⅡ',
+				type: 'weapon',
+				properties: {
+					MATK_Rate: 7,
+					CastingSpeed_Rate: 14,
+					MotionSpeed_Rate: 3,
+					HP_Rate: -15,
+					AttackMPRecovery_Rate: -30,
+				},
+			},
+			{
+				id: 'e5703e08-4942-484a-9cae-a883cbc25f2b',
+				name: 'ロンディネ',
+				type: 'weapon',
+				properties: {
+					MATK_Rate: 11,
+					DEX_Rate: 9,
+					CastingSpeed_Rate: 7,
+				},
+			},
 		],
 		armor: [
 			{
@@ -385,14 +407,24 @@ export const crystalsData: CrystalsData = {
 			},
 			{
 				id: '6f789012-3456-789a-bcde-f01234567890',
-				name: '星の魔導士(盾装備)',
+				name: '星の魔導士',
 				type: 'special',
 				properties: {
 					MATK_Rate: 9,
 					CastingSpeed_Rate: 9,
-					Anticipate_Rate: 9,
-					Aggro_Rate: 9,
 				},
+				conditionalEffects: [
+					{
+						condition: { type: 'mainWeapon', weaponType: '杖' },
+						properties: { Aggro_Rate: -9 },
+						description: '杖装備時: ヘイト-9%',
+					},
+					{
+						condition: { type: 'subWeapon', weaponType: '盾' },
+						properties: { Aggro_Rate: 9 },
+						description: '盾装備時: ヘイト+9%',
+					},
+				],
 			},
 			{
 				id: '78901234-5678-9abc-def0-123456789012',
