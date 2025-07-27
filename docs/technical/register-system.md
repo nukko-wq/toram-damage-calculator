@@ -1047,13 +1047,80 @@ if (data.register?.effects) {
 7. **攻撃速度アップ(attackSpeedUp)** - 攻撃速度向上（装備品補正値1のASPD(+)に加算）
 8. **魔法速度アップ(magicalSpeedUp)** - 詠唱速度向上（装備品補正値1のCSPD(+)に加算）
 9. **運命共同体(fateCompanionship)** - パーティメンバー数×1%をATK%とMATK%に加算（レベル1固定）
-10. **虚無の構え** - 特殊戦闘効果
-11. **魔矢の追跡** - 魔法矢系効果
-12. **エアスライド圧縮** - エアスライド系効果
-13. **暗殺突き強化** - 暗殺系効果
-14. **共鳴パワー** - 共鳴系パワー効果
-15. **共鳴加速** - 共鳴系速度効果
-16. **共鳴集中** - 共鳴系集中効果
+10. **無の構え(voidStance)** - ダメージ計算時のコンボ倍率に影響（DamagePreviewのコンボ:強打無効時のみ）
+11. **術式アロー・追撃** - 術式アローに追加効果
+12. **エアスライド・圧縮** - エアスライドに追加効果
+13. **アサシンスタブ・強化** - アサシンスタブに追加効果
+14. **レゾナンス・火力** - レゾナンスに追加効果
+15. **レゾナンス・加速** - レゾナンスに追加効果
+16. **レゾナンス・集中** - レゾナンスに追加効果
+
+## 無の構え（voidStance）
+
+### 基本仕様
+- **効果**: ダメージ計算時のコンボ倍率を増加させる
+- **適用条件**: 
+  - 無の構えが有効に設定されている
+  - DamagePreviewのコンボ設定で「強打」が無効になっている
+- **計算方法**: `1 + (スキルレベル × 0.01)` 倍の倍率
+- **レベル範囲**: 1-10（最大1.10倍）
+
+### 実装方式
+無の構えは通常のレジスタ効果とは異なり、ダメージ計算エンジンで直接コンボ倍率に影響を与えます：
+
+1. **条件判定**: DamagePreviewでコンボ「強打」が無効かどうかを確認
+2. **倍率計算**: 無の構えのレベルに応じてコンボ倍率を調整
+3. **ダメージ適用**: 最終ダメージ計算でコンボ倍率として適用
+
+### 計算例
+**入力値:**
+- 無の構えレベル: 7 (有効)
+- DamagePreviewのコンボ設定: 強打が無効
+- 基本コンボ倍率: 1.0
+
+**計算手順:**
+1. 無の構え倍率: 1 + (7 × 0.01) = 1.07
+2. **最終コンボ倍率**: 1.0 × 1.07 = 1.07倍
+
+**レベル別倍率表:**
+- レベル1: 1.01倍
+- レベル5: 1.05倍  
+- レベル10: 1.10倍（最大）
+
+### 実装詳細
+```typescript
+// ダメージ計算エンジン内
+function calculateComboMultiplier(
+  comboSettings: ComboSettings,
+  registerData: RegisterFormData
+): number {
+  let comboMultiplier = 1.0
+  
+  // 強打コンボの判定
+  const hasStrongAttack = comboSettings.strongAttack?.enabled || false
+  
+  // 無の構えの効果（強打が無効の場合のみ）
+  if (!hasStrongAttack) {
+    const voidStanceEffect = registerData.effects.find(effect => 
+      effect.type === 'voidStance' && effect.isEnabled
+    )
+    if (voidStanceEffect) {
+      const voidStanceMultiplier = 1 + (voidStanceEffect.level * 0.01)
+      comboMultiplier *= voidStanceMultiplier
+    }
+  }
+  
+  return comboMultiplier
+}
+```
+
+### 特殊な仕様
+- **相互排他**: 強打コンボと無の構えは同時に適用されない
+- **UI連動**: DamagePreviewのコンボ設定UIと連動して効果の有無を判定
+- **計算タイミング**: ダメージ計算の最終段階でコンボ倍率として適用
+
+### StatusPreviewでの扱い
+無の構えは基本ステータス（HP、MP、ATK等）には影響を与えないため、StatusPreviewでの統合処理は不要です。ダメージ計算エンジンでのみ使用されます。
 
 ## ギルド料理効果一覧
 

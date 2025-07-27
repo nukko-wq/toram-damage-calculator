@@ -322,6 +322,19 @@ export function calculateDamageWithService(
 				isActive: powerOptions.combo,
 				multiplier: powerOptions.combo ? 150 : 100, // 仮のコンボ倍率
 			},
+			// レジスタ効果を反映
+			register: {
+				voidStance: calculatorData.register?.effects.find(effect => 
+					effect.type === 'voidStance'
+				) ? {
+					isEnabled: calculatorData.register.effects.find(effect => 
+						effect.type === 'voidStance'
+					)?.isEnabled ?? false,
+					level: calculatorData.register.effects.find(effect => 
+						effect.type === 'voidStance'
+					)?.level ?? 1,
+				} : undefined,
+			},
 			attackSkill: {
 				...defaultInput.attackSkill,
 				// 攻撃スキルが選択されている場合はその値を使用、なければ通常攻撃
