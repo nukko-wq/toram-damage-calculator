@@ -281,7 +281,6 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: true,
 				canUseShortRangePower: true,
 				canUseLongRangePower: true,
-				specialEffects: ['範囲攻撃', '6hitのうち1hit'],
 			},
 		],
 	},

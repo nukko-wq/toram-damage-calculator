@@ -111,13 +111,6 @@
       canUseShortRangePower: true,   // 近距離威力適用可能
       canUseLongRangePower: true     // 遠距離威力適用可能
     }
-  ],
-  
-  // 特殊効果
-  specialEffects: [
-    '魔法攻撃',
-    '範囲攻撃',
-    '6hitのうち1hit'
   ]
 }
 ```
