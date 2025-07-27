@@ -389,6 +389,12 @@ export function calculateDamageWithService(
 						),
 						// ブレイブ倍率はスキル攻撃でも同じ値を使用（エンハンス含む）
 						braveMultiplier: braveMultiplierWithEnemy,
+						// 攻撃タイプに応じてクリティカルダメージを選択
+						critical: {
+							damage: originalHit.attackType === 'magical'
+								? calculationResults?.basicStats.magicCriticalDamage ?? 100
+								: calculationResults?.basicStats.criticalDamage ?? 100,
+						},
 						attackSkill: {
 							type: originalHit.attackType,
 							multiplier: hitResult.calculatedMultiplier,
