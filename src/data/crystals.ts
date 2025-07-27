@@ -359,6 +359,28 @@ export const crystalsData: CrystalsData = {
 					},
 				],
 			},
+			{
+				id: '106dc3d9-2869-4c6d-b63a-b8350e39faf2',
+				name: 'マギフィレーシア',
+				type: 'additional',
+				properties: {
+					MATK_Rate: 9,
+					INT_Rate: 3,
+					Stability_Rate: 6,
+				},
+				conditionalEffects: [
+					{
+						condition: { type: 'mainWeapon', weaponType: '杖' },
+						properties: { ArmorBreak_Rate: 10 },
+						description: '杖装備時: 防御崩し+10%',
+					},
+					{
+						condition: { type: 'mainWeapon', weaponType: '魔導具' },
+						properties: { BladeReduction_Rate: 20 },
+						description: '魔導具装備時: 射刃軽減+20%',
+					},
+				],
+			},
 		],
 		special: [
 			{
