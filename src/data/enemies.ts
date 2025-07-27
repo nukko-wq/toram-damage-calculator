@@ -44,6 +44,20 @@ export const enemiesData: EnemiesData = {
 				},
 				category: 'mob',
 			},
+			{
+				id: '810eec47-6d82-4822-a592-eb04e44485f5',
+				name: 'ブレッパ',
+				level: 223,
+				stats: {
+					DEF: 466,
+					MDEF: 291,
+					physicalResistance: 8,
+					magicalResistance: 8,
+					resistCritical: 0,
+					requiredHIT: 0,
+				},
+				category: 'mob',
+			},
 		],
 		fieldBoss: [
 			{
