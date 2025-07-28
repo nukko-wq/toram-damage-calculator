@@ -23,6 +23,7 @@ import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 import { getSpriteSkillBonuses, getSpriteSkillBraveMultiplier } from '../categories/spriteSkills'
 import { calculateHotKnowsEffects } from '../categories/minstrelSkills'
 import { getShootSkillPassiveMultiplier } from '../categories/shootSkills'
+import { getPriestSkillBonuses } from '../categories/priestSkills'
 
 /**
  * バフスキルデータから全体の補正値を取得（基本版）
@@ -118,6 +119,15 @@ export function getBuffSkillBonuses(
 		enemyLevel ?? 100,
 	)
 	for (const [key, value] of Object.entries(spriteBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// プリーストスキル
+	const priestBonuses = getPriestSkillBonuses(buffSkillData)
+	for (const [key, value] of Object.entries(priestBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value

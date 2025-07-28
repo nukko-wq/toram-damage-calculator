@@ -42,21 +42,3 @@ export function calculateHotKnowsEffects(
 	}
 }
 
-/**
- * インスピレーションの効果を計算（既存実装がある場合はそちらを使用）
- * 
- * @param playerCount プレイヤー数
- * @returns バフ効果
- */
-export function calculateInspirationEffects(
-	playerCount: number,
-): Partial<EquipmentProperties> {
-	if (!playerCount || playerCount <= 0) return {}
-
-	const effectValue = playerCount * 5
-
-	return {
-		ATK_Rate: effectValue,
-		MATK_Rate: effectValue,
-	}
-}

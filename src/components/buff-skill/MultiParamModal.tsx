@@ -230,6 +230,14 @@ export default function MultiParamModal({
 										<br />
 										両手剣以外の場合: 2
 									</>
+								) : skill.id === 'IsPriere' ? (
+									<>
+										いずれかを選択して下さい。
+										<br />
+										メイン/サブ武器が魔導具の場合: 1
+										<br />
+										それ以外の場合: 2
+									</>
 								) : (
 									`${skill.multiParams.param1.name}を入力してください。`
 								)
@@ -276,6 +284,8 @@ export default function MultiParamModal({
 									? currentState.level || 2
 									: skill.id === 'IsWarcry'
 									? currentState.level || 2
+									: skill.id === 'IsPriere'
+									? currentState.level || 2
 									: `Lv.${currentState.level || 10}`}
 							</div>
 
@@ -314,7 +324,7 @@ export default function MultiParamModal({
 					</div>
 
 					{/* 重ねがけ数設定 */}
-					{skill.id !== 'IsBrave' && skill.id !== 'IsWarcry' && (
+					{skill.id !== 'IsBrave' && skill.id !== 'IsWarcry' && skill.id !== 'IsPriere' && (
 						<div>
 							<div className="text-sm text-gray-600 mb-3">
 								{skill.type === 'multiParam' && skill.multiParams
@@ -547,7 +557,8 @@ export default function MultiParamModal({
 						skill.id !== 'mg4' &&
 						skill.id !== 'knight5-3' &&
 						skill.id !== 'IsBrave' &&
-						skill.id !== 'IsWarcry' && (
+						skill.id !== 'IsWarcry' &&
+						skill.id !== 'IsPriere' && (
 							<div className="text-xs text-gray-500 text-center">
 								{skill.name}はカウント数1-{skill.maxStack || 10}まで設定可能です
 							</div>

@@ -28,6 +28,8 @@
 - **ダークパワースキル系統**: [buff-skills/darkpower-skills.md](./buff-skills/darkpower-skills.md) ✅
 - **アサシンスキル系統**: [buff-skills/assassin-skills.md](./buff-skills/assassin-skills.md) ✅
 - **スプライトスキル系統**: [buff-skills/sprite-skills.md](./buff-skills/sprite-skills.md) ✅
+- **ミンストレルスキル系統**: [buff-skills/minstrel-skills.md](./buff-skills/minstrel-skills.md) ✅
+- **シュートスキル系統**: [buff-skills/shoot-skills.md](./buff-skills/shoot-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills/README.md](./buff-skills/README.md) を参照してください。
@@ -87,83 +89,11 @@ interface WeaponRequirement {
 
 ### 2. シュートスキル系統
 
-#### 2.1 ロングレンジ (LongRange)
-```typescript
-{
-  id: 'LongRange',
-  name: 'ロングレンジ',
-  category: 'shoot',
-  type: 'level',
-  order: 302,
-  maxLevel: 10,
-  description: 'AttackSkillのロングレンジ(canUseLongRange)が有効な場合にパッシブ倍率を上昇させる',
-  effects: [
-    {
-      property: 'PassiveDamage_Rate',
-      formula: 'skillLevel',
-      conditions: ['AttackSkillのcanUseLongRange=true']
-    }
-  ],
-  calculationFormula: 'パッシブ倍率% = skillLevel',
-  weaponRequirements: [
-    {
-      weaponType: 'all',
-      description: '全ての武器で効果があります'
-    }
-  ],
-  uiSettings: {
-    parameterName: 'スキルレベル',
-    parameterUnit: 'Lv',
-    showInModal: true,
-    quickToggle: false
-  },
-  specialMechanics: {
-    longRangeCondition: true,
-    note: 'canUseLongRangePowerとは違う条件です。AttackSkillのcanUseLongRangeプロパティが有効な場合のみ効果があります。'
-  }
-}
-```
+詳細は [buff-skills/shoot-skills.md](./buff-skills/shoot-skills.md) を参照してください。
 
-**計算例:**
-- スキルレベル10: パッシブ倍率+10%
-- スキルレベル5: パッシブ倍率+5%
-
-**適用条件:**
-- AttackSkillのcanUseLongRange=trueの場合のみ効果発動
-- canUseLongRangePowerとは異なる条件
-
-#### 2.2 武士弓術 (ar1)
-```typescript
-{
-  id: 'ar1',
-  name: '武士弓術',
-  category: 'shoot',
-  type: 'toggle',
-  order: 301,
-  description: 'サブ武器の抜刀剣による武器ATKと安定率の向上',
-  effects: [
-    {
-      property: 'WeaponATK',
-      formula: 'subWeaponATK',
-      conditions: ['メイン武器が弓', 'サブ武器が抜刀剣']
-    },
-    {
-      property: 'Stability_Rate',
-      formula: 'Math.floor(subWeaponStability / 4)',
-      conditions: ['メイン武器が弓', 'サブ武器が抜刀剣']
-    }
-  ],
-  calculationFormula: 'WeaponATK = base + サブ武器の武器ATK, Stability% = base + Math.floor(サブ武器の安定率 / 4)',
-  weaponRequirement: {
-    description: 'メイン武器が弓でサブ武器が抜刀剣で効果があります'
-  },
-  uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
-  }
-}
-```
+**含まれるスキル:**
+- 2.1 ロングレンジ (LongRange) - AttackSkillのcanUseLongRange条件でパッシブ倍率上昇
+- 2.2 武士弓術 (ar1) - 弓+抜刀剣装備時の武器ATK・安定率向上
 
 
 ### 3. ハルバードスキル系統
@@ -220,30 +150,65 @@ interface WeaponRequirement {
 }
 ```
 
-#### 6.2 ネメシス (nemesis1)
+#### 6.2 プリエール (IsPriere)
 ```typescript
 {
-  id: 'nemesis1',
-  name: 'ネメシス',
+  id: 'IsPriere',
+  name: 'プリエール',
   category: 'priest',
-  type: 'toggle',
-  order: 802,
-  description: 'ヘイトを上昇させる',
+  type: 'multiParam',
+  multiParams: {
+    param1: {
+      name: '武器タイプ',
+      min: 1,
+      max: 2,
+      default: 2,
+      unit: ''
+    }
+  },
+  order: 1101,
+  description: '魔導具装備状況に応じて魔法攻撃力率を上昇させる',
   effects: [
     {
-      property: 'Aggro_Rate',
-      formula: '+500',
-      conditions: []
+      property: 'MATK_Rate',
+      formula: 'param1 === 1 ? +15 : +10',
+      conditions: ['魔導具装備(1): +15%, それ以外(2): +10%']
     }
   ],
-  calculationFormula: 'ヘイト% = base + 500',
+  calculationFormula: `
+    魔導具装備(1)の場合:
+    - MATK_Rate: +15%
+    
+    それ以外(2)の場合:
+    - MATK_Rate: +10%
+  `,
+  weaponRequirements: [
+    {
+      weaponType: 'all',
+      description: '全ての武器で効果があります'
+    }
+  ],
   uiSettings: {
-    parameterName: 'ON/OFF',
-    showInModal: false,
-    quickToggle: true
+    parameterName: '武器タイプ',
+    parameterUnit: '',
+    showInModal: true,
+    quickToggle: false,
+    parameterOptions: [
+      { value: 1, label: 'メイン/サブ武器が魔導具', description: 'MATK率+15%' },
+      { value: 2, label: 'それ以外', description: 'MATK率+10%' }
+    ]
   }
 }
 ```
+
+**計算例:**
+- メイン武器が魔導具装備: MATK率+15%
+- サブ武器が魔導具装備: MATK率+15%
+- メイン・サブ武器両方とも魔導具以外: MATK率+10%
+
+**適用条件:**
+- メイン武器またはサブ武器のいずれかが魔導具の場合: 15%効果
+- 両方とも魔導具以外の場合: 10%効果
 
 ### 7. ダークパワースキル系統
 
@@ -382,92 +347,10 @@ interface WeaponRequirement {
 
 ### 17. ミンストレルスキル系統
 
+詳細は [buff-skills/minstrel-skills.md](./buff-skills/minstrel-skills.md) を参照してください。
+
 **含まれるスキル:**
-- 17.1 インスピレーション (minstrel1) - プレイヤー数に応じたATK・MATK上昇
-- 17.2 熱情の歌 (IsHotKnows) - DamagePreview属性攻撃設定連動の属性有利率変動
-
-#### 17.1 インスピレーション (minstrel1)
-```typescript
-{
-  id: 'minstrel1',
-  name: 'インスピレーション',
-  category: 'minstrel',
-  type: 'special',
-  order: 2001,
-  description: 'プレイヤー数に応じて効果が変動',
-  effects: [
-    {
-      property: 'ATK_Rate',
-      formula: 'playerCount * 5',
-      conditions: ['プレイヤー数指定']
-    },
-    {
-      property: 'MATK_Rate',
-      formula: 'playerCount * 5',
-      conditions: ['プレイヤー数指定']
-    }
-  ],
-  calculationFormula: 'ATK% = プレイヤー数 × 5, MATK% = プレイヤー数 × 5',
-  uiSettings: {
-    parameterName: 'プレイヤー数',
-    parameterUnit: '人',
-    showInModal: true,
-    quickToggle: false
-  }
-}
-```
-
-#### 17.2 熱情の歌 (IsHotKnows)
-```typescript
-{
-  id: 'IsHotKnows',
-  name: '熱情の歌',
-  category: 'minstrel',
-  type: 'stack',
-  order: 2401,
-  maxStack: 10,
-  description: 'DamagePreviewの属性攻撃設定に応じて属性有利率が変動',
-  effects: [
-    {
-      property: 'ElementAdvantage_Rate',
-      formula: 'stackCount * 1.5',
-      conditions: ['DamagePreview属性攻撃=有(有利)']
-    },
-    {
-      property: 'ElementAdvantage_Rate',
-      formula: '-(stackCount * 1.5)',
-      conditions: ['DamagePreview属性攻撃=不利属性']
-    }
-  ],
-  calculationFormula: '属性有利% = ±(スタック数 × 1.5) [有利: +, 不利: -]',
-  weaponRequirements: [
-    {
-      weaponType: 'all',
-      description: '全ての武器で効果があります'
-    }
-  ],
-  uiSettings: {
-    parameterName: 'スタック数',
-    parameterUnit: '回',
-    showInModal: true,
-    quickToggle: false
-  },
-  specialMechanics: {
-    damagePreviewIntegration: true,
-    elementAdvantageConditions: {
-      advantageous: '+1.5 × スタック数',
-      disadvantageous: '-1.5 × スタック数',
-      other: '効果なし',
-      none: '効果なし'
-    }
-  }
-}
-```
-
-**計算例:**
-- スタック数10、属性攻撃=有(有利): +15%の属性有利率
-- スタック数10、属性攻撃=不利属性: -15%の属性有利率
-- スタック数5、属性攻撃=有(有利): +7.5%の属性有利率
+- 17.1 熱情の歌 (IsHotKnows) - DamagePreview属性攻撃設定連動の属性有利率変動
 
 
 ## スキルタイプ別UI仕様
