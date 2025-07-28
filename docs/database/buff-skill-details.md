@@ -94,25 +94,43 @@ interface WeaponRequirement {
   name: 'ロングレンジ',
   category: 'shoot',
   type: 'level',
-  order: 301,
+  order: 302,
   maxLevel: 10,
-  description: '遠距離威力を上昇させる',
+  description: 'AttackSkillのロングレンジ(canUseLongRange)が有効な場合にパッシブ倍率を上昇させる',
   effects: [
     {
-      property: 'LongRangeDamage_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
+      property: 'PassiveDamage_Rate',
+      formula: 'skillLevel',
+      conditions: ['AttackSkillのcanUseLongRange=true']
     }
   ],
-  calculationFormula: '遠距離威力% = skillLevel × 3',
+  calculationFormula: 'パッシブ倍率% = skillLevel',
+  weaponRequirements: [
+    {
+      weaponType: 'all',
+      description: '全ての武器で効果があります'
+    }
+  ],
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
     showInModal: true,
     quickToggle: false
+  },
+  specialMechanics: {
+    longRangeCondition: true,
+    note: 'canUseLongRangePowerとは違う条件です。AttackSkillのcanUseLongRangeプロパティが有効な場合のみ効果があります。'
   }
 }
 ```
+
+**計算例:**
+- スキルレベル10: パッシブ倍率+10%
+- スキルレベル5: パッシブ倍率+5%
+
+**適用条件:**
+- AttackSkillのcanUseLongRange=trueの場合のみ効果発動
+- canUseLongRangePowerとは異なる条件
 
 #### 2.2 武士弓術 (ar1)
 ```typescript
