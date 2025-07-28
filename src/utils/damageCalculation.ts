@@ -247,7 +247,8 @@ export function calculateDamage(
 	}
 	const step1Result = calculateBaseDamage(input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ1結果: ${step1Result}`)
+		const hasDecimal = step1Result % 1 !== 0
+		console.log(`ステップ1結果: ${step1Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ2: 固定値加算
@@ -256,7 +257,8 @@ export function calculateDamage(
 	}
 	let step2Result = applyFixedValues(step1Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ2結果: ${step2Result}`)
+		const hasDecimal = step2Result % 1 !== 0
+		console.log(`ステップ2結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ2a: クリティカルダメージ補正（クリティカル時のみ）
@@ -266,7 +268,8 @@ export function calculateDamage(
 		}
 		step2Result = applyCriticalDamage(step2Result, input, steps)
 		if (process.env.NODE_ENV === 'development') {
-			console.log(`ステップ2a結果: ${step2Result}`)
+			const hasDecimal = step2Result % 1 !== 0
+			console.log(`ステップ2a結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 		}
 	}
 
@@ -276,7 +279,8 @@ export function calculateDamage(
 	}
 	const step3Result = applyElementAdvantage(step2Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ3結果: ${step3Result}`)
+		const hasDecimal = step3Result % 1 !== 0
+		console.log(`ステップ3結果: ${step3Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ4: スキル倍率補正
@@ -285,7 +289,8 @@ export function calculateDamage(
 	}
 	const step4Result = applySkillMultiplier(step3Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ4結果: ${step4Result}`)
+		const hasDecimal = step4Result % 1 !== 0
+		console.log(`ステップ4結果: ${step4Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ5: 抜刀%補正 (Phase 3で実装)
@@ -294,7 +299,8 @@ export function calculateDamage(
 	}
 	const step5Result = applyUnsheatheRate(step4Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ5結果: ${step5Result}`)
+		const hasDecimal = step5Result % 1 !== 0
+		console.log(`ステップ5結果: ${step5Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ6: 慣れ補正 (Phase 3で実装)
@@ -303,7 +309,8 @@ export function calculateDamage(
 	}
 	const step6Result = applyFamiliarity(step5Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ6結果: ${step6Result}`)
+		const hasDecimal = step6Result % 1 !== 0
+		console.log(`ステップ6結果: ${step6Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ7: 距離補正 (Phase 3で実装)
@@ -312,21 +319,19 @@ export function calculateDamage(
 	}
 	const step7Result = applyDistance(step6Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ7結果: ${step7Result}`)
+		const hasDecimal = step7Result % 1 !== 0
+		console.log(`ステップ7結果: ${step7Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ8: コンボ補正 (Phase 3で実装)
 	if (process.env.NODE_ENV === 'development') {
 		console.log('\n--- ステップ8: コンボ補正 ---')
 	}
-	// コンボ補正前に小数点を切り捨て
-	const step7ResultFloored = Math.floor(step7Result)
-	if (process.env.NODE_ENV === 'development' && step7Result !== step7ResultFloored) {
-		console.log(`コンボ補正前切り捨て: ${step7Result} → ${step7ResultFloored}`)
-	}
-	const step8Result = applyCombo(step7ResultFloored, input, steps)
+	// コンボ補正は小数点を保持したまま計算
+	const step8Result = applyCombo(step7Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ8結果: ${step8Result}`)
+		const hasDecimal = step8Result % 1 !== 0
+		console.log(`ステップ8結果: ${step8Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ9: パッシブ倍率補正（プレースホルダー）
@@ -335,7 +340,8 @@ export function calculateDamage(
 	}
 	const step9Result = applyPassiveMultiplier(step8Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ9結果: ${step9Result}`)
+		const hasDecimal = step9Result % 1 !== 0
+		console.log(`ステップ9結果: ${step9Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ10: ブレイブ倍率補正
@@ -344,10 +350,11 @@ export function calculateDamage(
 	}
 	const baseDamage = applyBraveMultiplier(step9Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ10結果: ${baseDamage}`)
+		const hasDecimal = baseDamage % 1 !== 0
+		console.log(`ステップ10結果: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 
 		console.log('\n=== 最終結果 ===')
-		console.log('最終baseDamage:', baseDamage)
+		console.log(`最終baseDamage: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// 安定率適用

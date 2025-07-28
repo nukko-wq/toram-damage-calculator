@@ -11,8 +11,8 @@ AttackSkillFormに新しい攻撃スキル「メテオブレイカー」を追�
 - **系統グループ**: `sword` (剣系統)
 - **カテゴリ**: `blade` (ブレードスキル)
 - **武器種要件**: `片手剣`, `両手剣`, `双剣`
-- **消費MP**: TBD（要仕様決定）
-- **表示順序**: TBD（剣系統100番台内で適切な位置）
+- **消費MP**: 600
+- **表示順序**: 102 (100番台: 剣系統)
 
 ## データ構造定義
 
@@ -23,19 +23,19 @@ AttackSkillFormに新しい攻撃スキル「メテオブレイカー」を追�
   // 基本情報
   id: 'meteor_breaker',
   name: 'メテオブレイカー',
-  order: TBD,                    // 剣系統100番台（順序要決定）
+  order: 102,                    // 剣系統100番台
   systemGroup: 'sword',          // 剣系統
   category: 'blade',             // ブレードカテゴリ
   weaponTypeRequirements: ['片手剣', '両手剣', '双剣'],
   
   // 消費・条件
-  mpCost: TBD,                   // 消費MP（要仕様決定）
+  mpCost: 600,
   
   // 表示用計算式説明
-  multiplierFormula: 'TBD',      // 倍率計算式（要仕様決定）
-  fixedDamageFormula: 'TBD',     // 固定ダメージ（要仕様決定）
+  multiplierFormula: '600% (両手剣装備時+200%+基礎STR/10%)',
+  fixedDamageFormula: '1hit目600、2hit目0',
   
-  // 攻撃情報（撃数・計算詳細は要仕様決定）
+  // 攻撃情報（2hit攻撃）
   hits: [
     {
       hitNumber: 1,
@@ -44,51 +44,163 @@ AttackSkillFormに新しい攻撃スキル「メテオブレイカー」を追�
       referenceResistance: 'physical',
       powerReference: 'ATK',      // 威力参照ステータス
       
-      // 表示用倍率・固定値（要仕様決定）
-      multiplier: TBD,            // 表示用倍率
-      fixedDamage: TBD,           // 固定ダメージ
+      // 表示用倍率・固定値
+      multiplier: 600,            // 表示用倍率600%
+      fixedDamage: 600,           // 1hit目固定ダメージ600
       
-      // 計算式説明（要仕様決定）
-      multiplierFormula: 'TBD',   // 倍率計算式詳細
-      fixedDamageFormula: 'TBD',  // 固定値計算式詳細
+      // 計算式説明
+      multiplierFormula: '両手剣装備時：威力+200%+基礎STR/10%',
+      fixedDamageFormula: '600',  // 固定ダメージ600
       
       // 慣れ設定
       familiarity: 'physical',     // 物理慣れ参照
-      familiarityGrant: 'physical', // 物理慣れ付与（要確認）
+      familiarityGrant: 'physical', // 物理慣れ付与
       
-      // 補正適用設定（要仕様決定）
-      canUseUnsheathePower: TBD,   // 抜刀威力適用可否
-      canUseLongRange: TBD,        // ロングレンジ適用可否
-      canUseShortRangePower: TBD,  // 近距離威力適用可否
-      canUseLongRangePower: TBD,   // 遠距離威力適用可否
+      // 補正適用設定
+      canUseUnsheathePower: false, // 抜刀威力適用不可
+      canUseLongRange: false,      // ロングレンジ適用不可
+      canUseShortRangePower: true, // 近距離威力適用可能
+      canUseLongRangePower: false, // 遠距離威力適用不可
+      
+      // 特殊効果（要仕様決定）
+      specialEffects: ['TBD']      // 特殊効果一覧
+    },
+    {
+      hitNumber: 2,
+      attackType: 'physical',
+      referenceDefense: 'DEF',
+      referenceResistance: 'physical',
+      powerReference: 'ATK',      // 威力参照ステータス
+      
+      // 表示用倍率・固定値
+      multiplier: 600,            // 表示用倍率600%
+      fixedDamage: 0,             // 2hit目固定ダメージは0
+      
+      // 計算式説明
+      multiplierFormula: '片手剣装備時：威力+基礎DEX/2%',
+      fixedDamageFormula: '0',    // 固定ダメージ0
+      
+      // 慣れ設定
+      familiarity: 'physical',     // 物理慣れ参照
+      familiarityGrant: 'physical', // 物理慣れ付与
+      
+      // 補正適用設定
+      canUseUnsheathePower: false, // 抜刀威力適用不可
+      canUseLongRange: false,      // ロングレンジ適用不可
+      canUseShortRangePower: true, // 近距離威力適用可能
+      canUseLongRangePower: false, // 遠距離威力適用不可
       
       // 特殊効果（要仕様決定）
       specialEffects: ['TBD']      // 特殊効果一覧
     }
-    // 複数撃の場合は追加のhitオブジェクト
   ]
 }
 ```
 
+## 計算仕様
+
+### 計算タイプ
+- **計算方式**: 特殊計算（MeteorBreakerCalculator専用）
+- **1撃目**: 600%（両手剣装備時+200%+基礎STR/10%）、固定600ダメージ
+- **2撃目**: 600%（片手剣装備時+基礎DEX/2%）、固定0ダメージ
+- **特殊計算**: あり（基礎STR・DEX依存）
+
+### 計算処理
+
+専用の`MeteorBreakerCalculator`を使用した特殊計算を行います：
+
+```typescript
+class MeteorBreakerCalculator extends SkillHitCalculator {
+  calculate(input: SkillCalculationInput): SkillCalculationResult {
+    const { hitNumber, playerStats, equipmentContext } = input
+
+    switch (hitNumber) {
+      case 1: {
+        // 1撃目: 基本600% + 両手剣装備時補正
+        let multiplier = 600  // 基本倍率600%
+        let weaponBonus = 0
+        
+        if (equipmentContext.mainWeaponType === '両手剣') {
+          weaponBonus = 200 + Math.floor(playerStats.baseSTR / 10)
+        }
+        
+        const finalMultiplier = multiplier + weaponBonus
+        
+        return {
+          hitNumber: 1,
+          calculatedMultiplier: finalMultiplier,
+          calculatedFixedDamage: 600,
+          calculationProcess: equipmentContext.mainWeaponType === '両手剣'
+            ? `600% + 200% + floor(${playerStats.baseSTR}/10)% = ${finalMultiplier}%`
+            : `600% (基本倍率)`
+        }
+      }
+
+      case 2: {
+        // 2撃目: 基本600% + 片手剣装備時補正
+        let multiplier = 600  // 基本倍率600%
+        let weaponBonus = 0
+        
+        if (equipmentContext.mainWeaponType === '片手剣') {
+          weaponBonus = Math.floor(playerStats.baseDEX / 2)
+        }
+        
+        const finalMultiplier = multiplier + weaponBonus
+        
+        return {
+          hitNumber: 2,
+          calculatedMultiplier: finalMultiplier,
+          calculatedFixedDamage: 0, // 固定ダメージなし
+          calculationProcess: equipmentContext.mainWeaponType === '片手剣'
+            ? `600% + floor(${playerStats.baseDEX}/2)% = ${finalMultiplier}%`
+            : `600% (基本倍率)`
+        }
+      }
+
+      default:
+        throw new Error(`Invalid hit number for Meteor Breaker: ${hitNumber}`)
+    }
+  }
+}
+```
+
+### 計算詳細
+
+#### 1撃目
+
+| 武器種 | 基本倍率 | 武器種別補正 | 計算例（基礎STR: 200の場合） |
+|--------|----------|--------------|------------------------------|
+| 片手剣 | 600%     | 補正なし     | 600%                        |
+| 両手剣 | 600%     | +200%+基礎STR/10% | 600% + 200% + 20% = 820%    |
+| 双剣   | 600%     | 補正なし     | 600%                        |
+
+#### 2撃目
+
+| 武器種 | 基本倍率 | 武器種別補正 | 計算例（基礎DEX: 300の場合） |
+|--------|----------|--------------|------------------------------|
+| 片手剣 | 600%     | +基礎DEX/2% | 600% + 150% = 750%          |
+| 両手剣 | 600%     | 補正なし     | 600%                        |
+| 双剣   | 600%     | 補正なし     | 600%                        |
+
 ## 仕様決定待ち項目
 
 ### 基本仕様
-- [ ] **消費MP**: 消費MPの設定値
-- [ ] **表示順序**: 剣系統内での表示順序（order値）
-- [ ] **撃数**: 単発攻撃か多段攻撃か
+- [x] **消費MP**: 600
+- [x] **表示順序**: 102 (剣系統100番台)
+- [x] **撃数**: 2hit攻撃
 - [ ] **計算方式**: 標準計算か特殊計算か
 
 ### 威力・ダメージ仕様
-- [ ] **基本倍率**: 基本威力倍率の設定
-- [ ] **固定ダメージ**: 固定ダメージ値の設定
-- [ ] **武器種別補正**: 武器種による倍率補正の有無
-- [ ] **特殊計算**: 基礎ステータス依存補正等の特殊計算
+- [x] **基本倍率**: 1hit目600%、2hit目600%
+- [x] **固定ダメージ**: 1hit目600、2hit目0
+- [x] **武器種別補正**: 1hit目は両手剣装備時+200%+基礎STR/10%、2hit目は片手剣装備時+基礎DEX/2%
+- [x] **特殊計算**: 基礎STR・DEX依存補正あり
 
 ### 補正適用仕様
-- [ ] **抜刀威力**: 抜刀威力補正の適用可否
-- [ ] **距離威力**: 近距離威力・遠距離威力の適用可否
-- [ ] **ロングレンジ**: ロングレンジ補正の適用可否
-- [ ] **慣れ付与**: 付与する慣れの種類（physical/normal）
+- [x] **抜刀威力**: 適用不可 (canUseUnsheathePower: false)
+- [x] **ロングレンジ**: 適用不可 (canUseLongRange: false)
+- [x] **距離威力**: 近距離威力適用可能 (canUseShortRangePower: true)、遠距離威力適用不可 (canUseLongRangePower: false)
+- [x] **慣れ付与**: 物理慣れ付与 (familiarity: 'physical', familiarityGrant: 'physical')
 
 ### 特殊効果仕様
 - [ ] **クリティカル**: 確定クリティカルの有無
@@ -99,22 +211,23 @@ AttackSkillFormに新しい攻撃スキル「メテオブレイカー」を追�
 ## UI表示仕様（暫定）
 
 ### スキル選択ドロップダウン
-- **表示位置**: 剣系統グループ内、order順による位置
+- **表示位置**: 剣系統グループ内、order順で`buster_blade`(101)の後
 - **表示名**: `メテオブレイカー`
 - **武器種フィルタ**: 片手剣・両手剣・双剣装備時のみ表示
 
 ### スキル情報表示（暫定）
 ```
 📊 メテオブレイカー
-　　カテゴリ: 剣系 | 消費MP: TBD
+　　カテゴリ: 剣系 | 消費MP: 600
 　　威力参照: ATK | タイプ: 物理スキル
-　　慣れ参照: 物理 | 慣れ付与: TBD
+　　慣れ参照: 物理 | 慣れ付与: 物理
 　　参照防御力: DEF | 参照耐性: 物理
-　　距離威力: TBD | 抜刀威力: TBD | ロングレンジ: TBD
+　　距離威力: 近距離○ | 抜刀威力: × | ロングレンジ: ×
 
 🎯 スキル威力値
-　　倍率: TBD | 固定値: TBD
-　　特殊効果: TBD
+　　1hit: 倍率: 600% (両手剣装備時+200%+基礎STR/10%) | 固定値: 600
+　　2hit: 倍率: 600% (片手剣装備時+基礎DEX/2%) | 固定値: 0
+　　特殊効果: 基礎STR・DEX依存計算
 ```
 
 ### 詳細情報（暫定）
@@ -122,9 +235,9 @@ AttackSkillFormに新しい攻撃スキル「メテオブレイカー」を追�
 📋 詳細情報 [▼]
 　　必要武器: 片手剣、両手剣、双剣
 　　前提スキル: TBD
-　　特殊効果: TBD
+　　特殊効果: 2段攻撃、TBD
 　　計算方式: TBD
-　　備考: 剣系統の攻撃スキル
+　　備考: 2hit攻撃の剣系統スキル
 ```
 
 ## 実装ファイル更新予定
@@ -135,18 +248,29 @@ AttackSkillFormに新しい攻撃スキル「メテオブレイカー」を追�
 ### 2. src/utils/attackSkillCalculation/AttackSkillCalculator.ts
 `getCalculatorForSkill`メソッドに`meteor_breaker`ケースを追加
 
-### 3. 計算機実装
-仕様に応じて以下のいずれかを実装：
-- **標準計算**: `StandardCalculator`を使用
-- **特殊計算**: `MeteorBreakerCalculator`専用クラスを作成
+### 3. src/utils/attackSkillCalculation/calculators/MeteorBreakerCalculator.ts
+両手剣装備時の基礎STR依存計算を実装した専用計算機を作成
 
-### 4. 型定義確認
+### 4. src/utils/attackSkillCalculation/calculators/index.ts
+MeteorBreakerCalculatorのエクスポートを追加
+
+### 5. 型定義確認
 `src/types/calculator.ts`の`AttackSkillCategory`に`blade`が既に含まれていることを確認
 
 ## 実装優先度
 
 ### 完了済み
 - スキルの基本情報設定（名前、ID、系統、カテゴリ、武器種要件）
+- 消費MP設定（600）
+- 表示順序設定（102）
+- 撃数設定（2hit攻撃）
+- 1hit目威力設定（600%、両手剣装備時+200%+基礎STR/10%）
+- 1hit目固定ダメージ設定（600）
+- 2hit目威力設定（600%、片手剣装備時+基礎DEX/2%）
+- 2hit目固定ダメージ設定（0）
+- 補正適用設定（抜刀威力×、ロングレンジ×、近距離威力○、遠距離威力×）
+- 慣れ設定（familiarity: 'physical', familiarityGrant: 'physical'）
+- 計算仕様設計（MeteorBreakerCalculator専用クラス）
 - データ構造の基本枠組み定義
 - UI表示の基本枠組み
 

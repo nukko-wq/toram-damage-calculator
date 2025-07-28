@@ -44,11 +44,58 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// メテオブレイカー
+	{
+		id: 'meteor_breaker',
+		name: 'メテオブレイカー',
+		order: 102,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['片手剣', '両手剣', '双剣'],
+		mpCost: 600,
+		multiplierFormula: '600% (両手剣装備時+200%+基礎STR/10%)',
+		fixedDamageFormula: '1hit目600、2hit目0',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 600, // 表示用（実際の計算は外部）
+				fixedDamage: 600, // 1hit目固定ダメージ600
+				multiplierFormula: '両手剣装備時：威力+200%+基礎STR/10%',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 600, // 表示用（実際の計算は外部）
+				fixedDamage: 0, // 2hit目固定ダメージ0
+				multiplierFormula: '片手剣装備時：威力+基礎DEX/2%',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// ムーンスラッシュ（特殊計算の例）
 	{
 		id: 'moon_slash',
 		name: 'ムーンスラッシュ',
-		order: 102,
+		order: 103,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['片手剣'],
@@ -382,7 +429,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'l_boomerang_3',
 		name: 'Lブーメラン\u2162',
-		order: 103,
+		order: 104,
 		systemGroup: 'sword',
 		category: 'partizan',
 		weaponTypeRequirements: ['両手剣'],

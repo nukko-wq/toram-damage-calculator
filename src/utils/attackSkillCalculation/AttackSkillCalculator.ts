@@ -4,6 +4,7 @@ import {
 	CycloneArrowCalculator,
 	LBoomerang3Calculator,
 	MagicArrowCalculator,
+	MeteorBreakerCalculator,
 	MoonSlashCalculator,
 	type SkillHitCalculator,
 	StandardCalculator,
@@ -62,6 +63,8 @@ export class AttackSkillCalculator {
 		switch (skillId) {
 			case 'l_boomerang_3':
 				return new LBoomerang3Calculator()
+			case 'meteor_breaker':
+				return new MeteorBreakerCalculator()
 			case 'moon_slash':
 				return new MoonSlashCalculator()
 			case 'strike_stab':
