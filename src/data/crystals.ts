@@ -386,6 +386,24 @@ export const crystalsData: CrystalsData = {
 					},
 				],
 			},
+			{
+				id: '70dfc8a7-b07d-426f-812d-9f80ec496a61',
+				name: 'アイヤーク',
+				type: 'additional',
+				properties: {
+					MATK_Rate: 10,
+					MagicalPenetration_Rate: 10,
+					HP_Rate: 24,
+					Aggro_Rate: -15,
+				},
+				conditionalEffects: [
+					{
+						condition: { type: 'mainWeapon', weaponType: '杖' },
+						properties: { MotionSpeed_Rate: 1 },
+						description: '杖装備時: 行動速度+1%',
+					},
+				],
+			},
 		],
 		special: [
 			{
