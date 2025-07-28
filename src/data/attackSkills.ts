@@ -316,6 +316,37 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// 術式/ストーム（1/6hit）- ストーム延長
+	{
+		id: 'storm_1_6hit_extend',
+		name: '術式/ストーム(1/6hit)-ストーム延長',
+		order: 604,
+		systemGroup: 'magic',
+		category: 'staff',
+		weaponTypeRequirements: ['杖', '魔導具'],
+		mpCost: 400,
+		multiplierFormula: '100% (杖装備時150%)',
+		fixedDamageFormula: '420',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'magical',
+				referenceDefense: 'MDEF',
+				referenceResistance: 'magical',
+				powerReference: 'MATK',
+				multiplier: 100, // 表示用（実際の計算は外部）
+				fixedDamage: 420, // 固定ダメージ420
+				multiplierFormula: '杖装備時：威力+50%',
+				familiarity: 'magical',
+				familiarityGrant: 'magical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
+
 	// サイクロンアロー（ハンタースキル）
 	{
 		id: 'cyclone_arrow',
