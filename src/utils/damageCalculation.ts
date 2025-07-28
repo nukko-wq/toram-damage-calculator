@@ -319,7 +319,12 @@ export function calculateDamage(
 	if (process.env.NODE_ENV === 'development') {
 		console.log('\n--- ステップ8: コンボ補正 ---')
 	}
-	const step8Result = applyCombo(step7Result, input, steps)
+	// コンボ補正前に小数点を切り捨て
+	const step7ResultFloored = Math.floor(step7Result)
+	if (process.env.NODE_ENV === 'development' && step7Result !== step7ResultFloored) {
+		console.log(`コンボ補正前切り捨て: ${step7Result} → ${step7ResultFloored}`)
+	}
+	const step8Result = applyCombo(step7ResultFloored, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		console.log(`ステップ8結果: ${step8Result}`)
 	}
