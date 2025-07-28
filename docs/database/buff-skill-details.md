@@ -150,6 +150,66 @@ interface WeaponRequirement {
 }
 ```
 
+#### 6.2 プリエール (IsPriere)
+```typescript
+{
+  id: 'IsPriere',
+  name: 'プリエール',
+  category: 'priest',
+  type: 'multiParam',
+  multiParams: {
+    param1: {
+      name: '武器タイプ',
+      min: 1,
+      max: 2,
+      default: 2,
+      unit: ''
+    }
+  },
+  order: 1101,
+  description: '魔導具装備状況に応じて魔法攻撃力率を上昇させる',
+  effects: [
+    {
+      property: 'MATK_Rate',
+      formula: 'param1 === 1 ? +15 : +10',
+      conditions: ['魔導具装備(1): +15%, それ以外(2): +10%']
+    }
+  ],
+  calculationFormula: `
+    魔導具装備(1)の場合:
+    - MATK_Rate: +15%
+    
+    それ以外(2)の場合:
+    - MATK_Rate: +10%
+  `,
+  weaponRequirements: [
+    {
+      weaponType: 'all',
+      description: '全ての武器で効果があります'
+    }
+  ],
+  uiSettings: {
+    parameterName: '武器タイプ',
+    parameterUnit: '',
+    showInModal: true,
+    quickToggle: false,
+    parameterOptions: [
+      { value: 1, label: 'メイン/サブ武器が魔導具', description: 'MATK率+15%' },
+      { value: 2, label: 'それ以外', description: 'MATK率+10%' }
+    ]
+  }
+}
+```
+
+**計算例:**
+- メイン武器が魔導具装備: MATK率+15%
+- サブ武器が魔導具装備: MATK率+15%
+- メイン・サブ武器両方とも魔導具以外: MATK率+10%
+
+**適用条件:**
+- メイン武器またはサブ武器のいずれかが魔導具の場合: 15%効果
+- 両方とも魔導具以外の場合: 10%効果
+
 ### 7. ダークパワースキル系統
 
 詳細は [buff-skills/darkpower-skills.md](./buff-skills/darkpower-skills.md) を参照してください。

@@ -120,7 +120,16 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		id: 'IsPriere',
 		name: 'プリエール',
 		category: 'priest',
-		type: 'toggle',
+		type: 'multiParam',
+		multiParams: {
+			param1: {
+				name: '武器タイプ',
+				min: 1,
+				max: 2,
+				default: 2,
+				unit: '',
+			},
+		},
 		order: 1101,
 	},
 
