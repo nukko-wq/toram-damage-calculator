@@ -18,6 +18,7 @@ import {
 	getBuffSkillBraveMultiplier,
 } from '@/utils/buffSkillCalculation'
 import { calculateMagicalStability, calculateINTElementAdvantage, calculateTotalElementAdvantage } from '@/utils/basicStatsCalculation'
+import { calculateHotKnowsEffects } from '@/utils/buffSkillCalculation/categories/minstrelSkills'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import type { BuffSkillState } from '@/types/buffSkill'
 import { createInitialPowerOptions } from '@/utils/initialData'
@@ -159,28 +160,43 @@ export function calculateDamageWithService(
 			const baseAdvantage =
 				calculationResults?.basicStats?.totalElementAdvantage ?? 0
 
-			// INT属性有利補正を計算（属性攻撃が有利の場合のみ）
+			// INT属性有利補正を計算（有利・不利属性に対応）
 			const intElementAdvantageResult = calculateINTElementAdvantage(
 				calculatorData.baseStats.INT, // 基礎INT（装備・バフ補正を除く）
 				calculatorData.mainWeapon.weaponType,
-				powerOptions.elementAttack === 'advantageous'
+				powerOptions.elementAttack
 			)
 
 			// INT補正を含む総属性有利を計算
 			const correctedTotalElementAdvantage = baseAdvantage + intElementAdvantageResult.intElementAdvantage
+
+			// 熱情の歌の効果を計算
+			const hotKnowsSkill = calculatorData.buffSkills?.skills?.IsHotKnows
+			let hotKnowsEffect = 0
+			if (hotKnowsSkill?.isEnabled && hotKnowsSkill.stackCount) {
+				const hotKnowsResult = calculateHotKnowsEffects(hotKnowsSkill.stackCount, powerOptions)
+				hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
+			}
+
+			// INT補正 + 熱情の歌補正を含む総属性有利を計算
+			const finalTotalElementAdvantage = correctedTotalElementAdvantage + hotKnowsEffect
 
 			// 属性威力オプションに応じて計算
 			switch (powerOptions.elementPower) {
 				case 'disabled':
 					return 0 // 属性威力無効時は0
 				case 'awakeningOnly':
-					return 25 // 覚醒のみ時は25%固定
+					// 覚醒のみ時: 25%固定 + 杖・魔導具装備時は有利・不利属性でINT補正も追加（2025年仕様変更）
+					if (powerOptions.elementAttack === 'advantageous' || powerOptions.elementAttack === 'disadvantageous') {
+						return 25 + intElementAdvantageResult.intElementAdvantage + hotKnowsEffect
+					}
+					return 25
 				case 'advantageOnly':
-					return correctedTotalElementAdvantage // INT補正を含む総属性有利のみ
+					return finalTotalElementAdvantage // INT補正 + 熱情の歌補正を含む総属性有利のみ
 				case 'enabled':
-					return correctedTotalElementAdvantage + 25 // INT補正を含む総属性有利 + 属性覚醒25%
+					return finalTotalElementAdvantage + 25 // INT補正 + 熱情の歌補正を含む総属性有利 + 属性覚醒25%
 				default:
-					return correctedTotalElementAdvantage
+					return finalTotalElementAdvantage
 			}
 		}
 
@@ -306,6 +322,19 @@ export function calculateDamageWithService(
 				isActive: powerOptions.combo,
 				multiplier: powerOptions.combo ? 150 : 100, // 仮のコンボ倍率
 			},
+			// レジスタ効果を反映
+			register: {
+				voidStance: calculatorData.register?.effects.find(effect => 
+					effect.type === 'voidStance'
+				) ? {
+					isEnabled: calculatorData.register.effects.find(effect => 
+						effect.type === 'voidStance'
+					)?.isEnabled ?? false,
+					level: calculatorData.register.effects.find(effect => 
+						effect.type === 'voidStance'
+					)?.level ?? 1,
+				} : undefined,
+			},
 			attackSkill: {
 				...defaultInput.attackSkill,
 				// 攻撃スキルが選択されている場合はその値を使用、なければ通常攻撃
@@ -386,6 +415,7 @@ export function calculateDamageWithService(
 							calculatorData.buffSkills?.skills || null,
 							calculatorData.mainWeapon?.weaponType || null,
 							selectedSkill.category,
+							originalHit.canUseLongRange,
 						),
 						// ブレイブ倍率はスキル攻撃でも同じ値を使用（エンハンス含む）
 						braveMultiplier: braveMultiplierWithEnemy,

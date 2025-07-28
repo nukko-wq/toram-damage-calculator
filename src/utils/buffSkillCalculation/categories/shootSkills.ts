@@ -30,6 +30,18 @@ export function calculateArcheryEffects(
 }
 
 /**
+ * ロングレンジのパッシブ倍率計算関数
+ */
+export function calculateLongRangePassiveMultiplier(
+	skillLevel: number,
+	canUseLongRange: boolean,
+): number {
+	if (skillLevel <= 0 || !canUseLongRange) return 0
+
+	return skillLevel // パッシブ倍率 +skillLevel%
+}
+
+/**
  * 武士弓術の効果を取得
  */
 export function getArcheryEffects(
@@ -53,4 +65,27 @@ export function getArcheryEffects(
 	}
 
 	return {}
+}
+
+/**
+ * シュートスキル系統のパッシブ倍率取得
+ */
+export function getShootSkillPassiveMultiplier(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	canUseLongRange: boolean,
+): number {
+	let totalPassiveMultiplier = 0
+
+	if (!buffSkillData) return totalPassiveMultiplier
+
+	// ロングレンジの処理 - canUseLongRange=trueの場合のみ適用
+	const longRange = buffSkillData.LongRange
+	if (longRange?.isEnabled && longRange.level && canUseLongRange) {
+		totalPassiveMultiplier += calculateLongRangePassiveMultiplier(
+			longRange.level,
+			canUseLongRange,
+		)
+	}
+
+	return totalPassiveMultiplier
 }

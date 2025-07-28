@@ -1683,20 +1683,24 @@ export function calculateMagicalStability(
 }
 
 /**
- * 基礎INT属性有利補正計算
+ * 基礎INT属性有利補正計算（2025年仕様変更対応）
  * 
- * メイン武器が杖・魔導具で属性攻撃が有利状態の場合、基礎INTによる属性有利補正を適用
+ * メイン武器が杖・魔導具の場合、基礎INTによる属性有利補正を適用
+ * - 有利属性: 常に適用
+ * - 不利属性: 杖・魔導具装備時のみ適用（2025年仕様変更）
+ * - その他・無属性: 適用されない
  * 
  * @param baseINT 基礎INT（装備・バフ補正を除く素のINT値）
  * @param weaponType メイン武器の種類
- * @param isElementAdvantage 属性攻撃が有利状態かどうか
+ * @param elementAttack 属性攻撃の種類
  * @returns 基礎INT属性有利補正計算結果
  */
 export interface INTElementAdvantageCalculationSteps {
 	baseINT: number
 	weaponType: WeaponTypeEnum
-	isElementAdvantage: boolean
+	elementAttack: 'advantageous' | 'disadvantageous' | 'other' | 'none'
 	isWeaponApplicable: boolean
+	isElementApplicable: boolean
 	isApplicable: boolean
 	intElementAdvantage: number
 }
@@ -1704,22 +1708,40 @@ export interface INTElementAdvantageCalculationSteps {
 export function calculateINTElementAdvantage(
 	baseINT: number,
 	weaponType: WeaponTypeEnum,
-	isElementAdvantage: boolean,
+	elementAttack: 'advantageous' | 'disadvantageous' | 'other' | 'none',
 ): INTElementAdvantageCalculationSteps {
 	// 1. 武器条件判定
 	const isWeaponApplicable = weaponType === '杖' || weaponType === '魔導具'
 	
-	// 2. 総合適用可否判定
-	const isApplicable = isWeaponApplicable && isElementAdvantage
+	// 2. 属性条件判定（2025年仕様変更対応）
+	let isElementApplicable: boolean
+	switch (elementAttack) {
+		case 'advantageous':
+			isElementApplicable = true // 有利属性の場合は適用
+			break
+		case 'disadvantageous':
+			// 2025年仕様変更: 不利属性でも杖・魔導具装備時は適用
+			isElementApplicable = isWeaponApplicable
+			break
+		case 'other':
+		case 'none':
+		default:
+			isElementApplicable = false // その他・無属性の場合は適用されない
+			break
+	}
 	
-	// 3. 基礎INT補正計算
+	// 3. 総合適用可否判定
+	const isApplicable = isWeaponApplicable && isElementApplicable
+	
+	// 4. 基礎INT補正計算
 	const intElementAdvantage = isApplicable ? Math.floor(baseINT / 10) : 0
 	
 	return {
 		baseINT,
 		weaponType,
-		isElementAdvantage,
+		elementAttack,
 		isWeaponApplicable,
+		isElementApplicable,
 		isApplicable,
 		intElementAdvantage,
 	}

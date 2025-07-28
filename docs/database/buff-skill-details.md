@@ -94,25 +94,43 @@ interface WeaponRequirement {
   name: 'ロングレンジ',
   category: 'shoot',
   type: 'level',
-  order: 301,
+  order: 302,
   maxLevel: 10,
-  description: '遠距離威力を上昇させる',
+  description: 'AttackSkillのロングレンジ(canUseLongRange)が有効な場合にパッシブ倍率を上昇させる',
   effects: [
     {
-      property: 'LongRangeDamage_Rate',
-      formula: 'skillLevel * 3',
-      conditions: []
+      property: 'PassiveDamage_Rate',
+      formula: 'skillLevel',
+      conditions: ['AttackSkillのcanUseLongRange=true']
     }
   ],
-  calculationFormula: '遠距離威力% = skillLevel × 3',
+  calculationFormula: 'パッシブ倍率% = skillLevel',
+  weaponRequirements: [
+    {
+      weaponType: 'all',
+      description: '全ての武器で効果があります'
+    }
+  ],
   uiSettings: {
     parameterName: 'スキルレベル',
     parameterUnit: 'Lv',
     showInModal: true,
     quickToggle: false
+  },
+  specialMechanics: {
+    longRangeCondition: true,
+    note: 'canUseLongRangePowerとは違う条件です。AttackSkillのcanUseLongRangeプロパティが有効な場合のみ効果があります。'
   }
 }
 ```
+
+**計算例:**
+- スキルレベル10: パッシブ倍率+10%
+- スキルレベル5: パッシブ倍率+5%
+
+**適用条件:**
+- AttackSkillのcanUseLongRange=trueの場合のみ効果発動
+- canUseLongRangePowerとは異なる条件
 
 #### 2.2 武士弓術 (ar1)
 ```typescript
@@ -364,6 +382,10 @@ interface WeaponRequirement {
 
 ### 17. ミンストレルスキル系統
 
+**含まれるスキル:**
+- 17.1 インスピレーション (minstrel1) - プレイヤー数に応じたATK・MATK上昇
+- 17.2 熱情の歌 (IsHotKnows) - DamagePreview属性攻撃設定連動の属性有利率変動
+
 #### 17.1 インスピレーション (minstrel1)
 ```typescript
 {
@@ -394,6 +416,58 @@ interface WeaponRequirement {
   }
 }
 ```
+
+#### 17.2 熱情の歌 (IsHotKnows)
+```typescript
+{
+  id: 'IsHotKnows',
+  name: '熱情の歌',
+  category: 'minstrel',
+  type: 'stack',
+  order: 2401,
+  maxStack: 10,
+  description: 'DamagePreviewの属性攻撃設定に応じて属性有利率が変動',
+  effects: [
+    {
+      property: 'ElementAdvantage_Rate',
+      formula: 'stackCount * 1.5',
+      conditions: ['DamagePreview属性攻撃=有(有利)']
+    },
+    {
+      property: 'ElementAdvantage_Rate',
+      formula: '-(stackCount * 1.5)',
+      conditions: ['DamagePreview属性攻撃=不利属性']
+    }
+  ],
+  calculationFormula: '属性有利% = ±(スタック数 × 1.5) [有利: +, 不利: -]',
+  weaponRequirements: [
+    {
+      weaponType: 'all',
+      description: '全ての武器で効果があります'
+    }
+  ],
+  uiSettings: {
+    parameterName: 'スタック数',
+    parameterUnit: '回',
+    showInModal: true,
+    quickToggle: false
+  },
+  specialMechanics: {
+    damagePreviewIntegration: true,
+    elementAdvantageConditions: {
+      advantageous: '+1.5 × スタック数',
+      disadvantageous: '-1.5 × スタック数',
+      other: '効果なし',
+      none: '効果なし'
+    }
+  }
+}
+```
+
+**計算例:**
+- スタック数10、属性攻撃=有(有利): +15%の属性有利率
+- スタック数10、属性攻撃=不利属性: -15%の属性有利率
+- スタック数5、属性攻撃=有(有利): +7.5%の属性有利率
 
 
 ## スキルタイプ別UI仕様

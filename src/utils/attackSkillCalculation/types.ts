@@ -34,6 +34,7 @@ export interface EquipmentContext {
 	subWeaponType: SubWeaponType | null
 	// 特定装備の判定用
 	hasHalberdEquipped: boolean // 旋風槍装備判定
+	hasStaffEquipped: boolean // 杖・魔導具装備判定
 	// 将来拡張: 他の特殊装備判定
 }
 

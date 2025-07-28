@@ -107,6 +107,14 @@ export interface DamageCalculationInput {
 		}
 		totalDarkPowerLevel: number // ダークパワースキル合計レベル
 	}
+
+	// レジスタ効果情報（無の構え用）
+	register?: {
+		voidStance?: {
+			isEnabled: boolean
+			level: number // 1-10
+		}
+	}
 }
 
 /**
@@ -311,7 +319,12 @@ export function calculateDamage(
 	if (process.env.NODE_ENV === 'development') {
 		console.log('\n--- ステップ8: コンボ補正 ---')
 	}
-	const step8Result = applyCombo(step7Result, input, steps)
+	// コンボ補正前に小数点を切り捨て
+	const step7ResultFloored = Math.floor(step7Result)
+	if (process.env.NODE_ENV === 'development' && step7Result !== step7ResultFloored) {
+		console.log(`コンボ補正前切り捨て: ${step7Result} → ${step7ResultFloored}`)
+	}
+	const step8Result = applyCombo(step7ResultFloored, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		console.log(`ステップ8結果: ${step8Result}`)
 	}
@@ -713,7 +726,22 @@ function applyCombo(
 	input: DamageCalculationInput,
 	steps: DamageCalculationSteps,
 ): number {
-	const comboRate = input.combo.isActive ? input.combo.multiplier : 100
+	let comboRate = input.combo.isActive ? input.combo.multiplier : 100
+
+	// 無の構えの効果適用（強打が無効かつ無の構えが有効の場合）
+	if (!input.combo.isActive && input.register?.voidStance?.isEnabled) {
+		const voidStanceLevel = input.register.voidStance.level
+		const voidStanceMultiplier = 1 + (voidStanceLevel * 0.01)
+		comboRate = Math.floor(comboRate * voidStanceMultiplier)
+		
+		if (process.env.NODE_ENV === 'development') {
+			console.log('=== 無の構え効果適用 ===')
+			console.log('無の構えレベル:', voidStanceLevel)
+			console.log('無の構え倍率:', voidStanceMultiplier)
+			console.log('適用前コンボ倍率:', input.combo.isActive ? input.combo.multiplier : 100)
+			console.log('適用後コンボ倍率:', comboRate)
+		}
+	}
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log('=== COMBO CALCULATION (Step 8) ===')

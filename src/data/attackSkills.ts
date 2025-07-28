@@ -254,10 +254,10 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
-	// 術式/ストーム（1/6hit）
+	// 術式/ストーム（1/6hit）- 旧仕様
 	{
 		id: 'storm_1_6hit',
-		name: '術式/ストーム(1/6hit)',
+		name: '術式/ストーム(1/6hit)-旧仕様',
 		order: 602,
 		systemGroup: 'magic',
 		category: 'staff',
@@ -274,6 +274,37 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'MATK',
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 固定ダメージ400
+				multiplierFormula: '杖装備時：威力+100%',
+				familiarity: 'magical',
+				familiarityGrant: 'magical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
+
+	// 術式/ストーム（1/6hit）- 新仕様
+	{
+		id: 'storm_1_6hit_new',
+		name: '術式/ストーム(1/6hit)',
+		order: 603,
+		systemGroup: 'magic',
+		category: 'staff',
+		weaponTypeRequirements: ['杖', '魔導具'],
+		mpCost: 400,
+		multiplierFormula: '200% (杖装備時300%)',
+		fixedDamageFormula: '420',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'magical',
+				referenceDefense: 'MDEF',
+				referenceResistance: 'magical',
+				powerReference: 'MATK',
+				multiplier: 200, // 表示用（実際の計算は外部）
+				fixedDamage: 420, // 固定ダメージ420
 				multiplierFormula: '杖装備時：威力+100%',
 				familiarity: 'magical',
 				familiarityGrant: 'magical',

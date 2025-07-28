@@ -21,6 +21,8 @@ import { getShieldSkillBonuses } from '../categories/shieldSkills'
 import { getAssassinSkillBonuses } from '../categories/assassinSkills'
 import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 import { getSpriteSkillBonuses, getSpriteSkillBraveMultiplier } from '../categories/spriteSkills'
+import { calculateHotKnowsEffects } from '../categories/minstrelSkills'
+import { getShootSkillPassiveMultiplier } from '../categories/shootSkills'
 
 /**
  * バフスキルデータから全体の補正値を取得（基本版）
@@ -292,8 +294,19 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
 	attackSkillCategory?: string,
+	canUseLongRange?: boolean,
 ): number {
-	return getBladeSkillPassiveMultiplier(buffSkillData, weaponType, attackSkillCategory)
+	let totalPassiveMultiplier = 0
+	
+	// ブレードスキル系統のパッシブ倍率
+	totalPassiveMultiplier += getBladeSkillPassiveMultiplier(buffSkillData, weaponType, attackSkillCategory)
+	
+	// シュートスキル系統のパッシブ倍率（ロングレンジ）
+	if (canUseLongRange !== undefined) {
+		totalPassiveMultiplier += getShootSkillPassiveMultiplier(buffSkillData, canUseLongRange)
+	}
+	
+	return totalPassiveMultiplier
 }
 
 /**

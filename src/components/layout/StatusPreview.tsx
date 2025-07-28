@@ -406,13 +406,22 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				const intElementAdvantageResult = calculateINTElementAdvantage(
 					baseStats.INT, // 基礎INT（装備・バフ補正を除く）
 					data.mainWeapon.weaponType,
-					powerOptions?.elementAttack === 'advantageous'
+					powerOptions?.elementAttack || 'none'
 				)
 				
-				// 総属性有利を計算（INT補正を含む）
+				// 熱情の歌の効果を計算
+				const hotKnowsSkill = data.buffSkills?.skills?.IsHotKnows
+				let hotKnowsEffect = 0
+				if (hotKnowsSkill?.isEnabled && hotKnowsSkill.stackCount && powerOptions) {
+					const { calculateHotKnowsEffects } = require('@/utils/buffSkillCalculation/categories/minstrelSkills')
+					const hotKnowsResult = calculateHotKnowsEffects(hotKnowsSkill.stackCount, powerOptions)
+					hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
+				}
+				
+				// 総属性有利を計算（INT補正 + 熱情の歌補正を含む）
 				return calculateTotalElementAdvantage(
 					finalBonuses,
-					intElementAdvantageResult.intElementAdvantage
+					intElementAdvantageResult.intElementAdvantage + hotKnowsEffect
 				)
 			})(),
 			stabilityCalculation: calculateStability(
