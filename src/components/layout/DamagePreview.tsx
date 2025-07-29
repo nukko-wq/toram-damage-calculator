@@ -88,6 +88,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			return calculateDamageWithService(calculatorData, calculationResults, {
 				powerOptions,
 				debug: false,
+				familiarityMultiplier,
 			})
 		} catch (error) {
 			console.error('ダメージ計算エラー:', error)
@@ -109,7 +110,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 			}
 		}
-	}, [calculatorData, calculationResults, powerOptions])
+	}, [calculatorData, calculationResults, powerOptions, familiarityMultiplier])
 
 	if (!isVisible) {
 		return null
