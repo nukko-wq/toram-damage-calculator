@@ -32,3 +32,38 @@ body {
 		grid-template-rows: 4rem 2rem repeat(3, auto);
 	}
 }
+
+/* 慣れ倍率スライダーのスタイル */
+.slider-thumb::-webkit-slider-thumb {
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #3b82f6;
+	border: 2px solid #ffffff;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+
+.slider-thumb::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: #3b82f6;
+	border: 2px solid #ffffff;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+
+.slider-thumb::-webkit-slider-track {
+	height: 8px;
+	border-radius: 4px;
+	background: transparent;
+}
+
+.slider-thumb::-moz-range-track {
+	height: 8px;
+	border-radius: 4px;
+	background: transparent;
+	border: none;
+}
