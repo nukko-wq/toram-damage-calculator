@@ -30,7 +30,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	)
 
 	// 慣れ倍率の状態管理
-	const [familiarityMultiplier, setFamiliarityMultiplier] = useState(100)
+	const [adaptationMultiplier, setAdaptationMultiplier] = useState(100)
 
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
@@ -88,7 +88,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			return calculateDamageWithService(calculatorData, calculationResults, {
 				powerOptions,
 				debug: false,
-				familiarityMultiplier,
+				adaptationMultiplier,
 			})
 		} catch (error) {
 			console.error('ダメージ計算エラー:', error)
@@ -110,7 +110,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 			}
 		}
-	}, [calculatorData, calculationResults, powerOptions, familiarityMultiplier])
+	}, [calculatorData, calculationResults, powerOptions, adaptationMultiplier])
 
 	if (!isVisible) {
 		return null
@@ -300,7 +300,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								慣れ倍率
 							</label>
 							<div className="text-[13px] font-semibold text-gray-700 min-w-12 text-center">
-								{familiarityMultiplier}%
+								{adaptationMultiplier}%
 							</div>
 						</div>
 						<div className="flex-1">
@@ -308,13 +308,13 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								type="range"
 								min="50"
 								max="250"
-								value={familiarityMultiplier}
+								value={adaptationMultiplier}
 								onChange={(e) =>
-									setFamiliarityMultiplier(Number(e.target.value))
+									setAdaptationMultiplier(Number(e.target.value))
 								}
 								className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
 								style={{
-									background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((familiarityMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((familiarityMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
+									background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
 								}}
 							/>
 						</div>
@@ -323,25 +323,25 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								type="number"
 								min="50"
 								max="250"
-								value={familiarityMultiplier}
+								value={adaptationMultiplier}
 								onChange={(e) => {
 									const value = Number(e.target.value)
 									// 範囲チェック
 									if (value >= 50 && value <= 250) {
-										setFamiliarityMultiplier(value)
+										setAdaptationMultiplier(value)
 									} else if (value < 50) {
-										setFamiliarityMultiplier(50)
+										setAdaptationMultiplier(50)
 									} else if (value > 250) {
-										setFamiliarityMultiplier(250)
+										setAdaptationMultiplier(250)
 									}
 								}}
 								onBlur={(e) => {
 									// フォーカスを失った時の最終調整
 									const value = Number(e.target.value)
 									if (Number.isNaN(value) || value < 50) {
-										setFamiliarityMultiplier(50)
+										setAdaptationMultiplier(50)
 									} else if (value > 250) {
-										setFamiliarityMultiplier(250)
+										setAdaptationMultiplier(250)
 									}
 								}}
 								className="w-12 pl-1.5 pr-1 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"

@@ -84,7 +84,7 @@ export interface DamageCalculationInput {
 
 	// UI制御値
 	userSettings: {
-		familiarity: number // 慣れ(50-250%)
+		adaptation: number // 慣れ(50-250%)
 		currentDistance: 'short' | 'long' | 'disabled' // 現在の距離判定
 		damageType: 'critical' | 'graze' | 'expected' | 'white' // ダメージ判定
 	}
@@ -186,9 +186,9 @@ export interface DamageCalculationSteps {
 	}
 
 	// ステップ6: 慣れ
-	step6_familiarity: {
-		beforeFamiliarity: number
-		familiarityRate: number
+	step6_adaptation: {
+		beforeAdaptation: number
+		adaptationRate: number
 		result: number
 	}
 
@@ -307,7 +307,7 @@ export function calculateDamage(
 	if (process.env.NODE_ENV === 'development') {
 		console.log('\n--- ステップ6: 慣れ補正 ---')
 	}
-	const step6Result = applyFamiliarity(step5Result, input, steps)
+	const step6Result = applyAdaptation(step5Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step6Result % 1 !== 0
 		console.log(`ステップ6結果: ${step6Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
@@ -641,22 +641,22 @@ function applyUnsheatheRate(
 /**
  * ステップ6: 慣れ補正
  */
-function applyFamiliarity(
-	beforeFamiliarity: number,
+function applyAdaptation(
+	beforeAdaptation: number,
 	input: DamageCalculationInput,
 	steps: DamageCalculationSteps,
 ): number {
-	const familiarityRate = input.userSettings.familiarity
+	const adaptationRate = input.userSettings.adaptation
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log('=== ステップ6: 慣れ補正詳細 ===')
-		console.log(`慣れ値: ${familiarityRate}%`)
+		console.log(`慣れ値: ${adaptationRate}%`)
 		console.log(
-			`計算式: Math.floor(${beforeFamiliarity} × ${familiarityRate}/100)`,
+			`計算式: Math.floor(${beforeAdaptation} × ${adaptationRate}/100)`,
 		)
 	}
 
-	const result = Math.floor(beforeFamiliarity * (familiarityRate / 100))
+	const result = Math.floor(beforeAdaptation * (adaptationRate / 100))
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log(`慣れ適用後: ${result}`)
@@ -665,9 +665,9 @@ function applyFamiliarity(
 	}
 
 	// 計算過程を記録
-	steps.step6_familiarity = {
-		beforeFamiliarity,
-		familiarityRate,
+	steps.step6_adaptation = {
+		beforeAdaptation,
+		adaptationRate,
 		result,
 	}
 
@@ -1186,7 +1186,7 @@ export function createDefaultDamageInput(): DamageCalculationInput {
 		passiveMultiplier: 0,
 		braveMultiplier: 0,
 		userSettings: {
-			familiarity: 100,
+			adaptation: 100,
 			currentDistance: 'disabled',
 			damageType: 'white',
 		},

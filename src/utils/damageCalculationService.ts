@@ -43,7 +43,7 @@ export interface DamageCalculationServiceResult {
 export interface DamageCalculationOptions {
 	debug?: boolean
 	powerOptions?: PowerOptions
-	familiarityMultiplier?: number // 慣れ倍率（50-250の範囲）
+	adaptationMultiplier?: number // 慣れ倍率（50-250の範囲）
 }
 
 /**
@@ -91,7 +91,7 @@ export function calculateDamageWithService(
 	calculationResults: any,
 	options: DamageCalculationOptions = {},
 ): DamageCalculationServiceResult {
-	const { debug = false, powerOptions = createInitialPowerOptions(), familiarityMultiplier = 100 } = options
+	const { debug = false, powerOptions = createInitialPowerOptions(), adaptationMultiplier = 100 } = options
 
 	// デバッグログを一時的に無効化
 	const debugEnabled = false
@@ -280,7 +280,7 @@ export function calculateDamageWithService(
 				isActive: powerOptions.unsheathe,
 			},
 			userSettings: {
-				familiarity: familiarityMultiplier, // 慣れ倍率を適用
+				adaptation: adaptationMultiplier, // 慣れ倍率を適用
 				currentDistance: powerOptions.distance,
 				damageType: powerOptions.damageType,
 			},
