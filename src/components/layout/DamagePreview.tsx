@@ -29,8 +29,13 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		(state) => state.updatePowerOptions,
 	)
 
-	// 慣れ倍率の状態管理
-	const [adaptationMultiplier, setAdaptationMultiplier] = useState(100)
+	// 慣れ倍率をZustandストアから取得・更新
+	const adaptationMultiplier = useCalculatorStore(
+		(state) => state.data.adaptationMultiplier || 100,
+	)
+	const updateAdaptationMultiplier = useCalculatorStore(
+		(state) => state.updateAdaptationMultiplier,
+	)
 
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
@@ -310,7 +315,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								max="250"
 								value={adaptationMultiplier}
 								onChange={(e) =>
-									setAdaptationMultiplier(Number(e.target.value))
+									updateAdaptationMultiplier(Number(e.target.value))
 								}
 								className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
 								style={{
@@ -328,20 +333,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									const value = Number(e.target.value)
 									// 範囲チェック
 									if (value >= 50 && value <= 250) {
-										setAdaptationMultiplier(value)
+										updateAdaptationMultiplier(value)
 									} else if (value < 50) {
-										setAdaptationMultiplier(50)
+										updateAdaptationMultiplier(50)
 									} else if (value > 250) {
-										setAdaptationMultiplier(250)
+										updateAdaptationMultiplier(250)
 									}
 								}}
 								onBlur={(e) => {
 									// フォーカスを失った時の最終調整
 									const value = Number(e.target.value)
 									if (Number.isNaN(value) || value < 50) {
-										setAdaptationMultiplier(50)
+										updateAdaptationMultiplier(50)
 									} else if (value > 250) {
-										setAdaptationMultiplier(250)
+										updateAdaptationMultiplier(250)
 									}
 								}}
 								className="w-12 pl-1.5 pr-1 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"

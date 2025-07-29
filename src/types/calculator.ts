@@ -392,6 +392,7 @@ export interface CalculatorData {
 	register: RegisterFormData // レジスタ他データ
 	attackSkill: AttackSkillFormData // 攻撃スキルデータ
 	powerOptions: PowerOptions // ダメージプレビュー威力オプション設定
+	adaptationMultiplier: number // 慣れ倍率 (50-250%)
 }
 
 // 計算結果

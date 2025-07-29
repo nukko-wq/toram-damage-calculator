@@ -396,4 +396,5 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	register: createInitialRegisterFormData(), // レジスタ他システム
 	attackSkill: createInitialAttackSkillFormData(), // 攻撃スキルシステム
 	powerOptions: createInitialPowerOptions(), // 威力オプション設定
+	adaptationMultiplier: 100, // 慣れ倍率のデフォルト値 (100%)
 })
