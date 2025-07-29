@@ -49,8 +49,8 @@ AttackSkillFormに新しい攻撃スキル「ムーンスラッシュ」を追�
       fixedDamage: 400,          // 表示用（実際の計算は外部）
       
       // 慣れ設定
-      familiarity: 'physical',     // 物理慣れ参照
-      familiarityGrant: 'normal',  // 通常慣れ付与
+      adaptation: 'physical',     // 物理慣れ参照
+      adaptationGrant: 'normal',  // 通常慣れ付与
       
       // 補正適用設定
       canUseUnsheathePower: false,  // 抜刀威力適用不可
@@ -74,8 +74,8 @@ AttackSkillFormに新しい攻撃スキル「ムーンスラッシュ」を追�
       fixedDamageFormula: '固定値+基礎INT/2',
       
       // 慣れ設定
-      familiarity: 'physical',     // 物理慣れ参照
-      familiarityGrant: 'normal',  // 通常慣れ付与
+      adaptation: 'physical',     // 物理慣れ参照
+      adaptationGrant: 'normal',  // 通常慣れ付与
       
       // 補正適用設定
       canUseUnsheathePower: false,  // 抜刀威力適用不可

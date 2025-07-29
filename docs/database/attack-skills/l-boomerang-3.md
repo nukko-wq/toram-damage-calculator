@@ -52,8 +52,8 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
       multiplierFormula: '|1350+基礎DEX|%',
       
       // 慣れ設定
-      familiarity: 'normal',        // 通常慣れ参照
-      familiarityGrant: 'normal',
+      adaptation: 'normal',        // 通常慣れ参照
+      adaptationGrant: 'normal',
       
       // 補正適用設定
       canUseUnsheathePower: false,   // 抜刀威力適用可能
@@ -76,8 +76,8 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
       multiplierFormula: '|1350+基礎DEX|%',
       
       // 慣れ設定
-      familiarity: 'normal',        // 通常慣れ参照
-      familiarityGrant: 'normal',
+      adaptation: 'normal',        // 通常慣れ参照
+      adaptationGrant: 'normal',
       
       // 補正適用設定
       canUseUnsheathePower: false,   // 抜刀威力適用可能

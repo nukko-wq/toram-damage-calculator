@@ -53,8 +53,8 @@ AttackSkillFormに新しい攻撃スキル「ストームブレイザー(1スタ
       fixedDamageFormula: '150+補正後VIT', // 固定値計算式
       
       // 慣れ設定
-      familiarity: 'physical',     // 物理慣れ参照
-      familiarityGrant: 'physical', // 物理慣れ付与
+      adaptation: 'physical',     // 物理慣れ参照
+      adaptationGrant: 'physical', // 物理慣れ付与
       
       // 補正適用設定
       canUseUnsheathePower: false, // 抜刀威力適用不可
@@ -87,7 +87,7 @@ AttackSkillFormに新しい攻撃スキル「ストームブレイザー(1スタ
 - [x] **抜刀威力**: 適用不可 (canUseUnsheathePower: false)
 - [x] **ロングレンジ**: 適用可能 (canUseLongRange: true)
 - [x] **距離威力**: 近距離威力適用可能 (canUseShortRangePower: true)、遠距離威力適用可能 (canUseLongRangePower: true)
-- [x] **慣れ付与**: 物理慣れ付与 (familiarity: 'physical', familiarityGrant: 'physical')
+- [x] **慣れ付与**: 物理慣れ付与 (adaptation: 'physical', adaptationGrant: 'physical')
 
 ### 特殊効果仕様
 - [ ] **クリティカル**: 確定クリティカルの有無
@@ -149,7 +149,7 @@ AttackSkillFormに新しい攻撃スキル「ストームブレイザー(1スタ
 - 基本倍率設定（75%）
 - 固定ダメージ設定（150+補正後VIT）
 - 補正適用設定（抜刀威力×、ロングレンジ○、近距離威力○、遠距離威力○）
-- 慣れ設定（familiarity: 'physical', familiarityGrant: 'physical'）
+- 慣れ設定（adaptation: 'physical', adaptationGrant: 'physical'）
 - 表示順序設定（106）
 - データ構造の基本枠組み定義
 - UI表示の基本枠組み

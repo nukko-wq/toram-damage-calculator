@@ -82,8 +82,8 @@ export default function AttackSkillForm({
 					fixedDamage: calculatedHit.calculatedFixedDamage,
 					multiplierFormula: originalHit.multiplierFormula,
 					fixedDamageFormula: originalHit.fixedDamageFormula,
-					familiarityReference: originalHit.familiarity,
-					familiarityGrant: originalHit.familiarityGrant,
+					adaptationReference: originalHit.adaptation,
+					adaptationGrant: originalHit.adaptationGrant,
 					canUseUnsheathePower: originalHit.canUseUnsheathePower,
 					canUseLongRange: originalHit.canUseLongRange,
 					canUseShortRangePower: originalHit.canUseShortRangePower,
@@ -141,8 +141,8 @@ export default function AttackSkillForm({
 						fixedDamage: calculatedHit.calculatedFixedDamage,
 						multiplierFormula: originalHit.multiplierFormula,
 						fixedDamageFormula: originalHit.fixedDamageFormula,
-						familiarityReference: originalHit.familiarity,
-						familiarityGrant: originalHit.familiarityGrant,
+						adaptationReference: originalHit.adaptation,
+						adaptationGrant: originalHit.adaptationGrant,
 						canUseUnsheathePower: originalHit.canUseUnsheathePower,
 						canUseLongRange: originalHit.canUseLongRange,
 						canUseShortRangePower: originalHit.canUseShortRangePower,
@@ -173,8 +173,8 @@ export default function AttackSkillForm({
 	}
 
 	// 慣れタイプの表示名
-	const getFamiliarityDisplayText = (familiarity: string) => {
-		switch (familiarity) {
+	const getAdaptationDisplayText = (adaptation: string) => {
+		switch (adaptation) {
 			case 'physical':
 				return '物理'
 			case 'magical':
@@ -182,7 +182,7 @@ export default function AttackSkillForm({
 			case 'normal':
 				return '通常'
 			default:
-				return familiarity
+				return adaptation
 		}
 	}
 
@@ -339,15 +339,15 @@ export default function AttackSkillForm({
 										<div className="px-3 py-2 border-r border-gray-300">
 											<span className="text-gray-700">慣れ参照:</span>{' '}
 											<span className="text-gray-700">
-												{getFamiliarityDisplayText(
-													currentHit.familiarityReference,
+												{getAdaptationDisplayText(
+													currentHit.adaptationReference,
 												)}
 											</span>
 										</div>
 										<div className="px-3 py-2">
 											<span className="text-gray-700">慣れ付与:</span>{' '}
 											<span className="text-gray-700">
-												{getFamiliarityDisplayText(currentHit.familiarityGrant)}
+												{getAdaptationDisplayText(currentHit.adaptationGrant)}
 											</span>
 										</div>
 									</div>

@@ -53,8 +53,8 @@ AttackSkillFormに新しい攻撃スキル「バスターブレード」を追�
       fixedDamageFormula: '300',
       
       // 慣れ設定
-      familiarity: 'physical',     // 物理慣れ参照
-      familiarityGrant: 'physical', // 物理慣れ付与
+      adaptation: 'physical',     // 物理慣れ参照
+      adaptationGrant: 'physical', // 物理慣れ付与
       
       // 補正適用設定
       canUseUnsheathePower: false,  // 抜刀威力適用不可

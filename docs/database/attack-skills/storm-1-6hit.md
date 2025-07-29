@@ -102,8 +102,8 @@
       fixedDamageFormula: '400',
       
       // 慣れ設定
-      familiarity: 'magical',    // 魔法慣れ参照
-      familiarityGrant: 'magical', // 魔法慣れ付与
+      adaptation: 'magical',    // 魔法慣れ参照
+      adaptationGrant: 'magical', // 魔法慣れ付与
       
       // 補正適用設定
       canUseUnsheathePower: false,   // 抜刀威力適用不可

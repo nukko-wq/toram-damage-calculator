@@ -33,8 +33,8 @@ const attackSkillsRawData: AttackSkill[] = [
 					'片手剣装備時：威力+基礎DEX/2%',
 					'両手剣装備時：威力+基礎STR%',
 				],
-				familiarity: 'physical',
-				familiarityGrant: 'physical',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -65,8 +65,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 600, // 表示用（実際の計算は外部）
 				fixedDamage: 600, // 1hit目固定ダメージ600
 				multiplierFormula: '両手剣装備時：威力+200%+基礎STR/10%',
-				familiarity: 'physical',
-				familiarityGrant: 'physical',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -81,8 +81,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 600, // 表示用（実際の計算は外部）
 				fixedDamage: 0, // 2hit目固定ダメージ0
 				multiplierFormula: '片手剣装備時：威力+基礎DEX/2%',
-				familiarity: 'physical',
-				familiarityGrant: 'physical',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -111,8 +111,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'ATK',
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 表示用（実際の計算は外部）
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -128,8 +128,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 0, // 表示用（基礎INT/2は外部計算）
 				multiplierFormula: '威力+補正後STR%',
 				fixedDamageFormula: '固定値+基礎INT/2',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -160,8 +160,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -177,8 +177,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -194,8 +194,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -226,8 +226,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -243,8 +243,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -260,8 +260,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -291,8 +291,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 125, // 表示用（実際の計算は外部）
 				fixedDamage: 50, // 表示用（実際の計算は外部）
 				multiplierFormula: '杖装備時：威力+25%',
-				familiarity: 'magical',
-				familiarityGrant: 'magical',
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -322,8 +322,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 固定ダメージ400
 				multiplierFormula: '杖装備時：威力+100%',
-				familiarity: 'magical',
-				familiarityGrant: 'magical',
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -353,8 +353,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 420, // 固定ダメージ420
 				multiplierFormula: '杖装備時：威力+100%',
-				familiarity: 'magical',
-				familiarityGrant: 'magical',
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -384,8 +384,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 100, // 表示用（実際の計算は外部）
 				fixedDamage: 420, // 固定ダメージ420
 				multiplierFormula: '杖装備時：威力+50%',
-				familiarity: 'magical',
-				familiarityGrant: 'magical',
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -415,8 +415,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 100,
 				fixedDamage: 100,
 				multiplierFormula: '矢装備時：威力+補正後DEX/2%',
-				familiarity: 'physical',
-				familiarityGrant: 'physical',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -446,8 +446,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
 				multiplierFormula: '威力+基礎DEX%',
-				familiarity: 'normal',
-				familiarityGrant: 'normal',
+				adaptation: 'normal',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: false,
@@ -463,8 +463,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
 				multiplierFormula: '威力+基礎DEX%',
-				familiarity: 'normal',
-				familiarityGrant: 'normal',
+				adaptation: 'normal',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: false,
@@ -495,8 +495,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 200, // 表示用（実際は200+補正後VIT）
 				fixedDamageFormula: '固定値+補正後VIT',
-				familiarity: 'physical',
-				familiarityGrant: 'physical',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -527,8 +527,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 150, // 表示用（実際は150+補正後VIT）
 				multiplierFormula: '75%',
 				fixedDamageFormula: '150+補正後VIT',
-				familiarity: 'physical',
-				familiarityGrant: 'physical',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -559,8 +559,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 50, // 仮の値
 				multiplierFormula: '仮の値（要仕様書設計）',
 				fixedDamageFormula: '仮の値（要仕様書設計）',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,

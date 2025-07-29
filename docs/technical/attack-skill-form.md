@@ -138,8 +138,8 @@ interface AttackHit {
   fixedDamageFormula?: string          // 固定値の計算式説明（例: "400", "基礎INT/2"）
   
   // 補正適用
-  familiarity: FamiliarityType         // 慣れ参照
-  familiarityGrant: FamiliarityType    // 慣れ付与
+  adaptation: AdaptationType         // 慣れ参照
+  adaptationGrant: AdaptationType    // 慣れ付与
   canUseUnsheathePower: boolean        // 抜刀威力適用可否
   canUseLongRange: boolean             // ロングレンジ適用可否
   canUseDistancePower: boolean         // 距離威力適用可否
@@ -155,7 +155,7 @@ interface AttackHit {
 type PowerReferenceType = 'totalATK' | 'MATK' // 将来拡張: 'spearMATK', 'STR', 'INT', etc.
 
 // 慣れタイプ
-type FamiliarityType = 'physical' | 'magical' | 'normal'
+type AdaptationType = 'physical' | 'magical' | 'normal'
 
 // 特殊効果
 interface SkillSpecialEffect {
@@ -193,8 +193,8 @@ interface CalculatedHit {
   fixedDamageFormula?: string         // 固定値の計算式説明
   
   // 慣れ情報
-  familiarityReference: FamiliarityType
-  familiarityGrant: FamiliarityType
+  adaptationReference: AdaptationType
+  adaptationGrant: AdaptationType
   
   // 補正適用
   canUseUnsheathePower: boolean
@@ -298,8 +298,8 @@ interface SkillInfoSection {
     mpCost: number
     attackType: 'physical' | 'magical'
     powerReference: string
-    familiarityRef: FamiliarityType
-    familiarityGrant: FamiliarityType
+    adaptationRef: AdaptationType
+    adaptationGrant: AdaptationType
     referenceDefense: 'DEF' | 'MDEF'
     referenceResistance: 'physical' | 'magical' // 参照耐性
     canUseUnsheathePower: boolean
@@ -362,8 +362,8 @@ function getSkillDisplayData(skill: AttackSkill): CalculatedHit[] {
     fixedDamageFormula: hit.fixedDamageFormula,
     
     // 慣れ・補正情報
-    familiarityReference: hit.familiarity,
-    familiarityGrant: hit.familiarityGrant,
+    adaptationReference: hit.adaptation,
+    adaptationGrant: hit.adaptationGrant,
     canUseUnsheathePower: hit.canUseUnsheathePower,
     canUseLongRange: hit.canUseLongRange,
     canUseDistancePower: hit.canUseDistancePower,
@@ -429,8 +429,8 @@ export const attackSkillsData: AttackSkill[] = [
       fixedDamage: 0,   // 表示用の値
       multiplierFormula: "125%",
       fixedDamageFormula: "0",
-      familiarity: 'physical',
-      familiarityGrant: 'physical',
+      adaptation: 'physical',
+      adaptationGrant: 'physical',
       canUseUnsheathePower: true,
       canUseLongRange: false,
       canUseDistancePower: true,
@@ -461,8 +461,8 @@ export const attackSkillsData: AttackSkill[] = [
         fixedDamage: 400,  // 表示用（実際の計算は外部）
         multiplierFormula: "1000%",
         fixedDamageFormula: "400",
-        familiarity: 'physical',
-        familiarityGrant: 'physical',
+        adaptation: 'physical',
+        adaptationGrant: 'physical',
         canUseUnsheathePower: false,
         canUseLongRange: false,
         canUseDistancePower: true,
@@ -482,8 +482,8 @@ export const attackSkillsData: AttackSkill[] = [
         fixedDamage: 0,    // 表示用（基礎INT/2は外部計算）
         multiplierFormula: "|補正後STR|%",
         fixedDamageFormula: "基礎INT/2",
-        familiarity: 'physical',
-        familiarityGrant: 'physical',
+        adaptation: 'physical',
+        adaptationGrant: 'physical',
         canUseUnsheathePower: false,
         canUseLongRange: false,
         canUseDistancePower: true,

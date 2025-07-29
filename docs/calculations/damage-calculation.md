@@ -475,7 +475,7 @@ export interface DamageCalculationInput {
   
   // UI制御値
   userSettings: {
-    familiarity: number // 慣れ(50-250%)
+    adaptation: number // 慣れ(50-250%)
     currentDistance: 'short' | 'long' | 'disabled' // 現在の距離判定
     damageType: 'critical' | 'graze' | 'expected' | 'white' // ダメージ判定
   }
@@ -558,9 +558,9 @@ export interface DamageCalculationSteps {
   }
   
   // ステップ6: 慣れ
-  step6_familiarity: {
-    beforeFamiliarity: number
-    familiarityRate: number
+  step6_adaptation: {
+    beforeAdaptation: number
+    adaptationRate: number
     result: number
   }
   
@@ -628,7 +628,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageCalculatio
   
   // ステップ5-10: 残りの倍率適用
   currentDamage = applyUnsheatheRate(currentDamage, input, steps)
-  currentDamage = applyFamiliarity(currentDamage, input, steps)
+  currentDamage = applyAdaptation(currentDamage, input, steps)
   currentDamage = applyDistance(currentDamage, input, steps)
   currentDamage = applyCombo(currentDamage, input, steps)
   currentDamage = applyPassiveMultiplier(currentDamage, input, steps)
