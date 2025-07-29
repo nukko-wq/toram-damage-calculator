@@ -12,6 +12,7 @@ import {
 	Storm1Hit6NewCalculator,
 	Storm1Hit6ExtendCalculator,
 	StormBlazer10StackCalculator,
+	StormBlazer1StackCalculator,
 	StrikeStabAilmentCalculator,
 	StrikeStabCalculator,
 } from './calculators'
@@ -70,6 +71,8 @@ export class AttackSkillCalculator {
 				return new MoonSlashCalculator()
 			case 'storm_blazer_10stack':
 				return new StormBlazer10StackCalculator()
+			case 'storm_blazer_1stack':
+				return new StormBlazer1StackCalculator()
 			case 'strike_stab':
 				return new StrikeStabCalculator()
 			case 'strike_stab_ailment':

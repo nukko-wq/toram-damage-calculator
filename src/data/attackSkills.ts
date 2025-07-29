@@ -494,8 +494,39 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'ATK',
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 200, // 表示用（実際は200+補正後VIT）
-				multiplierFormula: '1000%',
-				fixedDamageFormula: '200+補正後VIT',
+				fixedDamageFormula: '固定値+補正後VIT',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
+
+	// ストームブレイザー（1スタック）
+	{
+		id: 'storm_blazer_1stack',
+		name: 'ストームブレイザー(1スタック)',
+		order: 106,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['両手剣'],
+		mpCost: 200,
+		multiplierFormula: '75%',
+		fixedDamageFormula: '150+補正後VIT',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 75, // 表示用（実際の計算は外部）
+				fixedDamage: 150, // 表示用（実際は150+補正後VIT）
+				multiplierFormula: '75%',
+				fixedDamageFormula: '150+補正後VIT',
 				familiarity: 'physical',
 				familiarityGrant: 'physical',
 				canUseUnsheathePower: false,
