@@ -49,7 +49,7 @@ export const enemiesData: EnemiesData = {
 				name: 'ブレッパ',
 				level: 223,
 				stats: {
-					DEF: 466,
+					DEF: 446,
 					MDEF: 291,
 					physicalResistance: 8,
 					magicalResistance: 8,
@@ -118,6 +118,20 @@ export const enemiesData: EnemiesData = {
 			},
 		],
 		boss: [
+			{
+				id: 'b48bc00e-504f-41f8-8c9c-8c616a3fa010',
+				name: 'イコノス',
+				level: 108,
+				stats: {
+					DEF: 162,
+					MDEF: 140,
+					physicalResistance: 10,
+					magicalResistance: 10,
+					resistCritical: 0,
+					requiredHIT: 0,
+				},
+				category: 'boss',
+			},
 			{
 				id: '83b50518-c3e0-40ca-91a8-4caa2ca8643f',
 				name: 'ピヌグールガ',
