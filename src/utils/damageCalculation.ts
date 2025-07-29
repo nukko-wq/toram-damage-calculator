@@ -432,19 +432,33 @@ function calculateBaseDamage(
 		input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF
 	const defenseType = input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF'
 	const processedDefense = processEnemyDefense(enemyDefense, input, defenseType)
+	
+	// 防御力減算前に小数点を切り捨て
+	const afterResistanceFloored = Math.floor(afterResistance)
+	
+	// 処理後DEFも小数点を切り捨て
+	const processedDefenseFloored = Math.floor(processedDefense)
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log(`敵${defenseType}: ${enemyDefense}`)
-		console.log(`処理後${defenseType}: ${processedDefense}`)
-		console.log(`防御力減算前: ${afterResistance}`)
+		if (processedDefense !== processedDefenseFloored) {
+			console.log(`処理後${defenseType}: ${processedDefense} → ${processedDefenseFloored} (小数点切り捨て)`)
+		} else {
+			console.log(`処理後${defenseType}: ${processedDefenseFloored}`)
+		}
+		if (afterResistance !== afterResistanceFloored) {
+			console.log(`防御力減算前: ${afterResistance} → ${afterResistanceFloored} (小数点切り捨て)`)
+		} else {
+			console.log(`防御力減算前: ${afterResistanceFloored}`)
+		}
 	}
 
-	// 防御力減算後にfloorを適用
-	const result = Math.floor(afterResistance - processedDefense)
+	// 両方とも切り捨て後の値で減算
+	const result = afterResistanceFloored - processedDefenseFloored
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log(
-			`最終結果: ${result} = Math.floor(${afterResistance} - ${processedDefense})`,
+			`最終結果: ${result} = ${afterResistanceFloored} - ${processedDefenseFloored}`,
 		)
 		console.log(`最低保証後: ${Math.max(1, result)}`)
 		console.log('======================================')
@@ -459,8 +473,8 @@ function calculateBaseDamage(
 		physicalResistanceRate: input.resistance.physical,
 		magicalResistanceRate: input.resistance.magical,
 		weaponResistanceRate: input.resistance.weapon,
-		afterResistance,
-		enemyDEF: processedDefense,
+		afterResistance: afterResistanceFloored, // 切り捨て後の値を記録
+		enemyDEF: processedDefenseFloored, // 切り捨て後の値を記録
 		result,
 	}
 

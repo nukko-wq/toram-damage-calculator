@@ -474,6 +474,38 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// ストームブレイザー（10スタック）
+	{
+		id: 'storm_blazer_10stack',
+		name: 'ストームブレイザー(10スタック)',
+		order: 105,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['両手剣'],
+		mpCost: 200,
+		multiplierFormula: '1000%',
+		fixedDamageFormula: '200+補正後VIT',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1000, // 表示用（実際の計算は外部）
+				fixedDamage: 200, // 表示用（実際は200+補正後VIT）
+				multiplierFormula: '1000%',
+				fixedDamageFormula: '200+補正後VIT',
+				familiarity: 'physical',
+				familiarityGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
+
 	// エアスライサー（双剣スキル）
 	{
 		id: 'air_slasher',
