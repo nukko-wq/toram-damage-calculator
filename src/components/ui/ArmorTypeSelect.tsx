@@ -24,7 +24,7 @@ const ArmorTypeButton: React.FC<ArmorTypeButtonProps> = ({
 				px-3 py-2 text-sm rounded border transition-colors cursor-pointer
 				${
 					isSelected
-						? 'bg-blue-500 text-white border-blue-500'
+						? 'bg-blue-500/80 text-white border-transparent'
 						: 'bg-gray-200 text-gray-700 border-gray-300 hover:bg-gray-300'
 				}
 			`}

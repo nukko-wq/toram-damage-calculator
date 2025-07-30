@@ -81,7 +81,7 @@ export default React.memo<FloatingSavePanelProps>(function FloatingSavePanel({
 				type="button"
 				onClick={handleSaveButtonClick}
 				disabled={false}
-				className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer text-white bg-rose-400/80 hover:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
+				className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer text-white bg-rose-400/80 hover:bg-rose-400 focus:outline-none"
 				title="現在のデータを保存"
 			>
 				<svg
