@@ -119,28 +119,32 @@ export default function SaveDataItem({
 			</div>
 
 			{/* アクションボタン */}
-			<div className="flex-shrink-0 ml-2 flex items-center space-x-1">
-					<button
-						type="button"
-						onClick={() => onSelect(saveData.id)}
-						className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded transition-colors duration-150 cursor-pointer"
-						title="読み込み"
+			<div className="flex-shrink-0 ml-3 flex items-center space-x-2">
+				{/* 読み込みボタン - プライマリ */}
+				<button
+					type="button"
+					onClick={() => onSelect(saveData.id)}
+					className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-400/80 hover:bg-blue-400 rounded-md transition-colors duration-150 cursor-pointer focus:outline-none"
+					title="このセーブデータを読み込む"
+				>
+					<svg
+						className="w-4 h-4"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
 					>
-						<svg
-							className="w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-							/>
-						</svg>
-					</button>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+						/>
+					</svg>
+					<span>読み込み</span>
+				</button>
 
+				{/* 他のアクションボタン */}
+				<div className="flex items-center space-x-1">
 					{!isMainData && (
 						<>
 							<button
@@ -187,7 +191,8 @@ export default function SaveDataItem({
 						</>
 					)}
 				</div>
-			
+			</div>
+
 			{/* 名前変更モーダル */}
 			<RenameModal
 				isOpen={isRenameModalOpen}
@@ -195,7 +200,7 @@ export default function SaveDataItem({
 				onConfirm={handleRenameConfirm}
 				currentName={saveData.name}
 			/>
-			
+
 			{/* 削除確認モーダル */}
 			<DeleteConfirmModal
 				isOpen={isDeleteModalOpen}
