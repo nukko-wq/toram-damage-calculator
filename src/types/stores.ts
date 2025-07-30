@@ -137,6 +137,10 @@ export interface CalculatorStore {
 		equipmentId: string,
 		properties: Partial<EquipmentProperties>,
 	) => Promise<boolean>
+	updateCustomEquipmentRefinement: (
+		equipmentId: string,
+		refinement: number,
+	) => Promise<boolean>
 	updateEquipmentArmorType: (
 		equipmentId: string,
 		armorType: ArmorType,

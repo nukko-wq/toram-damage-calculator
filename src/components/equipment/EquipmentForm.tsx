@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useCalculatorStore } from '@/stores'
+import MessageModal from '@/components/ui/MessageModal'
+import { saveWeaponInfo, clearWeaponInfo, getWeaponInfo } from '@/utils/weaponInfoStorage'
 import type {
 	Equipment,
 	EquipmentSlots,
@@ -53,6 +55,7 @@ export default function EquipmentForm({
 	const updateEquipmentArmorType = useCalculatorStore(
 		(state) => state.updateEquipmentArmorType,
 	)
+	const updateMainWeapon = useCalculatorStore((state) => state.updateMainWeapon)
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
@@ -96,6 +99,15 @@ export default function EquipmentForm({
 		isOpen: false,
 		equipmentId: null,
 		currentName: '',
+	})
+
+	// メッセージモーダル状態
+	const [messageModalState, setMessageModalState] = useState<{
+		isOpen: boolean
+		message: string
+	}>({
+		isOpen: false,
+		message: '',
 	})
 
 	const equipmentSlots = [
@@ -561,6 +573,22 @@ export default function EquipmentForm({
 				// Zustandストアを更新
 				updateEquipment(updatedEquipment)
 
+				// メイン装備が選択された場合、保存されている武器情報をWeaponFormに反映
+				if (slotKey === 'main') {
+					const weaponInfo = getWeaponInfo(equipmentId)
+					if (weaponInfo) {
+						console.log('武器情報をWeaponFormに復元:', weaponInfo)
+						const currentMainWeapon = useCalculatorStore.getState().data.mainWeapon
+						const updatedMainWeapon = {
+							...currentMainWeapon,
+							ATK: weaponInfo.ATK,
+							stability: weaponInfo.stability,
+							refinement: weaponInfo.refinement,
+						}
+						updateMainWeapon(updatedMainWeapon)
+					}
+				}
+
 				// 後方互換性のため従来のonChangeも呼び出し
 				if (onEquipmentChange) {
 					onEquipmentChange(updatedEquipment)
@@ -701,6 +729,77 @@ export default function EquipmentForm({
 		if (!currentEquipment?.id) return
 
 		updateEquipmentArmorType(currentEquipment.id, newArmorType)
+	}
+
+	// メッセージモーダル表示
+	const showMessage = (message: string) => {
+		setMessageModalState({
+			isOpen: true,
+			message,
+		})
+	}
+
+	// メイン武器情報登録ハンドラー
+	const handleRegisterWeaponInfo = async () => {
+		const currentEquipment = effectiveEquipment.main
+		console.log('現在の装備:', currentEquipment)
+		
+		if (!currentEquipment?.id) {
+			console.log('装備が選択されていません')
+			showMessage('装備が選択されていません。')
+			return
+		}
+
+		try {
+			// WeaponFormからメイン武器データを取得
+			const mainWeapon = useCalculatorStore.getState().data.mainWeapon
+			console.log('メイン武器データ:', mainWeapon)
+			
+			// 新しい武器情報ストレージシステムを使用
+			const success = saveWeaponInfo(
+				currentEquipment.id, 
+				mainWeapon.ATK, 
+				mainWeapon.stability, 
+				mainWeapon.refinement
+			)
+			console.log('武器情報保存結果:', success)
+
+			if (success) {
+				showMessage('武器情報を登録しました。')
+				// UIを更新するため、装備データを再読み込み
+				const updatedEquipment = { ...effectiveEquipment }
+				updateEquipment(updatedEquipment)
+			} else {
+				showMessage('武器情報の登録に失敗しました。')
+			}
+		} catch (error) {
+			console.error('武器情報登録エラー:', error)
+			showMessage('武器情報の登録に失敗しました。')
+		}
+	}
+
+	// 武器情報削除ハンドラー
+	const handleDeleteWeaponInfo = async () => {
+		const currentEquipment = effectiveEquipment.main
+		if (!currentEquipment?.id) return
+
+		try {
+			// 新しい武器情報ストレージシステムを使用してクリア
+			const success = clearWeaponInfo(currentEquipment.id)
+			console.log('武器情報削除結果:', success)
+
+			if (success) {
+				showMessage('武器情報を削除しました。')
+				// UIを更新するため、装備データを再読み込み
+				const updatedEquipment = { ...effectiveEquipment }
+				updateEquipment(updatedEquipment)
+			} else {
+				showMessage('武器情報の削除に失敗しました。')
+			}
+		} catch (error) {
+			console.error('武器情報削除エラー:', error)
+			showMessage('武器情報の削除に失敗しました。')
+		}
 	}
 
 	const renderPropertyInputs = (
@@ -1006,6 +1105,28 @@ export default function EquipmentForm({
 							)}
 					</div>
 
+					{/* メイン装備専用：武器情報登録・削除ボタン */}
+					{activeTab === 'main' && effectiveEquipment.main?.id && (
+						<div className="flex gap-2 mt-2">
+							<button
+								type="button"
+								onClick={() => handleRegisterWeaponInfo()}
+								className="px-3 py-1 text-sm bg-green-400/80 text-white rounded-md hover:bg-green-400 transition-colors cursor-pointer"
+								title="WeaponFormの武器情報をメイン装備に登録"
+							>
+								メイン武器情報登録
+							</button>
+							<button
+								type="button"
+								onClick={() => handleDeleteWeaponInfo()}
+								className="px-3 py-1 text-sm bg-red-400/80 text-white rounded-md hover:bg-red-400 transition-colors cursor-pointer"
+								title="メイン装備の武器情報を削除"
+							>
+								武器情報削除
+							</button>
+						</div>
+					)}
+
 					{/* 体装備の防具の改造選択UI */}
 					{activeTab === 'body' && effectiveEquipment.body?.id && (
 						<div className="mt-4">
@@ -1017,12 +1138,12 @@ export default function EquipmentForm({
 						</div>
 					)}
 
-					{effectiveEquipment[activeTab] &&
+					{(activeTab as string) !== 'register' && effectiveEquipment[activeTab as keyof EquipmentSlots] &&
 						renderPropertyInputs(
-							effectiveEquipment[activeTab],
-							activeTab,
+							effectiveEquipment[activeTab as keyof EquipmentSlots],
+							activeTab as keyof EquipmentSlots,
 							(property: keyof EquipmentProperties, value: string) =>
-								handleEquipmentPropertyChange(activeTab, property, value),
+								handleEquipmentPropertyChange(activeTab as keyof EquipmentSlots, property, value),
 						)}
 				</>
 			)}
@@ -1079,6 +1200,13 @@ export default function EquipmentForm({
 				onConfirm={handleRenameConfirm}
 				currentName={renameModalState.currentName}
 				equipmentId={renameModalState.equipmentId || ''}
+			/>
+
+			{/* メッセージモーダル */}
+			<MessageModal
+				isOpen={messageModalState.isOpen}
+				onClose={() => setMessageModalState({ isOpen: false, message: '' })}
+				message={messageModalState.message}
 			/>
 		</section>
 	)

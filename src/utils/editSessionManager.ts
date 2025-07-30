@@ -73,6 +73,27 @@ export function updateEditSessionProperties(
 }
 
 /**
+ * 編集セッション中の装備の精錬値を更新
+ */
+export function updateEditSessionRefinement(
+	id: string,
+	refinement: number,
+): boolean {
+	const sessionKey = createSessionKey(id)
+	const sessionEquipment = editSessions.get(sessionKey)
+	if (!sessionEquipment) {
+		return false
+	}
+
+	// 精錬値を更新
+	sessionEquipment.refinement = refinement
+	sessionEquipment.updatedAt = new Date().toISOString()
+
+	editSessions.set(sessionKey, sessionEquipment)
+	return true
+}
+
+/**
  * 編集セッション中の装備の名前を更新
  */
 export function updateEditSessionName(id: string, newName: string): boolean {

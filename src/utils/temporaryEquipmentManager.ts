@@ -76,6 +76,26 @@ export function updateTemporaryEquipmentProperties(
 }
 
 /**
+ * 仮データ装備の精錬値を更新
+ */
+export function updateTemporaryEquipmentRefinement(
+	id: string,
+	refinement: number,
+): boolean {
+	const equipment = temporaryEquipments.get(id)
+	if (!equipment) {
+		return false
+	}
+
+	// 精錬値を更新
+	equipment.refinement = refinement
+	equipment.updatedAt = new Date().toISOString()
+
+	temporaryEquipments.set(id, equipment)
+	return true
+}
+
+/**
  * 仮データ装備の名前を更新
  */
 export function updateTemporaryEquipmentName(

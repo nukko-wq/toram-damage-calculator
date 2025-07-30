@@ -35,6 +35,7 @@ import {
 	saveCustomEquipment,
 	deleteCustomEquipment,
 	updateCustomEquipmentProperties,
+	updateCustomEquipmentRefinement,
 	hasTemporaryEquipments,
 	hasEditSessions,
 	renameCustomEquipment,
@@ -586,6 +587,25 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					return success
 				} catch (error) {
 					console.error('カスタム装備プロパティ更新エラー:', error)
+					throw error
+				}
+			},
+
+			// カスタム装備の精錬値を更新
+			updateCustomEquipmentRefinement: async (equipmentId, refinement) => {
+				try {
+					const success = updateCustomEquipmentRefinement(
+						equipmentId,
+						refinement,
+					)
+					if (success) {
+						// データベースレイヤーでの変更を検知するため、差分チェックを強制実行
+						const dataUpdate = createDataUpdate(set, get)
+						dataUpdate({}, 'updateCustomEquipmentRefinement')
+					}
+					return success
+				} catch (error) {
+					console.error('カスタム装備精錬値更新エラー:', error)
 					throw error
 				}
 			},
