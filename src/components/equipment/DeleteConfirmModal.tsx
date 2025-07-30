@@ -180,7 +180,7 @@ export default function DeleteConfirmModal({
 								type="button"
 								onClick={handleClose}
 								disabled={isDeleting}
-								className="px-4 py-2 text-sm font-medium text-white bg-gray-400/80 rounded-md hover:bg-gray-500 transition-colors disabled:opacity-50 cursor-pointer"
+								className="px-4 py-2 text-sm font-medium text-white bg-gray-400/80 rounded-md hover:bg-gray-400 transition-colors disabled:opacity-50 cursor-pointer"
 							>
 								キャンセル
 							</button>
@@ -188,7 +188,7 @@ export default function DeleteConfirmModal({
 								type="button"
 								onClick={handleConfirm}
 								disabled={isDeleting}
-								className="px-4 py-2 text-sm font-medium text-white bg-rose-400/80 border rounded-md hover:bg-rose-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+								className="px-4 py-2 text-sm font-medium text-white bg-rose-400/80 rounded-md hover:bg-rose-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
 							>
 								{isDeleting ? '削除中...' : '削除する'}
 							</button>
