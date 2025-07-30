@@ -333,8 +333,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 						<div className="flex items-center gap-1">
 							<input
-								type="text"
-								inputMode="numeric"
+								type="number"
+								min="50"
+								max="250"
+								step="1"
 								value={tempAdaptationValue}
 								onChange={(e) => {
 									const inputValue = e.target.value
