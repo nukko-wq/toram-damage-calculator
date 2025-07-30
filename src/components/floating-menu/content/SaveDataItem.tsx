@@ -1,6 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { EllipsisVertical, Edit, Trash2 } from 'lucide-react'
+import {
+	Button,
+	Menu,
+	MenuItem,
+	MenuTrigger,
+	Popover,
+} from 'react-aria-components'
 import type { SaveData } from '@/types/calculator'
 import DeleteConfirmModal from './modals/DeleteConfirmModal'
 import RenameModal from './modals/RenameModal'
@@ -143,54 +151,41 @@ export default function SaveDataItem({
 					<span>読み込み</span>
 				</button>
 
-				{/* 他のアクションボタン */}
-				<div className="flex items-center space-x-1">
-					{!isMainData && (
-						<>
-							<button
-								type="button"
-								onClick={handleRenameButtonClick}
-								className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded transition-colors duration-150 cursor-pointer"
-								title="名前を変更"
-							>
-								<svg
-									className="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+				{/* メニューボタン */}
+				{!isMainData && (
+					<MenuTrigger>
+						<Button
+							aria-label="メニュー"
+							className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors duration-150 cursor-pointer"
+						>
+							<EllipsisVertical className="w-[18px] h-[18px] text-gray-500" />
+						</Button>
+						<Popover placement="bottom end">
+							<Menu className="bg-white border border-gray-200 rounded-lg shadow-md min-w-[160px] text-sm z-50 outline-hidden">
+								<MenuItem
+									id="rename"
+									className="px-3 py-2 outline-none hover:bg-blue-50 cursor-pointer rounded-t-lg"
+									onAction={handleRenameButtonClick}
 								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-									/>
-								</svg>
-							</button>
-
-							<button
-								type="button"
-								onClick={handleDeleteButtonClick}
-								className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors duration-150 cursor-pointer"
-								title="削除"
-							>
-								<svg
-									className="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+									<div className="flex items-center gap-2">
+										<Edit className="w-4 h-4 text-gray-700" />
+										<span className="text-sm text-gray-700">名前を変更</span>
+									</div>
+								</MenuItem>
+								<MenuItem
+									id="delete"
+									className="px-3 py-2 outline-none hover:bg-blue-50 text-red-600 cursor-pointer rounded-b-lg"
+									onAction={handleDeleteButtonClick}
 								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-									/>
-								</svg>
-							</button>
-						</>
-					)}
-				</div>
+									<div className="flex items-center gap-2">
+										<Trash2 className="w-4 h-4" />
+										<span className="text-sm">削除</span>
+									</div>
+								</MenuItem>
+							</Menu>
+						</Popover>
+					</MenuTrigger>
+				)}
 			</div>
 
 			{/* 名前変更モーダル */}
