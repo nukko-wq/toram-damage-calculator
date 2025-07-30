@@ -124,7 +124,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					<button
 						type="button"
 						onClick={handleMobileDamageToggle}
-						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
+						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer outline-blue-500 focus:outline-blue-500 ${
 							showDamagePreview
 								? 'bg-blue-300 text-white'
 								: 'bg-blue-300 text-white'
@@ -154,7 +154,7 @@ export default React.memo<ResultToggleBarProps>(function ResultToggleBar({
 					<button
 						type="button"
 						onClick={handleMobileStatusToggle}
-						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer ${
+						className={`inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 cursor-pointer outline-blue-500 focus:outline-blue-500 	${
 							showStatusPreview
 								? 'bg-blue-300 text-white'
 								: 'bg-blue-300 text-white'
