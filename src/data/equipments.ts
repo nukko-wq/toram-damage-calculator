@@ -147,6 +147,20 @@ export const equipmentsData: EquipmentsData = {
 				},
 			},
 			{
+				id: 'dca4f0a5-f4aa-4ec0-a3bf-c48d2536b746',
+				name: 'パトリダブレイド',
+				properties: {
+					ElementAdvantage_Rate: 25,
+					ATK_Rate: 12,
+					STR_Rate: 10,
+					AttackMPRecovery: 15,
+					Accuracy_Rate: 30,
+					Anticipate_Rate: 10,
+					EarthResistance_Rate: 15,
+					AilmentResistance_Rate: 10,
+				},
+			},
+			{
 				id: 'f8b2c4d6-e9a1-4c3b-8f2d-5e7a9b1c3d4f',
 				name: '10周年魔導具',
 				properties: {
@@ -193,7 +207,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					ATK_Rate: 12,
 					STR_Rate: 10,
-					CriticalDamage_Rate: 21,
+					CriticalDamage: 21,
 					Critical: 25,
 					MATK_Rate: -12,
 					MagicalPenetration_Rate: -7,

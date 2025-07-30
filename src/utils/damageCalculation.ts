@@ -84,7 +84,7 @@ export interface DamageCalculationInput {
 
 	// UI制御値
 	userSettings: {
-		familiarity: number // 慣れ(50-250%)
+		adaptation: number // 慣れ(50-250%)
 		currentDistance: 'short' | 'long' | 'disabled' // 現在の距離判定
 		damageType: 'critical' | 'graze' | 'expected' | 'white' // ダメージ判定
 	}
@@ -186,9 +186,9 @@ export interface DamageCalculationSteps {
 	}
 
 	// ステップ6: 慣れ
-	step6_familiarity: {
-		beforeFamiliarity: number
-		familiarityRate: number
+	step6_adaptation: {
+		beforeAdaptation: number
+		adaptationRate: number
 		result: number
 	}
 
@@ -247,7 +247,8 @@ export function calculateDamage(
 	}
 	const step1Result = calculateBaseDamage(input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ1結果: ${step1Result}`)
+		const hasDecimal = step1Result % 1 !== 0
+		console.log(`ステップ1結果: ${step1Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ2: 固定値加算
@@ -256,7 +257,8 @@ export function calculateDamage(
 	}
 	let step2Result = applyFixedValues(step1Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ2結果: ${step2Result}`)
+		const hasDecimal = step2Result % 1 !== 0
+		console.log(`ステップ2結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ2a: クリティカルダメージ補正（クリティカル時のみ）
@@ -266,7 +268,8 @@ export function calculateDamage(
 		}
 		step2Result = applyCriticalDamage(step2Result, input, steps)
 		if (process.env.NODE_ENV === 'development') {
-			console.log(`ステップ2a結果: ${step2Result}`)
+			const hasDecimal = step2Result % 1 !== 0
+			console.log(`ステップ2a結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 		}
 	}
 
@@ -276,7 +279,8 @@ export function calculateDamage(
 	}
 	const step3Result = applyElementAdvantage(step2Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ3結果: ${step3Result}`)
+		const hasDecimal = step3Result % 1 !== 0
+		console.log(`ステップ3結果: ${step3Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ4: スキル倍率補正
@@ -285,7 +289,8 @@ export function calculateDamage(
 	}
 	const step4Result = applySkillMultiplier(step3Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ4結果: ${step4Result}`)
+		const hasDecimal = step4Result % 1 !== 0
+		console.log(`ステップ4結果: ${step4Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ5: 抜刀%補正 (Phase 3で実装)
@@ -294,16 +299,18 @@ export function calculateDamage(
 	}
 	const step5Result = applyUnsheatheRate(step4Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ5結果: ${step5Result}`)
+		const hasDecimal = step5Result % 1 !== 0
+		console.log(`ステップ5結果: ${step5Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ6: 慣れ補正 (Phase 3で実装)
 	if (process.env.NODE_ENV === 'development') {
 		console.log('\n--- ステップ6: 慣れ補正 ---')
 	}
-	const step6Result = applyFamiliarity(step5Result, input, steps)
+	const step6Result = applyAdaptation(step5Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ6結果: ${step6Result}`)
+		const hasDecimal = step6Result % 1 !== 0
+		console.log(`ステップ6結果: ${step6Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ7: 距離補正 (Phase 3で実装)
@@ -312,21 +319,19 @@ export function calculateDamage(
 	}
 	const step7Result = applyDistance(step6Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ7結果: ${step7Result}`)
+		const hasDecimal = step7Result % 1 !== 0
+		console.log(`ステップ7結果: ${step7Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ8: コンボ補正 (Phase 3で実装)
 	if (process.env.NODE_ENV === 'development') {
 		console.log('\n--- ステップ8: コンボ補正 ---')
 	}
-	// コンボ補正前に小数点を切り捨て
-	const step7ResultFloored = Math.floor(step7Result)
-	if (process.env.NODE_ENV === 'development' && step7Result !== step7ResultFloored) {
-		console.log(`コンボ補正前切り捨て: ${step7Result} → ${step7ResultFloored}`)
-	}
-	const step8Result = applyCombo(step7ResultFloored, input, steps)
+	// コンボ補正は小数点を保持したまま計算
+	const step8Result = applyCombo(step7Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ8結果: ${step8Result}`)
+		const hasDecimal = step8Result % 1 !== 0
+		console.log(`ステップ8結果: ${step8Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ9: パッシブ倍率補正（プレースホルダー）
@@ -335,7 +340,8 @@ export function calculateDamage(
 	}
 	const step9Result = applyPassiveMultiplier(step8Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ9結果: ${step9Result}`)
+		const hasDecimal = step9Result % 1 !== 0
+		console.log(`ステップ9結果: ${step9Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// ステップ10: ブレイブ倍率補正
@@ -344,10 +350,11 @@ export function calculateDamage(
 	}
 	const baseDamage = applyBraveMultiplier(step9Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
-		console.log(`ステップ10結果: ${baseDamage}`)
+		const hasDecimal = baseDamage % 1 !== 0
+		console.log(`ステップ10結果: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 
 		console.log('\n=== 最終結果 ===')
-		console.log('最終baseDamage:', baseDamage)
+		console.log(`最終baseDamage: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
 	}
 
 	// 安定率適用
@@ -425,19 +432,33 @@ function calculateBaseDamage(
 		input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF
 	const defenseType = input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF'
 	const processedDefense = processEnemyDefense(enemyDefense, input, defenseType)
+	
+	// 防御力減算前に小数点を切り捨て
+	const afterResistanceFloored = Math.floor(afterResistance)
+	
+	// 処理後DEFも小数点を切り捨て
+	const processedDefenseFloored = Math.floor(processedDefense)
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log(`敵${defenseType}: ${enemyDefense}`)
-		console.log(`処理後${defenseType}: ${processedDefense}`)
-		console.log(`防御力減算前: ${afterResistance}`)
+		if (processedDefense !== processedDefenseFloored) {
+			console.log(`処理後${defenseType}: ${processedDefense} → ${processedDefenseFloored} (小数点切り捨て)`)
+		} else {
+			console.log(`処理後${defenseType}: ${processedDefenseFloored}`)
+		}
+		if (afterResistance !== afterResistanceFloored) {
+			console.log(`防御力減算前: ${afterResistance} → ${afterResistanceFloored} (小数点切り捨て)`)
+		} else {
+			console.log(`防御力減算前: ${afterResistanceFloored}`)
+		}
 	}
 
-	// 防御力減算後にfloorを適用
-	const result = Math.floor(afterResistance - processedDefense)
+	// 両方とも切り捨て後の値で減算
+	const result = afterResistanceFloored - processedDefenseFloored
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log(
-			`最終結果: ${result} = Math.floor(${afterResistance} - ${processedDefense})`,
+			`最終結果: ${result} = ${afterResistanceFloored} - ${processedDefenseFloored}`,
 		)
 		console.log(`最低保証後: ${Math.max(1, result)}`)
 		console.log('======================================')
@@ -452,8 +473,8 @@ function calculateBaseDamage(
 		physicalResistanceRate: input.resistance.physical,
 		magicalResistanceRate: input.resistance.magical,
 		weaponResistanceRate: input.resistance.weapon,
-		afterResistance,
-		enemyDEF: processedDefense,
+		afterResistance: afterResistanceFloored, // 切り捨て後の値を記録
+		enemyDEF: processedDefenseFloored, // 切り捨て後の値を記録
 		result,
 	}
 
@@ -620,22 +641,22 @@ function applyUnsheatheRate(
 /**
  * ステップ6: 慣れ補正
  */
-function applyFamiliarity(
-	beforeFamiliarity: number,
+function applyAdaptation(
+	beforeAdaptation: number,
 	input: DamageCalculationInput,
 	steps: DamageCalculationSteps,
 ): number {
-	const familiarityRate = input.userSettings.familiarity
+	const adaptationRate = input.userSettings.adaptation
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log('=== ステップ6: 慣れ補正詳細 ===')
-		console.log(`慣れ値: ${familiarityRate}%`)
+		console.log(`慣れ値: ${adaptationRate}%`)
 		console.log(
-			`計算式: Math.floor(${beforeFamiliarity} × ${familiarityRate}/100)`,
+			`計算式: Math.floor(${beforeAdaptation} × ${adaptationRate}/100)`,
 		)
 	}
 
-	const result = Math.floor(beforeFamiliarity * (familiarityRate / 100))
+	const result = Math.floor(beforeAdaptation * (adaptationRate / 100))
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log(`慣れ適用後: ${result}`)
@@ -644,9 +665,9 @@ function applyFamiliarity(
 	}
 
 	// 計算過程を記録
-	steps.step6_familiarity = {
-		beforeFamiliarity,
-		familiarityRate,
+	steps.step6_adaptation = {
+		beforeAdaptation,
+		adaptationRate,
 		result,
 	}
 
@@ -1165,7 +1186,7 @@ export function createDefaultDamageInput(): DamageCalculationInput {
 		passiveMultiplier: 0,
 		braveMultiplier: 0,
 		userSettings: {
-			familiarity: 100,
+			adaptation: 100,
 			currentDistance: 'disabled',
 			damageType: 'white',
 		},

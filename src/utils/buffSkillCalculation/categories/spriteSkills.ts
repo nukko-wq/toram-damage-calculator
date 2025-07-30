@@ -39,9 +39,9 @@ export function calculateEnhanceEffects(
  */
 export function getSpriteSkillBonuses(
 	buffSkillData: Record<string, BuffSkillState> | null,
-	enemyDEF: number = 0,
-	enemyMDEF: number = 0,
-	enemyLevel: number = 1,
+	enemyDEF = 0,
+	enemyMDEF = 0,
+	enemyLevel = 1,
 ): Partial<AllBonuses> {
 	const bonuses: Partial<AllBonuses> = {}
 
@@ -67,9 +67,9 @@ export function getSpriteSkillBonuses(
  */
 export function getSpriteSkillBraveMultiplier(
 	buffSkillData: Record<string, BuffSkillState> | null,
-	enemyDEF: number = 0,
-	enemyMDEF: number = 0,
-	enemyLevel: number = 1,
+	enemyDEF = 0,
+	enemyMDEF = 0,
+	enemyLevel = 1,
 ): number {
 	let braveMultiplier = 0
 

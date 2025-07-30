@@ -12,7 +12,7 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
 - **カテゴリ**: `partisan` (パルチザンスキル)
 - **武器種要件**: `両手剣`
 - **消費MP**: 400
-- **表示順序**: 203 (200番台: 槍系統→剣系統へ修正: 103)
+- **表示順序**: 203 (200番台: 槍系統→剣系統へ修正: 104)
 
 ## データ構造定義
 
@@ -23,7 +23,7 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
   // 基本情報
   id: 'l_boomerang_3',
   name: 'Lブーメラン\u2162',
-  order: 103,                    // 剣系統100番台
+  order: 104,                    // 剣系統100番台
   systemGroup: 'sword',          // 剣系統
   category: 'partisan',          // パルチザンカテゴリ
   weaponTypeRequirements: ['両手剣'],
@@ -52,8 +52,8 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
       multiplierFormula: '|1350+基礎DEX|%',
       
       // 慣れ設定
-      familiarity: 'normal',        // 通常慣れ参照
-      familiarityGrant: 'normal',
+      adaptation: 'normal',        // 通常慣れ参照
+      adaptationGrant: 'normal',
       
       // 補正適用設定
       canUseUnsheathePower: false,   // 抜刀威力適用可能
@@ -76,8 +76,8 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
       multiplierFormula: '|1350+基礎DEX|%',
       
       // 慣れ設定
-      familiarity: 'normal',        // 通常慣れ参照
-      familiarityGrant: 'normal',
+      adaptation: 'normal',        // 通常慣れ参照
+      adaptationGrant: 'normal',
       
       // 補正適用設定
       canUseUnsheathePower: false,   // 抜刀威力適用可能
@@ -126,7 +126,7 @@ class StandardCalculator extends SkillHitCalculator {
 ## UI表示仕様
 
 ### スキル選択ドロップダウン
-- **表示位置**: 剣系統グループ内、order順で`moon_slash`(102)の後
+- **表示位置**: 剣系統グループ内、order順で`moon_slash`(103)の後
 - **表示名**: `Lブーメラン\u2162`
 - **武器種フィルタ**: 両手剣装備時のみ表示
 

@@ -392,6 +392,7 @@ export interface CalculatorData {
 	register: RegisterFormData // レジスタ他データ
 	attackSkill: AttackSkillFormData // 攻撃スキルデータ
 	powerOptions: PowerOptions // ダメージプレビュー威力オプション設定
+	adaptationMultiplier: number // 慣れ倍率 (50-250%)
 }
 
 // 計算結果
@@ -843,7 +844,7 @@ export type AttackSkillCategory =
 export type PowerReferenceType = 'totalATK' | 'ATK' | 'MATK' // 将来拡張: 'spearMATK', 'STR', 'INT', etc.
 
 // 慣れタイプ
-export type FamiliarityType = 'physical' | 'magical' | 'normal'
+export type AdaptationType = 'physical' | 'magical' | 'normal'
 
 // 攻撃段階情報
 export interface AttackHit {
@@ -862,8 +863,8 @@ export interface AttackHit {
 	fixedDamageFormula?: string // 固定値の計算式説明（例: "400", "基礎INT/2"）
 
 	// 補正適用
-	familiarity: FamiliarityType // 慣れ参照
-	familiarityGrant: FamiliarityType // 慣れ付与
+	adaptation: AdaptationType // 慣れ参照
+	adaptationGrant: AdaptationType // 慣れ付与
 	canUseUnsheathePower: boolean // 抜刀威力適用可否
 	canUseLongRange: boolean // ロングレンジ適用可否
 	canUseShortRangePower: boolean // 近距離威力適用可否
@@ -920,8 +921,8 @@ export interface CalculatedHit {
 	fixedDamageFormula?: string // 固定値の計算式説明
 
 	// 慣れ情報
-	familiarityReference: FamiliarityType
-	familiarityGrant: FamiliarityType
+	adaptationReference: AdaptationType
+	adaptationGrant: AdaptationType
 
 	// 補正適用
 	canUseUnsheathePower: boolean

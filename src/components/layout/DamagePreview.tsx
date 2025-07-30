@@ -29,6 +29,14 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		(state) => state.updatePowerOptions,
 	)
 
+	// 慣れ倍率をZustandストアから取得・更新
+	const adaptationMultiplier = useCalculatorStore(
+		(state) => state.data.adaptationMultiplier || 100,
+	)
+	const updateAdaptationMultiplier = useCalculatorStore(
+		(state) => state.updateAdaptationMultiplier,
+	)
+
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
 
@@ -85,6 +93,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			return calculateDamageWithService(calculatorData, calculationResults, {
 				powerOptions,
 				debug: false,
+				adaptationMultiplier,
 			})
 		} catch (error) {
 			console.error('ダメージ計算エラー:', error)
@@ -106,7 +115,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 			}
 		}
-	}, [calculatorData, calculationResults, powerOptions])
+	}, [calculatorData, calculationResults, powerOptions, adaptationMultiplier])
 
 	if (!isVisible) {
 		return null
@@ -248,7 +257,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 									{damageResults.normal.max.toLocaleString()}
 								</td>
 								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
-									{damageResults.normal.maxStability ? `${damageResults.normal.maxStability}%` : '100%'}
+									{damageResults.normal.maxStability
+										? `${damageResults.normal.maxStability}%`
+										: '100%'}
 								</td>
 								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-semibold text-gray-700 font-roboto">
 									{captureData
@@ -286,13 +297,65 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					</table>
 				</div>
 
-				{/* 慣れ倍率スライダー（後で実装予定の枠） */}
-				<div className="sm:p-2 flex items-center">
-					<div className="text-xs sm:text-[13px] font-medium text-gray-700">
-						慣れ倍率
+				{/* 慣れ倍率スライダー */}
+				<div className="sm:p-2 border-b-2 border-blue-200">
+					<div className="flex items-center gap-2 sm:gap-4">
+						<div className="flex items-center gap-2">
+							<label className="text-[13px] font-semibold text-gray-700">
+								慣れ倍率
+							</label>
+							<div className="text-[13px] font-semibold text-gray-700 min-w-12 text-center">
+								{adaptationMultiplier}%
+							</div>
+						</div>
+						<div className="flex-1">
+							<input
+								type="range"
+								min="50"
+								max="250"
+								value={adaptationMultiplier}
+								onChange={(e) =>
+									updateAdaptationMultiplier(Number(e.target.value))
+								}
+								className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+								style={{
+									background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
+								}}
+							/>
+						</div>
+						<div className="flex items-center gap-1">
+							<input
+								type="number"
+								min="50"
+								max="250"
+								value={adaptationMultiplier}
+								onChange={(e) => {
+									const value = Number(e.target.value)
+									// 範囲チェック
+									if (value >= 50 && value <= 250) {
+										updateAdaptationMultiplier(value)
+									} else if (value < 50) {
+										updateAdaptationMultiplier(50)
+									} else if (value > 250) {
+										updateAdaptationMultiplier(250)
+									}
+								}}
+								onBlur={(e) => {
+									// フォーカスを失った時の最終調整
+									const value = Number(e.target.value)
+									if (Number.isNaN(value) || value < 50) {
+										updateAdaptationMultiplier(50)
+									} else if (value > 250) {
+										updateAdaptationMultiplier(250)
+									}
+								}}
+								className="w-12 pl-1.5 pr-1 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+							/>
+							<span className="text-xs text-gray-600">%</span>
+						</div>
 					</div>
-					<div className="h-8 bg-gray-100 rounded flex items-center justify-center">
-						<span className="text-xs text-gray-500">スライダー実装予定</span>
+					<div className="mt-1 text-xs text-gray-500 ml-0">
+						慣れ倍率は最小50％から最大250％の範囲で変更できます。
 					</div>
 				</div>
 
@@ -314,7 +377,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</li>
 					</ul>
 
-					<div className="space-y-1">
+					<div className="space-y-0.5 sm:space-y-1">
 						{/* ボス戦難易度 */}
 						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
 							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">

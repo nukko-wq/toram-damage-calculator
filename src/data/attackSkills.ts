@@ -33,8 +33,8 @@ const attackSkillsRawData: AttackSkill[] = [
 					'片手剣装備時：威力+基礎DEX/2%',
 					'両手剣装備時：威力+基礎STR%',
 				],
-				familiarity: 'physical',
-				familiarityGrant: 'physical',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -44,11 +44,58 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// メテオブレイカー
+	{
+		id: 'meteor_breaker',
+		name: 'メテオブレイカー',
+		order: 102,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['片手剣', '両手剣', '双剣'],
+		mpCost: 600,
+		multiplierFormula: '600% (両手剣装備時+200%+基礎STR/10%)',
+		fixedDamageFormula: '1hit目600、2hit目0',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 600, // 表示用（実際の計算は外部）
+				fixedDamage: 600, // 1hit目固定ダメージ600
+				multiplierFormula: '両手剣装備時：威力+200%+基礎STR/10%',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 600, // 表示用（実際の計算は外部）
+				fixedDamage: 0, // 2hit目固定ダメージ0
+				multiplierFormula: '片手剣装備時：威力+基礎DEX/2%',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// ムーンスラッシュ（特殊計算の例）
 	{
 		id: 'moon_slash',
 		name: 'ムーンスラッシュ',
-		order: 102,
+		order: 103,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['片手剣'],
@@ -64,8 +111,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'ATK',
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 表示用（実際の計算は外部）
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -81,8 +128,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 0, // 表示用（基礎INT/2は外部計算）
 				multiplierFormula: '威力+補正後STR%',
 				fixedDamageFormula: '固定値+基礎INT/2',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -113,8 +160,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -130,8 +177,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -147,8 +194,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '400+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -179,8 +226,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -196,8 +243,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -213,8 +260,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 100, // 表示用（実際の計算は外部）
 				multiplierFormula: '威力+補正後STR/5%',
 				fixedDamageFormula: '槍装備時：威力+100% 固定値+100',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -244,8 +291,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 125, // 表示用（実際の計算は外部）
 				fixedDamage: 50, // 表示用（実際の計算は外部）
 				multiplierFormula: '杖装備時：威力+25%',
-				familiarity: 'magical',
-				familiarityGrant: 'magical',
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -275,8 +322,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 固定ダメージ400
 				multiplierFormula: '杖装備時：威力+100%',
-				familiarity: 'magical',
-				familiarityGrant: 'magical',
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -306,8 +353,39 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 200, // 表示用（実際の計算は外部）
 				fixedDamage: 420, // 固定ダメージ420
 				multiplierFormula: '杖装備時：威力+100%',
-				familiarity: 'magical',
-				familiarityGrant: 'magical',
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
+
+	// 術式/ストーム（1/6hit）- ストーム延長
+	{
+		id: 'storm_1_6hit_extend',
+		name: '術式/ストーム(1/6hit)-ストーム延長',
+		order: 604,
+		systemGroup: 'magic',
+		category: 'staff',
+		weaponTypeRequirements: ['杖', '魔導具'],
+		mpCost: 400,
+		multiplierFormula: '100% (杖装備時150%)',
+		fixedDamageFormula: '420',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'magical',
+				referenceDefense: 'MDEF',
+				referenceResistance: 'magical',
+				powerReference: 'MATK',
+				multiplier: 100, // 表示用（実際の計算は外部）
+				fixedDamage: 420, // 固定ダメージ420
+				multiplierFormula: '杖装備時：威力+50%',
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -337,8 +415,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 100,
 				fixedDamage: 100,
 				multiplierFormula: '矢装備時：威力+補正後DEX/2%',
-				familiarity: 'physical',
-				familiarityGrant: 'physical',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: true,
 				canUseShortRangePower: true,
@@ -351,7 +429,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'l_boomerang_3',
 		name: 'Lブーメラン\u2162',
-		order: 103,
+		order: 104,
 		systemGroup: 'sword',
 		category: 'partizan',
 		weaponTypeRequirements: ['両手剣'],
@@ -368,8 +446,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
 				multiplierFormula: '威力+基礎DEX%',
-				familiarity: 'normal',
-				familiarityGrant: 'normal',
+				adaptation: 'normal',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: false,
@@ -385,13 +463,76 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 1350, // 表示用（実際の計算は外部）
 				fixedDamage: 400,
 				multiplierFormula: '威力+基礎DEX%',
-				familiarity: 'normal',
-				familiarityGrant: 'normal',
+				adaptation: 'normal',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: false,
 				canUseLongRangePower: false,
 				specialEffects: ['貫通ボーナス50%'],
+			},
+		],
+	},
+
+	// ストームブレイザー（10スタック）
+	{
+		id: 'storm_blazer_10stack',
+		name: 'ストームブレイザー(10スタック)',
+		order: 105,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['両手剣'],
+		mpCost: 200,
+		multiplierFormula: '1000%',
+		fixedDamageFormula: '200+補正後VIT',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1000, // 表示用（実際の計算は外部）
+				fixedDamage: 200, // 表示用（実際は200+補正後VIT）
+				fixedDamageFormula: '固定値+補正後VIT',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
+
+	// ストームブレイザー（1スタック）
+	{
+		id: 'storm_blazer_1stack',
+		name: 'ストームブレイザー(1スタック)',
+		order: 106,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['両手剣'],
+		mpCost: 200,
+		multiplierFormula: '75%',
+		fixedDamageFormula: '150+補正後VIT',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 75, // 表示用（実際の計算は外部）
+				fixedDamage: 150, // 表示用（実際は150+補正後VIT）
+				multiplierFormula: '75%',
+				fixedDamageFormula: '150+補正後VIT',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
 			},
 		],
 	},
@@ -418,8 +559,8 @@ const attackSkillsRawData: AttackSkill[] = [
 				fixedDamage: 50, // 仮の値
 				multiplierFormula: '仮の値（要仕様書設計）',
 				fixedDamageFormula: '仮の値（要仕様書設計）',
-				familiarity: 'physical',
-				familiarityGrant: 'normal',
+				adaptation: 'physical',
+				adaptationGrant: 'normal',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,

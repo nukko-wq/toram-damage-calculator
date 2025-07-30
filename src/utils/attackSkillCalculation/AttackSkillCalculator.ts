@@ -4,11 +4,15 @@ import {
 	CycloneArrowCalculator,
 	LBoomerang3Calculator,
 	MagicArrowCalculator,
+	MeteorBreakerCalculator,
 	MoonSlashCalculator,
 	type SkillHitCalculator,
 	StandardCalculator,
 	Storm1Hit6Calculator,
 	Storm1Hit6NewCalculator,
+	Storm1Hit6ExtendCalculator,
+	StormBlazer10StackCalculator,
+	StormBlazer1StackCalculator,
 	StrikeStabAilmentCalculator,
 	StrikeStabCalculator,
 } from './calculators'
@@ -61,8 +65,14 @@ export class AttackSkillCalculator {
 		switch (skillId) {
 			case 'l_boomerang_3':
 				return new LBoomerang3Calculator()
+			case 'meteor_breaker':
+				return new MeteorBreakerCalculator()
 			case 'moon_slash':
 				return new MoonSlashCalculator()
+			case 'storm_blazer_10stack':
+				return new StormBlazer10StackCalculator()
+			case 'storm_blazer_1stack':
+				return new StormBlazer1StackCalculator()
 			case 'strike_stab':
 				return new StrikeStabCalculator()
 			case 'strike_stab_ailment':
@@ -73,6 +83,8 @@ export class AttackSkillCalculator {
 				return new Storm1Hit6Calculator()
 			case 'storm_1_6hit_new':
 				return new Storm1Hit6NewCalculator()
+			case 'storm_1_6hit_extend':
+				return new Storm1Hit6ExtendCalculator()
 			case 'buster_blade':
 				return new BusterBladeCalculator()
 			case 'cyclone_arrow':

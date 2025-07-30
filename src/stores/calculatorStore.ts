@@ -29,8 +29,6 @@ import {
 	type CalculationResultSettings,
 } from '@/types/calculationResult'
 import {
-	hasDataDifferences,
-	createDataSnapshot,
 	isValidCalculatorData,
 } from '@/utils/differenceDetection'
 import {
@@ -62,22 +60,19 @@ const initialCalculationSettings: CalculationSettings = {
 	calculateCritical: true,
 }
 
-// 差分検知付きデータ更新ヘルパー
-const createDataUpdateWithDifferenceCheck = (set: any, get: any) => {
+// シンプルなデータ更新ヘルパー
+const createDataUpdate = (set: any, get: any) => {
 	return (dataUpdates: Partial<CalculatorData>, actionName: string) => {
 		set(
 			(state: CalculatorStore) => {
 				const newData = { ...state.data, ...dataUpdates }
-				const hasChanges = hasDataDifferences(newData, state.lastSavedData)
 
 				// データ更新時に計算結果も自動更新
 				const results = calculateResults(newData)
 
-				// 基準ダメージ計算結果をクリア（次回アクセス時に再計算）
 				return {
 					data: newData,
-					hasUnsavedChanges: hasChanges, // 実際に差分がある場合のみtrueに設定
-					hasRealChanges: hasChanges,
+					hasUnsavedChanges: true, // データ変更時は常に未保存状態
 					calculationResults: results, // 計算結果を自動更新
 					baselineDamageResult: null, // データ更新時はクリア
 				}
@@ -100,10 +95,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			isCalculating: false,
 			calculationSettings: initialCalculationSettings,
 
-			// ===== 差分検知システム =====
-			lastSavedData: null,
-			lastSavedUIState: null,
-			hasRealChanges: false,
+			// ===== 削除された差分検知システム =====
+			// lastSavedData: null,
+			// lastSavedUIState: null,
+			// hasRealChanges: false,
 
 			// ===== ステータス計算結果表示 =====
 			calculationResults: null,
@@ -129,6 +124,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				const migratedData = {
 					...data,
 					powerOptions: data.powerOptions || createInitialPowerOptions(),
+					adaptationMultiplier: data.adaptationMultiplier ?? 100, // 慣れ倍率のマイグレーション
 				}
 				set({ data: migratedData }, false, 'setData')
 			},
@@ -145,46 +141,11 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				set({ isLoading: value }, false, 'setIsLoading')
 			},
 
-			// ===== 差分検知メソッド =====
-			updateLastSavedData: (data) => {
-				const snapshot = createDataSnapshot(data)
-				set(
-					{
-						lastSavedData: snapshot,
-						hasRealChanges: false,
-					},
-					false,
-					'updateLastSavedData',
-				)
-			},
-
-			checkForRealChanges: () => {
-				const { data, lastSavedData } = get()
-				try {
-					return hasDataDifferences(data, lastSavedData)
-				} catch (error) {
-					console.error('差分チェックエラー:', error)
-					// エラー時は安全側に倒して差分ありとみなす
-					return true
-				}
-			},
-
-			updateLastSavedUIState: (saveId) => {
-				// UIStoreから現在の状態を取得してスナップショットを作成
-				if (typeof window !== 'undefined') {
-					const { useUIStore } = require('./uiStore')
-					const currentCategory = useUIStore.getState().getStatusPreviewCategory(saveId)
-					set(
-						{ lastSavedUIState: { statusPreviewCategory: currentCategory } },
-						false,
-						'updateLastSavedUIState',
-					)
-				}
-			},
-
-			setHasRealChanges: (value) => {
-				set({ hasRealChanges: value }, false, 'setHasRealChanges')
-			},
+			// ===== 削除された差分検知メソッド =====
+			// updateLastSavedData: (data) => {...},
+			// checkForRealChanges: () => {...},
+			// updateLastSavedUIState: (saveId) => {...},
+			// setHasRealChanges: (value) => {...},
 
 			// ===== セーブデータ管理 =====
 			loadSaveData: async (data) => {
@@ -204,6 +165,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 									migratedData.register,
 								)
 							}
+							// 慣れ倍率のマイグレーション
+							if (migratedData.adaptationMultiplier === undefined) {
+								migratedData.adaptationMultiplier = 100
+							}
 							return migratedData
 						})()
 					: (() => {
@@ -216,26 +181,12 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				// 計算結果を更新
 				const results = calculateResults(validData)
 
-				// データを設定し、差分状態をリセット
-				const snapshot = createDataSnapshot(validData)
+				// データを設定
 				set({
 					data: validData,
-					lastSavedData: snapshot,
 					hasUnsavedChanges: false,
-					hasRealChanges: false,
 					calculationResults: results, // 計算結果も更新
 				})
-
-				// UIStateのスナップショットも更新（セーブデータ読み込み時）
-				if (typeof window !== 'undefined') {
-					try {
-						const { useSaveDataStore } = require('./saveDataStore')
-						const currentSaveId = useSaveDataStore.getState().currentSaveId
-						get().updateLastSavedUIState(currentSaveId)
-					} catch (error) {
-						console.warn('UIState snapshot update failed during loadSaveData:', error)
-					}
-				}
 
 				// フォームの変更検知を同期的に無効化（遅延によるちらつきを防止）
 				// setTimeout削除により、より予測可能な状態管理を実現
@@ -250,85 +201,53 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					const { data } = get()
 					await saveCurrentData(data)
 
-					// 保存完了後、lastSavedDataを更新し差分状態をリセット
-					const snapshot = createDataSnapshot(data)
+					// 保存完了後、未保存フラグをリセット
 					set({
-						lastSavedData: snapshot,
 						hasUnsavedChanges: false,
-						hasRealChanges: false,
 					})
-
-					// UIStateのスナップショットも更新（保存時）
-					if (typeof window !== 'undefined') {
-						try {
-							const { useSaveDataStore } = require('./saveDataStore')
-							const currentSaveId = useSaveDataStore.getState().currentSaveId
-							get().updateLastSavedUIState(currentSaveId)
-						} catch (error) {
-							console.warn('UIState snapshot update failed during saveCurrentData:', error)
-						}
-					}
 				} catch (error) {
 					console.error('データ保存エラー:', error)
 					throw error
 				}
 			},
 
-			checkUIChanges: (saveId) => {
-				// UIStoreの現在の状態と保存時の状態を比較
-				const { lastSavedUIState } = get()
-				
-				if (typeof window !== 'undefined' && lastSavedUIState) {
-					const { useUIStore } = require('./uiStore')
-					const currentCategory = useUIStore.getState().getStatusPreviewCategory(saveId)
-					const savedCategory = lastSavedUIState.statusPreviewCategory
-					
-					// UI状態に変更があるかチェック
-					const hasUIChanges = currentCategory !== savedCategory
-					
-					// データの変更もチェック
-					const hasDataChanges = get().checkForRealChanges()
-					
-					// どちらかに変更があれば保存ボタンを有効化
-					set({ hasRealChanges: hasUIChanges || hasDataChanges }, false, 'checkUIChanges')
-				}
-			},
+			// checkUIChanges: 削除（差分検知機能の一部）
 
 			// ===== 個別フォーム更新 =====
 			updateBaseStats: (stats) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ baseStats: stats }, 'updateBaseStats')
 			},
 
 			updateMainWeapon: (weapon) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ mainWeapon: weapon }, 'updateMainWeapon')
 			},
 
 			updateSubWeapon: (weapon) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ subWeapon: weapon }, 'updateSubWeapon')
 			},
 
 			updateCrystals: (crystals) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ crystals }, 'updateCrystals')
 			},
 
 			updateEquipment: (equipment) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ equipment }, 'updateEquipment')
 			},
 
 			updateFood: (food) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ food }, 'updateFood')
 			},
 
 			updateEnemy: (enemy) => {
 				// 敵設定はEnemyFormコンポーネント側でenemySettingsStoreに直接保存される
 				// ここでは個別データ（敵選択情報）のみ保存
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate(
 					{
 						enemy: {
@@ -344,12 +263,12 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			updateAttackSkill: (attackSkill) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ attackSkill }, 'updateAttackSkill')
 			},
 
 			updateBuffSkills: (buffSkills) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ buffSkills }, 'updateBuffSkills')
 			},
 
@@ -398,7 +317,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					skills: updatedSkills,
 				}
 
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate(
 					{ buffSkills: updatedBuffSkills },
 					`updateBuffSkillState:${skillId}`,
@@ -477,7 +396,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					skills: updatedSkills,
 				}
 
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate(
 					{ buffSkills: updatedBuffSkills },
 					`updateSkillParameter:${skillId}:${paramType}`,
@@ -485,18 +404,23 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			},
 
 			updateBuffItems: (buffItems) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ buffItems }, 'updateBuffItems')
 			},
 
 			updateRegister: (register) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ register }, 'updateRegister')
 			},
 
 			updatePowerOptions: (powerOptions) => {
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ powerOptions }, 'updatePowerOptions')
+			},
+
+			updateAdaptationMultiplier: (adaptationMultiplier: number) => {
+				const dataUpdate = createDataUpdate(set, get)
+				dataUpdate({ adaptationMultiplier }, 'updateAdaptationMultiplier')
 			},
 
 			updateRegisterEffect: (effectId, enabled) => {
@@ -507,7 +431,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						effect.id === effectId ? { ...effect, isEnabled: enabled } : effect,
 					),
 				}
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ register: updatedRegister }, 'updateRegisterEffect')
 			},
 
@@ -525,7 +449,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							: effect,
 					),
 				}
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ register: updatedRegister }, 'updateRegisterLevel')
 			},
 
@@ -541,7 +465,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						}),
 					})),
 				}
-				const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ register: resetRegister }, 'resetRegisterData')
 			},
 
@@ -656,7 +580,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					)
 					if (success) {
 						// データベースレイヤーでの変更を検知するため、差分チェックを強制実行
-						const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+						const dataUpdate = createDataUpdate(set, get)
 						dataUpdate({}, 'updateCustomEquipmentProperties')
 					}
 					return success
@@ -676,7 +600,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			getUnsavedDataStatus: () => {
 				return {
 					hasUnsavedChanges: get().hasUnsavedChanges,
-					hasRealChanges: get().hasRealChanges,
+					hasRealChanges: get().hasUnsavedChanges, // 差分検知削除により、hasUnsavedChangesと同一
 					hasTemporaryEquipments: hasTemporaryEquipments(),
 					hasEditSessions: hasEditSessions(),
 				}
@@ -779,7 +703,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 								},
 							}
 							// 差分検知システムを使用してデータを更新
-							const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+							const dataUpdate = createDataUpdate(set, get)
 							dataUpdate(
 								{ equipment: updatedEquipment },
 								'updateEquipmentArmorType',
@@ -787,7 +711,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						} else {
 							// 体装備以外やカスタム装備の場合も差分チェックを強制実行
 							// データベースレイヤーでの変更を検知するため、空の更新をトリガー
-							const dataUpdate = createDataUpdateWithDifferenceCheck(set, get)
+							const dataUpdate = createDataUpdate(set, get)
 							dataUpdate({}, 'updateEquipmentArmorType')
 						}
 					}
@@ -929,24 +853,18 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							migratedData.register,
 						)
 					}
+					// 慣れ倍率のマイグレーション（初期化時）
+					if (migratedData.adaptationMultiplier === undefined) {
+						migratedData.adaptationMultiplier = 100
+					}
 
-					// 初期化時に差分検知状態も設定
-					const snapshot = createDataSnapshot(migratedData)
+					// 初期化時のデータ設定
 					set({
 						data: migratedData,
-						lastSavedData: snapshot,
 						hasUnsavedChanges: false,
-						hasRealChanges: false,
 						isInitialized: true,
 						isLoading: false,
 					})
-
-					// UIStateのスナップショットも設定（初期化時）
-					try {
-						get().updateLastSavedUIState(currentSave.id)
-					} catch (error) {
-						console.warn('UIState snapshot update failed during initialization:', error)
-					}
 
 					// 計算結果表示設定の初期化（将来実装）
 					// const store = get()

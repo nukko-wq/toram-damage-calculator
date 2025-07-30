@@ -53,8 +53,8 @@ AttackSkillFormに新しい攻撃スキル「サイクロンアロー」を追�
       fixedDamageFormula: '100',
       
       // 慣れ設定
-      familiarity: 'physical',     // 物理慣れ参照
-      familiarityGrant: 'physical', // 物理慣れ付与
+      adaptation: 'physical',     // 物理慣れ参照
+      adaptationGrant: 'physical', // 物理慣れ付与
       
       // 補正適用設定（保留）
       canUseUnsheathePower: false,  // 保留

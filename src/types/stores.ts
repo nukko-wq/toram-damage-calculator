@@ -54,10 +54,10 @@ export interface CalculatorStore {
 	isLoading: boolean
 	isInitialized: boolean
 
-	// ===== 差分検知システム =====
-	lastSavedData: CalculatorData | null
-	lastSavedUIState: { statusPreviewCategory: string } | null
-	hasRealChanges: boolean
+	// ===== 削除された差分検知システム =====
+	// lastSavedData: CalculatorData | null
+	// lastSavedUIState: { statusPreviewCategory: string } | null
+	// hasRealChanges: boolean
 
 	// ===== 将来の計算結果 =====
 	calculationResult: DamageCalculationResult | null
@@ -78,11 +78,11 @@ export interface CalculatorStore {
 	setHasUnsavedChanges: (value: boolean) => void
 	setIsLoading: (value: boolean) => void
 
-	// ===== 差分検知メソッド =====
-	updateLastSavedData: (data: CalculatorData) => void
-	updateLastSavedUIState: (saveId: string) => void
-	checkForRealChanges: () => boolean
-	setHasRealChanges: (value: boolean) => void
+	// ===== 削除された差分検知メソッド =====
+	// updateLastSavedData: (data: CalculatorData) => void
+	// updateLastSavedUIState: (saveId: string) => void
+	// checkForRealChanges: () => boolean
+	// setHasRealChanges: (value: boolean) => void
 
 	// ===== セーブデータ管理 =====
 	loadSaveData: (data: CalculatorData) => Promise<void>
@@ -120,6 +120,7 @@ export interface CalculatorStore {
 	) => void
 	resetRegisterData: () => void
 	updatePowerOptions: (powerOptions: PowerOptions) => void
+	updateAdaptationMultiplier: (adaptationMultiplier: number) => void
 
 	// ===== カスタム装備管理 =====
 	createTemporaryCustomEquipment: (
