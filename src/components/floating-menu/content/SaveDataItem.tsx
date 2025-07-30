@@ -66,7 +66,7 @@ export default function SaveDataItem({
 			`}
 		>
 			{/* アイコン */}
-			<div className="flex-shrink-0 mr-3">
+			<div className="flex-shrink-0 mr-3 hidden sm:block">
 				{isMainData ? (
 					<svg
 						className="w-5 h-5 text-blue-600"
@@ -119,12 +119,12 @@ export default function SaveDataItem({
 			</div>
 
 			{/* アクションボタン */}
-			<div className="flex-shrink-0 ml-3 flex items-center space-x-2">
+			<div className="flex-shrink-0 ml-1 sm:ml-3 flex items-center space-x-1 sm:space-x-2">
 				{/* 読み込みボタン - プライマリ */}
 				<button
 					type="button"
 					onClick={() => onSelect(saveData.id)}
-					className="flex items-center space-x-1 px-3 py-1.5 text-xs font-medium text-white bg-blue-400/80 hover:bg-blue-400 rounded-md transition-colors duration-150 cursor-pointer focus:outline-none"
+					className="flex items-center space-x-1 px-1.5 sm:px-3 py-1.5 text-xs font-medium text-white bg-blue-400/80 hover:bg-blue-400 rounded-md transition-colors duration-150 cursor-pointer focus:outline-none"
 					title="このセーブデータを読み込む"
 				>
 					<svg
