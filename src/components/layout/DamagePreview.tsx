@@ -333,8 +333,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 						<div className="flex items-center gap-1">
 							<input
-								type="text"
-								inputMode="numeric"
+								type="number"
+								min="50"
+								max="250"
+								step="1"
 								value={tempAdaptationValue}
 								onChange={(e) => {
 									const inputValue = e.target.value
@@ -358,6 +360,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 										updateAdaptationMultiplier(value)
 									} else if (value > 250) {
 										updateAdaptationMultiplier(250)
+									}
+								}}
+								onMouseDown={(e) => {
+									// フォーカス状態でのクリックによる値クリア機能
+									if (document.activeElement === e.target) {
+										updateAdaptationMultiplier(50)
+										setTempAdaptationValue('50')
+										// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
+										setTimeout(() => {
+											const element = e.target as HTMLInputElement
+											if (element) {
+												element.select()
+											}
+										}, 0)
 									}
 								}}
 								onBlur={(e) => {

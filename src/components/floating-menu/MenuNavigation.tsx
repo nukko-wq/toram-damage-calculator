@@ -130,7 +130,7 @@ export default function MenuNavigation({
 }: MenuNavigationProps) {
 	return (
 		<nav
-			className="w-26 sm:w-30 bg-gray-50 border-r border-gray-200 flex flex-col"
+			className="w-26 sm:w-40 bg-gray-50 border-r border-gray-200 flex flex-col"
 			role="navigation"
 			aria-label="メニューナビゲーション"
 		>

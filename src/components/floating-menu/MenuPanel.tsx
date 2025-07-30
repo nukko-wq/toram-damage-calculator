@@ -64,7 +64,7 @@ export default function MenuPanel({
 				id="floating-menu-panel"
 				className={`
 					fixed top-20 right-2 sm:right-4 z-[9999]
-					w-96 lg:w-[500px] max-w-[calc(100vw-1rem)]
+					w-96 sm:w-[580px] max-w-[calc(100vw-1rem)]
 					max-h-[calc(100vh-6rem)]
 					bg-white rounded-lg shadow-2xl
 					border border-gray-200
