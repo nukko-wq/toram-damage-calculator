@@ -362,6 +362,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 										updateAdaptationMultiplier(250)
 									}
 								}}
+								onMouseDown={(e) => {
+									// フォーカス状態でのクリックによる値クリア機能
+									if (document.activeElement === e.target) {
+										updateAdaptationMultiplier(50)
+										setTempAdaptationValue('50')
+										// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
+										setTimeout(() => {
+											const element = e.target as HTMLInputElement
+											if (element) {
+												element.select()
+											}
+										}, 0)
+									}
+								}}
 								onBlur={(e) => {
 									// フォーカスを失った時の最終調整
 									const inputValue = e.target.value
