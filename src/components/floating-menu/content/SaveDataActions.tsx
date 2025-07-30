@@ -5,6 +5,7 @@ import { useCalculatorStore } from '@/stores'
 import ExportModal from './modals/ExportModal'
 import ImportModal from './modals/ImportModal'
 import ImportConfirmModal from './modals/ImportConfirmModal'
+import SaveConfirmModal from './modals/SaveConfirmModal'
 import { exportData, type ExportOptions } from '@/utils/exportManager'
 import {
 	importData,
@@ -21,6 +22,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 		useCalculatorStore()
 
 	// モーダル状態管理
+	const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
 	const [isExportModalOpen, setIsExportModalOpen] = useState(false)
 	const [isImportModalOpen, setIsImportModalOpen] = useState(false)
 	const [isImportConfirmModalOpen, setIsImportConfirmModalOpen] =
@@ -28,10 +30,16 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 	const [importValidationResult, setImportValidationResult] =
 		useState<ImportValidationResult | null>(null)
 
-	// 現在のデータを保存
+	// 保存確認ダイアログを表示
+	const handleSaveButtonClick = () => {
+		setIsSaveConfirmModalOpen(true)
+	}
+
+	// 現在のデータを保存（確認後）
 	const handleSaveCurrentData = async () => {
 		try {
 			await saveCurrentData()
+			setIsSaveConfirmModalOpen(false)
 		} catch (err) {
 			console.error('データ保存エラー:', err)
 		}
@@ -110,7 +118,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 						{/* 現在のデータを保存ボタン */}
 						<button
 							type="button"
-							onClick={handleSaveCurrentData}
+							onClick={handleSaveButtonClick}
 							disabled={false}
 							className={`
 								flex-1 inline-flex items-center justify-center px-3 py-2 
@@ -118,7 +126,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 								transition-colors duration-200
 								text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer
 							`}
-							title="現在のデータを保存"
+							title="データを保存"
 						>
 							<svg
 								className="w-4 h-4 mr-2"
@@ -134,7 +142,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 								/>
 							</svg>
 							<span className="truncate">
-								現在のデータを保存
+								データを保存
 								{unsavedStatus.hasTemporaryEquipments && (
 									<span className="ml-1 text-xs">(仮)</span>
 								)}
@@ -260,6 +268,13 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 				onClose={handleImportCancel}
 				onConfirm={handleImportConfirm}
 				validationResult={importValidationResult}
+			/>
+
+			{/* 保存確認モーダル */}
+			<SaveConfirmModal
+				isOpen={isSaveConfirmModalOpen}
+				onClose={() => setIsSaveConfirmModalOpen(false)}
+				onConfirm={handleSaveCurrentData}
 			/>
 		</>
 	)

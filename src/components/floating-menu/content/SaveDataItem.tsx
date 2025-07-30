@@ -3,6 +3,7 @@
 import type React from 'react'
 import { useState } from 'react'
 import type { SaveData } from '@/types/calculator'
+import DeleteConfirmModal from './modals/DeleteConfirmModal'
 
 interface SaveDataItemProps {
 	saveData: SaveData
@@ -21,6 +22,7 @@ export default function SaveDataItem({
 }: SaveDataItemProps) {
 	const [isEditing, setIsEditing] = useState(false)
 	const [editName, setEditName] = useState(saveData.name)
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
 	const handleStartEdit = () => {
 		setEditName(saveData.name)
@@ -47,10 +49,15 @@ export default function SaveDataItem({
 		}
 	}
 
-	const handleDelete = () => {
-		if (window.confirm(`「${saveData.name}」を削除しますか？`)) {
-			onDelete(saveData.id)
-		}
+	// 削除確認ダイアログを表示
+	const handleDeleteButtonClick = () => {
+		setIsDeleteModalOpen(true)
+	}
+
+	// 削除確認後の処理
+	const handleDeleteConfirm = () => {
+		onDelete(saveData.id)
+		setIsDeleteModalOpen(false)
 	}
 
 	const formatDate = (dateString: string) => {
@@ -187,7 +194,7 @@ export default function SaveDataItem({
 
 							<button
 								type="button"
-								onClick={handleDelete}
+								onClick={handleDeleteButtonClick}
 								className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors duration-150 cursor-pointer"
 								title="削除"
 							>
@@ -209,6 +216,14 @@ export default function SaveDataItem({
 					)}
 				</div>
 			)}
+			
+			{/* 削除確認モーダル */}
+			<DeleteConfirmModal
+				isOpen={isDeleteModalOpen}
+				onClose={() => setIsDeleteModalOpen(false)}
+				onConfirm={handleDeleteConfirm}
+				saveDataName={saveData.name}
+			/>
 		</div>
 	)
 }

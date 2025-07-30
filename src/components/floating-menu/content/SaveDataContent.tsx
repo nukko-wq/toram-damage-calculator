@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import NewSaveDataModal from '@/components/save-data/NewSaveDataModal'
+import NewSaveDataModal from './NewSaveDataModal'
 import { useCalculatorStore, useSaveDataStore } from '@/stores'
 
 import SaveDataActions from './SaveDataActions'

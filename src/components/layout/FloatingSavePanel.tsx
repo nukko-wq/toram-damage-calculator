@@ -1,7 +1,8 @@
 'use client'
 
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import { useCalculatorStore, useSaveDataStore } from '@/stores'
+import SaveConfirmModal from '@/components/floating-menu/content/modals/SaveConfirmModal'
 
 interface FloatingSavePanelProps {
 	className?: string
@@ -14,6 +15,9 @@ export default React.memo<FloatingSavePanelProps>(function FloatingSavePanel({
 	const { saveCurrentData, getUnsavedDataStatus } =
 		useCalculatorStore()
 	const { saveDataList, currentSaveId, isInitialized } = useSaveDataStore()
+	
+	// モーダル状態管理
+	const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
 
 	// 安定した表示名の管理（切り替え中の一時的な不整合状態を吸収）
 	const stableNameRef = useRef<string>('メインデータ')
@@ -44,10 +48,16 @@ export default React.memo<FloatingSavePanelProps>(function FloatingSavePanel({
 		return stableNameRef.current
 	}, [currentSaveId, saveDataList, isInitialized])
 
-	// 現在のデータを保存
+	// 保存確認ダイアログを表示
+	const handleSaveButtonClick = () => {
+		setIsSaveConfirmModalOpen(true)
+	}
+
+	// 現在のデータを保存（確認後）
 	const handleSaveCurrentData = async () => {
 		try {
 			await saveCurrentData()
+			setIsSaveConfirmModalOpen(false)
 		} catch (err) {
 			console.error('データ保存エラー:', err)
 		}
@@ -70,7 +80,7 @@ export default React.memo<FloatingSavePanelProps>(function FloatingSavePanel({
 			{/* 現在のデータを保存ボタン */}
 			<button
 				type="button"
-				onClick={handleSaveCurrentData}
+				onClick={handleSaveButtonClick}
 				disabled={false}
 				className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
 				title="現在のデータを保存"
@@ -96,6 +106,13 @@ export default React.memo<FloatingSavePanelProps>(function FloatingSavePanel({
 					<span className="ml-1 text-xs">(編)</span>
 				)}
 			</button>
+			
+			{/* 保存確認モーダル */}
+			<SaveConfirmModal
+				isOpen={isSaveConfirmModalOpen}
+				onClose={() => setIsSaveConfirmModalOpen(false)}
+				onConfirm={handleSaveCurrentData}
+			/>
 		</div>
 	)
 })
