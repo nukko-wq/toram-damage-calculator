@@ -1,9 +1,9 @@
 'use client'
 
-import type React from 'react'
 import { useState } from 'react'
 import type { SaveData } from '@/types/calculator'
 import DeleteConfirmModal from './modals/DeleteConfirmModal'
+import RenameModal from './modals/RenameModal'
 
 interface SaveDataItemProps {
 	saveData: SaveData
@@ -20,33 +20,18 @@ export default function SaveDataItem({
 	onRename,
 	onDelete,
 }: SaveDataItemProps) {
-	const [isEditing, setIsEditing] = useState(false)
-	const [editName, setEditName] = useState(saveData.name)
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+	const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
 
-	const handleStartEdit = () => {
-		setEditName(saveData.name)
-		setIsEditing(true)
+	// 名前変更モーダルを表示
+	const handleRenameButtonClick = () => {
+		setIsRenameModalOpen(true)
 	}
 
-	const handleSaveEdit = () => {
-		if (editName.trim() && editName.trim() !== saveData.name) {
-			onRename(saveData.id, editName.trim())
-		}
-		setIsEditing(false)
-	}
-
-	const handleCancelEdit = () => {
-		setEditName(saveData.name)
-		setIsEditing(false)
-	}
-
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
-			handleSaveEdit()
-		} else if (e.key === 'Escape') {
-			handleCancelEdit()
-		}
+	// 名前変更確認後の処理
+	const handleRenameConfirm = async (newName: string) => {
+		onRename(saveData.id, newName)
+		setIsRenameModalOpen(false)
 	}
 
 	// 削除確認ダイアログを表示
@@ -121,33 +106,20 @@ export default function SaveDataItem({
 
 			{/* 名前と詳細 */}
 			<div className="flex-1 min-w-0">
-				{isEditing ? (
-					<input
-						type="text"
-						value={editName}
-						onChange={(e) => setEditName(e.target.value)}
-						onBlur={handleSaveEdit}
-						onKeyDown={handleKeyDown}
-						className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-						autoFocus
-					/>
-				) : (
-					<div>
-						<div
-							className={`text-sm font-medium truncate ${isActive ? 'text-blue-900' : 'text-gray-900'}`}
-						>
-							{saveData.name}
-						</div>
-						<div className="text-xs text-gray-500">
-							{formatDate(saveData.updatedAt)}
-						</div>
+				<div>
+					<div
+						className={`text-sm font-medium truncate ${isActive ? 'text-blue-900' : 'text-gray-900'}`}
+					>
+						{saveData.name}
 					</div>
-				)}
+					<div className="text-xs text-gray-500">
+						{formatDate(saveData.updatedAt)}
+					</div>
+				</div>
 			</div>
 
 			{/* アクションボタン */}
-			{!isEditing && (
-				<div className="flex-shrink-0 ml-2 flex items-center space-x-1">
+			<div className="flex-shrink-0 ml-2 flex items-center space-x-1">
 					<button
 						type="button"
 						onClick={() => onSelect(saveData.id)}
@@ -173,7 +145,7 @@ export default function SaveDataItem({
 						<>
 							<button
 								type="button"
-								onClick={handleStartEdit}
+								onClick={handleRenameButtonClick}
 								className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded transition-colors duration-150 cursor-pointer"
 								title="名前を変更"
 							>
@@ -215,7 +187,14 @@ export default function SaveDataItem({
 						</>
 					)}
 				</div>
-			)}
+			
+			{/* 名前変更モーダル */}
+			<RenameModal
+				isOpen={isRenameModalOpen}
+				onClose={() => setIsRenameModalOpen(false)}
+				onConfirm={handleRenameConfirm}
+				currentName={saveData.name}
+			/>
 			
 			{/* 削除確認モーダル */}
 			<DeleteConfirmModal
