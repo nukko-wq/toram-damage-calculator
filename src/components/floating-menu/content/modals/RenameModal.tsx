@@ -81,8 +81,6 @@ export default function RenameModal({
 		}
 	}
 
-
-
 	if (!isOpen) return null
 
 	// モーダル全体のmousedownでイベント伝播を停止（floating-menuの外側クリック検知を回避）
@@ -93,7 +91,9 @@ export default function RenameModal({
 	// 背景クリック処理（RenameEquipmentModalと同じ手法）
 	const handleBackgroundClick = (e: React.MouseEvent) => {
 		// クリックされた要素がモーダルコンテンツ内かどうかをチェック
-		const modalContent = document.querySelector('[data-modal-content="rename-save"]')
+		const modalContent = document.querySelector(
+			'[data-modal-content="rename-save"]',
+		)
 		const target = e.target as Element
 
 		if (modalContent && !modalContent.contains(target)) {
@@ -107,7 +107,7 @@ export default function RenameModal({
 	}
 
 	const modalContent = (
-		<div 
+		<div
 			className="fixed inset-0 z-[10000] bg-black/50"
 			onMouseDown={handleModalMouseDown}
 			onClick={handleBackgroundClick}
@@ -124,7 +124,7 @@ export default function RenameModal({
 				>
 					{/* ヘッダー */}
 					<div className="flex items-center justify-between p-6 border-b border-gray-200">
-						<h3 
+						<h3
 							id="rename-save-modal-title"
 							className="text-lg font-medium text-gray-900"
 						>
@@ -204,14 +204,14 @@ export default function RenameModal({
 						<button
 							onClick={onClose}
 							disabled={isRenaming}
-							className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+							className="px-4 py-2 text-sm font-medium text-white bg-gray-400/80 rounded-md hover:bg-gray-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
 						>
 							キャンセル
 						</button>
 						<button
 							onClick={handleRename}
 							disabled={isRenaming || !newName.trim()}
-							className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center cursor-pointer"
+							className="px-4 py-2 text-sm font-medium text-white bg-rose-400/80 rounded-md hover:bg-rose-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed flex items-center cursor-pointer"
 						>
 							{isRenaming && (
 								<svg

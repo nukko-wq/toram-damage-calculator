@@ -15,6 +15,7 @@ export const STORAGE_KEYS = {
 
 	// アプリケーション設定
 	APP_SETTINGS: 'toram_app_settings',
+	FLOATING_MENU_SETTINGS: 'toram_floating_menu_settings',
 	VERSION: 'toram_storage_version',
 
 	// お気に入り機能

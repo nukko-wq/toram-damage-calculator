@@ -18,8 +18,7 @@ interface SaveDataActionsProps {
 }
 
 export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
-	const { saveCurrentData, getUnsavedDataStatus } =
-		useCalculatorStore()
+	const { saveCurrentData, getUnsavedDataStatus } = useCalculatorStore()
 
 	// モーダル状態管理
 	const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
@@ -124,7 +123,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 								flex-1 inline-flex items-center justify-center px-3 py-2 
 								border border-transparent text-sm font-medium rounded-md 
 								transition-colors duration-200
-								text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer
+								text-white bg-rose-400/80 hover:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer
 							`}
 							title="データを保存"
 						>
@@ -160,7 +159,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 								cursor-pointer
 								flex-1 inline-flex items-center justify-center px-3 py-2 
 								border border-transparent text-sm font-medium rounded-md 
-								text-white bg-blue-600 hover:bg-blue-700 
+								text-white bg-blue-400/80 hover:bg-blue-400 
 								focus:outline-none focus:ring-2 focus:ring-blue-500 
 								transition-colors duration-200
 							"
