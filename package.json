@@ -17,6 +17,7 @@
 		"date-fns": "^4.1.0",
 		"lodash-es": "^4.17.21",
 		"lodash.debounce": "^4.0.8",
+		"lucide-react": "^0.534.0",
 		"motion": "^12.23.11",
 		"next": "15.4.5",
 		"react": "^19.1.1",

@@ -36,6 +36,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	const updateAdaptationMultiplier = useCalculatorStore(
 		(state) => state.updateAdaptationMultiplier,
 	)
+	
+	// 入力中の一時的な値を管理するローカル状態
+	const [tempAdaptationValue, setTempAdaptationValue] = useState<string>(adaptationMultiplier.toString())
 
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
@@ -45,6 +48,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		const loadedData = loadCaptureData()
 		setCaptureData(loadedData)
 	}, [])
+	
+	// adaptationMultiplierが変更されたときにtempAdaptationValueを同期
+	useEffect(() => {
+		setTempAdaptationValue(adaptationMultiplier.toString())
+	}, [adaptationMultiplier])
 
 	// Zustandストアから計算データと計算結果を取得
 	const calculatorData = useCalculatorStore((state) => state.data)
@@ -325,28 +333,48 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 						<div className="flex items-center gap-1">
 							<input
-								type="number"
-								min="50"
-								max="250"
-								value={adaptationMultiplier}
+								type="text"
+								inputMode="numeric"
+								value={tempAdaptationValue}
 								onChange={(e) => {
-									const value = Number(e.target.value)
+									const inputValue = e.target.value
+									
+									// 入力値をローカル状態に保存（バックスペース削除を可能にするため）
+									setTempAdaptationValue(inputValue)
+									
+									// 空文字列の場合は処理終了（入力中の状態を保持）
+									if (inputValue === '') {
+										return
+									}
+									
+									// 数値のみを許可（正規表現チェック）
+									if (!/^\d+$/.test(inputValue)) {
+										return
+									}
+									
+									const value = Number(inputValue)
 									// 範囲チェック
 									if (value >= 50 && value <= 250) {
 										updateAdaptationMultiplier(value)
-									} else if (value < 50) {
-										updateAdaptationMultiplier(50)
 									} else if (value > 250) {
 										updateAdaptationMultiplier(250)
 									}
 								}}
 								onBlur={(e) => {
 									// フォーカスを失った時の最終調整
-									const value = Number(e.target.value)
-									if (Number.isNaN(value) || value < 50) {
+									const inputValue = e.target.value
+									if (inputValue === '' || Number.isNaN(Number(inputValue))) {
 										updateAdaptationMultiplier(50)
-									} else if (value > 250) {
-										updateAdaptationMultiplier(250)
+										setTempAdaptationValue('50')
+									} else {
+										const value = Number(inputValue)
+										if (value < 50) {
+											updateAdaptationMultiplier(50)
+											setTempAdaptationValue('50')
+										} else if (value > 250) {
+											updateAdaptationMultiplier(250)
+											setTempAdaptationValue('250')
+										}
 									}
 								}}
 								className="w-12 pl-1.5 pr-1 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"

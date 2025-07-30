@@ -1,8 +1,17 @@
 'use client'
 
-import type React from 'react'
 import { useState } from 'react'
+import { EllipsisVertical, Edit, Trash2 } from 'lucide-react'
+import {
+	Button,
+	Menu,
+	MenuItem,
+	MenuTrigger,
+	Popover,
+} from 'react-aria-components'
 import type { SaveData } from '@/types/calculator'
+import DeleteConfirmModal from './modals/DeleteConfirmModal'
+import RenameModal from './modals/RenameModal'
 
 interface SaveDataItemProps {
 	saveData: SaveData
@@ -19,38 +28,29 @@ export default function SaveDataItem({
 	onRename,
 	onDelete,
 }: SaveDataItemProps) {
-	const [isEditing, setIsEditing] = useState(false)
-	const [editName, setEditName] = useState(saveData.name)
+	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+	const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
 
-	const handleStartEdit = () => {
-		setEditName(saveData.name)
-		setIsEditing(true)
+	// 名前変更モーダルを表示
+	const handleRenameButtonClick = () => {
+		setIsRenameModalOpen(true)
 	}
 
-	const handleSaveEdit = () => {
-		if (editName.trim() && editName.trim() !== saveData.name) {
-			onRename(saveData.id, editName.trim())
-		}
-		setIsEditing(false)
+	// 名前変更確認後の処理
+	const handleRenameConfirm = async (newName: string) => {
+		onRename(saveData.id, newName)
+		setIsRenameModalOpen(false)
 	}
 
-	const handleCancelEdit = () => {
-		setEditName(saveData.name)
-		setIsEditing(false)
+	// 削除確認ダイアログを表示
+	const handleDeleteButtonClick = () => {
+		setIsDeleteModalOpen(true)
 	}
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (e.key === 'Enter') {
-			handleSaveEdit()
-		} else if (e.key === 'Escape') {
-			handleCancelEdit()
-		}
-	}
-
-	const handleDelete = () => {
-		if (window.confirm(`「${saveData.name}」を削除しますか？`)) {
-			onDelete(saveData.id)
-		}
+	// 削除確認後の処理
+	const handleDeleteConfirm = () => {
+		onDelete(saveData.id)
+		setIsDeleteModalOpen(false)
 	}
 
 	const formatDate = (dateString: string) => {
@@ -74,7 +74,7 @@ export default function SaveDataItem({
 			`}
 		>
 			{/* アイコン */}
-			<div className="flex-shrink-0 mr-3">
+			<div className="flex-shrink-0 mr-3 hidden sm:block">
 				{isMainData ? (
 					<svg
 						className="w-5 h-5 text-blue-600"
@@ -114,101 +114,95 @@ export default function SaveDataItem({
 
 			{/* 名前と詳細 */}
 			<div className="flex-1 min-w-0">
-				{isEditing ? (
-					<input
-						type="text"
-						value={editName}
-						onChange={(e) => setEditName(e.target.value)}
-						onBlur={handleSaveEdit}
-						onKeyDown={handleKeyDown}
-						className="w-full px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-						autoFocus
-					/>
-				) : (
-					<div>
-						<div
-							className={`text-sm font-medium truncate ${isActive ? 'text-blue-900' : 'text-gray-900'}`}
-						>
-							{saveData.name}
-						</div>
-						<div className="text-xs text-gray-500">
-							{formatDate(saveData.updatedAt)}
-						</div>
+				<div>
+					<div
+						className={`text-sm font-medium truncate ${isActive ? 'text-blue-900' : 'text-gray-900'}`}
+					>
+						{saveData.name}
 					</div>
-				)}
+					<div className="text-xs text-gray-500">
+						{formatDate(saveData.updatedAt)}
+					</div>
+				</div>
 			</div>
 
 			{/* アクションボタン */}
-			{!isEditing && (
-				<div className="flex-shrink-0 ml-2 flex items-center space-x-1">
-					<button
-						type="button"
-						onClick={() => onSelect(saveData.id)}
-						className="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded transition-colors duration-150 cursor-pointer"
-						title="読み込み"
+			<div className="flex-shrink-0 ml-1 sm:ml-3 flex items-center space-x-1 sm:space-x-2">
+				{/* 読み込みボタン - プライマリ */}
+				<button
+					type="button"
+					onClick={() => onSelect(saveData.id)}
+					className="flex items-center space-x-1 px-1.5 sm:px-3 py-1.5 text-xs font-medium text-white bg-blue-400/80 hover:bg-blue-400 rounded-md transition-colors duration-150 cursor-pointer focus:outline-none"
+					title="このセーブデータを読み込む"
+				>
+					<svg
+						className="w-4 h-4"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
 					>
-						<svg
-							className="w-4 h-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+						/>
+					</svg>
+					<span>読み込み</span>
+				</button>
+
+				{/* メニューボタン */}
+				{!isMainData && (
+					<MenuTrigger>
+						<Button
+							aria-label="メニュー"
+							className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors duration-150 cursor-pointer"
 						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-							/>
-						</svg>
-					</button>
-
-					{!isMainData && (
-						<>
-							<button
-								type="button"
-								onClick={handleStartEdit}
-								className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-100 rounded transition-colors duration-150 cursor-pointer"
-								title="名前を変更"
-							>
-								<svg
-									className="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+							<EllipsisVertical className="w-[18px] h-[18px] text-gray-500" />
+						</Button>
+						<Popover placement="bottom end">
+							<Menu className="bg-white border border-gray-200 rounded-lg shadow-md min-w-[160px] text-sm z-50 outline-hidden">
+								<MenuItem
+									id="rename"
+									className="px-3 py-2 outline-none hover:bg-blue-50 cursor-pointer rounded-t-lg"
+									onAction={handleRenameButtonClick}
 								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-									/>
-								</svg>
-							</button>
-
-							<button
-								type="button"
-								onClick={handleDelete}
-								className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded transition-colors duration-150 cursor-pointer"
-								title="削除"
-							>
-								<svg
-									className="w-4 h-4"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
+									<div className="flex items-center gap-2">
+										<Edit className="w-4 h-4 text-gray-700" />
+										<span className="text-sm text-gray-700">名前を変更</span>
+									</div>
+								</MenuItem>
+								<MenuItem
+									id="delete"
+									className="px-3 py-2 outline-none hover:bg-blue-50 text-red-600 cursor-pointer rounded-b-lg"
+									onAction={handleDeleteButtonClick}
 								>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-									/>
-								</svg>
-							</button>
-						</>
-					)}
-				</div>
-			)}
+									<div className="flex items-center gap-2">
+										<Trash2 className="w-4 h-4" />
+										<span className="text-sm">削除</span>
+									</div>
+								</MenuItem>
+							</Menu>
+						</Popover>
+					</MenuTrigger>
+				)}
+			</div>
+
+			{/* 名前変更モーダル */}
+			<RenameModal
+				isOpen={isRenameModalOpen}
+				onClose={() => setIsRenameModalOpen(false)}
+				onConfirm={handleRenameConfirm}
+				currentName={saveData.name}
+			/>
+
+			{/* 削除確認モーダル */}
+			<DeleteConfirmModal
+				isOpen={isDeleteModalOpen}
+				onClose={() => setIsDeleteModalOpen(false)}
+				onConfirm={handleDeleteConfirm}
+				saveDataName={saveData.name}
+			/>
 		</div>
 	)
 }

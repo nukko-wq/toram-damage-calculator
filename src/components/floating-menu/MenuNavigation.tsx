@@ -130,7 +130,7 @@ export default function MenuNavigation({
 }: MenuNavigationProps) {
 	return (
 		<nav
-			className="w-30 bg-gray-50 border-r border-gray-200 flex flex-col"
+			className="w-26 sm:w-30 bg-gray-50 border-r border-gray-200 flex flex-col"
 			role="navigation"
 			aria-label="メニューナビゲーション"
 		>
@@ -141,7 +141,7 @@ export default function MenuNavigation({
 					onClick={() => onSectionChange(item.id)}
 					className={`
 						cursor-pointer
-						w-full p-3 text-left transition-colors duration-150
+						w-full px-2 sm:px-3 py-3 sm:py-3 text-left transition-colors duration-150
 						hover:bg-gray-100 focus:outline-none focus:bg-gray-100
 						border-b border-gray-100 last:border-b-0
 						${
@@ -157,7 +157,7 @@ export default function MenuNavigation({
 					<div className="flex items-center space-x-2">
 						<div
 							className={`
-							flex-shrink-0
+							flex-shrink-0 hidden sm:block
 							${activeSection === item.id ? 'text-blue-600' : 'text-gray-500'}
 						`}
 						>

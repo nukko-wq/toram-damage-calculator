@@ -5,6 +5,7 @@ import { useCalculatorStore } from '@/stores'
 import ExportModal from './modals/ExportModal'
 import ImportModal from './modals/ImportModal'
 import ImportConfirmModal from './modals/ImportConfirmModal'
+import SaveConfirmModal from './modals/SaveConfirmModal'
 import { exportData, type ExportOptions } from '@/utils/exportManager'
 import {
 	importData,
@@ -17,10 +18,10 @@ interface SaveDataActionsProps {
 }
 
 export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
-	const { saveCurrentData, getUnsavedDataStatus } =
-		useCalculatorStore()
+	const { saveCurrentData, getUnsavedDataStatus } = useCalculatorStore()
 
 	// モーダル状態管理
+	const [isSaveConfirmModalOpen, setIsSaveConfirmModalOpen] = useState(false)
 	const [isExportModalOpen, setIsExportModalOpen] = useState(false)
 	const [isImportModalOpen, setIsImportModalOpen] = useState(false)
 	const [isImportConfirmModalOpen, setIsImportConfirmModalOpen] =
@@ -28,10 +29,16 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 	const [importValidationResult, setImportValidationResult] =
 		useState<ImportValidationResult | null>(null)
 
-	// 現在のデータを保存
+	// 保存確認ダイアログを表示
+	const handleSaveButtonClick = () => {
+		setIsSaveConfirmModalOpen(true)
+	}
+
+	// 現在のデータを保存（確認後）
 	const handleSaveCurrentData = async () => {
 		try {
 			await saveCurrentData()
+			setIsSaveConfirmModalOpen(false)
 		} catch (err) {
 			console.error('データ保存エラー:', err)
 		}
@@ -103,22 +110,22 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 
 	return (
 		<>
-			<div className="p-4 border-b border-gray-200">
+			<div className="p-2 sm:p-4 border-b border-gray-200">
 				<div className="space-y-3">
 					{/* 上段: メインアクション */}
 					<div className="flex gap-2">
 						{/* 現在のデータを保存ボタン */}
 						<button
 							type="button"
-							onClick={handleSaveCurrentData}
+							onClick={handleSaveButtonClick}
 							disabled={false}
 							className={`
 								flex-1 inline-flex items-center justify-center px-3 py-2 
 								border border-transparent text-sm font-medium rounded-md 
 								transition-colors duration-200
-								text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer
+								text-white bg-rose-400/80 hover:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 cursor-pointer
 							`}
-							title="現在のデータを保存"
+							title="データを保存"
 						>
 							<svg
 								className="w-4 h-4 mr-2"
@@ -133,8 +140,8 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 									d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"
 								/>
 							</svg>
-							<span className="truncate">
-								現在のデータを保存
+							<span className="truncate text-xs sm:text-sm">
+								データを保存
 								{unsavedStatus.hasTemporaryEquipments && (
 									<span className="ml-1 text-xs">(仮)</span>
 								)}
@@ -152,7 +159,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 								cursor-pointer
 								flex-1 inline-flex items-center justify-center px-3 py-2 
 								border border-transparent text-sm font-medium rounded-md 
-								text-white bg-blue-600 hover:bg-blue-700 
+								text-white bg-rose-400/80 hover:bg-rose-400 
 								focus:outline-none focus:ring-2 focus:ring-blue-500 
 								transition-colors duration-200
 							"
@@ -171,7 +178,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 									d="M12 4v16m8-8H4"
 								/>
 							</svg>
-							<span className="truncate">新規作成</span>
+							<span className="truncate text-xs sm:text-sm">新規作成</span>
 						</button>
 					</div>
 
@@ -204,7 +211,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 									d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
 								/>
 							</svg>
-							<span className="truncate">エクスポート</span>
+							<span className="truncate text-xs sm:text-sm">エクスポート</span>
 						</button>
 
 						{/* インポートボタン */}
@@ -234,7 +241,7 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 									d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
 								/>
 							</svg>
-							<span className="truncate">インポート</span>
+							<span className="truncate text-xs sm:text-sm">インポート</span>
 						</button>
 					</div>
 				</div>
@@ -260,6 +267,13 @@ export default function SaveDataActions({ onCreateNew }: SaveDataActionsProps) {
 				onClose={handleImportCancel}
 				onConfirm={handleImportConfirm}
 				validationResult={importValidationResult}
+			/>
+
+			{/* 保存確認モーダル */}
+			<SaveConfirmModal
+				isOpen={isSaveConfirmModalOpen}
+				onClose={() => setIsSaveConfirmModalOpen(false)}
+				onConfirm={handleSaveCurrentData}
 			/>
 		</>
 	)

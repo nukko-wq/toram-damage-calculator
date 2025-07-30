@@ -15,7 +15,7 @@ export default function SkillToggleButton({
 			onClick={() => onToggle(!isEnabled)}
 			className={`
 				relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none cursor-pointer
-				${isEnabled ? 'bg-blue-500/90' : 'bg-gray-200'}
+				${isEnabled ? 'bg-blue-500/80' : 'bg-gray-200'}
 			`}
 			role="switch"
 			aria-checked={isEnabled}

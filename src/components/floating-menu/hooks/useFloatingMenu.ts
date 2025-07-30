@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import { getLastActiveSection, saveLastActiveSection } from '@/utils/floatingMenuStorage'
 
 export type MenuSection = 'top' | 'sample' | 'save' | 'subsystem' | 'settings'
 
@@ -17,8 +18,14 @@ export function useFloatingMenu(
 	initialSection: MenuSection = 'top',
 ): UseFloatingMenuReturn {
 	const [isOpen, setIsOpen] = useState(false)
-	const [activeSection, setActiveSection] =
-		useState<MenuSection>(initialSection)
+	
+	// ローカルストレージから最後の選択状態を復元
+	const [activeSection, setActiveSectionState] = useState<MenuSection>(() => {
+		if (typeof window !== 'undefined') {
+			return getLastActiveSection()
+		}
+		return initialSection
+	})
 
 	const openMenu = useCallback(() => {
 		setIsOpen(true)
@@ -30,6 +37,14 @@ export function useFloatingMenu(
 
 	const toggleMenu = useCallback(() => {
 		setIsOpen((prev) => !prev)
+	}, [])
+
+	// セクション変更時にローカルストレージに保存
+	const setActiveSection = useCallback((section: MenuSection) => {
+		setActiveSectionState(section)
+		if (typeof window !== 'undefined') {
+			saveLastActiveSection(section)
+		}
 	}, [])
 
 	// ESCキーでメニューを閉じる
