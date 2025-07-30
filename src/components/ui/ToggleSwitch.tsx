@@ -41,7 +41,7 @@ export default function ToggleSwitch({
 			className={`
         relative inline-flex ${sizeClasses[size]} rounded-full border-2 border-transparent
         transition-colors duration-100 ease-in-out focus:outline-none
-        ${checked ? 'bg-blue-500/90' : 'bg-gray-200'}
+        ${checked ? 'bg-blue-500/80' : 'bg-gray-200'}
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
       `}
 		>

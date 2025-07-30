@@ -892,7 +892,7 @@ export default function EquipmentForm({
 							onClick={() => setActiveTab(key)}
 							className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
 								activeTab === key
-									? 'bg-blue-500/90 text-white'
+									? 'bg-blue-500/80 text-white'
 									: 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
 							}`}
 						>
