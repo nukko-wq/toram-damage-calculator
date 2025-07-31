@@ -119,10 +119,10 @@ function getWeaponInfoStorage(): WeaponInfoStorage {
 }
 
 /**
- * 武器情報をクリア（初期値：0, 0, 0）
+ * 武器情報をクリア（完全削除）
  */
 export function clearWeaponInfo(equipmentId: string): boolean {
-	return saveWeaponInfo(equipmentId, 0, 0, 0)
+	return deleteWeaponInfo(equipmentId)
 }
 
 // 移行関数は削除済み - weaponInfoStorageで統一管理完了

@@ -55,12 +55,12 @@ export default function EquipmentCard({
 
 	const formatWeaponInfo = () => {
 		const weaponInfo = getWeaponInfo(equipment.id)
-		if (!weaponInfo || (weaponInfo.ATK === 0 && weaponInfo.stability === 0 && weaponInfo.refinement === 0)) {
+		if (!weaponInfo) {
 			return null
 		}
 
 		const { ATK, stability, refinement } = weaponInfo
-		const refinementDisplay = refinement > 0 ? ` +${refinementValueToDisplay(refinement)}` : ''
+		const refinementDisplay = refinement > 0 ? ` +${refinementValueToDisplay(refinement as any)}` : ''
 		const stabilityDisplay = stability > 0 ? ` (${stability}%)` : ''
 		
 		return `${ATK}${refinementDisplay}${stabilityDisplay}`
