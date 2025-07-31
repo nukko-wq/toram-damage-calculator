@@ -137,6 +137,10 @@ export interface CalculatorStore {
 		equipmentId: string,
 		properties: Partial<EquipmentProperties>,
 	) => Promise<boolean>
+	updateCustomEquipmentRefinement: (
+		equipmentId: string,
+		refinement: number,
+	) => Promise<boolean>
 	updateEquipmentArmorType: (
 		equipmentId: string,
 		armorType: ArmorType,
@@ -175,7 +179,10 @@ export interface UIStore {
 	showDamagePreview: boolean
 
 	// セーブデータごとの基本ステータスカテゴリ表示状態
-	statusPreviewCategories: Record<string, 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'>
+	statusPreviewCategories: Record<
+		string,
+		'base' | 'physical' | 'magical' | 'hybrid' | 'tank'
+	>
 
 	setShowSaveManager: (value: boolean) => void
 	setShowUpdateNotifications: (value: boolean) => void
@@ -185,8 +192,13 @@ export interface UIStore {
 	toggleDamagePreview: () => void
 
 	// セーブデータごとの基本ステータスカテゴリ管理
-	getStatusPreviewCategory: (saveId: string) => 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'
-	setStatusPreviewCategory: (saveId: string, category: 'base' | 'physical' | 'magical' | 'hybrid' | 'tank') => void
+	getStatusPreviewCategory: (
+		saveId: string,
+	) => 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'
+	setStatusPreviewCategory: (
+		saveId: string,
+		category: 'base' | 'physical' | 'magical' | 'hybrid' | 'tank',
+	) => void
 }
 
 // ===== セーブデータストア =====

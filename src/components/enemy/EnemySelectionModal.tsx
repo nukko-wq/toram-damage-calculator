@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import type { EnemyCategory, PresetEnemy } from '@/types/calculator'
-import {
-	getPresetEnemies,
-} from '@/utils/enemyDatabase'
+import { getPresetEnemies } from '@/utils/enemyDatabase'
 import EnemyCard from './EnemyCard'
 
 interface EnemySelectionModalProps {
@@ -156,7 +154,7 @@ export default function EnemySelectionModal({
 								onClick={() => setActiveFilter(filter)}
 								className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
 									activeFilter === filter
-										? 'bg-blue-500 text-white'
+										? 'bg-blue-500/80 text-white'
 										: 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
 								}`}
 								role="tab"

@@ -17,7 +17,11 @@ import {
 	getBuffSkillPassiveMultiplierWithSkillCategory,
 	getBuffSkillBraveMultiplier,
 } from '@/utils/buffSkillCalculation'
-import { calculateMagicalStability, calculateINTElementAdvantage, calculateTotalElementAdvantage } from '@/utils/basicStatsCalculation'
+import {
+	calculateMagicalStability,
+	calculateINTElementAdvantage,
+	calculateTotalElementAdvantage,
+} from '@/utils/basicStatsCalculation'
 import { calculateHotKnowsEffects } from '@/utils/buffSkillCalculation/categories/minstrelSkills'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import type { BuffSkillState } from '@/types/buffSkill'
@@ -51,7 +55,7 @@ export interface DamageCalculationOptions {
  */
 function getEternalNightmareLevel(skill: BuffSkillState | undefined): number {
 	if (!skill?.isEnabled) return 0
-	
+
 	// multiParam型の場合はmultiParam1、level型の場合はlevel、specialParamの場合はspecialParamを使用
 	return skill.multiParam1 || skill.level || skill.specialParam || 0
 }
@@ -60,13 +64,15 @@ function getEternalNightmareLevel(skill: BuffSkillState | undefined): number {
  * ダークパワースキルの合計レベルを計算
  * エターナルナイトメアの場合、multiParam2がダークパワー全習得スキルポイント
  */
-function calculateTotalDarkPowerLevel(buffSkills: Record<string, BuffSkillState>): number {
+function calculateTotalDarkPowerLevel(
+	buffSkills: Record<string, BuffSkillState>,
+): number {
 	const eternalNightmare = buffSkills.dp1
 	if (eternalNightmare?.isEnabled) {
 		// multiParam2がダークパワー全習得スキルポイント（25-80）
 		return eternalNightmare.multiParam2 || eternalNightmare.specialParam || 80 // デフォルト80
 	}
-	
+
 	return 80 // デフォルト値
 }
 
@@ -75,12 +81,12 @@ function calculateTotalDarkPowerLevel(buffSkills: Record<string, BuffSkillState>
  */
 function isMagicalAttackSkill(skillId: string | null): boolean {
 	if (!skillId) return false
-	
+
 	const skill = getAttackSkillById(skillId)
 	if (!skill) return false
-	
+
 	// 全ての撃が魔法攻撃の場合、魔法スキルと判定
-	return skill.hits.every(hit => hit.attackType === 'magical')
+	return skill.hits.every((hit) => hit.attackType === 'magical')
 }
 
 /**
@@ -91,7 +97,11 @@ export function calculateDamageWithService(
 	calculationResults: any,
 	options: DamageCalculationOptions = {},
 ): DamageCalculationServiceResult {
-	const { debug = false, powerOptions = createInitialPowerOptions(), adaptationMultiplier = 100 } = options
+	const {
+		debug = false,
+		powerOptions = createInitialPowerOptions(),
+		adaptationMultiplier = 100,
+	} = options
 
 	// デバッグログを一時的に無効化
 	const debugEnabled = false
@@ -102,18 +112,32 @@ export function calculateDamageWithService(
 
 		// 中央集約された計算結果を使用
 		const totalATK = calculationResults?.basicStats.totalATK || 0
-		const physicalStabilityRate = calculationResults?.basicStats.stabilityRate || 85
-		
+		const physicalStabilityRate =
+			calculationResults?.basicStats.stabilityRate || 85
+
 		// 魔法スキル選択時は魔法安定率を計算
-		const isMagicalSkill = isMagicalAttackSkill(calculatorData.attackSkill?.selectedSkillId)
-		const stabilityInfo = isMagicalSkill 
+		const isMagicalSkill = isMagicalAttackSkill(
+			calculatorData.attackSkill?.selectedSkillId,
+		)
+		const stabilityInfo = isMagicalSkill
 			? calculateMagicalStability(physicalStabilityRate)
-			: { averageStability: physicalStabilityRate, magicalStabilityLower: physicalStabilityRate, magicalStabilityUpper: 100 }
-		
-		const stabilityRate = isMagicalSkill ? stabilityInfo.averageStability : physicalStabilityRate
-		
+			: {
+					averageStability: physicalStabilityRate,
+					magicalStabilityLower: physicalStabilityRate,
+					magicalStabilityUpper: 100,
+				}
+
+		const stabilityRate = isMagicalSkill
+			? stabilityInfo.averageStability
+			: physicalStabilityRate
+
 		// デバッグ情報
-		if (debugEnabled && debug && process.env.NODE_ENV === 'development' && isMagicalSkill) {
+		if (
+			debugEnabled &&
+			debug &&
+			process.env.NODE_ENV === 'development' &&
+			isMagicalSkill
+		) {
 			console.log('=== 魔法安定率計算 ===')
 			console.log('物理安定率:', physicalStabilityRate)
 			console.log('魔法安定率下限:', stabilityInfo.magicalStabilityLower)
@@ -165,22 +189,27 @@ export function calculateDamageWithService(
 			const intElementAdvantageResult = calculateINTElementAdvantage(
 				calculatorData.baseStats.INT, // 基礎INT（装備・バフ補正を除く）
 				calculatorData.mainWeapon.weaponType,
-				powerOptions.elementAttack
+				powerOptions.elementAttack,
 			)
 
 			// INT補正を含む総属性有利を計算
-			const correctedTotalElementAdvantage = baseAdvantage + intElementAdvantageResult.intElementAdvantage
+			const correctedTotalElementAdvantage =
+				baseAdvantage + intElementAdvantageResult.intElementAdvantage
 
 			// 熱情の歌の効果を計算
 			const hotKnowsSkill = calculatorData.buffSkills?.skills?.IsHotKnows
 			let hotKnowsEffect = 0
 			if (hotKnowsSkill?.isEnabled && hotKnowsSkill.stackCount) {
-				const hotKnowsResult = calculateHotKnowsEffects(hotKnowsSkill.stackCount, powerOptions)
+				const hotKnowsResult = calculateHotKnowsEffects(
+					hotKnowsSkill.stackCount,
+					powerOptions,
+				)
 				hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
 			}
 
 			// INT補正 + 熱情の歌補正を含む総属性有利を計算
-			const finalTotalElementAdvantage = correctedTotalElementAdvantage + hotKnowsEffect
+			const finalTotalElementAdvantage =
+				correctedTotalElementAdvantage + hotKnowsEffect
 
 			// 属性威力オプションに応じて計算
 			switch (powerOptions.elementPower) {
@@ -188,8 +217,15 @@ export function calculateDamageWithService(
 					return 0 // 属性威力無効時は0
 				case 'awakeningOnly':
 					// 覚醒のみ時: 25%固定 + 杖・魔導具装備時は有利・不利属性でINT補正も追加（2025年仕様変更）
-					if (powerOptions.elementAttack === 'advantageous' || powerOptions.elementAttack === 'disadvantageous') {
-						return 25 + intElementAdvantageResult.intElementAdvantage + hotKnowsEffect
+					if (
+						powerOptions.elementAttack === 'advantageous' ||
+						powerOptions.elementAttack === 'disadvantageous'
+					) {
+						return (
+							25 +
+							intElementAdvantageResult.intElementAdvantage +
+							hotKnowsEffect
+						)
 					}
 					return 25
 				case 'advantageOnly':
@@ -216,7 +252,7 @@ export function calculateDamageWithService(
 		let finalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
 		let finalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
 		let finalEnemyLevel = enemyInfo?.level ?? defaultInput.enemy.level
-		
+
 		// Normal難易度のDEF/MDEFを保持（エターナルナイトメア減算用）
 		const normalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
 		const normalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
@@ -259,9 +295,13 @@ export function calculateDamageWithService(
 			buffSkills: {
 				eternalNightmare: {
 					isEnabled: calculatorData.buffSkills?.skills?.dp1?.isEnabled ?? false,
-					level: getEternalNightmareLevel(calculatorData.buffSkills?.skills?.dp1),
+					level: getEternalNightmareLevel(
+						calculatorData.buffSkills?.skills?.dp1,
+					),
 				},
-				totalDarkPowerLevel: calculateTotalDarkPowerLevel(calculatorData.buffSkills?.skills ?? {}),
+				totalDarkPowerLevel: calculateTotalDarkPowerLevel(
+					calculatorData.buffSkills?.skills ?? {},
+				),
 			},
 			// PowerOptionsに基づいた設定
 			elementAdvantage: {
@@ -325,16 +365,20 @@ export function calculateDamageWithService(
 			},
 			// レジスタ効果を反映
 			register: {
-				voidStance: calculatorData.register?.effects.find(effect => 
-					effect.type === 'voidStance'
-				) ? {
-					isEnabled: calculatorData.register.effects.find(effect => 
-						effect.type === 'voidStance'
-					)?.isEnabled ?? false,
-					level: calculatorData.register.effects.find(effect => 
-						effect.type === 'voidStance'
-					)?.level ?? 1,
-				} : undefined,
+				voidStance: calculatorData.register?.effects.find(
+					(effect) => effect.type === 'voidStance',
+				)
+					? {
+							isEnabled:
+								calculatorData.register.effects.find(
+									(effect) => effect.type === 'voidStance',
+								)?.isEnabled ?? false,
+							level:
+								calculatorData.register.effects.find(
+									(effect) => effect.type === 'voidStance',
+								)?.level ?? 1,
+						}
+					: undefined,
 			},
 			attackSkill: {
 				...defaultInput.attackSkill,
@@ -422,9 +466,10 @@ export function calculateDamageWithService(
 						braveMultiplier: braveMultiplierWithEnemy,
 						// 攻撃タイプに応じてクリティカルダメージを選択
 						critical: {
-							damage: originalHit.attackType === 'magical'
-								? calculationResults?.basicStats.magicCriticalDamage ?? 100
-								: calculationResults?.basicStats.criticalDamage ?? 100,
+							damage:
+								originalHit.attackType === 'magical'
+									? (calculationResults?.basicStats.magicCriticalDamage ?? 100)
+									: (calculationResults?.basicStats.criticalDamage ?? 100),
 						},
 						attackSkill: {
 							type: originalHit.attackType,
@@ -500,9 +545,17 @@ export function calculateDamageWithService(
 			const baseStabilityRate = physicalStabilityRate
 
 			// 魔法スキルの場合は魔法安定率、物理スキルの場合は従来の安定率を使用
-			const effectiveMinStabilityRate = isMagicalSkill ? stabilityInfo.magicalStabilityLower : baseStabilityRate
-			const effectiveMaxStabilityRate = isMagicalSkill ? stabilityInfo.magicalStabilityUpper : 100
-			const effectiveAverageStabilityRate = isMagicalSkill ? stabilityInfo.averageStability : Math.floor((effectiveMaxStabilityRate + effectiveMinStabilityRate) / 2)
+			const effectiveMinStabilityRate = isMagicalSkill
+				? stabilityInfo.magicalStabilityLower
+				: baseStabilityRate
+			const effectiveMaxStabilityRate = isMagicalSkill
+				? stabilityInfo.magicalStabilityUpper
+				: 100
+			const effectiveAverageStabilityRate = isMagicalSkill
+				? stabilityInfo.averageStability
+				: Math.floor(
+						(effectiveMaxStabilityRate + effectiveMinStabilityRate) / 2,
+					)
 
 			// 各撃の最小ダメージを個別に計算して合計
 			// 各撃: 最大ダメージ × 最小安定率（小数点切り捨て）
@@ -551,11 +604,17 @@ export function calculateDamageWithService(
 		const getDamageByType = () => {
 			const baseDamage = attackResult.baseDamage // 白ダメ（基本ダメージ）
 			const stabilityResult = attackResult.stabilityResult
-			
+
 			// 魔法スキルの場合は魔法安定率を使用、物理スキルの場合は従来の安定率を使用
-			const minStabilityRate = isMagicalSkill ? stabilityInfo.magicalStabilityLower : stabilityResult.stabilityRate
-			const maxStabilityRate = isMagicalSkill ? stabilityInfo.magicalStabilityUpper : 100
-			const averageStabilityRate = isMagicalSkill ? stabilityInfo.averageStability : Math.floor((minStabilityRate + maxStabilityRate) / 2)
+			const minStabilityRate = isMagicalSkill
+				? stabilityInfo.magicalStabilityLower
+				: stabilityResult.stabilityRate
+			const maxStabilityRate = isMagicalSkill
+				? stabilityInfo.magicalStabilityUpper
+				: 100
+			const averageStabilityRate = isMagicalSkill
+				? stabilityInfo.averageStability
+				: Math.floor((minStabilityRate + maxStabilityRate) / 2)
 
 			switch (powerOptions.damageType) {
 				case 'white': {
@@ -566,22 +625,28 @@ export function calculateDamageWithService(
 						if (isMagicalSkill) {
 							const totalMinDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitMinDamage = Math.floor((hitMaxDamage * minStabilityRate) / 100)
+								const hitMinDamage = Math.floor(
+									(hitMaxDamage * minStabilityRate) / 100,
+								)
 								return sum + hitMinDamage
 							}, 0)
-							
+
 							const totalMaxDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitMaxDamageAdjusted = Math.floor((hitMaxDamage * maxStabilityRate) / 100)
+								const hitMaxDamageAdjusted = Math.floor(
+									(hitMaxDamage * maxStabilityRate) / 100,
+								)
 								return sum + hitMaxDamageAdjusted
 							}, 0)
-							
+
 							const totalAverageDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitAverageDamage = Math.floor((hitMaxDamage * averageStabilityRate) / 100)
+								const hitAverageDamage = Math.floor(
+									(hitMaxDamage * averageStabilityRate) / 100,
+								)
 								return sum + hitAverageDamage
 							}, 0)
-							
+
 							return {
 								min: totalMinDamage,
 								max: totalMaxDamage,
@@ -591,7 +656,7 @@ export function calculateDamageWithService(
 								maxStability: maxStabilityRate,
 							}
 						}
-						
+
 						return {
 							min: stabilityResult.minDamage, // 既に計算済み
 							max: stabilityResult.maxDamage, // 既に計算済み
@@ -619,22 +684,28 @@ export function calculateDamageWithService(
 						if (isMagicalSkill) {
 							const totalMinDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitMinDamage = Math.floor((hitMaxDamage * minStabilityRate) / 100)
+								const hitMinDamage = Math.floor(
+									(hitMaxDamage * minStabilityRate) / 100,
+								)
 								return sum + hitMinDamage
 							}, 0)
-							
+
 							const totalMaxDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitMaxDamageAdjusted = Math.floor((hitMaxDamage * maxStabilityRate) / 100)
+								const hitMaxDamageAdjusted = Math.floor(
+									(hitMaxDamage * maxStabilityRate) / 100,
+								)
 								return sum + hitMaxDamageAdjusted
 							}, 0)
-							
+
 							const totalAverageDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitAverageDamage = Math.floor((hitMaxDamage * averageStabilityRate) / 100)
+								const hitAverageDamage = Math.floor(
+									(hitMaxDamage * averageStabilityRate) / 100,
+								)
 								return sum + hitAverageDamage
 							}, 0)
-							
+
 							return {
 								min: totalMinDamage,
 								max: totalMaxDamage,
@@ -644,7 +715,7 @@ export function calculateDamageWithService(
 								maxStability: maxStabilityRate,
 							}
 						}
-						
+
 						return {
 							min: stabilityResult.minDamage, // 既に計算済み
 							max: stabilityResult.maxDamage, // 既に計算済み
@@ -673,22 +744,28 @@ export function calculateDamageWithService(
 						if (isMagicalSkill) {
 							const totalMinDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitGrazeMinDamage = Math.floor((hitMaxDamage * 0.1 * minStabilityRate) / 100)
+								const hitGrazeMinDamage = Math.floor(
+									(hitMaxDamage * 0.1 * minStabilityRate) / 100,
+								)
 								return sum + hitGrazeMinDamage
 							}, 0)
-							
+
 							const totalMaxDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitGrazeMaxDamage = Math.floor((hitMaxDamage * 0.1 * maxStabilityRate) / 100)
+								const hitGrazeMaxDamage = Math.floor(
+									(hitMaxDamage * 0.1 * maxStabilityRate) / 100,
+								)
 								return sum + hitGrazeMaxDamage
 							}, 0)
-							
+
 							const totalAverageDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitGrazeAverageDamage = Math.floor((hitMaxDamage * 0.1 * averageStabilityRate) / 100)
+								const hitGrazeAverageDamage = Math.floor(
+									(hitMaxDamage * 0.1 * averageStabilityRate) / 100,
+								)
 								return sum + hitGrazeAverageDamage
 							}, 0)
-							
+
 							return {
 								min: totalMinDamage,
 								max: totalMaxDamage,
@@ -698,7 +775,7 @@ export function calculateDamageWithService(
 								maxStability: maxStabilityRate,
 							}
 						}
-						
+
 						return {
 							min: Math.floor(stabilityResult.minDamage * 0.1),
 							max: Math.floor(stabilityResult.maxDamage * 0.1),
@@ -723,10 +800,12 @@ export function calculateDamageWithService(
 						if (isMagicalSkill) {
 							const totalAverageDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitAverageDamage = Math.floor((hitMaxDamage * averageStabilityRate) / 100)
+								const hitAverageDamage = Math.floor(
+									(hitMaxDamage * averageStabilityRate) / 100,
+								)
 								return sum + hitAverageDamage
 							}, 0)
-							
+
 							return {
 								min: totalAverageDamage,
 								max: totalAverageDamage,
@@ -736,7 +815,7 @@ export function calculateDamageWithService(
 								maxStability: maxStabilityRate,
 							}
 						}
-						
+
 						return {
 							min: stabilityResult.averageDamage,
 							max: stabilityResult.averageDamage,
@@ -746,8 +825,10 @@ export function calculateDamageWithService(
 							maxStability: maxStabilityRate,
 						}
 					}
-					
-					const expectedDamage = Math.floor((baseDamage * averageStabilityRate) / 100)
+
+					const expectedDamage = Math.floor(
+						(baseDamage * averageStabilityRate) / 100,
+					)
 					return {
 						min: expectedDamage,
 						max: expectedDamage,
@@ -765,22 +846,28 @@ export function calculateDamageWithService(
 						if (isMagicalSkill) {
 							const totalMinDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitMinDamage = Math.floor((hitMaxDamage * minStabilityRate) / 100)
+								const hitMinDamage = Math.floor(
+									(hitMaxDamage * minStabilityRate) / 100,
+								)
 								return sum + hitMinDamage
 							}, 0)
-							
+
 							const totalMaxDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitMaxDamageAdjusted = Math.floor((hitMaxDamage * maxStabilityRate) / 100)
+								const hitMaxDamageAdjusted = Math.floor(
+									(hitMaxDamage * maxStabilityRate) / 100,
+								)
 								return sum + hitMaxDamageAdjusted
 							}, 0)
-							
+
 							const totalAverageDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
-								const hitAverageDamage = Math.floor((hitMaxDamage * averageStabilityRate) / 100)
+								const hitAverageDamage = Math.floor(
+									(hitMaxDamage * averageStabilityRate) / 100,
+								)
 								return sum + hitAverageDamage
 							}, 0)
-							
+
 							return {
 								min: totalMinDamage,
 								max: totalMaxDamage,
@@ -790,7 +877,7 @@ export function calculateDamageWithService(
 								maxStability: maxStabilityRate,
 							}
 						}
-						
+
 						return {
 							min: stabilityResult.minDamage, // 既に計算済み
 							max: stabilityResult.maxDamage, // 既に計算済み

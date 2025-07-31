@@ -404,29 +404,36 @@ export default function AttackSkillForm({
 								{/* スキル威力/固定値の計算式表示 */}
 								{(currentHit.multiplierFormula ||
 									currentHit.fixedDamageFormula ||
-									(currentHit.specialEffects && currentHit.specialEffects.length > 0)) && (
+									(currentHit.specialEffects &&
+										currentHit.specialEffects.length > 0)) && (
 									<div className="space-y-2 p-3 rounded border border-gray-300 bg-gray-50">
 										{/* Special Effects の表示 */}
-										{currentHit.specialEffects && currentHit.specialEffects.length > 0 && (
-											<div className="space-y-1">
-												<div className="text-sm text-gray-600 font-medium">特殊効果:</div>
-												<div className="flex flex-wrap gap-1">
-													{currentHit.specialEffects.map((effect) => (
-														<span
-															key={effect}
-															className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full border border-blue-200"
-														>
-															{effect}
-														</span>
-													))}
+										{currentHit.specialEffects &&
+											currentHit.specialEffects.length > 0 && (
+												<div className="space-y-1">
+													<div className="text-sm text-gray-600 font-medium">
+														特殊効果:
+													</div>
+													<div className="flex flex-wrap gap-1">
+														{currentHit.specialEffects.map((effect) => (
+															<span
+																key={effect}
+																className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full border border-blue-200"
+															>
+																{effect}
+															</span>
+														))}
+													</div>
 												</div>
-											</div>
-										)}
+											)}
 										{currentHit.multiplierFormula && (
 											<div className="space-y-1">
 												{Array.isArray(currentHit.multiplierFormula) ? (
 													currentHit.multiplierFormula.map((formula) => (
-														<div key={formula} className="flex items-center text-sm">
+														<div
+															key={formula}
+															className="flex items-center text-sm"
+														>
 															<span className="text-gray-700 font-mono mt-1 before:content-['★'] before:text-red-500 text-xs sm:text-sm">
 																{formula}
 															</span>

@@ -3,10 +3,7 @@
  */
 
 import type { MainWeaponType } from '@/types/buffSkill'
-import type {
-	EquipmentProperties,
-	WeaponType,
-} from '@/types/calculator'
+import type { EquipmentProperties, WeaponType } from '@/types/calculator'
 import type { AllBonuses } from '../basicStatsCalculation'
 
 /**

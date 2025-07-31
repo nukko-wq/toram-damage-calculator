@@ -36,9 +36,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	const updateAdaptationMultiplier = useCalculatorStore(
 		(state) => state.updateAdaptationMultiplier,
 	)
-	
+
 	// 入力中の一時的な値を管理するローカル状態
-	const [tempAdaptationValue, setTempAdaptationValue] = useState<string>(adaptationMultiplier.toString())
+	const [tempAdaptationValue, setTempAdaptationValue] = useState<string>(
+		adaptationMultiplier.toString(),
+	)
 
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
@@ -48,7 +50,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		const loadedData = loadCaptureData()
 		setCaptureData(loadedData)
 	}, [])
-	
+
 	// adaptationMultiplierが変更されたときにtempAdaptationValueを同期
 	useEffect(() => {
 		setTempAdaptationValue(adaptationMultiplier.toString())
@@ -194,7 +196,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								>
 									<button
 										onClick={handleCapture}
-										className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 cursor-pointer text-sm mx-auto"
+										className="px-3 py-1 bg-blue-500/80 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 cursor-pointer text-sm mx-auto"
 									>
 										<svg
 											className="w-3 h-3"
@@ -327,7 +329,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								}
 								className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
 								style={{
-									background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
+									background: `linear-gradient(to right, oklch(62.3% 0.214 259.815 / .8) 0%, oklch(62.3% 0.214 259.815 / .8) ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
 								}}
 							/>
 						</div>
@@ -340,20 +342,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								value={tempAdaptationValue}
 								onChange={(e) => {
 									const inputValue = e.target.value
-									
+
 									// 入力値をローカル状態に保存（バックスペース削除を可能にするため）
 									setTempAdaptationValue(inputValue)
-									
+
 									// 空文字列の場合は処理終了（入力中の状態を保持）
 									if (inputValue === '') {
 										return
 									}
-									
+
 									// 数値のみを許可（正規表現チェック）
 									if (!/^\d+$/.test(inputValue)) {
 										return
 									}
-									
+
 									const value = Number(inputValue)
 									// 範囲チェック
 									if (value >= 50 && value <= 250) {

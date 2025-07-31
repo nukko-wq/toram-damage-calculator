@@ -7,7 +7,10 @@ import type { Crystal } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import { calculateResults } from '@/utils/calculationEngine'
-import { calculateDamageWithService, type DamageCalculationServiceResult } from '@/utils/damageCalculationService'
+import {
+	calculateDamageWithService,
+	type DamageCalculationServiceResult,
+} from '@/utils/damageCalculationService'
 import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
 
 interface CrystalWithDamage {
@@ -35,25 +38,31 @@ interface CrystalWithDamage {
 export function useCrystalDamageSorting(
 	crystals: Crystal[],
 	slotInfo: SlotInfo | undefined,
-	enabled = true
+	enabled = true,
 ) {
 	const currentData = useCalculatorStore((state) => state.data)
 	const currentResults = useCalculatorStore((state) => state.calculationResults)
 	const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
-	const baselineDamageResult = useCalculatorStore((state) => state.baselineDamageResult)
-	
-	const [crystalsWithDamage, setCrystalsWithDamage] = useState<CrystalWithDamage[]>([])
+	const baselineDamageResult = useCalculatorStore(
+		(state) => state.baselineDamageResult,
+	)
+
+	const [crystalsWithDamage, setCrystalsWithDamage] = useState<
+		CrystalWithDamage[]
+	>([])
 	const [isCalculating, setIsCalculating] = useState(false)
 
 	// ダメージ差分を計算
 	useEffect(() => {
 		if (!enabled || !slotInfo || crystals.length === 0 || !currentData) {
-			setCrystalsWithDamage(crystals.map(crystal => ({
-				...crystal,
-				damageDifference: 0,
-				isCalculating: false,
-				hasError: false
-			})))
+			setCrystalsWithDamage(
+				crystals.map((crystal) => ({
+					...crystal,
+					damageDifference: 0,
+					isCalculating: false,
+					hasError: false,
+				})),
+			)
 			return
 		}
 
@@ -75,7 +84,7 @@ export function useCrystalDamageSorting(
 					calculatedBaselineDamageResult = calculateDamageWithService(
 						currentData,
 						effectiveCurrentResults,
-						{ debug: false, powerOptions: powerOptions || {} }
+						{ debug: false, powerOptions: powerOptions || {} },
 					)
 				}
 
@@ -84,12 +93,16 @@ export function useCrystalDamageSorting(
 					crystals.map(async (crystal) => {
 						try {
 							// シミュレーション後のダメージを計算
-							const simulatedData = simulateItemEquipSimple(currentData, crystal, slotInfo)
+							const simulatedData = simulateItemEquipSimple(
+								currentData,
+								crystal,
+								slotInfo,
+							)
 							const simulatedResults = calculateResults(simulatedData)
 							const simulatedDamageResult = calculateDamageWithService(
 								simulatedData,
 								simulatedResults,
-								{ debug: false, powerOptions: powerOptions || {} }
+								{ debug: false, powerOptions: powerOptions || {} },
 							)
 
 							// 平均ダメージの差分を計算
@@ -103,35 +116,45 @@ export function useCrystalDamageSorting(
 								...crystal,
 								damageDifference: difference,
 								isCalculating: false,
-								hasError: false
+								hasError: false,
 							}
 						} catch (_error) {
 							return {
 								...crystal,
 								damageDifference: 0,
 								isCalculating: false,
-								hasError: true
+								hasError: true,
 							}
 						}
-					})
+					}),
 				)
 
 				setCrystalsWithDamage(results)
 			} catch (_error) {
 				// エラー時は元の配列を返す
-				setCrystalsWithDamage(crystals.map(crystal => ({
-					...crystal,
-					damageDifference: 0,
-					isCalculating: false,
-					hasError: true
-				})))
+				setCrystalsWithDamage(
+					crystals.map((crystal) => ({
+						...crystal,
+						damageDifference: 0,
+						isCalculating: false,
+						hasError: true,
+					})),
+				)
 			} finally {
 				setIsCalculating(false)
 			}
 		}
 
 		calculateDamages()
-	}, [crystals, slotInfo, enabled, currentData, currentResults, powerOptions, baselineDamageResult])
+	}, [
+		crystals,
+		slotInfo,
+		enabled,
+		currentData,
+		currentResults,
+		powerOptions,
+		baselineDamageResult,
+	])
 
 	// ダメージ差分順でソート
 	const sortedCrystals = useMemo(() => {
@@ -151,22 +174,25 @@ export function useCrystalDamageSorting(
 				// 同じダメージ差分の場合は名前順
 				return a.name.localeCompare(b.name)
 			})
-			.map(crystal => ({
-				id: crystal.id,
-				name: crystal.name,
-				type: crystal.type,
-				properties: crystal.properties,
-				description: crystal.description,
-				conditionalEffects: crystal.conditionalEffects,
-				isCustom: crystal.isCustom,
-				createdAt: crystal.createdAt,
-				updatedAt: crystal.updatedAt,
-				isFavorite: crystal.isFavorite
-			} as Crystal))
+			.map(
+				(crystal) =>
+					({
+						id: crystal.id,
+						name: crystal.name,
+						type: crystal.type,
+						properties: crystal.properties,
+						description: crystal.description,
+						conditionalEffects: crystal.conditionalEffects,
+						isCustom: crystal.isCustom,
+						createdAt: crystal.createdAt,
+						updatedAt: crystal.updatedAt,
+						isFavorite: crystal.isFavorite,
+					}) as Crystal,
+			)
 	}, [crystalsWithDamage, enabled, crystals, isCalculating])
 
 	return {
 		sortedCrystals,
-		isCalculating
+		isCalculating,
 	}
 }

@@ -32,9 +32,7 @@ export function startEditSession(equipment: UserEquipment): UserEquipment {
 	const editableEquipment: UserEquipment = {
 		...equipment,
 		properties: { ...equipment.properties },
-		weaponStats: equipment.weaponStats
-			? { ...equipment.weaponStats }
-			: undefined,
+		// weaponStatsは使用せず、weaponInfoStorageで管理
 		crystalSlots: equipment.crystalSlots
 			? { ...equipment.crystalSlots }
 			: undefined,
@@ -70,6 +68,37 @@ export function updateEditSessionProperties(
 
 	editSessions.set(sessionKey, sessionEquipment)
 	return true
+}
+
+/**
+ * 編集セッション中の装備の精錬値を更新
+ */
+export function updateEditSessionRefinement(
+	id: string,
+	refinement: number,
+): boolean {
+	const sessionKey = createSessionKey(id)
+	const sessionEquipment = editSessions.get(sessionKey)
+	if (!sessionEquipment) {
+		return false
+	}
+
+	// 精錬値をweaponInfoStorageで更新
+	const { saveWeaponInfo, getWeaponInfo } = require('./weaponInfoStorage')
+	const currentWeaponInfo = getWeaponInfo(id)
+	const success = saveWeaponInfo(
+		id,
+		currentWeaponInfo?.ATK || 0,
+		currentWeaponInfo?.stability || 0,
+		refinement,
+	)
+
+	if (success) {
+		sessionEquipment.updatedAt = new Date().toISOString()
+		editSessions.set(sessionKey, sessionEquipment)
+	}
+
+	return success
 }
 
 /**
@@ -233,28 +262,7 @@ export function convertAllEditSessionsToPersistent(): UserEquipment[] {
 	return persistentEquipments
 }
 
-/**
- * 編集セッション中の装備の武器ステータスを更新
- */
-export function updateEditSessionWeaponStats(
-	id: string,
-	weaponStats: { ATK?: number; stability?: number; refinement?: number },
-): boolean {
-	const sessionKey = createSessionKey(id)
-	const sessionEquipment = editSessions.get(sessionKey)
-	if (!sessionEquipment || !sessionEquipment.weaponStats) {
-		return false
-	}
-
-	sessionEquipment.weaponStats = {
-		...sessionEquipment.weaponStats,
-		...weaponStats,
-	}
-	sessionEquipment.updatedAt = new Date().toISOString()
-
-	editSessions.set(sessionKey, sessionEquipment)
-	return true
-}
+// updateEditSessionWeaponStats関数は削除 - weaponInfoStorageで管理
 
 /**
  * 編集セッション中の装備のクリスタルスロットを更新

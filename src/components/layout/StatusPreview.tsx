@@ -114,7 +114,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// 基本ステータスカテゴリ状態管理（UIStoreから取得）
 	const basicStatsCategory = getStatusPreviewCategory(currentSaveId)
-	const handleBasicStatsCategoryChange = (category: BasicStatsDisplayCategory['value']) => {
+	const handleBasicStatsCategoryChange = (
+		category: BasicStatsDisplayCategory['value'],
+	) => {
 		setStatusPreviewCategory(currentSaveId, category)
 	}
 
@@ -406,22 +408,31 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				const intElementAdvantageResult = calculateINTElementAdvantage(
 					baseStats.INT, // 基礎INT（装備・バフ補正を除く）
 					data.mainWeapon.weaponType,
-					powerOptions?.elementAttack || 'none'
+					powerOptions?.elementAttack || 'none',
 				)
-				
+
 				// 熱情の歌の効果を計算
 				const hotKnowsSkill = data.buffSkills?.skills?.IsHotKnows
 				let hotKnowsEffect = 0
-				if (hotKnowsSkill?.isEnabled && hotKnowsSkill.stackCount && powerOptions) {
-					const { calculateHotKnowsEffects } = require('@/utils/buffSkillCalculation/categories/minstrelSkills')
-					const hotKnowsResult = calculateHotKnowsEffects(hotKnowsSkill.stackCount, powerOptions)
+				if (
+					hotKnowsSkill?.isEnabled &&
+					hotKnowsSkill.stackCount &&
+					powerOptions
+				) {
+					const {
+						calculateHotKnowsEffects,
+					} = require('@/utils/buffSkillCalculation/categories/minstrelSkills')
+					const hotKnowsResult = calculateHotKnowsEffects(
+						hotKnowsSkill.stackCount,
+						powerOptions,
+					)
 					hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
 				}
-				
+
 				// 総属性有利を計算（INT補正 + 熱情の歌補正を含む）
 				return calculateTotalElementAdvantage(
 					finalBonuses,
-					intElementAdvantageResult.intElementAdvantage + hotKnowsEffect
+					intElementAdvantageResult.intElementAdvantage + hotKnowsEffect,
 				)
 			})(),
 			stabilityCalculation: calculateStability(
@@ -559,15 +570,21 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// カテゴリ別データ取得関数
 	const getBasicStatsByCategory = (
 		category: BasicStatsDisplayCategory['value'],
-		equipmentBonuses: ReturnType<typeof calculateEquipmentBonuses>
+		equipmentBonuses: ReturnType<typeof calculateEquipmentBonuses>,
 	): Record<string, number | null> => {
 		const baseStats = {
 			HP: hpCalculation.finalHP,
 			MP: mpCalculation.finalMP,
 			ATK: atkCalculation.finalATK,
 			baseATK: Math.floor(atkCalculation.baseATK),
-			subATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation ? subATKCalculation.subFinalATK : null,
-			subBaseATK: data.mainWeapon.weaponType === '双剣' && subATKCalculation ? Math.floor(subATKCalculation.subBaseATK) : null,
+			subATK:
+				data.mainWeapon.weaponType === '双剣' && subATKCalculation
+					? subATKCalculation.subFinalATK
+					: null,
+			subBaseATK:
+				data.mainWeapon.weaponType === '双剣' && subATKCalculation
+					? Math.floor(subATKCalculation.subBaseATK)
+					: null,
 			totalATK: totalATKCalculation.totalATK,
 			bringerAM: 0,
 			MATK: matkCalculation.finalMATK,
@@ -578,7 +595,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					return subATKCalculation.subStability
 				}
 				if (
-					(data.mainWeapon.weaponType === '弓' || data.mainWeapon.weaponType === '自動弓') &&
+					(data.mainWeapon.weaponType === '弓' ||
+						data.mainWeapon.weaponType === '自動弓') &&
 					data.subWeapon.weaponType === '矢'
 				) {
 					return data.subWeapon.stability
@@ -588,8 +606,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
 			magicCriticalRate: 0,
-			magicCriticalDamage: magicalCriticalDamageCalculation.finalMagicalCriticalDamage,
-			totalElementAdvantage: totalElementAdvantageCalculation.finalTotalElementAdvantage,
+			magicCriticalDamage:
+				magicalCriticalDamageCalculation.finalMagicalCriticalDamage,
+			totalElementAdvantage:
+				totalElementAdvantageCalculation.finalTotalElementAdvantage,
 			elementAwakeningAdvantage: 0,
 			ASPD: aspdCalculation.finalASPD,
 			CSPD: cspdCalculation.finalCSPD,
@@ -620,12 +640,28 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					criticalDamage: baseStats.criticalDamage,
 					totalElementAdvantage: baseStats.totalElementAdvantage,
 					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
-					shortRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.shortRangeDamage || 0,
-					longRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.longRangeDamage || 0,
-					physicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.physicalPenetration || 0,
-					magicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.magicalPenetration || 0,
-					unsheatheAttackRate: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {rate?: number})?.rate || 0,
-					unsheatheAttackFixed: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {fixed?: number})?.fixed || 0,
+					shortRangeDamage:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.shortRangeDamage || 0,
+					longRangeDamage:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.longRangeDamage || 0,
+					physicalPenetration:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.physicalPenetration || 0,
+					magicalPenetration:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.magicalPenetration || 0,
+					unsheatheAttackRate:
+						(
+							calculationResults.equipmentBonuses.equipmentBonus1
+								.unsheatheAttack as { rate?: number }
+						)?.rate || 0,
+					unsheatheAttackFixed:
+						(
+							calculationResults.equipmentBonuses.equipmentBonus1
+								.unsheatheAttack as { fixed?: number }
+						)?.fixed || 0,
 					armorBreak: baseStats.armorBreak,
 					anticipate: baseStats.anticipate,
 					motionSpeed: baseStats.motionSpeed,
@@ -647,12 +683,28 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					magicCriticalDamage: baseStats.magicCriticalDamage,
 					totalElementAdvantage: baseStats.totalElementAdvantage,
 					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
-					shortRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.shortRangeDamage || 0,
-					longRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.longRangeDamage || 0,
-					physicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.physicalPenetration || 0,
-					magicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.magicalPenetration || 0,
-					unsheatheAttackRate: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {rate?: number})?.rate || 0,
-					unsheatheAttackFixed: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {fixed?: number})?.fixed || 0,
+					shortRangeDamage:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.shortRangeDamage || 0,
+					longRangeDamage:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.longRangeDamage || 0,
+					physicalPenetration:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.physicalPenetration || 0,
+					magicalPenetration:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.magicalPenetration || 0,
+					unsheatheAttackRate:
+						(
+							calculationResults.equipmentBonuses.equipmentBonus1
+								.unsheatheAttack as { rate?: number }
+						)?.rate || 0,
+					unsheatheAttackFixed:
+						(
+							calculationResults.equipmentBonuses.equipmentBonus1
+								.unsheatheAttack as { fixed?: number }
+						)?.fixed || 0,
 					armorBreak: baseStats.armorBreak,
 					anticipate: baseStats.anticipate,
 					motionSpeed: baseStats.motionSpeed,
@@ -684,12 +736,28 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					magicCriticalDamage: baseStats.magicCriticalDamage,
 					totalElementAdvantage: baseStats.totalElementAdvantage,
 					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
-					shortRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.shortRangeDamage || 0,
-					longRangeDamage: calculationResults.equipmentBonuses.equipmentBonus1.longRangeDamage || 0,
-					physicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.physicalPenetration || 0,
-					magicalPenetration: calculationResults.equipmentBonuses.equipmentBonus1.magicalPenetration || 0,
-					unsheatheAttackRate: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {rate?: number})?.rate || 0,
-					unsheatheAttackFixed: (calculationResults.equipmentBonuses.equipmentBonus1.unsheatheAttack as {fixed?: number})?.fixed || 0,
+					shortRangeDamage:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.shortRangeDamage || 0,
+					longRangeDamage:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.longRangeDamage || 0,
+					physicalPenetration:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.physicalPenetration || 0,
+					magicalPenetration:
+						calculationResults.equipmentBonuses.equipmentBonus1
+							.magicalPenetration || 0,
+					unsheatheAttackRate:
+						(
+							calculationResults.equipmentBonuses.equipmentBonus1
+								.unsheatheAttack as { rate?: number }
+						)?.rate || 0,
+					unsheatheAttackFixed:
+						(
+							calculationResults.equipmentBonuses.equipmentBonus1
+								.unsheatheAttack as { fixed?: number }
+						)?.fixed || 0,
 					armorBreak: baseStats.armorBreak,
 					anticipate: baseStats.anticipate,
 					motionSpeed: baseStats.motionSpeed,
@@ -715,14 +783,29 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					motionSpeed: baseStats.motionSpeed,
 					armorBreak: baseStats.armorBreak,
 					anticipate: baseStats.anticipate,
-					physicalBarrier: calculationResults.equipmentBonuses.equipmentBonus2.physicalBarrier || 0,
-					magicalBarrier: calculationResults.equipmentBonuses.equipmentBonus2.magicalBarrier || 0,
-					fractionalBarrier: calculationResults.equipmentBonuses.equipmentBonus2.fractionalBarrier || 0,
-					barrierCooldown: calculationResults.equipmentBonuses.equipmentBonus2.barrierCooldown_Rate || 0,
-					guardPower: calculationResults.equipmentBonuses.equipmentBonus2.guardPower_Rate || 0,
-					guardRecovery: calculationResults.equipmentBonuses.equipmentBonus2.guardRecovery_Rate || 0,
-					aggro: calculationResults.equipmentBonuses.equipmentBonus1.aggro_Rate || 0,
-					darkResistance: calculationResults.equipmentBonuses.equipmentBonus2.darkResistance_Rate || 0,
+					physicalBarrier:
+						calculationResults.equipmentBonuses.equipmentBonus2
+							.physicalBarrier || 0,
+					magicalBarrier:
+						calculationResults.equipmentBonuses.equipmentBonus2
+							.magicalBarrier || 0,
+					fractionalBarrier:
+						calculationResults.equipmentBonuses.equipmentBonus2
+							.fractionalBarrier || 0,
+					barrierCooldown:
+						calculationResults.equipmentBonuses.equipmentBonus2
+							.barrierCooldown_Rate || 0,
+					guardPower:
+						calculationResults.equipmentBonuses.equipmentBonus2
+							.guardPower_Rate || 0,
+					guardRecovery:
+						calculationResults.equipmentBonuses.equipmentBonus2
+							.guardRecovery_Rate || 0,
+					aggro:
+						calculationResults.equipmentBonuses.equipmentBonus1.aggro_Rate || 0,
+					darkResistance:
+						calculationResults.equipmentBonuses.equipmentBonus2
+							.darkResistance_Rate || 0,
 				} as Record<string, number | null>
 
 			default: // 'base'
@@ -731,7 +814,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	}
 
 	// カテゴリ別ラベル定義
-	const getBasicStatsLabelsByCategory = (category: BasicStatsDisplayCategory['value']) => {
+	const getBasicStatsLabelsByCategory = (
+		category: BasicStatsDisplayCategory['value'],
+	) => {
 		const baseLabels = {
 			HP: 'HP',
 			MP: 'MP',
@@ -848,90 +933,160 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	}
 
 	// カテゴリ別表示順序定義
-	const getBasicStatsDisplayOrder = (category: BasicStatsDisplayCategory['value']): string[] => {
+	const getBasicStatsDisplayOrder = (
+		category: BasicStatsDisplayCategory['value'],
+	): string[] => {
 		switch (category) {
 			case 'physical':
 				return [
-					'HP', 'MP',
-					'ATK', 'baseATK',
-					'subATK', 'subBaseATK',
-					'totalATK', 'bringerAM',
-					'stabilityRate', 'subStabilityRate',
-					'criticalRate', 'criticalDamage',
-					'totalElementAdvantage', 'elementAwakeningAdvantage',
-					'shortRangeDamage', 'longRangeDamage',
-					'physicalPenetration', 'magicalPenetration',
-					'unsheatheAttackRate', 'unsheatheAttackFixed',
-					'armorBreak', 'anticipate',
-					'motionSpeed', '', // 行動速度の右にスペース
-					'ASPD', 'CSPD',
-					'HIT', 'FLEE',
+					'HP',
+					'MP',
+					'ATK',
+					'baseATK',
+					'subATK',
+					'subBaseATK',
+					'totalATK',
+					'bringerAM',
+					'stabilityRate',
+					'subStabilityRate',
+					'criticalRate',
+					'criticalDamage',
+					'totalElementAdvantage',
+					'elementAwakeningAdvantage',
+					'shortRangeDamage',
+					'longRangeDamage',
+					'physicalPenetration',
+					'magicalPenetration',
+					'unsheatheAttackRate',
+					'unsheatheAttackFixed',
+					'armorBreak',
+					'anticipate',
+					'motionSpeed',
+					'', // 行動速度の右にスペース
+					'ASPD',
+					'CSPD',
+					'HIT',
+					'FLEE',
 				]
 			case 'magical':
 				return [
-					'HP', 'MP',
-					'MATK', 'baseMATK',
-					'stabilityRate', 'subStabilityRate',
-					'magicCriticalRate', 'magicCriticalDamage',
-					'totalElementAdvantage', 'elementAwakeningAdvantage',
-					'shortRangeDamage', 'longRangeDamage',
-					'physicalPenetration', 'magicalPenetration',
-					'unsheatheAttackRate', 'unsheatheAttackFixed',
-					'armorBreak', 'anticipate',
-					'motionSpeed', '',
-					'ASPD', 'CSPD',
-					'HIT', 'FLEE',
+					'HP',
+					'MP',
+					'MATK',
+					'baseMATK',
+					'stabilityRate',
+					'subStabilityRate',
+					'magicCriticalRate',
+					'magicCriticalDamage',
+					'totalElementAdvantage',
+					'elementAwakeningAdvantage',
+					'shortRangeDamage',
+					'longRangeDamage',
+					'physicalPenetration',
+					'magicalPenetration',
+					'unsheatheAttackRate',
+					'unsheatheAttackFixed',
+					'armorBreak',
+					'anticipate',
+					'motionSpeed',
+					'',
+					'ASPD',
+					'CSPD',
+					'HIT',
+					'FLEE',
 				]
 			case 'hybrid':
 				return [
-					'HP', 'MP',
-					'ATK', 'baseATK',
-					'subATK', 'subBaseATK',
-					'totalATK', 'bringerAM',
-					'MATK', 'baseMATK',
-					'spearMATK', 'spearBaseMATK',
-					'stabilityRate', 'subStabilityRate',
-					'criticalRate', 'criticalDamage',
-					'magicCriticalRate', 'magicCriticalDamage',
-					'totalElementAdvantage', 'elementAwakeningAdvantage',
-					'shortRangeDamage', 'longRangeDamage',
-					'physicalPenetration', 'magicalPenetration',
-					'unsheatheAttackRate', 'unsheatheAttackFixed',
-					'armorBreak', 'anticipate',
-					'motionSpeed', '',
-					'ASPD', 'CSPD',
-					'HIT', 'FLEE',
+					'HP',
+					'MP',
+					'ATK',
+					'baseATK',
+					'subATK',
+					'subBaseATK',
+					'totalATK',
+					'bringerAM',
+					'MATK',
+					'baseMATK',
+					'spearMATK',
+					'spearBaseMATK',
+					'stabilityRate',
+					'subStabilityRate',
+					'criticalRate',
+					'criticalDamage',
+					'magicCriticalRate',
+					'magicCriticalDamage',
+					'totalElementAdvantage',
+					'elementAwakeningAdvantage',
+					'shortRangeDamage',
+					'longRangeDamage',
+					'physicalPenetration',
+					'magicalPenetration',
+					'unsheatheAttackRate',
+					'unsheatheAttackFixed',
+					'armorBreak',
+					'anticipate',
+					'motionSpeed',
+					'',
+					'ASPD',
+					'CSPD',
+					'HIT',
+					'FLEE',
 				]
 			case 'tank':
 				return [
-					'HP', 'MP',
-					'ASPD', 'CSPD',
-					'HIT', 'FLEE',
-					'criticalRate', 'stabilityRate',
-					'physicalResistance', 'magicalResistance',
-					'ailmentResistance', 'motionSpeed',
-					'armorBreak', 'anticipate',
-					'physicalBarrier', 'magicalBarrier',
-					'fractionalBarrier', 'barrierCooldown',
-					'guardPower', 'guardRecovery',
-					'aggro', 'darkResistance',
+					'HP',
+					'MP',
+					'ASPD',
+					'CSPD',
+					'HIT',
+					'FLEE',
+					'criticalRate',
+					'stabilityRate',
+					'physicalResistance',
+					'magicalResistance',
+					'ailmentResistance',
+					'motionSpeed',
+					'armorBreak',
+					'anticipate',
+					'physicalBarrier',
+					'magicalBarrier',
+					'fractionalBarrier',
+					'barrierCooldown',
+					'guardPower',
+					'guardRecovery',
+					'aggro',
+					'darkResistance',
 				]
 			default: // 'base'
 				return [
-					'HP', 'MP',
-					'ATK', 'baseATK',
-					'subATK', 'subBaseATK',
-					'totalATK', 'bringerAM',
-					'MATK', 'baseMATK',
-					'stabilityRate', 'subStabilityRate',
-					'criticalRate', 'criticalDamage',
-					'magicCriticalRate', 'magicCriticalDamage',
-					'totalElementAdvantage', 'elementAwakeningAdvantage',
-					'ASPD', 'CSPD',
-					'HIT', 'FLEE',
-					'physicalResistance', 'magicalResistance',
-					'ailmentResistance', 'motionSpeed',
-					'armorBreak', 'anticipate',
+					'HP',
+					'MP',
+					'ATK',
+					'baseATK',
+					'subATK',
+					'subBaseATK',
+					'totalATK',
+					'bringerAM',
+					'MATK',
+					'baseMATK',
+					'stabilityRate',
+					'subStabilityRate',
+					'criticalRate',
+					'criticalDamage',
+					'magicCriticalRate',
+					'magicCriticalDamage',
+					'totalElementAdvantage',
+					'elementAwakeningAdvantage',
+					'ASPD',
+					'CSPD',
+					'HIT',
+					'FLEE',
+					'physicalResistance',
+					'magicalResistance',
+					'ailmentResistance',
+					'motionSpeed',
+					'armorBreak',
+					'anticipate',
 				]
 		}
 	}
@@ -1026,7 +1181,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'basicStats'
 									: visibleSections.basicStats
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1045,7 +1200,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'adjustedStats'
 									: visibleSections.adjustedStats
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1064,7 +1219,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'equipmentBonus1'
 									: visibleSections.equipmentBonus1
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1083,7 +1238,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'equipmentBonus2'
 									: visibleSections.equipmentBonus2
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1102,7 +1257,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'equipmentBonus3'
 									: visibleSections.equipmentBonus3
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1118,12 +1273,16 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 						<div className="stat-section">
 							<div className="flex items-center justify-between mb-2">
 								<h3 className="text-sm font-semibold">基本ステータス</h3>
-								<select 
+								<select
 									value={basicStatsCategory}
-									onChange={(e) => handleBasicStatsCategoryChange(e.target.value as BasicStatsDisplayCategory['value'])}
+									onChange={(e) =>
+										handleBasicStatsCategoryChange(
+											e.target.value as BasicStatsDisplayCategory['value'],
+										)
+									}
 									className="ml-2 px-2 py-1 text-xs border border-gray-300 rounded outline-none"
 								>
-									{BASIC_STATS_CATEGORIES.map(category => (
+									{BASIC_STATS_CATEGORIES.map((category) => (
 										<option key={category.value} value={category.value}>
 											{category.label}
 										</option>
@@ -1132,7 +1291,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							</div>
 							<StatSection
 								title=""
-								stats={getBasicStatsByCategory(basicStatsCategory, calculationResults.equipmentBonuses)}
+								stats={getBasicStatsByCategory(
+									basicStatsCategory,
+									calculationResults.equipmentBonuses,
+								)}
 								labels={getBasicStatsLabelsByCategory(basicStatsCategory)}
 								displayMode="normal"
 								propertyOrder={getBasicStatsDisplayOrder(basicStatsCategory)}

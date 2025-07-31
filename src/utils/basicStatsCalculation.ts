@@ -1643,9 +1643,9 @@ export function calculateTotalElementAdvantage(
 
 /**
  * 魔法安定率計算
- * 
+ *
  * 物理安定率を基に魔法安定率の下限・上限を計算
- * 
+ *
  * @param physicalStability 物理安定率（0-100%）
  * @returns 魔法安定率計算結果
  */
@@ -1667,10 +1667,15 @@ export function calculateMagicalStability(
 
 	// 2. 上限計算
 	const upperLimitCalculation = 100 + Math.floor((physicalStability - 80) / 2)
-	const magicalStabilityUpper = Math.max(100, Math.min(110, upperLimitCalculation))
+	const magicalStabilityUpper = Math.max(
+		100,
+		Math.min(110, upperLimitCalculation),
+	)
 
 	// 3. 平均安定率（ダメージ計算で使用）
-	const averageStability = Math.floor((magicalStabilityLower + magicalStabilityUpper) / 2)
+	const averageStability = Math.floor(
+		(magicalStabilityLower + magicalStabilityUpper) / 2,
+	)
 
 	return {
 		physicalStability,
@@ -1684,12 +1689,12 @@ export function calculateMagicalStability(
 
 /**
  * 基礎INT属性有利補正計算（2025年仕様変更対応）
- * 
+ *
  * メイン武器が杖・魔導具の場合、基礎INTによる属性有利補正を適用
  * - 有利属性: 常に適用
  * - 不利属性: 杖・魔導具装備時のみ適用（2025年仕様変更）
  * - その他・無属性: 適用されない
- * 
+ *
  * @param baseINT 基礎INT（装備・バフ補正を除く素のINT値）
  * @param weaponType メイン武器の種類
  * @param elementAttack 属性攻撃の種類
@@ -1712,7 +1717,7 @@ export function calculateINTElementAdvantage(
 ): INTElementAdvantageCalculationSteps {
 	// 1. 武器条件判定
 	const isWeaponApplicable = weaponType === '杖' || weaponType === '魔導具'
-	
+
 	// 2. 属性条件判定（2025年仕様変更対応）
 	let isElementApplicable: boolean
 	switch (elementAttack) {
@@ -1729,13 +1734,13 @@ export function calculateINTElementAdvantage(
 			isElementApplicable = false // その他・無属性の場合は適用されない
 			break
 	}
-	
+
 	// 3. 総合適用可否判定
 	const isApplicable = isWeaponApplicable && isElementApplicable
-	
+
 	// 4. 基礎INT補正計算
 	const intElementAdvantage = isApplicable ? Math.floor(baseINT / 10) : 0
-	
+
 	return {
 		baseINT,
 		weaponType,

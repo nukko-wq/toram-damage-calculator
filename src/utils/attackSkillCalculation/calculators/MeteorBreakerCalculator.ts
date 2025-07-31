@@ -24,9 +24,10 @@ export class MeteorBreakerCalculator extends SkillHitCalculator {
 					hitNumber: 1,
 					calculatedMultiplier: finalMultiplier,
 					calculatedFixedDamage: 600,
-					calculationProcess: equipmentContext.mainWeaponType === '両手剣'
-						? `600% + 200% + floor(${playerStats.baseSTR}/10)% = ${finalMultiplier}%`
-						: '600% (基本倍率)',
+					calculationProcess:
+						equipmentContext.mainWeaponType === '両手剣'
+							? `600% + 200% + floor(${playerStats.baseSTR}/10)% = ${finalMultiplier}%`
+							: '600% (基本倍率)',
 				}
 			}
 
@@ -45,9 +46,10 @@ export class MeteorBreakerCalculator extends SkillHitCalculator {
 					hitNumber: 2,
 					calculatedMultiplier: finalMultiplier,
 					calculatedFixedDamage: 0, // 固定ダメージなし
-					calculationProcess: equipmentContext.mainWeaponType === '片手剣'
-						? `600% + floor(${playerStats.baseDEX}/2)% = ${finalMultiplier}%`
-						: '600% (基本倍率)',
+					calculationProcess:
+						equipmentContext.mainWeaponType === '片手剣'
+							? `600% + floor(${playerStats.baseDEX}/2)% = ${finalMultiplier}%`
+							: '600% (基本倍率)',
 				}
 			}
 

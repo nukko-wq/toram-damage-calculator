@@ -152,15 +152,21 @@ export default React.memo<StatSectionProps>(
 								const rightKey = orderedKeys[i + 1]
 
 								// 空文字列の場合はスペースとして扱う
-								const leftStat = leftKey && leftKey !== '' ? {
-									name: labels[leftKey] || leftKey,
-									value: stats[leftKey] ?? null,
-								} : undefined
+								const leftStat =
+									leftKey && leftKey !== ''
+										? {
+												name: labels[leftKey] || leftKey,
+												value: stats[leftKey] ?? null,
+											}
+										: undefined
 
-								const rightStat = rightKey && rightKey !== '' ? {
-									name: labels[rightKey] || rightKey,
-									value: stats[rightKey] ?? null,
-								} : undefined
+								const rightStat =
+									rightKey && rightKey !== ''
+										? {
+												name: labels[rightKey] || rightKey,
+												value: stats[rightKey] ?? null,
+											}
+										: undefined
 
 								// 左側が存在する場合、または右側のみが存在する場合に行を追加
 								if (leftStat || rightStat) {

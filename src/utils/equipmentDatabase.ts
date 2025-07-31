@@ -7,6 +7,7 @@ import type {
 	EquipmentCategory,
 	EquipmentProperties,
 	ArmorType,
+	ConditionalEffect,
 } from '@/types/calculator'
 import { equipmentsData } from '@/data/equipments'
 import {
@@ -22,9 +23,12 @@ import {
 	startEditSession,
 	updateEditSessionProperties,
 } from './editSessionManager'
+import { getWeaponInfo } from './weaponInfoStorage'
 
 // プロパティからundefinedの値を除外する関数
-function cleanProperties(properties: any): Partial<EquipmentProperties> {
+function cleanProperties(
+	properties: Record<string, unknown>,
+): Partial<EquipmentProperties> {
 	if (!properties) return {}
 
 	const cleaned: Partial<EquipmentProperties> = {}
@@ -36,12 +40,27 @@ function cleanProperties(properties: any): Partial<EquipmentProperties> {
 	return cleaned
 }
 
+// 装備に武器情報をオーバーレイする関数
+function applyWeaponInfoOverlay(equipment: Equipment): Equipment {
+	// 武器情報のオーバーレイを無効化 - EquipmentFormでの意図しない上書きを防ぐため
+	return equipment
+}
+
 // プリセット装備データを取得
 export function getAllEquipments(): PresetEquipment[] {
 	const allEquipments: PresetEquipment[] = []
 
 	// 新しいJSON構造に対応
-	const equipmentsRoot = (equipmentsData as any).equipments
+	type EquipmentItem = {
+		id: string
+		name: string
+		properties: Record<string, unknown>
+		source?: string
+		conditionalEffects?: unknown[]
+	}
+	const equipmentsRoot = (
+		equipmentsData as { equipments: Record<string, EquipmentItem[]> }
+	).equipments
 
 	if (!equipmentsRoot) {
 		console.error('equipments.json構造が不正です')
@@ -56,10 +75,10 @@ export function getAllEquipments(): PresetEquipment[] {
 				name: item.name,
 				type: 'weapon' as EquipmentType,
 				category: ['main'] as EquipmentCategory[],
-				baseStats: item.weaponStats || {},
+				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
-				conditionalEffects: item.conditionalEffects,
+				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
@@ -75,7 +94,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
-				conditionalEffects: item.conditionalEffects,
+				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
@@ -91,7 +110,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
-				conditionalEffects: item.conditionalEffects,
+				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
@@ -107,7 +126,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
-				conditionalEffects: item.conditionalEffects,
+				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
@@ -123,7 +142,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
-				conditionalEffects: item.conditionalEffects,
+				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
@@ -139,7 +158,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
-				conditionalEffects: item.conditionalEffects,
+				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
@@ -155,7 +174,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
-				conditionalEffects: item.conditionalEffects,
+				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
@@ -171,7 +190,7 @@ export function getAllEquipments(): PresetEquipment[] {
 				baseStats: {},
 				properties: cleanProperties(item.properties),
 				source: item.source,
-				conditionalEffects: item.conditionalEffects,
+				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
@@ -304,22 +323,26 @@ export function getAllAvailableEquipments(): Equipment[] {
 	const presetEquipments = getLocalStorageEquipments()
 	const customEquipments = getUserCustomEquipments()
 
-	// カスタム装備をCustomEquipment形式に変換
+	// カスタム装備をCustomEquipment形式に変換（weaponInfoOverlay適用）
 	const formattedCustomEquipments: Equipment[] = customEquipments.map(
-		(equipment) => ({
-			id: equipment.id,
-			name: equipment.name,
-			type: 'weapon' as const, // UserEquipmentにtypeがないのでデフォルト値
-			category: [equipment.category] as EquipmentCategory[], // 単一カテゴリを配列に変換
-			baseStats: equipment.weaponStats || {}, // weaponStatsをbaseStatsにマップ
-			properties: equipment.properties,
-			isPreset: false as const,
-			isCustom: true as const,
-			isFavorite: equipment.isFavorite,
-			isModified: false,
-			createdAt: equipment.createdAt,
-			updatedAt: equipment.updatedAt,
-		}),
+		(equipment) => {
+			const baseEquipment = {
+				id: equipment.id,
+				name: equipment.name,
+				type: 'weapon' as const, // UserEquipmentにtypeがないのでデフォルト値
+				category: [equipment.category] as EquipmentCategory[], // 単一カテゴリを配列に変換
+				baseStats: {},
+				properties: equipment.properties,
+				isPreset: false as const,
+				isCustom: true as const,
+				isFavorite: equipment.isFavorite,
+				isModified: false,
+				createdAt: equipment.createdAt,
+				updatedAt: equipment.updatedAt,
+			}
+			// weaponInfoOverlayを適用
+			return applyWeaponInfoOverlay(baseEquipment)
+		},
 	)
 
 	return [...presetEquipments, ...formattedCustomEquipments]
@@ -460,15 +483,7 @@ export function createCustomEquipment(
 		name,
 		category: equipmentCategory,
 		properties: {}, // 全プロパティをリセット状態で作成
-		// 武器系装備（メイン・サブ）には武器ステータスを初期化
-		weaponStats:
-			equipmentCategory === 'main' || equipmentCategory === 'subWeapon'
-				? {
-						ATK: 0,
-						stability: 0,
-						refinement: 0,
-					}
-				: undefined,
+		// weaponStatsは使用せず、weaponInfoStorageで管理するため削除
 		// クリスタルスロット対応装備にはスロットを初期化
 		crystalSlots: ['main', 'body', 'additional', 'special'].includes(
 			equipmentCategory,
@@ -483,6 +498,12 @@ export function createCustomEquipment(
 		createdAt: now,
 		updatedAt: now,
 		isFavorite: false,
+	}
+
+	// 武器系装備（メイン・サブ）の場合は初期武器情報をweaponInfoStorageに保存
+	if (equipmentCategory === 'main' || equipmentCategory === 'subWeapon') {
+		const { saveWeaponInfo } = require('./weaponInfoStorage')
+		saveWeaponInfo(id, 0, 0, 0)
 	}
 
 	return customEquipment
@@ -547,41 +568,49 @@ export function getCombinedEquipmentsByCategory(
 		freeInput3: 'accessory',
 	}
 
-	// カスタム装備をEquipment形式に変換
+	// カスタム装備をEquipment形式に変換（weaponInfoOverlay適用）
 	const formattedCustomEquipments: Equipment[] = filteredCustomEquipments.map(
-		(equipment) => ({
-			id: equipment.id,
-			name: equipment.name,
-			type: categoryToTypeMap[equipment.category],
-			category: [equipment.category] as EquipmentCategory[],
-			baseStats: equipment.weaponStats || {},
-			properties: equipment.properties,
-			armorType: equipment.armorType,
-			isPreset: false,
-			isCustom: true,
-			isFavorite: equipment.isFavorite,
-			isModified: false,
-			createdAt: equipment.createdAt,
-			updatedAt: equipment.updatedAt,
-		}),
+		(equipment) => {
+			const baseEquipment = {
+				id: equipment.id,
+				name: equipment.name,
+				type: categoryToTypeMap[equipment.category],
+				category: [equipment.category] as EquipmentCategory[],
+				baseStats: {},
+				properties: equipment.properties,
+				armorType: equipment.armorType,
+				isPreset: false as const,
+				isCustom: true as const,
+				isFavorite: equipment.isFavorite,
+				isModified: false,
+				createdAt: equipment.createdAt,
+				updatedAt: equipment.updatedAt,
+			}
+			// weaponInfoOverlayを適用
+			return applyWeaponInfoOverlay(baseEquipment)
+		},
 	)
 
-	// 仮データ装備をEquipment形式に変換
+	// 仮データ装備をEquipment形式に変換（weaponInfoOverlay適用）
 	const formattedTemporaryEquipments: Equipment[] = temporaryEquipments.map(
-		(equipment) => ({
-			id: equipment.id,
-			name: `${equipment.name} (未保存)`,
-			type: categoryToTypeMap[equipment.category],
-			category: [equipment.category] as EquipmentCategory[],
-			baseStats: equipment.weaponStats || {},
-			properties: equipment.properties,
-			isPreset: false,
-			isCustom: true,
-			isFavorite: equipment.isFavorite,
-			isModified: false,
-			createdAt: equipment.createdAt,
-			updatedAt: equipment.updatedAt,
-		}),
+		(equipment) => {
+			const baseEquipment = {
+				id: equipment.id,
+				name: `${equipment.name} (未保存)`,
+				type: categoryToTypeMap[equipment.category],
+				category: [equipment.category] as EquipmentCategory[],
+				baseStats: {},
+				properties: equipment.properties,
+				isPreset: false as const,
+				isCustom: true as const,
+				isFavorite: equipment.isFavorite,
+				isModified: false,
+				createdAt: equipment.createdAt,
+				updatedAt: equipment.updatedAt,
+			}
+			// weaponInfoOverlayを適用
+			return applyWeaponInfoOverlay(baseEquipment)
+		},
 	)
 
 	// プリセット装備とカスタム装備、仮データを結合
@@ -621,45 +650,49 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 	// 編集セッション中のデータから検索（最優先）
 	const editSessionEquipment = getEditSessionEquipment(id)
 	if (editSessionEquipment) {
-		return {
+		const equipment = {
 			id: editSessionEquipment.id,
 			name: `${editSessionEquipment.name} (編集中)`,
 			type: categoryToTypeMap[editSessionEquipment.category],
 			category: [editSessionEquipment.category],
-			baseStats: editSessionEquipment.weaponStats || {},
+			baseStats: {},
 			properties: editSessionEquipment.properties,
-			isPreset: false,
+			refinement: 0, // weaponInfoOverlayで上書きされる
+			isPreset: false as const,
 			isCustom: true,
 			isFavorite: editSessionEquipment.isFavorite,
 			isModified: true,
 			createdAt: editSessionEquipment.createdAt,
 			updatedAt: editSessionEquipment.updatedAt,
 		}
+		return applyWeaponInfoOverlay(equipment as Equipment)
 	}
 
 	// 仮データから検索（第二優先）
 	const temporaryEquipment = getTemporaryEquipmentById(id)
 	if (temporaryEquipment) {
-		return {
+		const equipment = {
 			id: temporaryEquipment.id,
 			name: `${temporaryEquipment.name} (未保存)`,
 			type: categoryToTypeMap[temporaryEquipment.category],
 			category: [temporaryEquipment.category],
-			baseStats: temporaryEquipment.weaponStats || {},
+			baseStats: {},
 			properties: temporaryEquipment.properties,
-			isPreset: false,
+			refinement: 0, // weaponInfoOverlayで上書きされる
+			isPreset: false as const,
 			isCustom: true,
 			isFavorite: temporaryEquipment.isFavorite,
 			isModified: false,
 			createdAt: temporaryEquipment.createdAt,
 			updatedAt: temporaryEquipment.updatedAt,
 		}
+		return applyWeaponInfoOverlay(equipment as Equipment)
 	}
 
 	// プリセット装備から検索
 	const presetEquipment = getEquipmentById(id)
 	if (presetEquipment) {
-		return {
+		const equipment = {
 			...presetEquipment,
 			isPreset: true as const,
 			isFavorite: false,
@@ -667,26 +700,29 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		}
+		return applyWeaponInfoOverlay(equipment as Equipment)
 	}
 
 	// カスタム装備から検索
 	const customEquipment = getCustomEquipmentById(id)
 	if (customEquipment) {
-		return {
+		const equipment = {
 			id: customEquipment.id,
 			name: customEquipment.name,
 			type: categoryToTypeMap[customEquipment.category],
 			category: [customEquipment.category],
-			baseStats: customEquipment.weaponStats || {},
+			baseStats: {},
 			properties: customEquipment.properties,
+			refinement: 0, // weaponInfoOverlayで上書きされる
 			armorType: customEquipment.armorType,
-			isPreset: false,
+			isPreset: false as const,
 			isCustom: true,
 			isFavorite: customEquipment.isFavorite,
 			isModified: false,
 			createdAt: customEquipment.createdAt,
 			updatedAt: customEquipment.updatedAt,
 		}
+		return applyWeaponInfoOverlay(equipment as Equipment)
 	}
 
 	return null
@@ -722,6 +758,52 @@ export function updateCustomEquipmentProperties(
 		const editableEquipment = startEditSession(customEquipment)
 		// 編集セッション内でプロパティを更新
 		return updateEditSessionProperties(editableEquipment.id, properties)
+	}
+
+	return false
+}
+
+// カスタム装備の精錬値を更新
+export function updateCustomEquipmentRefinement(
+	id: string,
+	refinement: number,
+): boolean {
+	// 編集セッション中のデータ更新を試行（最優先）
+	if (isInEditSession(id)) {
+		try {
+			const { updateEditSessionRefinement } = require('./editSessionManager')
+			return updateEditSessionRefinement(id, refinement)
+		} catch (error) {
+			console.error('Failed to update edit session refinement:', error)
+			return false
+		}
+	}
+
+	// 仮データから更新を試行
+	if (isTemporaryEquipment(id)) {
+		try {
+			const {
+				updateTemporaryEquipmentRefinement,
+			} = require('./temporaryEquipmentManager')
+			return updateTemporaryEquipmentRefinement(id, refinement)
+		} catch (error) {
+			console.error('Failed to update temporary equipment refinement:', error)
+			return false
+		}
+	}
+
+	// カスタム装備の場合は編集セッションを開始してから更新
+	const customEquipment = getCustomEquipmentById(id)
+	if (customEquipment) {
+		// 編集セッションを開始
+		const editableEquipment = startEditSession(customEquipment)
+		try {
+			const { updateEditSessionRefinement } = require('./editSessionManager')
+			return updateEditSessionRefinement(editableEquipment.id, refinement)
+		} catch (error) {
+			console.error('Failed to update refinement via edit session:', error)
+			return false
+		}
 	}
 
 	return false
@@ -821,3 +903,5 @@ export function updateEquipmentArmorType(
 	console.log('No equipment found with id:', id)
 	return false
 }
+
+// 移行関数は削除済み - weaponInfoStorageで統一管理完了

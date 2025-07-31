@@ -252,11 +252,12 @@ export default function MultiParamModal({
 								onClick={() =>
 									handleLevelChange((currentState.level || 10) - 10)
 								}
-								disabled={currentState.level <= (
-									skill.type === 'multiParam' && skill.multiParams
+								disabled={
+									currentState.level <=
+									(skill.type === 'multiParam' && skill.multiParams
 										? skill.multiParams.param1.min
-										: 1
-								)}
+										: 1)
+								}
 								className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 							>
 								-10
@@ -268,11 +269,12 @@ export default function MultiParamModal({
 								onClick={() =>
 									handleLevelChange((currentState.level || 10) - 1)
 								}
-								disabled={currentState.level <= (
-									skill.type === 'multiParam' && skill.multiParams
+								disabled={
+									currentState.level <=
+									(skill.type === 'multiParam' && skill.multiParams
 										? skill.multiParams.param1.min
-										: 1
-								)}
+										: 1)
+								}
 								className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
 							>
 								-1
@@ -283,10 +285,10 @@ export default function MultiParamModal({
 								{skill.id === 'IsBrave'
 									? currentState.level || 2
 									: skill.id === 'IsWarcry'
-									? currentState.level || 2
-									: skill.id === 'IsPriere'
-									? currentState.level || 2
-									: `Lv.${currentState.level || 10}`}
+										? currentState.level || 2
+										: skill.id === 'IsPriere'
+											? currentState.level || 2
+											: `Lv.${currentState.level || 10}`}
 							</div>
 
 							{/* レベル +1ボタン */}
@@ -295,11 +297,12 @@ export default function MultiParamModal({
 								onClick={() =>
 									handleLevelChange((currentState.level || 10) + 1)
 								}
-								disabled={currentState.level >= (
-									skill.type === 'multiParam' && skill.multiParams
+								disabled={
+									currentState.level >=
+									(skill.type === 'multiParam' && skill.multiParams
 										? skill.multiParams.param1.max
-										: skill.maxLevel || 10
-								)}
+										: skill.maxLevel || 10)
+								}
 								className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 							>
 								+1
@@ -311,11 +314,12 @@ export default function MultiParamModal({
 								onClick={() =>
 									handleLevelChange((currentState.level || 10) + 10)
 								}
-								disabled={currentState.level >= (
-									skill.type === 'multiParam' && skill.multiParams
+								disabled={
+									currentState.level >=
+									(skill.type === 'multiParam' && skill.multiParams
 										? skill.multiParams.param1.max
-										: skill.maxLevel || 10
-								)}
+										: skill.maxLevel || 10)
+								}
 								className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
 							>
 								+10
@@ -324,129 +328,133 @@ export default function MultiParamModal({
 					</div>
 
 					{/* 重ねがけ数設定 */}
-					{skill.id !== 'IsBrave' && skill.id !== 'IsWarcry' && skill.id !== 'IsPriere' && (
-						<div>
-							<div className="text-sm text-gray-600 mb-3">
-								{skill.type === 'multiParam' && skill.multiParams
-									? skill.id === 'dp1'
-										? 'ダークパワースキルに使用した全スキルポイントを入力してください。'
-										: skill.id === 'mg4'
-											? 'キャストマスタリを除いたウィザードスキルの習得数を入力してください。'
-											: skill.id === 'knight5-3'
-												? 'バフエリア内のプレイヤーの数を入力してください。'
-												: `${skill.multiParams.param2?.name || 'パラメータ2'}を入力してください。`
-									: 'カウント数を入力してください。'}
-							</div>
-							<div className="flex items-center justify-center space-x-2">
-								{/* スタック -10ボタン */}
-								<button
-									type="button"
-									onClick={() => {
-										const currentValue =
-											skill.type === 'multiParam'
-												? currentState.multiParam2 ||
-													skill.multiParams?.param2?.default ||
-													1
-												: currentState.stackCount || 1
-										handleStackCountChange(currentValue - 10)
-									}}
-									disabled={
-										skill.type === 'multiParam'
-											? (currentState.multiParam2 ||
-													skill.multiParams?.param2?.default ||
-													1) <= (skill.multiParams?.param2?.min || 1)
-											: (currentState.stackCount || 1) <= 1
-									}
-									className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
-								>
-									-10
-								</button>
-
-								{/* スタック -1ボタン */}
-								<button
-									type="button"
-									onClick={() => {
-										const currentValue =
-											skill.type === 'multiParam'
-												? currentState.multiParam2 ||
-													skill.multiParams?.param2?.default ||
-													1
-												: currentState.stackCount || 1
-										handleStackCountChange(currentValue - 1)
-									}}
-									disabled={
-										skill.type === 'multiParam'
-											? (currentState.multiParam2 ||
-													skill.multiParams?.param2?.default ||
-													1) <= (skill.multiParams?.param2?.min || 1)
-											: (currentState.stackCount || 1) <= 1
-									}
-									className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
-								>
-									-1
-								</button>
-
-								{/* スタック数表示 */}
-								<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded w-[80px] text-center">
-									{skill.id === 'dp1'
-										? `${currentState.multiParam2 || skill.multiParams?.param2?.default || 1}pt`
-										: skill.id === 'IsBrave'
-											? (currentState.stackCount || 2) === 1
-												? '使用者'
-												: '使用者以外'
-											: `×${currentState.stackCount || 1}`}
+					{skill.id !== 'IsBrave' &&
+						skill.id !== 'IsWarcry' &&
+						skill.id !== 'IsPriere' && (
+							<div>
+								<div className="text-sm text-gray-600 mb-3">
+									{skill.type === 'multiParam' && skill.multiParams
+										? skill.id === 'dp1'
+											? 'ダークパワースキルに使用した全スキルポイントを入力してください。'
+											: skill.id === 'mg4'
+												? 'キャストマスタリを除いたウィザードスキルの習得数を入力してください。'
+												: skill.id === 'knight5-3'
+													? 'バフエリア内のプレイヤーの数を入力してください。'
+													: `${skill.multiParams.param2?.name || 'パラメータ2'}を入力してください。`
+										: 'カウント数を入力してください。'}
 								</div>
-
-								{/* スタック +1ボタン */}
-								<button
-									type="button"
-									onClick={() => {
-										const currentValue =
+								<div className="flex items-center justify-center space-x-2">
+									{/* スタック -10ボタン */}
+									<button
+										type="button"
+										onClick={() => {
+											const currentValue =
+												skill.type === 'multiParam'
+													? currentState.multiParam2 ||
+														skill.multiParams?.param2?.default ||
+														1
+													: currentState.stackCount || 1
+											handleStackCountChange(currentValue - 10)
+										}}
+										disabled={
 											skill.type === 'multiParam'
-												? currentState.multiParam2 ||
-													skill.multiParams?.param2?.default ||
-													1
-												: currentState.stackCount || 1
-										handleStackCountChange(currentValue + 1)
-									}}
-									disabled={
-										skill.type === 'multiParam'
-											? (currentState.multiParam2 ||
-													skill.multiParams?.param2?.default ||
-													1) >= (skill.multiParams?.param2?.max || 10)
-											: (currentState.stackCount || 1) >= (skill.maxStack || 10)
-									}
-									className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
-								>
-									+1
-								</button>
+												? (currentState.multiParam2 ||
+														skill.multiParams?.param2?.default ||
+														1) <= (skill.multiParams?.param2?.min || 1)
+												: (currentState.stackCount || 1) <= 1
+										}
+										className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
+									>
+										-10
+									</button>
 
-								{/* スタック +10ボタン */}
-								<button
-									type="button"
-									onClick={() => {
-										const currentValue =
+									{/* スタック -1ボタン */}
+									<button
+										type="button"
+										onClick={() => {
+											const currentValue =
+												skill.type === 'multiParam'
+													? currentState.multiParam2 ||
+														skill.multiParams?.param2?.default ||
+														1
+													: currentState.stackCount || 1
+											handleStackCountChange(currentValue - 1)
+										}}
+										disabled={
 											skill.type === 'multiParam'
-												? currentState.multiParam2 ||
-													skill.multiParams?.param2?.default ||
-													1
-												: currentState.stackCount || 1
-										handleStackCountChange(currentValue + 10)
-									}}
-									disabled={
-										skill.type === 'multiParam'
-											? (currentState.multiParam2 ||
-													skill.multiParams?.param2?.default ||
-													1) >= (skill.multiParams?.param2?.max || 10)
-											: (currentState.stackCount || 1) >= (skill.maxStack || 10)
-									}
-									className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
-								>
-									+10
-								</button>
+												? (currentState.multiParam2 ||
+														skill.multiParams?.param2?.default ||
+														1) <= (skill.multiParams?.param2?.min || 1)
+												: (currentState.stackCount || 1) <= 1
+										}
+										className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer"
+									>
+										-1
+									</button>
+
+									{/* スタック数表示 */}
+									<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded w-[80px] text-center">
+										{skill.id === 'dp1'
+											? `${currentState.multiParam2 || skill.multiParams?.param2?.default || 1}pt`
+											: skill.id === 'IsBrave'
+												? (currentState.stackCount || 2) === 1
+													? '使用者'
+													: '使用者以外'
+												: `×${currentState.stackCount || 1}`}
+									</div>
+
+									{/* スタック +1ボタン */}
+									<button
+										type="button"
+										onClick={() => {
+											const currentValue =
+												skill.type === 'multiParam'
+													? currentState.multiParam2 ||
+														skill.multiParams?.param2?.default ||
+														1
+													: currentState.stackCount || 1
+											handleStackCountChange(currentValue + 1)
+										}}
+										disabled={
+											skill.type === 'multiParam'
+												? (currentState.multiParam2 ||
+														skill.multiParams?.param2?.default ||
+														1) >= (skill.multiParams?.param2?.max || 10)
+												: (currentState.stackCount || 1) >=
+													(skill.maxStack || 10)
+										}
+										className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
+									>
+										+1
+									</button>
+
+									{/* スタック +10ボタン */}
+									<button
+										type="button"
+										onClick={() => {
+											const currentValue =
+												skill.type === 'multiParam'
+													? currentState.multiParam2 ||
+														skill.multiParams?.param2?.default ||
+														1
+													: currentState.stackCount || 1
+											handleStackCountChange(currentValue + 10)
+										}}
+										disabled={
+											skill.type === 'multiParam'
+												? (currentState.multiParam2 ||
+														skill.multiParams?.param2?.default ||
+														1) >= (skill.multiParams?.param2?.max || 10)
+												: (currentState.stackCount || 1) >=
+													(skill.maxStack || 10)
+										}
+										className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer"
+									>
+										+10
+									</button>
+								</div>
 							</div>
-						</div>
-					)}
+						)}
 
 					{/* パラメータ3設定 */}
 					{skill.type === 'multiParam' &&

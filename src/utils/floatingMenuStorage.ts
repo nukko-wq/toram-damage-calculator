@@ -25,14 +25,16 @@ export function getFloatingMenuSettings(): FloatingMenuSettings {
 /**
  * FloatingMenuの設定を保存
  */
-export function saveFloatingMenuSettings(settings: Partial<FloatingMenuSettings>): boolean {
+export function saveFloatingMenuSettings(
+	settings: Partial<FloatingMenuSettings>,
+): boolean {
 	const currentSettings = getFloatingMenuSettings()
 	const newSettings: FloatingMenuSettings = {
 		...currentSettings,
 		...settings,
 		updatedAt: new Date().toISOString(),
 	}
-	
+
 	return StorageHelper.set(STORAGE_KEYS.FLOATING_MENU_SETTINGS, newSettings)
 }
 

@@ -36,13 +36,13 @@ export function getEternalNightmareEffects(
 	if (!buffSkillData) return {}
 
 	const eternalNightmare = buffSkillData.dp1
-	
+
 	if (eternalNightmare?.isEnabled) {
 		// multiParam型の場合は multiParam1, multiParam2 を使用
 		// level型の場合は level を使用
 		let skillLevel = 10 // デフォルト値
 		let skillPointTotal = 80 // デフォルト値
-		
+
 		if (eternalNightmare.multiParam1 && eternalNightmare.multiParam2) {
 			skillLevel = eternalNightmare.multiParam1
 			skillPointTotal = eternalNightmare.multiParam2
@@ -51,8 +51,11 @@ export function getEternalNightmareEffects(
 			// specialParamがスキルポイント合計として使われているかチェック
 			skillPointTotal = eternalNightmare.specialParam || 80
 		}
-		
-		const effects = calculateEternalNightmareEffects(skillLevel, skillPointTotal)
+
+		const effects = calculateEternalNightmareEffects(
+			skillLevel,
+			skillPointTotal,
+		)
 		return effects
 	}
 

@@ -9,7 +9,7 @@ export class BusterBladeCalculator extends SkillHitCalculator {
 	calculate(input: SkillCalculationInput): SkillCalculationResult {
 		const baseMultiplier = 750 // 基本倍率750%
 		let weaponBonus = 0
-		
+
 		// 武器種別による補正
 		switch (input.equipmentContext.mainWeaponType) {
 			case '両手剣':
@@ -24,9 +24,9 @@ export class BusterBladeCalculator extends SkillHitCalculator {
 			default:
 				weaponBonus = 0
 		}
-		
+
 		const finalMultiplier = baseMultiplier + weaponBonus
-		
+
 		return {
 			hitNumber: input.hitNumber,
 			calculatedMultiplier: finalMultiplier,

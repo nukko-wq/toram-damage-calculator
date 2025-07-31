@@ -6,6 +6,8 @@ import type { PresetEquipment } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
+import { getWeaponInfo } from '@/utils/weaponInfoStorage'
+import { refinementValueToDisplay } from '@/utils/refinementUtils'
 
 interface EquipmentCardProps {
 	equipment: PresetEquipment
@@ -50,13 +52,19 @@ export default function EquipmentCard({
 		[equipment.id, isFavorite, onFavoriteChange],
 	)
 
-	const formatBaseStats = () => {
-		const stats = Object.entries(equipment.baseStats)
-			.filter(([_, value]) => value !== undefined && value !== 0)
-			.map(([key, value]) => `${key}${value > 0 ? '+' : ''}${value}`)
-			.slice(0, 2) // 最大2つまで表示
 
-		return stats.length > 0 ? stats.join(', ') : ''
+	const formatWeaponInfo = () => {
+		const weaponInfo = getWeaponInfo(equipment.id)
+		if (!weaponInfo) {
+			return null
+		}
+
+		const { ATK, stability, refinement, weaponType } = weaponInfo
+		const refinementDisplay = refinement > 0 ? ` +${refinementValueToDisplay(refinement as any)}` : ''
+		const stabilityDisplay = stability > 0 ? ` (${stability}%)` : ''
+		const weaponTypeDisplay = weaponType ? `[${weaponType}] ` : ''
+		
+		return `${weaponTypeDisplay}${ATK}${refinementDisplay}${stabilityDisplay}`
 	}
 
 	const getPropertyList = () => {
@@ -318,10 +326,10 @@ export default function EquipmentCard({
 				</div>
 			)}
 
-			{/* 基本ステータス */}
-			{formatBaseStats() && (
+			{/* 武器情報 */}
+			{formatWeaponInfo() && (
 				<div className="text-sm text-blue-600 mb-2 font-medium">
-					{formatBaseStats()}
+					{formatWeaponInfo()}
 				</div>
 			)}
 
@@ -377,17 +385,7 @@ export default function EquipmentCard({
 					</div>
 				)}
 
-			{/* 説明 */}
-			{equipment.description && (
-				<div className="text-xs text-gray-500 line-clamp-2 mb-1">
-					{equipment.description}
-				</div>
-			)}
 
-			{/* 入手方法 */}
-			{equipment.source && (
-				<div className="text-xs text-gray-400">入手: {equipment.source}</div>
-			)}
 		</div>
 	)
 }

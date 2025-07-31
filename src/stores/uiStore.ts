@@ -3,9 +3,12 @@ import { devtools, persist } from 'zustand/middleware'
 import type { UIStore } from '@/types/stores'
 
 // ローカルストレージから初期カテゴリ状態を取得
-const getInitialStatusPreviewCategories = (): Record<string, 'base' | 'physical' | 'magical' | 'hybrid' | 'tank'> => {
+const getInitialStatusPreviewCategories = (): Record<
+	string,
+	'base' | 'physical' | 'magical' | 'hybrid' | 'tank'
+> => {
 	if (typeof window === 'undefined') return {}
-	
+
 	try {
 		const stored = localStorage.getItem('ui-store')
 		if (stored) {
@@ -13,7 +16,10 @@ const getInitialStatusPreviewCategories = (): Record<string, 'base' | 'physical'
 			return parsed.state?.statusPreviewCategories || {}
 		}
 	} catch (error) {
-		console.warn('Failed to load status preview categories from localStorage:', error)
+		console.warn(
+			'Failed to load status preview categories from localStorage:',
+			error,
+		)
 	}
 	return {}
 }
@@ -75,9 +81,9 @@ export const useUIStore = create<UIStore>()(
 							},
 						}),
 						false,
-						'setStatusPreviewCategory'
+						'setStatusPreviewCategory',
 					)
-					
+
 					// calculatorStoreに変更をチェックしてもらい、差分があれば保存ボタンを有効化
 					if (typeof window !== 'undefined') {
 						const { useCalculatorStore } = require('./calculatorStore')
@@ -90,7 +96,7 @@ export const useUIStore = create<UIStore>()(
 				partialize: (state) => ({
 					statusPreviewCategories: state.statusPreviewCategories,
 				}),
-			}
+			},
 		),
 		{
 			name: 'ui-store',

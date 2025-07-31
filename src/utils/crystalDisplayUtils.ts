@@ -185,18 +185,23 @@ export function formatConditionalEffect(effect: ConditionalEffect): {
  * 複数の条件付き効果をまとめて表示用に変換
  * 同じ効果が複数の条件で発生する場合は条件をまとめて表示
  */
-export function formatGroupedConditionalEffects(effects: ConditionalEffect[]): Array<{
+export function formatGroupedConditionalEffects(
+	effects: ConditionalEffect[],
+): Array<{
 	conditionText: string
 	effectTexts: string[]
 }> {
 	if (!effects || effects.length === 0) return []
 
 	// 効果ごとにグループ化
-	const effectGroups = new Map<string, { conditions: string[], effect: string }>()
+	const effectGroups = new Map<
+		string,
+		{ conditions: string[]; effect: string }
+	>()
 
 	for (const effect of effects) {
 		const conditionText = formatConditionText(effect.condition)
-		
+
 		for (const [propertyKey, value] of Object.entries(effect.properties)) {
 			if (typeof value === 'number' && value !== 0) {
 				const propertyName = formatPropertyName(
@@ -207,7 +212,7 @@ export function formatGroupedConditionalEffects(effects: ConditionalEffect[]): A
 					propertyKey as keyof EquipmentProperties,
 				)
 				const effectText = `${propertyName}${propertyValue}`
-				
+
 				if (effectGroups.has(effectText)) {
 					// 既存の効果に条件を追加
 					const existing = effectGroups.get(effectText)!
@@ -218,7 +223,7 @@ export function formatGroupedConditionalEffects(effects: ConditionalEffect[]): A
 					// 新しい効果を追加
 					effectGroups.set(effectText, {
 						conditions: [conditionText],
-						effect: effectText
+						effect: effectText,
 					})
 				}
 			}
@@ -226,20 +231,20 @@ export function formatGroupedConditionalEffects(effects: ConditionalEffect[]): A
 	}
 
 	// グループ化された結果を変換
-	return Array.from(effectGroups.values()).map(group => {
+	return Array.from(effectGroups.values()).map((group) => {
 		// 同じ武器種の場合は「魔導具装備時」のようにまとめる
 		const uniqueConditions = [...new Set(group.conditions)]
 		let conditionText: string
-		
+
 		if (uniqueConditions.length === 1) {
 			conditionText = uniqueConditions[0]
 		} else {
 			// 複数の条件がある場合、共通部分を抽出
-			const weaponTypes = uniqueConditions.map(condition => {
+			const weaponTypes = uniqueConditions.map((condition) => {
 				const match = condition.match(/^(.+)装備時$/)
 				return match ? match[1] : condition
 			})
-			
+
 			// 同じ武器種が複数の装備箇所にある場合
 			const uniqueWeaponTypes = [...new Set(weaponTypes)]
 			if (uniqueWeaponTypes.length === 1) {
@@ -248,10 +253,10 @@ export function formatGroupedConditionalEffects(effects: ConditionalEffect[]): A
 				conditionText = uniqueConditions.join('または')
 			}
 		}
-		
+
 		return {
 			conditionText,
-			effectTexts: [group.effect]
+			effectTexts: [group.effect],
 		}
 	})
 }

@@ -6,7 +6,7 @@ import type { EquipmentProperties, PowerOptions } from '@/types/calculator'
 
 /**
  * 熱情の歌の効果を計算
- * 
+ *
  * @param stackCount スタック数 (1-10)
  * @param powerOptions DamagePreviewの威力オプション設定
  * @returns バフ効果
@@ -21,7 +21,7 @@ export function calculateHotKnowsEffects(
 	if (!powerOptions) return {}
 
 	const elementAttack = powerOptions.elementAttack
-	
+
 	// 効果計算: 1.5 × スタック数
 	const effectValue = stackCount * 1.5
 
@@ -41,4 +41,3 @@ export function calculateHotKnowsEffects(
 			return {}
 	}
 }
-

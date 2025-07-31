@@ -28,13 +28,12 @@ import {
 	CALC_RESULT_SETTINGS_KEY,
 	type CalculationResultSettings,
 } from '@/types/calculationResult'
-import {
-	isValidCalculatorData,
-} from '@/utils/differenceDetection'
+import { isValidCalculatorData } from '@/utils/differenceDetection'
 import {
 	saveCustomEquipment,
 	deleteCustomEquipment,
 	updateCustomEquipmentProperties,
+	updateCustomEquipmentRefinement,
 	hasTemporaryEquipments,
 	hasEditSessions,
 	renameCustomEquipment,
@@ -590,6 +589,25 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				}
 			},
 
+			// カスタム装備の精錬値を更新
+			updateCustomEquipmentRefinement: async (equipmentId, refinement) => {
+				try {
+					const success = updateCustomEquipmentRefinement(
+						equipmentId,
+						refinement,
+					)
+					if (success) {
+						// データベースレイヤーでの変更を検知するため、差分チェックを強制実行
+						const dataUpdate = createDataUpdate(set, get)
+						dataUpdate({}, 'updateCustomEquipmentRefinement')
+					}
+					return success
+				} catch (error) {
+					console.error('カスタム装備精錬値更新エラー:', error)
+					throw error
+				}
+			},
+
 			// 仮データと編集セッションのクリーンアップ
 			cleanupTemporaryData: () => {
 				cleanupAllTemporaryEquipments()
@@ -802,7 +820,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			// ===== ダメージ計算結果キャッシュアクション =====
 			updateBaselineDamageResult: () => {
 				const { data, calculationResults } = get()
-				
+
 				if (!calculationResults) {
 					// 基本計算結果がない場合は先に計算
 					const results = calculateResults(data)
@@ -812,14 +830,14 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				try {
 					// powerOptionsを取得（フォールバック付き）
 					const powerOptions = data.powerOptions || createInitialPowerOptions()
-					
+
 					// 基準ダメージを計算してキャッシュ
 					const damageResult = calculateDamageWithService(
 						data,
 						get().calculationResults || calculateResults(data),
-						{ powerOptions, debug: false }
+						{ powerOptions, debug: false },
 					)
-					
+
 					set({ baselineDamageResult: damageResult })
 				} catch (error) {
 					console.error('基準ダメージ計算エラー:', error)

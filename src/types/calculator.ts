@@ -234,19 +234,7 @@ export type EquipmentCategory =
 export interface PresetEquipment {
 	id: string
 	name: string
-	type: EquipmentType
-	category: EquipmentCategory[]
-	baseStats: {
-		ATK?: number
-		DEF?: number
-		MATK?: number
-		MDEF?: number
-		stability?: number
-		refinement?: number
-	}
 	properties: Partial<EquipmentProperties>
-	description?: string
-	source?: string // 入手方法
 	armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
 	conditionalEffects?: ConditionalEffect[] // 条件付き効果
 }
@@ -446,11 +434,6 @@ export interface UserEquipment {
 	name: string
 	category: EquipmentCategory
 	properties: Partial<EquipmentProperties>
-	weaponStats?: {
-		ATK?: number
-		stability?: number
-		refinement?: number
-	}
 	crystalSlots?: {
 		slot1?: string
 		slot2?: string
@@ -547,7 +530,9 @@ interface LocalStorageCustomItemBase {
 // ローカルストレージ装備（プリセット由来）
 export interface LocalStorageEquipment
 	extends PresetEquipment,
-		LocalStoragePresetItemBase {}
+		LocalStoragePresetItemBase {
+	refinement?: number // weaponInfoStorageで管理される精錬値
+}
 
 // ローカルストレージクリスタル（プリセット由来）
 export interface LocalStorageCrystal
@@ -566,6 +551,7 @@ export interface CustomEquipment
 	extends PresetEquipment,
 		LocalStorageCustomItemBase {
 	isCustom: true
+	refinement?: number // weaponInfoStorageで管理される精錬値
 }
 
 export interface CustomCrystal

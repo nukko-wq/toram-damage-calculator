@@ -68,11 +68,11 @@ export default function CrystalCard({
 					type="button"
 					onClick={handleFavoriteClick}
 					className={`
-						absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10
+						absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 cursor-pointer
 						${
 							isFavorite
-								? 'text-red-500 hover:text-red-600'
-								: 'text-gray-300 hover:text-red-400'
+								? 'text-rose-500/80 hover:text-rose-500'
+								: 'text-gray-300 hover:text-rose-400'
 						}
 					`}
 					aria-label={isFavorite ? 'お気に入りから削除' : 'お気に入りに追加'}
@@ -99,7 +99,7 @@ export default function CrystalCard({
 				<h3 className="font-semibold text-gray-900">{crystal.name}</h3>
 				{/* 選択状態のチェックマーク */}
 				{isSelected && (
-					<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
+					<div className="w-6 h-6 bg-blue-500/80 rounded-full flex items-center justify-center ml-2">
 						<svg
 							className="w-4 h-4 text-white"
 							fill="none"
@@ -313,31 +313,35 @@ export default function CrystalCard({
 			{/* 条件付き効果 */}
 			{crystal.conditionalEffects && crystal.conditionalEffects.length > 0 && (
 				<div className="text-sm text-blue-600 space-y-1 pr-6">
-					{formatGroupedConditionalEffects(crystal.conditionalEffects).map((group, index) => (
-						<div key={`${crystal.id}-group-${index}`}>
-							<div className="flex flex-wrap gap-1">
-								<div className="">{group.conditionText}：</div>
-								{group.effectTexts.length > 1 ? (
-									<div className="flex flex-wrap gap-1">
-										{group.effectTexts.map((effectText, effectIndex) => (
+					{formatGroupedConditionalEffects(crystal.conditionalEffects).map(
+						(group, index) => (
+							<div key={`${crystal.id}-group-${index}`}>
+								<div className="flex flex-wrap gap-1">
+									<div className="">{group.conditionText}：</div>
+									{group.effectTexts.length > 1 ? (
+										<div className="flex flex-wrap gap-1">
+											{group.effectTexts.map((effectText, effectIndex) => (
+												<div
+													key={`${crystal.id}-group-${index}-effect-${effectIndex}`}
+												>
+													{effectText}
+													{effectIndex < group.effectTexts.length - 1 && ' '}
+												</div>
+											))}
+										</div>
+									) : (
+										group.effectTexts.map((effectText, effectIndex) => (
 											<div
 												key={`${crystal.id}-group-${index}-effect-${effectIndex}`}
 											>
 												{effectText}
-												{effectIndex < group.effectTexts.length - 1 && ' '}
 											</div>
-										))}
-									</div>
-								) : (
-									group.effectTexts.map((effectText, effectIndex) => (
-										<div key={`${crystal.id}-group-${index}-effect-${effectIndex}`}>
-											{effectText}
-										</div>
-									))
-								)}
+										))
+									)}
+								</div>
 							</div>
-						</div>
-					))}
+						),
+					)}
 				</div>
 			)}
 		</div>

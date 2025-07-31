@@ -17,7 +17,7 @@ export function calculateArcheryEffects(
 	subWeaponStability = 0,
 ): Partial<EquipmentProperties> {
 	if (!isEnabled) return {}
-	
+
 	// メイン武器が弓でサブ武器が抜刀剣の場合のみ効果が発動
 	if (mainWeaponType !== '弓' || subWeaponType !== '抜刀剣') {
 		return {}
