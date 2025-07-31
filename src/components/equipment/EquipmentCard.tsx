@@ -50,14 +50,6 @@ export default function EquipmentCard({
 		[equipment.id, isFavorite, onFavoriteChange],
 	)
 
-	const formatBaseStats = () => {
-		const stats = Object.entries(equipment.baseStats)
-			.filter(([_, value]) => value !== undefined && value !== 0)
-			.map(([key, value]) => `${key}${value > 0 ? '+' : ''}${value}`)
-			.slice(0, 2) // 最大2つまで表示
-
-		return stats.length > 0 ? stats.join(', ') : ''
-	}
 
 	const getPropertyList = () => {
 		// 装備フォームと同じプロパティ名マッピング
@@ -318,12 +310,6 @@ export default function EquipmentCard({
 				</div>
 			)}
 
-			{/* 基本ステータス */}
-			{formatBaseStats() && (
-				<div className="text-sm text-blue-600 mb-2 font-medium">
-					{formatBaseStats()}
-				</div>
-			)}
 
 			{/* プロパティ */}
 			{getPropertyList().length > 0 && (

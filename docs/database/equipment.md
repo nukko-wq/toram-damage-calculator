@@ -48,20 +48,38 @@ export const equipmentsData: EquipmentsData = {
 } as const
 ```
 
-**LocalStorage保存時の装備データ構造**（拡張版）:
+**LocalStorage保存時の装備データ構造**:
+
+**プリセット由来装備 (LocalStorageEquipment)**:
 ```json
 {
   "id": "equipment_id",
   "name": "装備名",
-  "type": "weapon|armor|accessory|fashion", // 装備タイプ
-  "category": ["main"],       // 装備カテゴリ（配列）
-  "baseStats": {},            // 基本ステータス（プリセット用）
   "properties": { /* プロパティ */ },
-  "source": "入手方法",
-  "crystalSlots": { /* クリスタルスロット */ },
+  "armorType": "normal",      // 防具の改造タイプ（体装備のみ）
+  "conditionalEffects": [],   // 条件付き効果
   "refinement": 0,            // weaponInfoStorageで上書きされる
   "isPreset": true,           // プリセット由来フラグ
-  "isCustom": false,          // カスタム装備フラグ
+  "isFavorite": false,        // お気に入り設定
+  "isModified": false,        // 変更済みフラグ
+  "modifiedAt": "ISO string", // 変更日時（オプション）
+  "originalChecksum": "hash", // 元データのチェックサム（オプション）
+  "createdAt": "ISO string",  // 作成日時
+  "updatedAt": "ISO string"   // 更新日時
+}
+```
+
+**カスタム装備 (CustomEquipment)**:
+```json
+{
+  "id": "equipment_id",
+  "name": "装備名",
+  "properties": { /* プロパティ */ },
+  "armorType": "normal",      // 防具の改造タイプ（体装備のみ）
+  "conditionalEffects": [],   // 条件付き効果
+  "refinement": 0,            // weaponInfoStorageで上書きされる
+  "isCustom": true,           // カスタム装備フラグ
+  "isPreset": false,          // プリセット由来フラグ
   "isFavorite": false,        // お気に入り設定
   "isModified": false,        // 変更済みフラグ
   "createdAt": "ISO string",  // 作成日時
@@ -88,28 +106,28 @@ export const equipmentsData: EquipmentsData = {
 interface PresetEquipment {
   id: string                    // 一意識別子
   name: string                  // 装備名
-  type: EquipmentType          // 装備タイプ（weapon|armor|accessory|fashion）
-  category: EquipmentCategory[] // 装備カテゴリ（配列）
-  baseStats: {                 // 基本ステータス
-    ATK?: number
-    DEF?: number
-    MATK?: number
-    MDEF?: number
-    stability?: number
-    refinement?: number
-  }
   properties: Partial<EquipmentProperties> // 付与プロパティ（PascalCase統一済み）
-  description?: string         // 装備の説明
-  source?: string             // 入手方法
-  armorType?: ArmorType       // 防具の改造タイプ（体装備のみ）
+  armorType?: ArmorType        // 防具の改造タイプ（体装備のみ）
   conditionalEffects?: ConditionalEffect[] // 条件付き効果
 }
 ```
 
 **ローカルストレージ装備インターフェース**（拡張版）:
 ```typescript
+// プリセット由来の装備
 interface LocalStorageEquipment extends PresetEquipment, LocalStoragePresetItemBase {
   refinement?: number // weaponInfoStorageで管理される精錬値
+}
+
+// LocalStoragePresetItemBase
+interface LocalStoragePresetItemBase {
+  isPreset: true
+  isFavorite: boolean
+  isModified: boolean
+  modifiedAt?: string
+  originalChecksum?: string
+  createdAt: string
+  updatedAt: string
 }
 
 // カスタム装備インターフェース
@@ -118,20 +136,13 @@ interface CustomEquipment extends PresetEquipment, LocalStorageCustomItemBase {
   refinement?: number // weaponInfoStorageで管理される精錬値
 }
 
-// ユーザーカスタム装備（LocalStorage保存用）
-interface UserEquipment {
-  id: string
-  name: string
-  category: EquipmentCategory
-  properties: Partial<EquipmentProperties>
-  crystalSlots?: {
-    slot1?: string
-    slot2?: string
-  }
-  armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
+// LocalStorageCustomItemBase
+interface LocalStorageCustomItemBase {
+  isPreset: false
+  isFavorite: boolean
+  isModified: boolean
   createdAt: string
   updatedAt: string
-  isFavorite: boolean
 }
 
 // 統合型（アプリ内で使用する装備データ型）

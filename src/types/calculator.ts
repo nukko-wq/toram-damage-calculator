@@ -234,19 +234,7 @@ export type EquipmentCategory =
 export interface PresetEquipment {
 	id: string
 	name: string
-	type: EquipmentType
-	category: EquipmentCategory[]
-	baseStats: {
-		ATK?: number
-		DEF?: number
-		MATK?: number
-		MDEF?: number
-		stability?: number
-		refinement?: number
-	}
 	properties: Partial<EquipmentProperties>
-	description?: string
-	source?: string // 入手方法
 	armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
 	conditionalEffects?: ConditionalEffect[] // 条件付き効果
 }

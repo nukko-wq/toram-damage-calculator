@@ -6,23 +6,8 @@
  */
 
 import type {
-	EquipmentProperties,
-	ArmorType,
-	ConditionalEffect,
+	PresetEquipment,
 } from '@/types/calculator'
-
-// 装備アイテムの型定義（JSONデータ構造に合わせて簡略化）
-interface EquipmentItem {
-	id: string
-	name: string
-	properties: Partial<EquipmentProperties>
-	crystalSlots?: {
-		slot1?: string | null
-		slot2?: string | null
-	}
-	armorType?: ArmorType // 防具の改造タイプ（体装備のみ使用）
-	conditionalEffects?: ConditionalEffect[] // 条件付き効果
-}
 
 // 装備カテゴリの型定義
 type EquipmentCategory =
@@ -40,7 +25,7 @@ type EquipmentCategory =
 
 // 装備データの型定義
 interface EquipmentsData {
-	equipments: Record<EquipmentCategory, EquipmentItem[]>
+	equipments: Record<EquipmentCategory, PresetEquipment[]>
 }
 
 // 装備プリセットデータ
@@ -56,10 +41,6 @@ export const equipmentsData: EquipmentsData = {
 					STR_Rate: 10,
 					NaturalHPRecovery: -30,
 					Dodge: -16,
-				},
-				crystalSlots: {
-					slot1: null,
-					slot2: null,
 				},
 			},
 			{
@@ -93,10 +74,6 @@ export const equipmentsData: EquipmentsData = {
 					STR_Rate: 10,
 					NaturalHPRecovery: -30,
 					Dodge: -16,
-				},
-				crystalSlots: {
-					slot1: null,
-					slot2: null,
 				},
 			},
 			{
