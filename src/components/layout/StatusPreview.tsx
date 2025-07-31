@@ -1181,7 +1181,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'basicStats'
 									: visibleSections.basicStats
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1200,7 +1200,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'adjustedStats'
 									: visibleSections.adjustedStats
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1219,7 +1219,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'equipmentBonus1'
 									: visibleSections.equipmentBonus1
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1238,7 +1238,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'equipmentBonus2'
 									: visibleSections.equipmentBonus2
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>
@@ -1257,7 +1257,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 									? activeSection === 'equipmentBonus3'
 									: visibleSections.equipmentBonus3
 							)
-								? 'bg-blue-500 text-white'
+								? 'bg-blue-500/80 text-white'
 								: 'bg-gray-200 text-gray-700 hover:bg-gray-300'
 						}`}
 					>

@@ -360,7 +360,7 @@ export default function CrystalSelectionModal({
 									onClick={() => setActiveFilter('all')}
 									className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
 										activeFilter === 'all'
-											? 'bg-blue-500 text-white'
+											? 'bg-blue-500/80 text-white'
 											: 'bg-white text-gray-700 hover:bg-gray-100'
 									}`}
 								>
@@ -379,7 +379,7 @@ export default function CrystalSelectionModal({
 											onClick={() => setActiveFilter(type)}
 											className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
 												activeFilter === type
-													? 'bg-blue-500 text-white'
+													? 'bg-blue-500/80 text-white'
 													: 'bg-white text-gray-700 hover:bg-gray-100'
 											}`}
 										>
@@ -422,7 +422,7 @@ export default function CrystalSelectionModal({
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
 										<svg
-											className="w-4 h-4 text-red-500 mr-1"
+											className="w-4 h-4 text-rose-500/80 mr-1"
 											fill="currentColor"
 											viewBox="0 0 24 24"
 										>

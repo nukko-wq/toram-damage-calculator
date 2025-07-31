@@ -371,7 +371,7 @@ export default function EquipmentSelectionModal({
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
 										<svg
-											className="w-4 h-4 text-red-500 mr-1"
+											className="w-4 h-4 text-rose-500/80 mr-1"
 											fill="currentColor"
 											viewBox="0 0 24 24"
 										>

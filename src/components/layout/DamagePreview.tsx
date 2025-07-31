@@ -196,7 +196,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								>
 									<button
 										onClick={handleCapture}
-										className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 cursor-pointer text-sm mx-auto"
+										className="px-3 py-1 bg-blue-500/80 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 cursor-pointer text-sm mx-auto"
 									>
 										<svg
 											className="w-3 h-3"
@@ -329,7 +329,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								}
 								className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
 								style={{
-									background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
+									background: `linear-gradient(to right, oklch(62.3% 0.214 259.815 / .8) 0%, oklch(62.3% 0.214 259.815 / .8) ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
 								}}
 							/>
 						</div>

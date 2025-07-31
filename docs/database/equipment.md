@@ -11,14 +11,16 @@
 
 **TypeScript移行の利点**:
 - EquipmentPropertiesインターフェースによる厳密な型チェック
-- weaponStatsとcrystalSlotsの型安全性保証
+- crystalSlotsの型安全性保証
 - 装備カテゴリごとの型制約
 - エディタでの自動補完とプロパティ検証
+- weaponInfoStorageによるIDベース武器情報管理
 
 **ローカルストレージキー**:
 - **プリセット装備（コピー済み）**: LocalStorage (`preset_equipments`)
 - **ユーザーカスタムデータ**: LocalStorage (`custom_equipments`)
-- **統合アクセス**: 両方のデータを統一的に管理
+- **武器情報データ**: LocalStorage (`toram_weapon_info_overrides`)
+- **統合アクセス**: 装備データと武器情報を統一的に管理
 
 ## TypeScriptデータ構造
 
@@ -31,7 +33,7 @@ interface EquipmentsData {
 
 export const equipmentsData: EquipmentsData = {
   equipments: {
-    mainWeapon: [装備アイテム配列],
+    mainWeapon: [装備アイテム配列], // → main カテゴリ、weapon タイプに変換
     body: [装備アイテム配列],
     additional: [装備アイテム配列],
     special: [装備アイテム配列],
@@ -51,14 +53,31 @@ export const equipmentsData: EquipmentsData = {
 {
   "id": "equipment_id",
   "name": "装備名",
+  "type": "weapon|armor|accessory|fashion", // 装備タイプ
+  "category": ["main"],       // 装備カテゴリ（配列）
+  "baseStats": {},            // 基本ステータス（プリセット用）
   "properties": { /* プロパティ */ },
   "source": "入手方法",
-  "weaponStats": { /* mainWeapon専用 */ },
   "crystalSlots": { /* クリスタルスロット */ },
+  "refinement": 0,            // weaponInfoStorageで上書きされる
   "isPreset": true,           // プリセット由来フラグ
+  "isCustom": false,          // カスタム装備フラグ
   "isFavorite": false,        // お気に入り設定
+  "isModified": false,        // 変更済みフラグ
   "createdAt": "ISO string",  // 作成日時
   "updatedAt": "ISO string"   // 更新日時
+}
+```
+
+**武器情報データ構造**（IDベース管理）:
+```json
+{
+  "equipment_id": {
+    "ATK": 300,
+    "stability": 85,
+    "refinement": 10,
+    "updatedAt": "ISO string"
+  }
 }
 ```
 
@@ -69,30 +88,61 @@ export const equipmentsData: EquipmentsData = {
 interface PresetEquipment {
   id: string                    // 一意識別子
   name: string                  // 装備名
+  type: EquipmentType          // 装備タイプ（weapon|armor|accessory|fashion）
+  category: EquipmentCategory[] // 装備カテゴリ（配列）
+  baseStats: {                 // 基本ステータス
+    ATK?: number
+    DEF?: number
+    MATK?: number
+    MDEF?: number
+    stability?: number
+    refinement?: number
+  }
   properties: Partial<EquipmentProperties> // 付与プロパティ（PascalCase統一済み）
-  source?: string              // 入手方法
-  weaponStats?: WeaponStats    // mainWeaponカテゴリ専用：武器基本ステータス（オプション）
-  crystalSlots?: CrystalSlots  // mainWeapon, body, additional, special専用：クリスタル枠（オプション）
+  description?: string         // 装備の説明
+  source?: string             // 入手方法
+  armorType?: ArmorType       // 防具の改造タイプ（体装備のみ）
+  conditionalEffects?: ConditionalEffect[] // 条件付き効果
 }
 ```
 
 **ローカルストレージ装備インターフェース**（拡張版）:
 ```typescript
-interface LocalStorageEquipment extends PresetEquipment {
-  isPreset: boolean            // プリセット由来かどうか
-  isFavorite: boolean          // お気に入り設定
-  createdAt: string           // 作成日時 (ISO string)
-  updatedAt: string           // 更新日時 (ISO string)
+interface LocalStorageEquipment extends PresetEquipment, LocalStoragePresetItemBase {
+  refinement?: number // weaponInfoStorageで管理される精錬値
+}
+
+// カスタム装備インターフェース
+interface CustomEquipment extends PresetEquipment, LocalStorageCustomItemBase {
+  isCustom: true
+  refinement?: number // weaponInfoStorageで管理される精錬値
+}
+
+// ユーザーカスタム装備（LocalStorage保存用）
+interface UserEquipment {
+  id: string
+  name: string
+  category: EquipmentCategory
+  properties: Partial<EquipmentProperties>
+  crystalSlots?: {
+    slot1?: string
+    slot2?: string
+  }
+  armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
+  createdAt: string
+  updatedAt: string
+  isFavorite: boolean
 }
 
 // 統合型（アプリ内で使用する装備データ型）
-type Equipment = LocalStorageEquipment
+type Equipment = LocalStorageEquipment | CustomEquipment
 
-// mainWeaponカテゴリ専用の武器基本ステータス
-interface WeaponStats {
-  ATK?: number       // 武器ATK（省略時はWeaponFormの値を使用）
-  stability?: number // 安定率（省略時はWeaponFormの値を使用）
-  refinement?: number // 精錬値（省略時はWeaponFormの値を使用）
+// 武器情報（IDベース管理）
+interface WeaponInfo {
+  ATK: number
+  stability: number
+  refinement: number
+  updatedAt: string
 }
 
 // mainWeapon, body, additional, special専用のクリスタル枠
@@ -102,7 +152,7 @@ interface CrystalSlots {
 }
 
 // 各装備カテゴリで利用可能なクリスタルタイプ
-// mainWeapon: weapon, normal
+// main: weapon, normal
 // body: armor, normal  
 // additional: additional, normal
 // special: special, normal
@@ -267,15 +317,56 @@ interface EquipmentProperties {
 
 ```typescript
 type EquipmentCategory = 
-  | 'mainWeapon'      // メイン装備
-  | 'body'      // 体装備
-  | 'additional' // 追加装備
-  | 'special'   // 特殊装備
-  | 'subWeapon' // サブ武器
-  | 'fashion1'  // オシャレ装備1
-  | 'fashion2'  // オシャレ装備2
-  | 'fashion3'  // オシャレ装備3
-  | 'freeInput1' // 自由入力1
-  | 'freeInput2' // 自由入力2
-  | 'freeInput3' // 自由入力3
+  | 'main'        // メイン装備（mainWeaponから変換）
+  | 'mainWeapon'  // プリセットデータ互換性のため保持
+  | 'body'        // 体装備
+  | 'additional'  // 追加装備
+  | 'special'     // 特殊装備
+  | 'subWeapon'   // サブ武器
+  | 'fashion1'    // オシャレ装備1
+  | 'fashion2'    // オシャレ装備2
+  | 'fashion3'    // オシャレ装備3
+  | 'freeInput1'  // 自由入力1
+  | 'freeInput2'  // 自由入力2
+  | 'freeInput3'  // 自由入力3
+
+type EquipmentType = 'weapon' | 'armor' | 'accessory' | 'fashion'
 ```
+
+## IDベース武器情報管理システム
+
+**weaponInfoStorage**:
+- 全ての装備（プリセット・カスタム・仮データ・編集セッション）で統一
+- 装備IDをキーとして武器ATK、安定率、精錬値を管理
+- LocalStorage: `toram_weapon_info_overrides`
+
+**データフロー**:
+```
+WeaponForm ↔ weaponInfoStorage ↔ 装備選択時復元
+                ↓
+        equipmentDatabase.applyWeaponInfoOverlay()
+                ↓
+        全装備データで武器情報をオーバーレイ
+```
+
+**主要関数**:
+- `saveWeaponInfo(equipmentId, ATK, stability, refinement)`: 武器情報保存
+- `getWeaponInfo(equipmentId)`: 武器情報取得
+- `deleteWeaponInfo(equipmentId)`: 武器情報削除
+- `applyWeaponInfoOverlay(equipment)`: 装備に武器情報をオーバーレイ
+
+## アーキテクチャ変更履歴
+
+**v2.0: IDベース統一管理への移行**:
+- **削除**: `weaponStats`プロパティ（UserEquipment、PresetEquipment）
+- **削除**: `refinement`プロパティ（UserEquipment）
+- **追加**: `weaponInfoStorage`による統一管理
+- **追加**: `applyWeaponInfoOverlay`による動的オーバーレイ
+- **変更**: `mainWeapon` → `main`カテゴリ統合（互換性維持）
+- **変更**: 武器情報はIDをキーとしたオーバーレイ方式に統一
+
+**メリット**:
+- プリセット・カスタム装備で同一の武器情報管理システム
+- データ整合性の向上（二重管理の解消）
+- 武器情報の集約管理による拡張性向上
+- 移行処理による既存データの保護
