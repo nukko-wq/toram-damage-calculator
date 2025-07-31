@@ -27,14 +27,7 @@ export function createTemporaryCustomEquipment(
 		name,
 		category,
 		properties: {}, // 全プロパティをリセット状態で作成
-		weaponStats:
-			category === 'main'
-				? {
-						ATK: 0,
-						stability: 0,
-						refinement: 0,
-					}
-				: undefined,
+		// weaponStatsは使用せず、weaponInfoStorageで管理するため削除
 		crystalSlots: ['main', 'body', 'additional', 'special'].includes(category)
 			? {
 					slot1: undefined,
@@ -48,6 +41,12 @@ export function createTemporaryCustomEquipment(
 
 	// メモリ上に保存
 	temporaryEquipments.set(id, temporaryEquipment)
+
+	// 武器系装備（メイン・サブ）の場合は初期武器情報をweaponInfoStorageに保存
+	if (category === 'main' || category === 'subWeapon') {
+		const { saveWeaponInfo } = require('./weaponInfoStorage')
+		saveWeaponInfo(id, 0, 0, 0)
+	}
 
 	return temporaryEquipment
 }
@@ -87,12 +86,22 @@ export function updateTemporaryEquipmentRefinement(
 		return false
 	}
 
-	// 精錬値を更新
-	equipment.refinement = refinement
-	equipment.updatedAt = new Date().toISOString()
+	// 精錬値をweaponInfoStorageで更新
+	const { saveWeaponInfo, getWeaponInfo } = require('./weaponInfoStorage')
+	const currentWeaponInfo = getWeaponInfo(id)
+	const success = saveWeaponInfo(
+		id,
+		currentWeaponInfo?.ATK || 0,
+		currentWeaponInfo?.stability || 0,
+		refinement,
+	)
 
-	temporaryEquipments.set(id, equipment)
-	return true
+	if (success) {
+		equipment.updatedAt = new Date().toISOString()
+		temporaryEquipments.set(id, equipment)
+	}
+
+	return success
 }
 
 /**

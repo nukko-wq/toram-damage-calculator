@@ -177,7 +177,7 @@ export async function validateStorageIntegrity(): Promise<boolean> {
 		if (
 			currentSaveId &&
 			// biome-ignore lint/suspicious/noExplicitAny: SaveData型の互換性のため
-		!saveDataList.find((save: any) => save.id === currentSaveId)
+			!saveDataList.find((save: any) => save.id === currentSaveId)
 		) {
 			console.warn('Current save ID not found in save data list')
 			return false

@@ -8,11 +8,7 @@ import {
 	type MainWeaponFormData,
 	type SubWeaponFormData,
 } from '@/schemas/weapons'
-import type {
-	MainWeapon,
-	SubWeapon,
-	WeaponType,
-} from '@/types/calculator'
+import type { MainWeapon, SubWeapon, WeaponType } from '@/types/calculator'
 import { useEffect, useState, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
 import {

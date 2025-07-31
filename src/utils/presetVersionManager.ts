@@ -167,7 +167,8 @@ export async function copyPresetEquipmentsToLocalStorage(): Promise<void> {
 						category === 'mainWeapon'
 							? ['main', 'mainWeapon']
 							: [category as EquipmentCategory],
-					baseStats: equipment.weaponStats || equipment.baseStats || {},
+					baseStats:
+						(equipment as any).weaponStats || equipment.baseStats || {},
 					isPreset: true,
 					isFavorite: false,
 					isModified: false,
@@ -337,7 +338,8 @@ async function updatePresetEquipments(): Promise<UpdateNotification | null> {
 						category === 'mainWeapon'
 							? ['main', 'mainWeapon']
 							: [category as EquipmentCategory],
-					baseStats: equipment.weaponStats || equipment.baseStats || {},
+					baseStats:
+						(equipment as any).weaponStats || equipment.baseStats || {},
 				} as PresetEquipment)
 			}
 		}

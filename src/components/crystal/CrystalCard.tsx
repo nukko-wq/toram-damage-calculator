@@ -313,31 +313,35 @@ export default function CrystalCard({
 			{/* 条件付き効果 */}
 			{crystal.conditionalEffects && crystal.conditionalEffects.length > 0 && (
 				<div className="text-sm text-blue-600 space-y-1 pr-6">
-					{formatGroupedConditionalEffects(crystal.conditionalEffects).map((group, index) => (
-						<div key={`${crystal.id}-group-${index}`}>
-							<div className="flex flex-wrap gap-1">
-								<div className="">{group.conditionText}：</div>
-								{group.effectTexts.length > 1 ? (
-									<div className="flex flex-wrap gap-1">
-										{group.effectTexts.map((effectText, effectIndex) => (
+					{formatGroupedConditionalEffects(crystal.conditionalEffects).map(
+						(group, index) => (
+							<div key={`${crystal.id}-group-${index}`}>
+								<div className="flex flex-wrap gap-1">
+									<div className="">{group.conditionText}：</div>
+									{group.effectTexts.length > 1 ? (
+										<div className="flex flex-wrap gap-1">
+											{group.effectTexts.map((effectText, effectIndex) => (
+												<div
+													key={`${crystal.id}-group-${index}-effect-${effectIndex}`}
+												>
+													{effectText}
+													{effectIndex < group.effectTexts.length - 1 && ' '}
+												</div>
+											))}
+										</div>
+									) : (
+										group.effectTexts.map((effectText, effectIndex) => (
 											<div
 												key={`${crystal.id}-group-${index}-effect-${effectIndex}`}
 											>
 												{effectText}
-												{effectIndex < group.effectTexts.length - 1 && ' '}
 											</div>
-										))}
-									</div>
-								) : (
-									group.effectTexts.map((effectText, effectIndex) => (
-										<div key={`${crystal.id}-group-${index}-effect-${effectIndex}`}>
-											{effectText}
-										</div>
-									))
-								)}
+										))
+									)}
+								</div>
 							</div>
-						</div>
-					))}
+						),
+					)}
 				</div>
 			)}
 		</div>

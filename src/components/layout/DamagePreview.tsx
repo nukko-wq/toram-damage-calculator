@@ -36,9 +36,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	const updateAdaptationMultiplier = useCalculatorStore(
 		(state) => state.updateAdaptationMultiplier,
 	)
-	
+
 	// 入力中の一時的な値を管理するローカル状態
-	const [tempAdaptationValue, setTempAdaptationValue] = useState<string>(adaptationMultiplier.toString())
+	const [tempAdaptationValue, setTempAdaptationValue] = useState<string>(
+		adaptationMultiplier.toString(),
+	)
 
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
@@ -48,7 +50,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		const loadedData = loadCaptureData()
 		setCaptureData(loadedData)
 	}, [])
-	
+
 	// adaptationMultiplierが変更されたときにtempAdaptationValueを同期
 	useEffect(() => {
 		setTempAdaptationValue(adaptationMultiplier.toString())
@@ -340,20 +342,20 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 								value={tempAdaptationValue}
 								onChange={(e) => {
 									const inputValue = e.target.value
-									
+
 									// 入力値をローカル状態に保存（バックスペース削除を可能にするため）
 									setTempAdaptationValue(inputValue)
-									
+
 									// 空文字列の場合は処理終了（入力中の状態を保持）
 									if (inputValue === '') {
 										return
 									}
-									
+
 									// 数値のみを許可（正規表現チェック）
 									if (!/^\d+$/.test(inputValue)) {
 										return
 									}
-									
+
 									const value = Number(inputValue)
 									// 範囲チェック
 									if (value >= 50 && value <= 250) {

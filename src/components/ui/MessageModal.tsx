@@ -6,17 +6,21 @@ interface MessageModalProps {
 	message: string
 }
 
-export default function MessageModal({ isOpen, onClose, message }: MessageModalProps) {
+export default function MessageModal({
+	isOpen,
+	onClose,
+	message,
+}: MessageModalProps) {
 	if (!isOpen) return null
 
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center">
 			{/* 背景オーバーレイ */}
-			<div 
+			<div
 				className="absolute inset-0 bg-black bg-opacity-50"
 				onClick={onClose}
 			/>
-			
+
 			{/* モーダルコンテンツ */}
 			<div className="relative bg-white rounded-lg shadow-lg p-6 w-80 max-w-[90vw]">
 				<div className="text-center">

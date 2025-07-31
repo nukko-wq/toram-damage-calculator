@@ -26,7 +26,9 @@ export class Storm1Hit6ExtendCalculator extends SkillHitCalculator {
 			}
 
 			default:
-				throw new Error(`Invalid hit number for Storm 1/6hit Extend: ${hitNumber}`)
+				throw new Error(
+					`Invalid hit number for Storm 1/6hit Extend: ${hitNumber}`,
+				)
 		}
 	}
 }

@@ -19,12 +19,7 @@ export default function BaseStatsForm() {
 	// Zustandストアの値を使用（完全移行）
 	const effectiveStats = storeStats
 
-	const {
-		register,
-		watch,
-		setValue,
-		getValues,
-	} = useForm<BaseStatsFormData>({
+	const { register, watch, setValue, getValues } = useForm<BaseStatsFormData>({
 		resolver: zodResolver(baseStatsSchema),
 		values: effectiveStats,
 		mode: 'onChange',
@@ -78,7 +73,6 @@ export default function BaseStatsForm() {
 		const timer = setTimeout(() => setIsInitialized(true), 30)
 		return () => clearTimeout(timer)
 	}, [])
-
 
 	// フォームの値変更を監視して親に通知
 	useEffect(() => {

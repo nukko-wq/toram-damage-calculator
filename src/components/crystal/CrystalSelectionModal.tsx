@@ -34,13 +34,13 @@ export default function CrystalSelectionModal({
 }: CrystalSelectionModalProps) {
 	const [activeFilter, setActiveFilter] = useState<'all' | CrystalType>('all')
 	const [_favoritesChanged, setFavoritesChanged] = useState(0)
-	
+
 	// 「クリスタなし」の特別なID
 	const CRYSTAL_NONE_ID = '__crystal_none__'
-	
+
 	// 「クリスタなし」のお気に入り状態
-	const [isNoneFavorite, setIsNoneFavorite] = useState(
-		() => CrystalFavoritesManager.isFavorite(CRYSTAL_NONE_ID),
+	const [isNoneFavorite, setIsNoneFavorite] = useState(() =>
+		CrystalFavoritesManager.isFavorite(CRYSTAL_NONE_ID),
 	)
 
 	// 現在のクリスタルデータを取得
@@ -49,13 +49,19 @@ export default function CrystalSelectionModal({
 	// 現在装着中のクリスタルがあるかどうかを判定
 	const hasCurrentlyEquippedCrystal = useMemo(() => {
 		if (!slotInfo || !currentData) return false
-		
-		if (slotInfo.type === 'crystal' && slotInfo.category && typeof slotInfo.slot === 'number') {
+
+		if (
+			slotInfo.type === 'crystal' &&
+			slotInfo.category &&
+			typeof slotInfo.slot === 'number'
+		) {
 			const slotKey = `${slotInfo.category}${slotInfo.slot + 1}`
-			const currentCrystalId = (currentData.crystals as unknown as Record<string, string | null>)[slotKey]
+			const currentCrystalId = (
+				currentData.crystals as unknown as Record<string, string | null>
+			)[slotKey]
 			return currentCrystalId !== null && currentCrystalId !== undefined
 		}
-		
+
 		return false
 	}, [slotInfo, currentData])
 
@@ -95,7 +101,7 @@ export default function CrystalSelectionModal({
 			if (crystalId === CRYSTAL_NONE_ID) {
 				setIsNoneFavorite(isFavorite)
 			}
-			
+
 			// お気に入り状態変更時の処理
 			setFavoritesChanged((prev) => prev + 1) // 再レンダリングトリガー
 
@@ -108,7 +114,7 @@ export default function CrystalSelectionModal({
 		},
 		[],
 	)
-	
+
 	// 「クリスタなし」のお気に入りクリックハンドラー
 	const handleNoneFavoriteClick = useCallback(
 		(e: React.MouseEvent) => {
@@ -154,16 +160,18 @@ export default function CrystalSelectionModal({
 	const { sortedCrystals, isCalculating: isSorting } = useCrystalDamageSorting(
 		filteredCrystals,
 		slotInfo,
-		isOpen && !!slotInfo
+		isOpen && !!slotInfo,
 	)
 
 	// 「クリスタなし」のダメージ差分を計算
 	const crystalNoneDamageResult = useDamageDifferenceCorrect(
 		CRYSTAL_NONE_ITEM,
 		slotInfo || { type: 'crystal', category: 'normal', slot: 0 },
-		{ debug: false }
+		{ debug: false },
 	)
-	const crystalNoneDamageDifference = slotInfo ? crystalNoneDamageResult.difference || 0 : 0
+	const crystalNoneDamageDifference = slotInfo
+		? crystalNoneDamageResult.difference || 0
+		: 0
 
 	// お気に入り分別（ソート済みのクリスタルから）
 	const { favoriteCrystals, otherCrystals } = useMemo(() => {
@@ -174,7 +182,9 @@ export default function CrystalSelectionModal({
 		const favorites = sortedCrystals.filter((crystal) =>
 			favoriteSet.has(crystal.id),
 		)
-		const others = sortedCrystals.filter((crystal) => !favoriteSet.has(crystal.id))
+		const others = sortedCrystals.filter(
+			(crystal) => !favoriteSet.has(crystal.id),
+		)
 
 		// 「クリスタなし」をダメージ差分に基づいて適切な位置に挿入
 		// クリスタが装着されていない場合でも「クリスタなし」カードを表示
@@ -186,15 +196,19 @@ export default function CrystalSelectionModal({
 				type: 'normal',
 				properties: {},
 				conditionalEffects: [],
-				damageDifference: crystalNoneDamageDifference
+				damageDifference: crystalNoneDamageDifference,
 			}
 
 			// お気に入りかどうかで分岐
 			if (isNoneFavorite) {
 				// お気に入りリストに挿入（ダメージ差分順）
-				const insertIndex = favorites.findIndex(crystal => {
+				const insertIndex = favorites.findIndex((crystal) => {
 					// biome-ignore lint/suspicious/noExplicitAny: CrystalWithDamageタイプのダメージ差分プロパティアクセス
-					const crystalDamage = 'damageDifference' in crystal && typeof (crystal as any).damageDifference === 'number' ? (crystal as any).damageDifference : 0
+					const crystalDamage =
+						'damageDifference' in crystal &&
+						typeof (crystal as any).damageDifference === 'number'
+							? (crystal as any).damageDifference
+							: 0
 					return crystalNoneWithDamage.damageDifference > crystalDamage
 				})
 				if (insertIndex === -1) {
@@ -204,9 +218,13 @@ export default function CrystalSelectionModal({
 				}
 			} else {
 				// その他リストに挿入（ダメージ差分順）
-				const insertIndex = others.findIndex(crystal => {
+				const insertIndex = others.findIndex((crystal) => {
 					// biome-ignore lint/suspicious/noExplicitAny: CrystalWithDamageタイプのダメージ差分プロパティアクセス
-					const crystalDamage = 'damageDifference' in crystal && typeof (crystal as any).damageDifference === 'number' ? (crystal as any).damageDifference : 0
+					const crystalDamage =
+						'damageDifference' in crystal &&
+						typeof (crystal as any).damageDifference === 'number'
+							? (crystal as any).damageDifference
+							: 0
 					return crystalNoneWithDamage.damageDifference > crystalDamage
 				})
 				if (insertIndex === -1) {
@@ -219,9 +237,14 @@ export default function CrystalSelectionModal({
 
 		return {
 			favoriteCrystals: favorites,
-			otherCrystals: others
+			otherCrystals: others,
 		}
-	}, [sortedCrystals, isNoneFavorite, crystalNoneDamageDifference, _favoritesChanged])
+	}, [
+		sortedCrystals,
+		isNoneFavorite,
+		crystalNoneDamageDifference,
+		_favoritesChanged,
+	])
 
 	const getFilterLabel = (filter: string) => {
 		switch (filter) {
@@ -372,9 +395,24 @@ export default function CrystalSelectionModal({
 							{/* ダメージ差分計算中の表示 */}
 							{isSorting && slotInfo && (
 								<div className="flex items-center justify-center py-4 mb-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
-									<svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
-										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+									<svg
+										className="w-4 h-4 mr-2 animate-spin"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<circle
+											className="opacity-25"
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											strokeWidth="4"
+										/>
+										<path
+											className="opacity-75"
+											fill="currentColor"
+											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+										/>
 									</svg>
 									ダメージ差分を計算中...
 								</div>
@@ -383,7 +421,11 @@ export default function CrystalSelectionModal({
 							{favoriteCrystals.length > 0 && (
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-										<svg className="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 24 24">
+										<svg
+											className="w-4 h-4 text-red-500 mr-1"
+											fill="currentColor"
+											viewBox="0 0 24 24"
+										>
 											<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 										</svg>
 										お気に入り ({favoriteCrystals.length})
@@ -412,47 +454,67 @@ export default function CrystalSelectionModal({
 															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-red-500 hover:text-red-600"
 															aria-label="お気に入りから削除"
 														>
-															<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+															<svg
+																className="w-5 h-5"
+																fill="currentColor"
+																viewBox="0 0 24 24"
+															>
 																<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 															</svg>
 														</button>
-														
+
 														{/* クリスタなしと選択マーク */}
 														<div className="flex justify-between items-center mb-1 sm:mb-2">
-															<h3 className="font-semibold text-gray-900">クリスタなし</h3>
+															<h3 className="font-semibold text-gray-900">
+																クリスタなし
+															</h3>
 															{selectedCrystalId === null && (
 																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	<svg
+																		className="w-4 h-4 text-white"
+																		fill="none"
+																		stroke="currentColor"
+																		viewBox="0 0 24 24"
+																	>
+																		<path
+																			strokeLinecap="round"
+																			strokeLinejoin="round"
+																			strokeWidth={2}
+																			d="M5 13l4 4L19 7"
+																		/>
 																	</svg>
 																</div>
 															)}
 														</div>
-														
+
 														{/* ダメージ差分表示（他のクリスタルと同じ形式） */}
 														{slotInfo && (
 															<div className="mb-1 sm:mb-2">
 																<div className="font-medium">
-																	<span className={`mr-3 text-sm ${
-																		crystalNoneDamageDifference > 0 
-																			? 'text-blue-500' 
-																			: crystalNoneDamageDifference < 0 
-																				? 'text-red-500' 
-																				: 'text-gray-400'
-																	}`}>
+																	<span
+																		className={`mr-3 text-sm ${
+																			crystalNoneDamageDifference > 0
+																				? 'text-blue-500'
+																				: crystalNoneDamageDifference < 0
+																					? 'text-red-500'
+																					: 'text-gray-400'
+																		}`}
+																	>
 																		ダメージ：
 																	</span>
-																	<span className={`text-sm ${
-																		crystalNoneDamageDifference > 0 
-																			? 'text-blue-600' 
-																			: crystalNoneDamageDifference < 0 
-																				? 'text-red-600' 
-																				: 'text-gray-500'
-																	}`}>
-																		{crystalNoneDamageDifference === 0 
-																			? '±0' 
-																			: crystalNoneDamageDifference > 0 
-																				? `+${crystalNoneDamageDifference.toLocaleString()}` 
+																	<span
+																		className={`text-sm ${
+																			crystalNoneDamageDifference > 0
+																				? 'text-blue-600'
+																				: crystalNoneDamageDifference < 0
+																					? 'text-red-600'
+																					: 'text-gray-500'
+																		}`}
+																	>
+																		{crystalNoneDamageDifference === 0
+																			? '±0'
+																			: crystalNoneDamageDifference > 0
+																				? `+${crystalNoneDamageDifference.toLocaleString()}`
 																				: crystalNoneDamageDifference.toLocaleString()}
 																	</span>
 																</div>
@@ -461,7 +523,7 @@ export default function CrystalSelectionModal({
 													</div>
 												)
 											}
-											
+
 											// 通常のクリスタルカード
 											return (
 												<CrystalCard
@@ -510,47 +572,73 @@ export default function CrystalSelectionModal({
 															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-gray-300 hover:text-red-400"
 															aria-label="お気に入りに追加"
 														>
-															<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+															<svg
+																className="w-5 h-5"
+																fill="none"
+																stroke="currentColor"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	strokeLinecap="round"
+																	strokeLinejoin="round"
+																	strokeWidth={2}
+																	d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+																/>
 															</svg>
 														</button>
-														
+
 														{/* クリスタなしと選択マーク */}
 														<div className="flex justify-between items-center mb-1 sm:mb-2">
-															<h3 className="font-semibold text-gray-900">クリスタなし</h3>
+															<h3 className="font-semibold text-gray-900">
+																クリスタなし
+															</h3>
 															{selectedCrystalId === null && (
 																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	<svg
+																		className="w-4 h-4 text-white"
+																		fill="none"
+																		stroke="currentColor"
+																		viewBox="0 0 24 24"
+																	>
+																		<path
+																			strokeLinecap="round"
+																			strokeLinejoin="round"
+																			strokeWidth={2}
+																			d="M5 13l4 4L19 7"
+																		/>
 																	</svg>
 																</div>
 															)}
 														</div>
-														
+
 														{/* ダメージ差分表示（他のクリスタルと同じ形式） */}
 														{slotInfo && (
 															<div className="mb-1 sm:mb-2">
 																<div className="font-medium">
-																	<span className={`mr-3 text-sm ${
-																		crystalNoneDamageDifference > 0 
-																			? 'text-blue-500' 
-																			: crystalNoneDamageDifference < 0 
-																				? 'text-red-500' 
-																				: 'text-gray-400'
-																	}`}>
+																	<span
+																		className={`mr-3 text-sm ${
+																			crystalNoneDamageDifference > 0
+																				? 'text-blue-500'
+																				: crystalNoneDamageDifference < 0
+																					? 'text-red-500'
+																					: 'text-gray-400'
+																		}`}
+																	>
 																		ダメージ：
 																	</span>
-																	<span className={`text-sm ${
-																		crystalNoneDamageDifference > 0 
-																			? 'text-blue-600' 
-																			: crystalNoneDamageDifference < 0 
-																				? 'text-red-600' 
-																				: 'text-gray-500'
-																	}`}>
-																		{crystalNoneDamageDifference === 0 
-																			? '±0' 
-																			: crystalNoneDamageDifference > 0 
-																				? `+${crystalNoneDamageDifference.toLocaleString()}` 
+																	<span
+																		className={`text-sm ${
+																			crystalNoneDamageDifference > 0
+																				? 'text-blue-600'
+																				: crystalNoneDamageDifference < 0
+																					? 'text-red-600'
+																					: 'text-gray-500'
+																		}`}
+																	>
+																		{crystalNoneDamageDifference === 0
+																			? '±0'
+																			: crystalNoneDamageDifference > 0
+																				? `+${crystalNoneDamageDifference.toLocaleString()}`
 																				: crystalNoneDamageDifference.toLocaleString()}
 																	</span>
 																</div>
@@ -559,7 +647,7 @@ export default function CrystalSelectionModal({
 													</div>
 												)
 											}
-											
+
 											// 通常のクリスタルカード
 											return (
 												<CrystalCard
@@ -579,12 +667,14 @@ export default function CrystalSelectionModal({
 							)}
 
 							{/* アイテムが見つからない場合 - クリスタなしを除いて判定 */}
-							{favoriteCrystals.filter(c => c.id !== CRYSTAL_NONE_ID).length === 0 && 
-							 otherCrystals.filter(c => c.id !== CRYSTAL_NONE_ID).length === 0 && (
-								<div className="text-center text-gray-500 py-8">
-									該当するクリスタがありません
-								</div>
-							)}
+							{favoriteCrystals.filter((c) => c.id !== CRYSTAL_NONE_ID)
+								.length === 0 &&
+								otherCrystals.filter((c) => c.id !== CRYSTAL_NONE_ID).length ===
+									0 && (
+									<div className="text-center text-gray-500 py-8">
+										該当するクリスタがありません
+									</div>
+								)}
 						</div>
 
 						{/* フッター */}

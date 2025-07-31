@@ -16,11 +16,6 @@ interface EquipmentItem {
 	id: string
 	name: string
 	properties: Partial<EquipmentProperties>
-	weaponStats?: {
-		ATK?: number
-		stability?: number
-		refinement?: number
-	}
 	crystalSlots?: {
 		slot1?: string | null
 		slot2?: string | null
@@ -70,11 +65,6 @@ export const equipmentsData: EquipmentsData = {
 			{
 				id: 'ee0de0d7-8402-4dca-9294-5527f5abb53c',
 				name: '槍有利23%A10%S10%C30',
-				weaponStats: {
-					ATK: 927,
-					stability: 60,
-					refinement: 15,
-				},
 				properties: {
 					ElementAdvantage_Rate: 23,
 					CriticalDamage_Rate: 10,
@@ -87,11 +77,6 @@ export const equipmentsData: EquipmentsData = {
 			{
 				id: '0b54f5ce-8be9-428c-8229-b51f6db9773b',
 				name: '槍汎用A15%S10%',
-				weaponStats: {
-					ATK: 927,
-					stability: 60,
-					refinement: 15,
-				},
 				properties: {
 					ATK_Rate: 15,
 					STR_Rate: 10,
@@ -117,11 +102,6 @@ export const equipmentsData: EquipmentsData = {
 			{
 				id: '9ce5ed42-1857-4145-86f5-c95882bae220',
 				name: '両手有利23%A10%S10%C30',
-				weaponStats: {
-					ATK: 927,
-					stability: 60,
-					refinement: 15,
-				},
 				properties: {
 					ElementAdvantage_Rate: 23,
 					CriticalDamage_Rate: 10,
@@ -134,11 +114,6 @@ export const equipmentsData: EquipmentsData = {
 			{
 				id: '57b356a8-661e-4ab1-9af6-bbfa1f5ad08b',
 				name: '両手汎用A15%S10%',
-				weaponStats: {
-					ATK: 927,
-					stability: 60,
-					refinement: 15,
-				},
 				properties: {
 					ATK_Rate: 15,
 					STR_Rate: 10,

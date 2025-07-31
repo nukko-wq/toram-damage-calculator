@@ -8,19 +8,31 @@ import type { AllBonuses } from '../../basicStatsCalculation'
 
 // カテゴリ別インポート
 import { getMasterySkillBonuses } from '../categories/masterySkills'
-import { getBladeSkillBonuses, getBladeSkillPassiveMultiplier } from '../categories/bladeSkills'
+import {
+	getBladeSkillBonuses,
+	getBladeSkillPassiveMultiplier,
+} from '../categories/bladeSkills'
 import { getHalberdSkillBonuses } from '../categories/halberdSkills'
 import { getMononofuSkillBonuses } from '../categories/mononofuSkills'
-import { getBattleSkillBonuses, getBattleSkillBonusesWithPlayerLevel } from '../categories/battleSkills'
+import {
+	getBattleSkillBonuses,
+	getBattleSkillBonusesWithPlayerLevel,
+} from '../categories/battleSkills'
 import { getSurvivalSkillBonuses } from '../categories/survivalSkills'
 import { getHunterSkillBonuses } from '../categories/hunterSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
-import { getSupportSkillBraveMultiplier, getSupportSkillBonuses } from '../categories/supportSkills'
+import {
+	getSupportSkillBraveMultiplier,
+	getSupportSkillBonuses,
+} from '../categories/supportSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
 import { getShieldSkillBonuses } from '../categories/shieldSkills'
 import { getAssassinSkillBonuses } from '../categories/assassinSkills'
 import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
-import { getSpriteSkillBonuses, getSpriteSkillBraveMultiplier } from '../categories/spriteSkills'
+import {
+	getSpriteSkillBonuses,
+	getSpriteSkillBraveMultiplier,
+} from '../categories/spriteSkills'
 import { calculateHotKnowsEffects } from '../categories/minstrelSkills'
 import { getShootSkillPassiveMultiplier } from '../categories/shootSkills'
 import { getPriestSkillBonuses } from '../categories/priestSkills'
@@ -160,8 +172,11 @@ export function getAttackUpEffects(
 	if (!buffSkillData) return bonuses
 
 	// バトルスキルのプレイヤーレベル依存スキルから攻撃力UPのみ抽出
-	const battleBonuses = getBattleSkillBonusesWithPlayerLevel(buffSkillData, playerLevel)
-	
+	const battleBonuses = getBattleSkillBonusesWithPlayerLevel(
+		buffSkillData,
+		playerLevel,
+	)
+
 	// 攻撃力UP関連のプロパティのみ抽出
 	if (battleBonuses.ATK) {
 		bonuses.ATK = battleBonuses.ATK
@@ -182,8 +197,11 @@ export function getMagicUpEffects(
 	if (!buffSkillData) return bonuses
 
 	// バトルスキルのプレイヤーレベル依存スキルから魔法力UPのみ抽出
-	const battleBonuses = getBattleSkillBonusesWithPlayerLevel(buffSkillData, playerLevel)
-	
+	const battleBonuses = getBattleSkillBonusesWithPlayerLevel(
+		buffSkillData,
+		playerLevel,
+	)
+
 	// 魔法力UP関連のプロパティのみ抽出
 	if (battleBonuses.MATK) {
 		bonuses.MATK = battleBonuses.MATK
@@ -236,7 +254,7 @@ export function getAccuracyUpEffects(
 
 	// バトルスキルのプレイヤーレベル依存スキルから命中UPのみ抽出
 	const battleBonuses = getBattleSkillBonusesWithPlayerLevel(buffSkillData, 1) // レベルは不要なのでダミー値
-	
+
 	// 命中UP関連のプロパティのみ抽出
 	if (battleBonuses.Accuracy) {
 		bonuses.Accuracy = battleBonuses.Accuracy
@@ -257,7 +275,7 @@ export function getDodgeUpEffects(
 
 	// バトルスキルのプレイヤーレベル依存スキルから回避UPのみ抽出
 	const battleBonuses = getBattleSkillBonusesWithPlayerLevel(buffSkillData, 1) // レベルは不要なのでダミー値
-	
+
 	// 回避UP関連のプロパティのみ抽出
 	if (battleBonuses.Dodge) {
 		bonuses.Dodge = battleBonuses.Dodge
@@ -307,15 +325,22 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
 	canUseLongRange?: boolean,
 ): number {
 	let totalPassiveMultiplier = 0
-	
+
 	// ブレードスキル系統のパッシブ倍率
-	totalPassiveMultiplier += getBladeSkillPassiveMultiplier(buffSkillData, weaponType, attackSkillCategory)
-	
+	totalPassiveMultiplier += getBladeSkillPassiveMultiplier(
+		buffSkillData,
+		weaponType,
+		attackSkillCategory,
+	)
+
 	// シュートスキル系統のパッシブ倍率（ロングレンジ）
 	if (canUseLongRange !== undefined) {
-		totalPassiveMultiplier += getShootSkillPassiveMultiplier(buffSkillData, canUseLongRange)
+		totalPassiveMultiplier += getShootSkillPassiveMultiplier(
+			buffSkillData,
+			canUseLongRange,
+		)
 	}
-	
+
 	return totalPassiveMultiplier
 }
 
@@ -330,9 +355,13 @@ export function getBuffSkillBraveMultiplier(
 	enemyLevel?: number,
 ): number {
 	let totalBraveMultiplier = getSupportSkillBraveMultiplier(buffSkillData)
-	
+
 	// エンハンスのブレイブ倍率も追加
-	if (enemyDEF !== undefined && enemyMDEF !== undefined && enemyLevel !== undefined) {
+	if (
+		enemyDEF !== undefined &&
+		enemyMDEF !== undefined &&
+		enemyLevel !== undefined
+	) {
 		totalBraveMultiplier += getSpriteSkillBraveMultiplier(
 			buffSkillData,
 			enemyDEF,
@@ -340,7 +369,7 @@ export function getBuffSkillBraveMultiplier(
 			enemyLevel,
 		)
 	}
-	
+
 	return totalBraveMultiplier
 }
 
@@ -365,4 +394,3 @@ export function getEnhanceSkillEffects(
 ): Partial<AllBonuses> {
 	return getSpriteSkillBonuses(buffSkillData, enemyDEF, enemyMDEF, enemyLevel)
 }
-

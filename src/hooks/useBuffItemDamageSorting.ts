@@ -3,11 +3,18 @@
  */
 
 import { useMemo, useState, useEffect } from 'react'
-import type { PresetBuffItem, BuffItemCategory, EquipmentProperties } from '@/types/calculator'
+import type {
+	PresetBuffItem,
+	BuffItemCategory,
+	EquipmentProperties,
+} from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import { calculateResults } from '@/utils/calculationEngine'
-import { calculateDamageWithService, type DamageCalculationServiceResult } from '@/utils/damageCalculationService'
+import {
+	calculateDamageWithService,
+	type DamageCalculationServiceResult,
+} from '@/utils/damageCalculationService'
 import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
 
 interface BuffItemWithDamage {
@@ -27,25 +34,31 @@ interface BuffItemWithDamage {
 export function useBuffItemDamageSorting(
 	buffItems: PresetBuffItem[],
 	slotInfo: SlotInfo | undefined,
-	enabled = true
+	enabled = true,
 ) {
 	const currentData = useCalculatorStore((state) => state.data)
 	const currentResults = useCalculatorStore((state) => state.calculationResults)
 	const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
-	const baselineDamageResult = useCalculatorStore((state) => state.baselineDamageResult)
-	
-	const [buffItemsWithDamage, setBuffItemsWithDamage] = useState<BuffItemWithDamage[]>([])
+	const baselineDamageResult = useCalculatorStore(
+		(state) => state.baselineDamageResult,
+	)
+
+	const [buffItemsWithDamage, setBuffItemsWithDamage] = useState<
+		BuffItemWithDamage[]
+	>([])
 	const [isCalculating, setIsCalculating] = useState(false)
 
 	// ダメージ差分を計算
 	useEffect(() => {
 		if (!enabled || !slotInfo || buffItems.length === 0 || !currentData) {
-			setBuffItemsWithDamage(buffItems.map(buffItem => ({
-				...buffItem,
-				damageDifference: 0,
-				isCalculating: false,
-				hasError: false
-			})))
+			setBuffItemsWithDamage(
+				buffItems.map((buffItem) => ({
+					...buffItem,
+					damageDifference: 0,
+					isCalculating: false,
+					hasError: false,
+				})),
+			)
 			return
 		}
 
@@ -67,7 +80,7 @@ export function useBuffItemDamageSorting(
 					calculatedBaselineDamageResult = calculateDamageWithService(
 						currentData,
 						effectiveCurrentResults,
-						{ debug: false, powerOptions: powerOptions || {} }
+						{ debug: false, powerOptions: powerOptions || {} },
 					)
 				}
 
@@ -77,12 +90,16 @@ export function useBuffItemDamageSorting(
 						try {
 							// シミュレーション後のダメージを計算
 							// biome-ignore lint/suspicious/noExplicitAny: simulateItemEquipSimpleの型互換性のため
-							const simulatedData = simulateItemEquipSimple(currentData, buffItem as any, slotInfo)
+							const simulatedData = simulateItemEquipSimple(
+								currentData,
+								buffItem as any,
+								slotInfo,
+							)
 							const simulatedResults = calculateResults(simulatedData)
 							const simulatedDamageResult = calculateDamageWithService(
 								simulatedData,
 								simulatedResults,
-								{ debug: false, powerOptions: powerOptions || {} }
+								{ debug: false, powerOptions: powerOptions || {} },
 							)
 
 							// 平均ダメージの差分を計算
@@ -96,35 +113,45 @@ export function useBuffItemDamageSorting(
 								...buffItem,
 								damageDifference: difference,
 								isCalculating: false,
-								hasError: false
+								hasError: false,
 							}
 						} catch (_error) {
 							return {
 								...buffItem,
 								damageDifference: 0,
 								isCalculating: false,
-								hasError: true
+								hasError: true,
 							}
 						}
-					})
+					}),
 				)
 
 				setBuffItemsWithDamage(results)
 			} catch (_error) {
 				// エラー時は元の配列を返す
-				setBuffItemsWithDamage(buffItems.map(buffItem => ({
-					...buffItem,
-					damageDifference: 0,
-					isCalculating: false,
-					hasError: true
-				})))
+				setBuffItemsWithDamage(
+					buffItems.map((buffItem) => ({
+						...buffItem,
+						damageDifference: 0,
+						isCalculating: false,
+						hasError: true,
+					})),
+				)
 			} finally {
 				setIsCalculating(false)
 			}
 		}
 
 		calculateDamages()
-	}, [buffItems, slotInfo, enabled, currentData, currentResults, powerOptions, baselineDamageResult])
+	}, [
+		buffItems,
+		slotInfo,
+		enabled,
+		currentData,
+		currentResults,
+		powerOptions,
+		baselineDamageResult,
+	])
 
 	// ダメージ差分順でソート
 	const sortedBuffItems = useMemo(() => {
@@ -144,11 +171,11 @@ export function useBuffItemDamageSorting(
 				// 同じダメージ差分の場合は名前順
 				return a.name.localeCompare(b.name)
 			})
-			.map(buffItem => buffItem as unknown as PresetBuffItem)
+			.map((buffItem) => buffItem as unknown as PresetBuffItem)
 	}, [buffItemsWithDamage, enabled, buffItems, isCalculating])
 
 	return {
 		sortedBuffItems,
-		isCalculating
+		isCalculating,
 	}
 }

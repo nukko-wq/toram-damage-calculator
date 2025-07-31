@@ -25,7 +25,9 @@ export class StormBlazer10StackCalculator extends SkillHitCalculator {
 			}
 
 			default:
-				throw new Error(`Invalid hit number for Storm Blazer (10 Stack): ${hitNumber}`)
+				throw new Error(
+					`Invalid hit number for Storm Blazer (10 Stack): ${hitNumber}`,
+				)
 		}
 	}
 }

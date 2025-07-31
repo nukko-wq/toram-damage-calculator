@@ -12,7 +12,10 @@ interface CrystalFormProps {
 	onChange?: (crystals: CrystalSlots) => void
 }
 
-export default function CrystalForm({ crystals: _crystals, onChange }: CrystalFormProps) {
+export default function CrystalForm({
+	crystals: _crystals,
+	onChange,
+}: CrystalFormProps) {
 	// Zustandストアからクリスタルデータを取得
 	const storeCrystals = useCalculatorStore((state) => state.data.crystals)
 	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)

@@ -248,7 +248,9 @@ export function calculateDamage(
 	const step1Result = calculateBaseDamage(input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step1Result % 1 !== 0
-		console.log(`ステップ1結果: ${step1Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ1結果: ${step1Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ2: 固定値加算
@@ -258,7 +260,9 @@ export function calculateDamage(
 	let step2Result = applyFixedValues(step1Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step2Result % 1 !== 0
-		console.log(`ステップ2結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ2結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ2a: クリティカルダメージ補正（クリティカル時のみ）
@@ -269,7 +273,9 @@ export function calculateDamage(
 		step2Result = applyCriticalDamage(step2Result, input, steps)
 		if (process.env.NODE_ENV === 'development') {
 			const hasDecimal = step2Result % 1 !== 0
-			console.log(`ステップ2a結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+			console.log(
+				`ステップ2a結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+			)
 		}
 	}
 
@@ -280,7 +286,9 @@ export function calculateDamage(
 	const step3Result = applyElementAdvantage(step2Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step3Result % 1 !== 0
-		console.log(`ステップ3結果: ${step3Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ3結果: ${step3Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ4: スキル倍率補正
@@ -290,7 +298,9 @@ export function calculateDamage(
 	const step4Result = applySkillMultiplier(step3Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step4Result % 1 !== 0
-		console.log(`ステップ4結果: ${step4Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ4結果: ${step4Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ5: 抜刀%補正 (Phase 3で実装)
@@ -300,7 +310,9 @@ export function calculateDamage(
 	const step5Result = applyUnsheatheRate(step4Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step5Result % 1 !== 0
-		console.log(`ステップ5結果: ${step5Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ5結果: ${step5Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ6: 慣れ補正 (Phase 3で実装)
@@ -310,7 +322,9 @@ export function calculateDamage(
 	const step6Result = applyAdaptation(step5Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step6Result % 1 !== 0
-		console.log(`ステップ6結果: ${step6Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ6結果: ${step6Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ7: 距離補正 (Phase 3で実装)
@@ -320,7 +334,9 @@ export function calculateDamage(
 	const step7Result = applyDistance(step6Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step7Result % 1 !== 0
-		console.log(`ステップ7結果: ${step7Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ7結果: ${step7Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ8: コンボ補正 (Phase 3で実装)
@@ -331,7 +347,9 @@ export function calculateDamage(
 	const step8Result = applyCombo(step7Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step8Result % 1 !== 0
-		console.log(`ステップ8結果: ${step8Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ8結果: ${step8Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ9: パッシブ倍率補正（プレースホルダー）
@@ -341,7 +359,9 @@ export function calculateDamage(
 	const step9Result = applyPassiveMultiplier(step8Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = step9Result % 1 !== 0
-		console.log(`ステップ9結果: ${step9Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ9結果: ${step9Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// ステップ10: ブレイブ倍率補正
@@ -351,10 +371,14 @@ export function calculateDamage(
 	const baseDamage = applyBraveMultiplier(step9Result, input, steps)
 	if (process.env.NODE_ENV === 'development') {
 		const hasDecimal = baseDamage % 1 !== 0
-		console.log(`ステップ10結果: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`ステップ10結果: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 
 		console.log('\n=== 最終結果 ===')
-		console.log(`最終baseDamage: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`)
+		console.log(
+			`最終baseDamage: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
+		)
 	}
 
 	// 安定率適用
@@ -432,22 +456,26 @@ function calculateBaseDamage(
 		input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF
 	const defenseType = input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF'
 	const processedDefense = processEnemyDefense(enemyDefense, input, defenseType)
-	
+
 	// 防御力減算前に小数点を切り捨て
 	const afterResistanceFloored = Math.floor(afterResistance)
-	
+
 	// 処理後DEFも小数点を切り捨て
 	const processedDefenseFloored = Math.floor(processedDefense)
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log(`敵${defenseType}: ${enemyDefense}`)
 		if (processedDefense !== processedDefenseFloored) {
-			console.log(`処理後${defenseType}: ${processedDefense} → ${processedDefenseFloored} (小数点切り捨て)`)
+			console.log(
+				`処理後${defenseType}: ${processedDefense} → ${processedDefenseFloored} (小数点切り捨て)`,
+			)
 		} else {
 			console.log(`処理後${defenseType}: ${processedDefenseFloored}`)
 		}
 		if (afterResistance !== afterResistanceFloored) {
-			console.log(`防御力減算前: ${afterResistance} → ${afterResistanceFloored} (小数点切り捨て)`)
+			console.log(
+				`防御力減算前: ${afterResistance} → ${afterResistanceFloored} (小数点切り捨て)`,
+			)
 		} else {
 			console.log(`防御力減算前: ${afterResistanceFloored}`)
 		}
@@ -752,14 +780,17 @@ function applyCombo(
 	// 無の構えの効果適用（強打が無効かつ無の構えが有効の場合）
 	if (!input.combo.isActive && input.register?.voidStance?.isEnabled) {
 		const voidStanceLevel = input.register.voidStance.level
-		const voidStanceMultiplier = 1 + (voidStanceLevel * 0.01)
+		const voidStanceMultiplier = 1 + voidStanceLevel * 0.01
 		comboRate = Math.floor(comboRate * voidStanceMultiplier)
-		
+
 		if (process.env.NODE_ENV === 'development') {
 			console.log('=== 無の構え効果適用 ===')
 			console.log('無の構えレベル:', voidStanceLevel)
 			console.log('無の構え倍率:', voidStanceMultiplier)
-			console.log('適用前コンボ倍率:', input.combo.isActive ? input.combo.multiplier : 100)
+			console.log(
+				'適用前コンボ倍率:',
+				input.combo.isActive ? input.combo.multiplier : 100,
+			)
 			console.log('適用後コンボ倍率:', comboRate)
 		}
 	}
@@ -840,7 +871,9 @@ function applyPassiveMultiplier(
 	// ブレイブ倍率がある場合は小数点を保持、ない場合は切り捨て
 	const hasBreaveMultiplier = input.braveMultiplier > 0
 	const calculationResult = beforePassive * (1 + passiveRate / 100)
-	const result = hasBreaveMultiplier ? calculationResult : Math.floor(calculationResult)
+	const result = hasBreaveMultiplier
+		? calculationResult
+		: Math.floor(calculationResult)
 
 	if (process.env.NODE_ENV === 'development') {
 		if (hasBreaveMultiplier) {
@@ -974,16 +1007,23 @@ function processEnemyDefense(
 
 	// 3. エターナルナイトメア減算
 	if (input.buffSkills.eternalNightmare.isEnabled) {
-		const calculatedReduction = input.buffSkills.eternalNightmare.level * input.buffSkills.totalDarkPowerLevel * 0.5
-		
+		const calculatedReduction =
+			input.buffSkills.eternalNightmare.level *
+			input.buffSkills.totalDarkPowerLevel *
+			0.5
+
 		// ボス戦の場合はNormal難易度のDEF/MDEFを参照、そうでなければ現在の値を使用
 		let referenceDef = processed
-		if (input.enemy.category === 'boss' && input.enemy.difficulty !== 'normal') {
-			referenceDef = defenseType === 'DEF' 
-				? (input.enemy.normalDEF ?? processed)
-				: (input.enemy.normalMDEF ?? processed)
+		if (
+			input.enemy.category === 'boss' &&
+			input.enemy.difficulty !== 'normal'
+		) {
+			referenceDef =
+				defenseType === 'DEF'
+					? (input.enemy.normalDEF ?? processed)
+					: (input.enemy.normalMDEF ?? processed)
 		}
-		
+
 		const halfDefense = referenceDef * 0.5
 		const eternalReduction = Math.min(calculatedReduction, halfDefense)
 		console.log('エターナルナイトメア減算:', {
@@ -997,7 +1037,8 @@ function processEnemyDefense(
 			finalReduction: eternalReduction,
 			beforeReduction: processed,
 			afterReduction: Math.max(0, processed - eternalReduction),
-			isBossWithDifficulty: input.enemy.category === 'boss' && input.enemy.difficulty !== 'normal'
+			isBossWithDifficulty:
+				input.enemy.category === 'boss' && input.enemy.difficulty !== 'normal',
 		})
 		processed = Math.max(0, processed - eternalReduction)
 	}

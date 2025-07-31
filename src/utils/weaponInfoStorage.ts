@@ -31,7 +31,7 @@ export function saveWeaponInfo(
 			refinement,
 			updatedAt: new Date().toISOString(),
 		}
-		
+
 		storage[equipmentId] = weaponInfo
 		localStorage.setItem(WEAPON_INFO_STORAGE_KEY, JSON.stringify(storage))
 		return true
@@ -124,3 +124,5 @@ function getWeaponInfoStorage(): WeaponInfoStorage {
 export function clearWeaponInfo(equipmentId: string): boolean {
 	return saveWeaponInfo(equipmentId, 0, 0, 0)
 }
+
+// 移行関数は削除済み - weaponInfoStorageで統一管理完了

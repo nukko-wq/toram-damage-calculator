@@ -446,11 +446,6 @@ export interface UserEquipment {
 	name: string
 	category: EquipmentCategory
 	properties: Partial<EquipmentProperties>
-	weaponStats?: {
-		ATK?: number
-		stability?: number
-		refinement?: number
-	}
 	crystalSlots?: {
 		slot1?: string
 		slot2?: string
@@ -547,7 +542,9 @@ interface LocalStorageCustomItemBase {
 // ローカルストレージ装備（プリセット由来）
 export interface LocalStorageEquipment
 	extends PresetEquipment,
-		LocalStoragePresetItemBase {}
+		LocalStoragePresetItemBase {
+	refinement?: number // weaponInfoStorageで管理される精錬値
+}
 
 // ローカルストレージクリスタル（プリセット由来）
 export interface LocalStorageCrystal
@@ -566,6 +563,7 @@ export interface CustomEquipment
 	extends PresetEquipment,
 		LocalStorageCustomItemBase {
 	isCustom: true
+	refinement?: number // weaponInfoStorageで管理される精錬値
 }
 
 export interface CustomCrystal

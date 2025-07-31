@@ -624,7 +624,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	let enemyDEF = 1000
 	let enemyMDEF = 1000
 	let enemyLevel = 100
-	
+
 	// 実際の敵データを取得してNormal難易度の値を使用
 	const normalEnemyData = getNormalDifficultyEnemyData(data)
 	if (normalEnemyData) {
@@ -741,9 +741,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	}
 
 	// ペットマインドアップスキルの補正値を追加
-	const petMindUpBonuses = getPetMindUpEffects(
-		data.buffSkills?.skills || null,
-	)
+	const petMindUpBonuses = getPetMindUpEffects(data.buffSkills?.skills || null)
 
 	for (const [key, value] of Object.entries(petMindUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
@@ -753,9 +751,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 	}
 
 	// ペットカットアップスキルの補正値を追加
-	const petCutUpBonuses = getPetCutUpEffects(
-		data.buffSkills?.skills || null,
-	)
+	const petCutUpBonuses = getPetCutUpEffects(data.buffSkills?.skills || null)
 
 	for (const [key, value] of Object.entries(petCutUpBonuses)) {
 		if (typeof value === 'number' && value !== 0) {

@@ -3,7 +3,11 @@
 import { useState } from 'react'
 import { useCalculatorStore } from '@/stores'
 import MessageModal from '@/components/ui/MessageModal'
-import { saveWeaponInfo, clearWeaponInfo, getWeaponInfo } from '@/utils/weaponInfoStorage'
+import {
+	saveWeaponInfo,
+	clearWeaponInfo,
+	getWeaponInfo,
+} from '@/utils/weaponInfoStorage'
 import type {
 	Equipment,
 	EquipmentSlots,
@@ -578,7 +582,8 @@ export default function EquipmentForm({
 					const weaponInfo = getWeaponInfo(equipmentId)
 					if (weaponInfo) {
 						console.log('武器情報をWeaponFormに復元:', weaponInfo)
-						const currentMainWeapon = useCalculatorStore.getState().data.mainWeapon
+						const currentMainWeapon =
+							useCalculatorStore.getState().data.mainWeapon
 						const updatedMainWeapon = {
 							...currentMainWeapon,
 							ATK: weaponInfo.ATK,
@@ -743,7 +748,7 @@ export default function EquipmentForm({
 	const handleRegisterWeaponInfo = async () => {
 		const currentEquipment = effectiveEquipment.main
 		console.log('現在の装備:', currentEquipment)
-		
+
 		if (!currentEquipment?.id) {
 			console.log('装備が選択されていません')
 			showMessage('装備が選択されていません。')
@@ -754,13 +759,13 @@ export default function EquipmentForm({
 			// WeaponFormからメイン武器データを取得
 			const mainWeapon = useCalculatorStore.getState().data.mainWeapon
 			console.log('メイン武器データ:', mainWeapon)
-			
+
 			// 新しい武器情報ストレージシステムを使用
 			const success = saveWeaponInfo(
-				currentEquipment.id, 
-				mainWeapon.ATK, 
-				mainWeapon.stability, 
-				mainWeapon.refinement
+				currentEquipment.id,
+				mainWeapon.ATK,
+				mainWeapon.stability,
+				mainWeapon.refinement,
 			)
 			console.log('武器情報保存結果:', success)
 
@@ -1138,12 +1143,17 @@ export default function EquipmentForm({
 						</div>
 					)}
 
-					{(activeTab as string) !== 'register' && effectiveEquipment[activeTab as keyof EquipmentSlots] &&
+					{(activeTab as string) !== 'register' &&
+						effectiveEquipment[activeTab as keyof EquipmentSlots] &&
 						renderPropertyInputs(
 							effectiveEquipment[activeTab as keyof EquipmentSlots],
 							activeTab as keyof EquipmentSlots,
 							(property: keyof EquipmentProperties, value: string) =>
-								handleEquipmentPropertyChange(activeTab as keyof EquipmentSlots, property, value),
+								handleEquipmentPropertyChange(
+									activeTab as keyof EquipmentSlots,
+									property,
+									value,
+								),
 						)}
 				</>
 			)}

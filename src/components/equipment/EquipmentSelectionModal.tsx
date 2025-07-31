@@ -42,13 +42,13 @@ export default function EquipmentSelectionModal({
 		[],
 	)
 	const [_favoritesChanged, setFavoritesChanged] = useState(0)
-	
+
 	// 「装備なし」の特別なID
 	const EQUIPMENT_NONE_ID = '__equipment_none__'
-	
+
 	// 「装備なし」のお気に入り状態
-	const [isNoneFavorite, setIsNoneFavorite] = useState(
-		() => EquipmentFavoritesManager.isFavorite(EQUIPMENT_NONE_ID),
+	const [isNoneFavorite, setIsNoneFavorite] = useState(() =>
+		EquipmentFavoritesManager.isFavorite(EQUIPMENT_NONE_ID),
 	)
 
 	// 現在の装備データを取得
@@ -57,13 +57,17 @@ export default function EquipmentSelectionModal({
 	// 現在装着中の装備があるかどうかを判定
 	const hasCurrentlyEquippedItem = useMemo(() => {
 		if (!slotInfo || !currentData) return false
-		
-		if (slotInfo.type === 'equipment' && slotInfo.slot && typeof slotInfo.slot === 'string') {
+
+		if (
+			slotInfo.type === 'equipment' &&
+			slotInfo.slot &&
+			typeof slotInfo.slot === 'string'
+		) {
 			const slotKey = slotInfo.slot as keyof typeof currentData.equipment
 			const currentEquipment = currentData.equipment[slotKey]
 			return currentEquipment !== null && currentEquipment !== undefined
 		}
-		
+
 		return false
 	}, [slotInfo, currentData])
 
@@ -79,7 +83,7 @@ export default function EquipmentSelectionModal({
 			if (equipmentId === EQUIPMENT_NONE_ID) {
 				setIsNoneFavorite(isFavorite)
 			}
-			
+
 			// お気に入り状態変更時の処理
 			setFavoritesChanged((prev) => prev + 1) // 再レンダリングトリガー
 
@@ -92,7 +96,7 @@ export default function EquipmentSelectionModal({
 		},
 		[],
 	)
-	
+
 	// 「装備なし」のお気に入りクリックハンドラー
 	const handleNoneFavoriteClick = useCallback(
 		(e: React.MouseEvent) => {
@@ -161,19 +165,22 @@ export default function EquipmentSelectionModal({
 	}, [isOpen, category, selectedEquipmentId, currentFormProperties])
 
 	// ダメージ差分順でソート
-	const { sortedEquipments, isCalculating: isSorting } = useEquipmentDamageSorting(
-		availableEquipments,
-		slotInfo,
-		isOpen && !!slotInfo
-	)
+	const { sortedEquipments, isCalculating: isSorting } =
+		useEquipmentDamageSorting(
+			availableEquipments,
+			slotInfo,
+			isOpen && !!slotInfo,
+		)
 
 	// 「装備なし」のダメージ差分を計算
 	const equipmentNoneDamageResult = useDamageDifferenceCorrect(
 		EQUIPMENT_NONE_ITEM,
 		slotInfo || { type: 'equipment', slot: 'main' },
-		{ debug: false }
+		{ debug: false },
 	)
-	const equipmentNoneDamageDifference = slotInfo ? equipmentNoneDamageResult.difference || 0 : 0
+	const equipmentNoneDamageDifference = slotInfo
+		? equipmentNoneDamageResult.difference || 0
+		: 0
 
 	// 装備リストの分別: お気に入り / その他（ソート済みの装備から）
 	const { favoriteEquipments, otherEquipments } = useMemo(() => {
@@ -181,9 +188,7 @@ export default function EquipmentSelectionModal({
 		const favoriteSet = new Set(favoriteIds)
 
 		// 通常の装備を分別
-		const favorites = sortedEquipments.filter((eq) =>
-			favoriteSet.has(eq.id),
-		)
+		const favorites = sortedEquipments.filter((eq) => favoriteSet.has(eq.id))
 		const others = sortedEquipments.filter((eq) => !favoriteSet.has(eq.id))
 
 		// 「装備なし」をダメージ差分に基づいて適切な位置に挿入
@@ -196,15 +201,19 @@ export default function EquipmentSelectionModal({
 				category: ['main'],
 				baseStats: {},
 				properties: {},
-				damageDifference: equipmentNoneDamageDifference
+				damageDifference: equipmentNoneDamageDifference,
 			}
 
 			// お気に入りかどうかで分岐
 			if (isNoneFavorite) {
 				// お気に入りリストに挿入（ダメージ差分順）
-				const insertIndex = favorites.findIndex(equipment => {
+				const insertIndex = favorites.findIndex((equipment) => {
 					// biome-ignore lint/suspicious/noExplicitAny: EquipmentWithDamageタイプのダメージ差分プロパティアクセス
-					const equipmentDamage = 'damageDifference' in equipment && typeof (equipment as any).damageDifference === 'number' ? (equipment as any).damageDifference : 0
+					const equipmentDamage =
+						'damageDifference' in equipment &&
+						typeof (equipment as any).damageDifference === 'number'
+							? (equipment as any).damageDifference
+							: 0
 					return equipmentNoneWithDamage.damageDifference > equipmentDamage
 				})
 				if (insertIndex === -1) {
@@ -214,9 +223,13 @@ export default function EquipmentSelectionModal({
 				}
 			} else {
 				// その他リストに挿入（ダメージ差分順）
-				const insertIndex = others.findIndex(equipment => {
+				const insertIndex = others.findIndex((equipment) => {
 					// biome-ignore lint/suspicious/noExplicitAny: EquipmentWithDamageタイプのダメージ差分プロパティアクセス
-					const equipmentDamage = 'damageDifference' in equipment && typeof (equipment as any).damageDifference === 'number' ? (equipment as any).damageDifference : 0
+					const equipmentDamage =
+						'damageDifference' in equipment &&
+						typeof (equipment as any).damageDifference === 'number'
+							? (equipment as any).damageDifference
+							: 0
 					return equipmentNoneWithDamage.damageDifference > equipmentDamage
 				})
 				if (insertIndex === -1) {
@@ -229,9 +242,15 @@ export default function EquipmentSelectionModal({
 
 		return {
 			favoriteEquipments: favorites,
-			otherEquipments: others
+			otherEquipments: others,
 		}
-	}, [sortedEquipments, isNoneFavorite, equipmentNoneDamageDifference, hasCurrentlyEquippedItem, slotInfo])
+	}, [
+		sortedEquipments,
+		isNoneFavorite,
+		equipmentNoneDamageDifference,
+		hasCurrentlyEquippedItem,
+		slotInfo,
+	])
 
 	const handleSelect = useCallback(
 		(equipmentId: string) => {
@@ -325,9 +344,24 @@ export default function EquipmentSelectionModal({
 							{/* ダメージ差分計算中の表示 */}
 							{isSorting && slotInfo && (
 								<div className="flex items-center justify-center py-4 mb-4 text-sm text-gray-500 bg-gray-50 rounded-lg">
-									<svg className="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
-										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+									<svg
+										className="w-4 h-4 mr-2 animate-spin"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<circle
+											className="opacity-25"
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											strokeWidth="4"
+										/>
+										<path
+											className="opacity-75"
+											fill="currentColor"
+											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+										/>
 									</svg>
 									ダメージ差分を計算中...
 								</div>
@@ -336,7 +370,11 @@ export default function EquipmentSelectionModal({
 							{favoriteEquipments.length > 0 && (
 								<div className="mb-6">
 									<h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-										<svg className="w-4 h-4 text-red-500 mr-1" fill="currentColor" viewBox="0 0 24 24">
+										<svg
+											className="w-4 h-4 text-red-500 mr-1"
+											fill="currentColor"
+											viewBox="0 0 24 24"
+										>
 											<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 										</svg>
 										お気に入り ({favoriteEquipments.length})
@@ -365,47 +403,67 @@ export default function EquipmentSelectionModal({
 															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-red-500 hover:text-red-600"
 															aria-label="お気に入りから削除"
 														>
-															<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+															<svg
+																className="w-5 h-5"
+																fill="currentColor"
+																viewBox="0 0 24 24"
+															>
 																<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
 															</svg>
 														</button>
-														
+
 														{/* 装備なしと選択マーク */}
 														<div className="flex justify-between items-center mb-1 sm:mb-2">
-															<h3 className="font-semibold text-gray-900">装備なし</h3>
+															<h3 className="font-semibold text-gray-900">
+																装備なし
+															</h3>
 															{selectedEquipmentId === null && (
 																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	<svg
+																		className="w-4 h-4 text-white"
+																		fill="none"
+																		stroke="currentColor"
+																		viewBox="0 0 24 24"
+																	>
+																		<path
+																			strokeLinecap="round"
+																			strokeLinejoin="round"
+																			strokeWidth={2}
+																			d="M5 13l4 4L19 7"
+																		/>
 																	</svg>
 																</div>
 															)}
 														</div>
-														
+
 														{/* ダメージ差分表示（他の装備と同じ形式） */}
 														{slotInfo && hasCurrentlyEquippedItem && (
 															<div className="mb-1 sm:mb-2">
 																<div className="font-medium">
-																	<span className={`mr-3 text-sm ${
-																		equipmentNoneDamageDifference > 0 
-																			? 'text-blue-500' 
-																			: equipmentNoneDamageDifference < 0 
-																				? 'text-red-500' 
-																				: 'text-gray-400'
-																	}`}>
+																	<span
+																		className={`mr-3 text-sm ${
+																			equipmentNoneDamageDifference > 0
+																				? 'text-blue-500'
+																				: equipmentNoneDamageDifference < 0
+																					? 'text-red-500'
+																					: 'text-gray-400'
+																		}`}
+																	>
 																		ダメージ：
 																	</span>
-																	<span className={`text-sm ${
-																		equipmentNoneDamageDifference > 0 
-																			? 'text-blue-600' 
-																			: equipmentNoneDamageDifference < 0 
-																				? 'text-red-600' 
-																				: 'text-gray-500'
-																	}`}>
-																		{equipmentNoneDamageDifference === 0 
-																			? '±0' 
-																			: equipmentNoneDamageDifference > 0 
-																				? `+${equipmentNoneDamageDifference.toLocaleString()}` 
+																	<span
+																		className={`text-sm ${
+																			equipmentNoneDamageDifference > 0
+																				? 'text-blue-600'
+																				: equipmentNoneDamageDifference < 0
+																					? 'text-red-600'
+																					: 'text-gray-500'
+																		}`}
+																	>
+																		{equipmentNoneDamageDifference === 0
+																			? '±0'
+																			: equipmentNoneDamageDifference > 0
+																				? `+${equipmentNoneDamageDifference.toLocaleString()}`
 																				: equipmentNoneDamageDifference.toLocaleString()}
 																	</span>
 																</div>
@@ -414,7 +472,7 @@ export default function EquipmentSelectionModal({
 													</div>
 												)
 											}
-											
+
 											// 通常の装備カード
 											return (
 												<EquipmentCard
@@ -463,47 +521,73 @@ export default function EquipmentSelectionModal({
 															className="absolute bottom-2 right-2 p-1.5 rounded-full transition-all duration-200 hover:scale-110 z-10 text-gray-300 hover:text-red-400"
 															aria-label="お気に入りに追加"
 														>
-															<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+															<svg
+																className="w-5 h-5"
+																fill="none"
+																stroke="currentColor"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	strokeLinecap="round"
+																	strokeLinejoin="round"
+																	strokeWidth={2}
+																	d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+																/>
 															</svg>
 														</button>
-														
+
 														{/* 装備なしと選択マーク */}
 														<div className="flex justify-between items-center mb-1 sm:mb-2">
-															<h3 className="font-semibold text-gray-900">装備なし</h3>
+															<h3 className="font-semibold text-gray-900">
+																装備なし
+															</h3>
 															{selectedEquipmentId === null && (
 																<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
-																	<svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-																		<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+																	<svg
+																		className="w-4 h-4 text-white"
+																		fill="none"
+																		stroke="currentColor"
+																		viewBox="0 0 24 24"
+																	>
+																		<path
+																			strokeLinecap="round"
+																			strokeLinejoin="round"
+																			strokeWidth={2}
+																			d="M5 13l4 4L19 7"
+																		/>
 																	</svg>
 																</div>
 															)}
 														</div>
-														
+
 														{/* ダメージ差分表示（他の装備と同じ形式） */}
 														{slotInfo && hasCurrentlyEquippedItem && (
 															<div className="mb-1 sm:mb-2">
 																<div className="font-medium">
-																	<span className={`mr-3 text-sm ${
-																		equipmentNoneDamageDifference > 0 
-																			? 'text-blue-500' 
-																			: equipmentNoneDamageDifference < 0 
-																				? 'text-red-500' 
-																				: 'text-gray-400'
-																	}`}>
+																	<span
+																		className={`mr-3 text-sm ${
+																			equipmentNoneDamageDifference > 0
+																				? 'text-blue-500'
+																				: equipmentNoneDamageDifference < 0
+																					? 'text-red-500'
+																					: 'text-gray-400'
+																		}`}
+																	>
 																		ダメージ：
 																	</span>
-																	<span className={`text-sm ${
-																		equipmentNoneDamageDifference > 0 
-																			? 'text-blue-600' 
-																			: equipmentNoneDamageDifference < 0 
-																				? 'text-red-600' 
-																				: 'text-gray-500'
-																	}`}>
-																		{equipmentNoneDamageDifference === 0 
-																			? '±0' 
-																			: equipmentNoneDamageDifference > 0 
-																				? `+${equipmentNoneDamageDifference.toLocaleString()}` 
+																	<span
+																		className={`text-sm ${
+																			equipmentNoneDamageDifference > 0
+																				? 'text-blue-600'
+																				: equipmentNoneDamageDifference < 0
+																					? 'text-red-600'
+																					: 'text-gray-500'
+																		}`}
+																	>
+																		{equipmentNoneDamageDifference === 0
+																			? '±0'
+																			: equipmentNoneDamageDifference > 0
+																				? `+${equipmentNoneDamageDifference.toLocaleString()}`
 																				: equipmentNoneDamageDifference.toLocaleString()}
 																	</span>
 																</div>
@@ -512,7 +596,7 @@ export default function EquipmentSelectionModal({
 													</div>
 												)
 											}
-											
+
 											// 通常の装備カード
 											return (
 												<EquipmentCard
@@ -532,11 +616,13 @@ export default function EquipmentSelectionModal({
 							)}
 
 							{/* アイテムが見つからない場合 */}
-							{favoriteEquipments.length === 0 && otherEquipments.length === 0 && !hasCurrentlyEquippedItem && (
-								<div className="text-center text-gray-500 py-8">
-									該当する装備がありません
-								</div>
-							)}
+							{favoriteEquipments.length === 0 &&
+								otherEquipments.length === 0 &&
+								!hasCurrentlyEquippedItem && (
+									<div className="text-center text-gray-500 py-8">
+										該当する装備がありません
+									</div>
+								)}
 						</div>
 
 						{/* フッター */}
