@@ -589,7 +589,9 @@ export default function EquipmentForm({
 							ATK: weaponInfo.ATK,
 							stability: weaponInfo.stability,
 							refinement: weaponInfo.refinement,
-							...(weaponInfo.weaponType && { weaponType: weaponInfo.weaponType }),
+							...(weaponInfo.weaponType && {
+								weaponType: weaponInfo.weaponType,
+							}),
 						}
 						updateMainWeapon(updatedMainWeapon)
 					}
@@ -1119,7 +1121,7 @@ export default function EquipmentForm({
 							<button
 								type="button"
 								onClick={() => handleRegisterWeaponInfo()}
-								className="px-3 py-1 text-sm bg-green-400/80 text-white rounded-md hover:bg-green-400 transition-colors cursor-pointer"
+								className="px-3 py-1 text-sm bg-blue-400/80 text-white rounded-md hover:bg-blue-400 transition-colors cursor-pointer"
 								title="WeaponFormの武器情報をメイン装備に登録"
 							>
 								メイン武器情報登録
@@ -1127,7 +1129,7 @@ export default function EquipmentForm({
 							<button
 								type="button"
 								onClick={() => handleDeleteWeaponInfo()}
-								className="px-3 py-1 text-sm bg-red-400/80 text-white rounded-md hover:bg-red-400 transition-colors cursor-pointer"
+								className="px-3 py-1 text-sm bg-gray-400/80 text-white rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
 								title="メイン装備の武器情報を削除"
 							>
 								武器情報削除
