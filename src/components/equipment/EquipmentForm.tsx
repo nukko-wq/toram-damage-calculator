@@ -577,23 +577,6 @@ export default function EquipmentForm({
 				// Zustandストアを更新
 				updateEquipment(updatedEquipment)
 
-				// メイン装備が選択された場合、保存されている武器情報をWeaponFormに反映
-				if (slotKey === 'main') {
-					const weaponInfo = getWeaponInfo(equipmentId)
-					if (weaponInfo) {
-						console.log('武器情報をWeaponFormに復元:', weaponInfo)
-						const currentMainWeapon =
-							useCalculatorStore.getState().data.mainWeapon
-						const updatedMainWeapon = {
-							...currentMainWeapon,
-							ATK: weaponInfo.ATK,
-							stability: weaponInfo.stability,
-							refinement: weaponInfo.refinement,
-						}
-						updateMainWeapon(updatedMainWeapon)
-					}
-				}
-
 				// 後方互換性のため従来のonChangeも呼び出し
 				if (onEquipmentChange) {
 					onEquipmentChange(updatedEquipment)
@@ -766,8 +749,10 @@ export default function EquipmentForm({
 				mainWeapon.ATK,
 				mainWeapon.stability,
 				mainWeapon.refinement,
+				mainWeapon.weaponType,
 			)
 			console.log('武器情報保存結果:', success)
+			console.log('保存した武器種:', mainWeapon.weaponType)
 
 			if (success) {
 				showMessage('武器情報を登録しました。')

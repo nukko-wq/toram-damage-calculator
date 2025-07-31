@@ -42,33 +42,8 @@ function cleanProperties(
 
 // 装備に武器情報をオーバーレイする関数
 function applyWeaponInfoOverlay(equipment: Equipment): Equipment {
-	if (!equipment.id) return equipment
-
-	const weaponInfo = getWeaponInfo(equipment.id)
-	if (!weaponInfo) return equipment
-
-	// 武器情報をプロパティとしてオーバーレイ
-	const overlayedProperties = {
-		...equipment.properties,
-		WeaponATK: weaponInfo.ATK,
-		Stability_Rate: weaponInfo.stability,
-	}
-
-	// baseStatsにも武器情報を反映
-	const overlayedBaseStats = {
-		...equipment.baseStats,
-		ATK: weaponInfo.ATK,
-		stability: weaponInfo.stability,
-		refinement: weaponInfo.refinement,
-	}
-
-	// 精錬値をオーバーレイ
-	return {
-		...equipment,
-		properties: overlayedProperties,
-		baseStats: overlayedBaseStats,
-		refinement: weaponInfo.refinement,
-	} as Equipment
+	// 武器情報のオーバーレイを無効化 - EquipmentFormでの意図しない上書きを防ぐため
+	return equipment
 }
 
 // プリセット装備データを取得

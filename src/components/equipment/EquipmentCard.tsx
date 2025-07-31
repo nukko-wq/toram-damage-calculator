@@ -59,11 +59,12 @@ export default function EquipmentCard({
 			return null
 		}
 
-		const { ATK, stability, refinement } = weaponInfo
+		const { ATK, stability, refinement, weaponType } = weaponInfo
 		const refinementDisplay = refinement > 0 ? ` +${refinementValueToDisplay(refinement as any)}` : ''
 		const stabilityDisplay = stability > 0 ? ` (${stability}%)` : ''
+		const weaponTypeDisplay = weaponType ? ` [${weaponType}]` : ''
 		
-		return `${ATK}${refinementDisplay}${stabilityDisplay}`
+		return `${ATK}${refinementDisplay}${stabilityDisplay}${weaponTypeDisplay}`
 	}
 
 	const getPropertyList = () => {

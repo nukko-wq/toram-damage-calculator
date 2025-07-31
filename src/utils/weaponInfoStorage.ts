@@ -5,6 +5,7 @@ interface WeaponInfo {
 	ATK: number
 	stability: number
 	refinement: number
+	weaponType?: import('@/types/calculator').WeaponType
 	updatedAt: string
 }
 
@@ -22,6 +23,7 @@ export function saveWeaponInfo(
 	ATK: number,
 	stability: number,
 	refinement: number,
+	weaponType?: import('@/types/calculator').WeaponType,
 ): boolean {
 	try {
 		const storage = getWeaponInfoStorage()
@@ -29,6 +31,7 @@ export function saveWeaponInfo(
 			ATK,
 			stability,
 			refinement,
+			weaponType,
 			updatedAt: new Date().toISOString(),
 		}
 
