@@ -6,6 +6,8 @@ import type { PresetEquipment } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
+import { getWeaponInfo } from '@/utils/weaponInfoStorage'
+import { refinementValueToDisplay } from '@/utils/refinementUtils'
 
 interface EquipmentCardProps {
 	equipment: PresetEquipment
@@ -50,6 +52,19 @@ export default function EquipmentCard({
 		[equipment.id, isFavorite, onFavoriteChange],
 	)
 
+
+	const formatWeaponInfo = () => {
+		const weaponInfo = getWeaponInfo(equipment.id)
+		if (!weaponInfo || (weaponInfo.ATK === 0 && weaponInfo.stability === 0 && weaponInfo.refinement === 0)) {
+			return null
+		}
+
+		const { ATK, stability, refinement } = weaponInfo
+		const refinementDisplay = refinement > 0 ? ` +${refinementValueToDisplay(refinement)}` : ''
+		const stabilityDisplay = stability > 0 ? ` (${stability}%)` : ''
+		
+		return `${ATK}${refinementDisplay}${stabilityDisplay}`
+	}
 
 	const getPropertyList = () => {
 		// 装備フォームと同じプロパティ名マッピング
@@ -310,6 +325,12 @@ export default function EquipmentCard({
 				</div>
 			)}
 
+			{/* 武器情報 */}
+			{formatWeaponInfo() && (
+				<div className="text-sm text-blue-600 mb-2 font-medium">
+					{formatWeaponInfo()}
+				</div>
+			)}
 
 			{/* プロパティ */}
 			{getPropertyList().length > 0 && (
@@ -363,17 +384,7 @@ export default function EquipmentCard({
 					</div>
 				)}
 
-			{/* 説明 */}
-			{equipment.description && (
-				<div className="text-xs text-gray-500 line-clamp-2 mb-1">
-					{equipment.description}
-				</div>
-			)}
 
-			{/* 入手方法 */}
-			{equipment.source && (
-				<div className="text-xs text-gray-400">入手: {equipment.source}</div>
-			)}
 		</div>
 	)
 }
