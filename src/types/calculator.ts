@@ -234,7 +234,6 @@ export interface PresetEquipment {
 	id: string
 	name: string
 	properties: Partial<EquipmentProperties>
-	armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
 	conditionalEffects?: ConditionalEffect[] // 条件付き効果
 }
 
@@ -437,7 +436,6 @@ export interface UserEquipment {
 		slot1?: string
 		slot2?: string
 	}
-	armorType?: ArmorType // 防具の改造タイプ（体装備のみ、セーブデータ間で共通）
 	createdAt: string
 	updatedAt: string
 	isFavorite: boolean

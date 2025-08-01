@@ -5,6 +5,7 @@
  * 詳細な計算式は docs/calculations/basic-stats.md を参照
  */
 
+import { getArmorType } from './armorTypeStorage'
 import type {
 	BaseStats,
 	WeaponType as WeaponTypeEnum,
@@ -1111,7 +1112,7 @@ export function getBodyEquipmentStatus(bodyEquipment: any): {
 
 	return {
 		hasBodyEquipment: true,
-		armorType: bodyEquipment.armorType || 'normal',
+		armorType: getArmorType(bodyEquipment.id) || 'normal',
 	}
 }
 

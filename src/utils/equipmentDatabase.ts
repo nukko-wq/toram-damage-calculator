@@ -23,6 +23,7 @@ import {
 	startEditSession,
 	updateEditSessionProperties,
 } from './editSessionManager'
+import { applyArmorTypeOverlay } from './armorTypeStorage'
 
 
 // プロパティからundefinedの値を除外する関数
@@ -42,8 +43,8 @@ function cleanProperties(
 
 // 装備に武器情報をオーバーレイする関数
 function applyWeaponInfoOverlay(equipment: Equipment): Equipment {
-	// 武器情報のオーバーレイを無効化 - EquipmentFormでの意図しない上書きを防ぐため
-	return equipment
+	// weaponInfoとarmorTypeの両方をオーバーレイ適用
+	return applyArmorTypeOverlay(equipment)
 }
 
 // プリセット装備データを取得
@@ -86,7 +87,6 @@ export function getAllEquipments(): PresetEquipment[] {
 				id: item.id,
 				name: item.name,
 				properties: cleanProperties(item.properties),
-				armorType: (item as { armorType?: ArmorType }).armorType,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
@@ -202,7 +202,7 @@ export function getEquipmentsByCategory(
 	category: EquipmentCategory,
 ): PresetEquipment[] {
 	const equipmentsRoot = (
-		equipmentsData as { equipments: Record<string, { id: string, name: string, properties: Record<string, unknown>, armorType?: ArmorType, conditionalEffects?: unknown[] }[]> }
+		equipmentsData as { equipments: Record<string, { id: string, name: string, properties: Record<string, unknown>, conditionalEffects?: unknown[] }[]> }
 	).equipments
 
 	if (!equipmentsRoot || !equipmentsRoot[category]) {
@@ -215,7 +215,6 @@ export function getEquipmentsByCategory(
 			id: item.id,
 			name: item.name,
 			properties: cleanProperties(item.properties),
-			armorType: category === 'body' ? item.armorType : undefined,
 			conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 		})
 	}
@@ -397,7 +396,6 @@ export function getAvailableEquipmentsByCategory(
 		id: custom.id,
 		name: custom.name,
 		properties: custom.properties,
-		armorType: custom.armorType,
 		isPreset: false as const,
 		isCustom: true as const,
 		isFavorite: custom.isFavorite,
@@ -549,8 +547,7 @@ export function createCustomEquipment(
 					slot2: undefined,
 				}
 			: undefined,
-		// 体装備の場合はarmorTypeにデフォルト値を設定
-		armorType: equipmentCategory === 'body' ? 'normal' : undefined,
+		// 体装備の場合はarmorTypeStorageにデフォルト値を設定（プロパティからは削除）
 		createdAt: now,
 		updatedAt: now,
 		isFavorite: false,
@@ -560,6 +557,12 @@ export function createCustomEquipment(
 	if (equipmentCategory === 'mainWeapon' || equipmentCategory === 'subWeapon') {
 		const { saveWeaponInfo } = require('./weaponInfoStorage')
 		saveWeaponInfo(id, 0, 0, 0)
+	}
+
+	// 体装備の場合はarmorTypeStorageにデフォルト値を保存
+	if (equipmentCategory === 'body') {
+		const { saveArmorType } = require('./armorTypeStorage')
+		saveArmorType(id, 'normal')
 	}
 
 	return customEquipment
@@ -633,7 +636,6 @@ export function getCombinedEquipmentsByCategory(
 				category: [equipment.category] as EquipmentCategory[],
 				baseStats: {},
 				properties: equipment.properties,
-				armorType: equipment.armorType,
 				isPreset: false as const,
 				isCustom: true as const,
 				isFavorite: equipment.isFavorite,
@@ -768,7 +770,6 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 			baseStats: {},
 			properties: customEquipment.properties,
 			refinement: 0, // weaponInfoOverlayで上書きされる
-			armorType: customEquipment.armorType,
 			isPreset: false as const,
 			isCustom: true,
 			isFavorite: customEquipment.isFavorite,
@@ -928,33 +929,17 @@ export function updateEquipmentArmorType(
 	armorType: ArmorType,
 ): boolean {
 	console.log('updateEquipmentArmorType called:', { id, armorType })
-
-	// カスタム装備の場合を先に確認
-	const customEquipment = getCustomEquipmentById(id)
-	if (customEquipment) {
-		console.log('Found custom equipment:', customEquipment.name)
-		try {
-			const { updateUserEquipment } = require('./customEquipmentManager')
-			updateUserEquipment(id, { armorType })
-			console.log('Custom equipment armorType updated successfully')
-			return true
-		} catch (error) {
-			console.error('Failed to update custom equipment armor type:', error)
-			return false
-		}
-	}
-
-	// プリセット装備の場合（equipments.tsのデータを直接更新）
-	const presetEquipment = getEquipmentById(id)
-	if (presetEquipment) {
-		console.log('Found preset equipment:', presetEquipment.name)
-		// プリセット装備データを直接更新（メモリ上の変更）
-		presetEquipment.armorType = armorType
-		console.log('Preset equipment armorType updated successfully')
+	
+	// armorTypeStorageシステムを使用して保存
+	const { saveArmorType } = require('./armorTypeStorage')
+	const success = saveArmorType(id, armorType)
+	
+	if (success) {
+		console.log('ArmorType updated successfully via armorTypeStorage')
 		return true
 	}
-
-	console.log('No equipment found with id:', id)
+	
+	console.error('Failed to update armorType via armorTypeStorage')
 	return false
 }
 

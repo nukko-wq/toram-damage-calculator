@@ -14,6 +14,7 @@ import type {
 	MainWeapon,
 	SubWeapon,
 } from '@/types/calculator'
+import { getArmorType } from './armorTypeStorage'
 import { getCombinedEquipmentById } from './equipmentDatabase'
 
 /**
@@ -37,7 +38,7 @@ export function checkEquipmentCondition(
 		case 'subWeapon':
 			return subWeapon?.weaponType === condition.weaponType
 		case 'armor':
-			return equipmentState?.body?.armorType === condition.armorType
+			return getArmorType(equipmentState?.body?.id) === condition.armorType
 		default:
 			return false
 	}
