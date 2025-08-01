@@ -2,9 +2,9 @@
 
 ## 概要
 
-DamagePreviewコンポーネントは、Toram Onlineダメージ計算機のメインコンポーネントとして、計算されたダメージ値・安定率・威力オプション設定を一元管理するコンポーネントです。
+DamagePreviewコンポーネントは、Toram Onlineダメージ計算機の表示専用コンポーネントとして、計算されたダメージ値・安定率・威力オプション設定を表示するコンポーネントです。
 
-**目的**: フォーム入力に基づいてリアルタイムでダメージ計算結果を表示し、詳細な威力オプション設定を提供する
+**目的**: フォーム入力に基づいてリアルタイムでダメージ計算結果を表示し、詳細な威力オプション設定を提供する（表示のみ、入力はしない）
 
 **主要機能**:
 - ダメージ値と安定率のリアルタイム表示（最小・最大・平均）
@@ -32,9 +32,10 @@ DamagePreviewコンポーネントは、Toram Onlineダメージ計算機のメ�
 │ │平均     │56,000   │95%    │57,000   │95%    │                 │
 │ └─────────┴─────────┴───────┴─────────┴───────┘                 │
 ├─────────────────────────────────────────────────────────────────┤
-│ 慣れ倍率（後で実装予定）                                           │
+│ 慣れ倍率（スライダー実装済み）                                     │
 ├─────────────────────────────────────────────────────────────────┤
 │ 敵：[選択された敵の名前]                                           │
+│ ※ラフィー選択時は属性覚醒注意書き表示                             │
 ├─────────────────────────────────────────────────────────────────┤
 │ 威力オプション                                                   │
 │ ┌─────────────────┬─────────────────┐                         │
@@ -471,6 +472,20 @@ const getSelectedEnemyName = (): string => {
 }
 ```
 
+### ラフィー特殊処理
+ラフィー選択時は属性覚醒+25%が無効化され、注意書きが表示されます：
+
+```typescript
+{/* ラフィー選択時の注意書き */}
+{calculatorData.enemy?.selectedEnemyId === '2b981c85-54f5-4c67-bac1-0e9cba4bdeb2' && (
+	<p className="text-xs text-orange-600 mt-1">
+		※この敵は属性覚醒の有利+25%が適用されません。
+	</p>
+)}
+```
+
+ダメージ計算ロジック内でも同様の判定が行われ、属性覚醒分が計算から除外されます。
+
 ### ボス難易度調整
 ```typescript
 // ボス系敵かつ難易度がnormal以外の場合、難易度調整を適用
@@ -509,18 +524,31 @@ if (calculatorData.attackSkill?.selectedSkillId) {
 }
 ```
 
-### 慣れ倍率（実装予定）
-現在は実装予定として表示されています：
+### 慣れ倍率（実装済み）
+慣れ倍率は50%-250%の範囲でスライダーと数値入力で調整可能です：
 
 ```typescript
-{/* 慣れ倍率スライダー（後で実装予定の枠） */}
-<div className="p-1 sm:p-2 flex items-center">
-	<div className="text-xs sm:text-[13px] font-medium text-gray-700">
-		慣れ倍率（後で実装）
+// 慣れ倍率スライダーの実装
+<div className="flex items-center gap-2 sm:gap-4">
+	<div className="flex items-center gap-2">
+		<label className="text-[13px] font-semibold text-gray-700">
+			慣れ倍率
+		</label>
+		<div className="text-[13px] font-semibold text-gray-700 min-w-12 text-center">
+			{adaptationMultiplier}%
+		</div>
 	</div>
-	<div className="h-8 bg-gray-100 rounded flex items-center justify-center">
-		<span className="text-xs text-gray-500">スライダー実装予定</span>
+	<div className="flex-1">
+		<input
+			type="range"
+			min="50"
+			max="250"
+			value={adaptationMultiplier}
+			onChange={(e) => updateAdaptationMultiplier(Number(e.target.value))}
+			className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
+		/>
 	</div>
+	// 数値入力フィールドも実装済み
 </div>
 ```
 
@@ -548,6 +576,7 @@ if (calculatorData.attackSkill?.selectedSkillId) {
 | 2024-12-25 | DamagePreview UI設計書作成 | 初版作成 |
 | 2025-01-04 | 威力オプション永続化機能の設計追加 | セーブデータ統合方式で実装 |
 | 2025-01-06 | 実装ドキュメントへ更新 | 実際の実装に合わせて全面改訂 |
+| 2025-08-01 | 表示専用コンポーネントとして更新 | 慣れ倍率実装・ラフィー特殊処理追加 |
 
 ## 関連ドキュメント
 - [ダメージ計算ロジック設計書](../calculations/damage-calculation.md) - ダメージ計算の詳細仕様
