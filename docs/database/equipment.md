@@ -11,14 +11,14 @@
 
 **TypeScript移行の利点**:
 - EquipmentPropertiesインターフェースによる厳密な型チェック
-- crystalSlotsの型安全性保証
+- ConditionalEffect配列の型安全性保証
 - 装備カテゴリごとの型制約
 - エディタでの自動補完とプロパティ検証
 - weaponInfoStorageによるIDベース武器情報管理
 
 **ローカルストレージキー**:
-- **プリセット装備（コピー済み）**: LocalStorage (`preset_equipments`)
-- **ユーザーカスタムデータ**: LocalStorage (`custom_equipments`)
+- **プリセット装備（コピー済み）**: LocalStorage (`toram_preset_equipments`)
+- **ユーザーカスタムデータ**: LocalStorage (`toram_custom_equipments`)
 - **武器情報データ**: LocalStorage (`toram_weapon_info_overrides`)
 - **統合アクセス**: 装備データと武器情報を統一的に管理
 
@@ -28,22 +28,22 @@
 ```typescript
 // src/data/equipments.ts
 interface EquipmentsData {
-  equipments: Record<EquipmentCategory, EquipmentItem[]>
+  equipments: Record<EquipmentCategory, PresetEquipment[]>
 }
 
 export const equipmentsData: EquipmentsData = {
   equipments: {
-    mainWeapon: [装備アイテム配列], // → main カテゴリ、weapon タイプに変換
-    body: [装備アイテム配列],
-    additional: [装備アイテム配列],
-    special: [装備アイテム配列],
-    subWeapon: [装備アイテム配列],
-    fashion1: [装備アイテム配列],
-    fashion2: [装備アイテム配列],
-    fashion3: [装備アイテム配列],
-    freeInput1: [装備アイテム配列],
-    freeInput2: [装備アイテム配列],
-    freeInput3: [装備アイテム配列]
+    mainWeapon: [PresetEquipment配列], // メイン武器装備
+    body: [PresetEquipment配列],        // 体装備
+    additional: [PresetEquipment配列],  // 追加装備
+    special: [PresetEquipment配列],     // 特殊装備
+    subWeapon: [PresetEquipment配列],   // サブ武器
+    fashion1: [PresetEquipment配列],    // オシャレ装備1
+    fashion2: [PresetEquipment配列],    // オシャレ装備2
+    fashion3: [PresetEquipment配列],    // オシャレ装備3
+    freeInput1: [PresetEquipment配列],  // 自由入力1
+    freeInput2: [PresetEquipment配列],  // 自由入力2
+    freeInput3: [PresetEquipment配列]   // 自由入力3
   }
 } as const
 ```
@@ -279,6 +279,9 @@ interface EquipmentProperties {
   AbsoluteAccuracy_Rate: number        // 絶対命中%
   AbsoluteDodge_Rate: number           // 絶対回避%
   
+  // ダメージ計算系
+  BraveMultiplier: number              // ブレイブ倍率%
+  
   // ステータス連動攻撃力
   ATK_STR_Rate: number                 // ATK+(STR)%
   ATK_INT_Rate: number                 // ATK+(INT)%
@@ -365,6 +368,14 @@ WeaponForm ↔ weaponInfoStorage ↔ 装備選択時復元
 - `getWeaponInfo(equipmentId)`: 武器情報取得
 - `deleteWeaponInfo(equipmentId)`: 武器情報削除
 - `applyWeaponInfoOverlay(equipment)`: 装備に武器情報をオーバーレイ
+
+## 実装上の注意点
+
+**データ構造の整合性**:
+- `src/data/equipments.ts`の実際のデータ構造は正しく`PresetEquipment`インターフェースに準拠
+- `equipmentDatabase.ts`の`getAllEquipments()`関数は現在レガシー実装を使用（要修正）
+- 現在の実装では`type`, `category`, `baseStats`プロパティを追加しているが、これらは`PresetEquipment`インターフェースにない
+- 将来的には`getAllEquipments()`を`PresetEquipment`インターフェースに準拠するよう修正が必要
 
 ## アーキテクチャ変更履歴
 
