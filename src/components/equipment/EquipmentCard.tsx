@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
-import type { PresetEquipment } from '@/types/calculator'
+import type { PresetEquipment, Equipment } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
@@ -306,9 +306,18 @@ export default function EquipmentCard({
 				<div className="mb-1 sm:mb-2">
 					{(() => {
 						try {
-							return (
-								<DamageDifferenceDisplayCorrect
-									item={equipment}
+							// Convert PresetEquipment to Equipment format
+								const equipmentAsEquipment: Equipment = {
+									...equipment,
+									isPreset: true,
+									isFavorite: false,
+									isModified: false,
+									createdAt: new Date().toISOString(),
+									updatedAt: new Date().toISOString(),
+								}
+								return (
+									<DamageDifferenceDisplayCorrect
+										item={equipmentAsEquipment}
 									slotInfo={slotInfo}
 									size="sm"
 									className="inline-block"

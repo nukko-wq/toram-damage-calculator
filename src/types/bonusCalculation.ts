@@ -82,7 +82,7 @@ export interface DataSourceBonuses {
 // 詳細データソース統合結果（フィルター機能用）
 export interface DetailedDataSourceBonuses {
 	equipment: {
-		main: Partial<AllBonuses>
+		mainWeapon: Partial<AllBonuses>
 		body: Partial<AllBonuses>
 		additional: Partial<AllBonuses>
 		special: Partial<AllBonuses>

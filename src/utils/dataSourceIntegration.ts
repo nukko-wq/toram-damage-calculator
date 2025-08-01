@@ -854,7 +854,7 @@ export function getEquipmentSlotBonuses(
 	} catch (error) {
 		console.error('Equipment slot bonus calculation error:', error)
 		return {
-			main: {},
+			mainWeapon: {},
 			body: {},
 			additional: {},
 			special: {},
@@ -941,7 +941,7 @@ export function getDetailedDataSourceBonuses(
 		console.error('Detailed data source bonuses calculation error:', error)
 		return {
 			equipment: {
-				main: {},
+				mainWeapon: {},
 				body: {},
 				additional: {},
 				special: {},
