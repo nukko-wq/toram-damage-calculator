@@ -37,17 +37,33 @@ DamagePreviewコンポーネントは、Toram Onlineダメージ計算機の表�
 │ 敵：[選択された敵の名前]                                           │
 │ ※ラフィー選択時は属性覚醒注意書き表示                             │
 ├─────────────────────────────────────────────────────────────────┤
-│ 威力オプション                                                   │
-│ ┌─────────────────┬─────────────────┐                         │
-│ │ ボス戦難易度     │ Normal/Hard/... │                         │
-│ │ スキルダメージ   │ 全て/1撃目/...  │                         │
-│ │ 属性攻撃        │ 有(有利)/無/... │                         │
-│ │ コンボ:強打     │ 有効/無効       │                         │
-│ │ ダメージ判定     │ 白ダメ/Critical │                         │
-│ │ 距離判定        │ 近距離/遠距離   │                         │
-│ │ 属性威力        │ 有効/有利のみ   │                         │
-│ │ 抜刀威力        │ 有効/無効       │                         │
-│ └─────────────────┴─────────────────┘                         │
+│ オプション設定（タブ切り替え）                                   │
+│ ┌─────────────┬─────────────┐                               │
+│ │ 威力オプション │ その他       │ ← タブメニュー             │
+│ └─────────────┴─────────────┘                               │
+│                                                               │
+│ [威力オプションタブ選択時]                                       │
+│ ┌─────────────────┬─────────────────┐                       │
+│ │ ボス戦難易度     │ Normal/Hard/... │                       │
+│ │ スキルダメージ   │ 全て/1撃目/...  │                       │
+│ │ 属性攻撃        │ 有(有利)/無/... │                       │
+│ │ コンボ:強打     │ 有効/無効       │                       │
+│ │ ダメージ判定     │ 白ダメ/Critical │                       │
+│ │ 距離判定        │ 近距離/遠距離   │                       │
+│ │ 属性威力        │ 有効/有利のみ   │                       │
+│ │ 抜刀威力        │ 有効/無効       │                       │
+│ └─────────────────┴─────────────────┘                       │
+│                                                               │
+│ [その他タブ選択時]                                             │
+│ ┌─────────────────┬─────────────────┐                       │
+│ │ 敵状態異常：破壊 │ 付与/なし       │                       │
+│ │ 敵状態異常：衰弱 │ 付与/なし       │                       │
+│ │ 敵状態異常：暗闇 │ 付与/なし       │                       │
+│ │ スキル：強打     │ 発動/未発動     │                       │
+│ │ スキル：集中     │ 発動/未発動     │                       │
+│ │ パッシブ倍率(+%) │ 手動入力/自動計算 │                     │
+│ │ ブレイブ倍率(+%) │ 手動入力/自動計算 │                     │
+│ └─────────────────┴─────────────────┘                       │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -107,6 +123,33 @@ interface PowerOptions {
   distance: 'short' | 'long' | 'disabled'
   elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled'
   unsheathe: boolean
+}
+
+// その他オプション（設計）
+interface OtherOptions {
+  // 敵状態異常
+  enemyStatusDestroy: 'applied' | 'none'    // 破壊
+  enemyStatusWeaken: 'applied' | 'none'     // 衰弱
+  enemyStatusBlind: 'applied' | 'none'      // 暗闇
+  
+  // スキル
+  skillPowerHit: 'activated' | 'inactive'   // 強打
+  skillConcentration: 'activated' | 'inactive' // 集中
+  
+  // 倍率
+  passiveMultiplier: {
+    mode: 'manual' | 'auto'    // 手動入力 or 自動計算
+    value?: number              // 手動入力時の値（%）
+  }
+  braveMultiplier: {
+    mode: 'manual' | 'auto'    // 手動入力 or 自動計算
+    value?: number              // 手動入力時の値（%）
+  }
+}
+
+// タブ状態管理
+interface OptionTabState {
+  activeTab: 'power' | 'other'  // 威力オプション or その他
 }
 ```
 
@@ -305,7 +348,9 @@ export const clearCaptureData = (): void => {
 
 ## 実装された威力オプション機能
 
-### 8つの威力オプション（実装完了）
+### タブ切り替えオプション
+
+#### 威力オプションタブ（8項目・実装完了）
 
 1. **ボス戦難易度**: Normal/Hard/Lunatic/Ultimate
 2. **スキルダメージ**: 全て/1撃目/2撃目/3撃目  
@@ -316,13 +361,37 @@ export const clearCaptureData = (): void => {
 7. **属性威力**: 有効/有利のみ/覚醒のみ/無効
 8. **抜刀威力**: 有効/無効
 
-### セーブデータ統合（実装済み）
-威力オプションはセーブデータの一部として保存され、セーブデータ切り替え時に自動的に復元されます。
+#### その他タブ（7項目・設計）
+
+1. **敵状態異常：破壊**: 付与/なし
+   - 付与時: 敵のDEF/MDEF減少効果を適用
+2. **敵状態異常：衰弱**: 付与/なし  
+   - 付与時: 敵の攻撃力減少・被ダメージ増加効果を適用
+3. **敵状態異常：暗闇**: 付与/なし
+   - 付与時: 敵の命中率減少効果を適用
+4. **スキル：強打**: 発動/未発動
+   - 発動時: ダメージ倍率増加効果を適用
+5. **スキル：集中**: 発動/未発動
+   - 発動時: クリティカル率・威力増加効果を適用
+6. **パッシブ倍率(+%)**: 手動入力/自動計算
+   - 手動入力: ユーザー指定値を使用
+   - 自動計算: バフスキルから自動算出（現在の実装）
+7. **ブレイブ倍率(+%)**: 手動入力/自動計算
+   - 手動入力: ユーザー指定値を使用
+   - 自動計算: バフスキルから自動算出（現在の実装）
+
+### セーブデータ統合（拡張設計）
+威力オプションとその他オプションはセーブデータの一部として保存され、セーブデータ切り替え時に自動的に復元されます。
 
 ```typescript
-// calculatorStoreでの管理
+// calculatorStoreでの管理（拡張版）
 const powerOptions = useCalculatorStore((state) => state.data.powerOptions)
+const otherOptions = useCalculatorStore((state) => state.data.otherOptions)
+const activeTab = useCalculatorStore((state) => state.data.optionTab)
+
 const updatePowerOptions = useCalculatorStore((state) => state.updatePowerOptions)
+const updateOtherOptions = useCalculatorStore((state) => state.updateOtherOptions)
+const updateOptionTab = useCalculatorStore((state) => state.updateOptionTab)
 ```
 
 ## ダメージ計算統合
@@ -356,6 +425,48 @@ console.log('5. 属性有利:', input.elementAdvantage.total)
 
 ## UIコンポーネント詳細
 
+### タブ切り替えUI実装
+威力オプションとその他をタブで切り替える実装：
+
+```typescript
+// タブヘッダー
+<ul className="flex gap-2 bg-blue-100 p-1 mb-1">
+	<li 
+		className={`text-[10px] sm:text-xs font-semibold flex-1 text-center cursor-pointer px-2 py-1 rounded ${
+			activeTab === 'power' 
+				? 'bg-blue-500 text-white' 
+				: 'text-gray-900 hover:bg-blue-200'
+		}`}
+		onClick={() => setActiveTab('power')}
+	>
+		威力オプション
+	</li>
+	<li 
+		className={`text-[10px] sm:text-xs font-semibold flex-1 text-center cursor-pointer px-2 py-1 rounded ${
+			activeTab === 'other' 
+				? 'bg-blue-500 text-white' 
+				: 'text-gray-900 hover:bg-blue-200'
+		}`}
+		onClick={() => setActiveTab('other')}
+	>
+		その他
+	</li>
+</ul>
+
+// タブコンテンツ
+{activeTab === 'power' && (
+	<div className="space-y-0.5 sm:space-y-1">
+		{/* 威力オプション項目 */}
+	</div>
+)}
+
+{activeTab === 'other' && (
+	<div className="space-y-0.5 sm:space-y-1">
+		{/* その他項目 */}
+	</div>
+)}
+```
+
 ### 威力オプションUI実装
 すべての威力オプションはボタン形式で実装され、選択状態に応じて背景色が変化します：
 
@@ -366,6 +477,66 @@ className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
 		? 'bg-blue-400 text-white'
 		: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
 }`}
+```
+
+### その他オプションUI実装
+その他項目は項目に応じて異なるUI要素を使用：
+
+```typescript
+// 敵状態異常・スキル（2択ボタン）
+<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+	<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+		敵状態異常：破壊
+	</label>
+	<div className="flex sm:gap-2">
+		{['applied', 'none'].map((status) => (
+			<button
+				key={status}
+				onClick={() => handleOtherOptionChange('enemyStatusDestroy', status)}
+				className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+					otherOptions.enemyStatusDestroy === status
+						? 'bg-red-400 text-white'
+						: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+				}`}
+			>
+				{status === 'applied' ? '付与' : 'なし'}
+			</button>
+		))}
+	</div>
+</div>
+
+// 倍率（モード選択 + 数値入力）
+<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+	<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+		パッシブ倍率(+%)
+	</label>
+	<div className="flex items-center sm:gap-2">
+		{/* モード選択 */}
+		{['manual', 'auto'].map((mode) => (
+			<button
+				key={mode}
+				onClick={() => handleMultiplierModeChange('passiveMultiplier', mode)}
+				className={`px-2 py-1 text-xs rounded cursor-pointer ${
+					otherOptions.passiveMultiplier.mode === mode
+						? 'bg-green-400 text-white'
+						: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+				}`}
+			>
+				{mode === 'manual' ? '手動入力' : '自動計算'}
+			</button>
+		))}
+		{/* 手動入力時のみ数値入力フィールドを表示 */}
+		{otherOptions.passiveMultiplier.mode === 'manual' && (
+			<input
+				type="number"
+				value={otherOptions.passiveMultiplier.value || 0}
+				onChange={(e) => handleMultiplierValueChange('passiveMultiplier', Number(e.target.value))}
+				className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+				placeholder="0"
+			/>
+		)}
+	</div>
+</div>
 ```
 
 ### レスポンシブ対応
@@ -577,6 +748,7 @@ if (calculatorData.attackSkill?.selectedSkillId) {
 | 2025-01-04 | 威力オプション永続化機能の設計追加 | セーブデータ統合方式で実装 |
 | 2025-01-06 | 実装ドキュメントへ更新 | 実際の実装に合わせて全面改訂 |
 | 2025-08-01 | 表示専用コンポーネントとして更新 | 慣れ倍率実装・ラフィー特殊処理追加 |
+| 2025-08-01 | タブ切り替え機能の設計追加 | その他オプション7項目とタブUI設計 |
 
 ## 関連ドキュメント
 - [ダメージ計算ロジック設計書](../calculations/damage-calculation.md) - ダメージ計算の詳細仕様
