@@ -461,6 +461,7 @@ export function calculateDamageWithService(
 							calculatorData.mainWeapon?.weaponType || null,
 							selectedSkill.category,
 							originalHit.canUseLongRange,
+							selectedSkill.id,
 						),
 						// ブレイブ倍率はスキル攻撃でも同じ値を使用（エンハンス含む）
 						braveMultiplier: braveMultiplierWithEnemy,
@@ -525,7 +526,7 @@ export function calculateDamageWithService(
 						averageDamage: 0,
 						stabilityRate: defaultStabilityRate,
 					},
-					calculationSteps: {} as any,
+					calculationSteps: {} as Record<string, unknown>,
 				}
 			}
 

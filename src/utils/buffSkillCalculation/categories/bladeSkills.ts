@@ -158,6 +158,7 @@ export function getBladeSkillPassiveMultiplier(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
 	attackSkillCategory?: string,
+	attackSkillId?: string,
 ): number {
 	const convertedWeaponType = convertWeaponType(weaponType)
 	let totalPassiveMultiplier = 0
@@ -165,12 +166,18 @@ export function getBladeSkillPassiveMultiplier(
 	if (!buffSkillData) return totalPassiveMultiplier
 
 	// 匠の剣術(sm4)の処理 - bladeカテゴリのスキル使用時のみ適用
+	// ただし、ストームブレイザー使用時は無効
 	const takumiKenjutsu = buffSkillData.sm4
 	if (takumiKenjutsu?.isEnabled && attackSkillCategory === 'blade') {
-		totalPassiveMultiplier += calculateTakumiKenjutsuPassiveMultiplier(
-			takumiKenjutsu.isEnabled,
-			convertedWeaponType,
-		)
+		// ストームブレイザー(1スタック/10スタック)の場合は匠の剣術を無効化
+		const isStormBlazer = attackSkillId === 'storm_blazer_1stack' || attackSkillId === 'storm_blazer_10stack'
+		
+		if (!isStormBlazer) {
+			totalPassiveMultiplier += calculateTakumiKenjutsuPassiveMultiplier(
+				takumiKenjutsu.isEnabled,
+				convertedWeaponType,
+			)
+		}
 	}
 
 	return totalPassiveMultiplier

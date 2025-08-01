@@ -323,6 +323,7 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
 	weaponType: WeaponType | null,
 	attackSkillCategory?: string,
 	canUseLongRange?: boolean,
+	attackSkillId?: string,
 ): number {
 	let totalPassiveMultiplier = 0
 
@@ -331,6 +332,7 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
 		buffSkillData,
 		weaponType,
 		attackSkillCategory,
+		attackSkillId,
 	)
 
 	// シュートスキル系統のパッシブ倍率（ロングレンジ）
