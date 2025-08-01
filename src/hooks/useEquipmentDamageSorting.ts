@@ -13,23 +13,7 @@ import {
 } from '@/utils/damageCalculationService'
 import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
 
-interface EquipmentWithDamage {
-	id: string
-	name: string
-	// biome-ignore lint/suspicious/noExplicitAny: Equipment typeは複雑な型のため一時的にanyを使用
-	type: any
-	// biome-ignore lint/suspicious/noExplicitAny: Equipment propertiesは複雑な型のため一時的にanyを使用
-	properties: any
-	description?: string
-	// biome-ignore lint/suspicious/noExplicitAny: conditionalEffectsは複雑な型のため一時的にanyを使用
-	conditionalEffects?: any[]
-	isCustom?: boolean
-	createdAt?: string
-	updatedAt?: string
-	isFavorite?: boolean
-	// biome-ignore lint/suspicious/noExplicitAny: Equipment categoryは複雑な型のため一時的にanyを使用
-	category?: any
-	refinement?: number
+type EquipmentWithDamage = Equipment & {
 	damageDifference: number
 	isCalculating: boolean
 	hasError: boolean

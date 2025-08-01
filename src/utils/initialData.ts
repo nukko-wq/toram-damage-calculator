@@ -119,9 +119,6 @@ export const createInitialEquipmentProperties =
 export const createInitialEquipment = (): Equipment => ({
 	id: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
 	name: '',
-	type: 'weapon',
-	category: ['main'],
-	baseStats: {},
 	properties: createInitialEquipmentProperties(),
 	isPreset: false,
 	isCustom: true,
@@ -135,9 +132,6 @@ export const createInitialEquipment = (): Equipment => ({
 export const createEmptyEquipment = (): Equipment => ({
 	id: '',
 	name: '',
-	type: 'weapon',
-	category: ['main'],
-	baseStats: {},
 	properties: createInitialEquipmentProperties(),
 	isPreset: true,
 	isFavorite: false,
@@ -147,7 +141,7 @@ export const createEmptyEquipment = (): Equipment => ({
 })
 
 export const createInitialEquipmentSlots = (): EquipmentSlots => ({
-	main: createEmptyEquipment(),
+	mainWeapon: createEmptyEquipment(),
 	body: createEmptyEquipment(),
 	additional: createEmptyEquipment(),
 	special: createEmptyEquipment(),

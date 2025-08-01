@@ -5,6 +5,7 @@
  * 詳細な計算式は docs/calculations/basic-stats.md を参照
  */
 
+import { getArmorType } from './armorTypeStorage'
 import type {
 	BaseStats,
 	WeaponType as WeaponTypeEnum,
@@ -1111,7 +1112,7 @@ export function getBodyEquipmentStatus(bodyEquipment: any): {
 
 	return {
 		hasBodyEquipment: true,
-		armorType: bodyEquipment.armorType || 'normal',
+		armorType: getArmorType(bodyEquipment.id) || 'normal',
 	}
 }
 
@@ -1223,18 +1224,11 @@ export function getBodyArmorType(bodyEquipment: any): ArmorType {
 		return 'normal'
 	}
 
-	// まず体装備スロット自体のarmorTypeをチェック（ユーザーが設定した改造タイプ）
-	if (bodyEquipment.armorType) {
-		return bodyEquipment.armorType
-	}
-
-	// 体装備のArmorTypeを取得（装備データから）
-	const { getCombinedEquipmentById } = require('./equipmentDatabase')
-	const equipment = getCombinedEquipmentById(bodyEquipment.id)
-
-	const finalArmorType = equipment?.armorType || 'normal'
-
-	return finalArmorType
+	// armorTypeStorageから防具改造タイプを取得
+	const { getArmorType } = require('./armorTypeStorage')
+	const armorType = getArmorType(bodyEquipment.id)
+	
+	return armorType || 'normal'
 }
 
 /**

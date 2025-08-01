@@ -8,6 +8,10 @@ import {
 	clearWeaponInfo,
 	getWeaponInfo,
 } from '@/utils/weaponInfoStorage'
+import {
+	getArmorType,
+	saveArmorType,
+} from '@/utils/armorTypeStorage'
 import type {
 	Equipment,
 	EquipmentSlots,
@@ -64,7 +68,7 @@ export default function EquipmentForm({
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
 	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots | 'register'>(
-		'main',
+		'mainWeapon',
 	)
 	const [modalState, setModalState] = useState<{
 		isOpen: boolean
@@ -115,7 +119,7 @@ export default function EquipmentForm({
 	})
 
 	const equipmentSlots = [
-		{ key: 'main' as const, label: 'メイン装備' },
+		{ key: 'mainWeapon' as const, label: 'メイン装備' },
 		{ key: 'body' as const, label: '体装備' },
 		{ key: 'additional' as const, label: '追加装備' },
 		{ key: 'special' as const, label: '特殊装備' },
@@ -578,7 +582,7 @@ export default function EquipmentForm({
 				updateEquipment(updatedEquipment)
 
 				// メイン装備が選択された場合、保存されている武器情報をWeaponFormに復元
-				if (slotKey === 'main') {
+				if (slotKey === 'mainWeapon') {
 					const weaponInfo = getWeaponInfo(equipmentId)
 					if (weaponInfo) {
 						console.log('武器情報をWeaponFormに復元:', weaponInfo)
@@ -736,7 +740,12 @@ export default function EquipmentForm({
 		const currentEquipment = effectiveEquipment.body
 		if (!currentEquipment?.id) return
 
-		updateEquipmentArmorType(currentEquipment.id, newArmorType)
+		// armorTypeStorageに直接保存
+		saveArmorType(currentEquipment.id, newArmorType)
+		
+		// UIを更新するため、装備データを再読み込み
+		const updatedEquipment = { ...effectiveEquipment }
+		updateEquipment(updatedEquipment)
 	}
 
 	// メッセージモーダル表示
@@ -749,7 +758,7 @@ export default function EquipmentForm({
 
 	// メイン武器情報登録ハンドラー
 	const handleRegisterWeaponInfo = async () => {
-		const currentEquipment = effectiveEquipment.main
+		const currentEquipment = effectiveEquipment.mainWeapon
 		console.log('現在の装備:', currentEquipment)
 
 		if (!currentEquipment?.id) {
@@ -790,7 +799,7 @@ export default function EquipmentForm({
 
 	// 武器情報削除ハンドラー
 	const handleDeleteWeaponInfo = async () => {
-		const currentEquipment = effectiveEquipment.main
+		const currentEquipment = effectiveEquipment.mainWeapon
 		if (!currentEquipment?.id) return
 
 		try {
@@ -811,6 +820,19 @@ export default function EquipmentForm({
 			showMessage('武器情報の削除に失敗しました。')
 		}
 	}
+	// 上部説明テキストを追加するため、武器情報セクションの上に挿入する説明
+	const renderWeaponInfoExplanation = () => (
+		<div className="mt-2 text-xs text-gray-600 font-semibold">
+			※各装備は任意の値に変更できます。
+		</div>
+	)
+
+	// 下部説明テキストを追加するため、武器情報セクションの下に挿入する説明
+	const renderWeaponInfoBottomExplanation = () => (
+		<div className="mt-1 text-xs text-gray-600 pl-3 font-semibold">
+			※武器能力情報を登録、または削除します。
+		</div>
+	)
 
 	const renderPropertyInputs = (
 		item: Equipment,
@@ -1116,32 +1138,41 @@ export default function EquipmentForm({
 					</div>
 
 					{/* メイン装備専用：武器情報登録・削除ボタン */}
-					{activeTab === 'main' && effectiveEquipment.main?.id && (
-						<div className="flex gap-2 mt-2">
-							<button
-								type="button"
-								onClick={() => handleRegisterWeaponInfo()}
-								className="px-3 py-1 text-sm bg-blue-400/80 text-white rounded-md hover:bg-blue-400 transition-colors cursor-pointer"
-								title="WeaponFormの武器情報をメイン装備に登録"
-							>
-								メイン武器情報登録
-							</button>
-							<button
-								type="button"
-								onClick={() => handleDeleteWeaponInfo()}
-								className="px-3 py-1 text-sm bg-gray-400/80 text-white rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
-								title="メイン装備の武器情報を削除"
-							>
-								武器情報削除
-							</button>
-						</div>
+					{activeTab === 'mainWeapon' && effectiveEquipment.mainWeapon?.id && (
+						<>
+							{renderWeaponInfoExplanation()}
+							<div className="flex gap-4 items-center mt-2 pl-3">
+								<div className="text-sm font-semibold text-gray-700">
+									メイン武器情報
+								</div>
+								<div className="flex gap-2">
+									<button
+										type="button"
+										onClick={() => handleRegisterWeaponInfo()}
+										className="px-3 py-1 text-sm bg-blue-400/80 text-white rounded-md hover:bg-blue-400 transition-colors cursor-pointer"
+										title="WeaponFormの武器情報をメイン装備に登録"
+									>
+										登録
+									</button>
+									<button
+										type="button"
+										onClick={() => handleDeleteWeaponInfo()}
+										className="px-3 py-1 text-sm bg-gray-400/80 text-white rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
+										title="メイン装備の武器情報を削除"
+									>
+										削除
+									</button>
+								</div>
+							</div>
+							{renderWeaponInfoBottomExplanation()}
+						</>
 					)}
 
 					{/* 体装備の防具の改造選択UI */}
 					{activeTab === 'body' && effectiveEquipment.body?.id && (
 						<div className="mt-4">
 							<ArmorTypeSelect
-								selectedType={effectiveEquipment.body.armorType || 'normal'}
+								selectedType={getArmorType(effectiveEquipment.body.id) || 'normal'}
 								onChange={handleArmorTypeChange}
 								className="max-w-md"
 							/>
@@ -1172,7 +1203,7 @@ export default function EquipmentForm({
 					selectedEquipmentId={
 						effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null
 					}
-					category={modalState.category || 'main'}
+					category={modalState.category || 'mainWeapon'}
 					title={modalState.title}
 					currentFormProperties={
 						effectiveEquipment[activeTab as keyof EquipmentSlots]?.properties ||

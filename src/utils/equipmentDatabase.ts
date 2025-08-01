@@ -23,7 +23,8 @@ import {
 	startEditSession,
 	updateEditSessionProperties,
 } from './editSessionManager'
-import { getWeaponInfo } from './weaponInfoStorage'
+import { applyArmorTypeOverlay } from './armorTypeStorage'
+
 
 // プロパティからundefinedの値を除外する関数
 function cleanProperties(
@@ -42,8 +43,8 @@ function cleanProperties(
 
 // 装備に武器情報をオーバーレイする関数
 function applyWeaponInfoOverlay(equipment: Equipment): Equipment {
-	// 武器情報のオーバーレイを無効化 - EquipmentFormでの意図しない上書きを防ぐため
-	return equipment
+	// weaponInfoとarmorTypeの両方をオーバーレイ適用
+	return applyArmorTypeOverlay(equipment)
 }
 
 // プリセット装備データを取得
@@ -67,129 +68,97 @@ export function getAllEquipments(): PresetEquipment[] {
 		return []
 	}
 
-	// mainWeapon -> main カテゴリ、weapon タイプ
+	// mainWeapon カテゴリ
 	if (equipmentsRoot.mainWeapon) {
 		for (const item of equipmentsRoot.mainWeapon) {
 			allEquipments.push({
 				id: item.id,
 				name: item.name,
-				type: 'weapon' as EquipmentType,
-				category: ['main'] as EquipmentCategory[],
-				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
 
-	// body -> body カテゴリ、armor タイプ
+	// body カテゴリ
 	if (equipmentsRoot.body) {
 		for (const item of equipmentsRoot.body) {
 			allEquipments.push({
 				id: item.id,
 				name: item.name,
-				type: 'armor' as EquipmentType,
-				category: ['body'] as EquipmentCategory[],
-				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
 
-	// additional -> additional カテゴリ、accessory タイプ
+	// additional カテゴリ
 	if (equipmentsRoot.additional) {
 		for (const item of equipmentsRoot.additional) {
 			allEquipments.push({
 				id: item.id,
 				name: item.name,
-				type: 'accessory' as EquipmentType,
-				category: ['additional'] as EquipmentCategory[],
-				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
 
-	// special -> special カテゴリ、accessory タイプ
+	// special カテゴリ
 	if (equipmentsRoot.special) {
 		for (const item of equipmentsRoot.special) {
 			allEquipments.push({
 				id: item.id,
 				name: item.name,
-				type: 'accessory' as EquipmentType,
-				category: ['special'] as EquipmentCategory[],
-				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
 
-	// subWeapon -> subWeapon カテゴリ、weapon タイプ
+	// subWeapon カテゴリ
 	if (equipmentsRoot.subWeapon) {
 		for (const item of equipmentsRoot.subWeapon) {
 			allEquipments.push({
 				id: item.id,
 				name: item.name,
-				type: 'weapon' as EquipmentType,
-				category: ['subWeapon'] as EquipmentCategory[],
-				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
 
-	// fashion1 -> fashion1 カテゴリ、fashion タイプ
+	// fashion1 カテゴリ
 	if (equipmentsRoot.fashion1) {
 		for (const item of equipmentsRoot.fashion1) {
 			allEquipments.push({
 				id: item.id,
 				name: item.name,
-				type: 'fashion' as EquipmentType,
-				category: ['fashion1'] as EquipmentCategory[],
-				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
 
-	// fashion2 -> fashion2 カテゴリ、fashion タイプ
+	// fashion2 カテゴリ
 	if (equipmentsRoot.fashion2) {
 		for (const item of equipmentsRoot.fashion2) {
 			allEquipments.push({
 				id: item.id,
 				name: item.name,
-				type: 'fashion' as EquipmentType,
-				category: ['fashion2'] as EquipmentCategory[],
-				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
 	}
 
-	// fashion3 -> fashion3 カテゴリ、fashion タイプ
+	// fashion3 カテゴリ
 	if (equipmentsRoot.fashion3) {
 		for (const item of equipmentsRoot.fashion3) {
 			allEquipments.push({
 				id: item.id,
 				name: item.name,
-				type: 'fashion' as EquipmentType,
-				category: ['fashion3'] as EquipmentCategory[],
-				baseStats: {},
 				properties: cleanProperties(item.properties),
-				source: item.source,
 				conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
 			})
 		}
@@ -200,16 +169,57 @@ export function getAllEquipments(): PresetEquipment[] {
 
 // 装備タイプでフィルタリング
 export function getEquipmentsByType(type: EquipmentType): PresetEquipment[] {
-	return getAllEquipments().filter((equipment) => equipment.type === type)
+	const allEquipments: PresetEquipment[] = []
+	
+	// タイプに応じてカテゴリを選択
+	switch (type) {
+		case 'weapon':
+			allEquipments.push(...getEquipmentsByCategory('mainWeapon'))
+			allEquipments.push(...getEquipmentsByCategory('subWeapon'))
+			break
+		case 'armor':
+			allEquipments.push(...getEquipmentsByCategory('body'))
+			break
+		case 'accessory':
+			allEquipments.push(...getEquipmentsByCategory('additional'))
+			allEquipments.push(...getEquipmentsByCategory('special'))
+			allEquipments.push(...getEquipmentsByCategory('freeInput1'))
+			allEquipments.push(...getEquipmentsByCategory('freeInput2'))
+			allEquipments.push(...getEquipmentsByCategory('freeInput3'))
+			break
+		case 'fashion':
+			allEquipments.push(...getEquipmentsByCategory('fashion1'))
+			allEquipments.push(...getEquipmentsByCategory('fashion2'))
+			allEquipments.push(...getEquipmentsByCategory('fashion3'))
+			break
+	}
+	
+	return allEquipments
 }
 
 // 装備カテゴリでフィルタリング
 export function getEquipmentsByCategory(
 	category: EquipmentCategory,
 ): PresetEquipment[] {
-	return getAllEquipments().filter((equipment) =>
-		equipment.category.includes(category),
-	)
+	const equipmentsRoot = (
+		equipmentsData as { equipments: Record<string, { id: string, name: string, properties: Record<string, unknown>, conditionalEffects?: unknown[] }[]> }
+	).equipments
+
+	if (!equipmentsRoot || !equipmentsRoot[category]) {
+		return []
+	}
+
+	const categoryEquipments: PresetEquipment[] = []
+	for (const item of equipmentsRoot[category]) {
+		categoryEquipments.push({
+			id: item.id,
+			name: item.name,
+			properties: cleanProperties(item.properties),
+			conditionalEffects: item.conditionalEffects as ConditionalEffect[] | undefined,
+		})
+	}
+
+	return categoryEquipments
 }
 
 // IDで装備を取得
@@ -359,26 +369,72 @@ export function getAvailableEquipmentById(id: string): Equipment | null {
 export function getAvailableEquipmentsByCategory(
 	category: EquipmentCategory,
 ): Equipment[] {
-	return getAllAvailableEquipments().filter((equipment) => {
-		if (!equipment.category) return false
-
-		// mainカテゴリを検索する時はmainWeaponカテゴリも含める
-		if (category === 'main') {
-			return (
-				equipment.category.includes('main') ||
-				equipment.category.includes('mainWeapon')
-			)
-		}
-
-		return equipment.category.includes(category)
-	})
+	// プリセット装備から取得
+	const presetEquipments = getEquipmentsByCategory(category)
+	
+	// カスタム装備から取得
+	const customEquipments = getUserCustomEquipments().filter(
+		equipment => equipment.category === category
+	)
+	
+	
+	// 全て統合してEquipment型に変換
+	const allEquipments: Equipment[] = []
+	
+	// プリセット装備を変換
+	allEquipments.push(...presetEquipments.map(preset => ({
+		...preset,
+		isPreset: true as const,
+		isFavorite: false,
+		isModified: false,
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+	})))
+	
+	// カスタム装備を変換
+	allEquipments.push(...customEquipments.map(custom => ({
+		id: custom.id,
+		name: custom.name,
+		properties: custom.properties,
+		isPreset: false as const,
+		isCustom: true as const,
+		isFavorite: custom.isFavorite,
+		isModified: false,
+		createdAt: custom.createdAt,
+		updatedAt: custom.updatedAt,
+	})))
+	
+	return allEquipments
 }
 
 // 装備タイプ別の統合装備リストを取得
 export function getAvailableEquipmentsByType(type: EquipmentType): Equipment[] {
-	return getAllAvailableEquipments().filter(
-		(equipment) => equipment.type === type,
-	)
+	const allEquipments: Equipment[] = []
+	
+	// タイプに応じてカテゴリを選択
+	switch (type) {
+		case 'weapon':
+			allEquipments.push(...getAvailableEquipmentsByCategory('mainWeapon'))
+			allEquipments.push(...getAvailableEquipmentsByCategory('subWeapon'))
+			break
+		case 'armor':
+			allEquipments.push(...getAvailableEquipmentsByCategory('body'))
+			break
+		case 'accessory':
+			allEquipments.push(...getAvailableEquipmentsByCategory('additional'))
+			allEquipments.push(...getAvailableEquipmentsByCategory('special'))
+			allEquipments.push(...getAvailableEquipmentsByCategory('freeInput1'))
+			allEquipments.push(...getAvailableEquipmentsByCategory('freeInput2'))
+			allEquipments.push(...getAvailableEquipmentsByCategory('freeInput3'))
+			break
+		case 'fashion':
+			allEquipments.push(...getAvailableEquipmentsByCategory('fashion1'))
+			allEquipments.push(...getAvailableEquipmentsByCategory('fashion2'))
+			allEquipments.push(...getAvailableEquipmentsByCategory('fashion3'))
+			break
+	}
+	
+	return allEquipments
 }
 
 // 装備の表示名を取得（装備タイプに応じたラベル）
@@ -400,8 +456,6 @@ export function getEquipmentTypeLabel(type: EquipmentType): string {
 // 装備カテゴリの表示名を取得
 export function getEquipmentCategoryLabel(category: EquipmentCategory): string {
 	switch (category) {
-		case 'main':
-			return 'メイン装備'
 		case 'mainWeapon':
 			return 'メイン武器'
 		case 'body':
@@ -434,7 +488,7 @@ export function getEquipmentCategoryDisplayName(
 	category: EquipmentCategory,
 ): string {
 	switch (category) {
-		case 'main':
+		case 'mainWeapon':
 			return 'メイン装備'
 		case 'body':
 			return '体装備'
@@ -485,7 +539,7 @@ export function createCustomEquipment(
 		properties: {}, // 全プロパティをリセット状態で作成
 		// weaponStatsは使用せず、weaponInfoStorageで管理するため削除
 		// クリスタルスロット対応装備にはスロットを初期化
-		crystalSlots: ['main', 'body', 'additional', 'special'].includes(
+		crystalSlots: ['mainWeapon', 'body', 'additional', 'special'].includes(
 			equipmentCategory,
 		)
 			? {
@@ -493,17 +547,22 @@ export function createCustomEquipment(
 					slot2: undefined,
 				}
 			: undefined,
-		// 体装備の場合はarmorTypeにデフォルト値を設定
-		armorType: equipmentCategory === 'body' ? 'normal' : undefined,
+		// 体装備の場合はarmorTypeStorageにデフォルト値を設定（プロパティからは削除）
 		createdAt: now,
 		updatedAt: now,
 		isFavorite: false,
 	}
 
 	// 武器系装備（メイン・サブ）の場合は初期武器情報をweaponInfoStorageに保存
-	if (equipmentCategory === 'main' || equipmentCategory === 'subWeapon') {
+	if (equipmentCategory === 'mainWeapon' || equipmentCategory === 'subWeapon') {
 		const { saveWeaponInfo } = require('./weaponInfoStorage')
 		saveWeaponInfo(id, 0, 0, 0)
+	}
+
+	// 体装備の場合はarmorTypeStorageにデフォルト値を保存
+	if (equipmentCategory === 'body') {
+		const { saveArmorType } = require('./armorTypeStorage')
+		saveArmorType(id, 'normal')
 	}
 
 	return customEquipment
@@ -554,7 +613,6 @@ export function getCombinedEquipmentsByCategory(
 
 	// カテゴリからタイプへのマップ
 	const categoryToTypeMap: Record<EquipmentCategory, EquipmentType> = {
-		main: 'weapon',
 		mainWeapon: 'weapon',
 		body: 'armor',
 		additional: 'accessory',
@@ -578,7 +636,6 @@ export function getCombinedEquipmentsByCategory(
 				category: [equipment.category] as EquipmentCategory[],
 				baseStats: {},
 				properties: equipment.properties,
-				armorType: equipment.armorType,
 				isPreset: false as const,
 				isCustom: true as const,
 				isFavorite: equipment.isFavorite,
@@ -633,7 +690,6 @@ export function getCombinedEquipmentsByCategory(
 // 統合装備をIDで取得（プリセット・カスタム・編集セッション対応）
 export function getCombinedEquipmentById(id: string): Equipment | null {
 	const categoryToTypeMap: Record<EquipmentCategory, EquipmentType> = {
-		main: 'weapon',
 		mainWeapon: 'weapon',
 		body: 'armor',
 		additional: 'accessory',
@@ -714,7 +770,6 @@ export function getCombinedEquipmentById(id: string): Equipment | null {
 			baseStats: {},
 			properties: customEquipment.properties,
 			refinement: 0, // weaponInfoOverlayで上書きされる
-			armorType: customEquipment.armorType,
 			isPreset: false as const,
 			isCustom: true,
 			isFavorite: customEquipment.isFavorite,
@@ -874,33 +929,17 @@ export function updateEquipmentArmorType(
 	armorType: ArmorType,
 ): boolean {
 	console.log('updateEquipmentArmorType called:', { id, armorType })
-
-	// カスタム装備の場合を先に確認
-	const customEquipment = getCustomEquipmentById(id)
-	if (customEquipment) {
-		console.log('Found custom equipment:', customEquipment.name)
-		try {
-			const { updateUserEquipment } = require('./customEquipmentManager')
-			updateUserEquipment(id, { armorType })
-			console.log('Custom equipment armorType updated successfully')
-			return true
-		} catch (error) {
-			console.error('Failed to update custom equipment armor type:', error)
-			return false
-		}
-	}
-
-	// プリセット装備の場合（equipments.tsのデータを直接更新）
-	const presetEquipment = getEquipmentById(id)
-	if (presetEquipment) {
-		console.log('Found preset equipment:', presetEquipment.name)
-		// プリセット装備データを直接更新（メモリ上の変更）
-		presetEquipment.armorType = armorType
-		console.log('Preset equipment armorType updated successfully')
+	
+	// armorTypeStorageシステムを使用して保存
+	const { saveArmorType } = require('./armorTypeStorage')
+	const success = saveArmorType(id, armorType)
+	
+	if (success) {
+		console.log('ArmorType updated successfully via armorTypeStorage')
 		return true
 	}
-
-	console.log('No equipment found with id:', id)
+	
+	console.error('Failed to update armorType via armorTypeStorage')
 	return false
 }
 

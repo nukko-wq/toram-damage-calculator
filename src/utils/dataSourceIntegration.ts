@@ -129,7 +129,7 @@ export function getEquipmentBonuses(equipmentData: any): Partial<AllBonuses> {
 
 		// 11スロット分のプロパティを統合（従来8スロット + 自由入力3スロット）
 		const allSlots = [
-			equipmentData.main,
+			equipmentData.mainWeapon,
 			equipmentData.body,
 			equipmentData.additional,
 			equipmentData.special,
@@ -802,7 +802,7 @@ export function getEquipmentSlotBonuses(
 ): Record<string, Partial<AllBonuses>> {
 	try {
 		const bonuses: Record<string, Partial<AllBonuses>> = {
-			main: {},
+			mainWeapon: {},
 			body: {},
 			additional: {},
 			special: {},
@@ -822,7 +822,7 @@ export function getEquipmentSlotBonuses(
 
 		// 各スロットごとに個別計算
 		const slots = [
-			{ key: 'main', data: equipmentData.main },
+			{ key: 'mainWeapon', data: equipmentData.mainWeapon },
 			{ key: 'body', data: equipmentData.body },
 			{ key: 'additional', data: equipmentData.additional },
 			{ key: 'special', data: equipmentData.special },
@@ -854,7 +854,7 @@ export function getEquipmentSlotBonuses(
 	} catch (error) {
 		console.error('Equipment slot bonus calculation error:', error)
 		return {
-			main: {},
+			mainWeapon: {},
 			body: {},
 			additional: {},
 			special: {},
@@ -916,7 +916,7 @@ export function getDetailedDataSourceBonuses(
 
 		return {
 			equipment: {
-				main: equipmentSlots.main,
+				mainWeapon: equipmentSlots.mainWeapon,
 				body: equipmentSlots.body,
 				additional: equipmentSlots.additional,
 				special: equipmentSlots.special,
@@ -941,7 +941,7 @@ export function getDetailedDataSourceBonuses(
 		console.error('Detailed data source bonuses calculation error:', error)
 		return {
 			equipment: {
-				main: {},
+				mainWeapon: {},
 				body: {},
 				additional: {},
 				special: {},

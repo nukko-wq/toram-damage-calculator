@@ -14,7 +14,7 @@ import type {
 export type Crystal = PresetCrystal
 
 // 装備エイリアス
-export type Equipment = PresetEquipment
+export type Equipment = import('./calculator').Equipment
 
 // 装備スロット型
 export type EquipmentSlot = keyof EquipmentSlots
@@ -88,10 +88,12 @@ export const CRYSTAL_NONE_ITEM: Crystal = {
 export const EQUIPMENT_NONE_ITEM: Equipment = {
 	id: '__equipment_none__',
 	name: '装備なし',
-	type: 'weapon',
-	category: ['main'], // ダミーカテゴリ
-	baseStats: {},
 	properties: {},
+	isPreset: true,
+	isFavorite: false,
+	isModified: false,
+	createdAt: new Date().toISOString(),
+	updatedAt: new Date().toISOString(),
 }
 
 /**

@@ -11,16 +11,17 @@
 
 **TypeScript移行の利点**:
 - EquipmentPropertiesインターフェースによる厳密な型チェック
-- crystalSlotsの型安全性保証
+- ConditionalEffect配列の型安全性保証
 - 装備カテゴリごとの型制約
 - エディタでの自動補完とプロパティ検証
 - weaponInfoStorageによるIDベース武器情報管理
 
 **ローカルストレージキー**:
-- **プリセット装備（コピー済み）**: LocalStorage (`preset_equipments`)
-- **ユーザーカスタムデータ**: LocalStorage (`custom_equipments`)
+- **プリセット装備（コピー済み）**: LocalStorage (`toram_preset_equipments`)
+- **ユーザーカスタムデータ**: LocalStorage (`toram_custom_equipments`)
 - **武器情報データ**: LocalStorage (`toram_weapon_info_overrides`)
-- **統合アクセス**: 装備データと武器情報を統一的に管理
+- **防具改造タイプデータ**: LocalStorage (`toram_armor_type_overrides`)
+- **統合アクセス**: 装備データ、武器情報、防具改造タイプを統一的にID管理
 
 ## TypeScriptデータ構造
 
@@ -28,22 +29,22 @@
 ```typescript
 // src/data/equipments.ts
 interface EquipmentsData {
-  equipments: Record<EquipmentCategory, EquipmentItem[]>
+  equipments: Record<EquipmentCategory, PresetEquipment[]>
 }
 
 export const equipmentsData: EquipmentsData = {
   equipments: {
-    mainWeapon: [装備アイテム配列], // → main カテゴリ、weapon タイプに変換
-    body: [装備アイテム配列],
-    additional: [装備アイテム配列],
-    special: [装備アイテム配列],
-    subWeapon: [装備アイテム配列],
-    fashion1: [装備アイテム配列],
-    fashion2: [装備アイテム配列],
-    fashion3: [装備アイテム配列],
-    freeInput1: [装備アイテム配列],
-    freeInput2: [装備アイテム配列],
-    freeInput3: [装備アイテム配列]
+    mainWeapon: [PresetEquipment配列], // メイン武器装備
+    body: [PresetEquipment配列],        // 体装備
+    additional: [PresetEquipment配列],  // 追加装備
+    special: [PresetEquipment配列],     // 特殊装備
+    subWeapon: [PresetEquipment配列],   // サブ武器
+    fashion1: [PresetEquipment配列],    // オシャレ装備1
+    fashion2: [PresetEquipment配列],    // オシャレ装備2
+    fashion3: [PresetEquipment配列],    // オシャレ装備3
+    freeInput1: [PresetEquipment配列],  // 自由入力1
+    freeInput2: [PresetEquipment配列],  // 自由入力2
+    freeInput3: [PresetEquipment配列]   // 自由入力3
   }
 } as const
 ```
@@ -56,7 +57,6 @@ export const equipmentsData: EquipmentsData = {
   "id": "equipment_id",
   "name": "装備名",
   "properties": { /* プロパティ */ },
-  "armorType": "normal",      // 防具の改造タイプ（体装備のみ）
   "conditionalEffects": [],   // 条件付き効果
   "refinement": 0,            // weaponInfoStorageで上書きされる
   "isPreset": true,           // プリセット由来フラグ
@@ -75,7 +75,6 @@ export const equipmentsData: EquipmentsData = {
   "id": "equipment_id",
   "name": "装備名",
   "properties": { /* プロパティ */ },
-  "armorType": "normal",      // 防具の改造タイプ（体装備のみ）
   "conditionalEffects": [],   // 条件付き効果
   "refinement": 0,            // weaponInfoStorageで上書きされる
   "isCustom": true,           // カスタム装備フラグ
@@ -99,6 +98,16 @@ export const equipmentsData: EquipmentsData = {
 }
 ```
 
+**防具改造タイプデータ構造**（IDベース管理）:
+```json
+{
+  "equipment_id": {
+    "armorType": "normal",
+    "updatedAt": "ISO string"
+  }
+}
+```
+
 ## 装備アイテム構造
 
 **プリセット装備インターフェース**（初期配置用）:
@@ -107,8 +116,8 @@ interface PresetEquipment {
   id: string                    // 一意識別子
   name: string                  // 装備名
   properties: Partial<EquipmentProperties> // 付与プロパティ（PascalCase統一済み）
-  armorType?: ArmorType        // 防具の改造タイプ（体装備のみ）
   conditionalEffects?: ConditionalEffect[] // 条件付き効果
+  // 注意: armorType は armorTypeStorage で ID ベース管理
 }
 ```
 
@@ -153,6 +162,12 @@ interface WeaponInfo {
   ATK: number
   stability: number
   refinement: number
+  updatedAt: string
+}
+
+// 防具改造タイプ（IDベース管理）
+interface ArmorTypeInfo {
+  armorType: ArmorType
   updatedAt: string
 }
 
@@ -279,6 +294,9 @@ interface EquipmentProperties {
   AbsoluteAccuracy_Rate: number        // 絶対命中%
   AbsoluteDodge_Rate: number           // 絶対回避%
   
+  // ダメージ計算系
+  BraveMultiplier: number              // ブレイブ倍率%
+  
   // ステータス連動攻撃力
   ATK_STR_Rate: number                 // ATK+(STR)%
   ATK_INT_Rate: number                 // ATK+(INT)%
@@ -328,8 +346,7 @@ interface EquipmentProperties {
 
 ```typescript
 type EquipmentCategory = 
-  | 'main'        // メイン装備（mainWeaponから変換）
-  | 'mainWeapon'  // プリセットデータ互換性のため保持
+  | 'mainWeapon'  // メイン武器装備
   | 'body'        // 体装備
   | 'additional'  // 追加装備
   | 'special'     // 特殊装備
@@ -344,27 +361,53 @@ type EquipmentCategory =
 type EquipmentType = 'weapon' | 'armor' | 'accessory' | 'fashion'
 ```
 
-## IDベース武器情報管理システム
+## IDベース統一管理システム
 
-**weaponInfoStorage**:
+**weaponInfoStorage（武器情報管理）**:
 - 全ての装備（プリセット・カスタム・仮データ・編集セッション）で統一
 - 装備IDをキーとして武器ATK、安定率、精錬値を管理
 - LocalStorage: `toram_weapon_info_overrides`
 
+**armorTypeStorage（防具改造タイプ管理）**:
+- 全ての装備（プリセット・カスタム・仮データ・編集セッション）で統一
+- 装備IDをキーとして防具改造タイプ（normal/light/heavy）を管理
+- LocalStorage: `toram_armor_type_overrides`
+
 **データフロー**:
 ```
 WeaponForm ↔ weaponInfoStorage ↔ 装備選択時復元
+ArmorTypeSelect ↔ armorTypeStorage ↔ 装備選択時復元
                 ↓
         equipmentDatabase.applyWeaponInfoOverlay()
+        equipmentDatabase.applyArmorTypeOverlay()
                 ↓
-        全装備データで武器情報をオーバーレイ
+        全装備データで武器情報・防具改造タイプをオーバーレイ
 ```
 
-**主要関数**:
+**武器情報管理の主要関数**:
 - `saveWeaponInfo(equipmentId, ATK, stability, refinement)`: 武器情報保存
 - `getWeaponInfo(equipmentId)`: 武器情報取得
 - `deleteWeaponInfo(equipmentId)`: 武器情報削除
 - `applyWeaponInfoOverlay(equipment)`: 装備に武器情報をオーバーレイ
+
+**防具改造タイプ管理の主要関数**:
+- `saveArmorType(equipmentId, armorType)`: 防具改造タイプ保存
+- `getArmorType(equipmentId)`: 防具改造タイプ取得
+- `deleteArmorType(equipmentId)`: 防具改造タイプ削除
+- `applyArmorTypeOverlay(equipment)`: 装備に防具改造タイプをオーバーレイ
+
+## 実装上の注意点
+
+**データ構造の整合性**:
+- `src/data/equipments.ts`の実際のデータ構造は正しく`PresetEquipment`インターフェースに準拠
+- `equipmentDatabase.ts`の`getAllEquipments()`関数は現在レガシー実装を使用（要修正）
+- 現在の実装では`type`, `category`, `baseStats`プロパティを追加しているが、これらは`PresetEquipment`インターフェースにない
+- 将来的には`getAllEquipments()`を`PresetEquipment`インターフェースに準拠するよう修正が必要
+
+**カテゴリ統一の完了**:
+- `main`カテゴリを廃止し、`mainWeapon`に統一
+- 全てのコードベースで`main`→`mainWeapon`への移行完了
+- 装備カテゴリの一貫性が向上
 
 ## アーキテクチャ変更履歴
 
@@ -373,11 +416,22 @@ WeaponForm ↔ weaponInfoStorage ↔ 装備選択時復元
 - **削除**: `refinement`プロパティ（UserEquipment）
 - **追加**: `weaponInfoStorage`による統一管理
 - **追加**: `applyWeaponInfoOverlay`による動的オーバーレイ
-- **変更**: `mainWeapon` → `main`カテゴリ統合（互換性維持）
 - **変更**: 武器情報はIDをキーとしたオーバーレイ方式に統一
 
+**v2.1: カテゴリ統一**:
+- **削除**: `main`カテゴリを廃止
+- **統一**: 全て`mainWeapon`カテゴリに統一
+- **修正**: 全コードベースで`main`→`mainWeapon`への移行完了
+
+**v2.2: 防具改造タイプのIDベース管理**:
+- **削除**: `armorType`プロパティ（PresetEquipment、UserEquipment）
+- **追加**: `armorTypeStorage`による統一管理
+- **追加**: `applyArmorTypeOverlay`による動的オーバーレイ
+- **変更**: 防具改造タイプはIDをキーとしたオーバーレイ方式に統一
+
 **メリット**:
-- プリセット・カスタム装備で同一の武器情報管理システム
+- プリセット・カスタム装備で同一の武器情報・防具改造タイプ管理システム
 - データ整合性の向上（二重管理の解消）
-- 武器情報の集約管理による拡張性向上
+- 武器情報・防具改造タイプの集約管理による拡張性向上
+- IDベース管理による一貫したアーキテクチャ
 - 移行処理による既存データの保護

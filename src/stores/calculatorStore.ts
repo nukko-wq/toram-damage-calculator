@@ -482,7 +482,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 						string,
 						keyof EquipmentSlots
 					> = {
-						main: 'main',
+						main: 'mainWeapon',
 						body: 'body',
 						additional: 'additional',
 						special: 'special',
