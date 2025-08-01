@@ -811,6 +811,19 @@ export default function EquipmentForm({
 			showMessage('武器情報の削除に失敗しました。')
 		}
 	}
+	// 上部説明テキストを追加するため、武器情報セクションの上に挿入する説明
+	const renderWeaponInfoExplanation = () => (
+		<div className="mt-2 text-xs text-gray-600 font-semibold">
+			※各装備は任意の値に変更できます。
+		</div>
+	)
+
+	// 下部説明テキストを追加するため、武器情報セクションの下に挿入する説明
+	const renderWeaponInfoBottomExplanation = () => (
+		<div className="mt-1 text-xs text-gray-600 pl-3 font-semibold">
+			※武器能力情報を登録、または削除します。
+		</div>
+	)
 
 	const renderPropertyInputs = (
 		item: Equipment,
@@ -1117,24 +1130,33 @@ export default function EquipmentForm({
 
 					{/* メイン装備専用：武器情報登録・削除ボタン */}
 					{activeTab === 'main' && effectiveEquipment.main?.id && (
-						<div className="flex gap-2 mt-2">
-							<button
-								type="button"
-								onClick={() => handleRegisterWeaponInfo()}
-								className="px-3 py-1 text-sm bg-blue-400/80 text-white rounded-md hover:bg-blue-400 transition-colors cursor-pointer"
-								title="WeaponFormの武器情報をメイン装備に登録"
-							>
-								メイン武器情報登録
-							</button>
-							<button
-								type="button"
-								onClick={() => handleDeleteWeaponInfo()}
-								className="px-3 py-1 text-sm bg-gray-400/80 text-white rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
-								title="メイン装備の武器情報を削除"
-							>
-								武器情報削除
-							</button>
-						</div>
+						<>
+							{renderWeaponInfoExplanation()}
+							<div className="flex gap-4 items-center mt-2 pl-3">
+								<div className="text-sm font-semibold text-gray-700">
+									メイン武器情報
+								</div>
+								<div className="flex gap-2">
+									<button
+										type="button"
+										onClick={() => handleRegisterWeaponInfo()}
+										className="px-3 py-1 text-sm bg-blue-400/80 text-white rounded-md hover:bg-blue-400 transition-colors cursor-pointer"
+										title="WeaponFormの武器情報をメイン装備に登録"
+									>
+										登録
+									</button>
+									<button
+										type="button"
+										onClick={() => handleDeleteWeaponInfo()}
+										className="px-3 py-1 text-sm bg-gray-400/80 text-white rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
+										title="メイン装備の武器情報を削除"
+									>
+										削除
+									</button>
+								</div>
+							</div>
+							{renderWeaponInfoBottomExplanation()}
+						</>
 					)}
 
 					{/* 体装備の防具の改造選択UI */}
