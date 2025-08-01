@@ -217,7 +217,6 @@ export type EquipmentType = 'weapon' | 'armor' | 'accessory' | 'fashion'
 
 // 装備カテゴリ
 export type EquipmentCategory =
-	| 'main'
 	| 'mainWeapon'
 	| 'body'
 	| 'additional'
@@ -272,7 +271,7 @@ export interface PresetCrystal {
 
 // 装備スロット
 export interface EquipmentSlots {
-	main: Equipment
+	mainWeapon: Equipment
 	body: Equipment
 	additional: Equipment
 	special: Equipment

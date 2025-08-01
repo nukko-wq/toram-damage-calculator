@@ -331,8 +331,7 @@ interface EquipmentProperties {
 
 ```typescript
 type EquipmentCategory = 
-  | 'main'        // メイン装備（mainWeaponから変換）
-  | 'mainWeapon'  // プリセットデータ互換性のため保持
+  | 'mainWeapon'  // メイン武器装備
   | 'body'        // 体装備
   | 'additional'  // 追加装備
   | 'special'     // 特殊装備
@@ -377,6 +376,11 @@ WeaponForm ↔ weaponInfoStorage ↔ 装備選択時復元
 - 現在の実装では`type`, `category`, `baseStats`プロパティを追加しているが、これらは`PresetEquipment`インターフェースにない
 - 将来的には`getAllEquipments()`を`PresetEquipment`インターフェースに準拠するよう修正が必要
 
+**カテゴリ統一の完了**:
+- `main`カテゴリを廃止し、`mainWeapon`に統一
+- 全てのコードベースで`main`→`mainWeapon`への移行完了
+- 装備カテゴリの一貫性が向上
+
 ## アーキテクチャ変更履歴
 
 **v2.0: IDベース統一管理への移行**:
@@ -384,8 +388,12 @@ WeaponForm ↔ weaponInfoStorage ↔ 装備選択時復元
 - **削除**: `refinement`プロパティ（UserEquipment）
 - **追加**: `weaponInfoStorage`による統一管理
 - **追加**: `applyWeaponInfoOverlay`による動的オーバーレイ
-- **変更**: `mainWeapon` → `main`カテゴリ統合（互換性維持）
 - **変更**: 武器情報はIDをキーとしたオーバーレイ方式に統一
+
+**v2.1: カテゴリ統一**:
+- **削除**: `main`カテゴリを廃止
+- **統一**: 全て`mainWeapon`カテゴリに統一
+- **修正**: 全コードベースで`main`→`mainWeapon`への移行完了
 
 **メリット**:
 - プリセット・カスタム装備で同一の武器情報管理システム

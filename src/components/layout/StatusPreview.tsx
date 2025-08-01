@@ -68,7 +68,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 	const options = [
 		{ value: 'all', label: '全ての合計値' },
 		{ value: 'calculation', label: '計算用' },
-		{ value: 'main', label: 'メイン装備' },
+		{ value: 'mainWeapon', label: 'メイン装備' },
 		{ value: 'subWeapon', label: 'サブ装備' },
 		{ value: 'body', label: '体装備' },
 		{ value: 'additional', label: '追加装備' },
@@ -469,8 +469,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				case 'calculation':
 					// 計算用（既存のロジック）
 					return getAllDataSourceBonusesWithBuffSkills(data)
-				case 'main':
-					return detailedBonuses.equipment.main
+				case 'mainWeapon':
+					return detailedBonuses.equipment.mainWeapon
 				case 'subWeapon':
 					return detailedBonuses.equipment.subWeapon
 				case 'body':

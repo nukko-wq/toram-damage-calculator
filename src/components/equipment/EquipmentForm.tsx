@@ -64,7 +64,7 @@ export default function EquipmentForm({
 	// Zustandストアの値を使用（完全移行）
 	const effectiveEquipment = storeEquipment
 	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots | 'register'>(
-		'main',
+		'mainWeapon',
 	)
 	const [modalState, setModalState] = useState<{
 		isOpen: boolean
@@ -115,7 +115,7 @@ export default function EquipmentForm({
 	})
 
 	const equipmentSlots = [
-		{ key: 'main' as const, label: 'メイン装備' },
+		{ key: 'mainWeapon' as const, label: 'メイン装備' },
 		{ key: 'body' as const, label: '体装備' },
 		{ key: 'additional' as const, label: '追加装備' },
 		{ key: 'special' as const, label: '特殊装備' },
@@ -578,7 +578,7 @@ export default function EquipmentForm({
 				updateEquipment(updatedEquipment)
 
 				// メイン装備が選択された場合、保存されている武器情報をWeaponFormに復元
-				if (slotKey === 'main') {
+				if (slotKey === 'mainWeapon') {
 					const weaponInfo = getWeaponInfo(equipmentId)
 					if (weaponInfo) {
 						console.log('武器情報をWeaponFormに復元:', weaponInfo)
@@ -749,7 +749,7 @@ export default function EquipmentForm({
 
 	// メイン武器情報登録ハンドラー
 	const handleRegisterWeaponInfo = async () => {
-		const currentEquipment = effectiveEquipment.main
+		const currentEquipment = effectiveEquipment.mainWeapon
 		console.log('現在の装備:', currentEquipment)
 
 		if (!currentEquipment?.id) {
@@ -790,7 +790,7 @@ export default function EquipmentForm({
 
 	// 武器情報削除ハンドラー
 	const handleDeleteWeaponInfo = async () => {
-		const currentEquipment = effectiveEquipment.main
+		const currentEquipment = effectiveEquipment.mainWeapon
 		if (!currentEquipment?.id) return
 
 		try {
@@ -1129,7 +1129,7 @@ export default function EquipmentForm({
 					</div>
 
 					{/* メイン装備専用：武器情報登録・削除ボタン */}
-					{activeTab === 'main' && effectiveEquipment.main?.id && (
+					{activeTab === 'mainWeapon' && effectiveEquipment.mainWeapon?.id && (
 						<>
 							{renderWeaponInfoExplanation()}
 							<div className="flex gap-4 items-center mt-2 pl-3">
@@ -1194,7 +1194,7 @@ export default function EquipmentForm({
 					selectedEquipmentId={
 						effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null
 					}
-					category={modalState.category || 'main'}
+					category={modalState.category || 'mainWeapon'}
 					title={modalState.title}
 					currentFormProperties={
 						effectiveEquipment[activeTab as keyof EquipmentSlots]?.properties ||

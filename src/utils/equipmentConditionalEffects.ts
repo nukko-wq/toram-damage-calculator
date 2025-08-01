@@ -192,7 +192,7 @@ export function recalculateEquipmentEffects(
 
 	// 11スロット分の装備を処理（従来8スロット + 自由入力3スロット）
 	const allSlots = [
-		equipmentState.main,
+		equipmentState.mainWeapon,
 		equipmentState.body,
 		equipmentState.additional,
 		equipmentState.special,

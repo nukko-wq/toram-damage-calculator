@@ -63,7 +63,7 @@ export default function SaveDataItem({
 		})
 	}
 
-	const isMainData = saveData.id === 'main'
+	const isMainData = saveData.id === 'mainWeapon'
 
 	return (
 		<div

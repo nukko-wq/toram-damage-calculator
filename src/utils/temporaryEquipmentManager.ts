@@ -28,7 +28,7 @@ export function createTemporaryCustomEquipment(
 		category,
 		properties: {}, // 全プロパティをリセット状態で作成
 		// weaponStatsは使用せず、weaponInfoStorageで管理するため削除
-		crystalSlots: ['main', 'body', 'additional', 'special'].includes(category)
+		crystalSlots: ['mainWeapon', 'body', 'additional', 'special'].includes(category)
 			? {
 					slot1: undefined,
 					slot2: undefined,
@@ -43,7 +43,7 @@ export function createTemporaryCustomEquipment(
 	temporaryEquipments.set(id, temporaryEquipment)
 
 	// 武器系装備（メイン・サブ）の場合は初期武器情報をweaponInfoStorageに保存
-	if (category === 'main' || category === 'subWeapon') {
+	if (category === 'mainWeapon' || category === 'subWeapon') {
 		const { saveWeaponInfo } = require('./weaponInfoStorage')
 		saveWeaponInfo(id, 0, 0, 0)
 	}

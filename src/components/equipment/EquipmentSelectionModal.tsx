@@ -175,7 +175,7 @@ export default function EquipmentSelectionModal({
 	// 「装備なし」のダメージ差分を計算
 	const equipmentNoneDamageResult = useDamageDifferenceCorrect(
 		EQUIPMENT_NONE_ITEM,
-		slotInfo || { type: 'equipment', slot: 'main' },
+		slotInfo || { type: 'equipment', slot: 'mainWeapon' },
 		{ debug: false },
 	)
 	const equipmentNoneDamageDifference = slotInfo
@@ -198,7 +198,7 @@ export default function EquipmentSelectionModal({
 				id: EQUIPMENT_NONE_ID,
 				name: '装備なし',
 				type: 'weapon',
-				category: ['main'],
+				category: ['mainWeapon'],
 				baseStats: {},
 				properties: {},
 				damageDifference: equipmentNoneDamageDifference,

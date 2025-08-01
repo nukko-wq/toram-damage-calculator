@@ -105,7 +105,7 @@ export interface DetailedDataSourceBonuses {
 export type FilterOption =
 	| 'all'
 	| 'calculation'
-	| 'main'
+	| 'mainWeapon'
 	| 'subWeapon'
 	| 'body'
 	| 'additional'

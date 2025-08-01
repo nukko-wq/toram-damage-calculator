@@ -89,7 +89,7 @@ export const EQUIPMENT_NONE_ITEM: Equipment = {
 	id: '__equipment_none__',
 	name: '装備なし',
 	type: 'weapon',
-	category: ['main'], // ダミーカテゴリ
+	category: ['mainWeapon'], // ダミーカテゴリ
 	baseStats: {},
 	properties: {},
 }
