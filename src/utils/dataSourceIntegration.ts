@@ -802,7 +802,7 @@ export function getEquipmentSlotBonuses(
 ): Record<string, Partial<AllBonuses>> {
 	try {
 		const bonuses: Record<string, Partial<AllBonuses>> = {
-			main: {},
+			mainWeapon: {},
 			body: {},
 			additional: {},
 			special: {},
