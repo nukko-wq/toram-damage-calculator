@@ -47,6 +47,8 @@ export function getBuffSkillBonuses(
 	enemyDEF?: number,
 	enemyMDEF?: number,
 	enemyLevel?: number,
+	subWeaponType?: SubWeaponType | null,
+	subWeaponRefinement?: number,
 ): Partial<AllBonuses> {
 	const bonuses: Partial<AllBonuses> = {}
 
@@ -61,8 +63,13 @@ export function getBuffSkillBonuses(
 		}
 	}
 
-	// ブレードスキル
-	const bladeBonuses = getBladeSkillBonuses(buffSkillData, weaponType)
+	// ブレードスキル（サブ武器情報を含む）
+	const bladeBonuses = getBladeSkillBonuses(
+		buffSkillData,
+		weaponType,
+		subWeaponType,
+		subWeaponRefinement,
+	)
 	for (const [key, value] of Object.entries(bladeBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =

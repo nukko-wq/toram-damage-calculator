@@ -3,7 +3,7 @@
  */
 
 import type { BuffSkillState, MainWeaponType } from '@/types/buffSkill'
-import type { EquipmentProperties, WeaponType } from '@/types/calculator'
+import type { EquipmentProperties, WeaponType, SubWeaponType } from '@/types/calculator'
 import type { AllBonuses } from '../../basicStatsCalculation'
 import { convertWeaponType, integrateEffects } from '../types'
 
@@ -134,11 +134,43 @@ export function calculateAuraBladeEffects(
 }
 
 /**
+ * バスターブレード(BusterBlade)の効果計算関数
+ */
+export function calculateBusterBladeEffects(
+	isEnabled: boolean,
+	weaponType: MainWeaponType | null,
+	subWeaponType?: SubWeaponType | null,
+	shieldRefinement?: number,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+
+	// 対象武器種チェック
+	const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+	if (!weaponType || !bladeWeapons.includes(weaponType)) return {}
+
+	// 片手剣+盾の特殊条件チェック
+	if (weaponType === 'oneHandSword' && subWeaponType === '盾') {
+		// 片手剣+盾装備時: 武器ATK率 = 10 + 盾の精錬値
+		const weaponATKRate = 10 + (shieldRefinement || 0)
+		return {
+			WeaponATK_Rate: weaponATKRate,
+		}
+	}
+
+	// 基本効果: 武器ATK率+10%
+	return {
+		WeaponATK_Rate: 10,
+	}
+}
+
+/**
  * ブレードスキル系統の統合効果取得
  */
 export function getBladeSkillBonuses(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
+	subWeaponType?: SubWeaponType | null,
+	shieldRefinement?: number,
 ): Partial<AllBonuses> {
 	const convertedWeaponType = convertWeaponType(weaponType)
 	const bonuses: Partial<AllBonuses> = {}
@@ -167,6 +199,18 @@ export function getBladeSkillBonuses(
 	const activeBerserk = berserkIds.find((id) => buffSkillData[id]?.isEnabled)
 	if (activeBerserk) {
 		const effects = calculateBerserkEffects(true, convertedWeaponType)
+		integrateEffects(effects, bonuses)
+	}
+
+	// バスターブレードの処理
+	const busterBlade = buffSkillData['5-BusterBlade']
+	if (busterBlade?.isEnabled) {
+		const effects = calculateBusterBladeEffects(
+			true,
+			convertedWeaponType,
+			subWeaponType,
+			shieldRefinement,
+		)
 		integrateEffects(effects, bonuses)
 	}
 
