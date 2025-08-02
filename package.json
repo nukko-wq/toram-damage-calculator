@@ -9,6 +9,7 @@
 		"lint": "npx @biomejs/biome lint",
 		"lint:fix": "npx @biomejs/biome lint --write",
 		"format": "npx @biomejs/biome format --write",
+		"check": "npx @biomejs/biome check",
 		"upgrade-interactive": "ncu --interactive --format group"
 	},
 	"dependencies": {
