@@ -193,6 +193,7 @@ export default function BuffItemCard({
 						fill={isFavorite ? 'currentColor' : 'none'}
 						stroke="currentColor"
 						viewBox="0 0 24 24"
+						aria-label={isFavorite ? 'お気に入り済み' : 'お気に入りに追加'}
 					>
 						<title>{isFavorite ? 'お気に入り済み' : 'お気に入りに追加'}</title>
 						<path
@@ -216,7 +217,9 @@ export default function BuffItemCard({
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
+							aria-label="選択済み"
 						>
+							<title>選択済み</title>
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"
