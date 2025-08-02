@@ -3,9 +3,9 @@
  */
 
 import type {
-	RegisterFormData,
-	RegisterEffect,
 	EquipmentProperties,
+	RegisterEffect,
+	RegisterFormData,
 } from '@/types/calculator'
 
 /**

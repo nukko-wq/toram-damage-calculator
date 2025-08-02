@@ -1,6 +1,6 @@
 import { useCalculatorStore } from '@/stores/calculatorStore'
-import { calculateResults } from '@/utils/calculationEngine'
 import type { CalculatorData } from '@/types/calculator'
+import { calculateResults } from '@/utils/calculationEngine'
 import type { EquipmentContext, PlayerStats } from './types'
 
 /**

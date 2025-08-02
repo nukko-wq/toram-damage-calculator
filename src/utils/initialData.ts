@@ -1,22 +1,22 @@
 import type {
 	BaseStats,
-	MainWeapon,
-	SubWeapon,
-	Equipment,
-	EquipmentSlots,
-	CrystalSlots,
-	FoodFormData,
-	SaveDataEnemyInfo,
-	RegisterFormData,
-	RegisterEffect,
 	CalculatorData,
+	CrystalSlots,
+	Equipment,
 	EquipmentProperties,
-	PowerOptions,
-	OtherOptions,
+	EquipmentSlots,
+	FoodFormData,
+	MainWeapon,
 	OptionTabType,
+	OtherOptions,
+	PowerOptions,
+	RegisterEffect,
+	RegisterFormData,
+	SaveDataEnemyInfo,
+	SubWeapon,
 } from '@/types/calculator'
-import { getDefaultBuffSkillFormData } from './buffSkillDefaults'
 import { getDefaultBuffItems } from './buffItemDefaults'
+import { getDefaultBuffSkillFormData } from './buffSkillDefaults'
 
 export const createInitialBaseStats = (): BaseStats => ({
 	STR: 1,

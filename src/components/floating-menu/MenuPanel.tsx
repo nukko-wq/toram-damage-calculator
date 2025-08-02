@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-
+import type { MenuSection } from './hooks/useFloatingMenu'
 import MenuContent from './MenuContent'
 import MenuNavigation from './MenuNavigation'
-import type { MenuSection } from './hooks/useFloatingMenu'
 
 interface MenuPanelProps {
 	isOpen: boolean

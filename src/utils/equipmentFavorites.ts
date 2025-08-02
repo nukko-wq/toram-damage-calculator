@@ -1,6 +1,6 @@
 // 装備品お気に入り管理ユーティリティ
 
-import type { FavoritesData, EquipmentFavorite } from '@/types/favorites'
+import type { EquipmentFavorite, FavoritesData } from '@/types/favorites'
 import { STORAGE_KEYS, StorageHelper } from './storage'
 
 export class EquipmentFavoritesManager {

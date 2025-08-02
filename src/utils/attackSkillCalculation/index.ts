@@ -1,10 +1,10 @@
+import type { CalculatorData } from '@/types/calculator'
 import { AttackSkillCalculator } from './AttackSkillCalculator'
 import type {
 	EquipmentContext,
 	PlayerStats,
 	SkillCalculationResult,
 } from './types'
-import type { CalculatorData } from '@/types/calculator'
 import { SkillCalculationUtils } from './utils'
 
 /**
@@ -69,8 +69,8 @@ export const attackSkillCalculation = new AttackSkillCalculationService()
 
 // 型のエクスポート
 export type {
-	PlayerStats,
 	EquipmentContext,
-	SkillCalculationResult,
+	PlayerStats,
 	SkillCalculationInput,
+	SkillCalculationResult,
 } from './types'

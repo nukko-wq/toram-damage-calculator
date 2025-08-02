@@ -1,7 +1,7 @@
 // カスタム敵管理システム
 
 import type { UserEnemy } from '@/types/calculator'
-import { StorageHelper, STORAGE_KEYS } from './storage'
+import { STORAGE_KEYS, StorageHelper } from './storage'
 
 /**
  * ユーザーカスタム敵をLocalStorageから取得

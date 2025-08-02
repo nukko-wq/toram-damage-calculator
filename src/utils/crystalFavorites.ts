@@ -1,7 +1,7 @@
 // クリスタお気に入り管理ユーティリティ
 
-import type { CrystalFavoritesData, CrystalFavorite } from '@/types/favorites'
 import type { Crystal, CrystalType } from '@/types/calculator'
+import type { CrystalFavorite, CrystalFavoritesData } from '@/types/favorites'
 import { STORAGE_KEYS, StorageHelper } from './storage'
 
 export class CrystalFavoritesManager {

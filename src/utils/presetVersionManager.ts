@@ -1,20 +1,19 @@
-import type {
-	PresetVersionInfo,
-	UpdateCheckResult,
-	LocalStorageEquipment,
-	LocalStorageCrystal,
-	LocalStorageEnemy,
-	PresetEquipment,
-	PresetCrystal,
-	PresetEnemy,
-	UpdateNotification,
-	EquipmentCategory,
-} from '@/types/calculator'
-
-// フォールバック用の静的インポート
-import { equipmentsData } from '@/data/equipments'
 import { crystalsData } from '@/data/crystals'
 import { enemiesData } from '@/data/enemies'
+// フォールバック用の静的インポート
+import { equipmentsData } from '@/data/equipments'
+import type {
+	EquipmentCategory,
+	LocalStorageCrystal,
+	LocalStorageEnemy,
+	LocalStorageEquipment,
+	PresetCrystal,
+	PresetEnemy,
+	PresetEquipment,
+	PresetVersionInfo,
+	UpdateCheckResult,
+	UpdateNotification,
+} from '@/types/calculator'
 
 // ストレージキー
 const STORAGE_KEYS = {

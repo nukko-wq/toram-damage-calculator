@@ -1,7 +1,7 @@
 'use client'
 
-import type { MenuSection } from './hooks/useFloatingMenu'
 import SaveDataContent from './content/SaveDataContent'
+import type { MenuSection } from './hooks/useFloatingMenu'
 
 interface MenuContentProps {
 	activeSection: MenuSection

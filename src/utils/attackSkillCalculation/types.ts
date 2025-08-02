@@ -1,4 +1,4 @@
-import type { WeaponType, SubWeaponType } from '@/types/calculator'
+import type { SubWeaponType, WeaponType } from '@/types/calculator'
 
 /**
  * プレイヤーステータス（計算に必要な値）

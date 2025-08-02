@@ -1,10 +1,10 @@
 import { z } from 'zod'
-import { isValidWeaponCombination } from '@/utils/weaponCombinations'
+import type { SubWeaponType, WeaponType } from '@/types/calculator'
 import {
 	getRefinementDisplayOptions,
 	type RefinementDisplay,
 } from '@/utils/refinementUtils'
-import type { WeaponType, SubWeaponType } from '@/types/calculator'
+import { isValidWeaponCombination } from '@/utils/weaponCombinations'
 
 // 武器タイプのZodスキーマ
 export const weaponTypeSchema = z.enum([

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import { Roboto } from 'next/font/google'
 import './globals.css'
-import Header from '@/components/layout/Header'
-import FloatingSavePanel from '@/components/layout/FloatingSavePanel'
-import ResultToggleBar from '@/components/layout/ResultToggleBar'
-import Footer from '@/components/layout/Footer'
 import { FloatingMenuSystem } from '@/components/floating-menu'
+import FloatingSavePanel from '@/components/layout/FloatingSavePanel'
+import Footer from '@/components/layout/Footer'
+import Header from '@/components/layout/Header'
+import ResultToggleBar from '@/components/layout/ResultToggleBar'
 
 // Robotoフォントの設定（数字表示用）
 const roboto = Roboto({

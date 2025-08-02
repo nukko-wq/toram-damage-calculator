@@ -1,8 +1,8 @@
 'use client'
 
 import FloatingMenuButton from './FloatingMenuButton'
-import MenuPanel from './MenuPanel'
 import { useFloatingMenu } from './hooks/useFloatingMenu'
+import MenuPanel from './MenuPanel'
 
 export default function FloatingMenuSystem() {
 	const { isOpen, activeSection, toggleMenu, closeMenu, setActiveSection } =

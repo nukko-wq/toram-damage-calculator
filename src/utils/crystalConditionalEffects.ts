@@ -5,12 +5,12 @@
  */
 
 import type {
-	EquipmentCondition,
-	EquipmentSlots,
-	EquipmentProperties,
 	CrystalSlots,
-	PresetCrystal,
+	EquipmentCondition,
+	EquipmentProperties,
+	EquipmentSlots,
 	MainWeapon,
+	PresetCrystal,
 	SubWeapon,
 } from '@/types/calculator'
 import { getArmorType } from './armorTypeStorage'

@@ -3,15 +3,15 @@
  * パッシブ倍率・ブレイブ倍率の計算をUI層から分離
  */
 
-import type { CalculatorData } from '@/types/calculator'
 import { getAttackSkillById } from '@/data/attackSkills'
-import { getPresetEnemyById } from '@/utils/enemyDatabase'
+import type { CalculatorData } from '@/types/calculator'
 import {
+	getBuffSkillBraveMultiplier,
 	getBuffSkillPassiveMultiplier,
 	getBuffSkillPassiveMultiplierWithSkillCategory,
-	getBuffSkillBraveMultiplier,
 	getShootSkillPassiveMultiplier,
 } from '@/utils/buffSkillCalculation'
+import { getPresetEnemyById } from '@/utils/enemyDatabase'
 
 /**
  * 現在のパッシブ倍率を取得（自動計算用）

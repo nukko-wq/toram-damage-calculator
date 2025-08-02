@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useCalculatorStore } from '@/stores'
 import type { CrystalSlots, CrystalType } from '@/types/calculator'
 import { getCrystalById } from '@/utils/crystalDatabase'
 import CrystalSelectionModal from './CrystalSelectionModal'
-import { useCalculatorStore } from '@/stores'
 
 interface CrystalFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）

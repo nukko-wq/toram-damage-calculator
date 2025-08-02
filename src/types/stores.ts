@@ -1,26 +1,26 @@
+import type { DamageCalculationServiceResult } from '@/utils/damageCalculationService'
+import type { BuffSkillFormData } from './buffSkill'
+import type { CalculationResults } from './calculationResult'
 import type {
-	CalculatorData,
+	ArmorType,
 	BaseStats,
-	MainWeapon,
-	SubWeapon,
+	BuffItemFormData,
+	CalculatorData,
 	CrystalSlots,
-	EquipmentSlots,
-	EquipmentType,
+	EnemyFormData,
 	EquipmentCategory,
 	EquipmentProperties,
+	EquipmentSlots,
+	EquipmentType,
 	FoodFormData,
-	EnemyFormData,
-	BuffItemFormData,
+	MainWeapon,
+	OptionTabType,
+	OtherOptions,
+	PowerOptions,
 	RegisterFormData,
 	SaveData,
-	ArmorType,
-	PowerOptions,
-	OtherOptions,
-	OptionTabType,
+	SubWeapon,
 } from './calculator'
-import type { CalculationResults } from './calculationResult'
-import type { BuffSkillFormData } from './buffSkill'
-import type { DamageCalculationServiceResult } from '@/utils/damageCalculationService'
 
 // ===== 計算結果関連（将来実装）=====
 export interface DamageCalculationResult {

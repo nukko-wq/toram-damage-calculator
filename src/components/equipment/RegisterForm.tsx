@@ -1,8 +1,8 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { registerFormDataSchema } from '@/schemas/register'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { RegisterFormData } from '@/types/calculator'

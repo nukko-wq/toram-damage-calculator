@@ -9,10 +9,10 @@ import {
 	type SkillHitCalculator,
 	StandardCalculator,
 	Storm1Hit6Calculator,
-	Storm1Hit6NewCalculator,
 	Storm1Hit6ExtendCalculator,
-	StormBlazer10StackCalculator,
+	Storm1Hit6NewCalculator,
 	StormBlazer1StackCalculator,
+	StormBlazer10StackCalculator,
 	StrikeStabAilmentCalculator,
 	StrikeStabCalculator,
 } from './calculators'

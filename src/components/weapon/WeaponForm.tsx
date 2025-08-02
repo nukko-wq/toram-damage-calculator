@@ -1,27 +1,27 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
-	mainWeaponSchema,
-	subWeaponSchema,
 	type MainWeaponFormData,
+	mainWeaponSchema,
 	type SubWeaponFormData,
+	subWeaponSchema,
 } from '@/schemas/weapons'
-import type { MainWeapon, SubWeapon, WeaponType } from '@/types/calculator'
-import { useEffect, useState, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
-import {
-	getAvailableSubWeaponTypes,
-	isValidWeaponCombination,
-	getAutoFixedSubWeapon,
-} from '@/utils/weaponCombinations'
+import type { MainWeapon, SubWeapon, WeaponType } from '@/types/calculator'
 import {
 	getRefinementDisplayOptions,
+	type RefinementDisplay,
 	refinementDisplayToValue,
 	refinementValueToDisplay,
-	type RefinementDisplay,
 } from '@/utils/refinementUtils'
+import {
+	getAutoFixedSubWeapon,
+	getAvailableSubWeaponTypes,
+	isValidWeaponCombination,
+} from '@/utils/weaponCombinations'
 
 export default function WeaponForm() {
 	// Zustandストアから武器データを取得

@@ -2,10 +2,10 @@
  * 装備をダメージ差分順でソートするためのユーティリティ
  */
 
-import { useMemo, useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { Equipment } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
-import { useCalculatorStore } from '@/stores/calculatorStore'
 import { calculateResults } from '@/utils/calculationEngine'
 import {
 	calculateDamageWithService,

@@ -1,7 +1,7 @@
 // バフアイテムお気に入り管理ユーティリティ
 
-import type { BuffItemFavoritesData, BuffItemFavorite } from '@/types/favorites'
-import type { PresetBuffItem, BuffItemCategory } from '@/types/calculator'
+import type { BuffItemCategory, PresetBuffItem } from '@/types/calculator'
+import type { BuffItemFavorite, BuffItemFavoritesData } from '@/types/favorites'
 import { STORAGE_KEYS, StorageHelper } from './storage'
 
 export class BuffItemFavoritesManager {

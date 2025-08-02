@@ -1,21 +1,16 @@
+import { equipmentsData } from '@/data/equipments'
 import type {
-	PresetEquipment,
-	LocalStorageEquipment,
-	Equipment,
-	UserEquipment,
-	EquipmentType,
-	EquipmentCategory,
-	EquipmentProperties,
 	ArmorType,
 	ConditionalEffect,
+	Equipment,
+	EquipmentCategory,
+	EquipmentProperties,
+	EquipmentType,
+	LocalStorageEquipment,
+	PresetEquipment,
+	UserEquipment,
 } from '@/types/calculator'
-import { equipmentsData } from '@/data/equipments'
-import {
-	getAllTemporaryEquipments,
-	getTemporaryEquipmentsByCategory,
-	getTemporaryEquipmentById,
-	isTemporaryEquipment,
-} from './temporaryEquipmentManager'
+import { applyArmorTypeOverlay } from './armorTypeStorage'
 import {
 	getAllEditSessionEquipments,
 	getEditSessionEquipment,
@@ -23,7 +18,12 @@ import {
 	startEditSession,
 	updateEditSessionProperties,
 } from './editSessionManager'
-import { applyArmorTypeOverlay } from './armorTypeStorage'
+import {
+	getAllTemporaryEquipments,
+	getTemporaryEquipmentById,
+	getTemporaryEquipmentsByCategory,
+	isTemporaryEquipment,
+} from './temporaryEquipmentManager'
 
 // プロパティからundefinedの値を除外する関数
 function cleanProperties(

@@ -5,13 +5,13 @@
  * 詳細な計算式は docs/calculations/basic-stats.md を参照
  */
 
-import { getArmorType } from './armorTypeStorage'
 import type {
+	ArmorType,
 	BaseStats,
 	WeaponType as WeaponTypeEnum,
-	ArmorType,
 } from '@/types/calculator'
 import { getWeaponTypeKey } from '@/utils/weaponTypeMapping'
+import { getArmorType } from './armorTypeStorage'
 
 // 全補正値（装備・クリスタ・料理・バフアイテムの合計）
 // EquipmentPropertiesと同じ命名規則を使用

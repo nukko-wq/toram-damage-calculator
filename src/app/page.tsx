@@ -1,9 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useCalculatorStore } from '@/stores'
-import type { UpdateNotification } from '@/types/calculator'
-import { initializeStorage } from '@/utils/saveDataManager'
+import AttackSkillForm from '@/components/attack-skill/AttackSkillForm'
 import BaseStatsForm from '@/components/base-stats/BaseStatsForm'
 import BuffItemForm from '@/components/buff-item/BuffItemForm'
 import BuffSkillForm from '@/components/buff-skill/BuffSkillForm'
@@ -12,7 +10,9 @@ import EnemyForm from '@/components/enemy/EnemyForm'
 import EquipmentForm from '@/components/equipment/EquipmentForm'
 import FoodForm from '@/components/food/FoodForm'
 import WeaponForm from '@/components/weapon/WeaponForm'
-import AttackSkillForm from '@/components/attack-skill/AttackSkillForm'
+import { useCalculatorStore } from '@/stores'
+import type { UpdateNotification } from '@/types/calculator'
+import { initializeStorage } from '@/utils/saveDataManager'
 
 export default function Home() {
 	// Zustandストアからデータを取得

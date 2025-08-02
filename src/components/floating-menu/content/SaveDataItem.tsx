@@ -1,7 +1,7 @@
 'use client'
 
+import { Edit, EllipsisVertical, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { EllipsisVertical, Edit, Trash2 } from 'lucide-react'
 import {
 	Button,
 	Menu,

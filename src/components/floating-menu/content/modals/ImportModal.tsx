@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ImportValidationResult } from '@/utils/dataValidator'
-import { readImportFile, canImport } from '@/utils/importManager'
+import { canImport, readImportFile } from '@/utils/importManager'
 
 interface ImportModalProps {
 	isOpen: boolean

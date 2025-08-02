@@ -1,9 +1,9 @@
+import { buffItemsData } from '@/data/buffItems'
 import type {
-	PresetBuffItem,
 	BuffItem,
 	BuffItemCategory,
+	PresetBuffItem,
 } from '@/types/calculator'
-import { buffItemsData } from '@/data/buffItems'
 
 // JSONデータからプリセットバフアイテムを取得
 export const getPresetBuffItems = (): PresetBuffItem[] => {

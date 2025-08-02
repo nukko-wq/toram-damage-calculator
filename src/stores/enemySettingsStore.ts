@@ -5,9 +5,9 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type {
+	BossDifficulty,
 	EnemySettings,
 	EnemySettingsMap,
-	BossDifficulty,
 } from '@/types/calculator'
 
 interface EnemySettingsStore {

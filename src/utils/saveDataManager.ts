@@ -2,13 +2,12 @@
 
 import { v4 as uuidv4 } from 'uuid'
 import type {
-	SaveData,
-	DefaultSaveData,
 	CalculatorData,
 	DataValidation,
+	DefaultSaveData,
+	SaveData,
 	UpdateNotification,
 } from '@/types/calculator'
-import { StorageHelper, STORAGE_KEYS } from './storage'
 import {
 	createInitialCalculatorData,
 	createInitialPowerOptions,
@@ -17,6 +16,7 @@ import {
 	checkAndUpdatePresetData,
 	forceResetPresetData,
 } from './presetVersionManager'
+import { STORAGE_KEYS, StorageHelper } from './storage'
 
 /**
  * 初期化・セットアップ（バージョン管理システム統合版）

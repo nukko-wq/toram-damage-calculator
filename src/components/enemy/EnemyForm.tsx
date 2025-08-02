@@ -1,16 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { useEnemyData } from '@/hooks/useEnemyData'
 import { useCalculatorStore } from '@/stores'
-import type { EnemyFormData, BossDifficulty } from '@/types/calculator'
+import { useEnemySettingsStore } from '@/stores/enemySettingsStore'
+import type { BossDifficulty, EnemyFormData } from '@/types/calculator'
+import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import {
 	calculateRaidBossStats,
 	isSelditeFLEEUnknown,
 } from '@/utils/raidBossCalculation'
-import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
-import { useEnemyData } from '@/hooks/useEnemyData'
-import { useEnemySettingsStore } from '@/stores/enemySettingsStore'
 import EnemySelectionModal from './EnemySelectionModal'
 
 export default function EnemyForm() {

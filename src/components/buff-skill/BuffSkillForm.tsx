@@ -1,13 +1,13 @@
 'use client'
 
 import { useMemo } from 'react'
-import { getAvailableSkills, sortSkills } from '@/utils/buffSkillUtils'
 import { useCalculatorData } from '@/hooks/useCalculatorData'
 import type { MainWeaponType, SubWeaponType } from '@/types/buffSkill'
 import type {
-	WeaponType,
 	SubWeaponType as CalculatorSubWeaponType,
+	WeaponType,
 } from '@/types/calculator'
+import { getAvailableSkills, sortSkills } from '@/utils/buffSkillUtils'
 import SkillCard from './SkillCard'
 
 // 武器種変換関数

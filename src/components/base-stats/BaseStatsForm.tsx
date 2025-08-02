@@ -1,11 +1,11 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { baseStatsSchema, type BaseStatsFormData } from '@/schemas/baseStats'
-import type { BaseStats } from '@/types/calculator'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { type BaseStatsFormData, baseStatsSchema } from '@/schemas/baseStats'
 import { useCalculatorStore } from '@/stores'
+import type { BaseStats } from '@/types/calculator'
 import { calculateStatPoints } from '@/utils/statPointCalculation'
 
 export default function BaseStatsForm() {

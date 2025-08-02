@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import type { CalculatedHit, AttackSkillDisplayData } from '@/types/calculator'
-import { useCalculatorStore } from '@/stores/calculatorStore'
+import { useMemo, useState } from 'react'
 import {
 	attackSkillsData,
 	getAttackSkillById,
 	getPowerReferenceDisplayText,
 	getSystemGroupLabel,
 } from '@/data/attackSkills'
+import { useCalculatorStore } from '@/stores/calculatorStore'
+import type { AttackSkillDisplayData, CalculatedHit } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 
 interface AttackSkillFormProps {

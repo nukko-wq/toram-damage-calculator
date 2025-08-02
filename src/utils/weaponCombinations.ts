@@ -1,4 +1,4 @@
-import type { WeaponType, SubWeaponType } from '@/types/calculator'
+import type { SubWeaponType, WeaponType } from '@/types/calculator'
 
 // 武器組み合わせテーブル
 export const WEAPON_COMBINATIONS: Record<WeaponType, SubWeaponType[]> = {

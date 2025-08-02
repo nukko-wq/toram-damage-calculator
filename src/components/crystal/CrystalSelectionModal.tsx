@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import type { CrystalType } from '@/types/calculator'
-import { getCrystalsByType } from '@/utils/crystalDatabase'
-import CrystalCard from './CrystalCard'
-import type { SlotInfo } from '@/types/damagePreview'
-import { CRYSTAL_NONE_ITEM } from '@/types/damagePreview'
-import { CrystalFavoritesManager } from '@/utils/crystalFavorites'
+import { AnimatePresence, motion } from 'motion/react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useCrystalDamageSorting } from '@/hooks/useCrystalDamageSorting'
 import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 import { useCalculatorStore } from '@/stores/calculatorStore'
+import type { CrystalType } from '@/types/calculator'
+import type { SlotInfo } from '@/types/damagePreview'
+import { CRYSTAL_NONE_ITEM } from '@/types/damagePreview'
+import { getCrystalsByType } from '@/utils/crystalDatabase'
+import { CrystalFavoritesManager } from '@/utils/crystalFavorites'
+import CrystalCard from './CrystalCard'
 
 interface CrystalSelectionModalProps {
 	isOpen: boolean

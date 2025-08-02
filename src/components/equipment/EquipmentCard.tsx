@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
-import type { PresetEquipment, Equipment } from '@/types/calculator'
+import type { Equipment, PresetEquipment } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
-import { getWeaponInfo } from '@/utils/weaponInfoStorage'
 import { refinementValueToDisplay } from '@/utils/refinementUtils'
+import { getWeaponInfo } from '@/utils/weaponInfoStorage'
 
 interface EquipmentCardProps {
 	equipment: PresetEquipment
