@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useCallback, useMemo } from 'react'
-import type { BuffSkillDefinition } from '@/types/buffSkill'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
+import type { BuffSkillDefinition } from '@/types/buffSkill'
 
 interface SkillParameterModalProps {
 	skill: BuffSkillDefinition

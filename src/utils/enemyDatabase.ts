@@ -1,14 +1,14 @@
 // 敵情報データベース（プリセット + ユーザーカスタム統合）
 
+import { enemiesData } from '@/data/enemies'
 import type {
-	PresetEnemy,
-	LocalStorageEnemy,
 	Enemy,
-	UserEnemy,
 	EnemyCategory,
+	LocalStorageEnemy,
+	PresetEnemy,
+	UserEnemy,
 } from '@/types/calculator'
 import { getUserEnemies } from './customEnemyManager'
-import { enemiesData } from '@/data/enemies'
 
 // ストレージキー
 const STORAGE_KEYS = {

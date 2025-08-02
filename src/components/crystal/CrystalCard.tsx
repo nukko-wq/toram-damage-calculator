@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import type { Crystal } from '@/types/calculator'
+import { useCallback, useState } from 'react'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
+import type { Crystal } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatGroupedConditionalEffects } from '@/utils/crystalDisplayUtils'
 import { CrystalFavoritesManager } from '@/utils/crystalFavorites'

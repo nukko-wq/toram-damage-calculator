@@ -1,7 +1,7 @@
 // Floating Menu の設定を管理するユーティリティ
 
-import { StorageHelper, STORAGE_KEYS } from './storage'
 import type { MenuSection } from '@/components/floating-menu/hooks/useFloatingMenu'
+import { STORAGE_KEYS, StorageHelper } from './storage'
 
 // FloatingMenu設定の型定義
 export interface FloatingMenuSettings {

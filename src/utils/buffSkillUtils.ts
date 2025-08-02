@@ -3,17 +3,17 @@
 import {
 	COMMON_BUFF_SKILLS,
 	NEARLY_COMMON_SKILLS,
-	WEAPON_SPECIFIC_SKILLS,
 	SUB_WEAPON_SKILLS,
+	WEAPON_SPECIFIC_SKILLS,
 } from '@/data/buffSkills'
 import type {
+	BuffSkillCategory,
 	BuffSkillDefinition,
-	BuffSkillState,
 	BuffSkillFormData,
+	BuffSkillState,
 	MainWeaponType,
 	SubWeaponType,
 	WeaponRequirement,
-	BuffSkillCategory,
 } from '@/types/buffSkill'
 import { CATEGORY_ORDER_RANGES } from '@/types/buffSkill'
 

@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useMemo, useRef, useState } from 'react'
-import { useCalculatorStore, useSaveDataStore } from '@/stores'
 import SaveConfirmModal from '@/components/floating-menu/content/modals/SaveConfirmModal'
+import { useCalculatorStore, useSaveDataStore } from '@/stores'
 
 interface FloatingSavePanelProps {
 	className?: string

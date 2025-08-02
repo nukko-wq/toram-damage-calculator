@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type {
-	ImportValidationResult,
 	ImportOptions,
+	ImportValidationResult,
 } from '@/utils/importManager'
 
 interface ImportConfirmModalProps {

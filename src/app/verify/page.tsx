@@ -149,10 +149,14 @@ export default function VerifyPage() {
 								</h2>
 								<div className="space-y-4">
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
+										<label
+											htmlFor="selfLevel"
+											className="block text-sm font-medium text-gray-700 mb-2"
+										>
 											自分のレベル
 										</label>
 										<input
+											id="selfLevel"
 											type="number"
 											min="1"
 											max="305"
@@ -175,10 +179,14 @@ export default function VerifyPage() {
 									</div>
 
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
+										<label
+											htmlFor="attack"
+											className="block text-sm font-medium text-gray-700 mb-2"
+										>
 											ATK（攻撃力）
 										</label>
 										<input
+											id="attack"
 											type="number"
 											min="1"
 											max="99999"
@@ -202,10 +210,14 @@ export default function VerifyPage() {
 									</div>
 
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
+										<label
+											htmlFor="enemyLevel"
+											className="block text-sm font-medium text-gray-700 mb-2"
+										>
 											敵のレベル
 										</label>
 										<input
+											id="enemyLevel"
 											type="number"
 											min="1"
 											max="300"
@@ -229,10 +241,14 @@ export default function VerifyPage() {
 									</div>
 
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
+										<label
+											htmlFor="normalDamage"
+											className="block text-sm font-medium text-gray-700 mb-2"
+										>
 											与えたダメージ
 										</label>
 										<input
+											id="normalDamage"
 											type="number"
 											min="0"
 											max="999999"
@@ -255,10 +271,14 @@ export default function VerifyPage() {
 									</div>
 
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">
+										<label
+											htmlFor="boostedDamage"
+											className="block text-sm font-medium text-gray-700 mb-2"
+										>
 											ATK+100の場合のダメージ
 										</label>
 										<input
+											id="boostedDamage"
 											type="number"
 											min="0"
 											max="999999"
@@ -282,12 +302,14 @@ export default function VerifyPage() {
 
 									<div className="pt-4 space-y-2">
 										<button
+											type="button"
 											onClick={handleAddVerifyData}
 											className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
 										>
 											検証データを追加
 										</button>
 										<button
+											type="button"
 											onClick={handleStartVerification}
 											disabled={isVerifying || verifyDataList.length === 0}
 											className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -295,6 +317,7 @@ export default function VerifyPage() {
 											{isVerifying ? '検証中...' : '検証開始'}
 										</button>
 										<button
+											type="button"
 											onClick={handleClearData}
 											className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 										>
@@ -334,6 +357,7 @@ export default function VerifyPage() {
 														</span>
 													</div>
 													<button
+														type="button"
 														onClick={() =>
 															setVerifyDataList((prev) =>
 																prev.filter((item) => item.id !== data.id),

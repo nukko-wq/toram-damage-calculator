@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
-import type { BuffItemCategory, PresetBuffItem } from '@/types/calculator'
-import { getBuffItemsByCategory } from '@/utils/buffItemDatabase'
-import BuffItemCard from './BuffItemCard'
-import type { SlotInfo } from '@/types/damagePreview'
-import { BUFF_ITEM_NONE_ITEM } from '@/types/damagePreview'
-import { BuffItemFavoritesManager } from '@/utils/buffItemFavorites'
+import { AnimatePresence, motion } from 'motion/react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useBuffItemDamageSorting } from '@/hooks/useBuffItemDamageSorting'
 import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 import { useCalculatorStore } from '@/stores/calculatorStore'
+import type { BuffItemCategory, PresetBuffItem } from '@/types/calculator'
+import type { SlotInfo } from '@/types/damagePreview'
+import { BUFF_ITEM_NONE_ITEM } from '@/types/damagePreview'
+import { getBuffItemsByCategory } from '@/utils/buffItemDatabase'
+import { BuffItemFavoritesManager } from '@/utils/buffItemFavorites'
+import BuffItemCard from './BuffItemCard'
 
 interface BuffItemSelectionModalProps {
 	isOpen: boolean

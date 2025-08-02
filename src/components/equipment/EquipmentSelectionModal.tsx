@@ -1,20 +1,20 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
+import { useEquipmentDamageSorting } from '@/hooks/useEquipmentDamageSorting'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 import type {
 	Equipment,
 	EquipmentCategory,
 	EquipmentProperties,
 } from '@/types/calculator'
-import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
-import EquipmentCard from './EquipmentCard'
 import type { SlotInfo } from '@/types/damagePreview'
 import { EQUIPMENT_NONE_ITEM } from '@/types/damagePreview'
+import { getCombinedEquipmentsByCategory } from '@/utils/equipmentDatabase'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
-import { useEquipmentDamageSorting } from '@/hooks/useEquipmentDamageSorting'
-import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
-import { useCalculatorStore } from '@/stores/calculatorStore'
+import EquipmentCard from './EquipmentCard'
 
 interface EquipmentSelectionModalProps {
 	isOpen: boolean

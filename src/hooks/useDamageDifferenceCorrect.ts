@@ -5,19 +5,19 @@
 
 import { useMemo, useState } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
+import type { CalculatorData } from '@/types/calculator'
 import type {
+	DamageDifferenceOptions,
+	DamageDifferenceResult,
 	PreviewItem,
 	SlotInfo,
-	DamageDifferenceResult,
-	DamageDifferenceOptions,
 } from '@/types/damagePreview'
-import type { CalculatorData } from '@/types/calculator'
 import { calculateResults } from '@/utils/calculationEngine'
-import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
 import {
 	calculateDamageWithService,
 	type DamageCalculationServiceResult,
 } from '@/utils/damageCalculationService'
+import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
 
 /**
  * 正しい方法によるダメージ差分計算フック

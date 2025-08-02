@@ -4,12 +4,12 @@
 
 'use client'
 
+import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 import type {
+	DamageDifferenceOptions,
 	PreviewItem,
 	SlotInfo,
-	DamageDifferenceOptions,
 } from '@/types/damagePreview'
-import { useDamageDifferenceCorrect } from '@/hooks/useDamageDifferenceCorrect'
 
 interface DamageDifferenceDisplayCorrectProps {
 	item: PreviewItem

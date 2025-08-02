@@ -1,5 +1,5 @@
-import type { AttackHit } from '@/types/calculator'
 import { getAttackSkillById } from '@/data/attackSkills'
+import type { AttackHit } from '@/types/calculator'
 import type { SkillCalculationInput, SkillCalculationResult } from '../types'
 
 /**

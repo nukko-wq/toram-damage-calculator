@@ -1,31 +1,31 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
+import type {
+	OptionTabType,
+	OtherOptions,
+	PowerOptions,
+} from '@/types/calculator'
 import {
 	calculateDamageWithService,
 	type DamageCalculationServiceResult,
 } from '@/utils/damageCalculationService'
+import {
+	createCaptureData,
+	type DamageCaptureData,
+	loadCaptureData,
+	saveCaptureData,
+} from '@/utils/damageCaptureStorage'
+import {
+	getCurrentBraveMultiplier,
+	getCurrentPassiveMultiplier,
+} from '@/utils/damagePreviewCalculations'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import {
-	type DamageCaptureData,
-	saveCaptureData,
-	loadCaptureData,
-	createCaptureData,
-} from '@/utils/damageCaptureStorage'
-import type {
-	PowerOptions,
-	OtherOptions,
-	OptionTabType,
-} from '@/types/calculator'
-import {
-	createInitialPowerOptions,
 	createInitialOtherOptions,
+	createInitialPowerOptions,
 } from '@/utils/initialData'
-import {
-	getCurrentPassiveMultiplier,
-	getCurrentBraveMultiplier,
-} from '@/utils/damagePreviewCalculations'
 
 interface DamagePreviewProps {
 	isVisible: boolean

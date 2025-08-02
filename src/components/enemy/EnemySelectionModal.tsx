@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { EnemyCategory, PresetEnemy } from '@/types/calculator'
 import { getPresetEnemies } from '@/utils/enemyDatabase'
 import EnemyCard from './EnemyCard'

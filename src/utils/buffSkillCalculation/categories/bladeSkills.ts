@@ -3,7 +3,11 @@
  */
 
 import type { BuffSkillState, MainWeaponType } from '@/types/buffSkill'
-import type { EquipmentProperties, WeaponType, SubWeaponType } from '@/types/calculator'
+import type {
+	EquipmentProperties,
+	SubWeaponType,
+	WeaponType,
+} from '@/types/calculator'
 import type { AllBonuses } from '../../basicStatsCalculation'
 import { convertWeaponType, integrateEffects } from '../types'
 
@@ -145,7 +149,11 @@ export function calculateBusterBladeEffects(
 	if (!isEnabled) return {}
 
 	// 対象武器種チェック
-	const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+	const bladeWeapons: MainWeaponType[] = [
+		'oneHandSword',
+		'twoHandSword',
+		'dualSword',
+	]
 	if (!weaponType || !bladeWeapons.includes(weaponType)) return {}
 
 	// 片手剣+盾の特殊条件チェック
@@ -266,7 +274,9 @@ export function getBladeSkillBraveMultiplier(
 
 	// オーラブレード(AuraBlade)の処理（武器種別ごとに異なるID）
 	const auraBladeIds = ['4-OH', '4-DS', '4-TH'] // 片手剣、双剣、両手剣
-	const activeAuraBlade = auraBladeIds.find((id) => buffSkillData[id]?.isEnabled)
+	const activeAuraBlade = auraBladeIds.find(
+		(id) => buffSkillData[id]?.isEnabled,
+	)
 	if (activeAuraBlade) {
 		totalBraveMultiplier += calculateAuraBladeEffects(true, convertedWeaponType)
 	}

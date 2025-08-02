@@ -1,62 +1,62 @@
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import type {
-	CalculatorStore,
-	DamageCalculationResult,
-	CalculationSettings,
-} from '@/types/stores'
+import type { BuffSkillFormData } from '@/types/buffSkill'
+import {
+	CALC_RESULT_SETTINGS_KEY,
+	type CalculationResultSettings,
+} from '@/types/calculationResult'
 import type {
 	CalculatorData,
 	EnemyFormData,
-	OtherOptions,
+	EquipmentSlots,
 	OptionTabType,
+	OtherOptions,
 } from '@/types/calculator'
-import type { EquipmentSlots } from '@/types/calculator'
-import type { BuffSkillFormData } from '@/types/buffSkill'
-import {
-	createInitialCalculatorData,
-	migrateRegisterEffects,
-	createInitialPowerOptions,
-	createInitialOtherOptions,
-} from '@/utils/initialData'
-// 敵設定はenemySettingsStoreで管理するため、このインポートは削除
-import {
-	saveCurrentData,
-	getCurrentSaveData,
-	initializeStorage,
-} from '@/utils/saveDataManager'
+import type {
+	CalculationSettings,
+	CalculatorStore,
+	DamageCalculationResult,
+} from '@/types/stores'
 import { calculateResults } from '@/utils/calculationEngine'
 import {
 	calculateDamageWithService,
 	type DamageCalculationServiceResult,
 } from '@/utils/damageCalculationService'
-import {
-	CALC_RESULT_SETTINGS_KEY,
-	type CalculationResultSettings,
-} from '@/types/calculationResult'
 import { isValidCalculatorData } from '@/utils/differenceDetection'
-import {
-	saveCustomEquipment,
-	deleteCustomEquipment,
-	updateCustomEquipmentProperties,
-	updateCustomEquipmentRefinement,
-	hasTemporaryEquipments,
-	hasEditSessions,
-	renameCustomEquipment,
-	updateEquipmentArmorType,
-} from '@/utils/equipmentDatabase'
-import {
-	createTemporaryCustomEquipment,
-	cleanupAllTemporaryEquipments,
-	getAllTemporaryEquipments,
-	convertTemporaryEquipmentToPersistent,
-} from '@/utils/temporaryEquipmentManager'
 import {
 	cleanupAllEditSessions,
 	cleanupCurrentEditSessions,
 	getAllEditSessionEquipments,
 } from '@/utils/editSessionManager'
-import { createInitialEquipment } from '@/utils/initialData'
+import {
+	deleteCustomEquipment,
+	hasEditSessions,
+	hasTemporaryEquipments,
+	renameCustomEquipment,
+	saveCustomEquipment,
+	updateCustomEquipmentProperties,
+	updateCustomEquipmentRefinement,
+	updateEquipmentArmorType,
+} from '@/utils/equipmentDatabase'
+import {
+	createInitialCalculatorData,
+	createInitialEquipment,
+	createInitialOtherOptions,
+	createInitialPowerOptions,
+	migrateRegisterEffects,
+} from '@/utils/initialData'
+// 敵設定はenemySettingsStoreで管理するため、このインポートは削除
+import {
+	getCurrentSaveData,
+	initializeStorage,
+	saveCurrentData,
+} from '@/utils/saveDataManager'
+import {
+	cleanupAllTemporaryEquipments,
+	convertTemporaryEquipmentToPersistent,
+	createTemporaryCustomEquipment,
+	getAllTemporaryEquipments,
+} from '@/utils/temporaryEquipmentManager'
 
 // 初期計算設定
 const initialCalculationSettings: CalculationSettings = {

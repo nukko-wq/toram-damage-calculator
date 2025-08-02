@@ -1,31 +1,31 @@
 'use client'
 
 import { useState } from 'react'
-import { useCalculatorStore } from '@/stores'
+import ArmorTypeSelect from '@/components/ui/ArmorTypeSelect'
 import MessageModal from '@/components/ui/MessageModal'
-import {
-	saveWeaponInfo,
-	clearWeaponInfo,
-	getWeaponInfo,
-} from '@/utils/weaponInfoStorage'
-import { getArmorType, saveArmorType } from '@/utils/armorTypeStorage'
+import { useCalculatorStore } from '@/stores'
 import type {
-	Equipment,
-	EquipmentSlots,
-	EquipmentProperties,
-	EquipmentCategory,
 	ArmorType,
+	Equipment,
+	EquipmentCategory,
+	EquipmentProperties,
+	EquipmentSlots,
 } from '@/types/calculator'
+import { getArmorType, saveArmorType } from '@/utils/armorTypeStorage'
 import {
 	getCombinedEquipmentById,
 	getEquipmentCategoryLabel,
 } from '@/utils/equipmentDatabase'
+import {
+	clearWeaponInfo,
+	getWeaponInfo,
+	saveWeaponInfo,
+} from '@/utils/weaponInfoStorage'
 import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
-import RenameEquipmentModal from './RenameEquipmentModal'
 import { RegisterForm } from './RegisterForm'
-import ArmorTypeSelect from '@/components/ui/ArmorTypeSelect'
+import RenameEquipmentModal from './RenameEquipmentModal'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）

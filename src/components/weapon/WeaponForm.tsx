@@ -1,27 +1,27 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
-	mainWeaponSchema,
-	subWeaponSchema,
 	type MainWeaponFormData,
+	mainWeaponSchema,
 	type SubWeaponFormData,
+	subWeaponSchema,
 } from '@/schemas/weapons'
-import type { MainWeapon, SubWeapon, WeaponType } from '@/types/calculator'
-import { useEffect, useState, useMemo } from 'react'
 import { useCalculatorStore } from '@/stores'
-import {
-	getAvailableSubWeaponTypes,
-	isValidWeaponCombination,
-	getAutoFixedSubWeapon,
-} from '@/utils/weaponCombinations'
+import type { MainWeapon, SubWeapon, WeaponType } from '@/types/calculator'
 import {
 	getRefinementDisplayOptions,
+	type RefinementDisplay,
 	refinementDisplayToValue,
 	refinementValueToDisplay,
-	type RefinementDisplay,
 } from '@/utils/refinementUtils'
+import {
+	getAutoFixedSubWeapon,
+	getAvailableSubWeaponTypes,
+	isValidWeaponCombination,
+} from '@/utils/weaponCombinations'
 
 export default function WeaponForm() {
 	// Zustandストアから武器データを取得
@@ -267,10 +267,14 @@ export default function WeaponForm() {
 					</h3>
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+							<label
+								htmlFor="main-weapon-type"
+								className="text-sm font-medium text-gray-700 w-16 flex-shrink-0"
+							>
 								武器種:
 							</label>
 							<select
+								id="main-weapon-type"
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								{...registerMain('weaponType')}
 							>
@@ -283,7 +287,10 @@ export default function WeaponForm() {
 						</div>
 
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+							<label
+								htmlFor="main-weapon-ATK"
+								className="text-sm font-medium text-gray-700 w-16 flex-shrink-0"
+							>
 								武器ATK:
 							</label>
 							<input
@@ -311,7 +318,10 @@ export default function WeaponForm() {
 						</div>
 
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+							<label
+								htmlFor="main-weapon-stability"
+								className="text-sm font-medium text-gray-700 w-16 flex-shrink-0"
+							>
 								安定率:
 							</label>
 							<input
@@ -339,10 +349,14 @@ export default function WeaponForm() {
 						</div>
 
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+							<label
+								htmlFor="main-weapon-refinement"
+								className="text-sm font-medium text-gray-700 w-16 flex-shrink-0"
+							>
 								精錬値:
 							</label>
 							<select
+								id="main-weapon-refinement"
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								value={getCurrentMainRefinementDisplay()}
 								onChange={(e) =>
@@ -368,10 +382,14 @@ export default function WeaponForm() {
 					</h3>
 					<div className="space-y-2">
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+							<label
+								htmlFor="sub-weapon-type"
+								className="text-sm font-medium text-gray-700 w-16 flex-shrink-0"
+							>
 								武器種:
 							</label>
 							<select
+								id="sub-weapon-type"
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								{...registerSub('weaponType')}
 							>
@@ -384,7 +402,10 @@ export default function WeaponForm() {
 						</div>
 
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+							<label
+								htmlFor="sub-weapon-ATK"
+								className="text-sm font-medium text-gray-700 w-16 flex-shrink-0"
+							>
 								武器ATK:
 							</label>
 							<input
@@ -412,7 +433,10 @@ export default function WeaponForm() {
 						</div>
 
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+							<label
+								htmlFor="sub-weapon-stability"
+								className="text-sm font-medium text-gray-700 w-16 flex-shrink-0"
+							>
 								安定率:
 							</label>
 							<input
@@ -440,10 +464,14 @@ export default function WeaponForm() {
 						</div>
 
 						<div className="flex items-center gap-2">
-							<label className="text-sm font-medium text-gray-700 w-16 flex-shrink-0">
+							<label
+								htmlFor="sub-weapon-refinement"
+								className="text-sm font-medium text-gray-700 w-16 flex-shrink-0"
+							>
 								精錬値:
 							</label>
 							<select
+								id="sub-weapon-refinement"
 								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
 								value={getCurrentSubRefinementDisplay()}
 								onChange={(e) =>

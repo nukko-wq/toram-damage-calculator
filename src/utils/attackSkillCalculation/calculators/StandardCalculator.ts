@@ -1,5 +1,5 @@
-import { SkillHitCalculator } from './SkillHitCalculator'
 import type { SkillCalculationInput, SkillCalculationResult } from '../types'
+import { SkillHitCalculator } from './SkillHitCalculator'
 
 /**
  * 標準計算器（固定値スキル用）

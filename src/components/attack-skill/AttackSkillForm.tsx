@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import type { CalculatedHit, AttackSkillDisplayData } from '@/types/calculator'
-import { useCalculatorStore } from '@/stores/calculatorStore'
+import { useMemo, useState } from 'react'
 import {
 	attackSkillsData,
 	getAttackSkillById,
 	getPowerReferenceDisplayText,
 	getSystemGroupLabel,
 } from '@/data/attackSkills'
+import { useCalculatorStore } from '@/stores/calculatorStore'
+import type { AttackSkillDisplayData, CalculatedHit } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 
 interface AttackSkillFormProps {
@@ -304,6 +304,7 @@ export default function AttackSkillForm({
 						<div className="flex border-b border-gray-300">
 							{selectedSkill.hits.map((hit, index) => (
 								<button
+									type="button"
 									key={hit.hitNumber}
 									onClick={() => setSelectedHitIndex(index)}
 									className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${

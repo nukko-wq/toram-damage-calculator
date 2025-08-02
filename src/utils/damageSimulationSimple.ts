@@ -4,7 +4,7 @@
  */
 
 import type { CalculatorData } from '@/types/calculator'
-import type { SlotInfo, PreviewItem } from '@/types/damagePreview'
+import type { PreviewItem, SlotInfo } from '@/types/damagePreview'
 
 /**
  * アイテム装着シミュレーション（シンプル版）

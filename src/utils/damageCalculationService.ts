@@ -3,28 +3,28 @@
  * 差分計算でも同じ計算エンジンを使用できるようにする
  */
 
+import { getAttackSkillById } from '@/data/attackSkills'
+import type { BuffSkillState } from '@/types/buffSkill'
+import type { CalculatorData, PowerOptions } from '@/types/calculator'
+import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
+import {
+	calculateINTElementAdvantage,
+	calculateMagicalStability,
+	calculateTotalElementAdvantage,
+} from '@/utils/basicStatsCalculation'
+import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
+import {
+	getBuffSkillBraveMultiplier,
+	getBuffSkillPassiveMultiplier,
+	getBuffSkillPassiveMultiplierWithSkillCategory,
+} from '@/utils/buffSkillCalculation'
+import { calculateHotKnowsEffects } from '@/utils/buffSkillCalculation/categories/minstrelSkills'
 import {
 	calculateDamage,
 	createDefaultDamageInput,
 	type DamageCalculationInput,
 } from '@/utils/damageCalculation'
-import { getAttackSkillById } from '@/data/attackSkills'
-import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
-import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
-import {
-	getBuffSkillPassiveMultiplier,
-	getBuffSkillPassiveMultiplierWithSkillCategory,
-	getBuffSkillBraveMultiplier,
-} from '@/utils/buffSkillCalculation'
-import {
-	calculateMagicalStability,
-	calculateINTElementAdvantage,
-	calculateTotalElementAdvantage,
-} from '@/utils/basicStatsCalculation'
-import { calculateHotKnowsEffects } from '@/utils/buffSkillCalculation/categories/minstrelSkills'
-import type { CalculatorData, PowerOptions } from '@/types/calculator'
-import type { BuffSkillState } from '@/types/buffSkill'
 import { createInitialPowerOptions } from '@/utils/initialData'
 
 // ダメージ表示結果の型定義

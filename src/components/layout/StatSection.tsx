@@ -1,11 +1,11 @@
 import React from 'react'
-import StatRow from './StatRow'
+import type { PropertyConfig } from './PropertyDisplay'
 import PropertyDisplay from './PropertyDisplay'
-import PropertySectionHeader from './PropertySectionHeader'
+import type { PropertyDisplayData } from './PropertyDoubleDisplay'
 import PropertyDoubleDisplay from './PropertyDoubleDisplay'
 import PropertyDoubleSectionHeader from './PropertyDoubleSectionHeader'
-import type { PropertyConfig } from './PropertyDisplay'
-import type { PropertyDisplayData } from './PropertyDoubleDisplay'
+import PropertySectionHeader from './PropertySectionHeader'
+import StatRow from './StatRow'
 
 interface StatSectionProps {
 	title: string

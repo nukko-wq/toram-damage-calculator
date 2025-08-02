@@ -1,7 +1,7 @@
 import type {
 	AttackSkill,
-	WeaponType,
 	AttackSkillSystemGroup,
+	WeaponType,
 } from '@/types/calculator'
 
 /**

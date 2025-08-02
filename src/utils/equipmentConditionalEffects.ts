@@ -6,12 +6,12 @@
  */
 
 import type {
-	EquipmentCondition,
-	EquipmentSlots,
-	EquipmentProperties,
-	PresetEquipment,
 	Equipment,
+	EquipmentCondition,
+	EquipmentProperties,
+	EquipmentSlots,
 	MainWeapon,
+	PresetEquipment,
 	SubWeapon,
 } from '@/types/calculator'
 import { getArmorType } from './armorTypeStorage'
