@@ -8,10 +8,7 @@ import {
 	clearWeaponInfo,
 	getWeaponInfo,
 } from '@/utils/weaponInfoStorage'
-import {
-	getArmorType,
-	saveArmorType,
-} from '@/utils/armorTypeStorage'
+import { getArmorType, saveArmorType } from '@/utils/armorTypeStorage'
 import type {
 	Equipment,
 	EquipmentSlots,
@@ -742,7 +739,7 @@ export default function EquipmentForm({
 
 		// armorTypeStorageに直接保存
 		saveArmorType(currentEquipment.id, newArmorType)
-		
+
 		// UIを更新するため、装備データを再読み込み
 		const updatedEquipment = { ...effectiveEquipment }
 		updateEquipment(updatedEquipment)
@@ -1172,7 +1169,9 @@ export default function EquipmentForm({
 					{activeTab === 'body' && effectiveEquipment.body?.id && (
 						<div className="mt-4">
 							<ArmorTypeSelect
-								selectedType={getArmorType(effectiveEquipment.body.id) || 'normal'}
+								selectedType={
+									getArmorType(effectiveEquipment.body.id) || 'normal'
+								}
 								onChange={handleArmorTypeChange}
 								className="max-w-md"
 							/>

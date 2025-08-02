@@ -28,7 +28,9 @@ export function createTemporaryCustomEquipment(
 		category,
 		properties: {}, // 全プロパティをリセット状態で作成
 		// weaponStatsは使用せず、weaponInfoStorageで管理するため削除
-		crystalSlots: ['mainWeapon', 'body', 'additional', 'special'].includes(category)
+		crystalSlots: ['mainWeapon', 'body', 'additional', 'special'].includes(
+			category,
+		)
 			? {
 					slot1: undefined,
 					slot2: undefined,

@@ -378,6 +378,8 @@ export interface CalculatorData {
 	register: RegisterFormData // レジスタ他データ
 	attackSkill: AttackSkillFormData // 攻撃スキルデータ
 	powerOptions: PowerOptions // ダメージプレビュー威力オプション設定
+	otherOptions: OtherOptions // その他オプション設定
+	optionTab: OptionTabType // オプションタブ状態
 	adaptationMultiplier: number // 慣れ倍率 (50-250%)
 }
 
@@ -764,6 +766,31 @@ export interface PowerOptions {
 	elementPower: 'enabled' | 'advantageOnly' | 'awakeningOnly' | 'disabled' // 属性威力
 	unsheathe: boolean // 抜刀威力
 }
+
+// その他オプション
+export interface OtherOptions {
+	// 敵状態異常
+	enemyStatusDestroy: 'applied' | 'none' // 破壊
+	enemyStatusWeaken: 'applied' | 'none' // 衰弱
+	enemyStatusBlind: 'applied' | 'none' // 暗闇
+
+	// スキル
+	skillPowerHit: 'activated' | 'inactive' // 強打
+	skillConcentration: 'activated' | 'inactive' // 集中
+
+	// 倍率
+	passiveMultiplier: {
+		mode: 'manual' | 'auto' // 手動入力 or 自動計算
+		value?: number // 手動入力時の値（%）
+	}
+	braveMultiplier: {
+		mode: 'manual' | 'auto' // 手動入力 or 自動計算
+		value?: number // 手動入力時の値（%）
+	}
+}
+
+// オプションタブ状態
+export type OptionTabType = 'power' | 'other'
 
 // 攻撃スキルシステム
 

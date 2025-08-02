@@ -212,7 +212,9 @@ export function calculateDamageWithService(
 				correctedTotalElementAdvantage + hotKnowsEffect
 
 			// ラフィー選択時は属性覚醒分+25%を無効化
-			const isRaphy = calculatorData.enemy?.selectedEnemyId === '2b981c85-54f5-4c67-bac1-0e9cba4bdeb2'
+			const isRaphy =
+				calculatorData.enemy?.selectedEnemyId ===
+				'2b981c85-54f5-4c67-bac1-0e9cba4bdeb2'
 
 			// 属性威力オプションに応じて計算
 			switch (powerOptions.elementPower) {
@@ -226,11 +228,13 @@ export function calculateDamageWithService(
 							powerOptions.elementAttack === 'advantageous' ||
 							powerOptions.elementAttack === 'disadvantageous'
 						) {
-							return intElementAdvantageResult.intElementAdvantage + hotKnowsEffect
+							return (
+								intElementAdvantageResult.intElementAdvantage + hotKnowsEffect
+							)
 						}
 						return 0
 					}
-					
+
 					if (
 						powerOptions.elementAttack === 'advantageous' ||
 						powerOptions.elementAttack === 'disadvantageous'

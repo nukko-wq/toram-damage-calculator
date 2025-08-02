@@ -170,8 +170,10 @@ export function getBladeSkillPassiveMultiplier(
 	const takumiKenjutsu = buffSkillData.sm4
 	if (takumiKenjutsu?.isEnabled && attackSkillCategory === 'blade') {
 		// ストームブレイザー(1スタック/10スタック)の場合は匠の剣術を無効化
-		const isStormBlazer = attackSkillId === 'storm_blazer_1stack' || attackSkillId === 'storm_blazer_10stack'
-		
+		const isStormBlazer =
+			attackSkillId === 'storm_blazer_1stack' ||
+			attackSkillId === 'storm_blazer_10stack'
+
 		if (!isStormBlazer) {
 			totalPassiveMultiplier += calculateTakumiKenjutsuPassiveMultiplier(
 				takumiKenjutsu.isEnabled,

@@ -28,7 +28,10 @@ export default function VerifyPage() {
 	const [boostedDamageDisplay, setBoostedDamageDisplay] = useState('')
 
 	// 物理耐性を計算する関数
-	const calculatePhysicalResistance = (normalDamage: number, boostedDamage: number): number => {
+	const calculatePhysicalResistance = (
+		normalDamage: number,
+		boostedDamage: number,
+	): number => {
 		// 公式: 100 - ATK+100の場合のダメージ + 与えたダメージ
 		const resistance = 100 - boostedDamage + normalDamage
 		return Math.round(resistance * 10) / 10 // 小数点第1位で四捨五入
@@ -37,19 +40,28 @@ export default function VerifyPage() {
 	// 検証データから物理耐性の平均値を計算
 	const getAveragePhysicalResistance = (): number => {
 		if (verifyDataList.length === 0) return 0
-		
-		const resistances = verifyDataList.map(data => 
-			calculatePhysicalResistance(data.normalDamage, data.boostedDamage)
+
+		const resistances = verifyDataList.map((data) =>
+			calculatePhysicalResistance(data.normalDamage, data.boostedDamage),
 		)
-		
-		const average = resistances.reduce((sum, resistance) => sum + resistance, 0) / resistances.length
+
+		const average =
+			resistances.reduce((sum, resistance) => sum + resistance, 0) /
+			resistances.length
 		return Math.round(average * 10) / 10
 	}
 
 	// DEFを計算する関数
-	const calculateDEF = (selfLevel: number, attack: number, enemyLevel: number, physicalResistance: number, normalDamage: number): number => {
+	const calculateDEF = (
+		selfLevel: number,
+		attack: number,
+		enemyLevel: number,
+		physicalResistance: number,
+		normalDamage: number,
+	): number => {
 		// 公式: (自Lv+ATK-敵Lv)×(1-物理耐性/100) - 与えたダメージ
-		const baseDamage = (selfLevel + attack - enemyLevel) * (1 - physicalResistance / 100)
+		const baseDamage =
+			(selfLevel + attack - enemyLevel) * (1 - physicalResistance / 100)
 		const def = baseDamage - normalDamage
 		return Math.round(def * 10) / 10 // 小数点第1位で四捨五入
 	}
@@ -57,12 +69,21 @@ export default function VerifyPage() {
 	// 検証データからDEFの平均値を計算
 	const getAverageDEF = (): number => {
 		if (verifyDataList.length === 0) return 0
-		
-		const defs = verifyDataList.map(data => {
-			const physicalResistance = calculatePhysicalResistance(data.normalDamage, data.boostedDamage)
-			return calculateDEF(data.selfLevel, data.attack, data.enemyLevel, physicalResistance, data.normalDamage)
+
+		const defs = verifyDataList.map((data) => {
+			const physicalResistance = calculatePhysicalResistance(
+				data.normalDamage,
+				data.boostedDamage,
+			)
+			return calculateDEF(
+				data.selfLevel,
+				data.attack,
+				data.enemyLevel,
+				physicalResistance,
+				data.normalDamage,
+			)
 		})
-		
+
 		const average = defs.reduce((sum, def) => sum + def, 0) / defs.length
 		return Math.round(average * 10) / 10
 	}
@@ -84,10 +105,10 @@ export default function VerifyPage() {
 			attack,
 			enemyLevel,
 			normalDamage,
-			boostedDamage
+			boostedDamage,
 		}
 
-		setVerifyDataList(prev => [...prev, newData])
+		setVerifyDataList((prev) => [...prev, newData])
 	}
 
 	const handleStartVerification = () => {
@@ -131,15 +152,15 @@ export default function VerifyPage() {
 										<label className="block text-sm font-medium text-gray-700 mb-2">
 											自分のレベル
 										</label>
-										<input 
-											type="number" 
-											min="1" 
+										<input
+											type="number"
+											min="1"
 											max="305"
 											value={selfLevelDisplay}
 											onChange={(e) => {
 												const value = e.target.value
 												setSelfLevelDisplay(value)
-												
+
 												if (value === '') {
 													setSelfLevel(305) // 計算用はデフォルト値を保持
 												} else {
@@ -152,20 +173,20 @@ export default function VerifyPage() {
 											className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
 										/>
 									</div>
-									
+
 									<div>
 										<label className="block text-sm font-medium text-gray-700 mb-2">
 											ATK（攻撃力）
 										</label>
-										<input 
-											type="number" 
-											min="1" 
+										<input
+											type="number"
+											min="1"
 											max="99999"
 											value={attackDisplay}
 											onChange={(e) => {
 												const value = e.target.value
 												setAttackDisplay(value)
-												
+
 												if (value === '') {
 													setAttack(1) // 計算用は最小値を保持
 												} else {
@@ -184,15 +205,15 @@ export default function VerifyPage() {
 										<label className="block text-sm font-medium text-gray-700 mb-2">
 											敵のレベル
 										</label>
-										<input 
-											type="number" 
-											min="1" 
+										<input
+											type="number"
+											min="1"
 											max="300"
 											value={enemyLevelDisplay}
 											onChange={(e) => {
 												const value = e.target.value
 												setEnemyLevelDisplay(value)
-												
+
 												if (value === '') {
 													setEnemyLevel(1) // 計算用は最小値を保持
 												} else {
@@ -211,15 +232,15 @@ export default function VerifyPage() {
 										<label className="block text-sm font-medium text-gray-700 mb-2">
 											与えたダメージ
 										</label>
-										<input 
-											type="number" 
-											min="0" 
+										<input
+											type="number"
+											min="0"
 											max="999999"
 											value={normalDamageDisplay}
 											onChange={(e) => {
 												const value = e.target.value
 												setNormalDamageDisplay(value)
-												
+
 												if (value === '') {
 													setNormalDamage(0)
 												} else {
@@ -237,15 +258,15 @@ export default function VerifyPage() {
 										<label className="block text-sm font-medium text-gray-700 mb-2">
 											ATK+100の場合のダメージ
 										</label>
-										<input 
-											type="number" 
-											min="0" 
+										<input
+											type="number"
+											min="0"
 											max="999999"
 											value={boostedDamageDisplay}
 											onChange={(e) => {
 												const value = e.target.value
 												setBoostedDamageDisplay(value)
-												
+
 												if (value === '') {
 													setBoostedDamage(0)
 												} else {
@@ -260,20 +281,20 @@ export default function VerifyPage() {
 									</div>
 
 									<div className="pt-4 space-y-2">
-										<button 
+										<button
 											onClick={handleAddVerifyData}
 											className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
 										>
 											検証データを追加
 										</button>
-										<button 
+										<button
 											onClick={handleStartVerification}
 											disabled={isVerifying || verifyDataList.length === 0}
 											className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
 										>
 											{isVerifying ? '検証中...' : '検証開始'}
 										</button>
-										<button 
+										<button
 											onClick={handleClearData}
 											className="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
 										>
@@ -305,11 +326,19 @@ export default function VerifyPage() {
 														<span className="ml-4">自Lv:{data.selfLevel}</span>
 														<span className="ml-4">ATK:{data.attack}</span>
 														<span className="ml-4">敵Lv:{data.enemyLevel}</span>
-														<span className="ml-4 text-red-600 font-medium">通常:{data.normalDamage}</span>
-														<span className="ml-4 text-blue-600 font-medium">+100:{data.boostedDamage}</span>
+														<span className="ml-4 text-red-600 font-medium">
+															通常:{data.normalDamage}
+														</span>
+														<span className="ml-4 text-blue-600 font-medium">
+															+100:{data.boostedDamage}
+														</span>
 													</div>
 													<button
-														onClick={() => setVerifyDataList(prev => prev.filter(item => item.id !== data.id))}
+														onClick={() =>
+															setVerifyDataList((prev) =>
+																prev.filter((item) => item.id !== data.id),
+															)
+														}
 														className="text-red-500 hover:text-red-700 text-sm"
 													>
 														削除
@@ -337,20 +366,28 @@ export default function VerifyPage() {
 									{verifyDataList.length > 0 ? getAverageDEF() : '-'}
 								</p>
 								<p className="text-sm text-blue-600 mt-1">
-									{verifyDataList.length > 0 ? `${verifyDataList.length}件のデータから算出` : '検証データが不足しています'}
+									{verifyDataList.length > 0
+										? `${verifyDataList.length}件のデータから算出`
+										: '検証データが不足しています'}
 								</p>
 							</div>
 							<div className="bg-green-50 p-4 rounded-lg">
-								<h3 className="font-medium text-green-900 mb-2">推定物理耐性</h3>
+								<h3 className="font-medium text-green-900 mb-2">
+									推定物理耐性
+								</h3>
 								<p className="text-2xl font-bold text-green-700">
-									{verifyDataList.length > 0 ? `${getAveragePhysicalResistance()}%` : '-%'}
+									{verifyDataList.length > 0
+										? `${getAveragePhysicalResistance()}%`
+										: '-%'}
 								</p>
 								<p className="text-sm text-green-600 mt-1">
-									{verifyDataList.length > 0 ? `${verifyDataList.length}件のデータから算出` : '検証データが不足しています'}
+									{verifyDataList.length > 0
+										? `${verifyDataList.length}件のデータから算出`
+										: '検証データが不足しています'}
 								</p>
 							</div>
 						</div>
-						
+
 						<div className="overflow-x-auto">
 							<table className="min-w-full divide-y divide-gray-200">
 								<thead className="bg-gray-50">
@@ -384,7 +421,10 @@ export default function VerifyPage() {
 								<tbody className="bg-white divide-y divide-gray-200">
 									{verifyDataList.length === 0 ? (
 										<tr>
-											<td colSpan={8} className="px-6 py-4 text-center text-gray-500">
+											<td
+												colSpan={8}
+												className="px-6 py-4 text-center text-gray-500"
+											>
 												検証データがありません
 											</td>
 										</tr>
@@ -410,12 +450,26 @@ export default function VerifyPage() {
 													{data.boostedDamage}
 												</td>
 												<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-													{calculatePhysicalResistance(data.normalDamage, data.boostedDamage)}%
+													{calculatePhysicalResistance(
+														data.normalDamage,
+														data.boostedDamage,
+													)}
+													%
 												</td>
 												<td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
 													{(() => {
-														const physicalResistance = calculatePhysicalResistance(data.normalDamage, data.boostedDamage)
-														return calculateDEF(data.selfLevel, data.attack, data.enemyLevel, physicalResistance, data.normalDamage)
+														const physicalResistance =
+															calculatePhysicalResistance(
+																data.normalDamage,
+																data.boostedDamage,
+															)
+														return calculateDEF(
+															data.selfLevel,
+															data.attack,
+															data.enemyLevel,
+															physicalResistance,
+															data.normalDamage,
+														)
 													})()}
 												</td>
 											</tr>

@@ -5,9 +5,7 @@
  * EquipmentPropertiesインターフェースによる厳密な型チェック
  */
 
-import type {
-	PresetEquipment,
-} from '@/types/calculator'
+import type { PresetEquipment } from '@/types/calculator'
 
 // 装備カテゴリの型定義
 type EquipmentCategory =
@@ -136,7 +134,6 @@ export const equipmentsData: EquipmentsData = {
 					Accuracy: -14,
 					Accuracy_Rate: -6,
 				},
-				
 			},
 			{
 				id: 'cd287974-decd-4fbe-8c20-52d6801159f8',
@@ -151,7 +148,6 @@ export const equipmentsData: EquipmentsData = {
 					Accuracy: -16,
 					Accuracy_Rate: -6,
 				},
-				
 			},
 			{
 				id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
@@ -166,7 +162,6 @@ export const equipmentsData: EquipmentsData = {
 					Accuracy: -16,
 					Accuracy_Rate: -5,
 				},
-				
 			},
 			{
 				id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
@@ -187,7 +182,6 @@ export const equipmentsData: EquipmentsData = {
 						description: '両手剣装備時: MP+200',
 					},
 				],
-				
 			},
 			{
 				id: 'a3e5f7b9-d1c2-4a6b-9e8f-2d4c6a8b0e2f',
@@ -197,7 +191,6 @@ export const equipmentsData: EquipmentsData = {
 					MATK_Rate: 10,
 					INT_Rate: 10,
 				},
-				
 			},
 		],
 		additional: [

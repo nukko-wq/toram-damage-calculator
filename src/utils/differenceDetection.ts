@@ -44,7 +44,10 @@ export const hasLightDifferences = (
 		const defaultData = getDefaultCalculatorData()
 		return (
 			!isEqual(currentData.baseStats, defaultData.baseStats) ||
-			!isEqual(currentData.equipment.mainWeapon, defaultData.equipment.mainWeapon) ||
+			!isEqual(
+				currentData.equipment.mainWeapon,
+				defaultData.equipment.mainWeapon,
+			) ||
 			!isEqual(currentData.equipment.body, defaultData.equipment.body)
 		)
 	}
@@ -52,7 +55,10 @@ export const hasLightDifferences = (
 	// 頻繁に変更される主要フィールドのみチェック
 	return (
 		!isEqual(currentData.baseStats, savedData.baseStats) ||
-		!isEqual(currentData.equipment.mainWeapon, savedData.equipment.mainWeapon) ||
+		!isEqual(
+			currentData.equipment.mainWeapon,
+			savedData.equipment.mainWeapon,
+		) ||
 		!isEqual(currentData.equipment.body, savedData.equipment.body) ||
 		!isEqual(currentData.buffSkills.skills, savedData.buffSkills.skills)
 	)

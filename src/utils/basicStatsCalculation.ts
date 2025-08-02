@@ -1227,7 +1227,7 @@ export function getBodyArmorType(bodyEquipment: any): ArmorType {
 	// armorTypeStorageから防具改造タイプを取得
 	const { getArmorType } = require('./armorTypeStorage')
 	const armorType = getArmorType(bodyEquipment.id)
-	
+
 	return armorType || 'normal'
 }
 

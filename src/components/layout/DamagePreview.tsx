@@ -13,8 +13,22 @@ import {
 	loadCaptureData,
 	createCaptureData,
 } from '@/utils/damageCaptureStorage'
-import type { PowerOptions } from '@/types/calculator'
-import { createInitialPowerOptions } from '@/utils/initialData'
+import type {
+	PowerOptions,
+	OtherOptions,
+	OptionTabType,
+} from '@/types/calculator'
+import {
+	createInitialPowerOptions,
+	createInitialOtherOptions,
+} from '@/utils/initialData'
+import {
+	getBuffSkillPassiveMultiplier,
+	getBuffSkillPassiveMultiplierWithSkillCategory,
+	getBuffSkillBraveMultiplier,
+	getShootSkillPassiveMultiplier,
+} from '@/utils/buffSkillCalculation'
+import { getAttackSkillById } from '@/data/attackSkills'
 
 interface DamagePreviewProps {
 	isVisible: boolean
@@ -28,6 +42,19 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	const updatePowerOptions = useCalculatorStore(
 		(state) => state.updatePowerOptions,
 	)
+
+	// その他オプション設定をZustandストアから取得（フォールバック付き）
+	const otherOptions =
+		useCalculatorStore((state) => state.data.otherOptions) ||
+		createInitialOtherOptions()
+	const updateOtherOptions = useCalculatorStore(
+		(state) => state.updateOtherOptions,
+	)
+
+	// オプションタブ状態をZustandストアから取得
+	const optionTab =
+		useCalculatorStore((state) => state.data.optionTab) || 'power'
+	const updateOptionTab = useCalculatorStore((state) => state.updateOptionTab)
 
 	// 慣れ倍率をZustandストアから取得・更新
 	const adaptationMultiplier = useCalculatorStore(
@@ -96,6 +123,96 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		return '未選択'
 	}
 
+	// 現在のパッシブ倍率を取得（自動計算用）
+	const getCurrentPassiveMultiplier = (): number => {
+		try {
+			// バフスキルデータを取得
+			const buffSkillsData = calculatorData.buffSkills.skills
+
+			// 攻撃スキルが選択されているかチェック
+			const selectedSkillId = calculatorData.attackSkill?.selectedSkillId
+			if (selectedSkillId) {
+				// 攻撃スキルが選択されている場合
+				const selectedSkill = getAttackSkillById(selectedSkillId)
+				if (selectedSkill && selectedSkill.hits.length > 0) {
+					// 実際のダメージ計算と同じロジックを使用
+					// 最初のヒットのcanUseLongRangeを使用（複数ヒットの場合は最初のもの）
+					const firstHit = selectedSkill.hits[0]
+					const passiveMultiplier =
+						getBuffSkillPassiveMultiplierWithSkillCategory(
+							buffSkillsData,
+							calculatorData.mainWeapon.weaponType,
+							selectedSkill.category,
+							firstHit.canUseLongRange, // スキルデータから実際の値を取得
+							selectedSkill.id,
+						)
+					return Math.round(passiveMultiplier * 100) / 100
+				}
+			}
+
+			// 攻撃スキルが選択されていない場合（通常攻撃）
+			// 通常攻撃の場合は、ロングレンジスキルが有効かつレベル > 0の場合のみ適用
+			const longRangeSkill = buffSkillsData?.LongRange
+			const canUseLongRange =
+				longRangeSkill?.isEnabled && (longRangeSkill.level ?? 0) > 0
+
+			const passiveMultiplier = getBuffSkillPassiveMultiplier(
+				buffSkillsData,
+				calculatorData.mainWeapon.weaponType,
+			)
+
+			// 通常攻撃でロングレンジが有効な場合は追加で適用
+			if (canUseLongRange) {
+				const longRangeMultiplier = getShootSkillPassiveMultiplier(
+					buffSkillsData,
+					canUseLongRange,
+				)
+				return Math.round((passiveMultiplier + longRangeMultiplier) * 100) / 100
+			}
+
+			return Math.round(passiveMultiplier * 100) / 100 // 小数第2位まで
+		} catch (error) {
+			console.error('パッシブ倍率計算エラー:', error)
+			return 0
+		}
+	}
+
+	// 現在のブレイブ倍率を取得（自動計算用）
+	const getCurrentBraveMultiplier = (): number => {
+		try {
+			// 実際のダメージ計算と同じロジックを使用
+			// エンハンススキルのブレイブ倍率を適用するため、敵情報を含めて計算
+
+			// 敵情報を取得
+			let enemyInfo = null
+			if (calculatorData.enemy?.selectedEnemyId) {
+				enemyInfo = getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
+			}
+
+			// デフォルト値を設定
+			const defaultEnemyDEF = 1000
+			const defaultEnemyMDEF = 1000
+			const defaultEnemyLevel = 100
+
+			// Normal難易度のDEF/MDEFを使用（エンハンス計算用）
+			const normalEnemyDEF = enemyInfo?.stats.DEF ?? defaultEnemyDEF
+			const normalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultEnemyMDEF
+			const enemyLevel = enemyInfo?.level ?? defaultEnemyLevel
+
+			// 敵情報を含めてブレイブ倍率を計算（エンハンス含む）
+			const braveMultiplier = getBuffSkillBraveMultiplier(
+				calculatorData.buffSkills.skills,
+				normalEnemyDEF,
+				normalEnemyMDEF,
+				enemyLevel,
+			)
+			return Math.round(braveMultiplier * 100) / 100 // 小数第2位まで
+		} catch (error) {
+			console.error('ブレイブ倍率計算エラー:', error)
+			return 0
+		}
+	}
+
 	// 実際のダメージ計算
 	const damageResults = useMemo((): DamageCalculationServiceResult => {
 		try {
@@ -162,6 +279,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		value: PowerOptions[K],
 	) => {
 		updatePowerOptions({ ...powerOptions, [key]: value })
+	}
+
+	const handleOtherOptionChange = <K extends keyof OtherOptions>(
+		key: K,
+		value: OtherOptions[K],
+	) => {
+		updateOtherOptions({ ...otherOptions, [key]: value })
+	}
+
+	const handleTabChange = (tab: OptionTabType) => {
+		updateOptionTab(tab)
 	}
 
 	// powerOptionsが存在しない場合のフォールバック表示
@@ -411,7 +539,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						敵：{getSelectedEnemyName()}
 					</p>
 					{/* ラフィー選択時の注意書き */}
-					{calculatorData.enemy?.selectedEnemyId === '2b981c85-54f5-4c67-bac1-0e9cba4bdeb2' && (
+					{calculatorData.enemy?.selectedEnemyId ===
+						'2b981c85-54f5-4c67-bac1-0e9cba4bdeb2' && (
 						<p className="text-xs text-orange-600 mt-1">
 							※この敵は属性覚醒の有利+25%が適用されません。
 						</p>
@@ -421,258 +550,519 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				{/* 威力オプション */}
 				<div className=" sm:p-2">
 					<ul className="flex gap-2 bg-blue-100 p-1 mb-1">
-						<li className="text-[10px] sm:text-xs font-semibold text-gray-900 flex-1 text-center">
+						<li
+							className={`text-[10px] sm:text-xs font-semibold flex-1 text-center cursor-pointer px-2 py-1 rounded ${
+								optionTab === 'power'
+									? 'bg-blue-500 text-white'
+									: 'text-gray-900 hover:bg-blue-200'
+							}`}
+							onClick={() => handleTabChange('power')}
+						>
 							威力オプション
 						</li>
-						<li className="text-[10px] sm:text-xs font-semibold text-gray-900 flex-1 text-center">
+						<li
+							className={`text-[10px] sm:text-xs font-semibold flex-1 text-center cursor-pointer px-2 py-1 rounded ${
+								optionTab === 'other'
+									? 'bg-blue-500 text-white'
+									: 'text-gray-900 hover:bg-blue-200'
+							}`}
+							onClick={() => handleTabChange('other')}
+						>
 							その他
 						</li>
 					</ul>
 
-					<div className="space-y-0.5 sm:space-y-1">
-						{/* ボス戦難易度 */}
-						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
-							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
-								ボス戦難易度
-							</label>
-							<div className="flex sm:gap-2">
-								{(['normal', 'hard', 'lunatic', 'ultimate'] as const).map(
-									(difficulty) => (
+					{/* タブコンテンツ */}
+					{optionTab === 'power' && (
+						<div className="space-y-0.5 sm:space-y-1">
+							{/* ボス戦難易度 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									ボス戦難易度
+								</label>
+								<div className="flex sm:gap-2">
+									{(['normal', 'hard', 'lunatic', 'ultimate'] as const).map(
+										(difficulty) => (
+											<button
+												key={difficulty}
+												onClick={() =>
+													handlePowerOptionChange('bossDifficulty', difficulty)
+												}
+												className={`px-3 py-0.5 sm:py-1 text-xs md:text-[13px] rounded min-h-6 cursor-pointer ${
+													powerOptions.bossDifficulty === difficulty
+														? 'bg-blue-400 text-white'
+														: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+												}`}
+											>
+												{difficulty === 'normal'
+													? 'Normal'
+													: difficulty === 'hard'
+														? 'Hard'
+														: difficulty === 'lunatic'
+															? 'Lunatic'
+															: 'Ultimate'}
+											</button>
+										),
+									)}
+								</div>
+							</div>
+
+							{/* スキルダメージ */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									スキルダメージ
+								</label>
+								<div className="flex sm:gap-2">
+									{(['all', 'hit1', 'hit2', 'hit3'] as const).map((hit) => (
 										<button
-											key={difficulty}
+											key={hit}
 											onClick={() =>
-												handlePowerOptionChange('bossDifficulty', difficulty)
+												handlePowerOptionChange('skillDamage', hit)
 											}
-											className={`px-3 py-0.5 sm:py-1 text-xs md:text-[13px] rounded min-h-6 cursor-pointer ${
-												powerOptions.bossDifficulty === difficulty
+											className={`px-3 py-1 text-xs md:text-[13px] rounded min-h-6 cursor-pointer ${
+												powerOptions.skillDamage === hit
 													? 'bg-blue-400 text-white'
 													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
 											}`}
 										>
-											{difficulty === 'normal'
-												? 'Normal'
-												: difficulty === 'hard'
-													? 'Hard'
-													: difficulty === 'lunatic'
-														? 'Lunatic'
-														: 'Ultimate'}
+											{hit === 'all'
+												? '全て'
+												: hit === 'hit1'
+													? '1撃目'
+													: hit === 'hit2'
+														? '2撃目'
+														: '3撃目'}
 										</button>
-									),
-								)}
+									))}
+								</div>
 							</div>
-						</div>
 
-						{/* スキルダメージ */}
-						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
-							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
-								スキルダメージ
-							</label>
-							<div className="flex sm:gap-2">
-								{(['all', 'hit1', 'hit2', 'hit3'] as const).map((hit) => (
-									<button
-										key={hit}
-										onClick={() => handlePowerOptionChange('skillDamage', hit)}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded min-h-6 cursor-pointer ${
-											powerOptions.skillDamage === hit
-												? 'bg-blue-400 text-white'
-												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-										}`}
-									>
-										{hit === 'all'
-											? '全て'
-											: hit === 'hit1'
-												? '1撃目'
-												: hit === 'hit2'
-													? '2撃目'
-													: '3撃目'}
-									</button>
-								))}
-							</div>
-						</div>
-
-						{/* 属性攻撃 */}
-						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
-							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
-								属性攻撃
-							</label>
-							<div className="flex sm:gap-2">
-								{(
-									['advantageous', 'other', 'none', 'disadvantageous'] as const
-								).map((element) => (
-									<button
-										key={element}
-										onClick={() =>
-											handlePowerOptionChange('elementAttack', element)
-										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
-											powerOptions.elementAttack === element
-												? 'bg-pink-400 text-white'
-												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-										}`}
-									>
-										{element === 'advantageous'
-											? '有(有利)'
-											: element === 'other'
-												? '有(その他)'
-												: element === 'none'
-													? '無'
-													: '不利属性'}
-									</button>
-								))}
-							</div>
-						</div>
-
-						{/* コンボ:強打 */}
-						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
-							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
-								コンボ:強打
-							</label>
-							<div className="flex sm:gap-2">
-								{[
-									{ value: true, label: '有効' },
-									{ value: false, label: '無効' },
-								].map((option) => (
-									<button
-										key={option.label}
-										onClick={() =>
-											handlePowerOptionChange('combo', option.value)
-										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
-											powerOptions.combo === option.value
-												? 'bg-rose-400 text-white'
-												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-										}`}
-									>
-										{option.label}
-									</button>
-								))}
-							</div>
-						</div>
-
-						{/* ダメージ判定 */}
-						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
-							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
-								ダメージ判定
-							</label>
-							<div className="flex sm:gap-2">
-								{(['critical', 'graze', 'white', 'expected'] as const).map(
-									(type) => (
+							{/* 属性攻撃 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									属性攻撃
+								</label>
+								<div className="flex sm:gap-2">
+									{(
+										[
+											'advantageous',
+											'other',
+											'none',
+											'disadvantageous',
+										] as const
+									).map((element) => (
 										<button
-											key={type}
+											key={element}
 											onClick={() =>
-												handlePowerOptionChange('damageType', type)
+												handlePowerOptionChange('elementAttack', element)
 											}
 											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
-												powerOptions.damageType === type
-													? 'bg-amber-400 text-white'
+												powerOptions.elementAttack === element
+													? 'bg-pink-400 text-white'
 													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
 											}`}
 										>
-											{type === 'white'
-												? '白ダメ'
-												: type === 'critical'
-													? 'Critical'
-													: type === 'graze'
-														? 'Graze'
-														: '期待値'}
+											{element === 'advantageous'
+												? '有(有利)'
+												: element === 'other'
+													? '有(その他)'
+													: element === 'none'
+														? '無'
+														: '不利属性'}
 										</button>
-									),
-								)}
+									))}
+								</div>
 							</div>
-						</div>
 
-						{/* 距離判定 */}
-						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
-							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
-								距離判定
-							</label>
-							<div className="flex sm:gap-2">
-								{(['short', 'long', 'disabled'] as const).map((distance) => (
-									<button
-										key={distance}
-										onClick={() =>
-											handlePowerOptionChange('distance', distance)
-										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
-											powerOptions.distance === distance
-												? 'bg-rose-400 text-white'
-												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-										}`}
-									>
-										{distance === 'short'
-											? '近距離'
-											: distance === 'long'
-												? '遠距離'
-												: '無効化'}
-									</button>
-								))}
+							{/* コンボ:強打 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									コンボ:強打
+								</label>
+								<div className="flex sm:gap-2">
+									{[
+										{ value: true, label: '有効' },
+										{ value: false, label: '無効' },
+									].map((option) => (
+										<button
+											key={option.label}
+											onClick={() =>
+												handlePowerOptionChange('combo', option.value)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												powerOptions.combo === option.value
+													? 'bg-rose-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{option.label}
+										</button>
+									))}
+								</div>
 							</div>
-						</div>
 
-						{/* 属性威力 */}
-						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
-							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
-								属性威力
-							</label>
-							<div className="flex sm:gap-2">
-								{(
-									[
-										'enabled',
-										'advantageOnly',
-										'awakeningOnly',
-										'disabled',
-									] as const
-								).map((power) => (
-									<button
-										key={power}
-										onClick={() =>
-											handlePowerOptionChange('elementPower', power)
-										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
-											powerOptions.elementPower === power
-												? 'bg-rose-400 text-white'
-												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-										}`}
-									>
-										{power === 'enabled'
-											? '有効'
-											: power === 'advantageOnly'
-												? '有利のみ'
-												: power === 'awakeningOnly'
-													? '覚醒のみ'
-													: '無効'}
-									</button>
-								))}
+							{/* ダメージ判定 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									ダメージ判定
+								</label>
+								<div className="flex sm:gap-2">
+									{(['critical', 'graze', 'white', 'expected'] as const).map(
+										(type) => (
+											<button
+												key={type}
+												onClick={() =>
+													handlePowerOptionChange('damageType', type)
+												}
+												className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+													powerOptions.damageType === type
+														? 'bg-amber-400 text-white'
+														: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+												}`}
+											>
+												{type === 'white'
+													? '白ダメ'
+													: type === 'critical'
+														? 'Critical'
+														: type === 'graze'
+															? 'Graze'
+															: '期待値'}
+											</button>
+										),
+									)}
+								</div>
 							</div>
-						</div>
 
-						{/* 抜刀威力 */}
-						<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
-							<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
-								抜刀威力
-							</label>
-							<div className="flex sm:gap-2">
-								{[
-									{ value: true, label: '有効' },
-									{ value: false, label: '無効' },
-								].map((option) => (
-									<button
-										key={option.label}
-										onClick={() =>
-											handlePowerOptionChange('unsheathe', option.value)
-										}
-										className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
-											powerOptions.unsheathe === option.value
-												? 'bg-rose-400 text-white'
-												: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-										}`}
-									>
-										{option.label}
-									</button>
-								))}
+							{/* 距離判定 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									距離判定
+								</label>
+								<div className="flex sm:gap-2">
+									{(['short', 'long', 'disabled'] as const).map((distance) => (
+										<button
+											key={distance}
+											onClick={() =>
+												handlePowerOptionChange('distance', distance)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												powerOptions.distance === distance
+													? 'bg-rose-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{distance === 'short'
+												? '近距離'
+												: distance === 'long'
+													? '遠距離'
+													: '無効化'}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* 属性威力 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									属性威力
+								</label>
+								<div className="flex sm:gap-2">
+									{(
+										[
+											'enabled',
+											'advantageOnly',
+											'awakeningOnly',
+											'disabled',
+										] as const
+									).map((power) => (
+										<button
+											key={power}
+											onClick={() =>
+												handlePowerOptionChange('elementPower', power)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												powerOptions.elementPower === power
+													? 'bg-rose-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{power === 'enabled'
+												? '有効'
+												: power === 'advantageOnly'
+													? '有利のみ'
+													: power === 'awakeningOnly'
+														? '覚醒のみ'
+														: '無効'}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* 抜刀威力 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									抜刀威力
+								</label>
+								<div className="flex sm:gap-2">
+									{[
+										{ value: true, label: '有効' },
+										{ value: false, label: '無効' },
+									].map((option) => (
+										<button
+											key={option.label}
+											onClick={() =>
+												handlePowerOptionChange('unsheathe', option.value)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												powerOptions.unsheathe === option.value
+													? 'bg-rose-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{option.label}
+										</button>
+									))}
+								</div>
 							</div>
 						</div>
-					</div>
+					)}
+
+					{optionTab === 'other' && (
+						<div className="space-y-0.5 sm:space-y-1">
+							{/* 敵状態異常：破壊 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									敵状態異常：破壊
+								</label>
+								<div className="flex sm:gap-2">
+									{['applied', 'none'].map((status) => (
+										<button
+											key={status}
+											onClick={() =>
+												handleOtherOptionChange(
+													'enemyStatusDestroy',
+													status as 'applied' | 'none',
+												)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												otherOptions.enemyStatusDestroy === status
+													? 'bg-red-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{status === 'applied' ? '付与' : 'なし'}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* 敵状態異常：衰弱 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									敵状態異常：衰弱
+								</label>
+								<div className="flex sm:gap-2">
+									{['applied', 'none'].map((status) => (
+										<button
+											key={status}
+											onClick={() =>
+												handleOtherOptionChange(
+													'enemyStatusWeaken',
+													status as 'applied' | 'none',
+												)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												otherOptions.enemyStatusWeaken === status
+													? 'bg-red-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{status === 'applied' ? '付与' : 'なし'}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* 敵状態異常：暗闇 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									敵状態異常：暗闇
+								</label>
+								<div className="flex sm:gap-2">
+									{['applied', 'none'].map((status) => (
+										<button
+											key={status}
+											onClick={() =>
+												handleOtherOptionChange(
+													'enemyStatusBlind',
+													status as 'applied' | 'none',
+												)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												otherOptions.enemyStatusBlind === status
+													? 'bg-red-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{status === 'applied' ? '付与' : 'なし'}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* スキル：強打 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									スキル：強打
+								</label>
+								<div className="flex sm:gap-2">
+									{['activated', 'inactive'].map((status) => (
+										<button
+											key={status}
+											onClick={() =>
+												handleOtherOptionChange(
+													'skillPowerHit',
+													status as 'activated' | 'inactive',
+												)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												otherOptions.skillPowerHit === status
+													? 'bg-orange-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{status === 'activated' ? '発動' : '未発動'}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* スキル：集中 */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									スキル：集中
+								</label>
+								<div className="flex sm:gap-2">
+									{['activated', 'inactive'].map((status) => (
+										<button
+											key={status}
+											onClick={() =>
+												handleOtherOptionChange(
+													'skillConcentration',
+													status as 'activated' | 'inactive',
+												)
+											}
+											className={`px-3 py-1 text-xs md:text-[13px] rounded cursor-pointer ${
+												otherOptions.skillConcentration === status
+													? 'bg-orange-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{status === 'activated' ? '発動' : '未発動'}
+										</button>
+									))}
+								</div>
+							</div>
+
+							{/* パッシブ倍率(+%) */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									パッシブ倍率(+%)
+								</label>
+								<div className="flex items-center sm:gap-2">
+									{/* モード選択 */}
+									{['manual', 'auto'].map((mode) => (
+										<button
+											key={mode}
+											onClick={() =>
+												handleOtherOptionChange('passiveMultiplier', {
+													...otherOptions.passiveMultiplier,
+													mode: mode as 'manual' | 'auto',
+												})
+											}
+											className={`px-2 py-1 text-xs rounded cursor-pointer ${
+												otherOptions.passiveMultiplier.mode === mode
+													? 'bg-green-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{mode === 'manual' ? '手動入力' : '自動計算'}
+										</button>
+									))}
+									{/* 自動計算時の現在の倍率表示 */}
+									{otherOptions.passiveMultiplier.mode === 'auto' && (
+										<span className="text-xs text-gray-600 font-mono">
+											{getCurrentPassiveMultiplier()}%
+										</span>
+									)}
+									{/* 手動入力時のみ数値入力フィールドを表示 */}
+									{otherOptions.passiveMultiplier.mode === 'manual' && (
+										<input
+											type="number"
+											value={otherOptions.passiveMultiplier.value || 0}
+											onChange={(e) =>
+												handleOtherOptionChange('passiveMultiplier', {
+													...otherOptions.passiveMultiplier,
+													value: Number(e.target.value),
+												})
+											}
+											className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+											placeholder="0"
+										/>
+									)}
+								</div>
+							</div>
+
+							{/* ブレイブ倍率(+%) */}
+							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
+								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">
+									ブレイブ倍率(+%)
+								</label>
+								<div className="flex items-center sm:gap-2">
+									{/* モード選択 */}
+									{['manual', 'auto'].map((mode) => (
+										<button
+											key={mode}
+											onClick={() =>
+												handleOtherOptionChange('braveMultiplier', {
+													...otherOptions.braveMultiplier,
+													mode: mode as 'manual' | 'auto',
+												})
+											}
+											className={`px-2 py-1 text-xs rounded cursor-pointer ${
+												otherOptions.braveMultiplier.mode === mode
+													? 'bg-green-400 text-white'
+													: 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+											}`}
+										>
+											{mode === 'manual' ? '手動入力' : '自動計算'}
+										</button>
+									))}
+									{/* 自動計算時の現在の倍率表示 */}
+									{otherOptions.braveMultiplier.mode === 'auto' && (
+										<span className="text-xs text-gray-600 font-mono">
+											{getCurrentBraveMultiplier()}%
+										</span>
+									)}
+									{/* 手動入力時のみ数値入力フィールドを表示 */}
+									{otherOptions.braveMultiplier.mode === 'manual' && (
+										<input
+											type="number"
+											value={otherOptions.braveMultiplier.value || 0}
+											onChange={(e) =>
+												handleOtherOptionChange('braveMultiplier', {
+													...otherOptions.braveMultiplier,
+													value: Number(e.target.value),
+												})
+											}
+											className="w-16 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+											placeholder="0"
+										/>
+									)}
+								</div>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
