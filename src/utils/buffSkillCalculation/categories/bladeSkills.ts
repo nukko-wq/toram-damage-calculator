@@ -112,6 +112,28 @@ export function calculateBerserkEffects(
 }
 
 /**
+ * オーラブレード(AuraBlade)のブレイブ倍率計算関数
+ */
+export function calculateAuraBladeEffects(
+	isEnabled: boolean,
+	weaponType: MainWeaponType | null,
+): number {
+	if (!isEnabled) return 0
+
+	// 武器種別ブレイブ倍率計算
+	switch (weaponType) {
+		case 'oneHandSword':
+			return 20 // +20%
+		case 'twoHandSword':
+			return 30 // +30%
+		case 'dualSword':
+			return 10 // +10%
+		default:
+			return 0 // 効果なし
+	}
+}
+
+/**
  * ブレードスキル系統の統合効果取得
  */
 export function getBladeSkillBonuses(
@@ -183,4 +205,27 @@ export function getBladeSkillPassiveMultiplier(
 	}
 
 	return totalPassiveMultiplier
+}
+
+/**
+ * ブレードスキル系統のブレイブ倍率取得
+ * オーラブレードによるブレイブ倍率効果を計算
+ */
+export function getBladeSkillBraveMultiplier(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	weaponType: WeaponType | null,
+): number {
+	const convertedWeaponType = convertWeaponType(weaponType)
+	let totalBraveMultiplier = 0
+
+	if (!buffSkillData) return totalBraveMultiplier
+
+	// オーラブレード(AuraBlade)の処理（武器種別ごとに異なるID）
+	const auraBladeIds = ['4-OH', '4-DS', '4-TH'] // 片手剣、双剣、両手剣
+	const activeAuraBlade = auraBladeIds.find((id) => buffSkillData[id]?.isEnabled)
+	if (activeAuraBlade) {
+		totalBraveMultiplier += calculateAuraBladeEffects(true, convertedWeaponType)
+	}
+
+	return totalBraveMultiplier
 }

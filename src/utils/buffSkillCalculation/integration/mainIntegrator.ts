@@ -10,6 +10,7 @@ import type { AllBonuses } from '../../basicStatsCalculation'
 import { getMasterySkillBonuses } from '../categories/masterySkills'
 import {
 	getBladeSkillBonuses,
+	getBladeSkillBraveMultiplier,
 	getBladeSkillPassiveMultiplier,
 } from '../categories/bladeSkills'
 import { getHalberdSkillBonuses } from '../categories/halberdSkills'
@@ -352,11 +353,17 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
  */
 export function getBuffSkillBraveMultiplier(
 	buffSkillData: Record<string, BuffSkillState> | null,
+	weaponType?: WeaponType | null,
 	enemyDEF?: number,
 	enemyMDEF?: number,
 	enemyLevel?: number,
 ): number {
 	let totalBraveMultiplier = getSupportSkillBraveMultiplier(buffSkillData)
+
+	// ブレードスキルのブレイブ倍率も追加（オーラブレード）
+	if (weaponType !== undefined) {
+		totalBraveMultiplier += getBladeSkillBraveMultiplier(buffSkillData, weaponType)
+	}
 
 	// エンハンスのブレイブ倍率も追加
 	if (

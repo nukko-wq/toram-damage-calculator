@@ -99,9 +99,10 @@ export function getCurrentBraveMultiplier(
 		const normalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultEnemyMDEF
 		const enemyLevel = enemyInfo?.level ?? defaultEnemyLevel
 
-		// 敵情報を含めてブレイブ倍率を計算（エンハンス含む）
+		// 敵情報を含めてブレイブ倍率を計算（オーラブレード・エンハンス含む）
 		const braveMultiplier = getBuffSkillBraveMultiplier(
 			calculatorData.buffSkills.skills,
+			calculatorData.mainWeapon.weaponType,
 			normalEnemyDEF,
 			normalEnemyMDEF,
 			enemyLevel,

@@ -152,9 +152,10 @@ export function calculateDamageWithService(
 			calculatorData.mainWeapon?.weaponType || null,
 		)
 
-		// バフスキルからブレイブ倍率を取得
+		// バフスキルからブレイブ倍率を取得（オーラブレード含む）
 		const braveMultiplier = getBuffSkillBraveMultiplier(
 			calculatorData.buffSkills?.skills || null,
+			calculatorData.mainWeapon?.weaponType || null,
 		)
 
 		if (debugEnabled && debug && process.env.NODE_ENV === 'development') {
@@ -279,9 +280,10 @@ export function calculateDamageWithService(
 		const normalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
 		const normalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
 
-		// エンハンススキルのブレイブ倍率を適用するため、敵情報を含めて再計算
+		// エンハンススキル・オーラブレードのブレイブ倍率を適用するため、敵情報を含めて再計算
 		const braveMultiplierWithEnemy = getBuffSkillBraveMultiplier(
 			calculatorData.buffSkills?.skills || null,
+			calculatorData.mainWeapon?.weaponType || null,
 			normalEnemyDEF,
 			normalEnemyMDEF,
 			finalEnemyLevel,
