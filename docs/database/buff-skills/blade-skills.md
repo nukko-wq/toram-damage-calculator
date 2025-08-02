@@ -252,24 +252,93 @@ function calculateBerserkEffects(
 }
 ```
 
+### 1.3 オーラブレード (AuraBlade)
+```typescript
+{
+  id: '4-OH',  // 片手剣用ID
+  id: '4-DS',  // 双剣用ID  
+  id: '4-TH',  // 両手剣用ID
+  name: 'オーラブレード',
+  category: 'blade',
+  type: 'toggle',
+  order: 206,
+  description: '武器種に応じてブレイブ倍率を上昇させる',
+  effects: [
+    {
+      property: 'BraveMultiplier',
+      formula: 'weaponType === "oneHandSword" ? 20 : weaponType === "twoHandSword" ? 30 : weaponType === "dualSword" ? 10 : 0',
+      conditions: ['片手剣: +20%, 両手剣: +30%, 双剣: +10%']
+    }
+  ],
+  calculationFormula: `
+    片手剣装備時: ブレイブ倍率 = base + 20%
+    両手剣装備時: ブレイブ倍率 = base + 30%
+    双剣装備時: ブレイブ倍率 = base + 10%
+    その他武器装備時: 効果なし
+  `,
+  weaponRequirements: [
+    { weaponType: '片手剣', include: true },
+    { weaponType: '両手剣', include: true },
+    { weaponType: '双剣', include: true }
+  ],
+  weaponEffects: {
+    oneHandSword: { BraveMultiplier: 20 },
+    twoHandSword: { BraveMultiplier: 30 },
+    dualSword: { BraveMultiplier: 10 },
+    other: { BraveMultiplier: 0 }
+  },
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+
+// 実装用の効果計算関数
+function calculateAuraBladeEffects(
+  isEnabled: boolean,
+  weaponType: MainWeaponType | null
+): number {
+  if (!isEnabled) return 0
+  
+  // 武器種別ブレイブ倍率計算
+  switch (weaponType) {
+    case 'oneHandSword':
+      return 20  // +20%
+    case 'twoHandSword':
+      return 30  // +30%
+    case 'dualSword':
+      return 10  // +10%
+    default:
+      return 0   // 効果なし
+  }
+}
+```
 
 ## 実装ステータス
 
 - [x] ブレードマスタリ (Ms-blade) - 設計・実装完了
 - [x] ウォークライ (IsWarcry) - 設計・実装完了（multiParam対応）
 - [x] バーサーク (Berserk) - 設計・実装完了
+- [x] オーラブレード (AuraBlade) - 設計完了・実装待ち
 
 ## 特徴
 
-- **武器種制限**: ブレードマスタリは片手剣・両手剣・双剣装備時のみ効果発動
+- **武器種制限**: ブレードマスタリとオーラブレードは片手剣・両手剣・双剣装備時のみ効果発動
 - **段階的効果**: ブレードマスタリのATK%効果はスキルレベル帯によって段階的に変化
 - **パラメータ選択効果**: ウォークライは武器タイプパラメータ（両手剣 or 両手剣以外）により効果が変動
   - 両手剣(1): ATK率+15%
   - 両手剣以外(2): ATK率+10%（デフォルト）
-- **武器種別効果変動**: バーサークは武器種により効果が変化
-  - 片手剣・双剣: 安定率減少が軽減 (-25%)
-  - 両手剣: クリティカル増加が強化 (+50)
-  - その他武器: 標準効果 (クリティカル+25、安定率-50%)
+- **武器種別効果変動**: 
+  - **バーサーク**: 武器種により効果が変化
+    - 片手剣・双剣: 安定率減少が軽減 (-25%)
+    - 両手剣: クリティカル増加が強化 (+50)
+    - その他武器: 標準効果 (クリティカル+25、安定率-50%)
+  - **オーラブレード**: 武器種別ブレイブ倍率効果
+    - 片手剣: ブレイブ倍率+20%
+    - 両手剣: ブレイブ倍率+30%（最大効果）
+    - 双剣: ブレイブ倍率+10%
+    - その他武器: 効果なし
 
 ## 関連ファイル
 
