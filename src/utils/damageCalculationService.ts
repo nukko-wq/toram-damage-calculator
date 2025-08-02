@@ -152,9 +152,10 @@ export function calculateDamageWithService(
 			calculatorData.mainWeapon?.weaponType || null,
 		)
 
-		// バフスキルからブレイブ倍率を取得
+		// バフスキルからブレイブ倍率を取得（オーラブレード含む）
 		const braveMultiplier = getBuffSkillBraveMultiplier(
 			calculatorData.buffSkills?.skills || null,
+			calculatorData.mainWeapon?.weaponType || null,
 		)
 
 		if (debugEnabled && debug && process.env.NODE_ENV === 'development') {
@@ -211,12 +212,30 @@ export function calculateDamageWithService(
 			const finalTotalElementAdvantage =
 				correctedTotalElementAdvantage + hotKnowsEffect
 
+			// ラフィー選択時は属性覚醒分+25%を無効化
+			const isRaphy =
+				calculatorData.enemy?.selectedEnemyId ===
+				'2b981c85-54f5-4c67-bac1-0e9cba4bdeb2'
+
 			// 属性威力オプションに応じて計算
 			switch (powerOptions.elementPower) {
 				case 'disabled':
 					return 0 // 属性威力無効時は0
 				case 'awakeningOnly':
 					// 覚醒のみ時: 25%固定 + 杖・魔導具装備時は有利・不利属性でINT補正も追加（2025年仕様変更）
+					// ラフィー選択時は属性覚醒分+25%を無効化
+					if (isRaphy) {
+						if (
+							powerOptions.elementAttack === 'advantageous' ||
+							powerOptions.elementAttack === 'disadvantageous'
+						) {
+							return (
+								intElementAdvantageResult.intElementAdvantage + hotKnowsEffect
+							)
+						}
+						return 0
+					}
+
 					if (
 						powerOptions.elementAttack === 'advantageous' ||
 						powerOptions.elementAttack === 'disadvantageous'
@@ -231,6 +250,10 @@ export function calculateDamageWithService(
 				case 'advantageOnly':
 					return finalTotalElementAdvantage // INT補正 + 熱情の歌補正を含む総属性有利のみ
 				case 'enabled':
+					// ラフィー選択時は属性覚醒分+25%を無効化
+					if (isRaphy) {
+						return finalTotalElementAdvantage // 属性覚醒25%を除外
+					}
 					return finalTotalElementAdvantage + 25 // INT補正 + 熱情の歌補正を含む総属性有利 + 属性覚醒25%
 				default:
 					return finalTotalElementAdvantage
@@ -257,9 +280,10 @@ export function calculateDamageWithService(
 		const normalEnemyDEF = enemyInfo?.stats.DEF ?? defaultInput.enemy.DEF
 		const normalEnemyMDEF = enemyInfo?.stats.MDEF ?? defaultInput.enemy.MDEF
 
-		// エンハンススキルのブレイブ倍率を適用するため、敵情報を含めて再計算
+		// エンハンススキル・オーラブレードのブレイブ倍率を適用するため、敵情報を含めて再計算
 		const braveMultiplierWithEnemy = getBuffSkillBraveMultiplier(
 			calculatorData.buffSkills?.skills || null,
+			calculatorData.mainWeapon?.weaponType || null,
 			normalEnemyDEF,
 			normalEnemyMDEF,
 			finalEnemyLevel,
@@ -461,6 +485,7 @@ export function calculateDamageWithService(
 							calculatorData.mainWeapon?.weaponType || null,
 							selectedSkill.category,
 							originalHit.canUseLongRange,
+							selectedSkill.id,
 						),
 						// ブレイブ倍率はスキル攻撃でも同じ値を使用（エンハンス含む）
 						braveMultiplier: braveMultiplierWithEnemy,
@@ -525,7 +550,7 @@ export function calculateDamageWithService(
 						averageDamage: 0,
 						stabilityRate: defaultStabilityRate,
 					},
-					calculationSteps: {} as any,
+					calculationSteps: {} as Record<string, unknown>,
 				}
 			}
 

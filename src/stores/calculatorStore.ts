@@ -5,13 +5,19 @@ import type {
 	DamageCalculationResult,
 	CalculationSettings,
 } from '@/types/stores'
-import type { CalculatorData, EnemyFormData } from '@/types/calculator'
+import type {
+	CalculatorData,
+	EnemyFormData,
+	OtherOptions,
+	OptionTabType,
+} from '@/types/calculator'
 import type { EquipmentSlots } from '@/types/calculator'
 import type { BuffSkillFormData } from '@/types/buffSkill'
 import {
 	createInitialCalculatorData,
 	migrateRegisterEffects,
 	createInitialPowerOptions,
+	createInitialOtherOptions,
 } from '@/utils/initialData'
 // 敵設定はenemySettingsStoreで管理するため、このインポートは削除
 import {
@@ -123,6 +129,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				const migratedData = {
 					...data,
 					powerOptions: data.powerOptions || createInitialPowerOptions(),
+					otherOptions: data.otherOptions || createInitialOtherOptions(),
+					optionTab: data.optionTab || 'power',
 					adaptationMultiplier: data.adaptationMultiplier ?? 100, // 慣れ倍率のマイグレーション
 				}
 				set({ data: migratedData }, false, 'setData')
@@ -415,6 +423,16 @@ export const useCalculatorStore = create<CalculatorStore>()(
 			updatePowerOptions: (powerOptions) => {
 				const dataUpdate = createDataUpdate(set, get)
 				dataUpdate({ powerOptions }, 'updatePowerOptions')
+			},
+
+			updateOtherOptions: (otherOptions) => {
+				const dataUpdate = createDataUpdate(set, get)
+				dataUpdate({ otherOptions }, 'updateOtherOptions')
+			},
+
+			updateOptionTab: (optionTab) => {
+				const dataUpdate = createDataUpdate(set, get)
+				dataUpdate({ optionTab }, 'updateOptionTab')
 			},
 
 			updateAdaptationMultiplier: (adaptationMultiplier: number) => {

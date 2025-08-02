@@ -177,6 +177,9 @@ export default function CrystalSelectionModal({
 	const { favoriteCrystals, otherCrystals } = useMemo(() => {
 		const favoriteIds = CrystalFavoritesManager.getFavoriteCrystalIds()
 		const favoriteSet = new Set(favoriteIds)
+		
+		// _favoritesChangedを使用してお気に入り状態の変更を検知
+		const _unused = _favoritesChanged
 
 		// 通常のクリスタルを分別
 		const favorites = sortedCrystals.filter((crystal) =>

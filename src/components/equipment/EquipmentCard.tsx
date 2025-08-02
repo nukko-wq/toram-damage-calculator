@@ -52,7 +52,6 @@ export default function EquipmentCard({
 		[equipment.id, isFavorite, onFavoriteChange],
 	)
 
-
 	const formatWeaponInfo = () => {
 		const weaponInfo = getWeaponInfo(equipment.id)
 		if (!weaponInfo) {
@@ -60,10 +59,11 @@ export default function EquipmentCard({
 		}
 
 		const { ATK, stability, refinement, weaponType } = weaponInfo
-		const refinementDisplay = refinement > 0 ? ` +${refinementValueToDisplay(refinement as any)}` : ''
+		const refinementDisplay =
+			refinement > 0 ? ` +${refinementValueToDisplay(refinement as any)}` : ''
 		const stabilityDisplay = stability > 0 ? ` (${stability}%)` : ''
 		const weaponTypeDisplay = weaponType ? `[${weaponType}] ` : ''
-		
+
 		return `${weaponTypeDisplay}${ATK}${refinementDisplay}${stabilityDisplay}`
 	}
 
@@ -307,17 +307,17 @@ export default function EquipmentCard({
 					{(() => {
 						try {
 							// Convert PresetEquipment to Equipment format
-								const equipmentAsEquipment: Equipment = {
-									...equipment,
-									isPreset: true,
-									isFavorite: false,
-									isModified: false,
-									createdAt: new Date().toISOString(),
-									updatedAt: new Date().toISOString(),
-								}
-								return (
-									<DamageDifferenceDisplayCorrect
-										item={equipmentAsEquipment}
+							const equipmentAsEquipment: Equipment = {
+								...equipment,
+								isPreset: true,
+								isFavorite: false,
+								isModified: false,
+								createdAt: new Date().toISOString(),
+								updatedAt: new Date().toISOString(),
+							}
+							return (
+								<DamageDifferenceDisplayCorrect
+									item={equipmentAsEquipment}
 									slotInfo={slotInfo}
 									size="sm"
 									className="inline-block"
@@ -393,8 +393,6 @@ export default function EquipmentCard({
 						})}
 					</div>
 				)}
-
-
 		</div>
 	)
 }

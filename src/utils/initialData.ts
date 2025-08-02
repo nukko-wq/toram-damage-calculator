@@ -12,6 +12,8 @@ import type {
 	CalculatorData,
 	EquipmentProperties,
 	PowerOptions,
+	OtherOptions,
+	OptionTabType,
 } from '@/types/calculator'
 import { getDefaultBuffSkillFormData } from './buffSkillDefaults'
 import { getDefaultBuffItems } from './buffItemDefaults'
@@ -377,6 +379,27 @@ export const createInitialPowerOptions = (): PowerOptions => ({
 	unsheathe: false,
 })
 
+export const createInitialOtherOptions = (): OtherOptions => ({
+	// 敵状態異常
+	enemyStatusDestroy: 'none',
+	enemyStatusWeaken: 'none',
+	enemyStatusBlind: 'none',
+
+	// スキル
+	skillPowerHit: 'inactive',
+	skillConcentration: 'inactive',
+
+	// 倍率
+	passiveMultiplier: {
+		mode: 'auto',
+		value: 0,
+	},
+	braveMultiplier: {
+		mode: 'auto',
+		value: 0,
+	},
+})
+
 export const createInitialCalculatorData = (): CalculatorData => ({
 	baseStats: createInitialBaseStats(),
 	mainWeapon: createInitialMainWeapon(),
@@ -390,5 +413,7 @@ export const createInitialCalculatorData = (): CalculatorData => ({
 	register: createInitialRegisterFormData(), // レジスタ他システム
 	attackSkill: createInitialAttackSkillFormData(), // 攻撃スキルシステム
 	powerOptions: createInitialPowerOptions(), // 威力オプション設定
+	otherOptions: createInitialOtherOptions(), // その他オプション設定
+	optionTab: 'power' as OptionTabType, // オプションタブ状態（デフォルトは威力オプション）
 	adaptationMultiplier: 100, // 慣れ倍率のデフォルト値 (100%)
 })

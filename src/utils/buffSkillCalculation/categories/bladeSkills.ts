@@ -3,7 +3,7 @@
  */
 
 import type { BuffSkillState, MainWeaponType } from '@/types/buffSkill'
-import type { EquipmentProperties, WeaponType } from '@/types/calculator'
+import type { EquipmentProperties, WeaponType, SubWeaponType } from '@/types/calculator'
 import type { AllBonuses } from '../../basicStatsCalculation'
 import { convertWeaponType, integrateEffects } from '../types'
 
@@ -112,11 +112,65 @@ export function calculateBerserkEffects(
 }
 
 /**
+ * オーラブレード(AuraBlade)のブレイブ倍率計算関数
+ */
+export function calculateAuraBladeEffects(
+	isEnabled: boolean,
+	weaponType: MainWeaponType | null,
+): number {
+	if (!isEnabled) return 0
+
+	// 武器種別ブレイブ倍率計算
+	switch (weaponType) {
+		case 'oneHandSword':
+			return 20 // +20%
+		case 'twoHandSword':
+			return 30 // +30%
+		case 'dualSword':
+			return 10 // +10%
+		default:
+			return 0 // 効果なし
+	}
+}
+
+/**
+ * バスターブレード(BusterBlade)の効果計算関数
+ */
+export function calculateBusterBladeEffects(
+	isEnabled: boolean,
+	weaponType: MainWeaponType | null,
+	subWeaponType?: SubWeaponType | null,
+	shieldRefinement?: number,
+): Partial<EquipmentProperties> {
+	if (!isEnabled) return {}
+
+	// 対象武器種チェック
+	const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+	if (!weaponType || !bladeWeapons.includes(weaponType)) return {}
+
+	// 片手剣+盾の特殊条件チェック
+	if (weaponType === 'oneHandSword' && subWeaponType === '盾') {
+		// 片手剣+盾装備時: 武器ATK率 = 10 + 盾の精錬値
+		const weaponATKRate = 10 + (shieldRefinement || 0)
+		return {
+			WeaponATK_Rate: weaponATKRate,
+		}
+	}
+
+	// 基本効果: 武器ATK率+10%
+	return {
+		WeaponATK_Rate: 10,
+	}
+}
+
+/**
  * ブレードスキル系統の統合効果取得
  */
 export function getBladeSkillBonuses(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
+	subWeaponType?: SubWeaponType | null,
+	shieldRefinement?: number,
 ): Partial<AllBonuses> {
 	const convertedWeaponType = convertWeaponType(weaponType)
 	const bonuses: Partial<AllBonuses> = {}
@@ -148,6 +202,18 @@ export function getBladeSkillBonuses(
 		integrateEffects(effects, bonuses)
 	}
 
+	// バスターブレードの処理
+	const busterBlade = buffSkillData['5-BusterBlade']
+	if (busterBlade?.isEnabled) {
+		const effects = calculateBusterBladeEffects(
+			true,
+			convertedWeaponType,
+			subWeaponType,
+			shieldRefinement,
+		)
+		integrateEffects(effects, bonuses)
+	}
+
 	return bonuses
 }
 
@@ -158,6 +224,7 @@ export function getBladeSkillPassiveMultiplier(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
 	attackSkillCategory?: string,
+	attackSkillId?: string,
 ): number {
 	const convertedWeaponType = convertWeaponType(weaponType)
 	let totalPassiveMultiplier = 0
@@ -165,13 +232,44 @@ export function getBladeSkillPassiveMultiplier(
 	if (!buffSkillData) return totalPassiveMultiplier
 
 	// 匠の剣術(sm4)の処理 - bladeカテゴリのスキル使用時のみ適用
+	// ただし、ストームブレイザー使用時は無効
 	const takumiKenjutsu = buffSkillData.sm4
 	if (takumiKenjutsu?.isEnabled && attackSkillCategory === 'blade') {
-		totalPassiveMultiplier += calculateTakumiKenjutsuPassiveMultiplier(
-			takumiKenjutsu.isEnabled,
-			convertedWeaponType,
-		)
+		// ストームブレイザー(1スタック/10スタック)の場合は匠の剣術を無効化
+		const isStormBlazer =
+			attackSkillId === 'storm_blazer_1stack' ||
+			attackSkillId === 'storm_blazer_10stack'
+
+		if (!isStormBlazer) {
+			totalPassiveMultiplier += calculateTakumiKenjutsuPassiveMultiplier(
+				takumiKenjutsu.isEnabled,
+				convertedWeaponType,
+			)
+		}
 	}
 
 	return totalPassiveMultiplier
+}
+
+/**
+ * ブレードスキル系統のブレイブ倍率取得
+ * オーラブレードによるブレイブ倍率効果を計算
+ */
+export function getBladeSkillBraveMultiplier(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	weaponType: WeaponType | null,
+): number {
+	const convertedWeaponType = convertWeaponType(weaponType)
+	let totalBraveMultiplier = 0
+
+	if (!buffSkillData) return totalBraveMultiplier
+
+	// オーラブレード(AuraBlade)の処理（武器種別ごとに異なるID）
+	const auraBladeIds = ['4-OH', '4-DS', '4-TH'] // 片手剣、双剣、両手剣
+	const activeAuraBlade = auraBladeIds.find((id) => buffSkillData[id]?.isEnabled)
+	if (activeAuraBlade) {
+		totalBraveMultiplier += calculateAuraBladeEffects(true, convertedWeaponType)
+	}
+
+	return totalBraveMultiplier
 }

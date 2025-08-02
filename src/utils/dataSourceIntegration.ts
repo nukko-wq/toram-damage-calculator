@@ -633,13 +633,15 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		enemyLevel = normalEnemyData.level
 	}
 
-	// バフスキルの補正値を追加（敵情報を渡す）
+	// バフスキルの補正値を追加（敵情報とサブ武器情報を渡す）
 	const buffSkillBonuses = getBuffSkillBonuses(
 		data.buffSkills?.skills || null,
 		data.mainWeapon?.weaponType || null,
 		enemyDEF,
 		enemyMDEF,
 		enemyLevel,
+		data.subWeapon?.weaponType || null,
+		data.subWeapon?.refinement || 0,
 	)
 
 	for (const [key, value] of Object.entries(buffSkillBonuses)) {
@@ -935,6 +937,11 @@ export function getDetailedDataSourceBonuses(
 			buffSkills: getBuffSkillBonuses(
 				data.buffSkills?.skills || null,
 				data.mainWeapon?.weaponType || null,
+				undefined, // enemyDEF - not available in this context
+				undefined, // enemyMDEF - not available in this context
+				undefined, // enemyLevel - not available in this context
+				data.subWeapon?.weaponType || null,
+				data.subWeapon?.refinement || 0,
 			),
 		}
 	} catch (error) {

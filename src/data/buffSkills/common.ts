@@ -19,6 +19,42 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		},
 		order: 201,
 	},
+	{
+		id: '4-OH',
+		name: 'オーラブレード',
+		category: 'blade',
+		type: 'toggle',
+		order: 206,
+		requirements: [
+			{
+				mainWeapon: 'oneHandSword',
+			},
+		],
+	},
+	{
+		id: '4-DS',
+		name: 'オーラブレード',
+		category: 'blade',
+		type: 'toggle',
+		order: 206,
+		requirements: [
+			{
+				mainWeapon: 'dualSword',
+			},
+		],
+	},
+	{
+		id: '4-TH',
+		name: 'オーラブレード',
+		category: 'blade',
+		type: 'toggle',
+		order: 206,
+		requirements: [
+			{
+				mainWeapon: 'twoHandSword',
+			},
+		],
+	},
 
 	// シュートスキル
 	{

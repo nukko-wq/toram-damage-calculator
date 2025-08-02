@@ -10,6 +10,7 @@ import type { AllBonuses } from '../../basicStatsCalculation'
 import { getMasterySkillBonuses } from '../categories/masterySkills'
 import {
 	getBladeSkillBonuses,
+	getBladeSkillBraveMultiplier,
 	getBladeSkillPassiveMultiplier,
 } from '../categories/bladeSkills'
 import { getHalberdSkillBonuses } from '../categories/halberdSkills'
@@ -46,6 +47,8 @@ export function getBuffSkillBonuses(
 	enemyDEF?: number,
 	enemyMDEF?: number,
 	enemyLevel?: number,
+	subWeaponType?: SubWeaponType | null,
+	subWeaponRefinement?: number,
 ): Partial<AllBonuses> {
 	const bonuses: Partial<AllBonuses> = {}
 
@@ -60,8 +63,13 @@ export function getBuffSkillBonuses(
 		}
 	}
 
-	// ブレードスキル
-	const bladeBonuses = getBladeSkillBonuses(buffSkillData, weaponType)
+	// ブレードスキル（サブ武器情報を含む）
+	const bladeBonuses = getBladeSkillBonuses(
+		buffSkillData,
+		weaponType,
+		subWeaponType,
+		subWeaponRefinement,
+	)
 	for (const [key, value] of Object.entries(bladeBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -323,6 +331,7 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
 	weaponType: WeaponType | null,
 	attackSkillCategory?: string,
 	canUseLongRange?: boolean,
+	attackSkillId?: string,
 ): number {
 	let totalPassiveMultiplier = 0
 
@@ -331,6 +340,7 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
 		buffSkillData,
 		weaponType,
 		attackSkillCategory,
+		attackSkillId,
 	)
 
 	// シュートスキル系統のパッシブ倍率（ロングレンジ）
@@ -350,11 +360,17 @@ export function getBuffSkillPassiveMultiplierWithSkillCategory(
  */
 export function getBuffSkillBraveMultiplier(
 	buffSkillData: Record<string, BuffSkillState> | null,
+	weaponType?: WeaponType | null,
 	enemyDEF?: number,
 	enemyMDEF?: number,
 	enemyLevel?: number,
 ): number {
 	let totalBraveMultiplier = getSupportSkillBraveMultiplier(buffSkillData)
+
+	// ブレードスキルのブレイブ倍率も追加（オーラブレード）
+	if (weaponType !== undefined) {
+		totalBraveMultiplier += getBladeSkillBraveMultiplier(buffSkillData, weaponType)
+	}
 
 	// エンハンスのブレイブ倍率も追加
 	if (

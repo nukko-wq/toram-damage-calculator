@@ -38,7 +38,9 @@ export function saveArmorType(
 /**
  * 装備IDに紐づけられた防具改造タイプを取得
  */
-export function getArmorType(equipmentId: string): import('@/types/calculator').ArmorType | null {
+export function getArmorType(
+	equipmentId: string,
+): import('@/types/calculator').ArmorType | null {
 	try {
 		const storage = getArmorTypeStorage()
 		const armorTypeInfo = storage[equipmentId]
@@ -123,9 +125,9 @@ export function clearArmorType(equipmentId: string): boolean {
 /**
  * 装備に防具改造タイプをオーバーレイする関数（equipmentDatabaseで使用）
  */
-export function applyArmorTypeOverlay<T extends { id: string; armorType?: import('@/types/calculator').ArmorType }>(
-	equipment: T
-): T {
+export function applyArmorTypeOverlay<
+	T extends { id: string; armorType?: import('@/types/calculator').ArmorType },
+>(equipment: T): T {
 	const armorType = getArmorType(equipment.id)
 	if (armorType) {
 		return {

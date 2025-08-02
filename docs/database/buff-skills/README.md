@@ -23,7 +23,9 @@ buff-skills/
 ├── assassin-skills.md          # アサシンスキル系統
 ├── sprite-skills.md            # スプライトスキル系統
 ├── minstrel-skills.md          # ミンストレルスキル系統
-├── shoot-skills.md             # シュートスキル系統（予定）
+├── shoot-skills.md             # シュートスキル系統
+├── pet-skills.md               # ペット使用スキル系統
+├── shield-skills.md            # シールドスキル系統
 └── ... (他の系統)
 ```
 
@@ -31,8 +33,11 @@ buff-skills/
 
 ### ✅ blade-skills.md
 - **スキル系統**: ブレードスキル (category: 'blade')
-- **含まれるスキル**: 1スキル
+- **含まれるスキル**: 4スキル
+  - ブレードマスタリ (Ms-blade)
   - ウォークライ (IsWarcry)
+  - バーサーク (Berserk)
+  - オーラブレード (AuraBlade) ★新規追加
 
 ### ✅ halberd-skills.md
 - **スキル系統**: ハルバードスキル (category: 'halberd')
@@ -62,12 +67,14 @@ buff-skills/
 
 ### ✅ battle-skills.md
 - **スキル系統**: バトルスキル (category: 'battle')
-- **含まれるスキル**: 5スキル
+- **含まれるスキル**: 7スキル
   - クリティカルup (oh1)
   - 攻撃力up (exATK1)
   - 魔法力up (exMATK1)
   - 驚異の威力 (exATK2)
   - 更なる魔力 (exMATK2)
+  - 命中up (exHIT)
+  - 回避up (exFREE)
 
 ### ✅ hunter-skills.md
 - **スキル系統**: ハンタースキル (category: 'hunter')
@@ -111,6 +118,20 @@ buff-skills/
 - **含まれるスキル**: 1スキル
   - 熱情の歌 (IsHotKnows)
 
+### ✅ pet-skills.md
+- **スキル系統**: ペット使用スキル (category: 'pet')
+- **含まれるスキル**: 4スキル
+  - ブレイブアップ (IsPetBrave)
+  - マインドアップ (IsPetMind)
+  - カットアップ (IsPetCut)
+  - クリティカルアップ (IsPetCri)
+
+### ✅ shield-skills.md
+- **スキル系統**: シールドスキル (category: 'shield')
+- **含まれるスキル**: 2スキル
+  - プロテクション (IsProtect)
+  - イージス (IsAegis)
+
 ## 使用方法
 
 1. **メインドキュメント**: `../buff-skill-details.md` で全体構造を確認
@@ -122,6 +143,12 @@ buff-skills/
 - 新しいスキルが追加された場合は、対応する系統ファイルに追加
 - 新しい系統が追加された場合は、新しいファイルを作成
 - メインドキュメントの参照リンクも更新
+
+### 最新の更新
+
+**2025-08-02**: ブレードスキル系統にオーラブレード (AuraBlade) を追加
+- 武器種別ブレイブ倍率効果 (片手剣+20%, 両手剣+30%, 双剣+10%)
+- 設計完了・実装待ち状態
 
 ## 関連ファイル
 

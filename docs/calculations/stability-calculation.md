@@ -58,7 +58,7 @@
 - **旋風槍**: STR × 0.05 + DEX × 0.05
 - **抜刀剣**: STR × 0.075 + DEX × 0.025
 - **素手**: DEX × 0.35
-- **双剣**: 特殊計算（保留）
+- **双剣**: STR × 0.025 + DEX × 0.075
 
 ### 計算手順
 1. **ステータス安定率計算**: 武器種別に応じたSTR・DEX係数による計算
@@ -224,8 +224,7 @@ function calculateStability(
       statusStability = adjustedDEX * 0.35
       break
     case 'dualSword':
-      // 双剣は特殊計算のため保留
-      statusStability = 0
+      statusStability = adjustedSTR * 0.025 + adjustedDEX * 0.075
       break
   }
   
@@ -390,7 +389,7 @@ function calculateMagicalStability(
 3. **小数点切り捨て**: 最終結果にINT()関数を適用して小数点以下を切り捨て
 4. **料理除外**: 料理からの安定率補正は存在しない
 5. **武器種依存**: ステータス安定率は武器種別により計算式が大きく異なる
-6. **双剣特殊**: 双剣の安定率計算は特殊なため保留
+6. **双剣**: 双剣の安定率計算はSTR × 0.025 + DEX × 0.075
 7. **弓・自動弓特殊**: 矢装備時の特別な加算処理が存在する
 
 ## 更新履歴

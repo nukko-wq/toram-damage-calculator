@@ -15,6 +15,8 @@ import type {
 	SaveData,
 	ArmorType,
 	PowerOptions,
+	OtherOptions,
+	OptionTabType,
 } from './calculator'
 import type { CalculationResults } from './calculationResult'
 import type { BuffSkillFormData } from './buffSkill'
@@ -120,6 +122,8 @@ export interface CalculatorStore {
 	) => void
 	resetRegisterData: () => void
 	updatePowerOptions: (powerOptions: PowerOptions) => void
+	updateOtherOptions: (otherOptions: OtherOptions) => void
+	updateOptionTab: (optionTab: OptionTabType) => void
 	updateAdaptationMultiplier: (adaptationMultiplier: number) => void
 
 	// ===== カスタム装備管理 =====

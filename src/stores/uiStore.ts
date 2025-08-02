@@ -84,11 +84,7 @@ export const useUIStore = create<UIStore>()(
 						'setStatusPreviewCategory',
 					)
 
-					// calculatorStoreに変更をチェックしてもらい、差分があれば保存ボタンを有効化
-					if (typeof window !== 'undefined') {
-						const { useCalculatorStore } = require('./calculatorStore')
-						useCalculatorStore.getState().checkUIChanges(saveId)
-					}
+					// calculatorStoreのcheckUIChanges関数は削除されたため、この呼び出しは不要
 				},
 			}),
 			{
