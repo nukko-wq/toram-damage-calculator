@@ -315,16 +315,93 @@ function calculateAuraBladeEffects(
 }
 ```
 
+### 1.4 バスターブレード (BusterBlade)
+```typescript
+{
+  id: '5-BusterBlade',
+  name: 'バスターブレード',
+  category: 'blade',
+  type: 'toggle',
+  order: 207,
+  description: '片手剣・双剣・両手剣装備時に武器ATK率を上昇させる。片手剣+盾装備時は盾の精錬値に応じて効果増加',
+  effects: [
+    {
+      property: 'WeaponATK_Rate',
+      formula: 'calculateBusterBladeWeaponATKRate(weaponType, subWeaponType, shieldRefinement)',
+      conditions: [
+        '片手剣・双剣・両手剣装備時: 武器ATK率+10%',
+        '片手剣+盾装備時: 武器ATK率+(10+盾の精錬値)%'
+      ]
+    }
+  ],
+  calculationFormula: `
+    基本効果（片手剣・双剣・両手剣装備時）:
+    - WeaponATK_Rate = +10%
+    
+    特殊効果（片手剣+盾装備時）:
+    - WeaponATK_Rate = +(10 + 盾の精錬値)%
+    - 盾の精錬値S(15)の場合: WeaponATK_Rate = +25%
+  `,
+  weaponRequirements: [
+    { weaponType: '片手剣', include: true },
+    { weaponType: '両手剣', include: true },
+    { weaponType: '双剣', include: true }
+  ],
+  specialConditions: [
+    {
+      description: '片手剣+盾装備時の精錬値ボーナス',
+      condition: 'mainWeapon === "oneHandSword" && subWeapon === "shield"',
+      effect: 'WeaponATK_Rate = 10 + shieldRefinement'
+    }
+  ],
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true,
+    specialInfo: '片手剣+盾装備時は盾の精錬値により効果増加'
+  }
+}
+
+// 実装用の効果計算関数
+function calculateBusterBladeEffects(
+  isEnabled: boolean,
+  weaponType: MainWeaponType | null,
+  subWeaponType: SubWeaponType | null,
+  shieldRefinement: number = 0
+): Partial<EquipmentProperties> {
+  if (!isEnabled) return {}
+  
+  // 対象武器種チェック
+  const bladeWeapons: MainWeaponType[] = ['oneHandSword', 'twoHandSword', 'dualSword']
+  if (!weaponType || !bladeWeapons.includes(weaponType)) return {}
+  
+  // 片手剣+盾の特殊条件チェック
+  if (weaponType === 'oneHandSword' && subWeaponType === 'shield') {
+    // 片手剣+盾装備時: 武器ATK率 = 10 + 盾の精錬値
+    const weaponATKRate = 10 + shieldRefinement
+    return {
+      WeaponATK_Rate: weaponATKRate
+    }
+  }
+  
+  // 基本効果: 武器ATK率+10%
+  return {
+    WeaponATK_Rate: 10
+  }
+}
+```
+
 ## 実装ステータス
 
 - [x] ブレードマスタリ (Ms-blade) - 設計・実装完了
 - [x] ウォークライ (IsWarcry) - 設計・実装完了（multiParam対応）
 - [x] バーサーク (Berserk) - 設計・実装完了
 - [x] オーラブレード (AuraBlade) - 設計完了・実装待ち
+- [x] バスターブレード (BusterBlade) - 設計完了・実装待ち
 
 ## 特徴
 
-- **武器種制限**: ブレードマスタリとオーラブレードは片手剣・両手剣・双剣装備時のみ効果発動
+- **武器種制限**: ブレードマスタリ・オーラブレード・バスターブレードは片手剣・両手剣・双剣装備時のみ効果発動
 - **段階的効果**: ブレードマスタリのATK%効果はスキルレベル帯によって段階的に変化
 - **パラメータ選択効果**: ウォークライは武器タイプパラメータ（両手剣 or 両手剣以外）により効果が変動
   - 両手剣(1): ATK率+15%
@@ -339,6 +416,11 @@ function calculateAuraBladeEffects(
     - 両手剣: ブレイブ倍率+30%（最大効果）
     - 双剣: ブレイブ倍率+10%
     - その他武器: 効果なし
+- **サブ武器連動効果**:
+  - **バスターブレード**: 片手剣+盾装備時の特殊効果
+    - 基本効果: 武器ATK率+10%
+    - 片手剣+盾装備時: 武器ATK率+(10+盾の精錬値)%
+    - 盾の精錬値S(15)の場合: 武器ATK率+25%（最大効果）
 
 ## 関連ファイル
 
