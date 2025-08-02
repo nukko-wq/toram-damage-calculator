@@ -163,7 +163,15 @@ export default function BuffItemCard({
 
 	return (
 		<div
+			role="button"
+			tabIndex={0}
 			onClick={onClick}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault()
+					onClick()
+				}
+			}}
 			className={`
 				relative p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-full max-w-[100%] sm:max-w-[260px]
 				${
@@ -172,6 +180,7 @@ export default function BuffItemCard({
 						: 'border-gray-200 bg-white hover:border-gray-300'
 				}
 			`}
+			aria-label={`バフアイテム ${buffItem.name} を選択`}
 		>
 			{/* お気に入りボタン - 右下に絶対配置 */}
 			{showFavoriteButton && (

@@ -52,7 +52,15 @@ export default function CrystalCard({
 
 	return (
 		<div
+			role="button"
+			tabIndex={0}
 			onClick={onClick}
+			onKeyDown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					e.preventDefault()
+					onClick()
+				}
+			}}
 			className={`
 				relative p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md w-full max-w-[100%] sm:max-w-[260px]
 				${
@@ -61,6 +69,7 @@ export default function CrystalCard({
 						: 'border-gray-200 bg-white hover:border-gray-300'
 				}
 			`}
+			aria-label={`クリスタル ${crystal.name} を選択`}
 		>
 			{/* お気に入りボタン - 右下に絶対配置 */}
 			{showFavoriteButton && (
@@ -105,7 +114,9 @@ export default function CrystalCard({
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
+							aria-label="選択済み"
 						>
+							<title>選択済み</title>
 							<path
 								strokeLinecap="round"
 								strokeLinejoin="round"

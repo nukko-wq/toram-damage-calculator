@@ -223,6 +223,7 @@ export default function BuffItemSelectionModal({
 		buffItemNoneDamageDifference,
 		hasCurrentlyEquippedBuffItem,
 		slotInfo,
+		_favoritesChanged,
 	])
 
 	const _getCategoryLabel = (categoryValue: string) => {

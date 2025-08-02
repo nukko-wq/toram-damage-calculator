@@ -53,8 +53,9 @@ export function getBuffSkillBonuses(
 
 	if (!buffSkillData) return bonuses
 
-	// マスタリスキル
-	const masteryBonuses = getMasterySkillBonuses(buffSkillData, weaponType)
+	// マスタリスキル（subWeaponTypeを渡して盾判定も可能にする）
+	const subWeapon = subWeaponType ? { weaponType: subWeaponType, ATK: 0, stability: 0, refinement: 0 } : null
+	const masteryBonuses = getMasterySkillBonuses(buffSkillData, weaponType, subWeapon)
 	for (const [key, value] of Object.entries(masteryBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =

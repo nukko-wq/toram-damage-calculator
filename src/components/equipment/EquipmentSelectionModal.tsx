@@ -250,6 +250,7 @@ export default function EquipmentSelectionModal({
 		equipmentNoneDamageDifference,
 		hasCurrentlyEquippedItem,
 		slotInfo,
+		_favoritesChanged,
 	])
 
 	const handleSelect = useCallback(
