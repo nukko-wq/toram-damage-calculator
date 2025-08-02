@@ -23,7 +23,50 @@ interface ShieldBuffSkillDetail {
 
 ## シールドスキル一覧
 
-### 10.1 プロテクション (IsProtect)
+### 10.1 シールドマスタリ (Ms-Shield)
+```typescript
+{
+  id: 'Ms-Shield',
+  name: 'シールドマスタリ',
+  category: 'mastery', // マスタリスキル
+  type: 'toggle',
+  order: 103,
+  description: '盾装備時に攻撃速度を大幅に上昇させる',
+  effects: [
+    {
+      property: 'AttackSpeed_Rate',
+      formula: '+50',
+      conditions: ['盾装備時のみ効果あり']
+    }
+  ],
+  calculationFormula: 'AttackSpeed% = base + 50 (盾装備時のみ)',
+  weaponRequirements: [
+    {
+      subWeaponType: 'shield',
+      description: '盾装備時のみ効果があります'
+    }
+  ],
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+
+// 実装用の効果計算関数
+function calculateShieldMasteryEffects(
+  isEnabled: boolean,
+  hasShield: boolean
+): Partial<EquipmentProperties> {
+  if (!isEnabled || !hasShield) return {}
+  
+  return {
+    AttackSpeed_Rate: 50
+  }
+}
+```
+
+### 10.2 プロテクション (IsProtect)
 ```typescript
 {
   id: 'IsProtect',
@@ -68,7 +111,7 @@ function calculateProtectionEffects(
 }
 ```
 
-### 10.2 イージス (IsAegis)
+### 10.3 イージス (IsAegis)
 ```typescript
 {
   id: 'IsAegis',
@@ -115,7 +158,10 @@ function calculateAegisEffects(
 
 ## スキル間の相互作用
 
-### 相殺効果
+### シールドマスタリの条件
+シールドマスタリは盾装備時のみ効果があり、他のシールドスキルとは独立して機能します。
+
+### プロテクション・イージスの相殺効果
 プロテクションとイージスを同時に有効化した場合：
 ```
 物理耐性% = base + 30 - 15 = base + 15
@@ -124,12 +170,14 @@ function calculateAegisEffects(
 結果として両耐性が15%ずつ上昇します。
 
 ### 戦略的活用
+- **盾使用時**: シールドマスタリで攻撃速度向上
 - **物理攻撃主体の敵**: プロテクションのみ有効化
 - **魔法攻撃主体の敵**: イージスのみ有効化
 - **混合攻撃の敵**: 両スキル有効化で均等防御
 
 ## 実装ステータス
 
+- [x] シールドマスタリ (Ms-Shield) - 設計完了
 - [x] プロテクション (IsProtect) - 設計・実装完了
 - [x] イージス (IsAegis) - 設計・実装完了
 - [x] 統合関数 (getShieldSkillBonuses) - 実装完了
@@ -138,8 +186,11 @@ function calculateAegisEffects(
 
 ## 特徴
 
-- **武器種制限**: なし（全武器種で使用可能）
+- **武器種制限**: 
+  - シールドマスタリ: 盾装備時のみ効果あり
+  - プロテクション・イージス: 全武器種で使用可能
 - **効果タイプ**: トグル式（ON/OFF）
+- **シールドマスタリ**: 攻撃速度向上（盾装備条件）
 - **相反効果**: 物理と魔法の耐性がトレードオフ関係
 - **累積効果**: 両スキル同時使用時の効果累積
 
@@ -175,18 +226,21 @@ function calculateMagicalResistance(bonuses: AllBonuses) {
 
 ### バフスキル統合システム
 ```typescript
-// 統合関数による両スキルの効果統合
+// 統合関数による全シールドスキルの効果統合
 function getShieldSkillBonuses(
-  buffSkillData: Record<string, BuffSkillState> | null
+  buffSkillData: Record<string, BuffSkillState> | null,
+  hasShield: boolean = false
 ): Partial<EquipmentProperties> {
   const bonuses: Partial<EquipmentProperties> = {}
   
+  // シールドマスタリの効果を統合（盾装備条件付き）
+  const shieldMasteryBonuses = getShieldMasteryEffects(buffSkillData, hasShield)
   // プロテクションの効果を統合
   const protectionBonuses = getProtectionEffects(buffSkillData)
   // イージスの効果を統合
   const aegisBonuses = getAegisEffects(buffSkillData)
   
   // 効果を累積加算
-  return integrateEffects([protectionBonuses, aegisBonuses])
+  return integrateEffects([shieldMasteryBonuses, protectionBonuses, aegisBonuses])
 }
 ```
