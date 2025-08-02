@@ -190,7 +190,7 @@ export const crystalsData: CrystalsData = {
 			},
 			{
 				id: 'ebc3fa48-5a5a-4134-94ff-dd20ad0133bc',
-				name: 'バングルドム(軽鎧装備)',
+				name: 'バングルドム',
 				type: 'armor',
 				properties: {
 					ATK_Rate: 10,
@@ -198,8 +198,19 @@ export const crystalsData: CrystalsData = {
 					AttackSpeed_Rate: 10,
 					CastingSpeed_Rate: 10,
 					HP_Rate: -20,
-					MagicalPenetration_Rate: 5,
 				},
+				conditionalEffects: [
+					{
+						condition: { type: 'subWeapon', weaponType: '盾' },
+						properties: { DEX_Rate: 5 },
+						description: '盾装備時: DEX+5%',
+					},
+					{
+						condition: { type: 'armor', armorType: 'light' },
+						properties: { MagicalPenetration_Rate: 5 },
+						description: '軽鎧装備時: 魔法貫通+5%',
+					},
+				],
 			},
 			{
 				id: '8afa1704-3ed9-4210-86a9-f18a8ca1244f',
@@ -441,14 +452,20 @@ export const crystalsData: CrystalsData = {
 			},
 			{
 				id: '5e6f7890-1234-5678-9abc-def012345678',
-				name: 'シカノカーミ(槍装備時)',
+				name: 'シカノカーミ',
 				type: 'special',
 				properties: {
 					ShortRangeDamage_Rate: 5,
 					AttackMPRecovery: 20,
 					Accuracy: 50,
-					LongRangeDamage_Rate: 5,
 				},
+				conditionalEffects: [
+					{
+						condition: { type: 'mainWeapon', weaponType: '旋風槍' },
+						properties: { LongRangeDamage_Rate: 5 },
+						description: '旋風槍装備時: 遠距離威力+5%',
+					},
+				],
 			},
 			{
 				id: '6f789012-3456-789a-bcde-f01234567890',
