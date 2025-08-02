@@ -119,6 +119,16 @@ export const equipmentsData: EquipmentsData = {
 					ElementAdvantage_Rate: 23,
 				},
 			},
+			{
+				id: '794a928f-b6eb-42bc-bfa1-13f4d3295a3d',
+				name: 'ディグニダー',
+				properties: {
+					Anticipate_Rate: 30,
+					ArmorBreak_Rate: 30,
+					Aggro_Rate: 30,
+					Critical: 90,
+				},
+			},
 		],
 		body: [
 			{
@@ -165,7 +175,7 @@ export const equipmentsData: EquipmentsData = {
 			},
 			{
 				id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
-				name: '星辰の舟衣',
+				name: '星辰の舟衣(近)',
 				properties: {
 					HP: 7500,
 					Critical: 25,
@@ -515,6 +525,18 @@ export const equipmentsData: EquipmentsData = {
 						description: '抜刀剣装備時: 命中+10%',
 					},
 				],
+			},
+			{
+				id: 'f78ec8a2-93e8-4457-a0bd-351922cb89c6',
+				name: '十露盤の盾',
+				properties: {
+					GuardRecharge_Rate: 35,
+					GuardPower_Rate: 25,
+					AttackMPRecovery: 10,
+					CastingSpeed: 300,
+					LightResistance_Rate: 30,
+					Aggro_Rate: 60,
+				},
 			},
 		],
 		fashion1: [
