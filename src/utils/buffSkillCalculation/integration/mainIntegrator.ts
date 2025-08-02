@@ -369,7 +369,10 @@ export function getBuffSkillBraveMultiplier(
 
 	// ブレードスキルのブレイブ倍率も追加（オーラブレード）
 	if (weaponType !== undefined) {
-		totalBraveMultiplier += getBladeSkillBraveMultiplier(buffSkillData, weaponType)
+		totalBraveMultiplier += getBladeSkillBraveMultiplier(
+			buffSkillData,
+			weaponType,
+		)
 	}
 
 	// エンハンスのブレイブ倍率も追加
