@@ -636,7 +636,7 @@ const WEAPON_TYPES: Record<string, WeaponType> = {
 		statusATKFormula: (stats) =>
 			stats.STR * 1.0 + stats.DEX * 2.0 + stats.AGI * 1.0,
 		statusASPDFormula: (stats) => stats.STR * 0.2 + stats.AGI * 4.2,
-		statusStabilityFormula: (stats) => 0, // 特殊計算（保留）
+		statusStabilityFormula: (stats) => stats.STR * 0.025 + stats.DEX * 0.075,
 		aspdCorrection: 100,
 	},
 	barehand: {
