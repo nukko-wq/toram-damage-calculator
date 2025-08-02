@@ -3,7 +3,7 @@
  */
 
 import type { BuffSkillState, MainWeaponType } from '@/types/buffSkill'
-import type { EquipmentProperties, WeaponType } from '@/types/calculator'
+import type { EquipmentProperties, WeaponType, SubWeapon } from '@/types/calculator'
 import type { AllBonuses } from '../../basicStatsCalculation'
 import { convertWeaponType, integrateEffects } from '../types'
 
@@ -186,11 +186,27 @@ export function calculateMagicMasteryEffects(
 }
 
 /**
+ * シールドマスタリの効果計算関数
+ */
+export function calculateShieldMasteryEffects(
+	isEnabled: boolean,
+	subWeapon: SubWeapon | null,
+): Partial<EquipmentProperties> {
+	// 盾装備時のみ効果あり
+	if (!isEnabled || !subWeapon || subWeapon.weaponType !== '盾') return {}
+
+	return {
+		AttackSpeed_Rate: 50,
+	}
+}
+
+/**
  * マスタリスキル系統の統合効果取得
  */
 export function getMasterySkillBonuses(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
+	subWeapon: SubWeapon | null = null,
 ): Partial<AllBonuses> {
 	const convertedWeaponType = convertWeaponType(weaponType)
 	const bonuses: Partial<AllBonuses> = {}
@@ -253,6 +269,16 @@ export function getMasterySkillBonuses(
 		const effects = calculateMagicMasteryEffects(
 			magicMastery.level,
 			convertedWeaponType,
+		)
+		integrateEffects(effects, bonuses)
+	}
+
+	// シールドマスタリの処理
+	const shieldMastery = buffSkillData['Ms-Shield']
+	if (shieldMastery?.isEnabled) {
+		const effects = calculateShieldMasteryEffects(
+			shieldMastery.isEnabled,
+			subWeapon,
 		)
 		integrateEffects(effects, bonuses)
 	}
