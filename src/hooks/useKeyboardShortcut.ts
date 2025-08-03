@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 /**
  * キーボードショートカットを管理するカスタムフック
@@ -136,4 +136,80 @@ export function useFloatingMenuEscape(
 			document.removeEventListener('mousedown', handleClickOutside)
 		}
 	}, [isOpen, callback, excludeSelector])
+}
+
+/**
+ * レスポンシブ対応と状態管理を統合するフック
+ * StatusPreviewで使用される複雑な状態管理を最適化
+ */
+export function useResponsiveStateManager<T extends Record<string, boolean>>(
+	initialVisibleSections: T,
+	initialActiveSection: keyof T | null,
+	breakpoint = '(max-width: 639px)',
+) {
+	const [isMobile, setIsMobile] = useState(false)
+	const [visibleSections, setVisibleSections] = useState(initialVisibleSections)
+	const [activeSection, setActiveSection] = useState<keyof T | null>(initialActiveSection)
+
+	// ブレークポイント監視の最適化
+	useEffect(() => {
+		const mediaQuery = window.matchMedia(breakpoint)
+		const handleChange = () => {
+			setIsMobile(mediaQuery.matches)
+			// モバイル切り替え時に初期状態に設定
+			if (mediaQuery.matches) {
+				// モバイルでは基本セクションを初期表示
+				setActiveSection(initialActiveSection)
+				setVisibleSections(initialVisibleSections)
+			}
+		}
+
+		handleChange() // 初期状態設定
+		mediaQuery.addEventListener('change', handleChange)
+		return () => mediaQuery.removeEventListener('change', handleChange)
+	}, [breakpoint, initialVisibleSections, initialActiveSection])
+
+	// セクション表示の切り替え
+	const toggleSection = useCallback((section: keyof T) => {
+		setVisibleSections((prev) => ({
+			...prev,
+			[section]: !prev[section],
+		}))
+	}, [])
+
+	// モバイル用セクション切り替え処理
+	const handleMobileSectionChange = useCallback((section: keyof T) => {
+		// 現在選択中のセクションと同じ場合はトグル（非表示）
+		if (activeSection === section && visibleSections[section]) {
+			setActiveSection(null) // アクティブセクションをクリア
+			setVisibleSections((prev) => {
+				const newState = { ...prev }
+				for (const key in newState) {
+					newState[key] = false as T[typeof key]
+				}
+				return newState
+			})
+		} else {
+			// 新しいセクションを選択
+			setActiveSection(section)
+			setVisibleSections((prev) => {
+				const newState = { ...prev }
+				for (const key in newState) {
+					newState[key] = false as T[typeof key]
+				}
+				newState[section] = true as T[typeof section]
+				return newState
+			})
+		}
+	}, [activeSection, visibleSections])
+
+	return {
+		isMobile,
+		visibleSections,
+		activeSection,
+		toggleSection,
+		handleMobileSectionChange,
+		setVisibleSections,
+		setActiveSection,
+	}
 }
