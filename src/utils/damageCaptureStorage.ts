@@ -2,6 +2,8 @@
  * ダメージキャプチャデータの型定義とLocalStorage操作
  */
 
+import { safeJSONParse } from './storage'
+
 // ダメージ計算結果の型定義
 export interface DamageCalculationResult {
 	minimum: {
@@ -46,7 +48,7 @@ export const saveCaptureData = (data: DamageCaptureData): void => {
 export const loadCaptureData = (): DamageCaptureData | null => {
 	try {
 		const stored = localStorage.getItem(DAMAGE_CAPTURE_KEY)
-		return stored ? JSON.parse(stored) : null
+		return stored ? safeJSONParse(stored, null) : null
 	} catch (error) {
 		console.error('Failed to load capture data:', error)
 		// 破損データの場合は削除して null を返す

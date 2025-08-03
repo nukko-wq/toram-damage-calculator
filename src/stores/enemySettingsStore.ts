@@ -9,6 +9,7 @@ import type {
 	EnemySettings,
 	EnemySettingsMap,
 } from '@/types/calculator'
+import { safeJSONParse } from '@/utils/storage'
 
 interface EnemySettingsStore {
 	// 状態
@@ -131,7 +132,7 @@ export const useEnemySettingsStore = create<EnemySettingsStore>()(
 				try {
 					const stored = localStorage.getItem(STORAGE_KEY)
 					if (stored) {
-						const parsed = JSON.parse(stored) as EnemySettingsMap
+						const parsed = safeJSONParse(stored, {} as EnemySettingsMap)
 						set({ settingsMap: parsed }, false, 'loadFromLocalStorage')
 					}
 				} catch (error) {

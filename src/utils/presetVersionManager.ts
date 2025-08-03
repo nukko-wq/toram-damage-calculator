@@ -1,4 +1,5 @@
 import { crystalsData } from '@/data/crystals'
+import { safeJSONParse } from './storage'
 import { enemiesData } from '@/data/enemies'
 // フォールバック用の静的インポート
 import { equipmentsData } from '@/data/equipments'
@@ -46,7 +47,7 @@ export function forceResetPresetData(): void {
 export function getLocalPresetVersion(): PresetVersionInfo | null {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEYS.PRESET_VERSION)
-		return stored ? JSON.parse(stored) : null
+		return stored ? safeJSONParse(stored, null) : null
 	} catch (error) {
 		console.error('Failed to get local preset version:', error)
 		return null
@@ -556,7 +557,7 @@ export async function checkAndUpdatePresetData(): Promise<
 function getLocalStorageEquipments(): LocalStorageEquipment[] {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEYS.PRESET_EQUIPMENTS)
-		return stored ? JSON.parse(stored) : []
+		return stored ? safeJSONParse(stored, []) : []
 	} catch (error) {
 		console.error('Failed to get local storage equipments:', error)
 		return []
@@ -566,7 +567,7 @@ function getLocalStorageEquipments(): LocalStorageEquipment[] {
 function getLocalStorageCrystals(): LocalStorageCrystal[] {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEYS.PRESET_CRYSTALS)
-		return stored ? JSON.parse(stored) : []
+		return stored ? safeJSONParse(stored, []) : []
 	} catch (error) {
 		console.error('Failed to get local storage crystals:', error)
 		return []
@@ -576,7 +577,7 @@ function getLocalStorageCrystals(): LocalStorageCrystal[] {
 function getLocalStorageEnemies(): LocalStorageEnemy[] {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEYS.PRESET_ENEMIES)
-		return stored ? JSON.parse(stored) : []
+		return stored ? safeJSONParse(stored, []) : []
 	} catch (error) {
 		console.error('Failed to get local storage enemies:', error)
 		return []

@@ -1,6 +1,8 @@
 // 武器情報専用のLocalStorage管理システム
 // プリセット装備とカスタム装備の両方で武器情報をオーバーレイ保存
 
+import { safeJSONParse } from './storage'
+
 interface WeaponInfo {
 	ATK: number
 	stability: number
@@ -114,7 +116,7 @@ export function clearAllWeaponInfo(): boolean {
 function getWeaponInfoStorage(): WeaponInfoStorage {
 	try {
 		const stored = localStorage.getItem(WEAPON_INFO_STORAGE_KEY)
-		return stored ? JSON.parse(stored) : {}
+		return stored ? safeJSONParse(stored, {}) : {}
 	} catch (error) {
 		console.error('武器情報ストレージ取得エラー:', error)
 		return {}

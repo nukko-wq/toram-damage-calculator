@@ -6,7 +6,7 @@ import type {
 	PresetCrystal,
 	UserCrystal,
 } from '@/types/calculator'
-import { STORAGE_KEYS, StorageHelper } from './storage'
+import { STORAGE_KEYS, StorageHelper, safeJSONParse } from './storage'
 
 // ストレージキー
 const NEW_STORAGE_KEYS = {
@@ -42,7 +42,7 @@ const presetCrystals: PresetCrystal[] = [
 export function getLocalStorageCrystals(): LocalStorageCrystal[] {
 	try {
 		const stored = localStorage.getItem(NEW_STORAGE_KEYS.PRESET_CRYSTALS)
-		return stored ? JSON.parse(stored) : []
+		return stored ? safeJSONParse(stored, []) : []
 	} catch (error) {
 		console.error('Failed to load preset crystals from localStorage:', error)
 		return []
