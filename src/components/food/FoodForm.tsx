@@ -62,33 +62,28 @@ export default function FoodForm({ food: _food, onFoodChange }: FoodFormProps) {
 		mode: 'onChange',
 	})
 
-	// フォームの値を監視し、変更時にコールバックを呼び出す
-	const [isInitialized, setIsInitialized] = React.useState(false)
-
-	React.useEffect(() => {
-		// valuesプロパティを使用しているため、データ変更時の処理を軽量化
-		setIsInitialized(false)
-		const timer = setTimeout(() => setIsInitialized(true), 30)
-		return () => clearTimeout(timer)
-	}, [])
-
+	// FoodFormDataは複雑な構造のため、シンプルなuseEffectベースで監視
 	React.useEffect(() => {
 		const subscription = watch((value, { name, type }) => {
-			// 初期化中やプログラム的な変更は無視
-			if (!isInitialized || !name || !value || type !== 'change') {
+			// プログラム的な変更は無視
+			if (!name || !value || type !== 'change') {
 				return
 			}
 
-			// Zustandストアを更新
-			updateFood(value as FoodFormData)
-
-			// 後方互換性のため従来のonChangeも呼び出し
-			if (onFoodChange) {
-				onFoodChange(value as FoodFormData)
+			// すべてのスロットが定義されている場合のみ更新
+			if (value && typeof value === 'object' && 
+				'slot1' in value && 'slot2' in value && 'slot3' in value && 
+				'slot4' in value && 'slot5' in value) {
+				// Zustandストアを更新
+				updateFood(value as FoodFormData)
+				// 後方互換性のため従来のonChangeも呼び出し
+				if (onFoodChange) {
+					onFoodChange(value as FoodFormData)
+				}
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watch, onFoodChange, isInitialized, updateFood])
+	}, [watch, updateFood, onFoodChange])
 
 	// 現在の値を取得（UI表示用）
 	const watchedValues = watch()

@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import {
 	type MainWeaponFormData,
@@ -9,6 +9,7 @@ import {
 	type SubWeaponFormData,
 	subWeaponSchema,
 } from '@/schemas/weapons'
+import { useWeaponFormSync, validateWeaponData } from '@/hooks/useFormSync'
 import { useCalculatorStore } from '@/stores'
 import type { MainWeapon, SubWeapon, WeaponType } from '@/types/calculator'
 import {
@@ -57,8 +58,6 @@ export default function WeaponForm() {
 		return getRefinementDisplayOptions()
 	}, [])
 
-	// 初期化状態管理
-	const [isInitialized, setIsInitialized] = useState(false)
 
 	// 精錬値変換ヘルパー関数
 	const getCurrentMainRefinementDisplay = (): RefinementDisplay => {
@@ -188,63 +187,42 @@ export default function WeaponForm() {
 		}
 	}
 
-	// 外部からの変更を反映（軽量化でちらつき防止）
-	useEffect(() => {
-		// valuesプロパティを使用しているため、変更検知を一時的に無効化のみ
-		setIsInitialized(false)
-		const timer = setTimeout(() => setIsInitialized(true), 30)
-		return () => clearTimeout(timer)
-	}, [])
 
-	// フォーム値変更を監視してZustandストアに通知（メイン武器）
-	useEffect(() => {
-		const subscription = watchMain((value, { name, type }) => {
-			// 初期化中やプログラム的な変更は無視
-			if (!isInitialized || !name || !value || type !== 'change') {
-				return
+	// メイン武器の武器タイプ変更時の処理
+	const handleMainWeaponTypeChange = (newWeaponType: string, currentData: Partial<MainWeaponFormData>) => {
+		const newMainWeaponType = newWeaponType as WeaponType
+		const currentSubWeaponType = effectiveSubWeapon.weaponType
+
+		// 現在のサブ武器が新しいメイン武器で選択可能かチェック
+		if (!isValidWeaponCombination(newMainWeaponType, currentSubWeaponType)) {
+			// 無効な場合は自動修正
+			const fixedSubWeaponType = getAutoFixedSubWeapon(newMainWeaponType)
+			const fixedSubWeapon = {
+				...effectiveSubWeapon,
+				weaponType: fixedSubWeaponType,
 			}
-			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
-				// メイン武器が変更された場合、サブ武器の組み合わせをチェック
-				if (name === 'weaponType') {
-					const newMainWeaponType = value.weaponType as WeaponType
-					const currentSubWeaponType = effectiveSubWeapon.weaponType
 
-					// 現在のサブ武器が新しいメイン武器で選択可能かチェック
-					if (
-						!isValidWeaponCombination(newMainWeaponType, currentSubWeaponType)
-					) {
-						// 無効な場合は自動修正
-						const fixedSubWeaponType = getAutoFixedSubWeapon(newMainWeaponType)
-						const fixedSubWeapon = {
-							...effectiveSubWeapon,
-							weaponType: fixedSubWeaponType,
-						}
+			// サブ武器を自動修正
+			updateSubWeapon(fixedSubWeapon)
+			setValueSub('weaponType', fixedSubWeaponType)
+		}
+	}
 
-						// サブ武器を自動修正
-						updateSubWeapon(fixedSubWeapon)
-						setValueSub('weaponType', fixedSubWeaponType)
-					}
-				}
-
-				// Zustandストアを更新
-				updateMainWeapon(value as MainWeapon)
-			}
-		})
-		return () => subscription.unsubscribe()
-	}, [
+	// メイン武器のフォーム同期（カスタムフック使用）
+	useWeaponFormSync<MainWeaponFormData>(
 		watchMain,
-		isInitialized,
-		updateMainWeapon,
-		updateSubWeapon,
-		effectiveSubWeapon,
-		setValueSub,
-	])
+		(data: MainWeaponFormData) => updateMainWeapon(data as MainWeapon),
+		validateWeaponData,
+		{
+			onWeaponTypeChange: handleMainWeaponTypeChange,
+		},
+	)
 
-	// フォーム値変更を監視してZustandストアに通知（サブ武器）
+	// サブ武器のフォーム値変更を監視（シンプル版）
 	useEffect(() => {
 		const subscription = watchSub((value, { name, type }) => {
-			// 初期化中やプログラム的な変更は無視
-			if (!isInitialized || !name || !value || type !== 'change') {
+			// プログラム的な変更は無視
+			if (!name || !value || type !== 'change') {
 				return
 			}
 			if (Object.values(value).every((v) => v !== undefined && v !== null)) {
@@ -253,7 +231,7 @@ export default function WeaponForm() {
 			}
 		})
 		return () => subscription.unsubscribe()
-	}, [watchSub, isInitialized, updateSubWeapon])
+	}, [watchSub, updateSubWeapon])
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-5 md:col-end-9 md:row-start-1 md:row-end-2 xl:col-start-1 xl:col-end-3 xl:row-start-2 xl:row-end-3">

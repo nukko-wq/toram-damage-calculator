@@ -1,17 +1,15 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
+import { useFormSync, validateBaseStats } from '@/hooks/useFormSync'
 import { type BaseStatsFormData, baseStatsSchema } from '@/schemas/baseStats'
 import { useCalculatorStore } from '@/stores'
 import type { BaseStats } from '@/types/calculator'
 import { calculateStatPoints } from '@/utils/statPointCalculation'
 
 export default function BaseStatsForm() {
-	// 初期化状態管理
-	const [isInitialized, setIsInitialized] = useState(false)
-
 	// Zustandストアから基本ステータスを取得
 	const storeStats = useCalculatorStore((state) => state.data.baseStats)
 	const updateBaseStats = useCalculatorStore((state) => state.updateBaseStats)
@@ -24,6 +22,13 @@ export default function BaseStatsForm() {
 		values: effectiveStats,
 		mode: 'onChange',
 	})
+
+	// useFormSyncカスタムフックで初期化とフォーム監視を統合
+	useFormSync<BaseStatsFormData>(
+		watch,
+		(data: BaseStatsFormData) => updateBaseStats(data as BaseStats),
+		validateBaseStats,
+	)
 
 	// 現在のレベル値と全ステータス値を取得してステータスポイントを計算
 	const currentLevel = watch('level') || effectiveStats.level || 1
@@ -65,34 +70,8 @@ export default function BaseStatsForm() {
 		}, 0)
 	}
 
-	// 外部データ変更時の初期化管理（軽量化でちらつき防止）
-	useEffect(() => {
-		// データが変更されたときは一時的に変更検知を無効化
-		setIsInitialized(false)
-		// 次のティックで再有効化（ちらつき最小化）
-		const timer = setTimeout(() => setIsInitialized(true), 30)
-		return () => clearTimeout(timer)
-	}, [])
-
-	// フォームの値変更を監視して親に通知
-	useEffect(() => {
-		const subscription = watch((value, { name, type }) => {
-			// 初期化中やプログラム的な変更は無視
-			if (!isInitialized || !name || !value || type !== 'change') {
-				return
-			}
-
-			// 全ての値が有効な数値の場合のみZustandストアを更新
-			const isAllValid = Object.values(value).every(
-				(v) => typeof v === 'number' && !Number.isNaN(v) && v >= 1,
-			)
-
-			if (isAllValid) {
-				updateBaseStats(value as BaseStats)
-			}
-		})
-		return () => subscription.unsubscribe()
-	}, [watch, isInitialized, updateBaseStats])
+	// useFormSyncカスタムフックで初期化は自動的に管理される
+	// useEffectによる手動管理は不要
 
 	return (
 		<section className="bg-white rounded-lg shadow-md p-4 md:col-start-1 md:col-end-5 md:row-start-1 md:row-end-2 xl:col-start-1 xl:col-end-3 xl:row-start-1 xl:row-end-2">
