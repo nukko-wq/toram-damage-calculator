@@ -1,6 +1,7 @@
 // 敵情報データベース（プリセット + ユーザーカスタム統合）
 
 import { enemiesData } from '@/data/enemies'
+import { safeJSONParse } from './storage'
 import type {
 	Enemy,
 	EnemyCategory,
@@ -30,7 +31,7 @@ interface EnemiesData {
 export function getLocalStorageEnemies(): LocalStorageEnemy[] {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEYS.PRESET_ENEMIES)
-		return stored ? JSON.parse(stored) : []
+		return stored ? safeJSONParse(stored, []) : []
 	} catch (error) {
 		console.error('Failed to load preset enemies from localStorage:', error)
 		return []

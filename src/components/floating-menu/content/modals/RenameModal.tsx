@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useRenameModal } from '@/hooks/useModal'
 
 interface RenameModalProps {
 	isOpen: boolean
@@ -20,26 +21,8 @@ export default function RenameModal({
 	const [isRenaming, setIsRenaming] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 
-	// モーダルが開いたときの初期化
-	useEffect(() => {
-		if (isOpen) {
-			setNewName(currentName)
-			setError(null)
-			setIsRenaming(false)
-		}
-	}, [isOpen, currentName])
-
-	// ESCキーでモーダルを閉じる
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape' && isOpen) {
-				onClose()
-			}
-		}
-
-		document.addEventListener('keydown', handleKeyDown)
-		return () => document.removeEventListener('keydown', handleKeyDown)
-	}, [isOpen, onClose])
+	// カスタムフックで初期化とESCキー処理を統合
+	useRenameModal(isOpen, onClose, currentName, setNewName, setError, setIsRenaming)
 
 	// 名前変更処理
 	const handleRename = async () => {

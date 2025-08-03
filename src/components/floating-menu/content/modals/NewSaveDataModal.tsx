@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useCreateModal } from '@/hooks/useModal'
 
 interface NewSaveDataModalProps {
 	isOpen: boolean
@@ -18,26 +19,8 @@ export default function NewSaveDataModal({
 	const [isCreating, setIsCreating] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 
-	// モーダルが開いたときの初期化
-	useEffect(() => {
-		if (isOpen) {
-			setSaveName('')
-			setError(null)
-			setIsCreating(false)
-		}
-	}, [isOpen])
-
-	// ESCキーでモーダルを閉じる
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape' && isOpen) {
-				onClose()
-			}
-		}
-
-		document.addEventListener('keydown', handleKeyDown)
-		return () => document.removeEventListener('keydown', handleKeyDown)
-	}, [isOpen, onClose])
+	// カスタムフックで初期化とESCキー処理を統合
+	useCreateModal(isOpen, onClose, setSaveName, setError, setIsCreating)
 
 	// セーブデータ作成
 	const handleCreateSave = async () => {

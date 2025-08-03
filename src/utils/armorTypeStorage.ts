@@ -1,6 +1,8 @@
 // 防具改造タイプ専用のLocalStorage管理システム
 // プリセット装備とカスタム装備の両方で防具改造タイプをオーバーレイ保存
 
+import { safeJSONParse } from './storage'
+
 interface ArmorTypeInfo {
 	armorType: import('@/types/calculator').ArmorType
 	updatedAt: string
@@ -108,7 +110,7 @@ export function clearAllArmorType(): boolean {
 function getArmorTypeStorage(): ArmorTypeStorage {
 	try {
 		const stored = localStorage.getItem(ARMOR_TYPE_STORAGE_KEY)
-		return stored ? JSON.parse(stored) : {}
+		return stored ? safeJSONParse(stored, {}) : {}
 	} catch (error) {
 		console.error('防具改造タイプストレージ取得エラー:', error)
 		return {}

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useResponsiveStateManager } from '@/hooks/useKeyboardShortcut'
 import { useCalculatorStore, useSaveDataStore, useUIStore } from '@/stores'
 import type { FilterOption } from '@/types/bonusCalculation'
 import {
@@ -103,14 +104,23 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const { currentSaveId } = useSaveDataStore()
 	const { getStatusPreviewCategory, setStatusPreviewCategory } = useUIStore()
 
-	// 表示状態管理
-	const [visibleSections, setVisibleSections] = useState({
-		basicStats: true,
-		adjustedStats: false,
-		equipmentBonus1: false,
-		equipmentBonus2: false,
-		equipmentBonus3: false,
-	})
+	// レスポンシブ状態管理をカスタムフックで最適化
+	const {
+		isMobile,
+		visibleSections,
+		activeSection,
+		toggleSection,
+		handleMobileSectionChange,
+	} = useResponsiveStateManager(
+		{
+			basicStats: true,
+			adjustedStats: false,
+			equipmentBonus1: false,
+			equipmentBonus2: false,
+			equipmentBonus3: false,
+		},
+		'basicStats',
+	)
 
 	// 基本ステータスカテゴリ状態管理（UIStoreから取得）
 	const basicStatsCategory = getStatusPreviewCategory(currentSaveId)
@@ -126,73 +136,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		equipmentBonus2: 'all' as FilterOption,
 		equipmentBonus3: 'all' as FilterOption,
 	})
-
-	// レスポンシブ表示制御
-	const [isMobile, setIsMobile] = useState(false)
-	const [activeSection, setActiveSection] = useState<
-		keyof typeof visibleSections | null
-	>('basicStats')
-
-	// セクション表示の切り替え
-	const toggleSection = (section: keyof typeof visibleSections) => {
-		setVisibleSections((prev) => ({
-			...prev,
-			[section]: !prev[section],
-		}))
-	}
-
-	// ブレークポイント監視
-	useEffect(() => {
-		const mediaQuery = window.matchMedia('(max-width: 639px)') // sm未満
-		const handleChange = () => {
-			setIsMobile(mediaQuery.matches)
-			// モバイル切り替え時に初期状態に設定
-			if (mediaQuery.matches) {
-				// モバイルでは基本ステータスを初期表示
-				setActiveSection('basicStats')
-				setVisibleSections({
-					basicStats: true,
-					adjustedStats: false,
-					equipmentBonus1: false,
-					equipmentBonus2: false,
-					equipmentBonus3: false,
-				})
-			}
-		}
-
-		handleChange() // 初期状態設定
-		mediaQuery.addEventListener('change', handleChange)
-		return () => mediaQuery.removeEventListener('change', handleChange)
-	}, [])
-
-	// モバイル用セクション切り替え処理
-	const handleMobileSectionChange = (section: keyof typeof visibleSections) => {
-		// 現在選択中のセクションと同じ場合はトグル（非表示）
-		if (activeSection === section && visibleSections[section]) {
-			setActiveSection(null) // アクティブセクションをクリア
-			setVisibleSections({
-				basicStats: false,
-				adjustedStats: false,
-				equipmentBonus1: false,
-				equipmentBonus2: false,
-				equipmentBonus3: false,
-			})
-		} else {
-			// 新しいセクションを選択
-			setActiveSection(section)
-			setVisibleSections({
-				basicStats: false,
-				adjustedStats: false,
-				equipmentBonus1: false,
-				equipmentBonus2: false,
-				equipmentBonus3: false,
-			})
-			setVisibleSections((prev) => ({
-				...prev,
-				[section]: true,
-			}))
-		}
-	}
 
 	// フィルター変更処理
 	const handleFilterChange = (

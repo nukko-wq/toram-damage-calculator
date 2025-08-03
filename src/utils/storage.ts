@@ -24,6 +24,19 @@ export const STORAGE_KEYS = {
 	BUFF_ITEM_FAVORITES: 'toram_buff_item_favorites',
 } as const
 
+/**
+ * 安全なJSONパース関数
+ * 不正なJSONまたはパースエラーが発生した場合、フォールバック値を返す
+ */
+export function safeJSONParse<T>(json: string, fallback: T): T {
+	try {
+		return JSON.parse(json)
+	} catch (error) {
+		console.warn('JSON parse failed:', error)
+		return fallback
+	}
+}
+
 // 安全なLocalStorage操作のヘルパー関数
 // biome-ignore lint/complexity/noStaticOnlyClass: LocalStorage操作の名前空間として使用
 export class StorageHelper {
@@ -36,7 +49,7 @@ export class StorageHelper {
 		try {
 			const item = localStorage.getItem(key)
 			if (item === null) return defaultValue
-			return JSON.parse(item) as T
+			return safeJSONParse(item, defaultValue)
 		} catch (error) {
 			console.error(`Error reading from localStorage (${key}):`, error)
 			return defaultValue

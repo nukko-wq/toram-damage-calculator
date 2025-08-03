@@ -1,4 +1,5 @@
 import { equipmentsData } from '@/data/equipments'
+import { safeJSONParse } from './storage'
 import type {
 	ArmorType,
 	ConditionalEffect,
@@ -264,7 +265,7 @@ const STORAGE_KEYS = {
 export function getLocalStorageEquipments(): LocalStorageEquipment[] {
 	try {
 		const stored = localStorage.getItem(STORAGE_KEYS.PRESET_EQUIPMENTS)
-		return stored ? JSON.parse(stored) : []
+		return stored ? safeJSONParse(stored, []) : []
 	} catch (error) {
 		console.error('Failed to load preset equipments from localStorage:', error)
 		return []
@@ -275,7 +276,7 @@ export function getLocalStorageEquipments(): LocalStorageEquipment[] {
 export function getUserCustomEquipments(): UserEquipment[] {
 	try {
 		const customData = localStorage.getItem(STORAGE_KEYS.CUSTOM_EQUIPMENTS)
-		return customData ? JSON.parse(customData) : []
+		return customData ? safeJSONParse(customData, []) : []
 	} catch (error) {
 		console.error('Failed to load custom equipments:', error)
 		return []

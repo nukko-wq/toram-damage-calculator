@@ -18,6 +18,7 @@ import type {
 	DamageCalculationResult,
 } from '@/types/stores'
 import { calculateResults } from '@/utils/calculationEngine'
+import { safeJSONParse } from '@/utils/storage'
 import {
 	calculateDamageWithService,
 	type DamageCalculationServiceResult,
@@ -825,7 +826,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				try {
 					const saved = localStorage.getItem(CALC_RESULT_SETTINGS_KEY)
 					if (saved) {
-						const settings: CalculationResultSettings = JSON.parse(saved)
+						const settings: CalculationResultSettings = safeJSONParse(saved, {
+							isVisible: false,
+							lastToggleTime: new Date().toISOString()
+						})
 						set({ isCalculationResultVisible: settings.isVisible })
 					}
 				} catch (error) {

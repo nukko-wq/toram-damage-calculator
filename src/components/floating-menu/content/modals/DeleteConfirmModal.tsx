@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEscapeKey } from '@/hooks/useKeyboardShortcut'
 import { createPortal } from 'react-dom'
 
 interface DeleteConfirmModalProps {
@@ -16,17 +16,8 @@ export default function DeleteConfirmModal({
 	onConfirm,
 	saveDataName,
 }: DeleteConfirmModalProps) {
-	// ESCキーでモーダルを閉じる
-	useEffect(() => {
-		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape' && isOpen) {
-				onClose()
-			}
-		}
-
-		document.addEventListener('keydown', handleKeyDown)
-		return () => document.removeEventListener('keydown', handleKeyDown)
-	}, [isOpen, onClose])
+	// ESCキーでモーダルを閉じる（カスタムフック使用）
+	useEscapeKey(onClose, isOpen)
 
 	if (!isOpen) return null
 

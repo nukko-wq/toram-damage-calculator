@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type {
 	OptionTabType,
@@ -69,17 +69,6 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
 
-	// キャプチャデータの初期読み込み
-	useEffect(() => {
-		const loadedData = loadCaptureData()
-		setCaptureData(loadedData)
-	}, [])
-
-	// adaptationMultiplierが変更されたときにtempAdaptationValueを同期
-	useEffect(() => {
-		setTempAdaptationValue(adaptationMultiplier.toString())
-	}, [adaptationMultiplier])
-
 	// Zustandストアから計算データと計算結果を取得
 	const calculatorData = useCalculatorStore((state) => state.data)
 	const calculationResults = useCalculatorStore(
@@ -94,23 +83,41 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		(state) => state.updateBaselineDamageResult,
 	)
 
-	// 計算結果を更新
+	// キャプチャデータ初期化の関数をuseMemoで最適化
+	const initialCaptureData = useMemo(() => {
+		return loadCaptureData()
+	}, [])
+
+	// 初期化とフィールド監視を統合したuseEffect
 	useEffect(() => {
+		// 1. キャプチャデータの初期読み込み（初回のみ）
+		if (captureData === null) {
+			setCaptureData(initialCaptureData)
+		}
+
+		// 2. adaptationMultiplierが変更されたときにtempAdaptationValueを同期
+		setTempAdaptationValue(adaptationMultiplier.toString())
+
+		// 3. 計算結果を更新（必要な場合のみ）
 		if (!calculationResults) {
 			updateCalculationResults()
 		}
-	}, [calculationResults, updateCalculationResults])
 
-	// ダメージ計算結果を更新（DamagePreviewでの計算後にキャッシュとして保存）
-	useEffect(() => {
-		// 計算結果が取得できた場合、基準ダメージをキャッシュに保存
+		// 4. ダメージ計算結果を更新（計算結果が取得できた場合）
 		if (calculationResults) {
 			updateBaselineDamageResult()
 		}
-	}, [calculationResults, updateBaselineDamageResult])
+	}, [
+		captureData,
+		initialCaptureData,
+		adaptationMultiplier,
+		calculationResults,
+		updateCalculationResults,
+		updateBaselineDamageResult,
+	])
 
-	// 選択されている敵の名前を取得
-	const getSelectedEnemyName = (): string => {
+	// 選択されている敵の名前を取得（useCallbackで最適化）
+	const getSelectedEnemyName = useCallback((): string => {
 		if (calculatorData.enemy?.selectedEnemyId) {
 			const enemy = getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
 			if (enemy) {
@@ -118,7 +125,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 		}
 		return '未選択'
-	}
+	}, [calculatorData.enemy?.selectedEnemyId])
 
 	// 実際のダメージ計算
 	const damageResults = useMemo((): DamageCalculationServiceResult => {
@@ -151,12 +158,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		}
 	}, [calculatorData, calculationResults, powerOptions, adaptationMultiplier])
 
-	if (!isVisible) {
-		return null
-	}
-
-	// キャプチャボタンクリック処理
-	const handleCapture = () => {
+	// キャプチャボタンクリック処理（useCallbackで最適化）
+	const handleCapture = useCallback(() => {
 		try {
 			// 現在のダメージ値を取得
 			const currentDamage = damageResults.normal
@@ -179,24 +182,28 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			console.error('キャプチャに失敗しました:', error)
 			alert('キャプチャに失敗しました')
 		}
-	}
+	}, [damageResults.normal])
 
-	const handlePowerOptionChange = <K extends keyof PowerOptions>(
+	const handlePowerOptionChange = useCallback(<K extends keyof PowerOptions>(
 		key: K,
 		value: PowerOptions[K],
 	) => {
 		updatePowerOptions({ ...powerOptions, [key]: value })
-	}
+	}, [powerOptions, updatePowerOptions])
 
-	const handleOtherOptionChange = <K extends keyof OtherOptions>(
+	const handleOtherOptionChange = useCallback(<K extends keyof OtherOptions>(
 		key: K,
 		value: OtherOptions[K],
 	) => {
 		updateOtherOptions({ ...otherOptions, [key]: value })
-	}
+	}, [otherOptions, updateOtherOptions])
 
-	const handleTabChange = (tab: OptionTabType) => {
+	const handleTabChange = useCallback((tab: OptionTabType) => {
 		updateOptionTab(tab)
+	}, [updateOptionTab])
+
+	if (!isVisible) {
+		return null
 	}
 
 	// powerOptionsが存在しない場合のフォールバック表示

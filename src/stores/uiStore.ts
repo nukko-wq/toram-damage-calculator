@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import type { UIStore } from '@/types/stores'
+import { safeJSONParse } from '@/utils/storage'
 
 // ローカルストレージから初期カテゴリ状態を取得
 const getInitialStatusPreviewCategories = (): Record<
@@ -12,7 +13,7 @@ const getInitialStatusPreviewCategories = (): Record<
 	try {
 		const stored = localStorage.getItem('ui-store')
 		if (stored) {
-			const parsed = JSON.parse(stored)
+			const parsed = safeJSONParse(stored, { state: { statusPreviewCategories: {} } })
 			return parsed.state?.statusPreviewCategories || {}
 		}
 	} catch (error) {
