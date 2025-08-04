@@ -16,7 +16,6 @@ interface EquipmentCrystalSelectorProps {
 	equipmentId: string
 	slotKey: keyof EquipmentSlots
 	onCrystalChange?: () => void
-	onMessage?: (message: string) => void
 }
 
 // 装備スロットとクリスタタイプのマッピング
@@ -38,7 +37,6 @@ export default function EquipmentCrystalSelector({
 	equipmentId,
 	slotKey,
 	onCrystalChange,
-	onMessage,
 }: EquipmentCrystalSelectorProps) {
 	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)
 	const currentCrystals = useCalculatorStore((state) => state.data.crystals)
@@ -143,10 +141,7 @@ export default function EquipmentCrystalSelector({
 					}
 					updateCrystals(updatedCrystals)
 
-					onMessage?.('クリスタを登録しました。')
 					onCrystalChange?.()
-				} else {
-					onMessage?.('クリスタの登録に失敗しました。')
 				}
 			} else {
 				// クリスタを削除した場合
@@ -167,14 +162,11 @@ export default function EquipmentCrystalSelector({
 					}
 					updateCrystals(updatedCrystals)
 
-					onMessage?.('クリスタを削除しました。')
 					onCrystalChange?.()
-				} else {
-					onMessage?.('クリスタの削除に失敗しました。')
 				}
 			}
 		},
-		[modalState.slotNumber, equipmentId, allowedTypes, currentCrystals, updateCrystals, onMessage, onCrystalChange],
+		[modalState.slotNumber, equipmentId, allowedTypes, currentCrystals, updateCrystals, onCrystalChange],
 	)
 
 	// クリスタを削除
@@ -197,13 +189,10 @@ export default function EquipmentCrystalSelector({
 				}
 				updateCrystals(updatedCrystals)
 
-				onMessage?.('クリスタを削除しました。')
 				onCrystalChange?.()
-			} else {
-				onMessage?.('クリスタの削除に失敗しました。')
 			}
 		},
-		[equipmentId, allowedTypes, currentCrystals, updateCrystals, onMessage, onCrystalChange],
+		[equipmentId, allowedTypes, currentCrystals, updateCrystals, onCrystalChange],
 	)
 
 	// 装備が変更された際に呼び出される更新関数

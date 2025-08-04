@@ -413,7 +413,6 @@ export default function PropertyEditor({
 					equipmentId={item.id}
 					slotKey={slotKey}
 					onCrystalChange={onUpdate}
-					onMessage={onMessage}
 				/>
 			)}
 			
