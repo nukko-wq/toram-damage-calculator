@@ -8,6 +8,7 @@ interface WeaponInfo {
 	stability: number
 	refinement: number
 	weaponType?: import('@/types/calculator').WeaponType
+	subWeaponType?: import('@/types/calculator').SubWeaponType
 	updatedAt: string
 }
 
@@ -18,7 +19,7 @@ interface WeaponInfoStorage {
 const WEAPON_INFO_STORAGE_KEY = 'toram_weapon_info_overrides'
 
 /**
- * 装備IDに紐づけて武器情報を保存
+ * 装備IDに紐づけて武器情報を保存（メイン武器用）
  */
 export function saveWeaponInfo(
 	equipmentId: string,
@@ -42,6 +43,35 @@ export function saveWeaponInfo(
 		return true
 	} catch (error) {
 		console.error('武器情報保存エラー:', error)
+		return false
+	}
+}
+
+/**
+ * 装備IDに紐づけてサブ武器情報を保存
+ */
+export function saveSubWeaponInfo(
+	equipmentId: string,
+	ATK: number,
+	stability: number,
+	refinement: number,
+	subWeaponType?: import('@/types/calculator').SubWeaponType,
+): boolean {
+	try {
+		const storage = getWeaponInfoStorage()
+		const weaponInfo: WeaponInfo = {
+			ATK,
+			stability,
+			refinement,
+			subWeaponType,
+			updatedAt: new Date().toISOString(),
+		}
+
+		storage[equipmentId] = weaponInfo
+		localStorage.setItem(WEAPON_INFO_STORAGE_KEY, JSON.stringify(storage))
+		return true
+	} catch (error) {
+		console.error('サブ武器情報保存エラー:', error)
 		return false
 	}
 }
