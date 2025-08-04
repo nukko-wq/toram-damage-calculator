@@ -17,16 +17,14 @@ import {
 	getEquipmentCategoryLabel,
 } from '@/utils/equipmentDatabase'
 import {
-	clearWeaponInfo,
 	getWeaponInfo,
-	saveWeaponInfo,
-	saveSubWeaponInfo,
 } from '@/utils/weaponInfoStorage'
 import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
 import EquipmentSelectionModal from './EquipmentSelectionModal'
 import { RegisterForm } from './RegisterForm'
 import RenameEquipmentModal from './RenameEquipmentModal'
+import WeaponInfoManager from './WeaponInfoManager'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
@@ -57,9 +55,6 @@ export default function EquipmentForm({
 	)
 	const updateCustomEquipmentProperties = useCalculatorStore(
 		(state) => state.updateCustomEquipmentProperties,
-	)
-	const updateEquipmentArmorType = useCalculatorStore(
-		(state) => state.updateEquipmentArmorType,
 	)
 	const updateMainWeapon = useCalculatorStore((state) => state.updateMainWeapon)
 	const updateSubWeapon = useCalculatorStore((state) => state.updateSubWeapon)
@@ -776,142 +771,16 @@ export default function EquipmentForm({
 		})
 	}
 
-	// メイン武器情報登録ハンドラー
-	const handleRegisterWeaponInfo = async () => {
-		const currentEquipment = effectiveEquipment.mainWeapon
-		console.log('現在の装備:', currentEquipment)
-
-		if (!currentEquipment?.id) {
-			console.log('装備が選択されていません')
-			showMessage('装備が選択されていません。')
-			return
-		}
-
-		try {
-			// WeaponFormからメイン武器データを取得
-			const mainWeapon = useCalculatorStore.getState().data.mainWeapon
-			console.log('メイン武器データ:', mainWeapon)
-
-			// 新しい武器情報ストレージシステムを使用
-			const success = saveWeaponInfo(
-				currentEquipment.id,
-				mainWeapon.ATK,
-				mainWeapon.stability,
-				mainWeapon.refinement,
-				mainWeapon.weaponType,
-			)
-			console.log('武器情報保存結果:', success)
-			console.log('保存した武器種:', mainWeapon.weaponType)
-
-			if (success) {
-				showMessage('武器情報を登録しました。')
-				// UIを更新するため、装備データを再読み込み
-				const updatedEquipment = { ...effectiveEquipment }
-				updateEquipment(updatedEquipment)
-			} else {
-				showMessage('武器情報の登録に失敗しました。')
-			}
-		} catch (error) {
-			console.error('武器情報登録エラー:', error)
-			showMessage('武器情報の登録に失敗しました。')
-		}
+	// UI更新処理
+	const handleUpdate = () => {
+		// UIを更新するため、装備データを再読み込み
+		const updatedEquipment = { ...effectiveEquipment }
+		updateEquipment(updatedEquipment)
 	}
 
-	// 武器情報削除ハンドラー
-	const handleDeleteWeaponInfo = async () => {
-		const currentEquipment = effectiveEquipment.mainWeapon
-		if (!currentEquipment?.id) return
 
-		try {
-			// 新しい武器情報ストレージシステムを使用してクリア
-			const success = clearWeaponInfo(currentEquipment.id)
-			console.log('武器情報削除結果:', success)
 
-			if (success) {
-				showMessage('武器情報を削除しました。')
-				// UIを更新するため、装備データを再読み込み
-				const updatedEquipment = { ...effectiveEquipment }
-				updateEquipment(updatedEquipment)
-			} else {
-				showMessage('武器情報の削除に失敗しました。')
-			}
-		} catch (error) {
-			console.error('武器情報削除エラー:', error)
-			showMessage('武器情報の削除に失敗しました。')
-		}
-	}
 
-	// サブ武器情報登録ハンドラー
-	const handleRegisterSubWeaponInfo = async () => {
-		const currentEquipment = effectiveEquipment.subWeapon
-		console.log('現在のサブ武器装備:', currentEquipment)
-
-		if (!currentEquipment?.id) {
-			console.log('サブ武器装備が選択されていません')
-			showMessage('サブ武器装備が選択されていません。')
-			return
-		}
-
-		try {
-			// WeaponFormからサブ武器データを取得
-			const subWeapon = useCalculatorStore.getState().data.subWeapon
-			console.log('サブ武器データ:', subWeapon)
-
-			// 新しいサブ武器情報ストレージシステムを使用
-			const success = saveSubWeaponInfo(
-				currentEquipment.id,
-				subWeapon.ATK,
-				subWeapon.stability,
-				subWeapon.refinement,
-				subWeapon.weaponType,
-			)
-			console.log('サブ武器情報保存結果:', success)
-			console.log('保存したサブ武器種:', subWeapon.weaponType)
-
-			if (success) {
-				showMessage('武器情報を登録しました。')
-				// UIを更新するため、装備データを再読み込み
-				const updatedEquipment = { ...effectiveEquipment }
-				updateEquipment(updatedEquipment)
-			} else {
-				showMessage('武器情報の登録に失敗しました。')
-			}
-		} catch (error) {
-			console.error('サブ武器情報登録エラー:', error)
-			showMessage('武器情報の登録に失敗しました。')
-		}
-	}
-
-	// サブ武器情報削除ハンドラー
-	const handleDeleteSubWeaponInfo = async () => {
-		const currentEquipment = effectiveEquipment.subWeapon
-		if (!currentEquipment?.id) return
-
-		try {
-			// 新しい武器情報ストレージシステムを使用してクリア
-			const success = clearWeaponInfo(currentEquipment.id)
-			console.log('サブ武器情報削除結果:', success)
-
-			if (success) {
-				showMessage('武器情報を削除しました。')
-				// UIを更新するため、装備データを再読み込み
-				const updatedEquipment = { ...effectiveEquipment }
-				updateEquipment(updatedEquipment)
-			} else {
-				showMessage('武器情報の削除に失敗しました。')
-			}
-		} catch (error) {
-			console.error('サブ武器情報削除エラー:', error)
-			showMessage('武器情報の削除に失敗しました。')
-		}
-	}
-
-	// 下部説明テキストを追加するため、武器情報セクションの下に挿入する説明
-	const renderWeaponInfoBottomExplanation = () => (
-		<div className="mt-1 text-xs text-gray-600 pl-3 font-semibold">
-			※武器能力情報を登録、または削除します。
-		</div>
-	)
 
 	const renderPropertyInputs = (
 		item: Equipment,
@@ -1223,62 +1092,22 @@ export default function EquipmentForm({
 
 					{/* メイン装備専用：武器情報登録・削除ボタン */}
 					{activeTab === 'mainWeapon' && effectiveEquipment.mainWeapon?.id && (
-						<>
-							<div className="flex gap-4 items-center mt-2 pl-3">
-								<div className="text-sm font-semibold text-gray-700">
-									メイン武器情報
-								</div>
-								<div className="flex gap-2">
-									<button
-										type="button"
-										onClick={() => handleRegisterWeaponInfo()}
-										className="px-3 py-1 text-sm bg-blue-400/80 text-white rounded-md hover:bg-blue-400 transition-colors cursor-pointer"
-										title="WeaponFormの武器情報をメイン装備に登録"
-									>
-										登録
-									</button>
-									<button
-										type="button"
-										onClick={() => handleDeleteWeaponInfo()}
-										className="px-3 py-1 text-sm bg-gray-400/80 text-white rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
-										title="メイン装備の武器情報を削除"
-									>
-										削除
-									</button>
-								</div>
-							</div>
-							{renderWeaponInfoBottomExplanation()}
-						</>
+						<WeaponInfoManager
+							slotKey="mainWeapon"
+							equipmentId={effectiveEquipment.mainWeapon.id}
+							onMessage={showMessage}
+							onUpdate={handleUpdate}
+						/>
 					)}
 
 					{/* サブ武器専用：武器情報登録・削除ボタン */}
 					{activeTab === 'subWeapon' && effectiveEquipment.subWeapon?.id && (
-						<>
-							<div className="flex gap-4 items-center mt-2 pl-3">
-								<div className="text-sm font-semibold text-gray-700">
-									サブ武器情報
-								</div>
-								<div className="flex gap-2">
-									<button
-										type="button"
-										onClick={() => handleRegisterSubWeaponInfo()}
-										className="px-3 py-1 text-sm bg-blue-400/80 text-white rounded-md hover:bg-blue-400 transition-colors cursor-pointer"
-										title="WeaponFormの武器情報をサブ武器装備に登録"
-									>
-										登録
-									</button>
-									<button
-										type="button"
-										onClick={() => handleDeleteSubWeaponInfo()}
-										className="px-3 py-1 text-sm bg-gray-400/80 text-white rounded-md hover:bg-gray-400 transition-colors cursor-pointer"
-										title="サブ武器装備の武器情報を削除"
-									>
-										削除
-									</button>
-								</div>
-							</div>
-							{renderWeaponInfoBottomExplanation()}
-						</>
+						<WeaponInfoManager
+							slotKey="subWeapon"
+							equipmentId={effectiveEquipment.subWeapon.id}
+							onMessage={showMessage}
+							onUpdate={handleUpdate}
+						/>
 					)}
 
 					{/* 体装備の防具の改造選択UI */}
