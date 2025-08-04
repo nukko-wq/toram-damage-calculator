@@ -372,7 +372,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		category: 'staff',
 		weaponTypeRequirements: ['杖', '魔導具'],
 		mpCost: 400,
-		multiplierFormula: '100% (杖装備時150%)',
+		multiplierFormula: '150% (杖装備時250%)',
 		fixedDamageFormula: '420',
 		hits: [
 			{
@@ -381,9 +381,9 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceDefense: 'MDEF',
 				referenceResistance: 'magical',
 				powerReference: 'MATK',
-				multiplier: 100, // 表示用（実際の計算は外部）
+				multiplier: 150, // 表示用（実際の計算は外部）
 				fixedDamage: 420, // 固定ダメージ420
-				multiplierFormula: '杖装備時：威力+50%',
+				multiplierFormula: '杖装備時：威力+100%',
 				adaptation: 'magical',
 				adaptationGrant: 'magical',
 				canUseUnsheathePower: false,

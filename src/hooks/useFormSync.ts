@@ -88,16 +88,23 @@ export function useWeaponFormSync<T extends Record<string, unknown>>(
 
 	// 初期化処理を統合
 	const initialize = useCallback(() => {
+		console.log('useWeaponFormSync: Initializing...')
 		setIsInitialized(false)
-		const timer = setTimeout(() => setIsInitialized(true), debounceMs)
+		const timer = setTimeout(() => {
+			console.log('useWeaponFormSync: Initialization complete')
+			setIsInitialized(true)
+		}, debounceMs)
 		return () => clearTimeout(timer)
 	}, [debounceMs])
 
 	// 武器フォーム専用の変更監視
 	useEffect(() => {
 		const subscription = watchFunction((value, { name, type }) => {
+			console.log('useWeaponFormSync watch triggered:', { name, type, value, isInitialized })
+			
 			// 初期化中やプログラム的な変更は無視
 			if (!isInitialized || !name || !value || type !== 'change') {
+				console.log('useWeaponFormSync: Skipping due to conditions')
 				return
 			}
 
@@ -123,6 +130,8 @@ export function useWeaponFormSync<T extends Record<string, unknown>>(
 		return () => subscription.unsubscribe()
 	}, [watchFunction, isInitialized, updateFunction, validationFunction, onWeaponTypeChange, dependentUpdateFunction])
 
+	console.log('useWeaponFormSync: Current state:', { isInitialized })
+	
 	return {
 		isInitialized,
 		initialize,

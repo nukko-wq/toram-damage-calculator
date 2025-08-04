@@ -8,11 +8,18 @@ export class Storm1Hit6ExtendCalculator extends SkillHitCalculator {
 	calculate(input: SkillCalculationInput): SkillCalculationResult {
 		const { hitNumber, equipmentContext } = input
 
+		// デバッグ情報を追加
+		console.log('Storm1Hit6ExtendCalculator DEBUG:', {
+			hitNumber,
+			hasStaffEquipped: equipmentContext.hasStaffEquipped,
+			mainWeaponType: equipmentContext.mainWeaponType
+		});
+
 		switch (hitNumber) {
 			case 1: {
-				// 1撃目: 基本100%、杖装備時150%
-				const baseMultiplier = 100
-				const staffBonus = equipmentContext.hasStaffEquipped ? 50 : 0
+				// 1撃目: 基本150%、杖装備時250%
+				const baseMultiplier = 150
+				const staffBonus = equipmentContext.hasStaffEquipped ? 100 : 0
 				const multiplier = baseMultiplier + staffBonus
 
 				return {
