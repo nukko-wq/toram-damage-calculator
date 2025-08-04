@@ -1215,6 +1215,11 @@ export default function EquipmentForm({
 								</>
 							)}
 					</div>
+					<div className="flex mt-3">
+						<p className="text-xs text-gray-600 font-semibold">
+							※各装備は任意の値に変更できます。
+						</p>
+					</div>
 
 					{/* メイン装備専用：武器情報登録・削除ボタン */}
 					{activeTab === 'mainWeapon' && effectiveEquipment.mainWeapon?.id && (
