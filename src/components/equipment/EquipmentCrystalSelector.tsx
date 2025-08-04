@@ -40,7 +40,8 @@ export default function EquipmentCrystalSelector({
 	onCrystalChange,
 	onMessage,
 }: EquipmentCrystalSelectorProps) {
-	const { setCrystalSlot } = useCalculatorStore()
+	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)
+	const currentCrystals = useCalculatorStore((state) => state.data.crystals)
 	
 	// 対象装備がクリスタ対応かどうかを判定
 	const allowedTypes = EQUIPMENT_CRYSTAL_TYPE_MAP[slotKey]
@@ -76,7 +77,7 @@ export default function EquipmentCrystalSelector({
 
 	// CrystalFormのスロット情報を生成
 	const getSlotInfo = (slotNumber: 1 | 2): SlotInfo => {
-		const categoryMap: Record<keyof EquipmentSlots, string> = {
+		const categoryMap: Record<keyof EquipmentSlots, CrystalType> = {
 			mainWeapon: 'weapon',
 			body: 'armor',
 			additional: 'additional',
@@ -136,7 +137,11 @@ export default function EquipmentCrystalSelector({
 
 					// CrystalFormにクリスタをセット
 					const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-					setCrystalSlot(crystalSlotKey, crystalId)
+					const updatedCrystals = {
+						...currentCrystals,
+						[crystalSlotKey]: crystalId,
+					}
+					updateCrystals(updatedCrystals)
 
 					onMessage?.('クリスタを登録しました。')
 					onCrystalChange?.()
@@ -156,7 +161,11 @@ export default function EquipmentCrystalSelector({
 
 					// CrystalFormからクリスタを削除
 					const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-					setCrystalSlot(crystalSlotKey, null)
+					const updatedCrystals = {
+						...currentCrystals,
+						[crystalSlotKey]: null,
+					}
+					updateCrystals(updatedCrystals)
 
 					onMessage?.('クリスタを削除しました。')
 					onCrystalChange?.()
@@ -165,7 +174,7 @@ export default function EquipmentCrystalSelector({
 				}
 			}
 		},
-		[modalState.slotNumber, equipmentId, allowedTypes, setCrystalSlot, onMessage, onCrystalChange],
+		[modalState.slotNumber, equipmentId, allowedTypes, currentCrystals, updateCrystals, onMessage, onCrystalChange],
 	)
 
 	// クリスタを削除
@@ -182,7 +191,11 @@ export default function EquipmentCrystalSelector({
 
 				// CrystalFormからクリスタを削除
 				const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-				setCrystalSlot(crystalSlotKey, null)
+				const updatedCrystals = {
+					...currentCrystals,
+					[crystalSlotKey]: null,
+				}
+				updateCrystals(updatedCrystals)
 
 				onMessage?.('クリスタを削除しました。')
 				onCrystalChange?.()
@@ -190,7 +203,7 @@ export default function EquipmentCrystalSelector({
 				onMessage?.('クリスタの削除に失敗しました。')
 			}
 		},
-		[equipmentId, allowedTypes, setCrystalSlot, onMessage, onCrystalChange],
+		[equipmentId, allowedTypes, currentCrystals, updateCrystals, onMessage, onCrystalChange],
 	)
 
 	// 装備が変更された際に呼び出される更新関数
@@ -225,7 +238,7 @@ export default function EquipmentCrystalSelector({
 					{slot1Crystal ? (
 						<span className="text-gray-900">{slot1Crystal.name}</span>
 					) : (
-						<span className="text-gray-500">なし</span>
+						<span className="text-gray-500">連携しない</span>
 					)}
 				</button>
 				{slot1Crystal && (
@@ -233,9 +246,9 @@ export default function EquipmentCrystalSelector({
 						type="button"
 						onClick={() => handleCrystalRemove(1)}
 						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors"
-						title="クリスタを削除"
+						title="連携を解除"
 					>
-						削除
+						解除
 					</button>
 				)}
 			</div>
@@ -251,7 +264,7 @@ export default function EquipmentCrystalSelector({
 					{slot2Crystal ? (
 						<span className="text-gray-900">{slot2Crystal.name}</span>
 					) : (
-						<span className="text-gray-500">なし</span>
+						<span className="text-gray-500">連携しない</span>
 					)}
 				</button>
 				{slot2Crystal && (
@@ -259,9 +272,9 @@ export default function EquipmentCrystalSelector({
 						type="button"
 						onClick={() => handleCrystalRemove(2)}
 						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors"
-						title="クリスタを削除"
+						title="連携を解除"
 					>
-						削除
+						解除
 					</button>
 				)}
 			</div>
