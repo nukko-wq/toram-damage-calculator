@@ -3,17 +3,22 @@
 import { useState } from 'react'
 import { useCalculatorStore } from '@/stores'
 import type { Equipment, EquipmentProperties, EquipmentSlots } from '@/types/calculator'
+import EquipmentCrystalSelector from './EquipmentCrystalSelector'
 
 interface PropertyEditorProps {
 	item: Equipment
 	slotKey: keyof EquipmentSlots
 	onPropertyChange: (property: keyof EquipmentProperties, value: string) => void
+	onMessage?: (message: string) => void
+	onUpdate?: () => void
 }
 
 export default function PropertyEditor({ 
 	item, 
 	slotKey, 
-	onPropertyChange 
+	onPropertyChange,
+	onMessage,
+	onUpdate
 }: PropertyEditorProps) {
 	// 一時的な入力値を管理するstate（プロパティキー -> 入力値のマップ）
 	const [tempInputValues, setTempInputValues] = useState<
@@ -401,7 +406,19 @@ export default function PropertyEditor({
 	}
 
 	return (
-		<div className="flex overflow-x-scroll w-full max-w-[82vw] sm:max-w-[95vw] flex-nowrap">
+		<div className="space-y-4">
+			{/* クリスタ選択UI - 対象装備のみ表示 */}
+			{item.id && (
+				<EquipmentCrystalSelector
+					equipmentId={item.id}
+					slotKey={slotKey}
+					onCrystalChange={onUpdate}
+					onMessage={onMessage}
+				/>
+			)}
+			
+			{/* プロパティ入力フォーム */}
+			<div className="flex overflow-x-scroll w-full max-w-[82vw] sm:max-w-[95vw] flex-nowrap">
 			{propertyGroups.map((group) => (
 				<div
 					key={group.title}
@@ -545,6 +562,7 @@ export default function PropertyEditor({
 					</div>
 				</div>
 			))}
+			</div>
 		</div>
 	)
 }

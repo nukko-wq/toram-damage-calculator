@@ -183,6 +183,8 @@ export default function EquipmentForm({
 										value,
 									)
 								}
+								onMessage={showMessage}
+								onUpdate={handleUpdate}
 							/>
 						)}
 				</>

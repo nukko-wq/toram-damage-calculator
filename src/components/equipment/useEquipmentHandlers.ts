@@ -13,6 +13,9 @@ import {
 import {
 	getWeaponInfo,
 } from '@/utils/weaponInfoStorage'
+import {
+	getEquipmentAllCrystals,
+} from '@/utils/equipmentCrystalStorage'
 
 interface ModalStates {
 	modalState: {
@@ -69,6 +72,7 @@ export function useEquipmentHandlers(
 	)
 	const updateMainWeapon = useCalculatorStore((state) => state.updateMainWeapon)
 	const updateSubWeapon = useCalculatorStore((state) => state.updateSubWeapon)
+	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)
 
 	const {
 		modalState,
@@ -213,6 +217,42 @@ export function useEquipmentHandlers(
 							}),
 						}
 						updateSubWeapon(updatedSubWeapon)
+					}
+				}
+
+				// 対象装備（メイン・体・追加・特殊装備）でクリスタ情報を復元
+				if (['mainWeapon', 'body', 'additional', 'special'].includes(slotKey)) {
+					const crystalInfo = getEquipmentAllCrystals(equipmentId)
+					if (crystalInfo.slot1 || crystalInfo.slot2) {
+						console.log('クリスタ情報をCrystalFormに復元:', crystalInfo)
+						
+						// 装備スロットとクリスタタイプのマッピング
+						const crystalTypeMap: Record<string, string> = {
+							mainWeapon: 'weapon',
+							body: 'armor',
+							additional: 'additional',
+							special: 'special',
+						}
+						
+						const crystalType = crystalTypeMap[slotKey]
+						if (crystalType) {
+							const currentCrystals = useCalculatorStore.getState().data.crystals
+							const updatedCrystals = { ...currentCrystals }
+							
+							// 1つ目のクリスタスロットを復元
+							if (crystalInfo.slot1) {
+								const crystalSlotKey = `${crystalType}1` as keyof import('@/types/calculator').CrystalSlots
+								updatedCrystals[crystalSlotKey] = crystalInfo.slot1
+							}
+							
+							// 2つ目のクリスタスロットを復元
+							if (crystalInfo.slot2) {
+								const crystalSlotKey = `${crystalType}2` as keyof import('@/types/calculator').CrystalSlots
+								updatedCrystals[crystalSlotKey] = crystalInfo.slot2
+							}
+							
+							updateCrystals(updatedCrystals)
+						}
 					}
 				}
 
