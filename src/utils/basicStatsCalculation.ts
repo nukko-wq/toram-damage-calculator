@@ -8,6 +8,7 @@
 import type {
 	ArmorType,
 	BaseStats,
+	PowerOptions,
 	WeaponType as WeaponTypeEnum,
 } from '@/types/calculator'
 import { getWeaponTypeKey } from '@/utils/weaponTypeMapping'
@@ -1632,6 +1633,68 @@ export function calculateTotalElementAdvantage(
 	return {
 		elementAdvantageRate,
 		finalTotalElementAdvantage,
+	}
+}
+
+// ===========================================================================================
+// 属性覚醒有利計算
+// ===========================================================================================
+
+export interface ElementAwakeningAdvantageCalculationSteps {
+	baseElementAwakeningAdvantage: number // 基本属性覚醒有利（25%または0%）
+	hotKnowsEffect: number // 熱情の歌効果
+	finalElementAwakeningAdvantage: number // 最終属性覚醒有利
+}
+
+/**
+ * 属性覚醒有利を計算
+ * @param powerOptions 威力オプション設定
+ * @param selectedEnemyId 選択中の敵ID
+ * @param buffSkills バフスキル設定
+ * @returns 属性覚醒有利計算結果
+ */
+export function calculateElementAwakeningAdvantage(
+	powerOptions?: PowerOptions,
+	selectedEnemyId?: string | null,
+	buffSkills?: import('../types/buffSkill').BuffSkillFormData,
+): ElementAwakeningAdvantageCalculationSteps {
+	// 1. 基本属性覚醒有利計算（25%または0%）
+	let baseElementAwakeningAdvantage = 0
+	
+	// ラフィーは特殊な敵で、属性覚醒が入らないため0を返す
+	if (selectedEnemyId) {
+		const { getEnemyById } = require('@/utils/enemyDatabase')
+		const selectedEnemy = getEnemyById(selectedEnemyId)
+		if (selectedEnemy?.name === 'ラフィー') {
+			baseElementAwakeningAdvantage = 0
+		} else if (powerOptions?.elementAttack === 'advantageous') {
+			baseElementAwakeningAdvantage = 25
+		}
+	} else if (powerOptions?.elementAttack === 'advantageous') {
+		baseElementAwakeningAdvantage = 25
+	}
+
+	// 2. 熱情の歌効果計算
+	let hotKnowsEffect = 0
+	if (buffSkills) {
+		const hotKnowsSkill = buffSkills.skills?.IsHotKnows
+		if (hotKnowsSkill?.isEnabled && hotKnowsSkill.stackCount && powerOptions) {
+			const { calculateHotKnowsEffects } = require('@/utils/buffSkillCalculation/categories/minstrelSkills')
+			const hotKnowsResult = calculateHotKnowsEffects(
+				hotKnowsSkill.stackCount,
+				powerOptions,
+			)
+			hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
+		}
+	}
+
+	// 3. 最終属性覚醒有利計算（基本 + 熱情の歌効果）
+	const finalElementAwakeningAdvantage = baseElementAwakeningAdvantage + hotKnowsEffect
+
+	return {
+		baseElementAwakeningAdvantage,
+		hotKnowsEffect,
+		finalElementAwakeningAdvantage,
 	}
 }
 

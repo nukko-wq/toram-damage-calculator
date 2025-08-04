@@ -12,6 +12,7 @@ import {
 	calculateCriticalDamage,
 	calculateCriticalRate,
 	calculateCSPD,
+	calculateElementAwakeningAdvantage,
 	calculateEquipmentBonuses,
 	calculateFLEE,
 	calculateHIT,
@@ -389,6 +390,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				baseStats,
 				finalBonuses,
 			),
+			elementAwakeningAdvantageCalculation: calculateElementAwakeningAdvantage(
+				powerOptions,
+				data.enemy.selectedEnemyId,
+				data.buffSkills,
+			),
 			adjustedStatsCalculation,
 		}
 	}, [data, baseStats, powerOptions])
@@ -484,6 +490,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		totalElementAdvantageCalculation,
 		stabilityCalculation,
 		ailmentResistanceCalculation,
+		elementAwakeningAdvantageCalculation,
 		adjustedStatsCalculation,
 	} = calculationResults
 
@@ -553,7 +560,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				magicalCriticalDamageCalculation.finalMagicalCriticalDamage,
 			totalElementAdvantage:
 				totalElementAdvantageCalculation.finalTotalElementAdvantage,
-			elementAwakeningAdvantage: 0,
+			elementAwakeningAdvantage: elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage,
 			ASPD: aspdCalculation.finalASPD,
 			CSPD: cspdCalculation.finalCSPD,
 			HIT: hitCalculation.finalHIT,
@@ -1078,7 +1085,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
 		totalElementAdvantage:
 			totalElementAdvantageCalculation.finalTotalElementAdvantage, // 総属性有利計算結果
-		elementAwakeningAdvantage: 0, // TODO: 属性覚醒有利
+		elementAwakeningAdvantage: elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage, // 属性覚醒有利（基本25% + 熱情の歌効果）
 		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
 		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果
 		HIT: hitCalculation.finalHIT, // HIT計算結果
