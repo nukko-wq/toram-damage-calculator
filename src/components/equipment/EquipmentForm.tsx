@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import ArmorTypeSelect from '@/components/ui/ArmorTypeSelect'
-import MessageModal from '@/components/ui/MessageModal'
 import { useCalculatorStore } from '@/stores'
 import type {
 	ArmorType,
@@ -14,16 +13,12 @@ import type {
 import { getArmorType, saveArmorType } from '@/utils/armorTypeStorage'
 import {
 	getCombinedEquipmentById,
-	getEquipmentCategoryLabel,
 } from '@/utils/equipmentDatabase'
 import {
 	getWeaponInfo,
 } from '@/utils/weaponInfoStorage'
-import CreateEquipmentModal from './CreateEquipmentModal'
-import DeleteConfirmModal from './DeleteConfirmModal'
-import EquipmentSelectionModal from './EquipmentSelectionModal'
+import EquipmentModals from './EquipmentModals'
 import { RegisterForm } from './RegisterForm'
-import RenameEquipmentModal from './RenameEquipmentModal'
 import WeaponInfoManager from './WeaponInfoManager'
 
 interface EquipmentFormProps {
@@ -1138,65 +1133,24 @@ export default function EquipmentForm({
 				</>
 			)}
 
-			{/* 装備選択モーダル */}
-			{activeTab !== 'register' && (
-				<EquipmentSelectionModal
-					isOpen={modalState.isOpen}
-					onClose={closeEquipmentModal}
-					onSelect={handlePresetEquipmentSelect}
-					selectedEquipmentId={
-						effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null
-					}
-					category={modalState.category || 'mainWeapon'}
-					title={modalState.title}
-					currentFormProperties={
-						effectiveEquipment[activeTab as keyof EquipmentSlots]?.properties ||
-						{}
-					} // 現在のフォーム値を渡す
-					slotInfo={{
-						type: 'equipment' as const,
-						slot: activeTab as keyof EquipmentSlots,
-					}}
-				/>
-			)}
-
-			{/* カスタム装備作成モーダル */}
-			<CreateEquipmentModal
-				isOpen={createModalState.isOpen}
-				onClose={handleCreateCancel}
-				onConfirm={handleCreateConfirm}
-				equipmentType={
-					createModalState.equipmentType
-						? getEquipmentCategoryLabel(
-								createModalState.equipmentType as EquipmentCategory,
-							)
-						: ''
-				}
-			/>
-
-			{/* カスタム装備削除確認モーダル */}
-			<DeleteConfirmModal
-				isOpen={deleteModalState.isOpen}
-				onClose={handleDeleteCancel}
-				onConfirm={handleDeleteConfirm}
-				equipmentName={deleteModalState.equipmentName}
-				message="この装備を削除しますか？"
-			/>
-
-			{/* カスタム装備名前変更モーダル */}
-			<RenameEquipmentModal
-				isOpen={renameModalState.isOpen}
-				onClose={handleRenameCancel}
-				onConfirm={handleRenameConfirm}
-				currentName={renameModalState.currentName}
-				equipmentId={renameModalState.equipmentId || ''}
-			/>
-
-			{/* メッセージモーダル */}
-			<MessageModal
-				isOpen={messageModalState.isOpen}
-				onClose={() => setMessageModalState({ isOpen: false, message: '' })}
-				message={messageModalState.message}
+			{/* モーダル */}
+			<EquipmentModals
+				activeTab={activeTab}
+				selectedEquipmentId={effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null}
+				equipmentModal={modalState}
+				onEquipmentSelect={handlePresetEquipmentSelect}
+				onEquipmentModalClose={closeEquipmentModal}
+				createModal={createModalState}
+				onCreateConfirm={handleCreateConfirm}
+				onCreateCancel={handleCreateCancel}
+				renameModal={renameModalState}
+				onRenameConfirm={handleRenameConfirm}
+				onRenameCancel={handleRenameCancel}
+				deleteModal={deleteModalState}
+				onDeleteConfirm={handleDeleteConfirm}
+				onDeleteCancel={handleDeleteCancel}
+				messageModal={messageModalState}
+				onMessageClose={() => setMessageModalState({ isOpen: false, message: '' })}
 			/>
 		</section>
 	)
