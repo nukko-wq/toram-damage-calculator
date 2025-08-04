@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 /**
  * モーダルの共通処理を統合管理するカスタムフック
@@ -17,10 +17,17 @@ export function useModal(
 ) {
 	const { preventEscapeWhenLoading = false, loadingState = false } = options
 
-	// モーダルが開いた時の初期化処理
+	// モーダルが開いた時の初期化処理（初回のみ実行）
+	const isInitialized = useRef(false)
 	useEffect(() => {
-		if (isOpen && onOpen) {
+		if (isOpen && onOpen && !isInitialized.current) {
 			onOpen()
+			isInitialized.current = true
+		}
+		
+		// モーダルが閉じた時に初期化フラグをリセット
+		if (!isOpen) {
+			isInitialized.current = false
 		}
 	}, [isOpen, onOpen])
 
@@ -87,11 +94,11 @@ export function useCreateModal(
 	setError: (error: string | null) => void,
 	setIsCreating: (loading: boolean) => void,
 ) {
-	const initializeCreate = () => {
+	const initializeCreate = useCallback(() => {
 		setSaveName('')
 		setError(null)
 		setIsCreating(false)
-	}
+	}, [setSaveName, setError, setIsCreating])
 
 	useModal(isOpen, onClose, initializeCreate)
 }
