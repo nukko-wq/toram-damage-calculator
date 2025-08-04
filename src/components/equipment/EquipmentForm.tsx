@@ -905,12 +905,6 @@ export default function EquipmentForm({
 			showMessage('武器情報の削除に失敗しました。')
 		}
 	}
-	// 上部説明テキストを追加するため、武器情報セクションの上に挿入する説明
-	const renderWeaponInfoExplanation = () => (
-		<div className="mt-2 text-xs text-gray-600 font-semibold">
-			※各装備は任意の値に変更できます。
-		</div>
-	)
 
 	// 下部説明テキストを追加するため、武器情報セクションの下に挿入する説明
 	const renderWeaponInfoBottomExplanation = () => (
@@ -1225,7 +1219,6 @@ export default function EquipmentForm({
 					{/* メイン装備専用：武器情報登録・削除ボタン */}
 					{activeTab === 'mainWeapon' && effectiveEquipment.mainWeapon?.id && (
 						<>
-							{renderWeaponInfoExplanation()}
 							<div className="flex gap-4 items-center mt-2 pl-3">
 								<div className="text-sm font-semibold text-gray-700">
 									メイン武器情報
@@ -1256,7 +1249,6 @@ export default function EquipmentForm({
 					{/* サブ武器専用：武器情報登録・削除ボタン */}
 					{activeTab === 'subWeapon' && effectiveEquipment.subWeapon?.id && (
 						<>
-							{renderWeaponInfoExplanation()}
 							<div className="flex gap-4 items-center mt-2 pl-3">
 								<div className="text-sm font-semibold text-gray-700">
 									サブ武器情報
