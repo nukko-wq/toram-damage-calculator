@@ -307,7 +307,16 @@ export default function EquipmentCard({
 
 			{/* 装備名と選択マーク */}
 			<div className="flex justify-between items-center mb-1 sm:mb-2">
-				<h3 className="font-semibold text-gray-900">{equipment.name}</h3>
+				<h3 className="font-semibold text-gray-900">
+					{('isCustom' in equipment && equipment.isCustom) ? (
+						<>
+							<span className="text-yellow-500 mr-1">★</span>
+							{equipment.name}
+						</>
+					) : (
+						equipment.name
+					)}
+				</h3>
 				{/* 選択状態のチェックマーク */}
 				{isSelected && (
 					<div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ml-2">
