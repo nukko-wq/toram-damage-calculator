@@ -92,6 +92,8 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					ATK_Rate: 15,
 					STR_Rate: 10,
+					CriticalDamage_Rate: 11,
+					CriticalDamage: 23,
 					NaturalHPRecovery: -30,
 					Dodge: -16,
 				},

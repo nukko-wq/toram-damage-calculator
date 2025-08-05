@@ -365,6 +365,9 @@ export default function EquipmentCard({
 							});
 						}
 						try {
+							// 連携クリスタ情報を取得
+							const crystalInfo = getEquipmentAllCrystals(equipment.id);
+							
 							// Convert PresetEquipment to Equipment format
 							const equipmentAsEquipment: Equipment = {
 								...equipment,
@@ -380,7 +383,13 @@ export default function EquipmentCard({
 									slotInfo={slotInfo}
 									size="sm"
 									className="inline-block"
-									options={{ debug: false }}
+									options={{ 
+										debug: false,
+										linkedCrystals: {
+											slot1: crystalInfo.slot1,
+											slot2: crystalInfo.slot2
+										}
+									}}
 								/>
 							)
 						} catch (error) {
