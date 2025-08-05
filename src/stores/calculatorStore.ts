@@ -39,7 +39,7 @@ import {
 	updateCustomEquipmentRefinement,
 	updateEquipmentArmorType,
 } from '@/utils/equipmentDatabase'
-import { saveEquipmentCrystal } from '@/utils/equipmentCrystalStorage'
+import { saveEquipmentCrystal, deleteEquipmentCrystal } from '@/utils/equipmentCrystalStorage'
 import {
 	createInitialCalculatorData,
 	createInitialEquipment,
@@ -909,12 +909,23 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				const tempCrystals = data.tempEquipmentCrystals
 				
 				if (tempCrystals) {
-					// LocalStorageに保存
+					// LocalStorageに保存または削除
 					Object.entries(tempCrystals).forEach(([equipmentId, crystals]) => {
-						if (crystals.slot1) {
+						// slot1の処理
+						if (crystals.slot1 === null) {
+							// 削除する場合
+							deleteEquipmentCrystal(equipmentId, 1)
+						} else if (crystals.slot1) {
+							// 保存する場合
 							saveEquipmentCrystal(equipmentId, 1, crystals.slot1)
 						}
-						if (crystals.slot2) {
+						
+						// slot2の処理
+						if (crystals.slot2 === null) {
+							// 削除する場合
+							deleteEquipmentCrystal(equipmentId, 2)
+						} else if (crystals.slot2) {
+							// 保存する場合
 							saveEquipmentCrystal(equipmentId, 2, crystals.slot2)
 						}
 					})

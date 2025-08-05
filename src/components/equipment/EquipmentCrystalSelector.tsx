@@ -152,15 +152,8 @@ export default function EquipmentCrystalSelector({
 					setSlot2CrystalId(null)
 				}
 
-			// CrystalFormからクリスタを削除
-			const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-			const updatedCrystals = {
-				...currentCrystals,
-				[crystalSlotKey]: null,
-			}
-			updateCrystals(updatedCrystals)
-
-			onCrystalChange?.()
+				// 連携解除時はCrystalFormは変更しない
+				onCrystalChange?.()
 			}
 		},
 		[modalState.slotNumber, equipmentId, allowedTypes, currentCrystals, updateCrystals, updateTempEquipmentCrystal, onCrystalChange],
@@ -179,17 +172,10 @@ export default function EquipmentCrystalSelector({
 				setSlot2CrystalId(null)
 			}
 
-			// CrystalFormからクリスタを削除
-			const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-			const updatedCrystals = {
-				...currentCrystals,
-				[crystalSlotKey]: null,
-			}
-			updateCrystals(updatedCrystals)
-
+			// 連携解除時はCrystalFormは変更しない
 			onCrystalChange?.()
 		},
-		[equipmentId, allowedTypes, currentCrystals, updateCrystals, updateTempEquipmentCrystal, onCrystalChange],
+		[equipmentId, updateTempEquipmentCrystal, onCrystalChange],
 	)
 
 	// 装備が変更された際に呼び出される更新関数
