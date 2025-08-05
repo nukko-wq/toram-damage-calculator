@@ -192,7 +192,8 @@ export default function EquipmentSelectionModal({
 		const others = sortedEquipments.filter((eq) => !favoriteSet.has(eq.id))
 
 		// 「装備なし」をダメージ差分に基づいて適切な位置に挿入
-		if (hasCurrentlyEquippedItem && slotInfo) {
+		// 装備スロットが存在する場合は常に「装備なし」オプションを表示
+		{
 			// biome-ignore lint/suspicious/noExplicitAny: Equipment typeと互換性のないNone用の仮想アイテム
 			const equipmentNoneWithDamage: any = {
 				id: EQUIPMENT_NONE_ID,
@@ -248,8 +249,6 @@ export default function EquipmentSelectionModal({
 		sortedEquipments,
 		isNoneFavorite,
 		equipmentNoneDamageDifference,
-		hasCurrentlyEquippedItem,
-		slotInfo,
 		_favoritesChanged,
 	])
 
@@ -438,7 +437,7 @@ export default function EquipmentSelectionModal({
 														</div>
 
 														{/* ダメージ差分表示（他の装備と同じ形式） */}
-														{slotInfo && hasCurrentlyEquippedItem && (
+														{slotInfo && (
 															<div className="mb-1 sm:mb-2">
 																<div className="font-medium">
 																	<span
@@ -475,6 +474,13 @@ export default function EquipmentSelectionModal({
 											}
 
 											// 通常の装備カード
+											console.log('Rendering EquipmentCard:', {
+												equipmentName: equipment.name,
+												showDamageDifference: isOpen && !!slotInfo,
+												slotInfo,
+												isOpen,
+												hasSlotInfo: !!slotInfo
+											});
 											return (
 												<EquipmentCard
 													key={equipment.id}
@@ -562,7 +568,7 @@ export default function EquipmentSelectionModal({
 														</div>
 
 														{/* ダメージ差分表示（他の装備と同じ形式） */}
-														{slotInfo && hasCurrentlyEquippedItem && (
+														{slotInfo && (
 															<div className="mb-1 sm:mb-2">
 																<div className="font-medium">
 																	<span
@@ -599,6 +605,13 @@ export default function EquipmentSelectionModal({
 											}
 
 											// 通常の装備カード
+											console.log('Rendering EquipmentCard:', {
+												equipmentName: equipment.name,
+												showDamageDifference: isOpen && !!slotInfo,
+												slotInfo,
+												isOpen,
+												hasSlotInfo: !!slotInfo
+											});
 											return (
 												<EquipmentCard
 													key={equipment.id}
