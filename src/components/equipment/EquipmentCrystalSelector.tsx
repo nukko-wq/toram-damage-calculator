@@ -5,9 +5,7 @@ import CrystalSelectionModal from '@/components/crystal/CrystalSelectionModal'
 import type { CrystalType, EquipmentSlots } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { getCrystalById } from '@/utils/crystalDatabase'
-import {
-	getEquipmentCrystal,
-} from '@/utils/equipmentCrystalStorage'
+import { getEquipmentCrystal } from '@/utils/equipmentCrystalStorage'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface EquipmentCrystalSelectorProps {
@@ -17,19 +15,20 @@ interface EquipmentCrystalSelectorProps {
 }
 
 // 装備スロットとクリスタタイプのマッピング
-const EQUIPMENT_CRYSTAL_TYPE_MAP: Record<keyof EquipmentSlots, CrystalType[]> = {
-	mainWeapon: ['weapon'],
-	body: ['armor'],
-	additional: ['additional'],
-	special: ['special'],
-	subWeapon: ['weapon'],
-	fashion1: [],
-	fashion2: [],
-	fashion3: [],
-	freeInput1: [],
-	freeInput2: [],
-	freeInput3: [],
-}
+const EQUIPMENT_CRYSTAL_TYPE_MAP: Record<keyof EquipmentSlots, CrystalType[]> =
+	{
+		mainWeapon: ['weapon'],
+		body: ['armor'],
+		additional: ['additional'],
+		special: ['special'],
+		subWeapon: ['weapon'],
+		fashion1: [],
+		fashion2: [],
+		fashion3: [],
+		freeInput1: [],
+		freeInput2: [],
+		freeInput3: [],
+	}
 
 export default function EquipmentCrystalSelector({
 	equipmentId,
@@ -38,8 +37,10 @@ export default function EquipmentCrystalSelector({
 }: EquipmentCrystalSelectorProps) {
 	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)
 	const currentCrystals = useCalculatorStore((state) => state.data.crystals)
-	const updateTempEquipmentCrystal = useCalculatorStore((state) => state.updateTempEquipmentCrystal)
-	
+	const updateTempEquipmentCrystal = useCalculatorStore(
+		(state) => state.updateTempEquipmentCrystal,
+	)
+
 	// 対象装備がクリスタ対応かどうかを判定
 	const allowedTypes = EQUIPMENT_CRYSTAL_TYPE_MAP[slotKey]
 	const isCrystalSupported = allowedTypes.length > 0
@@ -124,7 +125,7 @@ export default function EquipmentCrystalSelector({
 			if (crystalId) {
 				// クリスタを選択した場合 - 一時的なクリスタ連携情報を更新
 				updateTempEquipmentCrystal(equipmentId, slotNumber, crystalId)
-				
+
 				// ローカル状態を更新
 				if (slotNumber === 1) {
 					setSlot1CrystalId(crystalId)
@@ -133,7 +134,8 @@ export default function EquipmentCrystalSelector({
 				}
 
 				// CrystalFormにクリスタをセット
-				const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
+				const crystalSlotKey =
+					`${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
 				const updatedCrystals = {
 					...currentCrystals,
 					[crystalSlotKey]: crystalId,
@@ -144,7 +146,7 @@ export default function EquipmentCrystalSelector({
 			} else {
 				// クリスタを削除した場合 - 一時的なクリスタ連携情報を更新
 				updateTempEquipmentCrystal(equipmentId, slotNumber, null)
-				
+
 				// ローカル状態を更新
 				if (slotNumber === 1) {
 					setSlot1CrystalId(null)
@@ -156,7 +158,15 @@ export default function EquipmentCrystalSelector({
 				onCrystalChange?.()
 			}
 		},
-		[modalState.slotNumber, equipmentId, allowedTypes, currentCrystals, updateCrystals, updateTempEquipmentCrystal, onCrystalChange],
+		[
+			modalState.slotNumber,
+			equipmentId,
+			allowedTypes,
+			currentCrystals,
+			updateCrystals,
+			updateTempEquipmentCrystal,
+			onCrystalChange,
+		],
 	)
 
 	// クリスタを削除
@@ -164,7 +174,7 @@ export default function EquipmentCrystalSelector({
 		(slotNumber: 1 | 2) => {
 			// 一時的なクリスタ連携情報を更新
 			updateTempEquipmentCrystal(equipmentId, slotNumber, null)
-			
+
 			// ローカル状態を更新
 			if (slotNumber === 1) {
 				setSlot1CrystalId(null)
@@ -198,14 +208,14 @@ export default function EquipmentCrystalSelector({
 	return (
 		<div className="mt-4 space-y-3">
 			<h4 className="text-sm font-medium text-gray-700">クリスタ連携</h4>
-			
+
 			{/* 1つ目のクリスタスロット */}
 			<div className="flex items-center gap-2">
 				<span className="text-sm text-gray-600 min-w-[60px]">クリスタ1:</span>
 				<button
 					type="button"
 					onClick={() => openCrystalModal(1)}
-					className="flex-1 px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
+					className="w-[200px] px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
 				>
 					{slot1Crystal ? (
 						<span className="text-gray-900">{slot1Crystal.name}</span>
@@ -217,7 +227,7 @@ export default function EquipmentCrystalSelector({
 					<button
 						type="button"
 						onClick={() => handleCrystalRemove(1)}
-						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors"
+						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors cursor-pointer"
 						title="連携を解除"
 					>
 						解除
@@ -231,7 +241,7 @@ export default function EquipmentCrystalSelector({
 				<button
 					type="button"
 					onClick={() => openCrystalModal(2)}
-					className="flex-1 px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
+					className="w-[200px] px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
 				>
 					{slot2Crystal ? (
 						<span className="text-gray-900">{slot2Crystal.name}</span>
@@ -243,7 +253,7 @@ export default function EquipmentCrystalSelector({
 					<button
 						type="button"
 						onClick={() => handleCrystalRemove(2)}
-						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors"
+						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors cursor-pointer"
 						title="連携を解除"
 					>
 						解除
@@ -261,7 +271,9 @@ export default function EquipmentCrystalSelector({
 				}
 				allowedTypes={allowedTypes}
 				title={modalState.title}
-				slotInfo={modalState.slotNumber ? getSlotInfo(modalState.slotNumber) : undefined}
+				slotInfo={
+					modalState.slotNumber ? getSlotInfo(modalState.slotNumber) : undefined
+				}
 			/>
 		</div>
 	)
