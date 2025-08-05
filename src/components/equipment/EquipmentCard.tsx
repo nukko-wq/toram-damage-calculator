@@ -386,7 +386,7 @@ export default function EquipmentCard({
 							return (
 								<DamageDifferenceDisplayCorrect
 									item={equipmentAsEquipment}
-									slotInfo={slotInfo}
+									slotInfo={slotInfo!}
 									size="sm"
 									className="inline-block"
 									options={{

@@ -196,10 +196,10 @@ export default function EquipmentForm({
 				selectedEquipmentId={
 					effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null
 				}
-				slotInfo={{
+				slotInfo={activeTab !== 'register' ? {
 					type: 'equipment' as const,
 					slot: activeTab,
-				}}
+				} : undefined}
 				equipmentModal={modalState}
 				onEquipmentSelect={handlePresetEquipmentSelect}
 				onEquipmentModalClose={closeEquipmentModal}
