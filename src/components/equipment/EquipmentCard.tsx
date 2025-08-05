@@ -3,6 +3,8 @@
 import { useCallback, useState } from 'react'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
 import type { Equipment, PresetEquipment } from '@/types/calculator'
+import { getEquipmentAllCrystals } from '@/utils/equipmentCrystalStorage'
+import { getAllCrystals } from '@/utils/crystalDatabase'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
@@ -392,6 +394,45 @@ export default function EquipmentCard({
 					})()}
 				</div>
 			)}
+
+			{/* 連携クリスタ表示 - ダメージ差分の下に配置 */}
+			{(() => {
+				try {
+					const crystalInfo = getEquipmentAllCrystals(equipment.id);
+					const allCrystals = getAllCrystals();
+					const linkedCrystals: string[] = [];
+
+					// 各スロットの連携クリスタを取得
+					if (crystalInfo.slot1 && crystalInfo.slot1 !== 'none') {
+						const crystal = allCrystals.find(c => c.id === crystalInfo.slot1);
+						if (crystal) {
+							linkedCrystals.push(crystal.name);
+						}
+					}
+					
+					if (crystalInfo.slot2 && crystalInfo.slot2 !== 'none') {
+						const crystal = allCrystals.find(c => c.id === crystalInfo.slot2);
+						if (crystal) {
+							linkedCrystals.push(crystal.name);
+						}
+					}
+
+					if (linkedCrystals.length === 0) return null;
+
+					return (
+						<div className="mb-1 sm:mb-2">
+							{linkedCrystals.map((crystalName, index) => (
+								<div key={index} className="text-xs text-blue-600 mb-0.5">
+									◇{crystalName}
+								</div>
+							))}
+						</div>
+					);
+				} catch (error) {
+					console.error('EquipmentCard crystal display error:', error);
+					return null;
+				}
+			})()}
 
 			{/* 武器情報 */}
 			{formatWeaponInfo() && (
