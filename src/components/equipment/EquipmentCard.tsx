@@ -340,9 +340,28 @@ export default function EquipmentCard({
 			</div>
 
 			{/* ダメージ差分表示 - 装備名の下に配置 */}
-			{showDamageDifference && slotInfo && !isSelected && (
+			{(() => {
+				// 常にデバッグ情報を表示
+				console.log('EquipmentCard props debug:', {
+					showDamageDifference,
+					slotInfo,
+					equipmentName: equipment.name,
+					hasSlotInfo: !!slotInfo,
+					slotInfoType: slotInfo?.type,
+					slotInfoSlot: slotInfo?.slot
+				});
+				return showDamageDifference && slotInfo;
+			})() && (
 				<div className="mb-1 sm:mb-2">
 					{(() => {
+						// デバッグ情報を表示
+						if (process.env.NODE_ENV === 'development') {
+							console.log('EquipmentCard damage difference:', {
+								showDamageDifference,
+								slotInfo,
+								equipmentName: equipment.name
+							});
+						}
 						try {
 							// Convert PresetEquipment to Equipment format
 							const equipmentAsEquipment: Equipment = {
@@ -362,10 +381,11 @@ export default function EquipmentCard({
 									options={{ debug: false }}
 								/>
 							)
-						} catch {
+						} catch (error) {
+							console.error('EquipmentCard damage difference error:', error);
 							return (
 								<div className="bg-red-100 text-red-600 text-xs p-1 rounded">
-									Error
+									Error: {error instanceof Error ? error.message : 'Unknown error'}
 								</div>
 							)
 						}

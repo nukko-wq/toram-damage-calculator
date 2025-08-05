@@ -2,6 +2,7 @@
 
 import MessageModal from '@/components/ui/MessageModal'
 import type { EquipmentCategory, EquipmentSlots } from '@/types/calculator'
+import type { SlotInfo } from '@/types/damagePreview'
 import { getEquipmentCategoryLabel } from '@/utils/equipmentDatabase'
 import CreateEquipmentModal from './CreateEquipmentModal'
 import DeleteConfirmModal from './DeleteConfirmModal'
@@ -12,6 +13,9 @@ interface EquipmentModalsProps {
 	// 現在のアクティブタブ
 	activeTab: keyof EquipmentSlots | 'register'
 	selectedEquipmentId: string | null
+	
+	// ダメージ差分表示用
+	slotInfo?: SlotInfo
 
 	// Equipment Selection Modal
 	equipmentModal: {
@@ -59,6 +63,7 @@ interface EquipmentModalsProps {
 export default function EquipmentModals({
 	activeTab,
 	selectedEquipmentId,
+	slotInfo,
 	equipmentModal,
 	onEquipmentSelect,
 	onEquipmentModalClose,
@@ -85,6 +90,7 @@ export default function EquipmentModals({
 					selectedEquipmentId={selectedEquipmentId}
 					category={equipmentModal.category}
 					title={equipmentModal.title}
+					slotInfo={slotInfo}
 				/>
 			)}
 
