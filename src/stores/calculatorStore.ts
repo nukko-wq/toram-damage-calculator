@@ -39,6 +39,7 @@ import {
 	updateCustomEquipmentRefinement,
 	updateEquipmentArmorType,
 } from '@/utils/equipmentDatabase'
+import { saveEquipmentCrystal } from '@/utils/equipmentCrystalStorage'
 import {
 	createInitialCalculatorData,
 	createInitialEquipment,
@@ -205,6 +206,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					// 仮データと編集セッションを永続化
 					await get().saveTemporaryCustomEquipments()
 					await get().saveEditSessions()
+					
+					// 一時的なクリスタ連携情報をLocalStorageに永続化
+					get().saveTempEquipmentCrystalsToStorage()
 
 					const { data } = get()
 					await saveCurrentData(data)
@@ -864,6 +868,59 @@ export const useCalculatorStore = create<CalculatorStore>()(
 				} catch (error) {
 					console.error('基準ダメージ計算エラー:', error)
 					set({ baselineDamageResult: null })
+				}
+			},
+
+			// ===== 一時的なクリスタ連携情報管理 =====
+			updateTempEquipmentCrystal: (equipmentId, slotNumber, crystalId) => {
+				set((state) => {
+					const tempEquipmentCrystals = state.data.tempEquipmentCrystals || {}
+					const equipmentCrystals = tempEquipmentCrystals[equipmentId] || {}
+					
+					const updatedEquipmentCrystals = {
+						...equipmentCrystals,
+						[`slot${slotNumber}`]: crystalId
+					}
+					
+					return {
+						data: {
+							...state.data,
+							tempEquipmentCrystals: {
+								...tempEquipmentCrystals,
+								[equipmentId]: updatedEquipmentCrystals
+							}
+						},
+						hasUnsavedChanges: true
+					}
+				}, false, 'updateTempEquipmentCrystal')
+			},
+
+			clearTempEquipmentCrystals: () => {
+				set((state) => ({
+					data: {
+						...state.data,
+						tempEquipmentCrystals: {}
+					}
+				}), false, 'clearTempEquipmentCrystals')
+			},
+
+			saveTempEquipmentCrystalsToStorage: () => {
+				const { data } = get()
+				const tempCrystals = data.tempEquipmentCrystals
+				
+				if (tempCrystals) {
+					// LocalStorageに保存
+					Object.entries(tempCrystals).forEach(([equipmentId, crystals]) => {
+						if (crystals.slot1) {
+							saveEquipmentCrystal(equipmentId, 1, crystals.slot1)
+						}
+						if (crystals.slot2) {
+							saveEquipmentCrystal(equipmentId, 2, crystals.slot2)
+						}
+					})
+					
+					// 一時データをクリア
+					get().clearTempEquipmentCrystals()
 				}
 			},
 

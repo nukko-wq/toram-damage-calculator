@@ -6,9 +6,7 @@ import type { CrystalType, EquipmentSlots } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { getCrystalById } from '@/utils/crystalDatabase'
 import {
-	saveEquipmentCrystal,
 	getEquipmentCrystal,
-	deleteEquipmentCrystal,
 } from '@/utils/equipmentCrystalStorage'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 
@@ -40,6 +38,7 @@ export default function EquipmentCrystalSelector({
 }: EquipmentCrystalSelectorProps) {
 	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)
 	const currentCrystals = useCalculatorStore((state) => state.data.crystals)
+	const updateTempEquipmentCrystal = useCalculatorStore((state) => state.updateTempEquipmentCrystal)
 	
 	// 対象装備がクリスタ対応かどうかを判定
 	const allowedTypes = EQUIPMENT_CRYSTAL_TYPE_MAP[slotKey]
@@ -123,57 +122,29 @@ export default function EquipmentCrystalSelector({
 			const slotNumber = modalState.slotNumber
 
 			if (crystalId) {
-				// クリスタを選択した場合
-				const success = saveEquipmentCrystal(equipmentId, slotNumber, crystalId)
-				if (success) {
-					// ローカル状態を更新
-					if (slotNumber === 1) {
-						setSlot1CrystalId(crystalId)
-					} else {
-						setSlot2CrystalId(crystalId)
-					}
-
-					// CrystalFormにクリスタをセット
-					const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-					const updatedCrystals = {
-						...currentCrystals,
-						[crystalSlotKey]: crystalId,
-					}
-					updateCrystals(updatedCrystals)
-
-					onCrystalChange?.()
+				// クリスタを選択した場合 - 一時的なクリスタ連携情報を更新
+				updateTempEquipmentCrystal(equipmentId, slotNumber, crystalId)
+				
+				// ローカル状態を更新
+				if (slotNumber === 1) {
+					setSlot1CrystalId(crystalId)
+				} else {
+					setSlot2CrystalId(crystalId)
 				}
+
+				// CrystalFormにクリスタをセット
+				const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
+				const updatedCrystals = {
+					...currentCrystals,
+					[crystalSlotKey]: crystalId,
+				}
+				updateCrystals(updatedCrystals)
+
+				onCrystalChange?.()
 			} else {
-				// クリスタを削除した場合
-				const success = deleteEquipmentCrystal(equipmentId, slotNumber)
-				if (success) {
-					// ローカル状態を更新
-					if (slotNumber === 1) {
-						setSlot1CrystalId(null)
-					} else {
-						setSlot2CrystalId(null)
-					}
-
-					// CrystalFormからクリスタを削除
-					const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-					const updatedCrystals = {
-						...currentCrystals,
-						[crystalSlotKey]: null,
-					}
-					updateCrystals(updatedCrystals)
-
-					onCrystalChange?.()
-				}
-			}
-		},
-		[modalState.slotNumber, equipmentId, allowedTypes, currentCrystals, updateCrystals, onCrystalChange],
-	)
-
-	// クリスタを削除
-	const handleCrystalRemove = useCallback(
-		(slotNumber: 1 | 2) => {
-			const success = deleteEquipmentCrystal(equipmentId, slotNumber)
-			if (success) {
+				// クリスタを削除した場合 - 一時的なクリスタ連携情報を更新
+				updateTempEquipmentCrystal(equipmentId, slotNumber, null)
+				
 				// ローカル状態を更新
 				if (slotNumber === 1) {
 					setSlot1CrystalId(null)
@@ -181,18 +152,44 @@ export default function EquipmentCrystalSelector({
 					setSlot2CrystalId(null)
 				}
 
-				// CrystalFormからクリスタを削除
-				const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-				const updatedCrystals = {
-					...currentCrystals,
-					[crystalSlotKey]: null,
-				}
-				updateCrystals(updatedCrystals)
+			// CrystalFormからクリスタを削除
+			const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
+			const updatedCrystals = {
+				...currentCrystals,
+				[crystalSlotKey]: null,
+			}
+			updateCrystals(updatedCrystals)
 
-				onCrystalChange?.()
+			onCrystalChange?.()
 			}
 		},
-		[equipmentId, allowedTypes, currentCrystals, updateCrystals, onCrystalChange],
+		[modalState.slotNumber, equipmentId, allowedTypes, currentCrystals, updateCrystals, updateTempEquipmentCrystal, onCrystalChange],
+	)
+
+	// クリスタを削除
+	const handleCrystalRemove = useCallback(
+		(slotNumber: 1 | 2) => {
+			// 一時的なクリスタ連携情報を更新
+			updateTempEquipmentCrystal(equipmentId, slotNumber, null)
+			
+			// ローカル状態を更新
+			if (slotNumber === 1) {
+				setSlot1CrystalId(null)
+			} else {
+				setSlot2CrystalId(null)
+			}
+
+			// CrystalFormからクリスタを削除
+			const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
+			const updatedCrystals = {
+				...currentCrystals,
+				[crystalSlotKey]: null,
+			}
+			updateCrystals(updatedCrystals)
+
+			onCrystalChange?.()
+		},
+		[equipmentId, allowedTypes, currentCrystals, updateCrystals, updateTempEquipmentCrystal, onCrystalChange],
 	)
 
 	// 装備が変更された際に呼び出される更新関数
