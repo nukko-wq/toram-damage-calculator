@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
 import type { Equipment, PresetEquipment } from '@/types/calculator'
 import { getEquipmentAllCrystals } from '@/utils/equipmentCrystalStorage'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 import { getAllCrystals } from '@/utils/crystalDatabase'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
@@ -407,30 +408,53 @@ export default function EquipmentCard({
 			{/* 連携クリスタ表示 - ダメージ差分の下に配置 */}
 			{(() => {
 				try {
+					// 現在のCrystalFormの設定を取得
+					const currentCrystals = useCalculatorStore.getState().data.crystals;
 					const crystalInfo = getEquipmentAllCrystals(equipment.id);
 					const allCrystals = getAllCrystals();
-					const linkedCrystals: string[] = [];
+					const displayCrystals: string[] = [];
 
-					// 各スロットの連携クリスタを取得
-					if (crystalInfo.slot1 && crystalInfo.slot1 !== 'none') {
-						const crystal = allCrystals.find(c => c.id === crystalInfo.slot1);
-						if (crystal) {
-							linkedCrystals.push(crystal.name);
-						}
-					}
+					// 連携クリスタがある場合は連携クリスタを表示、ない場合はCrystalFormのクリスタを表示
+					const hasLinkedCrystals = (crystalInfo.slot1 && crystalInfo.slot1 !== 'none') || 
+											  (crystalInfo.slot2 && crystalInfo.slot2 !== 'none');
 					
-					if (crystalInfo.slot2 && crystalInfo.slot2 !== 'none') {
-						const crystal = allCrystals.find(c => c.id === crystalInfo.slot2);
-						if (crystal) {
-							linkedCrystals.push(crystal.name);
+					if (hasLinkedCrystals) {
+						// 連携クリスタがある場合
+						if (crystalInfo.slot1 && crystalInfo.slot1 !== 'none') {
+							const crystal = allCrystals.find(c => c.id === crystalInfo.slot1);
+							if (crystal) {
+								displayCrystals.push(crystal.name);
+							}
+						}
+						
+						if (crystalInfo.slot2 && crystalInfo.slot2 !== 'none') {
+							const crystal = allCrystals.find(c => c.id === crystalInfo.slot2);
+							if (crystal) {
+								displayCrystals.push(crystal.name);
+							}
+						}
+					} else {
+						// 連携クリスタがない場合はCrystalFormのクリスタを表示
+						if (currentCrystals.weapon1 && currentCrystals.weapon1 !== 'none') {
+							const crystal = allCrystals.find(c => c.id === currentCrystals.weapon1);
+							if (crystal) {
+								displayCrystals.push(crystal.name);
+							}
+						}
+						
+						if (currentCrystals.weapon2 && currentCrystals.weapon2 !== 'none') {
+							const crystal = allCrystals.find(c => c.id === currentCrystals.weapon2);
+							if (crystal) {
+								displayCrystals.push(crystal.name);
+							}
 						}
 					}
 
-					if (linkedCrystals.length === 0) return null;
+					if (displayCrystals.length === 0) return null;
 
 					return (
 						<div className="mb-1 sm:mb-2">
-							{linkedCrystals.map((crystalName, index) => (
+							{displayCrystals.map((crystalName, index) => (
 								<div key={index} className="text-xs text-blue-600 mb-0.5">
 									◇{crystalName}
 								</div>
