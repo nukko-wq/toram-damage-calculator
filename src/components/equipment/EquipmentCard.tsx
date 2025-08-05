@@ -3,6 +3,9 @@
 import { useCallback, useState } from 'react'
 import { DamageDifferenceDisplayCorrect } from '@/components/common/DamageDifferenceDisplayCorrect'
 import type { Equipment, PresetEquipment } from '@/types/calculator'
+import { getEquipmentAllCrystals } from '@/utils/equipmentCrystalStorage'
+import { useCalculatorStore } from '@/stores/calculatorStore'
+import { getAllCrystals } from '@/utils/crystalDatabase'
 import type { SlotInfo } from '@/types/damagePreview'
 import { formatConditionalEffect } from '@/utils/crystalDisplayUtils'
 import { EquipmentFavoritesManager } from '@/utils/equipmentFavorites'
@@ -59,11 +62,11 @@ export default function EquipmentCard({
 		}
 
 		const { ATK, stability, refinement, weaponType, subWeaponType } = weaponInfo
-		
+
 		const refinementDisplay =
 			refinement > 0 ? ` +${refinementValueToDisplay(refinement as any)}` : ''
 		const stabilityDisplay = stability > 0 ? ` (${stability}%)` : ''
-		
+
 		// スロット情報に基づいて適切な武器種を表示
 		let weaponTypeDisplay = ''
 		if (slotInfo?.slot === 'subWeapon' && subWeaponType) {
@@ -76,9 +79,14 @@ export default function EquipmentCard({
 
 		// ATKが0の場合はATKのみ非表示、その他の項目は表示
 		const atkDisplay = ATK > 0 ? ATK.toString() : ''
-		
+
 		// 表示する項目があるかチェック
-		if (!weaponTypeDisplay && !atkDisplay && !refinementDisplay && !stabilityDisplay) {
+		if (
+			!weaponTypeDisplay &&
+			!atkDisplay &&
+			!refinementDisplay &&
+			!stabilityDisplay
+		) {
 			return null
 		}
 
@@ -308,7 +316,7 @@ export default function EquipmentCard({
 			{/* 装備名と選択マーク */}
 			<div className="flex justify-between items-center mb-1 sm:mb-2">
 				<h3 className="font-semibold text-gray-900">
-					{('isCustom' in equipment && equipment.isCustom) ? (
+					{'isCustom' in equipment && equipment.isCustom ? (
 						<>
 							<span className="text-yellow-500 mr-1">★</span>
 							{equipment.name}
@@ -348,9 +356,9 @@ export default function EquipmentCard({
 					equipmentName: equipment.name,
 					hasSlotInfo: !!slotInfo,
 					slotInfoType: slotInfo?.type,
-					slotInfoSlot: slotInfo?.slot
-				});
-				return showDamageDifference && slotInfo;
+					slotInfoSlot: slotInfo?.slot,
+				})
+				return showDamageDifference && slotInfo
 			})() && (
 				<div className="mb-1 sm:mb-2">
 					{(() => {
@@ -359,10 +367,13 @@ export default function EquipmentCard({
 							console.log('EquipmentCard damage difference:', {
 								showDamageDifference,
 								slotInfo,
-								equipmentName: equipment.name
-							});
+								equipmentName: equipment.name,
+							})
 						}
 						try {
+							// 連携クリスタ情報を取得
+							const crystalInfo = getEquipmentAllCrystals(equipment.id)
+
 							// Convert PresetEquipment to Equipment format
 							const equipmentAsEquipment: Equipment = {
 								...equipment,
@@ -378,20 +389,98 @@ export default function EquipmentCard({
 									slotInfo={slotInfo}
 									size="sm"
 									className="inline-block"
-									options={{ debug: false }}
+									options={{
+										debug: false,
+										linkedCrystals: {
+											slot1: crystalInfo.slot1,
+											slot2: crystalInfo.slot2,
+										},
+									}}
 								/>
 							)
 						} catch (error) {
-							console.error('EquipmentCard damage difference error:', error);
+							console.error('EquipmentCard damage difference error:', error)
 							return (
 								<div className="bg-red-100 text-red-600 text-xs p-1 rounded">
-									Error: {error instanceof Error ? error.message : 'Unknown error'}
+									Error:{' '}
+									{error instanceof Error ? error.message : 'Unknown error'}
 								</div>
 							)
 						}
 					})()}
 				</div>
 			)}
+
+			{/* 連携クリスタ表示 - ダメージ差分の下に配置 */}
+			{(() => {
+				try {
+					// 現在のCrystalFormの設定を取得
+					const currentCrystals = useCalculatorStore.getState().data.crystals
+					const crystalInfo = getEquipmentAllCrystals(equipment.id)
+					const allCrystals = getAllCrystals()
+					const displayCrystals: string[] = []
+
+					// 連携クリスタがある場合は連携クリスタを表示、ない場合はCrystalFormのクリスタを表示
+					const hasLinkedCrystals =
+						(crystalInfo.slot1 && crystalInfo.slot1 !== 'none') ||
+						(crystalInfo.slot2 && crystalInfo.slot2 !== 'none')
+
+					if (hasLinkedCrystals) {
+						// 連携クリスタがある場合
+						if (crystalInfo.slot1 && crystalInfo.slot1 !== 'none') {
+							const crystal = allCrystals.find(
+								(c) => c.id === crystalInfo.slot1,
+							)
+							if (crystal) {
+								displayCrystals.push(crystal.name)
+							}
+						}
+
+						if (crystalInfo.slot2 && crystalInfo.slot2 !== 'none') {
+							const crystal = allCrystals.find(
+								(c) => c.id === crystalInfo.slot2,
+							)
+							if (crystal) {
+								displayCrystals.push(crystal.name)
+							}
+						}
+					} else {
+						// 連携クリスタがない場合はCrystalFormのクリスタを表示
+						if (currentCrystals.weapon1 && currentCrystals.weapon1 !== 'none') {
+							const crystal = allCrystals.find(
+								(c) => c.id === currentCrystals.weapon1,
+							)
+							if (crystal) {
+								displayCrystals.push(crystal.name)
+							}
+						}
+
+						if (currentCrystals.weapon2 && currentCrystals.weapon2 !== 'none') {
+							const crystal = allCrystals.find(
+								(c) => c.id === currentCrystals.weapon2,
+							)
+							if (crystal) {
+								displayCrystals.push(crystal.name)
+							}
+						}
+					}
+
+					if (displayCrystals.length === 0) return null
+
+					return (
+						<div className="mb-1 sm:mb-2 px-2 py-1 bg-rose-50 border border-rose-200 rounded">
+							{displayCrystals.map((crystalName, index) => (
+								<div key={index} className="text-sm text-gray-700 mb-0.5">
+									◇{crystalName}
+								</div>
+							))}
+						</div>
+					)
+				} catch (error) {
+					console.error('EquipmentCard crystal display error:', error)
+					return null
+				}
+			})()}
 
 			{/* 武器情報 */}
 			{formatWeaponInfo() && (

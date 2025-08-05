@@ -240,9 +240,28 @@ export function useDamageDifferenceCorrect(
 			}
 
 			// シミュレーション後のダメージを計算
-			const simulatedData = isCurrentlyEquipped
+			let simulatedData = isCurrentlyEquipped
 				? currentData // 現在装着中の場合は現在のデータ
 				: simulateItemEquipSimple(currentData, item, slotInfo) // 装着していない場合は装着後をシミュレート
+
+			// 連携クリスタがある場合は、それを考慮したデータに更新
+			if (options.linkedCrystals && slotInfo.type === 'equipment') {
+				simulatedData = { ...simulatedData }
+				
+				// 連携クリスタをシミュレーションデータに設定
+				if (options.linkedCrystals.slot1) {
+					simulatedData.crystals = {
+						...simulatedData.crystals,
+						weapon1: options.linkedCrystals.slot1,
+					}
+				}
+				if (options.linkedCrystals.slot2) {
+					simulatedData.crystals = {
+						...simulatedData.crystals,
+						weapon2: options.linkedCrystals.slot2,
+					}
+				}
+			}
 
 			const simulatedResults = calculateResults(simulatedData)
 			const simulatedDamageResult = calculateDamageWithService(
@@ -280,6 +299,7 @@ export function useDamageDifferenceCorrect(
 		slotInfo,
 		options.disabled,
 		options.debug,
+		options.linkedCrystals,
 		baselineDamageResult,
 	])
 }

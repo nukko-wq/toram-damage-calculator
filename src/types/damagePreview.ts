@@ -69,6 +69,13 @@ export interface DamageDifferenceOptions {
 	 * デバッグログを出力するかどうか
 	 */
 	debug?: boolean
+	/**
+	 * 連携クリスタ情報（装備選択時のダメージ差分計算用）
+	 */
+	linkedCrystals?: {
+		slot1?: string | null
+		slot2?: string | null
+	}
 }
 
 /**
