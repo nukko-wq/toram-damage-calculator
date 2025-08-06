@@ -259,6 +259,8 @@ interface WeaponRequirement {
 - 10.1 シールドマスタリ (Ms-Shield) - 攻撃速度%+50（盾装備時のみ）
 - 10.2 プロテクション (IsProtect) - 物理耐性+30%, 魔法耐性-15%（全武器種対応）
 - 10.3 イージス (IsAegis) - 物理耐性-15%, 魔法耐性+30%（全武器種対応）
+- 10.4 フォースシールド (shield1) - HP+(skillLevel × 50), 物理耐性+(skillLevel)%（盾装備時のみ）
+- 10.5 マジカルシールド (shield2) - HP+(skillLevel × 50), 魔法耐性+(skillLevel)%（盾装備時のみ）
 
 ### 11. アサシンスキル系統
 
