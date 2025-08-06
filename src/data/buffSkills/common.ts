@@ -330,7 +330,16 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		id: 'IsQuickMotion',
 		name: 'クイックモーション',
 		category: 'support',
-		type: 'toggle',
+		type: 'multiParam',
+		multiParams: {
+			param1: {
+				name: 'バフ使用者タイプ',
+				min: 1,
+				max: 2,
+				default: 2,
+				unit: '',
+			},
+		},
 		order: 2003,
 	},
 	{

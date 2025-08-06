@@ -29,6 +29,27 @@ export function calculateBraveAuraEffects(
 }
 
 /**
+ * クイックモーション(IsQuickMotion)の効果計算関数
+ */
+export function calculateQuickMotionEffects(
+	buffUserType: number, // 1: バフ使用者, 2: バフ非使用者
+): Partial<EquipmentProperties> {
+	if (!buffUserType || (buffUserType !== 1 && buffUserType !== 2)) return {}
+
+	const effects: Partial<EquipmentProperties> = {
+		AttackSpeed_Rate: 250, // 全タイプ共通: 攻撃速度率+250%
+		AttackSpeed: 1100, // 全タイプ共通: 攻撃速度+1100
+	}
+
+	// バフ使用者の場合はMP回復効率低下も追加
+	if (buffUserType === 1) {
+		effects.AttackMPRecovery_Rate = -70 // MP回復効率-70%
+	}
+
+	return effects
+}
+
+/**
  * マナリチャージ(IsManaReCharge)の効果計算関数
  */
 export function calculateManaRechargeEffects(
@@ -83,6 +104,13 @@ export function getSupportSkillBonuses(
 	const braveAura = buffSkillData.IsBrave
 	if (braveAura?.isEnabled && braveAura.multiParam1) {
 		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
+		integrateEffects(effects, bonuses)
+	}
+
+	// クイックモーション（IsQuickMotion）の処理
+	const quickMotion = buffSkillData.IsQuickMotion
+	if (quickMotion?.isEnabled && quickMotion.multiParam1) {
+		const effects = calculateQuickMotionEffects(quickMotion.multiParam1)
 		integrateEffects(effects, bonuses)
 	}
 
