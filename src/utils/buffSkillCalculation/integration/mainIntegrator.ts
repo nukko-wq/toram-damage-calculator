@@ -114,8 +114,9 @@ export function getBuffSkillBonuses(
 		}
 	}
 
-	// シールドスキル
-	const shieldBonuses = getShieldSkillBonuses(buffSkillData)
+	// シールドスキル（盾装備情報を渡す）
+	const hasShield = subWeaponType === '盾'
+	const shieldBonuses = getShieldSkillBonuses(buffSkillData, hasShield)
 	for (const [key, value] of Object.entries(shieldBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
