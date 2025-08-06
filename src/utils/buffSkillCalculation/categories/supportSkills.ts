@@ -29,6 +29,28 @@ export function calculateBraveAuraEffects(
 }
 
 /**
+ * ハイサイクル(IsHighCycle)の効果計算関数
+ */
+export function calculateHighCycleEffects(
+	buffUserType: number, // 1: バフ使用者, 2: バフ非使用者
+): Partial<EquipmentProperties> {
+	if (!buffUserType || (buffUserType !== 1 && buffUserType !== 2)) return {}
+
+	const effects: Partial<EquipmentProperties> = {
+		CastingSpeed_Rate: 250, // 全タイプ共通: 詠唱速度率+250%
+		CastingSpeed: 550, // 全タイプ共通: 詠唱速度+550
+	}
+
+	// バフ使用者の場合はMP回復効率大幅低下も追加
+	if (buffUserType === 1) {
+		effects.NaturalMPRecovery_Rate = -25.5 // 自然MP回復効率-25.5%
+		effects.AttackMPRecovery_Rate = -75.5 // 攻撃MP回復効率-75.5%
+	}
+
+	return effects
+}
+
+/**
  * クイックモーション(IsQuickMotion)の効果計算関数
  */
 export function calculateQuickMotionEffects(
@@ -104,6 +126,13 @@ export function getSupportSkillBonuses(
 	const braveAura = buffSkillData.IsBrave
 	if (braveAura?.isEnabled && braveAura.multiParam1) {
 		const effects = calculateBraveAuraEffects(braveAura.multiParam1)
+		integrateEffects(effects, bonuses)
+	}
+
+	// ハイサイクル（IsHighCycle）の処理
+	const highCycle = buffSkillData.IsHighCycle
+	if (highCycle?.isEnabled && highCycle.multiParam1) {
+		const effects = calculateHighCycleEffects(highCycle.multiParam1)
 		integrateEffects(effects, bonuses)
 	}
 
