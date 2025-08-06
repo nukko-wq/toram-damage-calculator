@@ -19,6 +19,7 @@ import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
 import { getHalberdSkillBonuses } from '../categories/halberdSkills'
 import { getHunterSkillBonuses } from '../categories/hunterSkills'
+import { getMartialSkillBonuses } from '../categories/martialSkills'
 // カテゴリ別インポート
 import { getMasterySkillBonuses } from '../categories/masterySkills'
 import { calculateHotKnowsEffects } from '../categories/minstrelSkills'
@@ -80,6 +81,15 @@ export function getBuffSkillBonuses(
 	// ハルバードスキル
 	const halberdBonuses = getHalberdSkillBonuses(buffSkillData, weaponType)
 	for (const [key, value] of Object.entries(halberdBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// マーシャルスキル
+	const martialBonuses = getMartialSkillBonuses(buffSkillData, weaponType)
+	for (const [key, value] of Object.entries(martialBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
