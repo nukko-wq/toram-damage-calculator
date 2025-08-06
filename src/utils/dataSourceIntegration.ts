@@ -1028,15 +1028,35 @@ export function getDetailedDataSourceBonuses(
 			crystal: getCrystalBonusesWithConditionalEffects(data),
 			food: getFoodBonuses(data.food),
 			buffItems: getBuffBonuses(data.buffItems),
-			buffSkills: getBuffSkillBonuses(
-				data.buffSkills?.skills || null,
-				data.mainWeapon?.weaponType || null,
-				undefined, // enemyDEF - not available in this context
-				undefined, // enemyMDEF - not available in this context
-				undefined, // enemyLevel - not available in this context
-				data.subWeapon?.weaponType || null,
-				data.subWeapon?.refinement || 0,
-			),
+			buffSkills: (() => {
+				const buffSkillBonuses = getBuffSkillBonuses(
+					data.buffSkills?.skills || null,
+					data.mainWeapon?.weaponType || null,
+					undefined, // enemyDEF - not available in this context
+					undefined, // enemyMDEF - not available in this context
+					undefined, // enemyLevel - not available in this context
+					data.subWeapon?.weaponType || null,
+					data.subWeapon?.refinement || 0,
+				)
+
+				// 両手持ちスキルの効果も統合
+				const twoHandsBonuses = getTwoHandsEffects(
+					data.buffSkills?.skills || null,
+					data.mainWeapon?.weaponType || null,
+					data.subWeapon?.weaponType || null,
+				)
+
+				// 両方の効果を統合
+				const combinedBonuses: Partial<AllBonuses> = { ...buffSkillBonuses }
+				for (const [key, value] of Object.entries(twoHandsBonuses)) {
+					if (typeof value === 'number' && value !== 0) {
+						combinedBonuses[key as keyof AllBonuses] =
+							(combinedBonuses[key as keyof AllBonuses] || 0) + value
+					}
+				}
+
+				return combinedBonuses
+			})(),
 			register: getRegisterBonuses(data.register),
 		}
 	} catch (error) {

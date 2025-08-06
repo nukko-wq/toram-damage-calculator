@@ -395,7 +395,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		armorBreakCalculation,
 		anticipateCalculation,
 		cspdCalculation,
-		totalElementAdvantageCalculation,
 		stabilityCalculation,
 		ailmentResistanceCalculation,
 		elementAwakeningAdvantageCalculation,
@@ -428,7 +427,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// カテゴリ別データ取得関数
 	const getBasicStatsByCategory = (
 		category: BasicStatsDisplayCategory['value'],
-		equipmentBonuses: ReturnType<typeof calculateEquipmentBonuses>,
 	): Record<string, number | null> => {
 		const baseStats = {
 			HP: hpCalculation.finalHP,
@@ -953,60 +951,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// TODO: 将来的には全98項目の計算を実装
 	// 現在は基本的な項目のみ計算
 
-	// 基本ステータス (30項目のうち実装可能な項目)
-	const basicStats = {
-		HP: hpCalculation.finalHP,
-		MP: mpCalculation.finalMP,
-		ATK: atkCalculation.finalATK, // 武器種別ATK計算結果
-		baseATK: Math.floor(atkCalculation.baseATK), // 基礎ATK（表示時のみ小数点以下切り捨て）
-		// サブATKとサブ基礎ATKは双剣の場合のみ計算、他は null で - 表示
-		subATK:
-			data.mainWeapon.weaponType === '双剣' && subATKCalculation
-				? subATKCalculation.subFinalATK // 双剣時は計算値
-				: null, // 非双剣時は null で - 表示
-		subBaseATK:
-			data.mainWeapon.weaponType === '双剣' && subATKCalculation
-				? Math.floor(subATKCalculation.subBaseATK) // 双剣時は計算値
-				: null, // 非双剣時は null で - 表示
-		totalATK: totalATKCalculation.totalATK, // 総ATK計算結果
-		bringerAM: 0, // TODO: ブリンガーAM計算
-		MATK: matkCalculation.finalMATK, // MATK計算結果
-		baseMATK: matkCalculation.baseMATK, // 基本MATK計算結果
-		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
-		// サブ安定率は常時表示（双剣・弓+矢以外は null で - 表示）
-		subStabilityRate: (() => {
-			if (data.mainWeapon.weaponType === '双剣' && subATKCalculation) {
-				return subATKCalculation.subStability // サブ安定率（計算後）
-			}
-			if (
-				(data.mainWeapon.weaponType === '弓' ||
-					data.mainWeapon.weaponType === '自動弓') &&
-				data.subWeapon.weaponType === '矢'
-			) {
-				return data.subWeapon.stability // 矢の安定率をそのまま表示
-			}
-			return null // その他は null で - 表示
-		})(),
-		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
-		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
-		magicCriticalRate: 0, // TODO: 魔法クリティカル率
-		magicCriticalDamage:
-			magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
-		totalElementAdvantage: 
-			(calculationResults.equipmentBonuses.equipmentBonus1.elementPower_Rate || 0) + 
-			elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage, // 総属性有利計算結果
-		elementAwakeningAdvantage: elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage, // 属性覚醒有利（基本25% + 熱情の歌効果）
-		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
-		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果
-		HIT: hitCalculation.finalHIT, // HIT計算結果
-		FLEE: fleeCalculation.finalFLEE, // FLEE計算結果
-		physicalResistance: physicalResistanceCalculation.finalPhysicalResistance, // 物理耐性計算結果
-		magicalResistance: magicalResistanceCalculation.finalMagicalResistance, // 魔法耐性計算結果
-		ailmentResistance: ailmentResistanceCalculation, // 異常耐性計算結果
-		motionSpeed: motionSpeedCalculation.finalMotionSpeed, // 行動速度計算結果
-		armorBreak: armorBreakCalculation.finalArmorBreak, // 防御崩し計算結果
-		anticipate: anticipateCalculation.finalAnticipate, // 先読み計算結果
-	}
 
 	// 補正後ステータス (8項目) - 正確な計算結果を使用
 	const adjustedStats: Record<string, number> = {
@@ -1151,10 +1095,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							</div>
 							<StatSection
 								title=""
-								stats={getBasicStatsByCategory(
-									basicStatsCategory,
-									calculationResults.equipmentBonuses,
-								)}
+								stats={getBasicStatsByCategory(basicStatsCategory)}
 								labels={getBasicStatsLabelsByCategory(basicStatsCategory)}
 								displayMode="normal"
 								propertyOrder={getBasicStatsDisplayOrder(basicStatsCategory)}
