@@ -30,6 +30,7 @@
 - **スプライトスキル系統**: [buff-skills/sprite-skills.md](./buff-skills/sprite-skills.md) ✅
 - **ミンストレルスキル系統**: [buff-skills/minstrel-skills.md](./buff-skills/minstrel-skills.md) ✅
 - **シュートスキル系統**: [buff-skills/shoot-skills.md](./buff-skills/shoot-skills.md) ✅
+- **マーシャルスキル系統**: [buff-skills/martial-skills.md](./buff-skills/martial-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills/README.md](./buff-skills/README.md) を参照してください。
@@ -353,6 +354,17 @@ interface WeaponRequirement {
 
 **含まれるスキル:**
 - 17.1 熱情の歌 (IsHotKnows) - DamagePreview属性攻撃設定連動の属性有利率変動
+
+## B. 武器固有バフスキル
+
+### マーシャルスキル系統（手甲）
+
+詳細は [buff-skills/martial-skills.md](./buff-skills/martial-skills.md) を参照してください。
+
+**含まれるスキル:**
+- B.1 体術鍛錬 (ma1) - 手甲装備時の攻撃速度上昇（AttackSpeed = skillLevel × 10, AttackSpeed_Rate = |skillLevel|%）
+- B.2 強力な追撃 (ma2-1) - 手甲装備時の追撃効果向上（詳細設計待ち）
+- B.3 アシュラオーラ (ma2) - 手甲装備時の特殊効果（詳細設計待ち）
 
 
 ## スキルタイプ別UI仕様
