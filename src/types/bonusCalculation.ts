@@ -99,6 +99,7 @@ export interface DetailedDataSourceBonuses {
 	food: Partial<AllBonuses>
 	buffItems: Partial<AllBonuses>
 	buffSkills: Partial<AllBonuses>
+	register: Partial<AllBonuses>
 }
 
 // フィルターオプション型
@@ -118,3 +119,4 @@ export type FilterOption =
 	| 'food'
 	| 'buffItems'
 	| 'buffSkills'
+	| 'register'

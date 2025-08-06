@@ -83,6 +83,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 		{ value: 'food', label: '料理' },
 		{ value: 'buffItems', label: 'アイテムバフ' },
 		{ value: 'buffSkills', label: 'スキルバフ' },
+		{ value: 'register', label: 'レジスタ他' },
 	]
 
 	return (
@@ -444,6 +445,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					return detailedBonuses.buffItems
 				case 'buffSkills':
 					return detailedBonuses.buffSkills
+				case 'register':
+					return detailedBonuses.register
 				default:
 					return {}
 			}
