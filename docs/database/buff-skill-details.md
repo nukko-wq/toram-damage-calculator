@@ -31,6 +31,7 @@
 - **ミンストレルスキル系統**: [buff-skills/minstrel-skills.md](./buff-skills/minstrel-skills.md) ✅
 - **シュートスキル系統**: [buff-skills/shoot-skills.md](./buff-skills/shoot-skills.md) ✅
 - **マーシャルスキル系統**: [buff-skills/martial-skills.md](./buff-skills/martial-skills.md) ✅
+- **忍者スキル系統**: [buff-skills/ninja-skills.md](./buff-skills/ninja-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills/README.md](./buff-skills/README.md) を参照してください。
