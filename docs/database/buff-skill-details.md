@@ -310,7 +310,9 @@ interface WeaponRequirement {
 
 **含まれるスキル:**
 - 12.1 ブレイブオーラ (IsBrave) - 武器ATK+30%、ブレイブ倍率+20%（バフ使用者時命中率-50%）
-- 12.2 マナリチャージ (IsManaReCharge) - ブレイブ倍率-25%
+- 12.2 ハイサイクル (IsHighCycle) - 詠唱速度%+250%、詠唱速度+550（バフ使用者時MP回復効率大幅低下）
+- 12.3 クイックモーション (IsQuickMotion) - 攻撃速度%+250%、攻撃速度+1100（バフ使用者時AttackMPRecovery%-70%）
+- 12.4 マナリチャージ (IsManaReCharge) - ブレイブ倍率-25%
 
 ### 13. サバイバルスキル系統
 
