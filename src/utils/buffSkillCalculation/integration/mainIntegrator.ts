@@ -22,7 +22,7 @@ import { getHunterSkillBonuses } from '../categories/hunterSkills'
 import { getMartialSkillBonuses } from '../categories/martialSkills'
 // カテゴリ別インポート
 import { getMasterySkillBonuses } from '../categories/masterySkills'
-import { calculateHotKnowsEffects } from '../categories/minstrelSkills'
+import { getNinjaSkillBonuses } from '../categories/ninjaSkills'
 import { getMononofuSkillBonuses } from '../categories/mononofuSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
 import { getPriestSkillBonuses } from '../categories/priestSkills'
@@ -90,6 +90,15 @@ export function getBuffSkillBonuses(
 	// マーシャルスキル
 	const martialBonuses = getMartialSkillBonuses(buffSkillData, weaponType)
 	for (const [key, value] of Object.entries(martialBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 忍者スキル
+	const ninjaBonuses = getNinjaSkillBonuses(buffSkillData)
+	for (const [key, value] of Object.entries(ninjaBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
 				(bonuses[key as keyof AllBonuses] || 0) + value
