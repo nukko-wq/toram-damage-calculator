@@ -381,6 +381,13 @@ export interface CalculatorData {
 	otherOptions: OtherOptions // その他オプション設定
 	optionTab: OptionTabType // オプションタブ状態
 	adaptationMultiplier: number // 慣れ倍率 (50-250%)
+	// 一時的なクリスタ連携情報（保存ボタン押下時にLocalStorageに永続化）
+	tempEquipmentCrystals?: {
+		[equipmentId: string]: {
+			slot1?: string | null
+			slot2?: string | null
+		}
+	}
 }
 
 // 計算結果

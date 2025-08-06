@@ -416,7 +416,16 @@ export default function EquipmentCard({
 				try {
 					// 現在のCrystalFormの設定を取得
 					const currentCrystals = useCalculatorStore.getState().data.crystals
-					const crystalInfo = getEquipmentAllCrystals(equipment.id)
+					const tempEquipmentCrystals = useCalculatorStore.getState().data.tempEquipmentCrystals
+					
+					// 一時的なクリスタ連携情報があればそれを優先、なければLocalStorageから取得
+					const tempCrystalInfo = tempEquipmentCrystals?.[equipment.id]
+					const storedCrystalInfo = getEquipmentAllCrystals(equipment.id)
+					
+					const crystalInfo = {
+						slot1: tempCrystalInfo?.slot1 ?? storedCrystalInfo.slot1,
+						slot2: tempCrystalInfo?.slot2 ?? storedCrystalInfo.slot2,
+					}
 					const allCrystals = getAllCrystals()
 					const displayCrystals: string[] = []
 

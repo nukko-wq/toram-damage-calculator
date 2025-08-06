@@ -30,6 +30,8 @@
 - **スプライトスキル系統**: [buff-skills/sprite-skills.md](./buff-skills/sprite-skills.md) ✅
 - **ミンストレルスキル系統**: [buff-skills/minstrel-skills.md](./buff-skills/minstrel-skills.md) ✅
 - **シュートスキル系統**: [buff-skills/shoot-skills.md](./buff-skills/shoot-skills.md) ✅
+- **マーシャルスキル系統**: [buff-skills/martial-skills.md](./buff-skills/martial-skills.md) ✅
+- **忍者スキル系統**: [buff-skills/ninja-skills.md](./buff-skills/ninja-skills.md) ✅
 - **その他の系統**: 順次分割予定
 
 詳細な分割状況は [buff-skills/README.md](./buff-skills/README.md) を参照してください。
@@ -258,6 +260,8 @@ interface WeaponRequirement {
 - 10.1 シールドマスタリ (Ms-Shield) - 攻撃速度%+50（盾装備時のみ）
 - 10.2 プロテクション (IsProtect) - 物理耐性+30%, 魔法耐性-15%（全武器種対応）
 - 10.3 イージス (IsAegis) - 物理耐性-15%, 魔法耐性+30%（全武器種対応）
+- 10.4 フォースシールド (shield1) - HP+(skillLevel × 50), 物理耐性+(skillLevel)%（盾装備時のみ）
+- 10.5 マジカルシールド (shield2) - HP+(skillLevel × 50), 魔法耐性+(skillLevel)%（盾装備時のみ）
 
 ### 11. アサシンスキル系統
 
@@ -307,7 +311,9 @@ interface WeaponRequirement {
 
 **含まれるスキル:**
 - 12.1 ブレイブオーラ (IsBrave) - 武器ATK+30%、ブレイブ倍率+20%（バフ使用者時命中率-50%）
-- 12.2 マナリチャージ (IsManaReCharge) - ブレイブ倍率-25%
+- 12.2 ハイサイクル (IsHighCycle) - 詠唱速度%+250%、詠唱速度+550（バフ使用者時MP回復効率大幅低下）
+- 12.3 クイックモーション (IsQuickMotion) - 攻撃速度%+250%、攻撃速度+1100（バフ使用者時AttackMPRecovery%-70%）
+- 12.4 マナリチャージ (IsManaReCharge) - ブレイブ倍率-25%
 
 ### 13. サバイバルスキル系統
 
@@ -353,6 +359,17 @@ interface WeaponRequirement {
 
 **含まれるスキル:**
 - 17.1 熱情の歌 (IsHotKnows) - DamagePreview属性攻撃設定連動の属性有利率変動
+
+## B. 武器固有バフスキル
+
+### マーシャルスキル系統（手甲）
+
+詳細は [buff-skills/martial-skills.md](./buff-skills/martial-skills.md) を参照してください。
+
+**含まれるスキル:**
+- B.1 体術鍛錬 (ma1) - 手甲装備時の攻撃速度上昇（AttackSpeed = skillLevel × 10, AttackSpeed_Rate = |skillLevel|%）
+- B.2 強力な追撃 (ma2-1) - 手甲装備時の追撃効果向上（詳細設計待ち）
+- B.3 アシュラオーラ (ma2) - 手甲装備時の特殊効果（詳細設計待ち）
 
 
 ## スキルタイプ別UI仕様

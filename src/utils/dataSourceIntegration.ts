@@ -13,7 +13,7 @@ import type {
 	EquipmentBonusSource,
 	FoodBonusSource,
 } from '@/types/bonusCalculation'
-import type { CalculatorData } from '@/types/calculator'
+import type { CalculatorData, RegisterFormData } from '@/types/calculator'
 import { getBuffItemById as getBuffItemFromDB } from '@/utils/buffItemDatabase'
 import type { AllBonuses } from './basicStatsCalculation'
 import {
@@ -793,6 +793,16 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
+	// レジスタ効果の補正値を追加
+	const registerBonuses = getRegisterBonuses(data.register)
+
+	for (const [key, value] of Object.entries(registerBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
 	return bonuses
 }
 
@@ -908,6 +918,90 @@ export function getEnchantmentBonuses(equipmentData: any): Partial<AllBonuses> {
 }
 
 /**
+ * レジスタ効果をボーナス値に変換
+ */
+function getRegisterBonuses(registerData?: RegisterFormData): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	if (!registerData?.effects) return bonuses
+
+	// 各効果を処理
+	for (const effect of registerData.effects) {
+		if (!effect.isEnabled) continue
+
+		switch (effect.type) {
+			case 'maxHpUp':
+				// 最大HPアップ: レベル × 10 をHP固定値に加算
+				bonuses.HP = (bonuses.HP || 0) + effect.level * 10
+				break
+
+			case 'maxMpUp':
+				// 最大MPアップ: レベル × 1 をMP固定値に加算
+				bonuses.MP = (bonuses.MP || 0) + effect.level * 1
+				break
+
+			case 'physicalAttackUp':
+				// 物理攻撃アップ: レベル × 1 をATK固定値に加算
+				bonuses.ATK = (bonuses.ATK || 0) + effect.level
+				break
+
+			case 'magicalAttackUp':
+				// 魔法攻撃アップ: レベル × 1 をMATK固定値に加算
+				bonuses.MATK = (bonuses.MATK || 0) + effect.level
+				break
+
+			case 'accuracyUp':
+				// 命中アップ: レベル × 1 をAccuracy固定値に加算
+				bonuses.Accuracy = (bonuses.Accuracy || 0) + effect.level
+				break
+
+			case 'evasionUp':
+				// 回避アップ: レベル × 1 をDodge固定値に加算
+				bonuses.Dodge = (bonuses.Dodge || 0) + effect.level
+				break
+
+			case 'attackSpeedUp':
+				// 攻撃速度アップ: レベル × 1 をAttackSpeed固定値に加算
+				bonuses.AttackSpeed = (bonuses.AttackSpeed || 0) + effect.level
+				break
+
+			case 'magicalSpeedUp':
+				// 魔法速度アップ: レベル × 1 をCastingSpeed固定値に加算
+				bonuses.CastingSpeed = (bonuses.CastingSpeed || 0) + effect.level
+				break
+
+			case 'fateCompanionship':
+				// 運命共同体: 特殊計算（レベル1固定 + パーティメンバー数効果）
+				if (effect.level === 1) {
+					const baseBonus = 5 // レベル1固定効果
+					const partyBonus = (effect.partyMembers || 1) * 3 // パーティメンバー数効果
+					const totalBonus = baseBonus + partyBonus
+
+					bonuses.ATK = (bonuses.ATK || 0) + totalBonus
+					bonuses.MATK = (bonuses.MATK || 0) + totalBonus
+				}
+				break
+
+			case 'deliciousIngredientTrade':
+				// 美味食材取引: レベル × 100 をHP固定値に加算
+				bonuses.HP = (bonuses.HP || 0) + effect.level * 100
+				break
+
+			case 'freshFruitTrade':
+				// 新鮮な果物取引: レベル × 10 をMP固定値に加算
+				bonuses.MP = (bonuses.MP || 0) + effect.level * 10
+				break
+
+			// 他の効果は将来実装
+			default:
+				break
+		}
+	}
+
+	return bonuses
+}
+
+/**
  * データソース別補正値を一括取得
  */
 export function getDetailedDataSourceBonuses(
@@ -943,6 +1037,7 @@ export function getDetailedDataSourceBonuses(
 				data.subWeapon?.weaponType || null,
 				data.subWeapon?.refinement || 0,
 			),
+			register: getRegisterBonuses(data.register),
 		}
 	} catch (error) {
 		console.error('Detailed data source bonuses calculation error:', error)
@@ -965,6 +1060,7 @@ export function getDetailedDataSourceBonuses(
 			food: {},
 			buffItems: {},
 			buffSkills: {},
+			register: {},
 		}
 	}
 }

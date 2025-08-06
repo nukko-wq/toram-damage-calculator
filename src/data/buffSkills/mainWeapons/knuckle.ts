@@ -33,6 +33,7 @@ export const knuckleSkills: BuffSkillDefinition[] = [
 		name: '体術鍛錬',
 		category: 'martial',
 		type: 'level',
+		maxLevel: 10,
 		order: 501,
 	},
 	{
@@ -40,6 +41,7 @@ export const knuckleSkills: BuffSkillDefinition[] = [
 		name: '強力な追撃',
 		category: 'martial',
 		type: 'level',
+		maxLevel: 10,
 		order: 502,
 	},
 	{

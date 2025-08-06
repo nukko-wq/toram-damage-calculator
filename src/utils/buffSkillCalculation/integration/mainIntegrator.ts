@@ -19,9 +19,10 @@ import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
 import { getHalberdSkillBonuses } from '../categories/halberdSkills'
 import { getHunterSkillBonuses } from '../categories/hunterSkills'
+import { getMartialSkillBonuses, getMartialSkillBraveMultiplier } from '../categories/martialSkills'
 // カテゴリ別インポート
 import { getMasterySkillBonuses } from '../categories/masterySkills'
-import { calculateHotKnowsEffects } from '../categories/minstrelSkills'
+import { getNinjaSkillBonuses } from '../categories/ninjaSkills'
 import { getMononofuSkillBonuses } from '../categories/mononofuSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
 import { getPriestSkillBonuses } from '../categories/priestSkills'
@@ -86,6 +87,24 @@ export function getBuffSkillBonuses(
 		}
 	}
 
+	// マーシャルスキル
+	const martialBonuses = getMartialSkillBonuses(buffSkillData, weaponType, subWeaponType)
+	for (const [key, value] of Object.entries(martialBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
+	// 忍者スキル
+	const ninjaBonuses = getNinjaSkillBonuses(buffSkillData)
+	for (const [key, value] of Object.entries(ninjaBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
 	// バトルスキル（基本）
 	const battleBonuses = getBattleSkillBonuses(buffSkillData)
 	for (const [key, value] of Object.entries(battleBonuses)) {
@@ -104,8 +123,9 @@ export function getBuffSkillBonuses(
 		}
 	}
 
-	// シールドスキル
-	const shieldBonuses = getShieldSkillBonuses(buffSkillData)
+	// シールドスキル（盾装備情報を渡す）
+	const hasShield = subWeaponType === '盾'
+	const shieldBonuses = getShieldSkillBonuses(buffSkillData, hasShield)
 	for (const [key, value] of Object.entries(shieldBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -364,6 +384,7 @@ export function getBuffSkillBraveMultiplier(
 	enemyDEF?: number,
 	enemyMDEF?: number,
 	enemyLevel?: number,
+	subWeaponType?: SubWeaponType | null,
 ): number {
 	let totalBraveMultiplier = getSupportSkillBraveMultiplier(buffSkillData)
 
@@ -372,6 +393,15 @@ export function getBuffSkillBraveMultiplier(
 		totalBraveMultiplier += getBladeSkillBraveMultiplier(
 			buffSkillData,
 			weaponType,
+		)
+	}
+
+	// マーシャルスキルのブレイブ倍率も追加（アシュラオーラ）
+	if (weaponType !== undefined) {
+		totalBraveMultiplier += getMartialSkillBraveMultiplier(
+			buffSkillData,
+			weaponType,
+			subWeaponType,
 		)
 	}
 

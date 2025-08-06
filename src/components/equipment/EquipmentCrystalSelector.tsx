@@ -5,11 +5,7 @@ import CrystalSelectionModal from '@/components/crystal/CrystalSelectionModal'
 import type { CrystalType, EquipmentSlots } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { getCrystalById } from '@/utils/crystalDatabase'
-import {
-	saveEquipmentCrystal,
-	getEquipmentCrystal,
-	deleteEquipmentCrystal,
-} from '@/utils/equipmentCrystalStorage'
+import { getEquipmentCrystal } from '@/utils/equipmentCrystalStorage'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface EquipmentCrystalSelectorProps {
@@ -19,19 +15,20 @@ interface EquipmentCrystalSelectorProps {
 }
 
 // 装備スロットとクリスタタイプのマッピング
-const EQUIPMENT_CRYSTAL_TYPE_MAP: Record<keyof EquipmentSlots, CrystalType[]> = {
-	mainWeapon: ['weapon'],
-	body: ['armor'],
-	additional: ['additional'],
-	special: ['special'],
-	subWeapon: ['weapon'],
-	fashion1: [],
-	fashion2: [],
-	fashion3: [],
-	freeInput1: [],
-	freeInput2: [],
-	freeInput3: [],
-}
+const EQUIPMENT_CRYSTAL_TYPE_MAP: Record<keyof EquipmentSlots, CrystalType[]> =
+	{
+		mainWeapon: ['weapon'],
+		body: ['armor'],
+		additional: ['additional'],
+		special: ['special'],
+		subWeapon: ['weapon'],
+		fashion1: [],
+		fashion2: [],
+		fashion3: [],
+		freeInput1: [],
+		freeInput2: [],
+		freeInput3: [],
+	}
 
 export default function EquipmentCrystalSelector({
 	equipmentId,
@@ -40,7 +37,10 @@ export default function EquipmentCrystalSelector({
 }: EquipmentCrystalSelectorProps) {
 	const updateCrystals = useCalculatorStore((state) => state.updateCrystals)
 	const currentCrystals = useCalculatorStore((state) => state.data.crystals)
-	
+	const updateTempEquipmentCrystal = useCalculatorStore(
+		(state) => state.updateTempEquipmentCrystal,
+	)
+
 	// 対象装備がクリスタ対応かどうかを判定
 	const allowedTypes = EQUIPMENT_CRYSTAL_TYPE_MAP[slotKey]
 	const isCrystalSupported = allowedTypes.length > 0
@@ -123,57 +123,30 @@ export default function EquipmentCrystalSelector({
 			const slotNumber = modalState.slotNumber
 
 			if (crystalId) {
-				// クリスタを選択した場合
-				const success = saveEquipmentCrystal(equipmentId, slotNumber, crystalId)
-				if (success) {
-					// ローカル状態を更新
-					if (slotNumber === 1) {
-						setSlot1CrystalId(crystalId)
-					} else {
-						setSlot2CrystalId(crystalId)
-					}
+				// クリスタを選択した場合 - 一時的なクリスタ連携情報を更新
+				updateTempEquipmentCrystal(equipmentId, slotNumber, crystalId)
 
-					// CrystalFormにクリスタをセット
-					const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-					const updatedCrystals = {
-						...currentCrystals,
-						[crystalSlotKey]: crystalId,
-					}
-					updateCrystals(updatedCrystals)
-
-					onCrystalChange?.()
+				// ローカル状態を更新
+				if (slotNumber === 1) {
+					setSlot1CrystalId(crystalId)
+				} else {
+					setSlot2CrystalId(crystalId)
 				}
+
+				// CrystalFormにクリスタをセット
+				const crystalSlotKey =
+					`${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
+				const updatedCrystals = {
+					...currentCrystals,
+					[crystalSlotKey]: crystalId,
+				}
+				updateCrystals(updatedCrystals)
+
+				onCrystalChange?.()
 			} else {
-				// クリスタを削除した場合
-				const success = deleteEquipmentCrystal(equipmentId, slotNumber)
-				if (success) {
-					// ローカル状態を更新
-					if (slotNumber === 1) {
-						setSlot1CrystalId(null)
-					} else {
-						setSlot2CrystalId(null)
-					}
+				// クリスタを削除した場合 - 一時的なクリスタ連携情報を更新
+				updateTempEquipmentCrystal(equipmentId, slotNumber, null)
 
-					// CrystalFormからクリスタを削除
-					const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-					const updatedCrystals = {
-						...currentCrystals,
-						[crystalSlotKey]: null,
-					}
-					updateCrystals(updatedCrystals)
-
-					onCrystalChange?.()
-				}
-			}
-		},
-		[modalState.slotNumber, equipmentId, allowedTypes, currentCrystals, updateCrystals, onCrystalChange],
-	)
-
-	// クリスタを削除
-	const handleCrystalRemove = useCallback(
-		(slotNumber: 1 | 2) => {
-			const success = deleteEquipmentCrystal(equipmentId, slotNumber)
-			if (success) {
 				// ローカル状態を更新
 				if (slotNumber === 1) {
 					setSlot1CrystalId(null)
@@ -181,18 +154,38 @@ export default function EquipmentCrystalSelector({
 					setSlot2CrystalId(null)
 				}
 
-				// CrystalFormからクリスタを削除
-				const crystalSlotKey = `${allowedTypes[0]}${slotNumber}` as keyof import('@/types/calculator').CrystalSlots
-				const updatedCrystals = {
-					...currentCrystals,
-					[crystalSlotKey]: null,
-				}
-				updateCrystals(updatedCrystals)
-
+				// 連携解除時はCrystalFormは変更しない
 				onCrystalChange?.()
 			}
 		},
-		[equipmentId, allowedTypes, currentCrystals, updateCrystals, onCrystalChange],
+		[
+			modalState.slotNumber,
+			equipmentId,
+			allowedTypes,
+			currentCrystals,
+			updateCrystals,
+			updateTempEquipmentCrystal,
+			onCrystalChange,
+		],
+	)
+
+	// クリスタを削除
+	const handleCrystalRemove = useCallback(
+		(slotNumber: 1 | 2) => {
+			// 一時的なクリスタ連携情報を更新
+			updateTempEquipmentCrystal(equipmentId, slotNumber, null)
+
+			// ローカル状態を更新
+			if (slotNumber === 1) {
+				setSlot1CrystalId(null)
+			} else {
+				setSlot2CrystalId(null)
+			}
+
+			// 連携解除時はCrystalFormは変更しない
+			onCrystalChange?.()
+		},
+		[equipmentId, updateTempEquipmentCrystal, onCrystalChange],
 	)
 
 	// 装備が変更された際に呼び出される更新関数
@@ -215,14 +208,14 @@ export default function EquipmentCrystalSelector({
 	return (
 		<div className="mt-4 space-y-3">
 			<h4 className="text-sm font-medium text-gray-700">クリスタ連携</h4>
-			
+
 			{/* 1つ目のクリスタスロット */}
 			<div className="flex items-center gap-2">
 				<span className="text-sm text-gray-600 min-w-[60px]">クリスタ1:</span>
 				<button
 					type="button"
 					onClick={() => openCrystalModal(1)}
-					className="flex-1 px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
+					className="w-[200px] px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
 				>
 					{slot1Crystal ? (
 						<span className="text-gray-900">{slot1Crystal.name}</span>
@@ -234,7 +227,7 @@ export default function EquipmentCrystalSelector({
 					<button
 						type="button"
 						onClick={() => handleCrystalRemove(1)}
-						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors"
+						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors cursor-pointer"
 						title="連携を解除"
 					>
 						解除
@@ -248,7 +241,7 @@ export default function EquipmentCrystalSelector({
 				<button
 					type="button"
 					onClick={() => openCrystalModal(2)}
-					className="flex-1 px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
+					className="w-[200px] px-3 py-2 text-sm text-left border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent hover:border-gray-400 transition-colors"
 				>
 					{slot2Crystal ? (
 						<span className="text-gray-900">{slot2Crystal.name}</span>
@@ -260,7 +253,7 @@ export default function EquipmentCrystalSelector({
 					<button
 						type="button"
 						onClick={() => handleCrystalRemove(2)}
-						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors"
+						className="px-2 py-1 text-xs bg-gray-400/80 text-white rounded hover:bg-gray-400 transition-colors cursor-pointer"
 						title="連携を解除"
 					>
 						解除
@@ -278,7 +271,9 @@ export default function EquipmentCrystalSelector({
 				}
 				allowedTypes={allowedTypes}
 				title={modalState.title}
-				slotInfo={modalState.slotNumber ? getSlotInfo(modalState.slotNumber) : undefined}
+				slotInfo={
+					modalState.slotNumber ? getSlotInfo(modalState.slotNumber) : undefined
+				}
 			/>
 		</div>
 	)

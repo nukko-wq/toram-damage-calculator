@@ -171,6 +171,15 @@ export interface CalculatorStore {
 
 	// ===== 初期化 =====
 	initialize: () => Promise<void>
+
+	// ===== 一時的なクリスタ連携情報管理 =====
+	updateTempEquipmentCrystal: (
+		equipmentId: string,
+		slotNumber: 1 | 2,
+		crystalId: string | null
+	) => void
+	clearTempEquipmentCrystals: () => void
+	saveTempEquipmentCrystalsToStorage: () => void
 }
 
 // ===== UIストア =====

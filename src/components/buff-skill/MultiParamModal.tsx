@@ -230,6 +230,22 @@ export default function MultiParamModal({
 										<br />
 										両手剣以外の場合: 2
 									</>
+								) : skill.id === 'IsHighCycle' ? (
+									<>
+										いずれかを選択して下さい。
+										<br />
+										バフ使用者の場合: 1
+										<br />
+										使用者以外の場合: 2
+									</>
+								) : skill.id === 'IsQuickMotion' ? (
+									<>
+										いずれかを選択して下さい。
+										<br />
+										バフ使用者の場合: 1
+										<br />
+										使用者以外の場合: 2
+									</>
 								) : skill.id === 'IsPriere' ? (
 									<>
 										いずれかを選択して下さい。
@@ -284,11 +300,15 @@ export default function MultiParamModal({
 							<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded w-[120px] text-center">
 								{skill.id === 'IsBrave'
 									? currentState.level || 2
-									: skill.id === 'IsWarcry'
+									: skill.id === 'IsHighCycle'
 										? currentState.level || 2
-										: skill.id === 'IsPriere'
+										: skill.id === 'IsQuickMotion'
 											? currentState.level || 2
-											: `Lv.${currentState.level || 10}`}
+											: skill.id === 'IsWarcry'
+												? currentState.level || 2
+												: skill.id === 'IsPriere'
+													? currentState.level || 2
+													: `Lv.${currentState.level || 10}`}
 							</div>
 
 							{/* レベル +1ボタン */}
@@ -329,6 +349,8 @@ export default function MultiParamModal({
 
 					{/* 重ねがけ数設定 */}
 					{skill.id !== 'IsBrave' &&
+						skill.id !== 'IsHighCycle' &&
+						skill.id !== 'IsQuickMotion' &&
 						skill.id !== 'IsWarcry' &&
 						skill.id !== 'IsPriere' && (
 							<div>

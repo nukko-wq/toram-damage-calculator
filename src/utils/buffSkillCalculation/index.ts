@@ -9,6 +9,7 @@ export * from './categories/darkPowerSkills'
 export * from './categories/dualSwordSkills'
 export * from './categories/halberdSkills'
 export * from './categories/hunterSkills'
+export * from './categories/martialSkills'
 // 個別カテゴリの計算関数（詳細な制御が必要な場合）
 export * from './categories/masterySkills'
 export * from './categories/minstrelSkills'
