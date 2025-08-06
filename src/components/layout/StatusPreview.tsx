@@ -68,8 +68,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 	className,
 }) => {
 	const options = [
-		{ value: 'all', label: '全ての合計値' },
-		{ value: 'calculation', label: '計算用' },
+		{ value: 'calculation', label: '全ての合計値' },
 		{ value: 'mainWeapon', label: 'メイン装備' },
 		{ value: 'subWeapon', label: 'サブ装備' },
 		{ value: 'body', label: '体装備' },
@@ -134,9 +133,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// フィルター状態管理
 	const [filters, setFilters] = useState({
-		equipmentBonus1: 'all' as FilterOption,
-		equipmentBonus2: 'all' as FilterOption,
-		equipmentBonus3: 'all' as FilterOption,
+		equipmentBonus1: 'calculation' as FilterOption,
+		equipmentBonus2: 'calculation' as FilterOption,
+		equipmentBonus3: 'calculation' as FilterOption,
 	})
 
 	// フィルター変更処理
@@ -318,11 +317,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			filter: FilterOption,
 		) => {
 			switch (filter) {
-				case 'all':
-					// 全ての合計（バフスキル等の反映なし）
-					return getAllDataSourceBonusesWithBuffSkills(data) // TODO: バフスキル等を除外した合計値を返す
 				case 'calculation':
-					// 計算用（既存のロジック）
+					// 全ての合計値（既存のロジック）
 					return getAllDataSourceBonusesWithBuffSkills(data)
 				case 'mainWeapon':
 					return detailedBonuses.equipment.mainWeapon
