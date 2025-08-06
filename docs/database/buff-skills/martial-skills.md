@@ -131,18 +131,33 @@ function calculatePhysicalTrainingEffects(
   category: 'martial',
   type: 'toggle',
   order: 503,
-  description: '手甲装備時の特殊効果を発動させる',
+  description: 'メイン武器が手甲、またはサブ武器が手甲の場合にクリティカルとブレイブ倍率を上昇させる',
   effects: [
-    // TODO: アシュラオーラ効果の詳細設計が必要
+    {
+      property: 'Critical',
+      formula: 'mainKnuckle ? 75 : subKnuckle ? 25 : 0',
+      conditions: ['メイン武器が手甲', 'サブ武器が手甲']
+    },
+    {
+      property: 'BraveMultiplier',
+      formula: '(mainKnuckle || subKnuckle) ? 10 : 0',
+      conditions: ['メイン武器が手甲', 'サブ武器が手甲']
+    }
   ],
   calculationFormula: `
-    手甲装備時:
-    - 特殊効果 = 詳細設計待ち
+    メイン武器が手甲の場合:
+    - Critical += 75
+    - BraveMultiplier += 10%
+
+    サブ武器が手甲の場合:
+    - Critical += 25  
+    - BraveMultiplier += 10%
   `,
   weaponRequirements: [
     {
       weaponType: 'knuckle',
-      include: true
+      include: true,
+      position: 'main_or_sub'
     }
   ],
   uiSettings: {
@@ -153,17 +168,56 @@ function calculatePhysicalTrainingEffects(
 }
 ```
 
+#### 実装詳細
+
+```typescript
+interface アシュラオーラEffect {
+  Critical?: number      // クリティカル補正
+  BraveMultiplier?: number // ブレイブ倍率補正(%)
+}
+```
+
+#### 計算関数
+
+```typescript
+function calculateアシュラオーラEffects(
+  mainWeaponType: WeaponType | null,
+  subWeaponType: SubWeaponType | null
+): Partial<AllBonuses> {
+  const effects: Partial<AllBonuses> = {}
+  
+  const isMainKnuckle = mainWeaponType === 'knuckle'
+  const isSubKnuckle = subWeaponType === '手甲'
+  
+  if (isMainKnuckle) {
+    effects.Critical = 75
+    effects.BraveMultiplier = 10
+  } else if (isSubKnuckle) {
+    effects.Critical = 25
+    effects.BraveMultiplier = 10
+  }
+  
+  return effects
+}
+```
+
+**適用条件:**
+- メイン武器が手甲 OR サブ武器が手甲装備時に効果発動
+- メイン武器とサブ武器の効果は重複しない（メイン武器優先）
+
 ## 実装ステータス
 
 - [x] 体術鍛錬 (ma1) - 設計・実装完了
 - [ ] 強力な追撃 (ma2-1) - 設計待ち（効果詳細が不明）
-- [ ] アシュラオーラ (ma2) - 設計待ち（効果詳細が不明）
+- [x] アシュラオーラ (ma2) - 設計・実装完了
 
 ## 特徴
 
 - **武器種制限**: 全てのマーシャルスキルは手甲装備時のみ効果発動
-- **攻撃速度特化**: 体術鍛錬は攻撃速度の向上に特化
+- **攻撃速度特化**: 体術鍛錬は攻撃速度の向上に特化  
 - **レベル依存効果**: 体術鍛錬はスキルレベルに比例して効果が上昇
+- **メイン・サブ武器対応**: アシュラオーラはメイン武器またはサブ武器が手甲の場合に効果発動
+- **ブレイブ倍率補正**: アシュラオーラはダメージ計算のブレイブ倍率に影響
 
 ## 関連ファイル
 

@@ -19,7 +19,7 @@ import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
 import { getHalberdSkillBonuses } from '../categories/halberdSkills'
 import { getHunterSkillBonuses } from '../categories/hunterSkills'
-import { getMartialSkillBonuses } from '../categories/martialSkills'
+import { getMartialSkillBonuses, getMartialSkillBraveMultiplier } from '../categories/martialSkills'
 // カテゴリ別インポート
 import { getMasterySkillBonuses } from '../categories/masterySkills'
 import { getNinjaSkillBonuses } from '../categories/ninjaSkills'
@@ -88,7 +88,7 @@ export function getBuffSkillBonuses(
 	}
 
 	// マーシャルスキル
-	const martialBonuses = getMartialSkillBonuses(buffSkillData, weaponType)
+	const martialBonuses = getMartialSkillBonuses(buffSkillData, weaponType, subWeaponType)
 	for (const [key, value] of Object.entries(martialBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -384,6 +384,7 @@ export function getBuffSkillBraveMultiplier(
 	enemyDEF?: number,
 	enemyMDEF?: number,
 	enemyLevel?: number,
+	subWeaponType?: SubWeaponType | null,
 ): number {
 	let totalBraveMultiplier = getSupportSkillBraveMultiplier(buffSkillData)
 
@@ -392,6 +393,15 @@ export function getBuffSkillBraveMultiplier(
 		totalBraveMultiplier += getBladeSkillBraveMultiplier(
 			buffSkillData,
 			weaponType,
+		)
+	}
+
+	// マーシャルスキルのブレイブ倍率も追加（アシュラオーラ）
+	if (weaponType !== undefined) {
+		totalBraveMultiplier += getMartialSkillBraveMultiplier(
+			buffSkillData,
+			weaponType,
+			subWeaponType,
 		)
 	}
 

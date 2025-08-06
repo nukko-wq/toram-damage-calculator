@@ -43,15 +43,31 @@ export function calculatePowerfulFollowUpEffects(
 
 /**
  * アシュラオーラの効果計算関数
- * TODO: アシュラオーラ効果の詳細設計が必要
+ * メイン武器が手甲の場合: Critical+75, BraveMultiplier+10%
+ * サブ武器が手甲の場合: Critical+25, BraveMultiplier+10%
  */
 export function calculateAshuraAuraEffects(
 	isEnabled: boolean,
-	weaponType: MainWeaponType | null,
+	mainWeaponType: MainWeaponType | null,
+	subWeaponType: string | null,
 ): Partial<EquipmentProperties> {
-	if (!isEnabled || !weaponType || weaponType !== 'knuckle') return {}
+	if (!isEnabled) return {}
 
-	// TODO: アシュラオーラ効果の実装
+	const isMainKnuckle = mainWeaponType === 'knuckle'
+	const isSubKnuckle = subWeaponType === '手甲'
+
+	if (isMainKnuckle) {
+		return {
+			Critical: 75,
+			BraveMultiplier: 10,
+		}
+	} else if (isSubKnuckle) {
+		return {
+			Critical: 25,
+			BraveMultiplier: 10,
+		}
+	}
+
 	return {}
 }
 
@@ -61,6 +77,7 @@ export function calculateAshuraAuraEffects(
 export function getMartialSkillBonuses(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
+	subWeaponType?: string | null,
 ): Partial<AllBonuses> {
 	const convertedWeaponType = convertWeaponType(weaponType)
 	const bonuses: Partial<AllBonuses> = {}
@@ -68,7 +85,7 @@ export function getMartialSkillBonuses(
 	if (!buffSkillData) return bonuses
 
 	// 体術鍛錬の処理
-	const physicalTraining = buffSkillData['ma1']
+	const physicalTraining = buffSkillData.ma1
 	if (physicalTraining?.isEnabled && physicalTraining.level) {
 		const effects = calculatePhysicalTrainingEffects(
 			physicalTraining.level,
@@ -88,14 +105,42 @@ export function getMartialSkillBonuses(
 	}
 
 	// アシュラオーラの処理
-	const ashuraAura = buffSkillData['ma2']
+	const ashuraAura = buffSkillData.ma2
 	if (ashuraAura?.isEnabled) {
 		const effects = calculateAshuraAuraEffects(
 			ashuraAura.isEnabled,
 			convertedWeaponType,
+			subWeaponType || null,
 		)
 		integrateEffects(effects, bonuses)
 	}
 
 	return bonuses
+}
+
+/**
+ * マーシャルスキル系統のブレイブ倍率取得
+ */
+export function getMartialSkillBraveMultiplier(
+	buffSkillData: Record<string, BuffSkillState> | null,
+	mainWeaponType: WeaponType | null,
+	subWeaponType?: string | null,
+): number {
+	let braveMultiplier = 0
+
+	if (!buffSkillData) return braveMultiplier
+
+	// アシュラオーラの処理
+	const ashuraAura = buffSkillData.ma2
+	if (ashuraAura?.isEnabled) {
+		const convertedWeaponType = convertWeaponType(mainWeaponType)
+		const effects = calculateAshuraAuraEffects(
+			ashuraAura.isEnabled,
+			convertedWeaponType,
+			subWeaponType || null,
+		)
+		braveMultiplier += effects.BraveMultiplier || 0
+	}
+
+	return braveMultiplier
 }
