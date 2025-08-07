@@ -389,7 +389,7 @@ export default function EquipmentCard({
 								createdAt: new Date().toISOString(),
 								updatedAt: new Date().toISOString(),
 							}
-							return (
+							return slotInfo ? (
 								<DamageDifferenceDisplayCorrect
 									item={equipmentAsEquipment}
 									slotInfo={slotInfo}
@@ -403,7 +403,7 @@ export default function EquipmentCard({
 										},
 									}}
 								/>
-							)
+							) : null
 						} catch (error) {
 							console.error('EquipmentCard damage difference error:', error)
 							return (
