@@ -415,6 +415,16 @@ export const crystalsData: CrystalsData = {
 					},
 				],
 			},
+			{
+				id: '9009d232-56a9-414d-a191-9d5a7009d212',
+				name: 'ペリプラスティ改',
+				type: 'additional',
+				properties: {
+					MATK_Rate: 5,
+					CastingSpeed_Rate: 75,
+					LongRangeDamage_Rate: -16,
+				},
+			},
 		],
 		special: [
 			{
