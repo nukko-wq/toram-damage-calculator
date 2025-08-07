@@ -1029,26 +1029,131 @@ export function getDetailedDataSourceBonuses(
 			food: getFoodBonuses(data.food),
 			buffItems: getBuffBonuses(data.buffItems),
 			buffSkills: (() => {
+				// 全バフスキル効果を統合（getAllDataSourceBonusesWithBuffSkillsと同じロジック）
+				let combinedBonuses: Partial<AllBonuses> = {}
+
+				// 敵情報を取得（エンハンス等で使用）
+				let enemyDEF = 1000
+				let enemyMDEF = 1000
+				let enemyLevel = 100
+
+				// 実際の敵データを取得してNormal難易度の値を使用
+				const normalEnemyData = getNormalDifficultyEnemyData(data)
+				if (normalEnemyData) {
+					enemyDEF = normalEnemyData.DEF
+					enemyMDEF = normalEnemyData.MDEF
+					enemyLevel = normalEnemyData.level
+				}
+
+				// 基本バフスキル効果
 				const buffSkillBonuses = getBuffSkillBonuses(
 					data.buffSkills?.skills || null,
 					data.mainWeapon?.weaponType || null,
-					undefined, // enemyDEF - not available in this context
-					undefined, // enemyMDEF - not available in this context
-					undefined, // enemyLevel - not available in this context
+					enemyDEF,
+					enemyMDEF,
+					enemyLevel,
 					data.subWeapon?.weaponType || null,
 					data.subWeapon?.refinement || 0,
 				)
 
-				// 両手持ちスキルの効果も統合
-				const twoHandsBonuses = getTwoHandsEffects(
+				for (const [key, value] of Object.entries(buffSkillBonuses)) {
+					if (typeof value === 'number' && value !== 0) {
+						combinedBonuses[key as keyof AllBonuses] =
+							(combinedBonuses[key as keyof AllBonuses] || 0) + value
+					}
+				}
+
+				// バトルスキル（プレイヤーレベル依存）の補正値を追加
+				const battleSkillBonuses = getBattleSkillBonusesWithPlayerLevel(
+					data.buffSkills?.skills || null,
+					data.baseStats?.level || 1,
+				)
+
+				for (const [key, value] of Object.entries(battleSkillBonuses)) {
+					if (typeof value === 'number' && value !== 0) {
+						combinedBonuses[key as keyof AllBonuses] =
+							(combinedBonuses[key as keyof AllBonuses] || 0) + value
+					}
+				}
+
+				// 神速の軌跡スキルの補正値を追加（武器タイプが必要）
+				const godspeedTrajectoryBonuses = getGodspeedTrajectoryEffects(
+					data.buffSkills?.skills || null,
+					data.mainWeapon?.weaponType || null,
+				)
+
+				for (const [key, value] of Object.entries(godspeedTrajectoryBonuses)) {
+					if (typeof value === 'number' && value !== 0) {
+						combinedBonuses[key as keyof AllBonuses] =
+							(combinedBonuses[key as keyof AllBonuses] || 0) + value
+					}
+				}
+
+				// カムフラージュスキルの補正値を追加（基本ステータスレベルと武器タイプが必要）
+				const camouflageBonuses = getCamouflageEffects(
+					data.buffSkills?.skills || null,
+					data.baseStats?.level || 1,
+					data.mainWeapon?.weaponType || null,
+				)
+
+				for (const [key, value] of Object.entries(camouflageBonuses)) {
+					if (typeof value === 'number' && value !== 0) {
+						combinedBonuses[key as keyof AllBonuses] =
+							(combinedBonuses[key as keyof AllBonuses] || 0) + value
+					}
+				}
+
+				// 前線維持Ⅱスキルの補正値を追加（基本ステータスレベルが必要）
+				const frontlineMaintenance2Bonuses = getFrontlineMaintenance2Effects(
+					data.buffSkills?.skills || null,
+					data.baseStats?.level || 1,
+				)
+
+				for (const [key, value] of Object.entries(frontlineMaintenance2Bonuses)) {
+					if (typeof value === 'number' && value !== 0) {
+						combinedBonuses[key as keyof AllBonuses] =
+							(combinedBonuses[key as keyof AllBonuses] || 0) + value
+					}
+				}
+
+				// ペット関連スキルの補正値を追加
+				const petCriticalUpBonuses = getPetCriticalUpEffects(data.buffSkills?.skills || null)
+				const petBraveUpBonuses = getPetBraveUpEffects(data.buffSkills?.skills || null)
+				const petMindUpBonuses = getPetMindUpEffects(data.buffSkills?.skills || null)
+				const petCutUpBonuses = getPetCutUpEffects(data.buffSkills?.skills || null)
+
+				for (const petBonuses of [petCriticalUpBonuses, petBraveUpBonuses, petMindUpBonuses, petCutUpBonuses]) {
+					for (const [key, value] of Object.entries(petBonuses)) {
+						if (typeof value === 'number' && value !== 0) {
+							combinedBonuses[key as keyof AllBonuses] =
+								(combinedBonuses[key as keyof AllBonuses] || 0) + value
+						}
+					}
+				}
+
+				// 武士弓術スキルの補正値を追加
+				const archeryBonuses = getArcheryEffects(
 					data.buffSkills?.skills || null,
 					data.mainWeapon?.weaponType || null,
 					data.subWeapon?.weaponType || null,
+					data.subWeapon?.ATK || 0,
+					data.subWeapon?.stability || 0,
 				)
 
-				// 両方の効果を統合
-				const combinedBonuses: Partial<AllBonuses> = { ...buffSkillBonuses }
-				for (const [key, value] of Object.entries(twoHandsBonuses)) {
+				for (const [key, value] of Object.entries(archeryBonuses)) {
+					if (typeof value === 'number' && value !== 0) {
+						combinedBonuses[key as keyof AllBonuses] =
+							(combinedBonuses[key as keyof AllBonuses] || 0) + value
+					}
+				}
+
+				// アサシンスキルの補正値を追加（サブ武器情報が必要）
+				const assassinSkillBonuses = getAssassinSkillEffects(
+					data.buffSkills?.skills || null,
+					data.subWeapon?.weaponType || null,
+				)
+
+				for (const [key, value] of Object.entries(assassinSkillBonuses)) {
 					if (typeof value === 'number' && value !== 0) {
 						combinedBonuses[key as keyof AllBonuses] =
 							(combinedBonuses[key as keyof AllBonuses] || 0) + value
