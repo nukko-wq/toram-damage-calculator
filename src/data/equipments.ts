@@ -203,6 +203,20 @@ export const equipmentsData: EquipmentsData = {
 					INT_Rate: 10,
 				},
 			},
+			{
+				id: 'ddb4fbad-f131-45a0-b10a-92dcbb927190',
+				name: '両カンスト壁用',
+				properties: {
+					AGI_Rate: 10,
+					DEX_Rate: 10,
+					AttackSpeed_Rate: 21,
+					CastingSpeed_Rate: 21,
+					CastingSpeed: 180,
+					Critical: 30,
+					MATK_Rate: -15,
+					MagicalPenetration_Rate: -9,
+				},
+			},
 		],
 		additional: [
 			{
