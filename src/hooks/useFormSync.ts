@@ -16,23 +16,38 @@ export function useFormSync<T extends Record<string, unknown>>(
 
 	// 初期化処理を統合
 	const initialize = useCallback(() => {
+		console.log('useFormSync: initialize called')
 		setIsInitialized(false)
-		const timer = setTimeout(() => setIsInitialized(true), debounceMs)
+		const timer = setTimeout(() => {
+			console.log('useFormSync: initialization complete, setting isInitialized to true')
+			setIsInitialized(true)
+		}, debounceMs)
 		return () => clearTimeout(timer)
 	}, [debounceMs])
 
+	// 初期化を自動実行
+	useEffect(() => {
+		initialize()
+	}, [initialize])
+
 	// フォーム変更監視を統合
 	useEffect(() => {
+		console.log('useFormSync: Setting up watch subscription, isInitialized:', isInitialized)
 		const subscription = watchFunction((value, { name, type }) => {
+			console.log('useFormSync: Watch callback triggered:', { name, type, isInitialized, hasValue: value !== undefined && value !== null })
+			
 			// 初期化中やプログラム的な変更は無視
-			if (!isInitialized || !name || !value || type !== 'change') {
+			if (!isInitialized || !name || value === undefined || value === null) {
+				console.log('useFormSync: Skipping update due to conditions:', { isInitialized, name, hasValue: value !== undefined && value !== null })
 				return
 			}
 
 			// バリデーション関数が提供されている場合は検証
 			const isValid = validationFunction ? validationFunction(value) : true
+			console.log('useFormSync: Validation result:', isValid)
 			
 			if (isValid) {
+				console.log('useFormSync: Calling updateFunction with:', value)
 				updateFunction(value as T)
 			}
 		})
@@ -103,7 +118,7 @@ export function useWeaponFormSync<T extends Record<string, unknown>>(
 			console.log('useWeaponFormSync watch triggered:', { name, type, value, isInitialized })
 			
 			// 初期化中やプログラム的な変更は無視
-			if (!isInitialized || !name || !value || type !== 'change') {
+			if (!isInitialized || !name || value === undefined || value === null) {
 				console.log('useWeaponFormSync: Skipping due to conditions')
 				return
 			}

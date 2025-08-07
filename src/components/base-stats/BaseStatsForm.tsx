@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useFormSync, validateBaseStats } from '@/hooks/useFormSync'
 import { type BaseStatsFormData, baseStatsSchema } from '@/schemas/baseStats'
@@ -10,25 +10,57 @@ import type { BaseStats } from '@/types/calculator'
 import { calculateStatPoints } from '@/utils/statPointCalculation'
 
 export default function BaseStatsForm() {
+	console.log('BaseStatsForm: Component rendered')
+	
 	// Zustandストアから基本ステータスを取得
 	const storeStats = useCalculatorStore((state) => state.data.baseStats)
 	const updateBaseStats = useCalculatorStore((state) => state.updateBaseStats)
+	
+	console.log('BaseStatsForm: storeStats:', storeStats)
+	console.log('BaseStatsForm: updateBaseStats:', updateBaseStats)
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveStats = storeStats
 
-	const { register, watch, setValue, getValues } = useForm<BaseStatsFormData>({
+	const { register, watch, setValue, getValues, reset } = useForm<BaseStatsFormData>({
 		resolver: zodResolver(baseStatsSchema),
-		values: effectiveStats,
+		defaultValues: effectiveStats,
 		mode: 'onChange',
 	})
+	
+	console.log('BaseStatsForm: useForm initialized with defaultValues:', effectiveStats)
 
 	// useFormSyncカスタムフックで初期化とフォーム監視を統合
+	console.log('BaseStatsForm: Calling useFormSync with watch function:', typeof watch)
+	
+	// 直接watchをテストしてみる
+	useEffect(() => {
+		const subscription = watch((value, { name, type }) => {
+			console.log('BaseStatsForm: Direct watch callback triggered:', { value, name, type })
+		})
+		return () => subscription.unsubscribe()
+	}, [watch])
+	
 	useFormSync<BaseStatsFormData>(
 		watch,
-		(data: BaseStatsFormData) => updateBaseStats(data as BaseStats),
-		validateBaseStats,
+		(data: BaseStatsFormData) => {
+			console.log('BaseStatsForm: updateBaseStats called with:', data)
+			updateBaseStats(data as BaseStats)
+		},
+		(data) => {
+			const isValid = validateBaseStats(data)
+			console.log('BaseStatsForm: validateBaseStats result:', isValid, 'data:', data)
+			return isValid
+		},
 	)
+
+	// デバッグ用：ストアの値が変わったときにフォームをリセット
+	useEffect(() => {
+		console.log('BaseStatsForm: storeStats changed:', storeStats)
+		console.log('BaseStatsForm: current form values:', watch())
+		// ストアの値が変わったときにフォームをリセット
+		reset(storeStats)
+	}, [storeStats, reset, watch])
 
 	// 現在のレベル値と全ステータス値を取得してステータスポイントを計算
 	const currentLevel = watch('level') || effectiveStats.level || 1
