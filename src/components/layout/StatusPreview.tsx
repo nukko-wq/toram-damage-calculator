@@ -68,8 +68,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 	className,
 }) => {
 	const options = [
-		{ value: 'all', label: '全ての合計値' },
-		{ value: 'calculation', label: '計算用' },
+		{ value: 'calculation', label: '全ての合計値' },
 		{ value: 'mainWeapon', label: 'メイン装備' },
 		{ value: 'subWeapon', label: 'サブ装備' },
 		{ value: 'body', label: '体装備' },
@@ -134,9 +133,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// フィルター状態管理
 	const [filters, setFilters] = useState({
-		equipmentBonus1: 'all' as FilterOption,
-		equipmentBonus2: 'all' as FilterOption,
-		equipmentBonus3: 'all' as FilterOption,
+		equipmentBonus1: 'calculation' as FilterOption,
+		equipmentBonus2: 'calculation' as FilterOption,
+		equipmentBonus3: 'calculation' as FilterOption,
 	})
 
 	// フィルター変更処理
@@ -158,103 +157,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 	// 統合計算のメモ化
 	const calculationResults = useMemo(() => {
-		// バフスキルを含む全データソースのボーナスを取得（計算用は常に全合計値）
-		const allBonuses = getAllDataSourceBonusesWithBuffSkills(data)
-
-		// 全ての効果を統合した最終ボーナス値を作成
-		const finalBonuses = { ...allBonuses }
-
-		// レジスタ効果を統合
-		if (data.register?.effects) {
-			const maxHpUpEffect = data.register.effects.find(
-				(effect) => effect.type === 'maxHpUp' && effect.isEnabled,
-			)
-			if (maxHpUpEffect) {
-				finalBonuses.HP = (finalBonuses.HP || 0) + maxHpUpEffect.level * 10
-			}
-
-			const maxMpUpEffect = data.register.effects.find(
-				(effect) => effect.type === 'maxMpUp' && effect.isEnabled,
-			)
-			if (maxMpUpEffect) {
-				finalBonuses.MP = (finalBonuses.MP || 0) + maxMpUpEffect.level * 1
-			}
-
-			const physicalAttackUpEffect = data.register.effects.find(
-				(effect) => effect.type === 'physicalAttackUp' && effect.isEnabled,
-			)
-			if (physicalAttackUpEffect) {
-				finalBonuses.ATK =
-					(finalBonuses.ATK || 0) + physicalAttackUpEffect.level * 1
-			}
-
-			const magicAttackUpEffect = data.register.effects.find(
-				(effect) => effect.type === 'magicalAttackUp' && effect.isEnabled,
-			)
-			if (magicAttackUpEffect) {
-				finalBonuses.MATK =
-					(finalBonuses.MATK || 0) + magicAttackUpEffect.level * 1
-			}
-
-			const accuracyUpEffect = data.register.effects.find(
-				(effect) => effect.type === 'accuracyUp' && effect.isEnabled,
-			)
-			if (accuracyUpEffect) {
-				finalBonuses.Accuracy =
-					(finalBonuses.Accuracy || 0) + accuracyUpEffect.level * 1
-			}
-
-			const evasionUpEffect = data.register.effects.find(
-				(effect) => effect.type === 'evasionUp' && effect.isEnabled,
-			)
-			if (evasionUpEffect) {
-				finalBonuses.Dodge =
-					(finalBonuses.Dodge || 0) + evasionUpEffect.level * 1
-			}
-
-			const attackSpeedUpEffect = data.register.effects.find(
-				(effect) => effect.type === 'attackSpeedUp' && effect.isEnabled,
-			)
-			if (attackSpeedUpEffect) {
-				finalBonuses.AttackSpeed =
-					(finalBonuses.AttackSpeed || 0) + attackSpeedUpEffect.level * 1
-			}
-
-			const magicalSpeedUpEffect = data.register.effects.find(
-				(effect) => effect.type === 'magicalSpeedUp' && effect.isEnabled,
-			)
-			if (magicalSpeedUpEffect) {
-				finalBonuses.CastingSpeed =
-					(finalBonuses.CastingSpeed || 0) + magicalSpeedUpEffect.level * 1
-			}
-
-			const fateCompanionshipEffect = data.register.effects.find(
-				(effect) => effect.type === 'fateCompanionship' && effect.isEnabled,
-			)
-			if (fateCompanionshipEffect) {
-				const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
-				finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
-				finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
-			}
-
-			// ギルド料理効果
-			const deliciousIngredientTradeEffect = data.register.effects.find(
-				(effect) =>
-					effect.type === 'deliciousIngredientTrade' && effect.isEnabled,
-			)
-			if (deliciousIngredientTradeEffect) {
-				finalBonuses.HP =
-					(finalBonuses.HP || 0) + deliciousIngredientTradeEffect.level * 100
-			}
-
-			const freshFruitTradeEffect = data.register.effects.find(
-				(effect) => effect.type === 'freshFruitTrade' && effect.isEnabled,
-			)
-			if (freshFruitTradeEffect) {
-				finalBonuses.MP =
-					(finalBonuses.MP || 0) + freshFruitTradeEffect.level * 10
-			}
-		}
+		// バフスキルを含む全データソースのボーナスを取得（レジスタ効果も含まれる）
+		const finalBonuses = getAllDataSourceBonusesWithBuffSkills(data)
 
 		const adjustedStatsCalculation = calculateAdjustedStats(
 			baseStats,
@@ -413,11 +317,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			filter: FilterOption,
 		) => {
 			switch (filter) {
-				case 'all':
-					// 全ての合計（バフスキル等の反映なし）
-					return getAllDataSourceBonusesWithBuffSkills(data) // TODO: バフスキル等を除外した合計値を返す
 				case 'calculation':
-					// 計算用（既存のロジック）
+					// 全ての合計値（既存のロジック）
 					return getAllDataSourceBonusesWithBuffSkills(data)
 				case 'mainWeapon':
 					return detailedBonuses.equipment.mainWeapon
@@ -490,7 +391,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		armorBreakCalculation,
 		anticipateCalculation,
 		cspdCalculation,
-		totalElementAdvantageCalculation,
 		stabilityCalculation,
 		ailmentResistanceCalculation,
 		elementAwakeningAdvantageCalculation,
@@ -523,7 +423,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// カテゴリ別データ取得関数
 	const getBasicStatsByCategory = (
 		category: BasicStatsDisplayCategory['value'],
-		equipmentBonuses: ReturnType<typeof calculateEquipmentBonuses>,
 	): Record<string, number | null> => {
 		const baseStats = {
 			HP: hpCalculation.finalHP,
@@ -1048,60 +947,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// TODO: 将来的には全98項目の計算を実装
 	// 現在は基本的な項目のみ計算
 
-	// 基本ステータス (30項目のうち実装可能な項目)
-	const basicStats = {
-		HP: hpCalculation.finalHP,
-		MP: mpCalculation.finalMP,
-		ATK: atkCalculation.finalATK, // 武器種別ATK計算結果
-		baseATK: Math.floor(atkCalculation.baseATK), // 基礎ATK（表示時のみ小数点以下切り捨て）
-		// サブATKとサブ基礎ATKは双剣の場合のみ計算、他は null で - 表示
-		subATK:
-			data.mainWeapon.weaponType === '双剣' && subATKCalculation
-				? subATKCalculation.subFinalATK // 双剣時は計算値
-				: null, // 非双剣時は null で - 表示
-		subBaseATK:
-			data.mainWeapon.weaponType === '双剣' && subATKCalculation
-				? Math.floor(subATKCalculation.subBaseATK) // 双剣時は計算値
-				: null, // 非双剣時は null で - 表示
-		totalATK: totalATKCalculation.totalATK, // 総ATK計算結果
-		bringerAM: 0, // TODO: ブリンガーAM計算
-		MATK: matkCalculation.finalMATK, // MATK計算結果
-		baseMATK: matkCalculation.baseMATK, // 基本MATK計算結果
-		stabilityRate: stabilityCalculation.finalStability, // 安定率計算結果
-		// サブ安定率は常時表示（双剣・弓+矢以外は null で - 表示）
-		subStabilityRate: (() => {
-			if (data.mainWeapon.weaponType === '双剣' && subATKCalculation) {
-				return subATKCalculation.subStability // サブ安定率（計算後）
-			}
-			if (
-				(data.mainWeapon.weaponType === '弓' ||
-					data.mainWeapon.weaponType === '自動弓') &&
-				data.subWeapon.weaponType === '矢'
-			) {
-				return data.subWeapon.stability // 矢の安定率をそのまま表示
-			}
-			return null // その他は null で - 表示
-		})(),
-		criticalRate: criticalRateCalculation.finalCriticalRate, // クリティカル率計算結果
-		criticalDamage: criticalDamageCalculation.finalCriticalDamage, // クリティカルダメージ計算結果
-		magicCriticalRate: 0, // TODO: 魔法クリティカル率
-		magicCriticalDamage:
-			magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
-		totalElementAdvantage: 
-			(calculationResults.equipmentBonuses.equipmentBonus1.elementPower_Rate || 0) + 
-			elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage, // 総属性有利計算結果
-		elementAwakeningAdvantage: elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage, // 属性覚醒有利（基本25% + 熱情の歌効果）
-		ASPD: aspdCalculation.finalASPD, // 攻撃速度計算結果
-		CSPD: cspdCalculation.finalCSPD, // CSPD計算結果
-		HIT: hitCalculation.finalHIT, // HIT計算結果
-		FLEE: fleeCalculation.finalFLEE, // FLEE計算結果
-		physicalResistance: physicalResistanceCalculation.finalPhysicalResistance, // 物理耐性計算結果
-		magicalResistance: magicalResistanceCalculation.finalMagicalResistance, // 魔法耐性計算結果
-		ailmentResistance: ailmentResistanceCalculation, // 異常耐性計算結果
-		motionSpeed: motionSpeedCalculation.finalMotionSpeed, // 行動速度計算結果
-		armorBreak: armorBreakCalculation.finalArmorBreak, // 防御崩し計算結果
-		anticipate: anticipateCalculation.finalAnticipate, // 先読み計算結果
-	}
 
 	// 補正後ステータス (8項目) - 正確な計算結果を使用
 	const adjustedStats: Record<string, number> = {
@@ -1246,10 +1091,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							</div>
 							<StatSection
 								title=""
-								stats={getBasicStatsByCategory(
-									basicStatsCategory,
-									calculationResults.equipmentBonuses,
-								)}
+								stats={getBasicStatsByCategory(basicStatsCategory)}
 								labels={getBasicStatsLabelsByCategory(basicStatsCategory)}
 								displayMode="normal"
 								propertyOrder={getBasicStatsDisplayOrder(basicStatsCategory)}

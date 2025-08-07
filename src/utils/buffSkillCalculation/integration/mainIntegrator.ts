@@ -96,6 +96,15 @@ export function getBuffSkillBonuses(
 		}
 	}
 
+	// モノノフスキル（武士道、両手持ち、怪力乱神等）
+	const mononofuBonuses = getMononofuSkillBonuses(buffSkillData, weaponType, subWeaponType || null)
+	for (const [key, value] of Object.entries(mononofuBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
 	// 忍者スキル
 	const ninjaBonuses = getNinjaSkillBonuses(buffSkillData)
 	for (const [key, value] of Object.entries(ninjaBonuses)) {

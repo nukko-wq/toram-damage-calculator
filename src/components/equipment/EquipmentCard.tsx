@@ -349,15 +349,21 @@ export default function EquipmentCard({
 
 			{/* ダメージ差分表示 - 装備名の下に配置 */}
 			{(() => {
-				// 常にデバッグ情報を表示
-				console.log('EquipmentCard props debug:', {
-					showDamageDifference,
-					slotInfo,
-					equipmentName: equipment.name,
-					hasSlotInfo: !!slotInfo,
-					slotInfoType: slotInfo?.type,
-					slotInfoSlot: slotInfo?.slot,
-				})
+				// 現在装着中の装備かどうかをチェック
+				const currentData = useCalculatorStore.getState().data
+				let isCurrentlyEquipped = false
+				
+				if (slotInfo && slotInfo.type === 'equipment' && slotInfo.slot) {
+					// biome-ignore lint/suspicious/noExplicitAny: 動的スロットキーアクセスのための型アサーション
+					const currentEquippedId = (currentData.equipment as any)[slotInfo.slot]?.id
+					isCurrentlyEquipped = currentEquippedId === equipment.id
+				}
+				
+				// 現在装着中の装備はダメージ差分を表示しない
+				if (isCurrentlyEquipped) {
+					return false
+				}
+				
 				return showDamageDifference && slotInfo
 			})() && (
 				<div className="mb-1 sm:mb-2">
@@ -386,7 +392,7 @@ export default function EquipmentCard({
 							return (
 								<DamageDifferenceDisplayCorrect
 									item={equipmentAsEquipment}
-									slotInfo={slotInfo!}
+									slotInfo={slotInfo}
 									size="sm"
 									className="inline-block"
 									options={{

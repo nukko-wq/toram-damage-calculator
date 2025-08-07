@@ -18,6 +18,7 @@ import {
 	type DamageCalculationServiceResult,
 } from '@/utils/damageCalculationService'
 import { simulateItemEquipSimple } from '@/utils/damageSimulationSimple'
+import { getWeaponInfo } from '@/utils/weaponInfoStorage'
 
 /**
  * 正しい方法によるダメージ差分計算フック
@@ -244,6 +245,34 @@ export function useDamageDifferenceCorrect(
 				? currentData // 現在装着中の場合は現在のデータ
 				: simulateItemEquipSimple(currentData, item, slotInfo) // 装着していない場合は装着後をシミュレート
 
+			// 装備の武器ATK情報をLocalStorageから取得して反映
+			if (slotInfo.type === 'equipment' && !isCurrentlyEquipped) {
+				const weaponInfo = getWeaponInfo(item.id)
+				if (weaponInfo && weaponInfo.ATK > 0) {
+					simulatedData = { ...simulatedData }
+					
+					// メイン武器またはサブ武器のATKを更新
+					if (slotInfo.slot === 'mainWeapon') {
+						simulatedData.mainWeapon = {
+							...simulatedData.mainWeapon,
+							ATK: weaponInfo.ATK,
+							stability: weaponInfo.stability,
+							refinement: weaponInfo.refinement,
+						}
+						if (weaponInfo.weaponType) {
+							simulatedData.mainWeapon.weaponType = weaponInfo.weaponType
+						}
+					} else if (slotInfo.slot === 'subWeapon') {
+						simulatedData.subWeapon = {
+							...simulatedData.subWeapon,
+							ATK: weaponInfo.ATK,
+							stability: weaponInfo.stability,
+							refinement: weaponInfo.refinement,
+						}
+					}
+				}
+			}
+
 			// 連携クリスタがある場合は、それを考慮したデータに更新
 			if (options.linkedCrystals && slotInfo.type === 'equipment') {
 				simulatedData = { ...simulatedData }
@@ -277,6 +306,61 @@ export function useDamageDifferenceCorrect(
 
 			// 最終差分は平均差分を使用
 			const difference = Math.round(averageDifference)
+			
+			// 特定の装備のみデバッグ用ログ出力
+			if (item.name === 'ディグニダー' || item.name === '両手有利23%A15%S10%') {
+				console.log('=== ダメージ差分計算の詳細 ===')
+				console.log('アイテム:', item.name, `(ID: ${item.id})`)
+				console.log('スロット情報:', slotInfo)
+				console.log('現在装着中:', isCurrentlyEquipped ? 'はい' : 'いいえ')
+				
+				// 武器情報の取得状況を確認
+				if (slotInfo.type === 'equipment' && !isCurrentlyEquipped) {
+					const weaponInfo = getWeaponInfo(item.id)
+					console.log('--- 武器情報取得 ---')
+					console.log('取得した武器情報:', weaponInfo)
+					if (weaponInfo) {
+						console.log('武器ATK:', weaponInfo.ATK)
+						console.log('安定率:', weaponInfo.stability)
+						console.log('精錬値:', weaponInfo.refinement)
+						console.log('武器種:', weaponInfo.weaponType || weaponInfo.subWeaponType)
+					} else {
+						console.log('武器情報が見つかりません')
+					}
+				}
+				
+				// シミュレーションデータの詳細
+				console.log('--- シミュレーションデータ ---')
+				console.log('メイン武器ATK:', simulatedData.mainWeapon?.ATK || 0)
+				console.log('サブ武器ATK:', simulatedData.subWeapon?.ATK || 0)
+				
+				if (slotInfo.type === 'equipment') {
+					console.log('装備スロット:', slotInfo.slot)
+					// biome-ignore lint/suspicious/noExplicitAny: 動的スロットキーアクセスのための型アサーション
+					const equipmentSlot = (simulatedData.equipment as any)[slotInfo.slot || '']
+					console.log('装備データ:', equipmentSlot)
+					if (equipmentSlot?.properties) {
+						console.log('装備プロパティ:', equipmentSlot.properties)
+					}
+				}
+				
+				// 基準ダメージの詳細
+				console.log('--- 基準ダメージ ---')
+				console.log('平均:', calculatedBaselineDamageResult.normal.average)
+				console.log('最小:', calculatedBaselineDamageResult.normal.min)
+				console.log('最大:', calculatedBaselineDamageResult.normal.max)
+				
+				// シミュレーション後ダメージの詳細
+				console.log('--- シミュレーション後ダメージ ---')
+				console.log('平均:', simulatedDamageResult.normal.average)
+				console.log('最小:', simulatedDamageResult.normal.min)
+				console.log('最大:', simulatedDamageResult.normal.max)
+				
+				console.log('--- 計算結果 ---')
+				console.log('平均ダメージ差分:', averageDifference)
+				console.log('最終差分（四捨五入）:', difference)
+				console.log('========================')
+			}
 
 			return {
 				difference,
