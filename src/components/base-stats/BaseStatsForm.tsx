@@ -80,9 +80,11 @@ export default function BaseStatsForm() {
 			max = 255
 		}
 
-		if (value < min) {
+		// 空文字、0、または不正な値の場合は最小値に設定
+		const numValue = Number(value)
+		if (value === undefined || value === null || String(value) === '' || Number.isNaN(numValue) || numValue < min) {
 			setValue(fieldName, min, { shouldValidate: true })
-		} else if (value > max) {
+		} else if (numValue > max) {
 			setValue(fieldName, max, { shouldValidate: true })
 		}
 	}
@@ -132,7 +134,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('level', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)
@@ -182,7 +188,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('STR', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)
@@ -214,7 +224,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('INT', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)
@@ -246,7 +260,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('VIT', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)
@@ -282,7 +300,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('AGI', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)
@@ -314,7 +336,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('DEX', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)
@@ -350,7 +376,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('CRT', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)
@@ -382,7 +412,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('MEN', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)
@@ -414,7 +448,11 @@ export default function BaseStatsForm() {
 								}}
 								{...register('TEC', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 1
 										}
 										const numValue = Number(value)

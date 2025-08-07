@@ -66,7 +66,12 @@ export function useFormSync<T extends Record<string, unknown>>(
  */
 export function validateBaseStats(value: Partial<Record<string, unknown>>): boolean {
 	return Object.values(value).every(
-		(v) => typeof v === 'number' && !Number.isNaN(v) && v >= 1,
+		(v) => {
+			// 空文字は入力中として許可
+			if (v === '' || v === undefined || v === null) return true
+			// 数値の場合は1以上をチェック
+			return typeof v === 'number' && !Number.isNaN(v) && v >= 1
+		},
 	)
 }
 
