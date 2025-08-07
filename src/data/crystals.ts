@@ -425,6 +425,16 @@ export const crystalsData: CrystalsData = {
 					LongRangeDamage_Rate: -16,
 				},
 			},
+			{
+				id: '558ffe22-f81a-4b76-a3b4-8dc50084ba81',
+				name: 'いにしえの女帝',
+				type: 'additional',
+				properties: {
+					ShortRangeDamage_Rate: -10,
+					MATK_Rate: 3,
+					CastingSpeed_Rate: 50,
+				},
+			},
 		],
 		special: [
 			{
