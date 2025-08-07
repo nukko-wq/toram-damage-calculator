@@ -80,15 +80,15 @@ function calculateCriticalUpEffects(
   effects: [
     {
       property: 'ATK',
-      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
+      formula: 'Math.floor(playerLevel * Math.floor(25 * skillLevel / 10) / 100)',
       conditions: []
     }
   ],
-  calculationFormula: 'ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
+  calculationFormula: 'ATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)',
   example: {
     playerLevel: 305,
     skillLevel: 10,
-    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
+    calculation: 'Math.floor(305 × Math.floor(25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × Math.floor(25) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
     result: 'ATK +76'
   },
   uiSettings: {
@@ -106,8 +106,8 @@ function calculateAttackUpEffects(
 ): Partial<EquipmentProperties> {
   if (!skillLevel || skillLevel === 0) return {}
   
-  // ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-  const atkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+  // ATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)
+  const atkBonus = Math.floor(playerLevel * Math.floor(25 * skillLevel / 10) / 100)
   
   return {
     ATK: atkBonus
@@ -128,15 +128,15 @@ function calculateAttackUpEffects(
   effects: [
     {
       property: 'MATK',
-      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
+      formula: 'Math.floor(playerLevel * Math.floor(25 * skillLevel / 10) / 100)',
       conditions: []
     }
   ],
-  calculationFormula: 'MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
+  calculationFormula: 'MATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)',
   example: {
     playerLevel: 305,
     skillLevel: 10,
-    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
+    calculation: 'Math.floor(305 × Math.floor(25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × Math.floor(25) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
     result: 'MATK +76'
   },
   uiSettings: {
@@ -154,8 +154,8 @@ function calculateMagicUpEffects(
 ): Partial<EquipmentProperties> {
   if (!skillLevel || skillLevel === 0) return {}
   
-  // MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-  const matkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+  // MATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)
+  const matkBonus = Math.floor(playerLevel * Math.floor(25 * skillLevel / 10) / 100)
   
   return {
     MATK: matkBonus
@@ -176,15 +176,15 @@ function calculateMagicUpEffects(
   effects: [
     {
       property: 'ATK',
-      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
+      formula: 'Math.floor(playerLevel * Math.floor(25 * skillLevel / 10) / 100)',
       conditions: []
     }
   ],
-  calculationFormula: 'ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
+  calculationFormula: 'ATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)',
   example: {
     playerLevel: 305,
     skillLevel: 10,
-    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
+    calculation: 'Math.floor(305 × Math.floor(25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × Math.floor(25) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
     result: 'ATK +76'
   },
   note: '攻撃力UP (exATK1) と同じ計算式を使用',
@@ -203,8 +203,8 @@ function calculateThreatPowerEffects(
 ): Partial<EquipmentProperties> {
   if (!skillLevel || skillLevel === 0) return {}
   
-  // ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-  const atkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+  // ATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)
+  const atkBonus = Math.floor(playerLevel * Math.floor(25 * skillLevel / 10) / 100)
   
   return {
     ATK: atkBonus
@@ -225,15 +225,15 @@ function calculateThreatPowerEffects(
   effects: [
     {
       property: 'MATK',
-      formula: 'Math.floor(playerLevel * (25 * skillLevel / 10) / 100)',
+      formula: 'Math.floor(playerLevel * Math.floor(25 * skillLevel / 10) / 100)',
       conditions: []
     }
   ],
-  calculationFormula: 'MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)',
+  calculationFormula: 'MATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)',
   example: {
     playerLevel: 305,
     skillLevel: 10,
-    calculation: 'Math.floor(305 × (25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
+    calculation: 'Math.floor(305 × Math.floor(25 × 10 ÷ 10) ÷ 100) = Math.floor(305 × Math.floor(25) ÷ 100) = Math.floor(305 × 25 ÷ 100) = Math.floor(76.25) = 76',
     result: 'MATK +76'
   },
   note: '魔法力UP (exMATK1) と同じ計算式を使用',
@@ -252,8 +252,8 @@ function calculateFurtherMagicEffects(
 ): Partial<EquipmentProperties> {
   if (!skillLevel || skillLevel === 0) return {}
   
-  // MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-  const matkBonus = Math.floor(playerLevel * (25 * skillLevel / 10) / 100)
+  // MATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)
+  const matkBonus = Math.floor(playerLevel * Math.floor(25 * skillLevel / 10) / 100)
   
   return {
     MATK: matkBonus
