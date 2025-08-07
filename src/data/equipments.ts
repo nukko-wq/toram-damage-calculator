@@ -334,6 +334,17 @@ export const equipmentsData: EquipmentsData = {
 					NeutralResistance_Rate: 40,
 				},
 			},
+			{
+				id: '9e3c85aa-61b0-4588-a5ad-cfa6aac8cfdf',
+				name: 'ポトゥムビアサーバー',
+				properties: {
+					AilmentResistance_Rate: 6,
+					MotionSpeed_Rate: 9,
+					Anticipate_Rate: 12,
+					NeutralResistance_Rate: 15,
+					FireResistance_Rate: 30,
+				},
+			},
 		],
 		special: [
 			{
