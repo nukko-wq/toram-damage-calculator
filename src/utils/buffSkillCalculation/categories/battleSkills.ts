@@ -16,8 +16,8 @@ export function calculateAttackUpEffects(
 ): Partial<EquipmentProperties> {
 	if (!skillLevel || skillLevel === 0) return {}
 
-	// ATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-	const atkBonus = Math.floor((playerLevel * ((25 * skillLevel) / 10)) / 100)
+	// ATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)
+	const atkBonus = Math.floor((playerLevel * Math.floor((25 * skillLevel) / 10)) / 100)
 
 	return {
 		ATK: atkBonus,
@@ -33,8 +33,8 @@ export function calculateMagicUpEffects(
 ): Partial<EquipmentProperties> {
 	if (!skillLevel || skillLevel === 0) return {}
 
-	// MATK = Math.floor(プレイヤーレベル × (25 × スキルレベル ÷ 10) ÷ 100)
-	const matkBonus = Math.floor((playerLevel * ((25 * skillLevel) / 10)) / 100)
+	// MATK = Math.floor(プレイヤーレベル × Math.floor(25 × スキルレベル ÷ 10) ÷ 100)
+	const matkBonus = Math.floor((playerLevel * Math.floor((25 * skillLevel) / 10)) / 100)
 
 	return {
 		MATK: matkBonus,
