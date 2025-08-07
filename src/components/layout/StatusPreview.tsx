@@ -100,6 +100,14 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 	)
 }
 
+const INITIAL_VISIBLE_SECTIONS = {
+	basicStats: true,
+	adjustedStats: false,
+	equipmentBonus1: false,
+	equipmentBonus2: false,
+	equipmentBonus3: false,
+}
+
 export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const { data } = useCalculatorStore()
 	const { currentSaveId } = useSaveDataStore()
@@ -113,13 +121,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		toggleSection,
 		handleMobileSectionChange,
 	} = useResponsiveStateManager(
-		{
-			basicStats: true,
-			adjustedStats: false,
-			equipmentBonus1: false,
-			equipmentBonus2: false,
-			equipmentBonus3: false,
-		},
+		INITIAL_VISIBLE_SECTIONS,
 		'basicStats',
 	)
 
