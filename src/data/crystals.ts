@@ -474,6 +474,7 @@ export const crystalsData: CrystalsData = {
 				properties: {
 					MATK_Rate: 9,
 					CastingSpeed_Rate: 9,
+					Anticipate_Rate: 9,
 				},
 				conditionalEffects: [
 					{

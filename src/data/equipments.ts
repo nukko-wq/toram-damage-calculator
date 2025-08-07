@@ -67,11 +67,10 @@ export const equipmentsData: EquipmentsData = {
 				id: '5e9e7299-a596-46ab-9cfe-72b69423bdc4',
 				name: '両手有利23%A15%S10%',
 				properties: {
-					ATK_Rate: 15,
 					ElementAdvantage_Rate: 23,
+					ATK_Rate: 15,
 					STR_Rate: 10,
-					NaturalHPRecovery: -30,
-					Dodge: -16,
+					Dodge: -12,
 				},
 			},
 			{
@@ -92,10 +91,10 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					ATK_Rate: 15,
 					STR_Rate: 10,
-					CriticalDamage_Rate: 11,
 					CriticalDamage: 23,
+					CriticalDamage_Rate: 11,
+					Dodge: -22,
 					NaturalHPRecovery: -30,
-					Dodge: -16,
 				},
 			},
 			{
