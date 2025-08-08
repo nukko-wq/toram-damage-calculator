@@ -361,7 +361,7 @@ export default function CrystalSelectionModal({
 								<button
 									type="button"
 									onClick={() => setActiveFilter('all')}
-									className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+									className={`px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
 										activeFilter === 'all'
 											? 'bg-blue-500/80 text-white'
 											: 'bg-white text-gray-700 hover:bg-gray-100'
