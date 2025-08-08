@@ -21,7 +21,7 @@ const EQUIPMENT_CRYSTAL_TYPE_MAP: Record<keyof EquipmentSlots, CrystalType[]> =
 		body: ['armor'],
 		additional: ['additional'],
 		special: ['special'],
-		subWeapon: ['weapon'],
+		subWeapon: [], // サブ武器はクリスタ非対応
 		fashion1: [],
 		fashion2: [],
 		fashion3: [],
