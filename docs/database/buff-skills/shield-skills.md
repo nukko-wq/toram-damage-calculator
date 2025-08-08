@@ -14,6 +14,7 @@ interface ShieldBuffSkillDetail {
   category: 'shield'           // スキル系統（シールド固定）
   type: BuffSkillType         // UI制御タイプ
   order: number               // 表示順序
+  isCircle?: boolean          // サークルバフ（味方にも効果）かどうか（デフォルト: false）
   description: string         // スキル説明
   effects: SkillEffect[]      // 効果リスト
   calculationFormula: string  // 計算式
@@ -74,6 +75,7 @@ function calculateShieldMasteryEffects(
   category: 'shield',
   type: 'toggle',
   order: 1501,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: '物理耐性を大幅に上昇させるが魔法耐性が低下する',
   effects: [
     {
@@ -119,6 +121,7 @@ function calculateProtectionEffects(
   category: 'shield',
   type: 'toggle',
   order: 1502,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: '魔法耐性を大幅に上昇させるが物理耐性が低下する',
   effects: [
     {

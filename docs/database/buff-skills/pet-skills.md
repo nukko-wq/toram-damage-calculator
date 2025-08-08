@@ -14,6 +14,7 @@ interface PetBuffSkillDetail {
   category: 'pet'              // スキル系統（ペット固定）
   type: BuffSkillType         // UI制御タイプ
   order: number               // 表示順序
+  isCircle?: boolean          // サークルバフ（味方にも効果）かどうか（デフォルト: false）
   maxLevel?: number           // 最大レベル（デフォルト10）
   maxStack?: number           // 最大重ねがけ数
   description: string         // スキル説明
@@ -33,6 +34,7 @@ interface PetBuffSkillDetail {
   category: 'pet',
   type: 'toggle',
   order: 2301,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: 'ペットによる攻撃力と攻撃速度の複合強化',
   effects: [
     {
@@ -90,6 +92,7 @@ function calculatePetBraveUpEffects(
   category: 'pet',
   type: 'toggle',
   order: 2302,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: 'ペットによる魔法攻撃力と詠唱速度の複合強化',
   effects: [
     {
@@ -147,6 +150,7 @@ function calculatePetMindUpEffects(
   category: 'pet',
   type: 'toggle',
   order: 2303,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: 'ペットによる物理・魔法耐性の複合強化',
   effects: [
     {
@@ -192,6 +196,7 @@ function calculatePetCutUpEffects(
   category: 'pet',
   type: 'toggle',
   order: 2304,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: 'ペットによるクリティカルダメージ強化',
   effects: [
     {
