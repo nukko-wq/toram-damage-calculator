@@ -153,10 +153,67 @@ function calculateGodspeedParryEffects(
 }
 ```
 
+### 4.3 会心の捌き (hb2)
+```typescript
+{
+  id: 'hb2',
+  name: '会心の捌き',
+  category: 'halberd',
+  type: 'toggle',
+  order: 503,
+  description: 'クリティカル率とクリティカルダメージを上昇させる（旋風槍装備時のみ効果）',
+  effects: [
+    {
+      property: 'Critical',
+      formula: '+5',
+      conditions: ['メイン武器が旋風槍の場合のみ']
+    },
+    {
+      property: 'Critical_Rate',
+      formula: '+5',
+      conditions: ['メイン武器が旋風槍の場合のみ']
+    }
+  ],
+  calculationFormula: `
+    旋風槍装備時:
+    - Critical = base + 5
+    - Critical_Rate = base + 5%
+    
+    その他武器装備時:
+    - 効果なし
+  `,
+  weaponRequirements: [
+    {
+      weaponType: 'halberd',
+      description: 'メイン武器が旋風槍の場合のみ効果があります'
+    }
+  ],
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+
+// 実装用の効果計算関数
+function calculateCriticalParryEffects(
+  isEnabled: boolean,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (!isEnabled || weaponType !== 'halberd') return {}
+  
+  return {
+    Critical: 5,
+    Critical_Rate: 5
+  }
+}
+```
+
 ## 実装ステータス
 
 - [x] クイックオーラ (hb1) - 設計・実装完了
 - [x] 神速の捌手 (godspeed_parry) - 設計・実装完了
+- [x] 会心の捌き (hb2) - 設計・実装完了
 
 ## 特徴
 
