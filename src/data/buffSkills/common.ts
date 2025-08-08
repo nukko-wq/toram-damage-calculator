@@ -143,6 +143,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'sprite',
 		type: 'toggle',
 		order: 801,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: 'IsStabilis',
@@ -168,6 +169,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 			},
 		},
 		order: 1101,
+		isCircle: true, // サークルバフ
 	},
 
 	// ダークパワースキル
@@ -202,6 +204,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'shield',
 		type: 'toggle',
 		order: 1501,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: 'IsAegis',
@@ -209,6 +212,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'shield',
 		type: 'toggle',
 		order: 1502,
+		isCircle: true, // サークルバフ
 	},
 
 	// ナイトスキル
@@ -453,6 +457,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'pet',
 		type: 'toggle',
 		order: 2301,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: 'IsPetMind',
@@ -460,6 +465,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'pet',
 		type: 'toggle',
 		order: 2302,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: 'IsPetCut',
@@ -467,6 +473,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'pet',
 		type: 'toggle',
 		order: 2303,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: 'IsPetCri',
@@ -474,6 +481,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'pet',
 		type: 'toggle',
 		order: 2304,
+		isCircle: true, // サークルバフ
 	},
 
 	// ミンストレルスキル
@@ -484,6 +492,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		type: 'stack',
 		maxStack: 10,
 		order: 2401,
+		isCircle: true, // サークルバフ
 	},
 
 	// パルチザンスキル

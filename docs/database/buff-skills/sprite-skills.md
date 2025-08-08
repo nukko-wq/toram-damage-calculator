@@ -14,6 +14,7 @@ interface SpriteSkillDetail {
   category: 'sprite'           // スキル系統（スプライト固定）
   type: BuffSkillType         // UI制御タイプ
   order: number               // 表示順序
+  isCircle?: boolean          // サークルバフ（味方にも効果）かどうか（デフォルト: false）
   description: string         // スキル説明
   effects: SkillEffect[]      // 効果リスト
   calculationFormula: string  // 計算式
@@ -34,6 +35,7 @@ interface SpriteSkillDetail {
   category: 'sprite',
   type: 'toggle',
   order: 801,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: 'ブレイブ倍率を上昇、ATK・MATKを敵の防御力に応じて上昇',
   effects: [
     {

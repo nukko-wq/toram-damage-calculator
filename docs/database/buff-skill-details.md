@@ -170,6 +170,7 @@ interface WeaponRequirement {
     }
   },
   order: 1101,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: '魔導具装備状況に応じて魔法攻撃力率を上昇させる',
   effects: [
     {
