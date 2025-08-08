@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useCalculatorStore } from '@/stores'
 import type { BuffSkillDefinition } from '@/types/buffSkill'
 import { CATEGORY_LABELS } from '@/types/buffSkill'
-import { getSkillNameClassName, shouldShowModal } from '@/utils/buffSkillUtils'
+import { getSkillNameClassName, getCategoryLabelClassName, shouldShowModal } from '@/utils/buffSkillUtils'
 import MultiParamModal from './MultiParamModal'
 import SkillParameterModal from './SkillParameterModal'
 import SkillToggleButton from './SkillToggleButton'
@@ -119,7 +119,7 @@ export default function SkillCard({ skill }: SkillCardProps) {
 	return (
 		<div className="border-b-2 border-blue-200">
 			{/* カテゴリラベル */}
-			<div className="text-[10px] text-gray-500">{categoryLabel}</div>
+			<div className={getCategoryLabelClassName(skill)}>{categoryLabel}</div>
 
 			{/* スキル名とトグルスイッチ */}
 			<div className="skill-header flex items-center justify-between mb-1">

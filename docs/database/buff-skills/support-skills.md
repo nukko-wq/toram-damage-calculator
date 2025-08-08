@@ -14,6 +14,7 @@ interface SupportSkillDetail {
   category: 'support'          // スキル系統
   type: BuffSkillType         // UI制御タイプ
   order: number               // 表示順序
+  isPassive?: boolean         // パッシブスキルかどうか（デフォルト: true）
   description: string         // スキル説明
   effects: SkillEffect[]      // 効果リスト
   calculationFormula: string  // 計算式
@@ -34,6 +35,7 @@ interface SupportSkillDetail {
   category: 'support',
   type: 'multiParam',
   order: 2001,
+  isPassive: false, // アクティブバフ（UI表示で赤色）
   multiParams: {
     param1: {
       name: 'バフ使用者タイプ',
@@ -166,6 +168,7 @@ function calculateManaRechargeEffects(
   category: 'support',
   type: 'multiParam',
   order: 2002,
+  isPassive: false, // アクティブバフ（UI表示で赤色）
   multiParams: {
     param1: {
       name: 'バフ使用者タイプ',
@@ -254,6 +257,7 @@ function calculateHighCycleEffects(
   category: 'support',
   type: 'multiParam',
   order: 2003,
+  isPassive: false, // アクティブバフ（UI表示で赤色）
   multiParams: {
     param1: {
       name: 'バフ使用者タイプ',
@@ -471,3 +475,4 @@ export function getSupportSkillBonuses(
 |------|----------|------|
 | 2025-01-XX | サポートスキル系統を個別ファイルに分離 | buff-skill-details-common.mdから移動 |
 | 2025-01-XX | ファーストエイドを削除 | 12.1を削除し、番号を調整 |
+| 2025-01-XX | isPassiveフラグを追加 | ブレイブオーラ、ハイサイクル、クイックモーションをアクティブバフとして定義（UI表示で赤色） |

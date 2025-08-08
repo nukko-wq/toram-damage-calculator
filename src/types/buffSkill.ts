@@ -50,6 +50,7 @@ export interface BuffSkillDefinition {
 	multiParams?: MultiParamConfig // multiParamタイプ用
 	description?: string // 説明文
 	requirements?: WeaponRequirement[] // 武器要件
+	isPassive?: boolean // パッシブスキルかどうか（デフォルト: true）
 }
 
 export type BuffSkillType =

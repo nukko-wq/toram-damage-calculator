@@ -318,6 +318,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 			},
 		},
 		order: 2001,
+		isPassive: false, // アクティブバフ
 	},
 	{
 		id: 'IsHighCycle',
@@ -334,6 +335,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 			},
 		},
 		order: 2002,
+		isPassive: false, // アクティブバフ
 	},
 	{
 		id: 'IsQuickMotion',
@@ -350,6 +352,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 			},
 		},
 		order: 2003,
+		isPassive: false, // アクティブバフ
 	},
 	{
 		id: 'IsManaReCharge',
