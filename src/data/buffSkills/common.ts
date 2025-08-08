@@ -361,6 +361,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'support',
 		type: 'toggle',
 		order: 2004,
+		isCircle: true, // サークルバフ
 	},
 
 	// サバイバルスキル
