@@ -14,6 +14,7 @@ interface BladeBuffSkillDetail {
   category: 'blade'            // スキル系統（ブレード固定）
   type: BuffSkillType         // UI制御タイプ
   order: number               // 表示順序
+  isCircle?: boolean          // サークルバフ（味方にも効果）かどうか（デフォルト: false）
   maxLevel?: number           // 最大レベル（デフォルト10）
   maxStack?: number           // 最大重ねがけ数
   description: string         // スキル説明
@@ -111,6 +112,7 @@ function calculateBladeMasteryEffects(
     }
   },
   order: 201,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: '武器タイプに応じて攻撃力率を上昇させる。全武器で効果があります',
   effects: [
     {

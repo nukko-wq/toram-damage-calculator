@@ -14,6 +14,7 @@ interface SupportSkillDetail {
   category: 'support'          // スキル系統
   type: BuffSkillType         // UI制御タイプ
   order: number               // 表示順序
+  isCircle?: boolean          // サークルバフ（味方にも効果）かどうか（デフォルト: false）
   description: string         // スキル説明
   effects: SkillEffect[]      // 効果リスト
   calculationFormula: string  // 計算式
@@ -34,6 +35,7 @@ interface SupportSkillDetail {
   category: 'support',
   type: 'multiParam',
   order: 2001,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   multiParams: {
     param1: {
       name: 'バフ使用者タイプ',
@@ -119,6 +121,7 @@ function calculateBraveAuraEffects(
   category: 'support',
   type: 'toggle',
   order: 2004,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   description: '全武器種で使用可能なブレイブ倍率低下スキル。マナ回復効果と引き換えにダメージが減少',
   effects: [
     {
@@ -166,6 +169,7 @@ function calculateManaRechargeEffects(
   category: 'support',
   type: 'multiParam',
   order: 2002,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   multiParams: {
     param1: {
       name: 'バフ使用者タイプ',
@@ -254,6 +258,7 @@ function calculateHighCycleEffects(
   category: 'support',
   type: 'multiParam',
   order: 2003,
+  isCircle: true, // サークルバフ（UI表示で赤色）
   multiParams: {
     param1: {
       name: 'バフ使用者タイプ',
@@ -471,3 +476,4 @@ export function getSupportSkillBonuses(
 |------|----------|------|
 | 2025-01-XX | サポートスキル系統を個別ファイルに分離 | buff-skill-details-common.mdから移動 |
 | 2025-01-XX | ファーストエイドを削除 | 12.1を削除し、番号を調整 |
+| 2025-01-XX | isCircleフラグを追加 | ブレイブオーラ、ハイサイクル、クイックモーションをサークルバフとして定義（UI表示で赤色） |

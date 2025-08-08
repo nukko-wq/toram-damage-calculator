@@ -202,7 +202,7 @@ export default function MultiParamModal({
 					<button
 						type="button"
 						onClick={onClose}
-						className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+						className="text-gray-400 hover:text-gray-600 text-2xl font-bold cursor-pointer"
 					>
 						×
 					</button>

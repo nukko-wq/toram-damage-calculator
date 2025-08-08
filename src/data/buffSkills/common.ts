@@ -18,6 +18,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 			},
 		},
 		order: 201,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: '4-OH',
@@ -318,6 +319,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 			},
 		},
 		order: 2001,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: 'IsHighCycle',
@@ -334,6 +336,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 			},
 		},
 		order: 2002,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: 'IsQuickMotion',
@@ -350,6 +353,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 			},
 		},
 		order: 2003,
+		isCircle: true, // サークルバフ
 	},
 	{
 		id: 'IsManaReCharge',
@@ -357,6 +361,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'support',
 		type: 'toggle',
 		order: 2004,
+		isCircle: true, // サークルバフ
 	},
 
 	// サバイバルスキル

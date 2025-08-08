@@ -322,11 +322,23 @@ export function shouldShowModal(skill: BuffSkillDefinition): boolean {
 // スキル名のクリック可能性を示すCSSクラス名を取得
 export function getSkillNameClassName(skill: BuffSkillDefinition): string {
 	const baseClass =
-		'skill-name text-[13px] font-medium text-gray-700 flex-1 mr-2 leading-tight'
+		'skill-name text-[13px] font-medium flex-1 mr-2 leading-tight'
+
+	// サークルバフ（味方にも効果）は赤色で表示
+	const colorClass = skill.isCircle === true ? 'text-rose-400' : 'text-gray-700'
 
 	if (shouldShowModal(skill)) {
-		return `${baseClass} hover:text-blue-600 cursor-pointer`
+		const hoverClass =
+			skill.isCircle === true ? 'hover:text-rose-500' : 'hover:text-blue-600'
+		return `${baseClass} ${colorClass} ${hoverClass} cursor-pointer`
 	}
 
-	return baseClass
+	return `${baseClass} ${colorClass}`
+}
+
+export function getCategoryLabelClassName(skill: BuffSkillDefinition): string {
+	const baseClass = 'text-[10px]'
+	const colorClass = skill.isCircle === true ? 'text-rose-400' : 'text-gray-500'
+
+	return `${baseClass} ${colorClass}`
 }
