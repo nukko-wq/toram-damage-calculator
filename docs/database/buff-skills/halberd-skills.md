@@ -209,11 +209,75 @@ function calculateCriticalParryEffects(
 }
 ```
 
+### 4.4 トルネードランス (hb3)
+```typescript
+{
+  id: 'hb3',
+  name: 'トルネードランス',
+  category: 'halberd',
+  type: 'stack',
+  order: 704,
+  maxStack: 10,
+  description: 'スタック数に応じてクリティカルダメージと回避率を上昇させる（旋風槍装備時のみ効果）',
+  effects: [
+    {
+      property: 'CriticalDamage',
+      formula: 'stackCount * 2',
+      conditions: ['メイン武器が旋風槍の場合のみ']
+    },
+    {
+      property: 'Dodge_Rate',
+      formula: 'stackCount * 10',
+      conditions: ['メイン武器が旋風槍の場合のみ']
+    }
+  ],
+  calculationFormula: `
+    旋風槍装備時:
+    - CriticalDamage = base + (stackCount × 2)
+    - Dodge_Rate = base + (stackCount × 10)%
+    
+    その他武器装備時:
+    - 効果なし
+  `,
+  example: {
+    stackCount: 10,
+    calculation: 'CriticalDamage = 10 × 2 = 20, Dodge_Rate = 10 × 10 = 100%',
+    result: 'クリティカルダメージ +20, 回避率 +100%'
+  },
+  weaponRequirements: [
+    {
+      weaponType: 'halberd',
+      description: 'メイン武器が旋風槍の場合のみ効果があります'
+    }
+  ],
+  uiSettings: {
+    parameterName: '重ねがけ数',
+    parameterUnit: '回',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+
+// 実装用の効果計算関数
+function calculateTornadoLanceEffects(
+  stackCount: number,
+  weaponType: MainWeaponType | null
+): Partial<EquipmentProperties> {
+  if (!stackCount || stackCount === 0 || weaponType !== 'halberd') return {}
+  
+  return {
+    CriticalDamage: stackCount * 2,
+    Dodge_Rate: stackCount * 10
+  }
+}
+```
+
 ## 実装ステータス
 
 - [x] クイックオーラ (hb1) - 設計・実装完了
 - [x] 神速の捌手 (godspeed_parry) - 設計・実装完了
 - [x] 会心の捌き (hb2) - 設計・実装完了
+- [x] トルネードランス (hb3) - 設計・実装完了
 
 ## 特徴
 

@@ -60,6 +60,21 @@ export function calculateCriticalParryEffects(
 /**
  * ハルバードスキル系統の統合効果取得
  */
+/**
+ * トルネードランス(hb3)の効果計算関数
+ */
+export function calculateTornadoLanceEffects(
+	stackCount: number,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (!stackCount || stackCount === 0 || weaponType !== 'halberd') return {}
+
+	return {
+		CriticalDamage: stackCount * 2,
+		Dodge_Rate: stackCount * 10,
+	}
+}
+
 export function getHalberdSkillBonuses(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
@@ -91,6 +106,16 @@ export function getHalberdSkillBonuses(
 	if (criticalParry?.isEnabled) {
 		const effects = calculateCriticalParryEffects(
 			criticalParry.isEnabled,
+			convertedWeaponType,
+		)
+		integrateEffects(effects, bonuses)
+	}
+
+	// トルネードランスの処理
+	const tornadoLance = buffSkillData['hb3']
+	if (tornadoLance?.isEnabled && tornadoLance.stackCount) {
+		const effects = calculateTornadoLanceEffects(
+			tornadoLance.stackCount,
 			convertedWeaponType,
 		)
 		integrateEffects(effects, bonuses)

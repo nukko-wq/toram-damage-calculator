@@ -37,9 +37,14 @@ export const halberdSkills: BuffSkillDefinition[] = [
 		id: 'hb3',
 		name: 'トルネードランス',
 		category: 'halberd',
-		type: 'level',
-		maxLevel: 10,
+		type: 'stack',
+		maxStack: 10,
 		order: 704,
+		requirements: [
+			{
+				mainWeapon: 'halberd',
+			},
+		],
 	},
 	{
 		id: 'hb1',
