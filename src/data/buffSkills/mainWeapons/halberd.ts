@@ -22,11 +22,24 @@ export const halberdSkills: BuffSkillDefinition[] = [
 
 	// ハルバードスキル
 	{
+		id: 'hb1',
+		name: 'クイックオーラ',
+		category: 'halberd',
+		type: 'level',
+		maxLevel: 10,
+		order: 501,
+		requirements: [
+			{
+				mainWeapon: 'halberd',
+			},
+		],
+	},
+	{
 		id: 'hb2',
 		name: '会心の捌き',
 		category: 'halberd',
 		type: 'toggle',
-		order: 503,
+		order: 502,
 		requirements: [
 			{
 				mainWeapon: 'halberd',
@@ -39,19 +52,12 @@ export const halberdSkills: BuffSkillDefinition[] = [
 		category: 'halberd',
 		type: 'stack',
 		maxStack: 10,
-		order: 704,
+		order: 503,
 		requirements: [
 			{
 				mainWeapon: 'halberd',
 			},
 		],
-	},
-	{
-		id: 'hb1',
-		name: 'トールハンマー',
-		category: 'halberd',
-		type: 'toggle',
-		order: 606,
 	},
 
 	// モノノフスキル
