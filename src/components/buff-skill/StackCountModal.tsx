@@ -135,7 +135,9 @@ export default function StackCountModal({
 								? '消費鬼力数を入力してください。'
 								: skill.id === 'mg2'
 									? 'MP回復量を入力してください。'
-									: '重ねがけ数を入力して下さい。'}
+									: skill.id === 'hb3'
+										? 'カウント数を入力してください。'
+										: '重ねがけ数を入力して下さい。'}
 						<br />
 						{skill.id === 'mg2'
 							? `(${currentState.stackCount || 15}→回復量${(currentState.stackCount || 15) * 100})`
@@ -195,7 +197,7 @@ export default function StackCountModal({
 					</div>
 
 					{/* 重ねがけ数の説明 */}
-					{skill.id !== 'mg2' && (
+					{skill.id !== 'mg2' && skill.id !== 'hb3' && (
 						<div className="text-xs text-gray-500 text-center">
 							{skill.id === 'IsHotKnows'
 								? `熱情の歌は最大${skill.maxStack || 10}カウントまで重ねがけ可能です`

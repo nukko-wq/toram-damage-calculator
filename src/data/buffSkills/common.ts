@@ -82,7 +82,8 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		category: 'halberd',
 		type: 'stack',
 		maxStack: 3,
-		order: 602,
+		order: 504,
+		categoryOrder: 4,
 	},
 
 	// モノノフスキル
