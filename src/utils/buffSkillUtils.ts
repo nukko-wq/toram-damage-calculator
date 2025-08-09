@@ -85,14 +85,21 @@ function getSubWeaponSkills(
 function deduplicateSkills(
 	skills: BuffSkillDefinition[],
 ): BuffSkillDefinition[] {
-	const seen = new Set<string>()
-	return skills.filter((skill) => {
-		if (seen.has(skill.id)) {
-			return false
+	const skillMap = new Map<string, BuffSkillDefinition>()
+	
+	for (const skill of skills) {
+		const existing = skillMap.get(skill.id)
+		if (!existing) {
+			skillMap.set(skill.id, skill)
+		} else {
+			// categoryOrderを持つスキルを優先（武器固有版を優先）
+			if (skill.categoryOrder !== undefined && existing.categoryOrder === undefined) {
+				skillMap.set(skill.id, skill)
+			}
 		}
-		seen.add(skill.id)
-		return true
-	})
+	}
+	
+	return Array.from(skillMap.values())
 }
 
 // スキルが武器組み合わせと互換性があるかチェック

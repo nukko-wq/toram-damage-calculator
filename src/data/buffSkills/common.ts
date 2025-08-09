@@ -83,6 +83,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		type: 'stack',
 		maxStack: 3,
 		order: 504,
+		categoryOrder: 4,
 	},
 
 	// モノノフスキル

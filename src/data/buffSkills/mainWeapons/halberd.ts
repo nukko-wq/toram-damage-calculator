@@ -28,6 +28,7 @@ export const halberdSkills: BuffSkillDefinition[] = [
 		type: 'level',
 		maxLevel: 10,
 		order: 501,
+		categoryOrder: 1,
 		requirements: [
 			{
 				mainWeapon: 'halberd',
@@ -40,6 +41,7 @@ export const halberdSkills: BuffSkillDefinition[] = [
 		category: 'halberd',
 		type: 'toggle',
 		order: 502,
+		categoryOrder: 2,
 		requirements: [
 			{
 				mainWeapon: 'halberd',
@@ -53,6 +55,20 @@ export const halberdSkills: BuffSkillDefinition[] = [
 		type: 'stack',
 		maxStack: 10,
 		order: 503,
+		categoryOrder: 3,
+		requirements: [
+			{
+				mainWeapon: 'halberd',
+			},
+		],
+	},
+	{
+		id: 'hb4',
+		name: 'トールハンマー',
+		category: 'halberd',
+		type: 'toggle',
+		order: 505,
+		categoryOrder: 5,
 		requirements: [
 			{
 				mainWeapon: 'halberd',
