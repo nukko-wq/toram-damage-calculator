@@ -27,6 +27,11 @@ export const halberdSkills: BuffSkillDefinition[] = [
 		category: 'halberd',
 		type: 'toggle',
 		order: 503,
+		requirements: [
+			{
+				mainWeapon: 'halberd',
+			},
+		],
 	},
 	{
 		id: 'hb3',

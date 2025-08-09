@@ -43,6 +43,21 @@ export function calculateQuickAuraEffects(
 }
 
 /**
+ * 会心の捌き(hb2)の効果計算関数
+ */
+export function calculateCriticalParryEffects(
+	isEnabled: boolean,
+	weaponType: MainWeaponType | null,
+): Partial<EquipmentProperties> {
+	if (!isEnabled || weaponType !== 'halberd') return {}
+
+	return {
+		Critical: 5,
+		Critical_Rate: 5,
+	}
+}
+
+/**
  * ハルバードスキル系統の統合効果取得
  */
 export function getHalberdSkillBonuses(
@@ -68,6 +83,16 @@ export function getHalberdSkillBonuses(
 	const quickAura = buffSkillData['hb1']
 	if (quickAura?.isEnabled && quickAura.level) {
 		const effects = calculateQuickAuraEffects(quickAura.level)
+		integrateEffects(effects, bonuses)
+	}
+
+	// 会心の捌きの処理
+	const criticalParry = buffSkillData['hb2']
+	if (criticalParry?.isEnabled) {
+		const effects = calculateCriticalParryEffects(
+			criticalParry.isEnabled,
+			convertedWeaponType,
+		)
 		integrateEffects(effects, bonuses)
 	}
 
