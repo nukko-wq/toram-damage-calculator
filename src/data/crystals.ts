@@ -44,11 +44,6 @@ export const crystalsData: CrystalsData = {
 						properties: { Aggro_Rate: -50 },
 						description: '盾装備時: ヘイト-50%',
 					},
-					{
-						condition: { type: 'subWeapon', weaponType: 'ナイフ' },
-						properties: { CriticalDamage_Rate: 1 },
-						description: '短剣装備時: クリティカルダメージ+1%',
-					},
 				],
 			},
 			{
