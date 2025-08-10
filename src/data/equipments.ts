@@ -136,7 +136,7 @@ export const equipmentsData: EquipmentsData = {
 				properties: {
 					ElementAdvantage_Rate: 23,
 					MATK_Rate: 15,
-					CriticalDamage_Rate: 23,
+					CriticalDamage: 23,
 					Dodge: -7,
 					NaturalHPRecovery: -30,
 				},
