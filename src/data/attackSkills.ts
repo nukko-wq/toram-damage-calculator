@@ -270,6 +270,37 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// トールハンマー(単発) - 槍系統の魔法攻撃スキル
+	{
+		id: 'thor_hammer_single',
+		name: 'トールハンマー(単発)',
+		order: 203,
+		systemGroup: 'halberd',
+		category: 'halberdSkill',
+		weaponTypeRequirements: ['旋風槍'], // 仮設定、要確定
+		mpCost: 400,
+		multiplierFormula: '1500%',
+		fixedDamageFormula: '400',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'magical',
+				referenceDefense: 'MDEF',
+				referenceResistance: 'magical',
+				powerReference: 'spearMATK',
+				multiplier: 1500,
+				fixedDamage: 400,
+				adaptation: 'magical',
+				adaptationGrant: 'magical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: false,
+				canUseLongRangePower: false,
+				specialEffects: ['確定クリティカル'],
+			},
+		],
+	},
+
 	// 杖スキル
 	{
 		id: 'magic_arrow',

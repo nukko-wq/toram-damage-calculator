@@ -858,7 +858,7 @@ export type AttackSkillCategory =
 	| 'minstrel' // ミンストレルスキル
 
 // 威力参照タイプ
-export type PowerReferenceType = 'totalATK' | 'ATK' | 'MATK' // 将来拡張: 'spearMATK', 'STR', 'INT', etc.
+export type PowerReferenceType = 'totalATK' | 'ATK' | 'MATK' | 'spearMATK' // 将来拡張: 'STR', 'INT', etc.
 
 // 慣れタイプ
 export type AdaptationType = 'physical' | 'magical' | 'normal'
