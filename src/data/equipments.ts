@@ -130,6 +130,17 @@ export const equipmentsData: EquipmentsData = {
 					Critical: 90,
 				},
 			},
+			{
+				id: 'b985d845-f2f5-4d36-8ef6-418f8f738d41',
+				name: '槍有利23%MATK15%CD23',
+				properties: {
+					ElementAdvantage_Rate: 23,
+					MATK_Rate: 15,
+					CriticalDamage_Rate: 23,
+					Dodge: -7,
+					NaturalHPRecovery: -30,
+				},
+			},
 		],
 		body: [
 			{
@@ -215,6 +226,20 @@ export const equipmentsData: EquipmentsData = {
 					Critical: 30,
 					MATK_Rate: -15,
 					MagicalPenetration_Rate: -9,
+				},
+			},
+			{
+				id: '4c76bff1-7132-4568-9e26-7193aa5e0a94',
+				name: '有利21%INT10%CD10%CD20',
+				properties: {
+					ElementAdvantage_Rate: 21,
+					INT_Rate: 10,
+					CriticalDamage_Rate: 10,
+					CriticalDamage: 20,
+					ATK_Rate: -14,
+					PhysicalPenetration_Rate: -8,
+					Accuracy: -22,
+					Accuracy_Rate: -6,
 				},
 			},
 		],
