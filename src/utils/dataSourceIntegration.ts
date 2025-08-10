@@ -642,6 +642,7 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		enemyLevel,
 		data.subWeapon?.weaponType || null,
 		data.subWeapon?.refinement || 0,
+		data.baseStats, // 基礎ステータスを追加
 	)
 
 	for (const [key, value] of Object.entries(buffSkillBonuses)) {
@@ -1042,6 +1043,7 @@ export function getDetailedDataSourceBonuses(
 					enemyLevel,
 					data.subWeapon?.weaponType || null,
 					data.subWeapon?.refinement || 0,
+					data.baseStats, // 基礎ステータスを追加
 				)
 
 				for (const [key, value] of Object.entries(buffSkillBonuses)) {

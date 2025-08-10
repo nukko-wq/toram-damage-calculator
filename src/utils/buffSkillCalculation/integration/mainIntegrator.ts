@@ -49,6 +49,7 @@ export function getBuffSkillBonuses(
 	enemyLevel?: number,
 	subWeaponType?: SubWeaponType | null,
 	subWeaponRefinement?: number,
+	baseStats?: { INT?: number }, // 基礎ステータスを追加
 ): Partial<AllBonuses> {
 	const bonuses: Partial<AllBonuses> = {}
 
@@ -79,7 +80,7 @@ export function getBuffSkillBonuses(
 	}
 
 	// ハルバードスキル
-	const halberdBonuses = getHalberdSkillBonuses(buffSkillData, weaponType)
+	const halberdBonuses = getHalberdSkillBonuses(buffSkillData, weaponType, baseStats)
 	for (const [key, value] of Object.entries(halberdBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =

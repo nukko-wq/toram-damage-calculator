@@ -75,9 +75,27 @@ export function calculateTornadoLanceEffects(
 	}
 }
 
+/**
+ * トールハンマー(hb4)の効果計算関数
+ */
+export function calculateThorHammerEffects(
+	isEnabled: boolean,
+	weaponType: MainWeaponType | null,
+	baseINT: number,
+): Partial<EquipmentProperties> {
+	if (!isEnabled || weaponType !== 'halberd') return {}
+
+	return {
+		MagicalPenetration_Rate: 20,
+		MagicalFollowup_Rate: 100,
+		Accuracy: baseINT,
+	}
+}
+
 export function getHalberdSkillBonuses(
 	buffSkillData: Record<string, BuffSkillState> | null,
 	weaponType: WeaponType | null,
+	baseStats?: { INT?: number }, // 基礎ステータスを追加
 ): Partial<AllBonuses> {
 	const convertedWeaponType = convertWeaponType(weaponType)
 	const bonuses: Partial<AllBonuses> = {}
@@ -117,6 +135,17 @@ export function getHalberdSkillBonuses(
 		const effects = calculateTornadoLanceEffects(
 			tornadoLance.stackCount,
 			convertedWeaponType,
+		)
+		integrateEffects(effects, bonuses)
+	}
+
+	// トールハンマーの処理
+	const thorHammer = buffSkillData['hb4']
+	if (thorHammer?.isEnabled) {
+		const effects = calculateThorHammerEffects(
+			thorHammer.isEnabled,
+			convertedWeaponType,
+			baseStats?.INT || 0, // 基礎INTを取得
 		)
 		integrateEffects(effects, bonuses)
 	}
