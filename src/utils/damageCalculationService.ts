@@ -10,6 +10,7 @@ import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import {
 	calculateINTElementAdvantage,
 	calculateMagicalStability,
+	calculateSpearMATK,
 	calculateTotalElementAdvantage,
 } from '@/utils/basicStatsCalculation'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
@@ -472,13 +473,29 @@ export function calculateDamageWithService(
 
 					const skillInput = {
 						...input,
-						// スキルの場合はMATK、ATK、またはtotalATKを参照
+						// スキルの場合はMATK、ATK、spearMATK、またはtotalATKを参照
 						referenceStat:
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
-								: originalHit.powerReference === 'ATK'
-									? calculationResults?.basicStats.ATK || 0
-									: totalATK,
+								: originalHit.powerReference === 'spearMATK'
+									? (() => {
+											// 槍MATK計算を実行
+											if (!calculationResults || !calculationResults.baseStats || !calculationResults.adjustedStats) {
+												return 1500 // デフォルト値
+											}
+											const spearMATKResult = calculateSpearMATK(
+												calculationResults.baseStats.level,
+												calculatorData.mainWeapon?.weaponType || '',
+												totalATK,
+												calculationResults.baseStats,
+												calculationResults.adjustedStats,
+												calculationResults.allBonuses,
+											)
+											return spearMATKResult.finalSpearMATK
+										})()
+									: originalHit.powerReference === 'ATK'
+										? calculationResults?.basicStats.ATK || 0
+										: totalATK,
 						// スキルカテゴリを考慮したパッシブ倍率を適用
 						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
 							calculatorData.buffSkills?.skills || null,
