@@ -16,6 +16,7 @@ import {
 	calculateMATK,
 	calculateMagicalCriticalDamage,
 	calculateMagicalResistance,
+	calculateSpearMATK,
 	calculateMotionSpeed,
 	calculateMP,
 	calculatePhysicalResistance,
@@ -176,6 +177,18 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		allBonuses,
 	)
 
+	// 18. 槍MATK計算（旋風槍装備時のみ）
+	const spearMatkCalculation = data.mainWeapon.weaponType === '旋風槍' 
+		? calculateSpearMATK(
+			data.baseStats.level,
+			data.mainWeapon.weaponType,
+			atkCalculation.totalWeaponATK, // 総武器ATK
+			data.baseStats, // 基礎ステータス（MATKアップ用）
+			adjustedStats, // 補正後ステータス（槍ステータスMATK用）
+			allBonuses, // 全ての効果を統合した最終ボーナス値を使用
+		)
+		: null
+
 	return {
 		basicStats: {
 			HP: hpCalculation.finalHP,
@@ -187,6 +200,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			bringerAM: 0, // 暫定
 			MATK: matkCalculation.finalMATK,
 			baseMATK: matkCalculation.baseMATK,
+			spearMATK: spearMatkCalculation?.finalSpearMATK || 0,
 			stabilityRate: stabilityCalculation.finalStability,
 			subStabilityRate:
 				subATKCalculation?.subStability || data.subWeapon.stability,
@@ -289,6 +303,9 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 			revivalTime: 0,
 			itemCooldown: 0,
 		},
+
+		// allBonusesを追加
+		allBonuses,
 	}
 }
 

@@ -10,7 +10,6 @@ import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import {
 	calculateINTElementAdvantage,
 	calculateMagicalStability,
-	calculateSpearMATK,
 	calculateTotalElementAdvantage,
 } from '@/utils/basicStatsCalculation'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
@@ -432,6 +431,7 @@ export function calculateDamageWithService(
 			const selectedSkill = getAttackSkillById(
 				calculatorData.attackSkill.selectedSkillId,
 			)
+			
 			if (selectedSkill) {
 				// 攻撃スキル計算システムを使用してスキル情報を取得
 				const skillCalculationResult = attackSkillCalculation.calculateSkill(
@@ -478,21 +478,7 @@ export function calculateDamageWithService(
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
 								: originalHit.powerReference === 'spearMATK'
-									? (() => {
-											// 槍MATK計算を実行
-											if (!calculationResults || !calculationResults.baseStats || !calculationResults.adjustedStats) {
-												return 1500 // デフォルト値
-											}
-											const spearMATKResult = calculateSpearMATK(
-												calculationResults.baseStats.level,
-												calculatorData.mainWeapon?.weaponType || '',
-												totalATK,
-												calculationResults.baseStats,
-												calculationResults.adjustedStats,
-												calculationResults.allBonuses,
-											)
-											return spearMATKResult.finalSpearMATK
-										})()
+									? calculationResults?.basicStats.spearMATK || 1500
 									: originalHit.powerReference === 'ATK'
 										? calculationResults?.basicStats.ATK || 0
 										: totalATK,
