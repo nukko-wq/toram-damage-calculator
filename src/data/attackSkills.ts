@@ -690,6 +690,8 @@ export function getPowerReferenceDisplayText(
 			return 'ATK'
 		case 'MATK':
 			return 'MATK'
+		case 'spearMATK':
+			return '槍MATK'
 		default:
 			return powerRef
 	}
