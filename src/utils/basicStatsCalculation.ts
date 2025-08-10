@@ -493,6 +493,31 @@ export interface MATKCalculationSteps {
 	finalMATK: number // 最終MATK
 }
 
+/**
+ * 槍MATK計算結果のインターフェース
+ */
+export interface SpearMATKCalculationSteps {
+	level: number // キャラクターレベル
+	weaponType: string // 武器種別
+	totalWeaponATK: number // 総武器ATK
+	spearWeaponMATK: number // 槍総武器MATK (総武器ATK × 5/8)
+	baseINT: number // 基礎INT
+	baseAGI: number // 基礎AGI
+	spearStatusMATK: number // 槍ステータスMATK
+	matkUpSTR: number // MATKアップ(STR)
+	matkUpINT: number // MATKアップ(INT)
+	matkUpVIT: number // MATKアップ(VIT)
+	matkUpAGI: number // MATKアップ(AGI)
+	matkUpDEX: number // MATKアップ(DEX)
+	matkUpTotal: number // MATKアップ合計
+	matkDownTotal: number // MATKダウン合計
+	spearBaseMATK: number // 槍基礎MATK
+	matkPercent: number // MATK%補正
+	matkAfterPercent: number // MATK%適用後
+	matkFixed: number // MATK固定値
+	finalSpearMATK: number // 最終槍MATK
+}
+
 // HIT計算の詳細ステップ
 export interface HITCalculationSteps {
 	level: number // ステータスのレベル
@@ -1479,6 +1504,78 @@ export const calculateMATK = (
 		matkAfterPercent,
 		matkFixed,
 		finalMATK,
+	}
+}
+/**
+ * 槍MATK計算（旋風槍の一部スキル専用）
+ * 槍MATK = INT((自Lv+槍総武器MATK+槍ステータスMATK+MATKアップ(ｽﾃｰﾀｽ%)-MATKダウン(ｽﾃｰﾀｽ%))×(1+MATK%/100))+MATK固定値
+ */
+export const calculateSpearMATK = (
+	level: number,
+	weaponType: string,
+	totalWeaponATK: number,
+	baseStats: BaseStats,
+	adjustedStats: AdjustedStatsCalculation,
+	bonuses: AllBonuses,
+): SpearMATKCalculationSteps => {
+	// 1. 槍総武器MATK計算: 総武器ATK × 5/8
+	const spearWeaponMATK = Math.floor(totalWeaponATK * 5 / 8)
+
+	// 2. 槍ステータスMATK計算（補正後ステータスを使用）
+	const { INT, AGI } = adjustedStats
+	const spearStatusMATK = INT * 4 + AGI * 1
+
+	// 3. MATKアップ・ダウン計算（基礎ステータスを使用）
+	const matkUpSTR = Math.floor(
+		(baseStats.STR * (bonuses.MATK_STR_Rate || 0)) / 100,
+	)
+	const matkUpINT = Math.floor(
+		(baseStats.INT * (bonuses.MATK_INT_Rate || 0)) / 100,
+	)
+	const matkUpVIT = Math.floor(
+		(baseStats.VIT * (bonuses.MATK_VIT_Rate || 0)) / 100,
+	)
+	const matkUpAGI = Math.floor(
+		(baseStats.AGI * (bonuses.MATK_AGI_Rate || 0)) / 100,
+	)
+	const matkUpDEX = Math.floor(
+		(baseStats.DEX * (bonuses.MATK_DEX_Rate || 0)) / 100,
+	)
+
+	const matkUpTotal = matkUpSTR + matkUpINT + matkUpVIT + matkUpAGI + matkUpDEX
+	const matkDownTotal = 0 // 必要に応じて実装
+
+	// 4. 槍基礎MATK計算
+	const spearBaseMATK = level + spearWeaponMATK + spearStatusMATK + matkUpTotal - matkDownTotal
+
+	// 5. MATK%適用
+	const matkPercent = bonuses.MATK_Rate || 0
+	const matkAfterPercent = Math.floor(spearBaseMATK * (1 + matkPercent / 100))
+
+	// 6. MATK固定値加算
+	const matkFixed = bonuses.MATK || 0
+	const finalSpearMATK = matkAfterPercent + matkFixed
+
+	return {
+		level,
+		weaponType,
+		totalWeaponATK,
+		spearWeaponMATK,
+		baseINT: INT, // 補正後ステータスのINT
+		baseAGI: AGI, // 補正後ステータスのAGI
+		spearStatusMATK,
+		matkUpSTR,
+		matkUpINT,
+		matkUpVIT,
+		matkUpAGI,
+		matkUpDEX,
+		matkUpTotal,
+		matkDownTotal,
+		spearBaseMATK,
+		matkPercent,
+		matkAfterPercent,
+		matkFixed,
+		finalSpearMATK,
 	}
 }
 

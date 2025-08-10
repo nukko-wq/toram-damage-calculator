@@ -24,6 +24,7 @@ import {
 	calculateMotionSpeed,
 	calculateMP,
 	calculatePhysicalResistance,
+	calculateSpearMATK,
 	calculateStability,
 	calculateSubATK,
 	calculateTotalATK,
@@ -410,6 +411,17 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		adjustedStatsCalculation, // 補正後ステータス（ステータスMATK用）
 		finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
 	)
+	// 槍MATK計算（旋風槍装備時のみ）
+	const spearMatkCalculation = data.mainWeapon.weaponType === '旋風槍' 
+		? calculateSpearMATK(
+			baseStats.level,
+			data.mainWeapon.weaponType,
+			atkCalculation.totalWeaponATK, // 総武器ATK
+			baseStats, // 基礎ステータス（MATKアップ用）
+			adjustedStatsCalculation, // 補正後ステータス（槍ステータスMATK用）
+			finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
+		)
+		: null
 
 	// 総ATK計算（ATK・サブATK計算結果が必要なため、useMemoの外で実行）
 	const totalATKCalculation = calculateTotalATK(
@@ -581,8 +593,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					bringerAM: baseStats.bringerAM,
 					MATK: baseStats.MATK,
 					baseMATK: baseStats.baseMATK,
-					spearMATK: 0, // 暫定値
-					spearBaseMATK: 0, // 暫定値
+					spearMATK: spearMatkCalculation?.finalSpearMATK || 0,
+					spearBaseMATK: spearMatkCalculation?.spearBaseMATK || 0,
 					stabilityRate: baseStats.stabilityRate,
 					subStabilityRate: baseStats.subStabilityRate,
 					criticalRate: baseStats.criticalRate,
