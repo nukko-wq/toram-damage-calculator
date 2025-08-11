@@ -887,6 +887,194 @@ MATK（魔法攻撃力）の計算については、専用ドキュメントを�
 2. **単純合算**: 複雑な計算はなく、全ての%補正を単純に加算
 3. **料理除外**: 料理からの防御崩し%補正は存在しない
 
+## 魔法クリティカル率計算
+
+### 基本計算式
+```
+魔法クリティカル率(%) = ➀ + ② + ➂
+```
+
+#### ➀ スペルバースト効果
+```
+➀ = INT(物理クリティカル率 × スペルバーストslv / 40)
+```
+
+#### ② 衰弱+弱点属性効果
+```
+② = 敵が衰弱時かつ攻撃が敵の弱点属性の時、INT(物理クリティカル率 / 2)
+※杖またはメイン魔導具の場合、弱点属性でなくても効果を得る
+```
+
+#### ➂ 無属性攻撃効果
+```
+➂ = 攻撃の属性が無属性の時、INT(物理クリティカル率 / 4)
+```
+
+### 詳細計算
+
+#### 構成要素
+- **物理クリティカル率**: 上記の物理クリティカル率計算の最終結果
+- **スペルバーストslv**: バフスキルのスペルバースト(sf1)のスキルレベル（0-10）
+- **敵の状態**: 衰弱状態の有無
+- **属性関係**: 攻撃属性と敵の弱点属性の関係
+- **武器種**: 杖・魔導具の場合の特殊効果
+
+#### 計算手順
+1. **物理クリティカル率取得**: 物理クリティカル率計算の最終値を使用
+2. **スペルバースト効果計算**: INT(物理クリティカル率 × スペルバーストslv / 40)
+3. **衰弱+弱点属性効果判定**: 条件満たす場合、INT(物理クリティカル率 / 2)
+4. **無属性攻撃効果判定**: 無属性攻撃の場合、INT(物理クリティカル率 / 4)
+5. **最終値算出**: ➀ + ② + ➂
+
+### 計算例
+
+#### 例1: 標準的なケース（スペルバーストのみ）
+**入力値:**
+- 物理クリティカル率: 80%
+- スペルバーストlv: 5
+- 敵の状態: 通常（衰弱なし）
+- 攻撃属性: 火属性
+- 敵の弱点: 土属性（弱点でない）
+
+**計算手順:**
+1. ➀ = INT(80 × 5 / 40) = INT(10) = 10
+2. ② = 0（衰弱でないまたは弱点属性でない）
+3. ➂ = 0（無属性でない）
+4. **魔法クリティカル率 = 10 + 0 + 0 = 10%**
+
+#### 例2: 衰弱+弱点属性の効果ありケース
+**入力値:**
+- 物理クリティカル率: 100%
+- スペルバーストlv: 8
+- 敵の状態: 衰弱
+- 攻撃属性: 火属性
+- 敵の弱点: 火属性（弱点一致）
+- 武器種: 片手剣（杖・魔導具でない）
+
+**計算手順:**
+1. ➀ = INT(100 × 8 / 40) = INT(20) = 20
+2. ② = INT(100 / 2) = INT(50) = 50（衰弱+弱点属性条件満たす）
+3. ➂ = 0（無属性でない）
+4. **魔法クリティカル率 = 20 + 50 + 0 = 70%**
+
+#### 例3: 杖装備での特殊効果ケース
+**入力値:**
+- 物理クリティカル率: 90%
+- スペルバーストlv: 6
+- 敵の状態: 衰弱
+- 攻撃属性: 火属性
+- 敵の弱点: 土属性（弱点でない）
+- 武器種: 杖（特殊効果対象）
+
+**計算手順:**
+1. ➀ = INT(90 × 6 / 40) = INT(13.5) = 13
+2. ② = INT(90 / 2) = INT(45) = 45（杖なので弱点属性でなくても効果適用）
+3. ➂ = 0（無属性でない）
+4. **魔法クリティカル率 = 13 + 45 + 0 = 58%**
+
+#### 例4: 無属性攻撃ケース
+**入力値:**
+- 物理クリティカル率: 120%
+- スペルバーストlv: 7
+- 敵の状態: 通常
+- 攻撃属性: 無属性
+- 武器種: 魔導具
+
+**計算手順:**
+1. ➀ = INT(120 × 7 / 40) = INT(21) = 21
+2. ② = 0（衰弱でない）
+3. ➂ = INT(120 / 4) = INT(30) = 30（無属性攻撃効果）
+4. **魔法クリティカル率 = 21 + 0 + 30 = 51%**
+
+#### 例5: 全効果適用ケース
+**入力値:**
+- 物理クリティカル率: 150%
+- スペルバーストlv: 10
+- 敵の状態: 衰弱
+- 攻撃属性: 無属性
+- 敵の弱点: 任意（無属性攻撃なので弱点判定は無関係）
+- 武器種: 杖
+
+**計算手順:**
+1. ➀ = INT(150 × 10 / 40) = INT(37.5) = 37
+2. ② = INT(150 / 2) = INT(75) = 75（衰弱+杖効果）
+3. ➂ = INT(150 / 4) = INT(37.5) = 37（無属性効果）
+4. **魔法クリティカル率 = 37 + 75 + 37 = 149%**
+
+### 重要な条件
+
+#### ② 衰弱+弱点属性効果の適用条件
+1. **敵が衰弱状態である**
+2. **攻撃属性が敵の弱点属性と一致する** OR **武器種が杖・メイン魔導具である**
+
+#### ➂ 無属性攻撃効果の適用条件
+1. **攻撃の属性が無属性である**
+
+#### 杖・魔導具の特殊効果
+- 杖またはメイン魔導具装備時は、弱点属性でなくても②の効果を得られる
+- この効果により、衰弱状態の敵に対して常に②の効果が適用される
+
+### TypeScript実装例
+
+```typescript
+interface MagicalCriticalRateCalculationSteps {
+  physicalCriticalRate: number
+  spellBurstLevel: number
+  spellBurstEffect: number
+  isWeakened: boolean
+  isWeakElementMatch: boolean
+  isStaffOrMagicDevice: boolean
+  weakElementEffect: number
+  isNeutralElement: boolean
+  neutralElementEffect: number
+  finalMagicalCriticalRate: number
+}
+
+function calculateMagicalCriticalRate(
+  physicalCriticalRate: number,
+  spellBurstLevel: number = 0,
+  isWeakened: boolean = false,
+  isWeakElementMatch: boolean = false,
+  isStaffOrMagicDevice: boolean = false,
+  isNeutralElement: boolean = false
+): MagicalCriticalRateCalculationSteps {
+  // ➀ スペルバースト効果
+  const spellBurstEffect = Math.floor(physicalCriticalRate * spellBurstLevel / 40)
+  
+  // ② 衰弱+弱点属性効果
+  const weakElementCondition = isWeakened && (isWeakElementMatch || isStaffOrMagicDevice)
+  const weakElementEffect = weakElementCondition ? Math.floor(physicalCriticalRate / 2) : 0
+  
+  // ➂ 無属性攻撃効果
+  const neutralElementEffect = isNeutralElement ? Math.floor(physicalCriticalRate / 4) : 0
+  
+  // 最終値算出
+  const finalMagicalCriticalRate = spellBurstEffect + weakElementEffect + neutralElementEffect
+  
+  return {
+    physicalCriticalRate,
+    spellBurstLevel,
+    spellBurstEffect,
+    isWeakened,
+    isWeakElementMatch,
+    isStaffOrMagicDevice,
+    weakElementEffect,
+    isNeutralElement,
+    neutralElementEffect,
+    finalMagicalCriticalRate,
+  }
+}
+```
+
+### 重要な制限事項
+
+1. **物理クリティカル率依存**: 魔法クリティカル率は物理クリティカル率の最終値に依存
+2. **INT()関数**: 各効果計算時に小数点以下切り捨て処理を実施
+3. **条件判定**: ②③の効果は特定条件下でのみ適用される
+4. **武器種特殊効果**: 杖・魔導具は②の効果適用条件を緩和する
+5. **スペルバーストスキル依存**: バフスキルのスペルバーストレベルが必須
+6. **敵の状態・属性依存**: 敵の衰弱状態と属性関係が計算に影響する
+
 ## 先読み計算
 
 ### 基本計算式
@@ -1074,6 +1262,7 @@ function calculateTotalATK(
 | 2025-07-05 | ステータスポイント計算式を簡素化 | 基本値172、レベル毎+2のシンプルな計算に変更、特定レベルボーナスを廃止 |
 | 2025-07-05 | レベル305ボーナスを追加 | レベル305以上で追加5ポイント、6つの計算例とTypeScript実装例を更新 |
 | 2025-07-05 | 使用済みポイント計算を追加 | 利用可能ステータスポイント = 総ポイント - 使用済みポイント、初期値1を除外、7つの計算例とUI表示を更新 |
+| 2025-08-11 | 魔法クリティカル率計算式を追加 | スペルバーストスキル・衰弱・弱点属性・無属性の3要素による計算、杖・魔導具の特殊効果、5つの計算例とTypeScript実装例を含む |
 
 ## 関連ドキュメント
 - [HP・MP計算式](./hp-mp-calculation.md) - HP・MP計算の詳細

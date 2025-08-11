@@ -113,7 +113,7 @@ export default function MenuPanel({
 					/>
 
 					{/* 右カラム - コンテンツ */}
-					<MenuContent activeSection={activeSection} />
+					<MenuContent activeSection={activeSection} onClose={onClose} />
 				</div>
 			</div>
 		</>

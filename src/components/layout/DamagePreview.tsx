@@ -452,13 +452,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					<p className="text-sm font-medium text-gray-700">
 						敵：{getSelectedEnemyName()}
 					</p>
-					{/* ラフィー選択時の注意書き */}
-					{calculatorData.enemy?.selectedEnemyId ===
-						'2b981c85-54f5-4c67-bac1-0e9cba4bdeb2' && (
-						<p className="text-xs text-orange-600 mt-1">
-							※この敵は属性覚醒の有利+25%が適用されません。
-						</p>
-					)}
+					{/* 無属性敵選択時の注意書き */}
+					{(() => {
+						const selectedEnemy = calculatorData.enemy?.selectedEnemyId 
+							? getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
+							: null
+						return selectedEnemy?.isNonElemental && (
+							<p className="text-xs text-orange-600 mt-1">
+									※この敵は属性覚醒の有利+25%が適用されません。
+							</p>
+						)
+					})()}
 				</div>
 
 				{/* 威力オプション */}

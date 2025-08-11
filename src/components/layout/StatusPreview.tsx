@@ -20,10 +20,13 @@ import {
 	calculateINTElementAdvantage,
 	calculateMATK,
 	calculateMagicalCriticalDamage,
+	calculateMagicalCriticalRate,
+	getSpellBurstLevel,
 	calculateMagicalResistance,
 	calculateMotionSpeed,
 	calculateMP,
 	calculatePhysicalResistance,
+	calculateSpearMATK,
 	calculateStability,
 	calculateSubATK,
 	calculateTotalATK,
@@ -255,12 +258,20 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 				finalBonuses,
 			),
 			totalElementAdvantageCalculation: (() => {
+				// 属性覚醒効果を計算（+25）
+				const elementAwakeningResult = calculateElementAwakeningAdvantage(
+					powerOptions,
+					data.enemy.selectedEnemyId,
+					data.buffSkills,
+				)
+
 				// INT属性有利補正を計算
 				const intElementAdvantageResult = calculateINTElementAdvantage(
 					baseStats.INT, // 基礎INT（装備・バフ補正を除く）
 					data.mainWeapon.weaponType,
 					powerOptions?.elementAttack || 'none',
 				)
+				
 
 				// 熱情の歌の効果を計算
 				const hotKnowsSkill = data.buffSkills?.skills?.IsHotKnows
@@ -280,11 +291,28 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
 				}
 
-				// 総属性有利を計算（INT補正 + 熱情の歌補正を含む）
-				return calculateTotalElementAdvantage(
-					finalBonuses,
-					intElementAdvantageResult.intElementAdvantage + hotKnowsEffect,
-				)
+				// スキル種別に応じて総属性有利を計算
+				const baseElementAdvantage = finalBonuses.ElementAdvantage_Rate || 0
+				const isStaffOrMagicDevice = data.mainWeapon.weaponType === '杖' || data.mainWeapon.weaponType === '魔導具'
+
+				// 物理スキル: 属性覚醒+25 + 属性有利プロパティ
+				const physicalTotal = elementAwakeningResult.finalElementAwakeningAdvantage + baseElementAdvantage
+
+				// 魔法スキル: 属性覚醒+25 + INT補正（条件満たす場合） + 属性有利プロパティ
+				const magicalTotal = elementAwakeningResult.finalElementAwakeningAdvantage + 
+					intElementAdvantageResult.intElementAdvantage + baseElementAdvantage
+
+
+				// 表示用に両方の値を含むオブジェクトを返す
+				return {
+					...calculateTotalElementAdvantage(finalBonuses, hotKnowsEffect),
+					physicalSkillTotal: physicalTotal,
+					magicalSkillTotal: magicalTotal,
+					elementAwakening: elementAwakeningResult.finalElementAwakeningAdvantage,
+					intElementAdvantage: intElementAdvantageResult.intElementAdvantage,
+					baseElementAdvantage: baseElementAdvantage,
+					isStaffOrMagicDevice,
+				}
 			})(),
 			stabilityCalculation: calculateStability(
 				data.mainWeapon.stability,
@@ -410,6 +438,58 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		adjustedStatsCalculation, // 補正後ステータス（ステータスMATK用）
 		finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
 	)
+	// 槍MATK計算（旋風槍装備時のみ）
+	const spearMatkCalculation = data.mainWeapon.weaponType === '旋風槍' 
+		? calculateSpearMATK(
+			baseStats.level,
+			data.mainWeapon.weaponType,
+			atkCalculation.totalWeaponATK, // 総武器ATK
+			baseStats, // 基礎ステータス（MATKアップ用）
+			adjustedStatsCalculation, // 補正後ステータス（槍ステータスMATK用）
+			finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
+		)
+		: null
+
+	// 魔法クリティカル率計算（DamagePreviewの設定を考慮）
+	const magicalCriticalRateCalculation = useMemo(() => {
+		// 物理クリティカル率を取得
+		const physicalCriticalRate = criticalRateCalculation.finalCriticalRate
+		
+		// スペルバーストレベル取得
+		const spellBurstLevel = getSpellBurstLevel(data.buffSkills.skills)
+		
+		// 武器種判定（杖または魔導具）
+		const isStaffOrMagicDevice = data.mainWeapon.weaponType === '杖' || data.mainWeapon.weaponType === '魔導具'
+		
+		// DamagePreviewの設定を取得
+		const powerOptions = data.powerOptions || { elementAttack: 'none' }
+		const otherOptions = data.otherOptions || { enemyStatusWeaken: 'none' }
+		
+		// 衰弱状態の判定
+		const isWeakened = otherOptions.enemyStatusWeaken === 'applied'
+		
+		// 弱点属性一致の判定
+		const isWeakElementMatch = powerOptions.elementAttack === 'advantageous'
+		
+		// 無属性攻撃の判定
+		const isNeutralElement = powerOptions.elementAttack === 'none'
+		
+		// 魔法クリティカル率計算（全条件を考慮）
+		return calculateMagicalCriticalRate(
+			physicalCriticalRate,
+			spellBurstLevel,
+			isWeakened,
+			isWeakElementMatch,
+			isStaffOrMagicDevice,
+			isNeutralElement,
+		)
+	}, [
+		criticalRateCalculation, 
+		data.buffSkills.skills, 
+		data.mainWeapon.weaponType,
+		data.powerOptions,
+		data.otherOptions
+	])
 
 	// 総ATK計算（ATK・サブATK計算結果が必要なため、useMemoの外で実行）
 	const totalATKCalculation = calculateTotalATK(
@@ -459,12 +539,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			})(),
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
-			magicCriticalRate: 0,
+			magicCriticalRate: magicalCriticalRateCalculation.finalMagicalCriticalRate,
 			magicCriticalDamage:
 				magicalCriticalDamageCalculation.finalMagicalCriticalDamage,
-			totalElementAdvantage: 
-				(calculationResults.equipmentBonuses.equipmentBonus1.elementPower_Rate || 0) + 
-				elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage,
+			totalElementAdvantage: calculationResults.totalElementAdvantageCalculation.physicalSkillTotal,
 			elementAwakeningAdvantage: elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage,
 			ASPD: aspdCalculation.finalASPD,
 			CSPD: cspdCalculation.finalCSPD,
@@ -479,7 +557,10 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		}
 
 		switch (category) {
-			case 'physical':
+			case 'physical': {
+				// 物理スキル用の属性覚醒有利（属性覚醒25のみ）
+				const physicalElementAwakeningAdvantage = calculationResults.totalElementAdvantageCalculation.elementAwakening
+				
 				return {
 					HP: baseStats.HP,
 					MP: baseStats.MP,
@@ -493,8 +574,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					subStabilityRate: baseStats.subStabilityRate,
 					criticalRate: baseStats.criticalRate,
 					criticalDamage: baseStats.criticalDamage,
-					totalElementAdvantage: baseStats.totalElementAdvantage,
-					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
+					totalElementAdvantage: calculationResults.totalElementAdvantageCalculation.physicalSkillTotal,
+					elementAwakeningAdvantage: physicalElementAwakeningAdvantage,
 					shortRangeDamage:
 						calculationResults.equipmentBonuses.equipmentBonus1
 							.shortRangeDamage || 0,
@@ -525,8 +606,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					HIT: baseStats.HIT,
 					FLEE: baseStats.FLEE,
 				} as Record<string, number | null>
+			}
 
-			case 'magical':
+			case 'magical': {
+				// 魔法スキル用の属性覚醒有利（属性覚醒25 + INT属性有利補正）
+				const magicalElementAwakeningAdvantage = calculationResults.totalElementAdvantageCalculation.elementAwakening + 
+					calculationResults.totalElementAdvantageCalculation.intElementAdvantage
+				
 				return {
 					HP: baseStats.HP,
 					MP: baseStats.MP,
@@ -536,8 +622,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					subStabilityRate: baseStats.subStabilityRate,
 					magicCriticalRate: baseStats.magicCriticalRate,
 					magicCriticalDamage: baseStats.magicCriticalDamage,
-					totalElementAdvantage: baseStats.totalElementAdvantage,
-					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
+					totalElementAdvantage: calculationResults.totalElementAdvantageCalculation.magicalSkillTotal,
+					elementAwakeningAdvantage: magicalElementAwakeningAdvantage,
 					shortRangeDamage:
 						calculationResults.equipmentBonuses.equipmentBonus1
 							.shortRangeDamage || 0,
@@ -568,8 +654,13 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					HIT: baseStats.HIT,
 					FLEE: baseStats.FLEE,
 				} as Record<string, number | null>
+			}
 
-			case 'hybrid':
+			case 'hybrid': {
+				// ハイブリッド用の属性覚醒有利（魔法スキルベース：属性覚醒25 + INT属性有利補正）
+				const hybridElementAwakeningAdvantage = calculationResults.totalElementAdvantageCalculation.elementAwakening + 
+					calculationResults.totalElementAdvantageCalculation.intElementAdvantage
+				
 				return {
 					HP: baseStats.HP,
 					MP: baseStats.MP,
@@ -581,16 +672,16 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					bringerAM: baseStats.bringerAM,
 					MATK: baseStats.MATK,
 					baseMATK: baseStats.baseMATK,
-					spearMATK: 0, // 暫定値
-					spearBaseMATK: 0, // 暫定値
+					spearMATK: spearMatkCalculation?.finalSpearMATK || 0,
+					spearBaseMATK: spearMatkCalculation?.spearBaseMATK || 0,
 					stabilityRate: baseStats.stabilityRate,
 					subStabilityRate: baseStats.subStabilityRate,
 					criticalRate: baseStats.criticalRate,
 					criticalDamage: baseStats.criticalDamage,
 					magicCriticalRate: baseStats.magicCriticalRate,
 					magicCriticalDamage: baseStats.magicCriticalDamage,
-					totalElementAdvantage: baseStats.totalElementAdvantage,
-					elementAwakeningAdvantage: baseStats.elementAwakeningAdvantage,
+					totalElementAdvantage: calculationResults.totalElementAdvantageCalculation.magicalSkillTotal,
+					elementAwakeningAdvantage: hybridElementAwakeningAdvantage,
 					shortRangeDamage:
 						calculationResults.equipmentBonuses.equipmentBonus1
 							.shortRangeDamage || 0,
@@ -621,6 +712,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					HIT: baseStats.HIT,
 					FLEE: baseStats.FLEE,
 				} as Record<string, number | null>
+			}
 
 			case 'tank':
 				return {
@@ -663,8 +755,39 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							.darkResistance_Rate || 0,
 				} as Record<string, number | null>
 
-			default: // 'base'
-				return baseStats as Record<string, number | null>
+			default: { // 'base'
+				// 攻撃スキルの設定に基づいて物理または魔法スキル用の総属性有利を判定
+				let attackSkillType: 'physical' | 'magical' = 'physical' // デフォルトは物理
+				
+				if (data.attackSkill?.selectedSkillId) {
+					try {
+						const { getAttackSkillById } = require('@/data/attackSkills')
+						const skill = getAttackSkillById(data.attackSkill.selectedSkillId)
+						if (skill?.hits?.[0]?.attackType) {
+							attackSkillType = skill.hits[0].attackType as 'physical' | 'magical'
+						}
+					} catch (error) {
+						// エラー時はデフォルトの物理を使用
+						console.warn('攻撃スキル情報の取得に失敗:', error)
+					}
+				}
+				
+				const totalElementAdvantageValue = attackSkillType === 'magical' 
+					? calculationResults.totalElementAdvantageCalculation.magicalSkillTotal
+					: calculationResults.totalElementAdvantageCalculation.physicalSkillTotal
+				
+				// ベースカテゴリの属性覚醒有利もスキルタイプに応じて変更
+				const baseElementAwakeningAdvantage = attackSkillType === 'magical'
+					? calculationResults.totalElementAdvantageCalculation.elementAwakening + 
+					  calculationResults.totalElementAdvantageCalculation.intElementAdvantage
+					: calculationResults.totalElementAdvantageCalculation.elementAwakening
+				
+				return {
+					...baseStats,
+					totalElementAdvantage: totalElementAdvantageValue,
+					elementAwakeningAdvantage: baseElementAwakeningAdvantage,
+				} as Record<string, number | null>
+			}
 		}
 	}
 
@@ -765,7 +888,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					darkResistance: '闇耐性(%)',
 				}
 
-			default: // 'base'
+			default: { // 'base'
 				return {
 					...baseLabels,
 					ATK: 'ATK',
@@ -784,6 +907,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					magicalResistance: '魔法耐性(%)',
 					ailmentResistance: '異常耐性(%)',
 				}
+			}
 		}
 	}
 
@@ -912,7 +1036,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					'aggro',
 					'darkResistance',
 				]
-			default: // 'base'
+			default: { // 'base'
 				return [
 					'HP',
 					'MP',
@@ -943,6 +1067,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					'armorBreak',
 					'anticipate',
 				]
+			}
 		}
 	}
 

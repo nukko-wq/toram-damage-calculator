@@ -1,4 +1,5 @@
 // ステータス計算結果の型定義
+import type { AllBonuses } from '@/utils/basicStatsCalculation'
 
 export interface CalculationResults {
 	// 基本ステータス（30項目）
@@ -12,6 +13,7 @@ export interface CalculationResults {
 		bringerAM: number
 		MATK: number
 		baseMATK: number
+		spearMATK: number
 		stabilityRate: number
 		subStabilityRate: number
 		criticalRate: number
@@ -124,6 +126,9 @@ export interface CalculationResults {
 		revivalTime: number
 		itemCooldown: number
 	}
+
+	// 全補正値（AllBonuses型）
+	allBonuses: AllBonuses
 }
 
 // 表示状態の設定
@@ -148,6 +153,7 @@ export const STAT_LABELS = {
 		bringerAM: 'BringerA/M',
 		MATK: 'MATK',
 		baseMATK: '基礎MATK',
+		spearMATK: '槍MATK',
 		stabilityRate: '安定率(%)',
 		subStabilityRate: 'サブ安定率(%)',
 		criticalRate: 'クリティカル率',

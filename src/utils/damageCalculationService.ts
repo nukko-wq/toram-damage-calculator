@@ -177,14 +177,26 @@ export function calculateDamageWithService(
 
 		// PowerOptionsに基づく属性攻撃設定
 		const getElementAdvantageTotal = () => {
-			// 属性攻撃が無効の場合は0を返す
-			if (powerOptions.elementAttack === 'none') {
-				return 0
-			}
-
 			// 基本ステータスから総属性有利を取得（装備・クリスタ・料理・バフ統合済み）
 			const baseAdvantage =
 				calculationResults?.basicStats?.totalElementAdvantage ?? 0
+
+			// 属性攻撃が「無」の場合は基本的な属性有利プロパティのみ適用（INT補正は除外）
+			if (powerOptions.elementAttack === 'none') {
+				// 熱情の歌の効果を計算（属性攻撃が無でも適用される）
+				const hotKnowsSkill = calculatorData.buffSkills?.skills?.IsHotKnows
+				let hotKnowsEffect = 0
+				if (hotKnowsSkill?.isEnabled && hotKnowsSkill.stackCount) {
+					const hotKnowsResult = calculateHotKnowsEffects(
+						hotKnowsSkill.stackCount,
+						powerOptions,
+					)
+					hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
+				}
+				
+				// 基本属性有利プロパティ + 熱情の歌効果（INT補正と属性覚醒は除外）
+				return baseAdvantage + hotKnowsEffect
+			}
 
 			// INT属性有利補正を計算（有利・不利属性に対応）
 			const intElementAdvantageResult = calculateINTElementAdvantage(
@@ -248,13 +260,18 @@ export function calculateDamageWithService(
 					}
 					return 25
 				case 'advantageOnly':
-					return finalTotalElementAdvantage // INT補正 + 熱情の歌補正を含む総属性有利のみ
+					// 有利のみ：基本属性有利プロパティ + 熱情の歌効果のみ（INT補正は除外）
+					return baseAdvantage + hotKnowsEffect
 				case 'enabled':
 					// ラフィー選択時は属性覚醒分+25%を無効化
 					if (isRaphy) {
 						return finalTotalElementAdvantage // 属性覚醒25%を除外
 					}
-					return finalTotalElementAdvantage + 25 // INT補正 + 熱情の歌補正を含む総属性有利 + 属性覚醒25%
+					// 属性覚醒+25%は有利属性の場合のみ適用
+					if (powerOptions.elementAttack === 'advantageous') {
+						return finalTotalElementAdvantage + 25 // INT補正 + 熱情の歌補正を含む総属性有利 + 属性覚醒25%
+					}
+					return finalTotalElementAdvantage // INT補正 + 熱情の歌補正を含む総属性有利のみ（属性覚醒25%は除外）
 				default:
 					return finalTotalElementAdvantage
 			}
@@ -331,9 +348,7 @@ export function calculateDamageWithService(
 			elementAdvantage: {
 				total: getElementAdvantageTotal(),
 				awakening: 0, // 総属性有利で統合計算されるため0
-				isActive:
-					powerOptions.elementAttack !== 'none' &&
-					powerOptions.elementPower !== 'disabled',
+				isActive: powerOptions.elementPower !== 'disabled', // 属性威力が無効でなければ有効（属性攻撃が「無」でも基本的な属性有利プロパティは適用）
 			},
 			distance: distanceValues,
 			unsheathe: {
@@ -431,6 +446,7 @@ export function calculateDamageWithService(
 			const selectedSkill = getAttackSkillById(
 				calculatorData.attackSkill.selectedSkillId,
 			)
+			
 			if (selectedSkill) {
 				// 攻撃スキル計算システムを使用してスキル情報を取得
 				const skillCalculationResult = attackSkillCalculation.calculateSkill(
@@ -472,13 +488,15 @@ export function calculateDamageWithService(
 
 					const skillInput = {
 						...input,
-						// スキルの場合はMATK、ATK、またはtotalATKを参照
+						// スキルの場合はMATK、ATK、spearMATK、またはtotalATKを参照
 						referenceStat:
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
-								: originalHit.powerReference === 'ATK'
-									? calculationResults?.basicStats.ATK || 0
-									: totalATK,
+								: originalHit.powerReference === 'spearMATK'
+									? calculationResults?.basicStats.spearMATK || 1500
+									: originalHit.powerReference === 'ATK'
+										? calculationResults?.basicStats.ATK || 0
+										: totalATK,
 						// スキルカテゴリを考慮したパッシブ倍率を適用
 						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
 							calculatorData.buffSkills?.skills || null,

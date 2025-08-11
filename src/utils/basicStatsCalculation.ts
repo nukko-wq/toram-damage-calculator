@@ -459,6 +459,20 @@ export interface CriticalDamageCalculationSteps {
 	finalCriticalDamage: number // 最終クリティカルダメージ
 }
 
+// 魔法クリティカル率計算の詳細ステップ
+export interface MagicalCriticalRateCalculationSteps {
+	physicalCriticalRate: number // 物理クリティカル率（％）
+	spellBurstLevel: number // スペルバーストスキルレベル（0-10）
+	spellBurstEffect: number // スペルバースト効果値
+	isWeakened: boolean // 敵が衰弱状態か
+	isWeakElementMatch: boolean // 弱点属性と一致するか
+	isStaffOrMagicDevice: boolean // 杖または魔導具か
+	weakElementEffect: number // 衰弱+弱点属性効果値
+	isNeutralElement: boolean // 無属性攻撃か
+	neutralElementEffect: number // 無属性攻撃効果値
+	finalMagicalCriticalRate: number // 最終魔法クリティカル率
+}
+
 // 魔法クリティカルダメージ計算の詳細ステップ
 export interface MagicalCriticalDamageCalculationSteps {
 	physicalCriticalDamage: number // 物理クリティカルダメージ（半減処理適用済み）
@@ -491,6 +505,31 @@ export interface MATKCalculationSteps {
 	matkAfterPercent: number // MATK%適用後
 	matkFixed: number // MATK固定値
 	finalMATK: number // 最終MATK
+}
+
+/**
+ * 槍MATK計算結果のインターフェース
+ */
+export interface SpearMATKCalculationSteps {
+	level: number // キャラクターレベル
+	weaponType: string // 武器種別
+	totalWeaponATK: number // 総武器ATK
+	spearWeaponMATK: number // 槍総武器MATK (総武器ATK × 5/8)
+	baseINT: number // 基礎INT
+	baseAGI: number // 基礎AGI
+	spearStatusMATK: number // 槍ステータスMATK
+	matkUpSTR: number // MATKアップ(STR)
+	matkUpINT: number // MATKアップ(INT)
+	matkUpVIT: number // MATKアップ(VIT)
+	matkUpAGI: number // MATKアップ(AGI)
+	matkUpDEX: number // MATKアップ(DEX)
+	matkUpTotal: number // MATKアップ合計
+	matkDownTotal: number // MATKダウン合計
+	spearBaseMATK: number // 槍基礎MATK
+	matkPercent: number // MATK%補正
+	matkAfterPercent: number // MATK%適用後
+	matkFixed: number // MATK固定値
+	finalSpearMATK: number // 最終槍MATK
 }
 
 // HIT計算の詳細ステップ
@@ -1481,6 +1520,78 @@ export const calculateMATK = (
 		finalMATK,
 	}
 }
+/**
+ * 槍MATK計算（旋風槍の一部スキル専用）
+ * 槍MATK = INT((自Lv+槍総武器MATK+槍ステータスMATK+MATKアップ(ｽﾃｰﾀｽ%)-MATKダウン(ｽﾃｰﾀｽ%))×(1+MATK%/100))+MATK固定値
+ */
+export const calculateSpearMATK = (
+	level: number,
+	weaponType: string,
+	totalWeaponATK: number,
+	baseStats: BaseStats,
+	adjustedStats: AdjustedStatsCalculation,
+	bonuses: AllBonuses,
+): SpearMATKCalculationSteps => {
+	// 1. 槍総武器MATK計算: 総武器ATK × 5/8
+	const spearWeaponMATK = Math.floor(totalWeaponATK * 5 / 8)
+
+	// 2. 槍ステータスMATK計算（補正後ステータスを使用）
+	const { INT, AGI } = adjustedStats
+	const spearStatusMATK = INT * 4 + AGI * 1
+
+	// 3. MATKアップ・ダウン計算（基礎ステータスを使用）
+	const matkUpSTR = Math.floor(
+		(baseStats.STR * (bonuses.MATK_STR_Rate || 0)) / 100,
+	)
+	const matkUpINT = Math.floor(
+		(baseStats.INT * (bonuses.MATK_INT_Rate || 0)) / 100,
+	)
+	const matkUpVIT = Math.floor(
+		(baseStats.VIT * (bonuses.MATK_VIT_Rate || 0)) / 100,
+	)
+	const matkUpAGI = Math.floor(
+		(baseStats.AGI * (bonuses.MATK_AGI_Rate || 0)) / 100,
+	)
+	const matkUpDEX = Math.floor(
+		(baseStats.DEX * (bonuses.MATK_DEX_Rate || 0)) / 100,
+	)
+
+	const matkUpTotal = matkUpSTR + matkUpINT + matkUpVIT + matkUpAGI + matkUpDEX
+	const matkDownTotal = 0 // 必要に応じて実装
+
+	// 4. 槍基礎MATK計算
+	const spearBaseMATK = level + spearWeaponMATK + spearStatusMATK + matkUpTotal - matkDownTotal
+
+	// 5. MATK%適用
+	const matkPercent = bonuses.MATK_Rate || 0
+	const matkAfterPercent = Math.floor(spearBaseMATK * (1 + matkPercent / 100))
+
+	// 6. MATK固定値加算
+	const matkFixed = bonuses.MATK || 0
+	const finalSpearMATK = matkAfterPercent + matkFixed
+
+	return {
+		level,
+		weaponType,
+		totalWeaponATK,
+		spearWeaponMATK,
+		baseINT: INT, // 補正後ステータスのINT
+		baseAGI: AGI, // 補正後ステータスのAGI
+		spearStatusMATK,
+		matkUpSTR,
+		matkUpINT,
+		matkUpVIT,
+		matkUpAGI,
+		matkUpDEX,
+		matkUpTotal,
+		matkDownTotal,
+		spearBaseMATK,
+		matkPercent,
+		matkAfterPercent,
+		matkFixed,
+		finalSpearMATK,
+	}
+}
 
 /**
  * HIT計算
@@ -1661,18 +1772,25 @@ export function calculateElementAwakeningAdvantage(
 	// 1. 基本属性覚醒有利計算（25%または0%）
 	let baseElementAwakeningAdvantage = 0
 	
-	// ラフィーは特殊な敵で、属性覚醒が入らないため0を返す
-	if (selectedEnemyId) {
-		const { getEnemyById } = require('@/utils/enemyDatabase')
-		const selectedEnemy = getEnemyById(selectedEnemyId)
-		if (selectedEnemy?.name === 'ラフィー') {
-			baseElementAwakeningAdvantage = 0
-		} else if (powerOptions?.elementAttack === 'advantageous') {
+	// 属性覚醒+25%が適用される条件：
+	// - 敵が無属性でない
+	// - 属性攻撃設定が「有利」の場合のみ
+	// 除外される場合：無・不利属性・有(その他)
+	if (powerOptions?.elementAttack === 'advantageous') {
+		// 無属性の敵（ラフィー・バクザンなど）は属性覚醒が適用されない
+		if (selectedEnemyId) {
+			const { getEnemyById } = require('@/utils/enemyDatabase')
+			const selectedEnemy = getEnemyById(selectedEnemyId)
+			if (!selectedEnemy?.isNonElemental) {
+				baseElementAwakeningAdvantage = 25
+			}
+		} else {
+			// 敵が選択されていない場合は通常通り適用
 			baseElementAwakeningAdvantage = 25
 		}
-	} else if (powerOptions?.elementAttack === 'advantageous') {
-		baseElementAwakeningAdvantage = 25
 	}
+	// powerOptions?.elementAttack が 'none'、'disadvantageous'、'other' の場合は
+	// baseElementAwakeningAdvantage = 0 のまま（属性覚醒+25%は適用されない）
 
 	// 2. 熱情の歌効果計算
 	let hotKnowsEffect = 0
@@ -1775,25 +1893,19 @@ export function calculateINTElementAdvantage(
 	// 1. 武器条件判定
 	const isWeaponApplicable = weaponType === '杖' || weaponType === '魔導具'
 
-	// 2. 属性条件判定（2025年仕様変更対応）
+	// 2. 属性条件判定
 	let isElementApplicable: boolean
-	switch (elementAttack) {
-		case 'advantageous':
-			isElementApplicable = true // 有利属性の場合は適用
-			break
-		case 'disadvantageous':
-			// 2025年仕様変更: 不利属性でも杖・魔導具装備時は適用
-			isElementApplicable = isWeaponApplicable
-			break
-		case 'other':
-		case 'none':
-		default:
-			isElementApplicable = false // その他・無属性の場合は適用されない
-			break
+	
+	if (isWeaponApplicable) {
+		// 杖・魔導具装備時: 属性攻撃（有利・その他・不利）すべてで適用、無属性のみ除外
+		isElementApplicable = elementAttack !== 'none'
+	} else {
+		// その他武器種: 有(有利)攻撃のみで適用
+		isElementApplicable = elementAttack === 'advantageous'
 	}
 
 	// 3. 総合適用可否判定
-	const isApplicable = isWeaponApplicable && isElementApplicable
+	const isApplicable = isElementApplicable
 
 	// 4. 基礎INT補正計算
 	const intElementAdvantage = isApplicable ? Math.floor(baseINT / 10) : 0
@@ -1806,6 +1918,64 @@ export function calculateINTElementAdvantage(
 		isElementApplicable,
 		isApplicable,
 		intElementAdvantage,
+	}
+}
+
+/**
+ * 魔法クリティカル率計算
+ * 魔法クリティカル率(%) = ➀ + ② + ➂
+ * ➀ = INT(物理クリティカル率 × スペルバーストslv / 40)
+ * ② = 敵が衰弱時かつ攻撃が敵の弱点属性の時、INT(物理クリティカル率 / 2) ※杖または魔導具の場合、弱点属性でなくても効果を得る
+ * ➂ = 攻撃の属性が無属性の時、INT(物理クリティカル率 / 4)
+ *
+ * @param physicalCriticalRate 物理クリティカル率（％）
+ * @param spellBurstLevel バフスキルのスペルバースト(sf1)のスキルレベル（0-10）
+ * @param isWeakened 敵が衰弱状態かどうか
+ * @param isWeakElementMatch 攻撃属性が敵の弱点属性と一致するかどうか
+ * @param isStaffOrMagicDevice 杖または魔導具を装備しているかどうか
+ * @param isNeutralElement 攻撃の属性が無属性かどうか
+ * @returns 魔法クリティカル率計算結果
+ */
+export function calculateMagicalCriticalRate(
+	physicalCriticalRate: number,
+	spellBurstLevel = 0,
+	isWeakened = false,
+	isWeakElementMatch = false,
+	isStaffOrMagicDevice = false,
+	isNeutralElement = false,
+): MagicalCriticalRateCalculationSteps {
+	// ➀ スペルバースト効果
+	const spellBurstEffect = Math.floor(
+		(physicalCriticalRate * spellBurstLevel) / 40,
+	)
+
+	// ② 衰弱+弱点属性効果
+	const weakElementCondition =
+		isWeakened && (isWeakElementMatch || isStaffOrMagicDevice)
+	const weakElementEffect = weakElementCondition
+		? Math.floor(physicalCriticalRate / 2)
+		: 0
+
+	// ➂ 無属性攻撃効果
+	const neutralElementEffect = isNeutralElement
+		? Math.floor(physicalCriticalRate / 4)
+		: 0
+
+	// 最終値算出
+	const finalMagicalCriticalRate =
+		spellBurstEffect + weakElementEffect + neutralElementEffect
+
+	return {
+		physicalCriticalRate,
+		spellBurstLevel,
+		spellBurstEffect,
+		isWeakened,
+		isWeakElementMatch,
+		isStaffOrMagicDevice,
+		weakElementEffect,
+		isNeutralElement,
+		neutralElementEffect,
+		finalMagicalCriticalRate,
 	}
 }
 
@@ -1935,4 +2105,18 @@ export function calculateStability(
 		stabilityBeforeLimit,
 		finalStability,
 	}
+}
+
+/**
+ * バフスキルからスペルバーストのレベルを取得
+ * @param buffSkills バフスキルデータ
+ * @returns スペルバーストのレベル（0-10）
+ */
+export function getSpellBurstLevel(buffSkills: Record<string, import('@/types/buffSkill').BuffSkillState>): number {
+	const spellBurstSkill = buffSkills.sf1 // sf1がスペルバーストのID
+	if (!spellBurstSkill || !spellBurstSkill.isEnabled) {
+		return 0
+	}
+	// スペルバーストはtoggle型なので、有効な場合はレベル10として扱う
+	return 10
 }

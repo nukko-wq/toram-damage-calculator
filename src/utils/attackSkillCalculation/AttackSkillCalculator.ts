@@ -15,6 +15,7 @@ import {
 	StormBlazer10StackCalculator,
 	StrikeStabAilmentCalculator,
 	StrikeStabCalculator,
+	ThorHammerSingleCalculator,
 } from './calculators'
 import type {
 	EquipmentContext,
@@ -89,6 +90,8 @@ export class AttackSkillCalculator {
 				return new BusterBladeCalculator()
 			case 'cyclone_arrow':
 				return new CycloneArrowCalculator()
+			case 'thor_hammer_single':
+				return new ThorHammerSingleCalculator()
 			case 'power_shot':
 			case 'dual_strike':
 				return new StandardCalculator()

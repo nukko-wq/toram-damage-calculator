@@ -320,6 +320,7 @@ export interface PresetEnemy {
 	level: number // レベル (1-999)
 	stats: EnemyStats // 基本ステータス
 	category: EnemyCategory // 敵カテゴリ
+	isNonElemental?: boolean // 無属性（属性覚醒が適用されない）
 }
 
 // 個別敵設定（敵ごとの設定値）
@@ -858,7 +859,7 @@ export type AttackSkillCategory =
 	| 'minstrel' // ミンストレルスキル
 
 // 威力参照タイプ
-export type PowerReferenceType = 'totalATK' | 'ATK' | 'MATK' // 将来拡張: 'spearMATK', 'STR', 'INT', etc.
+export type PowerReferenceType = 'totalATK' | 'ATK' | 'MATK' | 'spearMATK' // 将来拡張: 'STR', 'INT', etc.
 
 // 慣れタイプ
 export type AdaptationType = 'physical' | 'magical' | 'normal'

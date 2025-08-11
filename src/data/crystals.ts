@@ -624,6 +624,17 @@ export const crystalsData: CrystalsData = {
 					Critical: -7,
 				},
 			},
+			{
+				id: 'af5e8b04-0b14-43f6-bdc6-88c0a01fcc24',
+				name: 'ピヌグールガ',
+				type: 'normal',
+				properties: {
+					ATK_Rate: 11,
+					MATK_Rate: 11,
+					AttackSpeed: -300,
+					CastingSpeed: -300,
+				},
+			},
 		],
 	},
 } as const

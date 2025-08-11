@@ -272,12 +272,83 @@ function calculateTornadoLanceEffects(
 }
 ```
 
+### 4.5 トールハンマー (hb4)
+```typescript
+{
+  id: 'hb4',
+  name: 'トールハンマー',
+  category: 'halberd',
+  type: 'toggle',
+  order: 505,
+  categoryOrder: 5,
+  description: '魔法貫通率、魔法追撃確率を上昇させ、基礎INTに応じて命中を上昇させる（旋風槍装備時のみ効果）',
+  effects: [
+    {
+      property: 'MagicalPenetration_Rate',
+      formula: '+20',
+      conditions: ['メイン武器が旋風槍の場合のみ']
+    },
+    {
+      property: 'MagicalFollowup_Rate',
+      formula: '+100',
+      conditions: ['メイン武器が旋風槍の場合のみ']
+    },
+    {
+      property: 'Accuracy',
+      formula: '基礎INT',
+      conditions: ['メイン武器が旋風槍の場合のみ']
+    }
+  ],
+  calculationFormula: `
+    旋風槍装備時:
+    - MagicalPenetration_Rate = base + 20%
+    - MagicalFollowup_Rate = base + 100%
+    - Accuracy = base + 基礎INT
+    
+    その他武器装備時:
+    - 効果なし
+  `,
+  example: {
+    baseINT: 255,
+    calculation: 'MagicalPenetration_Rate = +20%, MagicalFollowup_Rate = +100%, Accuracy = +255',
+    result: '魔法貫通率 +20%, 魔法追撃確率 +100%, 命中 +255'
+  },
+  weaponRequirements: [
+    {
+      weaponType: 'halberd',
+      description: 'メイン武器が旋風槍の場合のみ効果があります'
+    }
+  ],
+  uiSettings: {
+    parameterName: 'ON/OFF',
+    showInModal: false,
+    quickToggle: true
+  }
+}
+
+// 実装用の効果計算関数
+function calculateThorHammerEffects(
+  isEnabled: boolean,
+  weaponType: MainWeaponType | null,
+  baseINT: number
+): Partial<EquipmentProperties> {
+  if (!isEnabled || weaponType !== 'halberd') return {}
+  
+  return {
+    MagicalPenetration_Rate: 20,
+    MagicalFollowup_Rate: 100,
+    Accuracy: baseINT
+  }
+}
+```
+
 ## 実装ステータス
 
 - [x] クイックオーラ (hb1) - 設計・実装完了
 - [x] 神速の捌手 (godspeed_parry) - 設計・実装完了
 - [x] 会心の捌き (hb2) - 設計・実装完了
 - [x] トルネードランス (hb3) - 設計・実装完了
+- [x] トールハンマー (hb4) - 設計・実装完了
 
 ## 特徴
 
