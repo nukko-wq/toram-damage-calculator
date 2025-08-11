@@ -260,7 +260,8 @@ export function calculateDamageWithService(
 					}
 					return 25
 				case 'advantageOnly':
-					return finalTotalElementAdvantage // INT補正 + 熱情の歌補正を含む総属性有利のみ
+					// 有利のみ：基本属性有利プロパティ + 熱情の歌効果のみ（INT補正は除外）
+					return baseAdvantage + hotKnowsEffect
 				case 'enabled':
 					// ラフィー選択時は属性覚醒分+25%を無効化
 					if (isRaphy) {
