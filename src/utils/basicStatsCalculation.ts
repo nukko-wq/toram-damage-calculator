@@ -1886,25 +1886,19 @@ export function calculateINTElementAdvantage(
 	// 1. 武器条件判定
 	const isWeaponApplicable = weaponType === '杖' || weaponType === '魔導具'
 
-	// 2. 属性条件判定（2025年仕様変更対応）
+	// 2. 属性条件判定
 	let isElementApplicable: boolean
-	switch (elementAttack) {
-		case 'advantageous':
-			isElementApplicable = true // 有利属性の場合は適用
-			break
-		case 'disadvantageous':
-			// 2025年仕様変更: 不利属性でも杖・魔導具装備時は適用
-			isElementApplicable = isWeaponApplicable
-			break
-		case 'other':
-		case 'none':
-		default:
-			isElementApplicable = false // その他・無属性の場合は適用されない
-			break
+	
+	if (isWeaponApplicable) {
+		// 杖・魔導具装備時: 属性攻撃（有利・その他・不利）すべてで適用、無属性のみ除外
+		isElementApplicable = elementAttack !== 'none'
+	} else {
+		// その他武器種: 有(有利)攻撃のみで適用
+		isElementApplicable = elementAttack === 'advantageous'
 	}
 
 	// 3. 総合適用可否判定
-	const isApplicable = isWeaponApplicable && isElementApplicable
+	const isApplicable = isElementApplicable
 
 	// 4. 基礎INT補正計算
 	const intElementAdvantage = isApplicable ? Math.floor(baseINT / 10) : 0
