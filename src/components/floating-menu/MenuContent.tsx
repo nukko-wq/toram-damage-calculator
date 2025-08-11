@@ -5,6 +5,7 @@ import type { MenuSection } from './hooks/useFloatingMenu'
 
 interface MenuContentProps {
 	activeSection: MenuSection
+	onClose: () => void
 }
 
 function TopContent() {
@@ -68,7 +69,7 @@ function SettingsContent() {
 	)
 }
 
-export default function MenuContent({ activeSection }: MenuContentProps) {
+export default function MenuContent({ activeSection, onClose }: MenuContentProps) {
 	const renderContent = () => {
 		switch (activeSection) {
 			case 'top':
@@ -76,7 +77,7 @@ export default function MenuContent({ activeSection }: MenuContentProps) {
 			case 'sample':
 				return <SampleDataContent />
 			case 'save':
-				return <SaveDataContent />
+				return <SaveDataContent onClose={onClose} />
 			case 'subsystem':
 				return <SubsystemContent />
 			case 'settings':

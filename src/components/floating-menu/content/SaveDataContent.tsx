@@ -7,7 +7,11 @@ import NewSaveDataModal from './modals/NewSaveDataModal'
 import SaveDataActions from './SaveDataActions'
 import SaveDataList from './SaveDataList'
 
-export default function SaveDataContent() {
+interface SaveDataContentProps {
+	onClose: () => void
+}
+
+export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 	// Zustandストアからデータを取得
 	const {
 		data: currentData,
@@ -201,6 +205,7 @@ export default function SaveDataContent() {
 				onItemSelect={handleSaveDataSelect}
 				onItemRename={handleRenameSaveData}
 				onItemDelete={handleDeleteSaveData}
+				onClose={onClose}
 			/>
 
 			{/* 新規作成モーダル */}

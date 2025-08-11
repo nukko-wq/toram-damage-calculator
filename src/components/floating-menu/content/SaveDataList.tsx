@@ -10,12 +10,14 @@ interface SaveDataListProps {
 	onItemSelect: (saveId: string) => void
 	onItemRename: (saveId: string, newName: string) => void
 	onItemDelete: (saveId: string) => void
+	onClose: () => void
 }
 
 export default function SaveDataList({
 	onItemSelect,
 	onItemRename,
 	onItemDelete,
+	onClose,
 }: SaveDataListProps) {
 	const { saveDataList, currentSaveId } = useSaveDataStore()
 
@@ -66,6 +68,7 @@ export default function SaveDataList({
 						onSelect={onItemSelect}
 						onRename={onItemRename}
 						onDelete={onItemDelete}
+						onClose={onClose}
 					/>
 				))}
 			</div>

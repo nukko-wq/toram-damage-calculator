@@ -19,6 +19,7 @@ interface SaveDataItemProps {
 	onSelect: (saveId: string) => void
 	onRename: (saveId: string, newName: string) => void
 	onDelete: (saveId: string) => void
+	onClose: () => void
 }
 
 export default function SaveDataItem({
@@ -27,6 +28,7 @@ export default function SaveDataItem({
 	onSelect,
 	onRename,
 	onDelete,
+	onClose,
 }: SaveDataItemProps) {
 	const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 	const [isRenameModalOpen, setIsRenameModalOpen] = useState(false)
@@ -131,7 +133,10 @@ export default function SaveDataItem({
 				{/* 読み込みボタン - プライマリ */}
 				<button
 					type="button"
-					onClick={() => onSelect(saveData.id)}
+					onClick={() => {
+						onSelect(saveData.id)
+						onClose()
+					}}
 					className="flex items-center space-x-1 px-1.5 sm:px-3 py-1.5 text-xs font-medium text-white bg-blue-400/80 hover:bg-blue-400 rounded-md transition-colors duration-150 cursor-pointer focus:outline-none"
 					title="このセーブデータを読み込む"
 				>
