@@ -1772,18 +1772,25 @@ export function calculateElementAwakeningAdvantage(
 	// 1. 基本属性覚醒有利計算（25%または0%）
 	let baseElementAwakeningAdvantage = 0
 	
-	// 無属性の敵（ラフィー・バクザンなど）は属性覚醒が適用されない
-	if (selectedEnemyId) {
-		const { getEnemyById } = require('@/utils/enemyDatabase')
-		const selectedEnemy = getEnemyById(selectedEnemyId)
-		if (selectedEnemy?.isNonElemental) {
-			baseElementAwakeningAdvantage = 0
-		} else if (powerOptions?.elementAttack === 'advantageous') {
+	// 属性覚醒+25%が適用される条件：
+	// - 敵が無属性でない
+	// - 属性攻撃設定が「有利」の場合のみ
+	// 除外される場合：無・不利属性・有(その他)
+	if (powerOptions?.elementAttack === 'advantageous') {
+		// 無属性の敵（ラフィー・バクザンなど）は属性覚醒が適用されない
+		if (selectedEnemyId) {
+			const { getEnemyById } = require('@/utils/enemyDatabase')
+			const selectedEnemy = getEnemyById(selectedEnemyId)
+			if (!selectedEnemy?.isNonElemental) {
+				baseElementAwakeningAdvantage = 25
+			}
+		} else {
+			// 敵が選択されていない場合は通常通り適用
 			baseElementAwakeningAdvantage = 25
 		}
-	} else if (powerOptions?.elementAttack === 'advantageous') {
-		baseElementAwakeningAdvantage = 25
 	}
+	// powerOptions?.elementAttack が 'none'、'disadvantageous'、'other' の場合は
+	// baseElementAwakeningAdvantage = 0 のまま（属性覚醒+25%は適用されない）
 
 	// 2. 熱情の歌効果計算
 	let hotKnowsEffect = 0
