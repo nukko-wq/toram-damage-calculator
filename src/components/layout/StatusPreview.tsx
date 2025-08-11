@@ -20,6 +20,8 @@ import {
 	calculateINTElementAdvantage,
 	calculateMATK,
 	calculateMagicalCriticalDamage,
+	calculateMagicalCriticalRate,
+	getSpellBurstLevel,
 	calculateMagicalResistance,
 	calculateMotionSpeed,
 	calculateMP,
@@ -423,6 +425,47 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		)
 		: null
 
+	// 魔法クリティカル率計算（DamagePreviewの設定を考慮）
+	const magicalCriticalRateCalculation = useMemo(() => {
+		// 物理クリティカル率を取得
+		const physicalCriticalRate = criticalRateCalculation.finalCriticalRate
+		
+		// スペルバーストレベル取得
+		const spellBurstLevel = getSpellBurstLevel(data.buffSkills.skills)
+		
+		// 武器種判定（杖または魔導具）
+		const isStaffOrMagicDevice = data.mainWeapon.weaponType === '杖' || data.mainWeapon.weaponType === '魔導具'
+		
+		// DamagePreviewの設定を取得
+		const powerOptions = data.powerOptions || { elementAttack: 'none' }
+		const otherOptions = data.otherOptions || { enemyStatusWeaken: 'none' }
+		
+		// 衰弱状態の判定
+		const isWeakened = otherOptions.enemyStatusWeaken === 'applied'
+		
+		// 弱点属性一致の判定
+		const isWeakElementMatch = powerOptions.elementAttack === 'advantageous'
+		
+		// 無属性攻撃の判定
+		const isNeutralElement = powerOptions.elementAttack === 'none'
+		
+		// 魔法クリティカル率計算（全条件を考慮）
+		return calculateMagicalCriticalRate(
+			physicalCriticalRate,
+			spellBurstLevel,
+			isWeakened,
+			isWeakElementMatch,
+			isStaffOrMagicDevice,
+			isNeutralElement,
+		)
+	}, [
+		criticalRateCalculation, 
+		data.buffSkills.skills, 
+		data.mainWeapon.weaponType,
+		data.powerOptions,
+		data.otherOptions
+	])
+
 	// 総ATK計算（ATK・サブATK計算結果が必要なため、useMemoの外で実行）
 	const totalATKCalculation = calculateTotalATK(
 		data.mainWeapon.weaponType,
@@ -471,7 +514,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			})(),
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
-			magicCriticalRate: 0,
+			magicCriticalRate: magicalCriticalRateCalculation.finalMagicalCriticalRate,
 			magicCriticalDamage:
 				magicalCriticalDamageCalculation.finalMagicalCriticalDamage,
 			totalElementAdvantage: 

@@ -459,6 +459,20 @@ export interface CriticalDamageCalculationSteps {
 	finalCriticalDamage: number // 最終クリティカルダメージ
 }
 
+// 魔法クリティカル率計算の詳細ステップ
+export interface MagicalCriticalRateCalculationSteps {
+	physicalCriticalRate: number // 物理クリティカル率（％）
+	spellBurstLevel: number // スペルバーストスキルレベル（0-10）
+	spellBurstEffect: number // スペルバースト効果値
+	isWeakened: boolean // 敵が衰弱状態か
+	isWeakElementMatch: boolean // 弱点属性と一致するか
+	isStaffOrMagicDevice: boolean // 杖または魔導具か
+	weakElementEffect: number // 衰弱+弱点属性効果値
+	isNeutralElement: boolean // 無属性攻撃か
+	neutralElementEffect: number // 無属性攻撃効果値
+	finalMagicalCriticalRate: number // 最終魔法クリティカル率
+}
+
 // 魔法クリティカルダメージ計算の詳細ステップ
 export interface MagicalCriticalDamageCalculationSteps {
 	physicalCriticalDamage: number // 物理クリティカルダメージ（半減処理適用済み）
@@ -1907,6 +1921,64 @@ export function calculateINTElementAdvantage(
 }
 
 /**
+ * 魔法クリティカル率計算
+ * 魔法クリティカル率(%) = ➀ + ② + ➂
+ * ➀ = INT(物理クリティカル率 × スペルバーストslv / 40)
+ * ② = 敵が衰弱時かつ攻撃が敵の弱点属性の時、INT(物理クリティカル率 / 2) ※杖または魔導具の場合、弱点属性でなくても効果を得る
+ * ➂ = 攻撃の属性が無属性の時、INT(物理クリティカル率 / 4)
+ *
+ * @param physicalCriticalRate 物理クリティカル率（％）
+ * @param spellBurstLevel バフスキルのスペルバースト(sf1)のスキルレベル（0-10）
+ * @param isWeakened 敵が衰弱状態かどうか
+ * @param isWeakElementMatch 攻撃属性が敵の弱点属性と一致するかどうか
+ * @param isStaffOrMagicDevice 杖または魔導具を装備しているかどうか
+ * @param isNeutralElement 攻撃の属性が無属性かどうか
+ * @returns 魔法クリティカル率計算結果
+ */
+export function calculateMagicalCriticalRate(
+	physicalCriticalRate: number,
+	spellBurstLevel = 0,
+	isWeakened = false,
+	isWeakElementMatch = false,
+	isStaffOrMagicDevice = false,
+	isNeutralElement = false,
+): MagicalCriticalRateCalculationSteps {
+	// ➀ スペルバースト効果
+	const spellBurstEffect = Math.floor(
+		(physicalCriticalRate * spellBurstLevel) / 40,
+	)
+
+	// ② 衰弱+弱点属性効果
+	const weakElementCondition =
+		isWeakened && (isWeakElementMatch || isStaffOrMagicDevice)
+	const weakElementEffect = weakElementCondition
+		? Math.floor(physicalCriticalRate / 2)
+		: 0
+
+	// ➂ 無属性攻撃効果
+	const neutralElementEffect = isNeutralElement
+		? Math.floor(physicalCriticalRate / 4)
+		: 0
+
+	// 最終値算出
+	const finalMagicalCriticalRate =
+		spellBurstEffect + weakElementEffect + neutralElementEffect
+
+	return {
+		physicalCriticalRate,
+		spellBurstLevel,
+		spellBurstEffect,
+		isWeakened,
+		isWeakElementMatch,
+		isStaffOrMagicDevice,
+		weakElementEffect,
+		isNeutralElement,
+		neutralElementEffect,
+		finalMagicalCriticalRate,
+	}
+}
+
+/**
  * 魔法クリティカルダメージ計算
  * 魔法クリティカルダメージ = INT(100 + (クリティカルダメージ - 100) × (20 + スペルバーストslv) / 40)
  *
@@ -2032,4 +2104,18 @@ export function calculateStability(
 		stabilityBeforeLimit,
 		finalStability,
 	}
+}
+
+/**
+ * バフスキルからスペルバーストのレベルを取得
+ * @param buffSkills バフスキルデータ
+ * @returns スペルバーストのレベル（0-10）
+ */
+export function getSpellBurstLevel(buffSkills: Record<string, import('@/types/buffSkill').BuffSkillState>): number {
+	const spellBurstSkill = buffSkills.sf1 // sf1がスペルバーストのID
+	if (!spellBurstSkill || !spellBurstSkill.isEnabled) {
+		return 0
+	}
+	// スペルバーストはtoggle型なので、有効な場合はレベル10として扱う
+	return 10
 }

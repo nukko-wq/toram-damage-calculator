@@ -15,6 +15,8 @@ import {
 	calculateHP,
 	calculateMATK,
 	calculateMagicalCriticalDamage,
+	calculateMagicalCriticalRate,
+	getSpellBurstLevel,
 	calculateMagicalResistance,
 	calculateSpearMATK,
 	calculateMotionSpeed,
@@ -108,11 +110,20 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		allBonuses,
 	)
 
-	// 8-3. 魔法クリティカルダメージ計算
-	// バフスキルからスペルバーストの状態を取得
-	// スペルバーストはtoggleタイプで、有効時はレベル10として扱う
-	const spellBurstSkill = data.buffSkills.skills.sf1
-	const spellBurstLevel = spellBurstSkill?.isEnabled ? 10 : 0
+	// 8-3. 魔法クリティカル率計算
+	// NOTE: 現在は敵状態・属性関係の情報がないため、スペルバーストのみの計算
+	// 実際のダメージ計算時にDamagePreviewのオプション設定と連携する
+	const spellBurstLevel = getSpellBurstLevel(data.buffSkills.skills)
+	const magicalCriticalRateCalculation = calculateMagicalCriticalRate(
+		criticalRateCalculation.finalCriticalRate,
+		spellBurstLevel,
+		false, // 衰弱状態（ダメージ計算時に設定）
+		false, // 弱点属性一致（ダメージ計算時に設定）
+		data.mainWeapon.weaponType === '杖' || data.mainWeapon.weaponType === '魔導具', // 杖または魔導具
+		false, // 無属性攻撃（ダメージ計算時に設定）
+	)
+
+	// 8-4. 魔法クリティカルダメージ計算
 	const magicalCriticalDamageCalculation = calculateMagicalCriticalDamage(
 		criticalDamageCalculation.finalCriticalDamage,
 		spellBurstLevel,
@@ -206,7 +217,7 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 				subATKCalculation?.subStability || data.subWeapon.stability,
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
-			magicCriticalRate: 0, // 暫定
+			magicCriticalRate: magicalCriticalRateCalculation.finalMagicalCriticalRate, // 魔法クリティカル率計算結果
 			magicCriticalDamage:
 				magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
 			totalElementAdvantage:
