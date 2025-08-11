@@ -320,6 +320,7 @@ export interface PresetEnemy {
 	level: number // レベル (1-999)
 	stats: EnemyStats // 基本ステータス
 	category: EnemyCategory // 敵カテゴリ
+	isNonElemental?: boolean // 無属性（属性覚醒が適用されない）
 }
 
 // 個別敵設定（敵ごとの設定値）

@@ -1772,11 +1772,11 @@ export function calculateElementAwakeningAdvantage(
 	// 1. 基本属性覚醒有利計算（25%または0%）
 	let baseElementAwakeningAdvantage = 0
 	
-	// ラフィーは特殊な敵で、属性覚醒が入らないため0を返す
+	// 無属性の敵（ラフィー・バクザンなど）は属性覚醒が適用されない
 	if (selectedEnemyId) {
 		const { getEnemyById } = require('@/utils/enemyDatabase')
 		const selectedEnemy = getEnemyById(selectedEnemyId)
-		if (selectedEnemy?.name === 'ラフィー') {
+		if (selectedEnemy?.isNonElemental) {
 			baseElementAwakeningAdvantage = 0
 		} else if (powerOptions?.elementAttack === 'advantageous') {
 			baseElementAwakeningAdvantage = 25

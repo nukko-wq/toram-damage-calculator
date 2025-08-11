@@ -29,6 +29,7 @@ export const enemiesData: EnemiesData = {
 					requiredHIT: 0,
 				},
 				category: 'mob',
+				isNonElemental: true,
 			},
 			{
 				id: 'ffc25bc7-9085-4959-9f4a-dedd996bef9d',
@@ -159,6 +160,7 @@ export const enemiesData: EnemiesData = {
 					requiredHIT: 0,
 				},
 				category: 'boss',
+				isNonElemental: true,
 			},
 		],
 		raidBoss: [
