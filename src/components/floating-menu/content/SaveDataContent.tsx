@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useCalculatorStore, useSaveDataStore } from '@/stores'
 import NewSaveDataModal from './modals/NewSaveDataModal'
 
@@ -216,12 +217,30 @@ export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 			/>
 
 			{/* 未保存変更の確認モーダル */}
-			{showUnsavedChangesModal && (
-				<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-					<div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+			{showUnsavedChangesModal && createPortal(
+				<div 
+					className="fixed inset-0 bg-black/50 flex items-center justify-center z-[10000]"
+					onMouseDown={(e) => e.stopPropagation()}
+					onClick={(e) => {
+						// 背景クリックで閉じる
+						if (e.target === e.currentTarget) {
+							handleCancelSwitch()
+						}
+					}}
+				>
+					<div 
+						className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4"
+						onClick={(e) => e.stopPropagation()}
+						role="dialog"
+						aria-labelledby="unsaved-changes-modal-title"
+						aria-modal="true"
+					>
 						{/* ヘッダー */}
 						<div className="flex items-center justify-between p-6 border-b border-gray-200">
-							<h3 className="text-lg font-medium text-gray-900">
+							<h3 
+								id="unsaved-changes-modal-title"
+								className="text-lg font-medium text-gray-900"
+							>
 								未保存の変更があります
 							</h3>
 							<button
@@ -300,7 +319,8 @@ export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 							</button>
 						</div>
 					</div>
-				</div>
+				</div>,
+				document.body
 			)}
 		</div>
 	)
