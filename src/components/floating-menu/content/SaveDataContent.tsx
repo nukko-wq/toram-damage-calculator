@@ -57,6 +57,8 @@ export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 			const loadedData = await switchSaveData(saveId)
 			// calculatorStoreにデータを読み込んで未保存変更フラグをリセット（同期的に実行）
 			await loadSaveData(loadedData)
+			// 未保存の変更がない場合はフロートメニューを閉じる
+			onClose()
 		} catch (err) {
 			console.error('セーブデータの切り替えに失敗しました:', err)
 		}
@@ -108,6 +110,8 @@ export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 				const loadedData = await switchSaveData(pendingSaveId)
 				// calculatorStoreにデータを読み込んで未保存変更フラグをリセット（同期的に実行）
 				await loadSaveData(loadedData)
+				// フロートメニューを閉じる
+				onClose()
 			} catch (err) {
 				console.error('セーブデータの切り替えに失敗しました:', err)
 			}
@@ -129,6 +133,8 @@ export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 				const loadedData = await switchSaveData(pendingSaveId)
 				// calculatorStoreにデータを読み込んで未保存変更フラグをリセット（同期的に実行）
 				await loadSaveData(loadedData)
+				// フロートメニューを閉じる
+				onClose()
 			} catch (err) {
 				console.error('セーブデータの切り替えに失敗しました:', err)
 			}
