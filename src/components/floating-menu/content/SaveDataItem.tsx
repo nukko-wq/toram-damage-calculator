@@ -135,7 +135,6 @@ export default function SaveDataItem({
 					type="button"
 					onClick={() => {
 						onSelect(saveData.id)
-						onClose()
 					}}
 					className="flex items-center space-x-1 px-1.5 sm:px-3 py-1.5 text-xs font-medium text-white bg-blue-400/80 hover:bg-blue-400 rounded-md transition-colors duration-150 cursor-pointer focus:outline-none"
 					title="このセーブデータを読み込む"

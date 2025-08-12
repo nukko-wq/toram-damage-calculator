@@ -197,6 +197,12 @@ export interface UIStore {
 		'base' | 'physical' | 'magical' | 'hybrid' | 'tank'
 	>
 
+	// StatusPreviewの高さ管理（ピクセル値）
+	statusPreviewHeight: number
+	
+	// DamagePreviewの高さ管理（ピクセル値）
+	damagePreviewHeight: number
+
 	setShowSaveManager: (value: boolean) => void
 	setShowUpdateNotifications: (value: boolean) => void
 	setShowStatusPreview: (show: boolean) => void
@@ -212,6 +218,12 @@ export interface UIStore {
 		saveId: string,
 		category: 'base' | 'physical' | 'magical' | 'hybrid' | 'tank',
 	) => void
+
+	// StatusPreviewの高さ管理
+	setStatusPreviewHeight: (height: number) => void
+	
+	// DamagePreviewの高さ管理
+	setDamagePreviewHeight: (height: number) => void
 }
 
 // ===== セーブデータストア =====
