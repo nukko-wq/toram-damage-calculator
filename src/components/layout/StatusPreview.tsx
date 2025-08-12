@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useResponsiveStateManager } from '@/hooks/useKeyboardShortcut'
 import { useCalculatorStore, useSaveDataStore, useUIStore } from '@/stores'
 import type { FilterOption } from '@/types/bonusCalculation'
@@ -114,7 +114,18 @@ const INITIAL_VISIBLE_SECTIONS = {
 export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const { data } = useCalculatorStore()
 	const { currentSaveId } = useSaveDataStore()
-	const { getStatusPreviewCategory, setStatusPreviewCategory } = useUIStore()
+	const { 
+		getStatusPreviewCategory, 
+		setStatusPreviewCategory,
+		statusPreviewHeight,
+		setStatusPreviewHeight 
+	} = useUIStore()
+
+	// リサイズ関連の状態管理
+	const containerRef = useRef<HTMLDivElement>(null)
+	const [isResizing, setIsResizing] = useState(false)
+	const [startY, setStartY] = useState(0)
+	const [startHeight, setStartHeight] = useState(statusPreviewHeight)
 
 	// レスポンシブ状態管理をカスタムフックで最適化
 	const {
@@ -153,6 +164,57 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			[section]: value,
 		}))
 	}
+
+	// リサイズ関連のイベントハンドラー
+	const handleMouseDown = useCallback((e: React.MouseEvent) => {
+		setIsResizing(true)
+		setStartY(e.clientY)
+		setStartHeight(statusPreviewHeight)
+		e.preventDefault()
+	}, [statusPreviewHeight])
+
+	const handleTouchStart = useCallback((e: React.TouchEvent) => {
+		setIsResizing(true)
+		setStartY(e.touches[0].clientY)
+		setStartHeight(statusPreviewHeight)
+		e.preventDefault()
+	}, [statusPreviewHeight])
+
+	const handleMouseMove = useCallback((e: MouseEvent) => {
+		if (!isResizing) return
+		const deltaY = e.clientY - startY
+		const newHeight = startHeight + deltaY // 下に動かすと高さを大きく、上に動かすと高さを小さく
+		setStatusPreviewHeight(newHeight)
+	}, [isResizing, startY, startHeight, setStatusPreviewHeight])
+
+	const handleTouchMove = useCallback((e: TouchEvent) => {
+		if (!isResizing) return
+		const deltaY = e.touches[0].clientY - startY
+		const newHeight = startHeight + deltaY
+		setStatusPreviewHeight(newHeight)
+		e.preventDefault()
+	}, [isResizing, startY, startHeight, setStatusPreviewHeight])
+
+	const handleEnd = useCallback(() => {
+		setIsResizing(false)
+	}, [])
+
+	// リサイズイベントの登録
+	useEffect(() => {
+		if (isResizing) {
+			document.addEventListener('mousemove', handleMouseMove)
+			document.addEventListener('mouseup', handleEnd)
+			document.addEventListener('touchmove', handleTouchMove, { passive: false })
+			document.addEventListener('touchend', handleEnd)
+
+			return () => {
+				document.removeEventListener('mousemove', handleMouseMove)
+				document.removeEventListener('mouseup', handleEnd)
+				document.removeEventListener('touchmove', handleTouchMove)
+				document.removeEventListener('touchend', handleEnd)
+			}
+		}
+	}, [isResizing, handleMouseMove, handleTouchMove, handleEnd])
 
 	// 正確なHP・MP計算を実行
 	const baseStats = data.baseStats
@@ -1091,8 +1153,30 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// 現在は仮値だが、将来的には calculateEquipmentBonuses の結果を使用
 
 	return (
-		<div className="">
-			<div className="flex flex-col items-center px-1 sm:px-4 py-2">
+		<div 
+			ref={containerRef}
+			className="relative bg-blue-50"
+			style={{ height: `${statusPreviewHeight}px`, overflow: 'hidden' }}
+		>
+			{/* リサイズハンドル */}
+			<div
+				className={`absolute bottom-0 left-0 right-0 h-3 bg-blue-200/50 hover:bg-blue-300/70 cursor-row-resize flex items-center justify-center transition-colors ${
+					isResizing ? 'bg-blue-400/70' : ''
+				}`}
+				onMouseDown={handleMouseDown}
+				onTouchStart={handleTouchStart}
+				tabIndex={0}
+				role="button"
+				aria-label="StatusPreviewの高さを調整"
+				title="ドラッグして高さを調整"
+			>
+				<div className="w-8 h-1 bg-gray-400 rounded-full" />
+			</div>
+			
+			<div 
+				className="flex flex-col items-center px-1 sm:px-4 py-2 h-full overflow-y-auto"
+				style={{ paddingBottom: '12px' }} // リサイズハンドル分のスペースを確保
+			>
 				{/* セクション表示切り替えボタン */}
 				<div className="mb-3 flex flex-wrap gap-2">
 					<button
