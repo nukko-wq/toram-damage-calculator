@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useCalculatorStore } from '@/stores/calculatorStore'
+import { useUIStore } from '@/stores'
 import type {
 	OptionTabType,
 	OtherOptions,
@@ -32,6 +33,18 @@ interface DamagePreviewProps {
 }
 
 export default function DamagePreview({ isVisible }: DamagePreviewProps) {
+	// UIStoreから高さ管理を取得
+	const { 
+		damagePreviewHeight,
+		setDamagePreviewHeight 
+	} = useUIStore()
+
+	// リサイズ関連の状態管理
+	const containerRef = useRef<HTMLDivElement>(null)
+	const [isResizing, setIsResizing] = useState(false)
+	const [startY, setStartY] = useState(0)
+	const [startHeight, setStartHeight] = useState(damagePreviewHeight)
+
 	// 威力オプション設定をZustandストアから取得（フォールバック付き）
 	const powerOptions =
 		useCalculatorStore((state) => state.data.powerOptions) ||
@@ -202,6 +215,57 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		updateOptionTab(tab)
 	}, [updateOptionTab])
 
+	// リサイズ関連のイベントハンドラー
+	const handleMouseDown = useCallback((e: React.MouseEvent) => {
+		setIsResizing(true)
+		setStartY(e.clientY)
+		setStartHeight(damagePreviewHeight)
+		e.preventDefault()
+	}, [damagePreviewHeight])
+
+	const handleTouchStart = useCallback((e: React.TouchEvent) => {
+		setIsResizing(true)
+		setStartY(e.touches[0].clientY)
+		setStartHeight(damagePreviewHeight)
+		e.preventDefault()
+	}, [damagePreviewHeight])
+
+	const handleMouseMove = useCallback((e: MouseEvent) => {
+		if (!isResizing) return
+		const deltaY = e.clientY - startY
+		const newHeight = startHeight + deltaY // 下に動かすと高さを大きく、上に動かすと高さを小さく
+		setDamagePreviewHeight(newHeight)
+	}, [isResizing, startY, startHeight, setDamagePreviewHeight])
+
+	const handleTouchMove = useCallback((e: TouchEvent) => {
+		if (!isResizing) return
+		const deltaY = e.touches[0].clientY - startY
+		const newHeight = startHeight + deltaY
+		setDamagePreviewHeight(newHeight)
+		e.preventDefault()
+	}, [isResizing, startY, startHeight, setDamagePreviewHeight])
+
+	const handleEnd = useCallback(() => {
+		setIsResizing(false)
+	}, [])
+
+	// リサイズイベントの登録
+	useEffect(() => {
+		if (isResizing) {
+			document.addEventListener('mousemove', handleMouseMove)
+			document.addEventListener('mouseup', handleEnd)
+			document.addEventListener('touchmove', handleTouchMove, { passive: false })
+			document.addEventListener('touchend', handleEnd)
+
+			return () => {
+				document.removeEventListener('mousemove', handleMouseMove)
+				document.removeEventListener('mouseup', handleEnd)
+				document.removeEventListener('touchmove', handleTouchMove)
+				document.removeEventListener('touchend', handleEnd)
+			}
+		}
+	}, [isResizing, handleMouseMove, handleTouchMove, handleEnd])
+
 	if (!isVisible) {
 		return null
 	}
@@ -218,8 +282,30 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	}
 
 	return (
-		<div className="bg-blue-50 py-1 sm:py-2">
-			<div className="container mx-auto px-4">
+		<div 
+			ref={containerRef}
+			className="relative bg-blue-50"
+			style={{ height: `${damagePreviewHeight}px`, overflow: 'hidden' }}
+		>
+			{/* リサイズハンドル */}
+			<div
+				className={`absolute bottom-0 left-0 right-0 h-3 bg-blue-200/50 hover:bg-blue-300/70 cursor-row-resize flex items-center justify-center transition-colors ${
+					isResizing ? 'bg-blue-400/70' : ''
+				}`}
+				onMouseDown={handleMouseDown}
+				onTouchStart={handleTouchStart}
+				tabIndex={0}
+				role="button"
+				aria-label="DamagePreviewの高さを調整"
+				title="ドラッグして高さを調整"
+			>
+				<div className="w-8 h-1 bg-gray-400 rounded-full" />
+			</div>
+			
+			<div 
+				className="container mx-auto px-4 h-full overflow-y-auto py-1 sm:py-2"
+				style={{ paddingBottom: '12px' }} // リサイズハンドル分のスペースを確保
+			>
 				{/* ダメージ表示テーブル */}
 				<div className="overflow-x-auto">
 					<table className="w-full text-sm">

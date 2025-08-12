@@ -36,6 +36,7 @@ export const useUIStore = create<UIStore>()(
 				showDamagePreview: false,
 				statusPreviewCategories: getInitialStatusPreviewCategories(),
 				statusPreviewHeight: 400, // デフォルトの高さ（400px）
+				damagePreviewHeight: 600, // デフォルトの高さ（600px）
 
 				// ===== アクション =====
 				setShowSaveManager: (value) => {
@@ -97,12 +98,22 @@ export const useUIStore = create<UIStore>()(
 					const clampedHeight = Math.max(minHeight, Math.min(maxHeight, height))
 					set({ statusPreviewHeight: clampedHeight }, false, 'setStatusPreviewHeight')
 				},
+
+				// ===== DamagePreviewの高さ管理 =====
+				setDamagePreviewHeight: (height) => {
+					// 最小高さと最大高さを制限
+					const minHeight = 200
+					const maxHeight = 600
+					const clampedHeight = Math.max(minHeight, Math.min(maxHeight, height))
+					set({ damagePreviewHeight: clampedHeight }, false, 'setDamagePreviewHeight')
+				},
 			}),
 			{
 				name: 'ui-store',
 				partialize: (state) => ({
 					statusPreviewCategories: state.statusPreviewCategories,
 					statusPreviewHeight: state.statusPreviewHeight,
+					damagePreviewHeight: state.damagePreviewHeight,
 				}),
 			},
 		),
