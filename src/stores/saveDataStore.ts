@@ -40,7 +40,6 @@ export const useSaveDataStore = create<SaveDataStore>()(
 			isInitialized: false,
 			error: null,
 			pendingSaveId: null,
-			showUnsavedChangesModal: false,
 
 			// ===== セーブデータ一覧読み込み（ユーザー作成データのみ） =====
 			loadSaveDataList: async () => {
@@ -194,9 +193,6 @@ export const useSaveDataStore = create<SaveDataStore>()(
 				set({ pendingSaveId: saveId })
 			},
 
-			setShowUnsavedChangesModal: (value) => {
-				set({ showUnsavedChangesModal: value })
-			},
 
 			setError: (error) => {
 				set({ error })

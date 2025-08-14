@@ -234,7 +234,6 @@ export interface SaveDataStore {
 	isInitialized: boolean
 	error: string | null
 	pendingSaveId: string | null
-	showUnsavedChangesModal: boolean
 
 	loadSaveDataList: () => Promise<void>
 	switchSaveData: (saveId: string) => Promise<CalculatorData>
@@ -248,7 +247,6 @@ export interface SaveDataStore {
 	switchToMainData: () => Promise<CalculatorData>
 
 	setPendingSaveId: (saveId: string | null) => void
-	setShowUnsavedChangesModal: (value: boolean) => void
 	setError: (error: string | null) => void
 
 	// ===== ステータス計算結果表示アクション =====

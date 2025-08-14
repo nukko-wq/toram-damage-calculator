@@ -635,6 +635,16 @@ export const crystalsData: CrystalsData = {
 					CastingSpeed: -300,
 				},
 			},
+			{
+				id: '04adc4c6-3f9c-4448-8fb0-9186ffe48e25',
+				name: 'コロン大親分',
+				type: 'normal',
+				properties: {
+					MATK_Rate: 10,
+					Critical_Rate: 20,
+					Accuracy: -40,
+				},
+			},
 		],
 	},
 } as const
