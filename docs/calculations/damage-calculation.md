@@ -23,10 +23,37 @@
 最終クリティカルダメージ = クリティカルダメージ × 安定率ランダム係数
 ```
 
-**重要な計算の違い**:
-- **基本ダメージ（白ダメ）**: スキル倍率はINT(スキル倍率)/100で計算（先に小数点切り捨て）
-- **クリティカルダメージ**: 固定値加算後にクリティカルダメージを適用し、その後属性有利、スキル倍率を順に適用
-- その他のステップは両方とも各ステップで小数点以下を切り捨て（INT適用）
+### Grazeダメージ計算式
+**注意**: 現在の実装では、Grazeダメージは暫定的に `基本ダメージ × 0.1` として計算されています。
+
+```
+現在の実装:
+Grazeダメージ = 基本ダメージ × 0.1
+
+実装予定の正式な計算式:
+Grazeダメージ = Criticalダメージと同じ計算過程
+最終Grazeダメージ = Grazeダメージ × Graze用安定率ランダム係数
+```
+
+**Graze安定率の計算（実装予定）**:
+- 基本安定率を半減（小数点以下切り捨て）して最小値とする
+- 最大値は100%のまま
+- 例: 基本安定率100% → Graze最小50% ～ 最大100%
+- 例: 基本安定率90% → Graze最小45% ～ 最大100%
+
+### ダメージ判定の実装状況
+
+#### 現在実装済みの判定タイプ
+1. **white（白ダメ）**: 基本ダメージに安定率を適用
+2. **critical（クリティカル）**: 固定値加算後にクリティカルダメージ倍率を適用、その後通常の計算過程
+3. **graze（グレイズ）**: 現在は暫定的に基本ダメージ×0.1として実装（本来の仕様とは異なる）
+4. **expected（期待値）**: 平均ダメージを固定値として表示
+
+#### 計算過程の共通性
+- **基本ダメージ（白ダメ）**: 全10ステップの通常計算過程
+- **クリティカルダメージ**: ステップ2後にクリティカル倍率適用、その後ステップ3～10を継続
+- **Grazeダメージ（実装予定）**: クリティカルダメージと同じ計算過程、安定率のみ半減
+- 全ステップで各段階ごとに小数点以下を切り捨て（INT適用）
 
 **クリティカルダメージ%の参照**:
 - 基本ステータスのクリティカルダメージ値を使用
@@ -54,16 +81,80 @@
 ランダム係数 = (70 + ランダム(0-30)) / 100
 ```
 
+#### Graze安定率の計算例
+
+**現在の実装**:
+```
+基本ダメージ: 30,000
+Grazeダメージ = 30,000 × 0.1 = 3,000（固定）
+```
+
+**実装予定の正式な計算**:
+```
+クリティカルダメージ: 30,000
+基本安定率: 70%
+
+Graze最小安定率 = Math.floor(70% / 2) = Math.floor(35) = 35%
+Graze最小ダメージ = 30,000 × 35% = 10,500
+Graze最大ダメージ = 30,000 × 100% = 30,000
+Grazeダメージ範囲: 10,500 ～ 30,000
+
+Grazeランダム係数 = (35 + ランダム(0-65)) / 100
+```
+
 **データソース**: `calculationResults.basicStats.stabilityRate`
 
+### 実装における安定率の適用方法
+
+#### damageCalculationService.ts の実装
+現在の`damageCalculationService.ts`では、ダメージ判定タイプに応じて以下のように処理されています：
+
+1. **white（白ダメ）**: 
+   - 最小ダメージ = `Math.floor(baseDamage * stabilityRate / 100)`
+   - 最大ダメージ = `baseDamage`
+   - 平均ダメージ = `Math.floor((minDamage + maxDamage) / 2)`
+
+2. **critical（クリティカル）**:
+   - 基本ダメージが既にクリティカル倍率適用済み
+   - 安定率の適用方法は白ダメと同じ
+
+3. **graze（グレイズ）**:
+   - 現在: `Math.floor(baseDamage * 0.1)` でグレイズベースダメージを計算
+   - 安定率適用: グレイズベースダメージに対して通常の安定率を適用
+   - **実装予定**: 安定率を半減してから適用する仕様
+
+4. **expected（期待値）**:
+   - 平均ダメージ = `Math.floor(baseDamage * averageStabilityRate / 100)`
+   - 最小・最大・平均すべて同じ値として表示
+
 #### 安定率別ダメージ例
-| 安定率 | 基本ダメージ | 最小ダメージ | 最大ダメージ | ダメージ幅 |
-|--------|-------------|-------------|-------------|-----------|
-| 50%    | 10,000      | 5,000       | 10,000      | 5,000     |
-| 70%    | 10,000      | 7,000       | 10,000      | 3,000     |
-| 85%    | 10,000      | 8,500       | 10,000      | 1,500     |
-| 95%    | 10,000      | 9,500       | 10,000      | 500       |
-| 100%   | 10,000      | 10,000      | 10,000      | 0         |
+
+**白ダメ・クリティカルダメージ**:
+| 安定率 | 基本ダメージ | 最小ダメージ | 最大ダメージ | 平均ダメージ |
+|--------|-------------|-------------|-------------|-------------|
+| 50%    | 10,000      | 5,000       | 10,000      | 7,500       |
+| 70%    | 10,000      | 7,000       | 10,000      | 8,500       |
+| 85%    | 10,000      | 8,500       | 10,000      | 9,250       |
+| 95%    | 10,000      | 9,500       | 10,000      | 9,750       |
+| 100%   | 10,000      | 10,000      | 10,000      | 10,000      |
+
+**Grazeダメージ（現在の実装）**:
+| 安定率 | 基本ダメージ | Graze基準値 | Graze最小 | Graze最大 | Graze平均 |
+|--------|-------------|-------------|-----------|-----------|-----------|
+| 50%    | 10,000      | 1,000       | 500       | 1,000     | 750       |
+| 70%    | 10,000      | 1,000       | 700       | 1,000     | 850       |
+| 85%    | 10,000      | 1,000       | 850       | 1,000     | 925       |
+| 95%    | 10,000      | 1,000       | 950       | 1,000     | 975       |
+| 100%   | 10,000      | 1,000       | 1,000     | 1,000     | 1,000     |
+
+**Grazeダメージ（実装予定の正式仕様）**:
+| 安定率 | クリティカル | Graze最小安定率 | Graze最小 | Graze最大 | Graze平均 |
+|--------|-------------|---------------|-----------|-----------|-----------|
+| 50%    | 15,000      | 25%           | 3,750     | 15,000    | 9,375     |
+| 70%    | 15,000      | 35%           | 5,250     | 15,000    | 10,125    |
+| 85%    | 15,000      | 42%           | 6,300     | 15,000    | 10,650    |
+| 95%    | 15,000      | 47%           | 7,050     | 15,000    | 11,025    |
+| 100%   | 15,000      | 50%           | 7,500     | 15,000    | 11,250    |
 
 ### 計算ステップ分解
 
@@ -118,8 +209,8 @@ INT(9779.3 - 121.55) = INT(9657.75) = 9657
 - スキル倍率334.4% → INT(334.4) = 334% として計算
 - スキル倍率120.9% → INT(120.9) = 120% として計算
 
-#### ステップ2a: クリティカルダメージ補正（クリティカル時のみ）
-クリティカルダメージ時は、固定値加算の後にクリティカルダメージ倍率を適用します。
+#### ステップ2a: クリティカルダメージ補正（クリティカル・Graze時のみ）
+クリティカルダメージ時およびGraze時は、固定値加算の後にクリティカルダメージ倍率を適用します。
 
 ```
 クリティカル適用後 = INT(固定値適用後 × クリティカルダメージ%)
@@ -130,6 +221,7 @@ INT(9779.3 - 121.55) = INT(9657.75) = 9657
 - その後は通常と同じ順序で属性有利、スキル倍率を適用
 - 基本ステータスのクリティカルダメージ値（例: 125%）を使用
 - calculationResults.basicStats.criticalDamageから取得
+- **重要**: GrazeダメージもCriticalと同じ計算過程を経て、最終的に安定率のみ変更
 
 **例**:
 - 固定値適用後: 10302、クリティカルダメージ: 336%
@@ -140,7 +232,7 @@ INT(9779.3 - 121.55) = INT(9657.75) = 9657
 抜刀%適用後 = INT(クリティカル適用後 × (1 + 抜刀%/100))
 ```
 
-**注意**: クリティカル時は「クリティカル適用後」の値を、通常時は「スキル倍率適用後」の値を使用します。
+**注意**: クリティカル・Graze時は「クリティカル適用後」の値を、通常時は「スキル倍率適用後」の値を使用します。
 
 #### ステップ6: 慣れ補正
 ```
@@ -504,10 +596,11 @@ export interface DamageCalculationInput {
 export interface DamageCalculationResult {
   baseDamage: number // 安定率適用前の基本ダメージ
   stabilityResult: {
-    minDamage: number // 最小ダメージ（安定率%適用時）
+    minDamage: number // 最小ダメージ（有効安定率%適用時）
     maxDamage: number // 最大ダメージ（100%時）
     averageDamage: number // 平均ダメージ
-    stabilityRate: number // 安定率(%)
+    stabilityRate: number // 元の安定率(%)
+    effectiveStabilityRate: number // 実際に使用された安定率(%)（Graze時は半減）
   }
   calculationSteps: DamageCalculationSteps
 }
@@ -585,7 +678,7 @@ export interface DamageCalculationSteps {
     result: number
   }
   
-  // ステップ4a: クリティカルダメージ（クリティカル時のみ）
+  // ステップ4a: クリティカルダメージ（クリティカル・Graze時のみ）
   step4a_critical?: {
     beforeCritical: number
     criticalRate: number
@@ -621,8 +714,8 @@ export function calculateDamage(input: DamageCalculationInput): DamageCalculatio
   currentDamage = applyElementAdvantage(currentDamage, input, steps)
   currentDamage = applySkillMultiplier(currentDamage, input, steps)
   
-  // ステップ4a: クリティカルダメージ（クリティカル時のみ）
-  if (input.userSettings.damageType === 'critical') {
+  // ステップ4a: クリティカルダメージ（クリティカル・Graze時のみ）
+  if (input.userSettings.damageType === 'critical' || input.userSettings.damageType === 'graze') {
     currentDamage = applyCriticalDamage(currentDamage, input, steps)
   }
   
@@ -635,7 +728,7 @@ export function calculateDamage(input: DamageCalculationInput): DamageCalculatio
   const baseDamage = applyBraveMultiplier(currentDamage, input, steps)
   
   // 安定率適用
-  const stabilityResult = calculateStabilityDamage(baseDamage, input.stability.rate)
+  const stabilityResult = calculateStabilityDamage(baseDamage, input.stability.rate, input.userSettings.damageType)
   
   return {
     baseDamage,
@@ -714,14 +807,26 @@ function processEnemyDefense(defense: number, input: DamageCalculationInput): nu
 /**
  * 安定率ダメージ計算
  */
-function calculateStabilityDamage(baseDamage: number, stabilityRate: number): {
+function calculateStabilityDamage(
+  baseDamage: number, 
+  stabilityRate: number, 
+  damageType: 'critical' | 'graze' | 'expected' | 'white'
+): {
   minDamage: number
   maxDamage: number
   averageDamage: number
   stabilityRate: number
+  effectiveStabilityRate: number
 } {
-  // 最小ダメージ = 基本ダメージ × 安定率%
-  const minDamage = Math.floor(baseDamage * stabilityRate / 100)
+  let effectiveStabilityRate = stabilityRate
+  
+  // Graze時は安定率を半減（小数点以下切り捨て）
+  if (damageType === 'graze') {
+    effectiveStabilityRate = Math.floor(stabilityRate / 2)
+  }
+  
+  // 最小ダメージ = 基本ダメージ × 有効安定率%
+  const minDamage = Math.floor(baseDamage * effectiveStabilityRate / 100)
   
   // 最大ダメージ = 基本ダメージ × 100%
   const maxDamage = baseDamage
@@ -733,18 +838,30 @@ function calculateStabilityDamage(baseDamage: number, stabilityRate: number): {
     minDamage,
     maxDamage,
     averageDamage,
-    stabilityRate
+    stabilityRate: stabilityRate, // 元の安定率
+    effectiveStabilityRate // 実際に使用された安定率
   }
 }
 
 /**
  * ランダムダメージ生成（実際のダメージシミュレーション用）
  */
-function generateRandomDamage(baseDamage: number, stabilityRate: number): number {
-  // ランダム係数: 安定率% ～ 100% の範囲
-  const randomRange = 100 - stabilityRate
+function generateRandomDamage(
+  baseDamage: number, 
+  stabilityRate: number, 
+  damageType: 'critical' | 'graze' | 'expected' | 'white'
+): number {
+  let effectiveStabilityRate = stabilityRate
+  
+  // Graze時は安定率を半減（小数点以下切り捨て）
+  if (damageType === 'graze') {
+    effectiveStabilityRate = Math.floor(stabilityRate / 2)
+  }
+  
+  // ランダム係数: 有効安定率% ～ 100% の範囲
+  const randomRange = 100 - effectiveStabilityRate
   const randomValue = Math.random() * randomRange
-  const finalRate = (stabilityRate + randomValue) / 100
+  const finalRate = (effectiveStabilityRate + randomValue) / 100
   
   return Math.floor(baseDamage * finalRate)
 }
