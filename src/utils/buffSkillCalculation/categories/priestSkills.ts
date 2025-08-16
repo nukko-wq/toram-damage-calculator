@@ -11,19 +11,19 @@ import { integrateEffects } from '../types'
  * プリエールの効果計算関数
  */
 export function calculatePriereEffects(
-	weaponTypeParam: number, // 1: メイン/サブ武器が魔導具, 2: それ以外
+	weaponTypeParam: number, // 1: メイン/サブ武器が魔導具, 2: メイン/サブ武器が魔導具以外
 ): Partial<EquipmentProperties> {
 	if (!weaponTypeParam || (weaponTypeParam !== 1 && weaponTypeParam !== 2))
 		return {}
 
-	// 武器タイプに応じた効果
+	// 魔導具装備状況に応じた効果（全武器種で効果あり）
 	if (weaponTypeParam === 1) {
 		// メイン/サブ武器が魔導具の場合
 		return {
 			MATK_Rate: 15, // MATK率+15%
 		}
 	}
-	// それ以外の場合
+	// メイン/サブ武器が魔導具以外の場合
 	return {
 		MATK_Rate: 10, // MATK率+10%
 	}

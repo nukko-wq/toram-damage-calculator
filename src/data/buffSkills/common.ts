@@ -162,7 +162,7 @@ export const COMMON_BUFF_SKILLS: BuffSkillDefinition[] = [
 		type: 'multiParam',
 		multiParams: {
 			param1: {
-				name: '武器タイプ',
+				name: '魔導具装備',
 				min: 1,
 				max: 2,
 				default: 2,
