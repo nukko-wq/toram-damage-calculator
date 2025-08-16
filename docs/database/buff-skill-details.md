@@ -162,7 +162,7 @@ interface WeaponRequirement {
   type: 'multiParam',
   multiParams: {
     param1: {
-      name: '武器タイプ',
+      name: '魔導具装備',
       min: 1,
       max: 2,
       default: 2,
@@ -171,12 +171,12 @@ interface WeaponRequirement {
   },
   order: 1101,
   isCircle: true, // サークルバフ（UI表示で赤色）
-  description: '魔導具装備状況に応じて魔法攻撃力率を上昇させる',
+  description: '魔導具装備状況に応じて魔法攻撃力率を上昇させる（全武器種で効果あり）',
   effects: [
     {
       property: 'MATK_Rate',
       formula: 'param1 === 1 ? +15 : +10',
-      conditions: ['魔導具装備(1): +15%, それ以外(2): +10%']
+      conditions: ['魔導具装備(1): +15%, 魔導具以外(2): +10%']
     }
   ],
   calculationFormula: `
