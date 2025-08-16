@@ -1,25 +1,32 @@
 # 敵情報データベース設計
 
 ## ファイル構成・データフロー
-**初期データ配置**:
+**データ配置**:
 - **プリセットデータ**: `src/data/enemies.ts`（TypeScript静的ファイル）
+- **ユーザーカスタムデータ**: LocalStorage (`custom_enemies`)
 
-**アプリ起動時の処理**:
+**データアクセス**:
+- **プリセット敵情報**: TypeScript静的ファイルから直接取得（LocalStorageコピーなし）
+- **ユーザーカスタム敵情報**: LocalStorageから取得
+- **敵設定（敵ID別）**: LocalStorage (`enemy_settings_per_enemy`) + Zustandストア
+
+**データフロー**:
 ```
-アプリ起動 → プリセットTypeScriptモジュールを読み込み → LocalStorageにコピー → 以降はLocalStorageから参照
+アプリ起動
+└─ プリセット敵情報: src/data/enemies.ts から直接参照
+└─ ユーザー敵情報: LocalStorage (custom_enemies) から取得
+└─ 敵設定: LocalStorage (enemy_settings_per_enemy) + EnemySettingsStore (Zustand)
 ```
 
-**TypeScript移行の利点**:
+**TypeScript設計の利点**:
 - EnemyStatsインターフェースによる厳密な型チェック
 - EnemyCategoryとPresetEnemyの型安全性保証
 - 数値範囲の型制約（DEF, MDEF, レベルなど）
 - nullから0への型安全な変換による一貫性確保
 
 **ローカルストレージキー**:
-- **プリセット敵情報（コピー済み）**: LocalStorage (`preset_enemies`)
-- **ユーザーカスタムデータ**: LocalStorage (`custom_enemies`)
+- **ユーザーカスタム敵データ**: LocalStorage (`custom_enemies`)
 - **敵設定（敵ID別）**: LocalStorage (`enemy_settings_per_enemy`) + Zustandストア
-- **統合アクセス**: 両方のデータを統一的に管理
 
 ## TypeScriptデータ構造
 
@@ -52,17 +59,17 @@ interface PresetEnemy {
 }
 ```
 
-**ローカルストレージ敵情報インターフェース**（拡張版）:
+**統合敵情報インターフェース**（アプリ内使用型）:
 ```typescript
-interface LocalStorageEnemy extends PresetEnemy {
+interface Enemy extends PresetEnemy {
   isPreset: boolean            // プリセット由来かどうか
+  isCustom: boolean            // カスタム敵情報かどうか
   isFavorite: boolean          // お気に入り設定
+  isModified: boolean          // 変更されたかどうか
   createdAt: string           // 作成日時 (ISO string)
   updatedAt: string           // 更新日時 (ISO string)
+  modifiedAt?: string         // 変更日時 (ISO string, optional)
 }
-
-// 統合型（アプリ内で使用する敵情報データ型）
-type Enemy = LocalStorageEnemy
 
 interface EnemyStats {
   DEF: number                  // 物理防御力 (0-9999)
@@ -103,7 +110,7 @@ interface EnemySettingsMap {
 ```typescript
 interface SaveDataEnemyInfo {
   selectedEnemyId: string | null      // 選択中の敵ID（参照のみ）
-  enemyType?: 'preset' | 'custom'     // データソースの識別
+  enemyType: 'preset' | 'custom' | null // データソースの識別
   lastSelectedAt?: string             // 最終選択日時 (ISO string)
 }
 ```
@@ -112,15 +119,19 @@ interface SaveDataEnemyInfo {
 ```
 1. 敵選択
    ↓
-2. SaveDataEnemyInfo（個別セーブデータ）に敵IDを保存
+2. CalculatorStore.updateEnemy() でEnemyFormDataを更新
    ↓
-3. 敵設定変更
+3. SaveDataEnemyInfo（個別セーブデータ）に敵IDとtypeを保存
    ↓
-4. EnemySettingsStore（Zustand）に敵ID別で設定保存
+4. 敵設定変更（レベル、確定クリティカル、必要HIT等）
    ↓
-5. セーブデータ切り替え時
+5. EnemySettingsStore（Zustand）に敵ID別で設定保存
    ↓
-6. 選択された敵IDに対応する設定をEnemySettingsStoreから読み込み
+6. セーブデータ切り替え時
+   ↓
+7. SaveDataEnemyInfoから敵IDを取得 + EnemySettingsStoreから設定を取得
+   ↓
+8. useEnemyData()でEnemyFormDataとして統合して提供
 ```
 
 ## ボス戦難易度システム
@@ -329,7 +340,7 @@ function calculateRaidBossStats(raidBossId: string, level: number): EnemyStats {
 ### Zustandストア実装詳細
 ```typescript
 // src/stores/enemySettingsStore.ts
-export const useEnemySettingsStore = create<EnemySettingsStore>()()
+export const useEnemySettingsStore = create<EnemySettingsStore>()(
   devtools(
     (set, get) => ({
       settingsMap: {},
@@ -343,58 +354,112 @@ export const useEnemySettingsStore = create<EnemySettingsStore>()()
       // 敵設定更新（LocalStorageと同期）
       updateEnemySettings: (enemyId: string, updates) => {
         set((state) => {
-          const newSettings = {
-            ...state.settingsMap[enemyId],
+          const currentSettings = state.settingsMap[enemyId] || getDefaultEnemySettings(enemyId)
+          const updatedSettings: EnemySettings = {
+            ...currentSettings,
             ...updates,
             enemyId,
-            lastUpdated: new Date().toISOString()
+            lastUpdated: new Date().toISOString(),
           }
-          const newMap = { ...state.settingsMap, [enemyId]: newSettings }
+          const newSettingsMap = {
+            ...state.settingsMap,
+            [enemyId]: updatedSettings,
+          }
           // LocalStorageに保存
-          localStorage.setItem('enemy_settings_per_enemy', JSON.stringify(newMap))
-          return { settingsMap: newMap }
+          try {
+            localStorage.setItem('enemy_settings_per_enemy', JSON.stringify(newSettingsMap))
+          } catch (error) {
+            console.error('Failed to save enemy settings to localStorage:', error)
+          }
+          return { settingsMap: newSettingsMap }
         })
       },
       
-      // 各種設定用ヘルパー関数
-      setBossDifficulty: (enemyId, difficulty) => { /* 実装 */ },
-      setRaidBossLevel: (enemyId, level) => { /* 実装 */ },
-      setManualOverrides: (enemyId, overrides) => { /* 実装 */ }
-    })
+      // ボス難易度設定
+      setBossDifficulty: (enemyId, difficulty) => {
+        get().updateEnemySettings(enemyId, { difficulty })
+      },
+      
+      // レイドボスレベル設定
+      setRaidBossLevel: (enemyId, level) => {
+        get().updateEnemySettings(enemyId, { raidBossLevel: level })
+      },
+      
+      // 手動調整値設定
+      setManualOverrides: (enemyId, overrides) => {
+        const currentSettings = get().getEnemySettings(enemyId)
+        const newOverrides = {
+          ...currentSettings.manualOverrides,
+          ...overrides,
+        }
+        get().updateEnemySettings(enemyId, { manualOverrides: newOverrides })
+      },
+      
+      // その他のメソッド
+      resetEnemySettings: (enemyId) => { /* 実装済み */ },
+      loadFromLocalStorage: () => { /* 実装済み */ },
+      saveToLocalStorage: () => { /* 実装済み */ }
+    }),
+    { name: 'enemy-settings-store' }
   )
 )
 ```
 
-## mainWeapon装備の武器ステータス仕様
+## EnemyFormDataとuseEnemyDataの統合
 
-mainWeaponカテゴリの装備では、`weaponStats`フィールドで武器の基本ステータスを定義できます：
-
-- **設定あり**: 装備データで定義された値を使用
-- **設定なし**: WeaponFormで入力された値を使用
-- **優先度**: `weaponStats` > WeaponForm入力値
+EnemyFormコンポーネントでは、セーブデータの敵選択情報とZustandの敵設定を統合した`EnemyFormData`を使用します：
 
 ```typescript
-// 例：武器ステータスが設定された装備
-{
-  "id": "legendary_sword",
-  "name": "レジェンダリーソード",
-  "weaponStats": {
-    "ATK": 500,
-    "stability": 90,
-    "refinement": 15
-  },
-  "properties": {
-    "ATK_Rate": 20,
-    "Critical_Rate": 15
-  }
-}
+// src/hooks/useEnemyData.ts
+export function useEnemyData() {
+  const saveDataEnemyInfo = useCalculatorStore((state) => state.data.enemy)
+  const getEnemySettings = useEnemySettingsStore((state) => state.getEnemySettings)
 
-// 例：武器ステータスが未設定の装備（WeaponFormの値を使用）
+  const enemyFormData = useMemo((): EnemyFormData => {
+    // 選択された敵がない場合のデフォルト値
+    if (!saveDataEnemyInfo.selectedEnemyId) {
+      return {
+        selectedId: null,
+        type: null,
+        difficulty: 'normal',
+        raidBossLevel: 288,
+        manualOverrides: {
+          resistCritical: 0,
+          requiredHIT: 0,
+        },
+      }
+    }
+
+    // 選択された敵の設定を取得
+    const enemySettings = getEnemySettings(saveDataEnemyInfo.selectedEnemyId)
+
+    return {
+      selectedId: saveDataEnemyInfo.selectedEnemyId,
+      type: saveDataEnemyInfo.enemyType,
+      difficulty: enemySettings.difficulty,
+      raidBossLevel: enemySettings.raidBossLevel,
+      manualOverrides: enemySettings.manualOverrides,
+    }
+  }, [saveDataEnemyInfo, getEnemySettings])
+
+  return { enemyFormData }
+}
+```
+
+## ローカルストレージ保存形式
+
+**敵設定データ（enemy_settings_per_enemy）**:
+```json
 {
-  "id": "basic_sword",
-  "name": "ベーシックソード",
-  "properties": {
-    "ATK%": 10 
+  "[敵ID]": {
+    "enemyId": "敵ID",
+    "difficulty": "normal" | "hard" | "lunatic" | "ultimate",
+    "raidBossLevel": 288,
+    "manualOverrides": {
+      "resistCritical": 85,
+      "requiredHIT": 120
+    },
+    "lastUpdated": "2025-01-15T10:30:00.000Z"
   }
 }
 ```
