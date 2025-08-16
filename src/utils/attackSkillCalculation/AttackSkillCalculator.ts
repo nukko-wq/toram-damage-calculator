@@ -15,6 +15,9 @@ import {
 	StormBlazer10StackCalculator,
 	StrikeStabAilmentCalculator,
 	StrikeStabCalculator,
+	ThorHammerFollowupCalculator,
+	ThorHammerFollowup5HitCalculator,
+	ThorHammerFollowup8HitCalculator,
 	ThorHammerSingleCalculator,
 } from './calculators'
 import type {
@@ -92,6 +95,12 @@ export class AttackSkillCalculator {
 				return new CycloneArrowCalculator()
 			case 'thor_hammer_single':
 				return new ThorHammerSingleCalculator()
+			case 'thor_hammer_followup':
+				return new ThorHammerFollowupCalculator()
+			case 'thor_hammer_followup_5hit':
+				return new ThorHammerFollowup5HitCalculator()
+			case 'thor_hammer_followup_8hit':
+				return new ThorHammerFollowup8HitCalculator()
 			case 'power_shot':
 			case 'dual_strike':
 				return new StandardCalculator()
