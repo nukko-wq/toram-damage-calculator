@@ -99,7 +99,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		order: 103,
 		systemGroup: 'sword',
 		category: 'blade',
-		weaponTypeRequirements: ['片手剣'],
+		weaponTypeRequirements: ['片手剣', '双剣', '両手剣'],
 		mpCost: 400,
 		multiplierFormula: '特殊計算',
 		fixedDamageFormula: '特殊計算',
