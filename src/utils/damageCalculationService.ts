@@ -779,16 +779,20 @@ export function calculateDamageWithService(
 					}
 				}
 				case 'graze': {
-					// グレイズ：後で実装予定
-					const grazeBaseDamage = Math.floor(baseDamage * 0.1)
+					// グレイズ：クリティカルダメージと同じ計算過程、安定率のみ半減
+					// NOTE: baseDamageは'critical'判定時と同様にクリティカル倍率が適用済みの状態
+					// グレイズ安定率 = Math.floor(基本安定率 / 2)
+					const grazeMinStabilityRate = Math.floor(minStabilityRate / 2)
+					const grazeMaxStabilityRate = 100 // 最大は100%のまま
+					const grazeAverageStabilityRate = Math.floor((grazeMinStabilityRate + grazeMaxStabilityRate) / 2)
 
-					// 多撃の場合は既に計算済みの値を使用（グレイズ適用後）
+					// 多撃の場合は既に計算済みの値を使用（グレイズ安定率適用）
 					if (isMultiHit) {
 						if (isMagicalSkill) {
 							const totalMinDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
 								const hitGrazeMinDamage = Math.floor(
-									(hitMaxDamage * 0.1 * minStabilityRate) / 100,
+									(hitMaxDamage * grazeMinStabilityRate) / 100,
 								)
 								return sum + hitGrazeMinDamage
 							}, 0)
@@ -796,7 +800,7 @@ export function calculateDamageWithService(
 							const totalMaxDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
 								const hitGrazeMaxDamage = Math.floor(
-									(hitMaxDamage * 0.1 * maxStabilityRate) / 100,
+									(hitMaxDamage * grazeMaxStabilityRate) / 100,
 								)
 								return sum + hitGrazeMaxDamage
 							}, 0)
@@ -804,7 +808,7 @@ export function calculateDamageWithService(
 							const totalAverageDamage = attackResults.reduce((sum, hit) => {
 								const hitMaxDamage = hit.result.baseDamage
 								const hitGrazeAverageDamage = Math.floor(
-									(hitMaxDamage * 0.1 * averageStabilityRate) / 100,
+									(hitMaxDamage * grazeAverageStabilityRate) / 100,
 								)
 								return sum + hitGrazeAverageDamage
 							}, 0)
@@ -813,28 +817,55 @@ export function calculateDamageWithService(
 								min: totalMinDamage,
 								max: totalMaxDamage,
 								average: totalAverageDamage,
-								stability: minStabilityRate,
-								averageStability: averageStabilityRate,
-								maxStability: maxStabilityRate,
+								stability: grazeMinStabilityRate,
+								averageStability: grazeAverageStabilityRate,
+								maxStability: grazeMaxStabilityRate,
 							}
 						}
 
+						// グレイズ安定率を適用した多撃ダメージ再計算
+						const totalMinDamage = attackResults.reduce((sum, hit) => {
+							const hitMaxDamage = hit.result.baseDamage
+							const hitGrazeMinDamage = Math.floor(
+								(hitMaxDamage * grazeMinStabilityRate) / 100,
+							)
+							return sum + hitGrazeMinDamage
+						}, 0)
+
+						const totalMaxDamage = attackResults.reduce((sum, hit) => {
+							const hitMaxDamage = hit.result.baseDamage
+							const hitGrazeMaxDamage = Math.floor(
+								(hitMaxDamage * grazeMaxStabilityRate) / 100,
+							)
+							return sum + hitGrazeMaxDamage
+						}, 0)
+
+						const totalAverageDamage = attackResults.reduce((sum, hit) => {
+							const hitMaxDamage = hit.result.baseDamage
+							const hitGrazeAverageDamage = Math.floor(
+								(hitMaxDamage * grazeAverageStabilityRate) / 100,
+							)
+							return sum + hitGrazeAverageDamage
+						}, 0)
+
 						return {
-							min: Math.floor(stabilityResult.minDamage * 0.1),
-							max: Math.floor(stabilityResult.maxDamage * 0.1),
-							average: Math.floor(stabilityResult.averageDamage * 0.1),
-							stability: minStabilityRate,
-							averageStability: averageStabilityRate,
-							maxStability: maxStabilityRate,
+							min: totalMinDamage,
+							max: totalMaxDamage,
+							average: totalAverageDamage,
+							stability: grazeMinStabilityRate,
+							averageStability: grazeAverageStabilityRate,
+							maxStability: grazeMaxStabilityRate,
 						}
 					}
 
+					// 単撃の場合：クリティカルダメージ（baseDamage）にグレイズ安定率を適用
 					return {
-						min: Math.floor((grazeBaseDamage * minStabilityRate) / 100),
-						max: Math.floor((grazeBaseDamage * maxStabilityRate) / 100),
-						average: Math.floor((grazeBaseDamage * averageStabilityRate) / 100),
-						stability: minStabilityRate,
-						averageStability: averageStabilityRate,
+						min: Math.floor((baseDamage * grazeMinStabilityRate) / 100),
+						max: Math.floor((baseDamage * grazeMaxStabilityRate) / 100),
+						average: Math.floor((baseDamage * grazeAverageStabilityRate) / 100),
+						stability: grazeMinStabilityRate,
+						averageStability: grazeAverageStabilityRate,
+						maxStability: grazeMaxStabilityRate,
 					}
 				}
 				case 'expected': {
