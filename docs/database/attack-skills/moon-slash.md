@@ -50,7 +50,7 @@ AttackSkillFormに新しい攻撃スキル「ムーンスラッシュ」を追�
       
       // 慣れ設定
       adaptation: 'physical',     // 物理慣れ参照
-      adaptationGrant: 'normal',  // 通常慣れ付与
+      adaptationGrant: 'physical',  // 物理慣れ付与
       
       // 補正適用設定
       canUseUnsheathePower: false,  // 抜刀威力適用不可
@@ -75,7 +75,7 @@ AttackSkillFormに新しい攻撃スキル「ムーンスラッシュ」を追�
       
       // 慣れ設定
       adaptation: 'physical',     // 物理慣れ参照
-      adaptationGrant: 'normal',  // 通常慣れ付与
+      adaptationGrant: 'physical',  // 物理慣れ付与
       
       // 補正適用設定
       canUseUnsheathePower: false,  // 抜刀威力適用不可
@@ -157,7 +157,7 @@ class MoonSlashCalculator extends SkillHitCalculator {
 📊 ムーンスラッシュ
 　　カテゴリ: 剣系 | 消費MP: 400
 　　威力参照: ATK | タイプ: 物理スキル
-　　慣れ参照: 物理 | 慣れ付与: 通常
+　　慣れ参照: 物理 | 慣れ付与: 物理
 　　参照防御力: DEF | 参照耐性: 物理
 　　距離威力: 近距離○ | 抜刀威力: × | ロングレンジ: ×
 

@@ -113,7 +113,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 表示用（実際の計算は外部）
 				adaptation: 'physical',
-				adaptationGrant: 'normal',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -130,7 +130,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplierFormula: '威力+補正後STR%',
 				fixedDamageFormula: '固定値+基礎INT/2',
 				adaptation: 'physical',
-				adaptationGrant: 'normal',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
