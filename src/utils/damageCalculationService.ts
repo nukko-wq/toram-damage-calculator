@@ -369,10 +369,18 @@ export function calculateDamageWithService(
 				damageType: (() => {
 					// 確定クリティカルスキルの判定
 					const isGuaranteedCritical = selectedSkill?.hits.some((hit) => hit.isGuaranteedCritical) || false
-					// 確定クリティカルスキルの場合、白ダメージ判定でもクリティカル倍率で計算
-					return isGuaranteedCritical && powerOptions.damageType === 'white' 
-						? 'critical' 
-						: powerOptions.damageType
+					
+					// 1. 確定クリティカルスキルの場合、白ダメージ判定でもクリティカル倍率で計算
+					if (isGuaranteedCritical && powerOptions.damageType === 'white') {
+						return 'critical'
+					}
+					
+					// 2. 魔法スキルの場合、Graze判定でもクリティカル倍率で計算（Grazeによる安定率半減を受けないため）
+					if (isMagicalSkill && powerOptions.damageType === 'graze') {
+						return 'critical'
+					}
+					
+					return powerOptions.damageType
 				})(),
 			},
 			// クリティカルダメージ設定
@@ -674,10 +682,20 @@ export function calculateDamageWithService(
 			// 確定クリティカルスキルの判定
 			const isGuaranteedCritical = selectedSkill?.hits.some((hit) => hit.isGuaranteedCritical) || false
 
-			// 確定クリティカルスキルの場合、白ダメージ判定でもクリティカル倍率で計算
-			const effectiveDamageType = isGuaranteedCritical && powerOptions.damageType === 'white' 
-				? 'critical' 
-				: powerOptions.damageType
+			// ダメージタイプの変換処理
+			const effectiveDamageType = (() => {
+				// 1. 確定クリティカルスキルの場合、白ダメージ判定でもクリティカル倍率で計算
+				if (isGuaranteedCritical && powerOptions.damageType === 'white') {
+					return 'critical'
+				}
+				
+				// 2. 魔法スキルの場合、Graze判定でもクリティカル倍率で計算（Grazeによる安定率半減を受けないため）
+				if (isMagicalSkill && powerOptions.damageType === 'graze') {
+					return 'critical'
+				}
+				
+				return powerOptions.damageType
+			})()
 
 			switch (effectiveDamageType) {
 				case 'white': {
