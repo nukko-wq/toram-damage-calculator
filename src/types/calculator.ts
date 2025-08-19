@@ -891,6 +891,9 @@ export interface AttackHit {
 	// 特殊効果（撃数別）
 	specialEffects?: string[] // 各撃数に固有の特殊効果
 
+	// 確定クリティカル判定
+	isGuaranteedCritical?: boolean // 確定クリティカル（damageType設定を無視してクリティカル倍率適用）
+
 	// 特殊設定
 	notes?: string // 備考
 }

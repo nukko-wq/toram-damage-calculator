@@ -258,7 +258,7 @@ export const createInitialRegisterFormData = (): RegisterFormData => {
 			isEnabled: false,
 			level: 1,
 			maxLevel: 1,
-			partyMembers: 3,
+			partyMembers: 0,
 		},
 		{
 			id: 'voidStance',

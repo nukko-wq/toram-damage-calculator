@@ -131,6 +131,11 @@ export function calculateDamageWithService(
 			? stabilityInfo.averageStability
 			: physicalStabilityRate
 
+		// 選択されたスキルを取得（確定クリティカル判定用）
+		const selectedSkill = calculatorData.attackSkill?.selectedSkillId 
+			? getAttackSkillById(calculatorData.attackSkill.selectedSkillId)
+			: null
+
 		// デバッグ情報
 		if (
 			debugEnabled &&
@@ -361,7 +366,22 @@ export function calculateDamageWithService(
 			userSettings: {
 				adaptation: adaptationMultiplier, // 慣れ倍率を適用
 				currentDistance: powerOptions.distance,
-				damageType: powerOptions.damageType,
+				damageType: (() => {
+					// 確定クリティカルスキルの判定
+					const isGuaranteedCritical = selectedSkill?.hits.some((hit) => hit.isGuaranteedCritical) || false
+					
+					// 1. 確定クリティカルスキルの場合、白ダメージ判定でもクリティカル倍率で計算
+					if (isGuaranteedCritical && powerOptions.damageType === 'white') {
+						return 'critical'
+					}
+					
+					// 2. 魔法スキルの場合、Graze判定でもクリティカル倍率で計算（Grazeによる安定率半減を受けないため）
+					if (isMagicalSkill && powerOptions.damageType === 'graze') {
+						return 'critical'
+					}
+					
+					return powerOptions.damageType
+				})(),
 			},
 			// クリティカルダメージ設定
 			critical: {
@@ -659,7 +679,25 @@ export function calculateDamageWithService(
 				? stabilityInfo.averageStability
 				: Math.floor((minStabilityRate + maxStabilityRate) / 2)
 
-			switch (powerOptions.damageType) {
+			// 確定クリティカルスキルの判定
+			const isGuaranteedCritical = selectedSkill?.hits.some((hit) => hit.isGuaranteedCritical) || false
+
+			// ダメージタイプの変換処理
+			const effectiveDamageType = (() => {
+				// 1. 確定クリティカルスキルの場合、白ダメージ判定でもクリティカル倍率で計算
+				if (isGuaranteedCritical && powerOptions.damageType === 'white') {
+					return 'critical'
+				}
+				
+				// 2. 魔法スキルの場合、Graze判定でもクリティカル倍率で計算（Grazeによる安定率半減を受けないため）
+				if (isMagicalSkill && powerOptions.damageType === 'graze') {
+					return 'critical'
+				}
+				
+				return powerOptions.damageType
+			})()
+
+			switch (effectiveDamageType) {
 				case 'white': {
 					// 白ダメ：基本ダメージに対して安定率を適用
 					// 多撃の場合は既に計算済みの値を使用

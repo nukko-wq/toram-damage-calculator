@@ -962,12 +962,10 @@ function getRegisterBonuses(registerData?: RegisterFormData): Partial<AllBonuses
 			case 'fateCompanionship':
 				// 運命共同体: 特殊計算（レベル1固定 + パーティメンバー数効果）
 				if (effect.level === 1) {
-					const baseBonus = 5 // レベル1固定効果
-					const partyBonus = (effect.partyMembers || 1) * 3 // パーティメンバー数効果
-					const totalBonus = baseBonus + partyBonus
+					const partyMemberBonus = (effect.partyMembers || 0) // パーティメンバー数%の効果
 
-					bonuses.ATK = (bonuses.ATK || 0) + totalBonus
-					bonuses.MATK = (bonuses.MATK || 0) + totalBonus
+					bonuses.ATK_Rate = (bonuses.ATK_Rate || 0) + partyMemberBonus
+					bonuses.MATK_Rate = (bonuses.MATK_Rate || 0) + partyMemberBonus
 				}
 				break
 

@@ -17,14 +17,14 @@ export function RegisterLevelModal({
 	onUpdate,
 }: RegisterLevelModalProps) {
 	const [level, setLevel] = useState(effect.level)
-	const [partyMembers, setPartyMembers] = useState(effect.partyMembers || 3)
+	const [partyMembers, setPartyMembers] = useState(effect.partyMembers || 0)
 
 	const isFateCompanionship = effect.type === 'fateCompanionship'
 
 	// エフェクトが変更されたときに値をリセット
 	useEffect(() => {
 		setLevel(effect.level)
-		setPartyMembers(effect.partyMembers || 3)
+		setPartyMembers(effect.partyMembers || 0)
 	}, [effect])
 
 	const handleUpdate = () => {
@@ -47,12 +47,6 @@ export function RegisterLevelModal({
 		}
 	}
 
-	const handlePartyMembersChange = (value: string) => {
-		const numValue = Number.parseInt(value, 10)
-		if (!Number.isNaN(numValue) && numValue >= 1 && numValue <= 3) {
-			setPartyMembers(numValue)
-		}
-	}
 
 	if (!isOpen) return null
 
@@ -90,21 +84,55 @@ export function RegisterLevelModal({
 					{/* 運命共同体専用：パーティメンバー数のみ */}
 					{isFateCompanionship && (
 						<div className="space-y-2">
-							<label
-								htmlFor="partyMembers"
-								className="block text-sm font-medium text-gray-700"
-							>
-								パーティメンバー数 (1-3)
+							<label className="block text-sm font-medium text-gray-700">
+								パーティメンバー数 (0-3)
 							</label>
-							<input
-								id="partyMembers"
-								type="number"
-								min={1}
-								max={3}
-								value={partyMembers}
-								onChange={(e) => handlePartyMembersChange(e.target.value)}
-								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-							/>
+							<div className="flex items-center justify-center space-x-2">
+								{/* -10ボタン（最小値0にセット） */}
+								<button
+									type="button"
+									onClick={() => setPartyMembers(0)}
+									disabled={partyMembers === 0}
+									className="py-1 px-4 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									-10
+								</button>
+
+								{/* -1ボタン */}
+								<button
+									type="button"
+									onClick={() => setPartyMembers(Math.max(0, partyMembers - 1))}
+									disabled={partyMembers <= 0}
+									className="py-1 px-3 text-sm bg-rose-100 hover:bg-rose-200 border border-rose-200 rounded transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									-1
+								</button>
+
+								{/* パーティメンバー数表示 */}
+								<div className="py-1 px-6 text-base font-medium bg-gray-100 border border-gray-200 rounded min-w-[60px] text-center">
+									{partyMembers}
+								</div>
+
+								{/* +1ボタン */}
+								<button
+									type="button"
+									onClick={() => setPartyMembers(Math.min(3, partyMembers + 1))}
+									disabled={partyMembers >= 3}
+									className="py-1 px-3 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									+1
+								</button>
+
+								{/* +10ボタン（最大値3にセット） */}
+								<button
+									type="button"
+									onClick={() => setPartyMembers(3)}
+									disabled={partyMembers === 3}
+									className="py-1 px-4 text-sm bg-blue-100 hover:bg-blue-200 border border-blue-200 rounded transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+								>
+									+10
+								</button>
+							</div>
 							<p className="text-sm text-gray-500">
 								自分以外のパーティメンバー数を設定してください
 							</p>
@@ -114,12 +142,14 @@ export function RegisterLevelModal({
 
 				<div className="flex justify-end space-x-3 mt-6">
 					<button
+						type="button"
 						onClick={onClose}
 						className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors cursor-pointer"
 					>
 						キャンセル
 					</button>
 					<button
+						type="button"
 						onClick={handleUpdate}
 						className="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
 					>
