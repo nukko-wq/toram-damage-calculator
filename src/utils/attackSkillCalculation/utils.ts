@@ -1,7 +1,7 @@
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { CalculatorData } from '@/types/calculator'
 import { calculateResults } from '@/utils/calculationEngine'
-import type { EquipmentContext, PlayerStats } from './types'
+import type { BuffSkillContext, EquipmentContext, PlayerStats } from './types'
 
 /**
  * 計算支援関数
@@ -37,6 +37,9 @@ export class SkillCalculationUtils {
 			HP: results.basicStats.HP || 0,
 			MP: results.basicStats.MP || 0,
 			level: baseStats.level,
+			
+			// 貫通系ステータス（仮の値、将来的に実装時に正しい値を設定）
+			physicalPenetration: 0,
 		}
 	}
 
@@ -83,6 +86,9 @@ export class SkillCalculationUtils {
 			HP: results.basicStats.HP || 0,
 			MP: results.basicStats.MP || 0,
 			level: baseStats.level,
+			
+			// 貫通系ステータス（仮の値、将来的に実装時に正しい値を設定）
+			physicalPenetration: 0,
 		}
 	}
 
@@ -99,6 +105,35 @@ export class SkillCalculationUtils {
 			subWeaponType: subWeapon.weaponType,
 			hasHalberdEquipped: mainWeapon.weaponType === '旋風槍',
 			hasStaffEquipped: mainWeapon.weaponType === '杖',
+		}
+	}
+
+	/**
+	 * CalculatorDataからBuffSkillContextに変換
+	 */
+	static convertToBuffSkillContext(
+		calculatorData: CalculatorData,
+	): BuffSkillContext {
+		const { buffSkills } = calculatorData
+
+		return {
+			getBuffSkillLevel: (skillId: string): number => {
+				const skill = buffSkills.skills[skillId]
+				if (!skill?.isEnabled) return 0
+
+				// スタック型の場合はstackCountを返す
+				if ('stackCount' in skill) {
+					return skill.stackCount || 0
+				}
+
+				// レベル型の場合はlevelを返す
+				if ('level' in skill) {
+					return skill.level || 0
+				}
+
+				// トグル型の場合は1を返す（有効時）
+				return 1
+			},
 		}
 	}
 }

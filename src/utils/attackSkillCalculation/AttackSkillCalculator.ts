@@ -6,6 +6,7 @@ import {
 	MagicArrowCalculator,
 	MeteorBreakerCalculator,
 	MoonSlashCalculator,
+	OgreSlashCalculator,
 	type SkillHitCalculator,
 	StandardCalculator,
 	Storm1Hit6Calculator,
@@ -21,6 +22,7 @@ import {
 	ThorHammerSingleCalculator,
 } from './calculators'
 import type {
+	BuffSkillContext,
 	EquipmentContext,
 	PlayerStats,
 	SkillCalculationInput,
@@ -38,6 +40,7 @@ export class AttackSkillCalculator {
 		skillId: string,
 		playerStats: PlayerStats,
 		equipmentContext: EquipmentContext,
+		buffSkillContext?: BuffSkillContext,
 	): SkillCalculationResult[] {
 		const skill = getAttackSkillById(skillId)
 		if (!skill) {
@@ -50,6 +53,7 @@ export class AttackSkillCalculator {
 				hitNumber: hit.hitNumber,
 				playerStats,
 				equipmentContext,
+				buffSkillContext,
 			}),
 		)
 	}
@@ -73,6 +77,8 @@ export class AttackSkillCalculator {
 				return new MeteorBreakerCalculator()
 			case 'moon_slash':
 				return new MoonSlashCalculator()
+			case 'ogre_slash':
+				return new OgreSlashCalculator()
 			case 'storm_blazer_10stack':
 				return new StormBlazer10StackCalculator()
 			case 'storm_blazer_1stack':

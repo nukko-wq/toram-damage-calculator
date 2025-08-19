@@ -10,6 +10,7 @@ import {
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { AttackSkillDisplayData, CalculatedHit } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
+import type { BuffSkillContext } from '@/utils/attackSkillCalculation/types'
 
 interface AttackSkillFormProps {
 	onSkillChange?: (skillData: AttackSkillDisplayData) => void

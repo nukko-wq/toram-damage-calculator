@@ -792,6 +792,16 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
+	// 攻撃スキルの特殊効果を追加（オーガスラッシュの物理貫通等）
+	const attackSkillBonuses = getAttackSkillSpecialEffects(data)
+
+	for (const [key, value] of Object.entries(attackSkillBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
 	return bonuses
 }
 
@@ -904,6 +914,37 @@ export function getEnchantmentBonuses(equipmentData: any): Partial<AllBonuses> {
 		console.error('Enchantment bonus calculation error:', error)
 		return {}
 	}
+}
+
+/**
+ * 攻撃スキルの特殊効果をボーナス値に変換
+ * （例：オーガスラッシュの物理貫通効果）
+ */
+function getAttackSkillSpecialEffects(data: CalculatorData): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	// 攻撃スキルが選択されていない場合はボーナスなし
+	if (!data.attackSkill?.selectedSkillId) {
+		return bonuses
+	}
+
+	// オーガスラッシュの特殊効果処理
+	if (data.attackSkill.selectedSkillId === 'ogre_slash') {
+		// バフスキルのオーガスラッシュ（sm1）が有効かチェック
+		const ogreSlashBuffSkill = data.buffSkills?.skills?.sm1
+		if (ogreSlashBuffSkill?.isEnabled && 'stackCount' in ogreSlashBuffSkill) {
+			const demonPowerCount = ogreSlashBuffSkill.stackCount || 0
+			// 物理貫通 = |消費鬼力 × 10|%
+			const physicalPenetration = Math.abs(demonPowerCount * 10)
+			
+			if (physicalPenetration > 0) {
+				bonuses.PhysicalPenetration_Rate = 
+					(bonuses.PhysicalPenetration_Rate || 0) + physicalPenetration
+			}
+		}
+	}
+
+	return bonuses
 }
 
 /**

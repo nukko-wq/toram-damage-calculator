@@ -139,6 +139,55 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// オーガスラッシュ（消費鬼力連携の例）
+	{
+		id: 'ogre_slash',
+		name: 'オーガスラッシュ',
+		order: 104,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['両手剣'],
+		mpCost: 500,
+		multiplierFormula: '特殊計算',
+		fixedDamageFormula: '特殊計算',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 0, // 表示用（|基礎STR+基礎VIT|%+貫通加算は外部計算）
+				fixedDamage: 0, // 表示用（補正後DEXは外部計算）
+				multiplierFormula: '威力+|基礎STR+基礎VIT|%',
+				fixedDamageFormula: '固定値+補正後DEX',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 0, // 表示用（|200×消費鬼力数|%は外部計算）
+				fixedDamage: 500, // 固定500ダメージ
+				multiplierFormula: '威力+|200×消費鬼力数|%',
+				fixedDamageFormula: '固定値500',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// 旋風槍スキル
 	{
 		id: 'strike_stab',
