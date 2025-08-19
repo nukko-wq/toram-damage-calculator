@@ -1083,6 +1083,9 @@ function processEnemyDefense(
 		}
 	}
 
+	// 貫通率の上限を100%に制限
+	penetrationRate = Math.min(100, penetrationRate)
+
 	if (process.env.NODE_ENV === 'development') {
 		console.log('貫通計算詳細:')
 		console.log(
