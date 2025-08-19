@@ -219,16 +219,16 @@ export default function RegisterLevelModal({
         {isFatefulCompanionship && (
           <div>
             <label className="block text-sm font-medium mb-1">
-              自分以外のパーティメンバー数
+              自分以外のパーティメンバー数 (0-3)
             </label>
-            <input
-              type="number"
-              min="1"
-              max="3"
-              value={partyMembers}
-              onChange={(e) => setPartyMembers(Number(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
+            <div className="flex items-center justify-center space-x-2">
+              {/* -10/-1/数値/+1/+10ボタン形式 */}
+              <button onClick={() => setPartyMembers(0)}>-10</button>
+              <button onClick={() => setPartyMembers(Math.max(0, partyMembers - 1))}>-1</button>
+              <div>{partyMembers}</div>
+              <button onClick={() => setPartyMembers(Math.min(3, partyMembers + 1))}>+1</button>
+              <button onClick={() => setPartyMembers(3)}>+10</button>
+            </div>
           </div>
         )}
         
@@ -846,7 +846,7 @@ if (data.register?.effects) {
     effect.type === 'fateCompanionship' && effect.isEnabled
   )
   if (fateCompanionshipEffect) {
-    const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
+    const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) // パーティメンバー数%
     finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
     finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
   }
@@ -857,10 +857,10 @@ if (data.register?.effects) {
 
 ### 基本仕様
 - **効果**: パーティメンバー数に応じてATK%とMATK%を増加させる
-- **計算方法**: `パーティメンバー数（1-3） × 1` を装備品補正値1のATK(%)とMATK(%)に加算
+- **計算方法**: `パーティメンバー数（0-3）` %を装備品補正値1のATK(%)とMATK(%)に加算
 - **適用条件**: レジスタが有効に設定されている場合のみ
 - **レベル**: 1で固定（レベル入力フォーム不要）
-- **パーティメンバー数**: 1-3人（自分以外のパーティメンバー数）
+- **パーティメンバー数**: 0-3人（自分以外のパーティメンバー数）
 
 ### 実装方式
 運命共同体効果は`finalBonuses`システムに統合され、以下の流れで適用されます：
@@ -872,18 +872,18 @@ if (data.register?.effects) {
 ### 計算例
 **入力値:**
 - fateCompanionshipが有効
-- パーティメンバー数: 3人
+- パーティメンバー数: 2人
 - 既存の装備品補正値1のATK(%): 20% (装備+クリスタ+料理+バフアイテム)
 - 既存の装備品補正値1のMATK(%): 15% (装備+クリスタ+料理+バフアイテム)
 
 **計算手順:**
-1. fateCompanionship効果: 3 × 1 = 3%
-2. **装備品補正値1のATK(%)合計**: 20% + 3% = 23%
-3. **装備品補正値1のMATK(%)合計**: 15% + 3% = 18%
+1. fateCompanionship効果: 2% (パーティメンバー数)
+2. **装備品補正値1のATK(%)合計**: 20% + 2% = 22%
+3. **装備品補正値1のMATK(%)合計**: 15% + 2% = 17%
 
 ### 特殊な仕様
 - **レベル固定**: 運命共同体のレベルは常に1（入力不要）
-- **パーティメンバー数**: 1-3人の範囲で設定可能
+- **パーティメンバー数**: 0-3人の範囲で設定可能
 - **双方同時適用**: ATK%とMATK%の両方に同じ値が加算される
 
 ### 実装詳細
@@ -893,7 +893,7 @@ const fateCompanionshipEffect = data.register.effects.find(effect =>
   effect.type === 'fateCompanionship' && effect.isEnabled
 )
 if (fateCompanionshipEffect) {
-  const bonusPercent = (fateCompanionshipEffect.partyMembers || 1) * 1
+  const bonusPercent = (fateCompanionshipEffect.partyMembers || 0) // パーティメンバー数%
   finalBonuses.ATK_Rate = (finalBonuses.ATK_Rate || 0) + bonusPercent
   finalBonuses.MATK_Rate = (finalBonuses.MATK_Rate || 0) + bonusPercent
 }
@@ -908,7 +908,7 @@ interface RegisterEffect {
   isEnabled: boolean
   level: 1 // 常に1で固定
   maxLevel: 1 // 常に1で固定
-  partyMembers: number // 1-3の範囲
+  partyMembers: number // 0-3の範囲
   maxPartyMembers: 3 // 最大3人
 }
 ```
@@ -916,9 +916,9 @@ interface RegisterEffect {
 ### UI仕様
 - **モーダルタイトル**: レジスタ名のみ（例: "運命共同体"）
 - **レベル入力フィールド**: 非表示（他のレジスタ効果のみ表示）
-- **パーティメンバー数入力**: 1-3の数値入力フィールド
+- **パーティメンバー数入力**: 0-3の数値入力フィールド（-10/-1/+1/+10ボタン形式）
 - **確定ボタン**: 常にレベル1で送信
-- **表示**: "運命共同体 (パーティメンバー数: 3人)" のような形式
+- **表示**: "運命共同体 (パーティメンバー数: 2)" のような形式
 
 ### モーダルの条件分岐
 ```typescript
@@ -1046,7 +1046,7 @@ if (data.register?.effects) {
 6. **回避アップ(evasionUp)** - 回避率向上（装備品補正値1の回避(+)に加算）
 7. **攻撃速度アップ(attackSpeedUp)** - 攻撃速度向上（装備品補正値1のASPD(+)に加算）
 8. **魔法速度アップ(magicalSpeedUp)** - 詠唱速度向上（装備品補正値1のCSPD(+)に加算）
-9. **運命共同体(fateCompanionship)** - パーティメンバー数×1%をATK%とMATK%に加算（レベル1固定）
+9. **運命共同体(fateCompanionship)** - パーティメンバー数%をATK%とMATK%に加算（レベル1固定）
 10. **無の構え(voidStance)** - ダメージ計算時のコンボ倍率に影響（DamagePreviewのコンボ:強打無効時のみ）
 11. **術式アロー・追撃** - 術式アローに追加効果
 12. **エアスライド・圧縮** - エアスライドに追加効果

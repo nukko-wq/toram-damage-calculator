@@ -201,7 +201,7 @@ export function createInitialRegisterData(): RegisterFormData {
 			isEnabled: false,
 			level: 1, // 運命共同体は常にレベル1
 			maxLevel: 1,
-			partyMembers: 1, // デフォルトは1人（自分以外）
+			partyMembers: 0, // デフォルトは0人（自分以外）
 		},
 	]
 
