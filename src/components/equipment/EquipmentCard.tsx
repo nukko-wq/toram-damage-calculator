@@ -352,18 +352,20 @@ export default function EquipmentCard({
 				// 現在装着中の装備かどうかをチェック
 				const currentData = useCalculatorStore.getState().data
 				let isCurrentlyEquipped = false
-				
+
 				if (slotInfo && slotInfo.type === 'equipment' && slotInfo.slot) {
 					// biome-ignore lint/suspicious/noExplicitAny: 動的スロットキーアクセスのための型アサーション
-					const currentEquippedId = (currentData.equipment as any)[slotInfo.slot]?.id
+					const currentEquippedId = (currentData.equipment as any)[
+						slotInfo.slot
+					]?.id
 					isCurrentlyEquipped = currentEquippedId === equipment.id
 				}
-				
+
 				// 現在装着中の装備はダメージ差分を表示しない
 				if (isCurrentlyEquipped) {
 					return false
 				}
-				
+
 				return showDamageDifference && slotInfo
 			})() && (
 				<div className="mb-1 sm:mb-2">
@@ -422,12 +424,13 @@ export default function EquipmentCard({
 				try {
 					// 現在のCrystalFormの設定を取得
 					const currentCrystals = useCalculatorStore.getState().data.crystals
-					const tempEquipmentCrystals = useCalculatorStore.getState().data.tempEquipmentCrystals
-					
+					const tempEquipmentCrystals =
+						useCalculatorStore.getState().data.tempEquipmentCrystals
+
 					// 一時的なクリスタ連携情報があればそれを優先、なければLocalStorageから取得
 					const tempCrystalInfo = tempEquipmentCrystals?.[equipment.id]
 					const storedCrystalInfo = getEquipmentAllCrystals(equipment.id)
-					
+
 					const crystalInfo = {
 						slot1: tempCrystalInfo?.slot1 ?? storedCrystalInfo.slot1,
 						slot2: tempCrystalInfo?.slot2 ?? storedCrystalInfo.slot2,

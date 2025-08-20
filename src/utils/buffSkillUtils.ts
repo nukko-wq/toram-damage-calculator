@@ -86,19 +86,22 @@ function deduplicateSkills(
 	skills: BuffSkillDefinition[],
 ): BuffSkillDefinition[] {
 	const skillMap = new Map<string, BuffSkillDefinition>()
-	
+
 	for (const skill of skills) {
 		const existing = skillMap.get(skill.id)
 		if (!existing) {
 			skillMap.set(skill.id, skill)
 		} else {
 			// categoryOrderを持つスキルを優先（武器固有版を優先）
-			if (skill.categoryOrder !== undefined && existing.categoryOrder === undefined) {
+			if (
+				skill.categoryOrder !== undefined &&
+				existing.categoryOrder === undefined
+			) {
 				skillMap.set(skill.id, skill)
 			}
 		}
 	}
-	
+
 	return Array.from(skillMap.values())
 }
 

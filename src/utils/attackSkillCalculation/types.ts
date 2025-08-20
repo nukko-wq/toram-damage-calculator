@@ -24,7 +24,7 @@ export interface PlayerStats {
 	HP: number
 	MP: number
 	level: number
-	
+
 	// 貫通系ステータス
 	physicalPenetration: number
 	totalPhysicalPenetration: number // StatusPreviewの装備品補正値1の物理貫通値

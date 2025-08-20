@@ -69,7 +69,10 @@ function SettingsContent() {
 	)
 }
 
-export default function MenuContent({ activeSection, onClose }: MenuContentProps) {
+export default function MenuContent({
+	activeSection,
+	onClose,
+}: MenuContentProps) {
 	const renderContent = () => {
 		switch (activeSection) {
 			case 'top':

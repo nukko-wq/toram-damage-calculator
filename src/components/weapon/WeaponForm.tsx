@@ -34,10 +34,10 @@ export default function WeaponForm() {
 	// Zustandストアの値を使用（完全移行）
 	const effectiveMainWeapon = storeMainWeapon
 	const effectiveSubWeapon = storeSubWeapon
-	
+
 	console.log('WeaponForm current state:', {
 		mainWeapon: effectiveMainWeapon,
-		subWeapon: effectiveSubWeapon
+		subWeapon: effectiveSubWeapon,
 	})
 	const weaponTypes: WeaponType[] = [
 		'片手剣',
@@ -56,7 +56,12 @@ export default function WeaponForm() {
 	// メイン武器に応じて選択可能なサブ武器種を動的に取得
 	const availableSubWeaponTypes = useMemo(() => {
 		const available = getAvailableSubWeaponTypes(effectiveMainWeapon.weaponType)
-		console.log('Available sub weapons for', effectiveMainWeapon.weaponType, ':', available)
+		console.log(
+			'Available sub weapons for',
+			effectiveMainWeapon.weaponType,
+			':',
+			available,
+		)
 		return available
 	}, [effectiveMainWeapon.weaponType])
 
@@ -64,7 +69,6 @@ export default function WeaponForm() {
 	const refinementOptions = useMemo(() => {
 		return getRefinementDisplayOptions()
 	}, [])
-
 
 	// 精錬値変換ヘルパー関数
 	const getCurrentMainRefinementDisplay = (): RefinementDisplay => {
@@ -194,10 +198,16 @@ export default function WeaponForm() {
 		}
 	}
 
-
 	// メイン武器の武器タイプ変更時の処理
-	const handleMainWeaponTypeChange = (newWeaponType: string, currentData: Partial<MainWeaponFormData>) => {
-		console.log('handleMainWeaponTypeChange called:', newWeaponType, currentData)
+	const handleMainWeaponTypeChange = (
+		newWeaponType: string,
+		currentData: Partial<MainWeaponFormData>,
+	) => {
+		console.log(
+			'handleMainWeaponTypeChange called:',
+			newWeaponType,
+			currentData,
+		)
 		const newMainWeaponType = newWeaponType as WeaponType
 		const currentSubWeaponType = effectiveSubWeapon.weaponType
 
@@ -217,17 +227,18 @@ export default function WeaponForm() {
 	}
 
 	// メイン武器のフォーム同期（カスタムフック使用）
-	const { initialize: initializeMainWeaponSync } = useWeaponFormSync<MainWeaponFormData>(
-		watchMain,
-		(data: MainWeaponFormData) => {
-			console.log('Updating main weapon:', data)
-			updateMainWeapon(data as MainWeapon)
-		},
-		validateWeaponData,
-		{
-			onWeaponTypeChange: handleMainWeaponTypeChange,
-		},
-	)
+	const { initialize: initializeMainWeaponSync } =
+		useWeaponFormSync<MainWeaponFormData>(
+			watchMain,
+			(data: MainWeaponFormData) => {
+				console.log('Updating main weapon:', data)
+				updateMainWeapon(data as MainWeapon)
+			},
+			validateWeaponData,
+			{
+				onWeaponTypeChange: handleMainWeaponTypeChange,
+			},
+		)
 
 	// 初期化処理を実行
 	useEffect(() => {
@@ -268,31 +279,34 @@ export default function WeaponForm() {
 							>
 								武器種:
 							</label>
-						<select
-							id="main-weapon-type"
-							className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-							{...registerMain('weaponType')}
-							onChange={(e) => {
-								console.log('Select onChange:', e.target.value)
-								const newWeaponType = e.target.value as WeaponType
-								
-								// React Hook Formに値を設定
-								setValueMain('weaponType', newWeaponType)
-								
-								// 直接Zustandストアを更新
-								const updatedMainWeapon = {
-									...effectiveMainWeapon,
-									weaponType: newWeaponType
-								}
-								updateMainWeapon(updatedMainWeapon)
-								
-								// サブ武器の自動修正処理を実行
-								handleMainWeaponTypeChange(newWeaponType, updatedMainWeapon)
-							}}
-							onClick={() => {
-								console.log('Select clicked - current weapon type:', effectiveMainWeapon.weaponType)
-							}}
-						>
+							<select
+								id="main-weapon-type"
+								className="flex-1 px-1 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+								{...registerMain('weaponType')}
+								onChange={(e) => {
+									console.log('Select onChange:', e.target.value)
+									const newWeaponType = e.target.value as WeaponType
+
+									// React Hook Formに値を設定
+									setValueMain('weaponType', newWeaponType)
+
+									// 直接Zustandストアを更新
+									const updatedMainWeapon = {
+										...effectiveMainWeapon,
+										weaponType: newWeaponType,
+									}
+									updateMainWeapon(updatedMainWeapon)
+
+									// サブ武器の自動修正処理を実行
+									handleMainWeaponTypeChange(newWeaponType, updatedMainWeapon)
+								}}
+								onClick={() => {
+									console.log(
+										'Select clicked - current weapon type:',
+										effectiveMainWeapon.weaponType,
+									)
+								}}
+							>
 								{weaponTypes.map((type) => (
 									<option key={type} value={type}>
 										{type}

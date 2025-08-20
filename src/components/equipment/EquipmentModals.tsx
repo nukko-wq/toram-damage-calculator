@@ -13,7 +13,7 @@ interface EquipmentModalsProps {
 	// 現在のアクティブタブ
 	activeTab: keyof EquipmentSlots | 'register'
 	selectedEquipmentId: string | null
-	
+
 	// ダメージ差分表示用
 	slotInfo?: SlotInfo
 

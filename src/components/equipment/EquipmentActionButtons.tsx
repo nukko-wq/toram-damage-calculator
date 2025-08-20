@@ -5,7 +5,10 @@ import type { EquipmentCategory, EquipmentSlots } from '@/types/calculator'
 interface EquipmentActionButtonsProps {
 	activeTab: keyof EquipmentSlots | 'register'
 	equipment: any // 装備データ
-	equipmentSlots: Array<{ key: keyof EquipmentSlots | 'register'; label: string }>
+	equipmentSlots: Array<{
+		key: keyof EquipmentSlots | 'register'
+		label: string
+	}>
 	onEquipmentModalOpen: () => void
 	onCreateEquipment: () => void
 	onRenameEquipment: () => void
@@ -57,10 +60,10 @@ export default function EquipmentActionButtons({
 								{!equipment?.id || !equipment?.name
 									? 'なし'
 									: ['freeInput1', 'freeInput2', 'freeInput3'].includes(
-											activeTab,
-										)
-									? '装備選択'
-									: 'プリセット選択'}
+												activeTab,
+											)
+										? '装備選択'
+										: 'プリセット選択'}
 							</span>
 							<svg
 								className="w-4 h-4 text-gray-400"
@@ -80,7 +83,7 @@ export default function EquipmentActionButtons({
 						</div>
 					)}
 				</button>
-				
+
 				{/* カスタム機能ボタンを表示 - 全スロットで常に表示 */}
 				<button
 					type="button"
@@ -90,7 +93,7 @@ export default function EquipmentActionButtons({
 				>
 					新規作成
 				</button>
-				
+
 				{equipment?.id &&
 					equipment &&
 					'isCustom' in equipment &&

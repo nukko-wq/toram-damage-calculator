@@ -2,9 +2,7 @@
 
 import { useState } from 'react'
 import ArmorTypeSelect from '@/components/ui/ArmorTypeSelect'
-import type {
-	EquipmentSlots,
-} from '@/types/calculator'
+import type { EquipmentSlots } from '@/types/calculator'
 import { getArmorType } from '@/utils/armorTypeStorage'
 import EquipmentActionButtons from './EquipmentActionButtons'
 import EquipmentModals from './EquipmentModals'
@@ -27,7 +25,7 @@ export default function EquipmentForm({
 	const [activeTab, setActiveTab] = useState<keyof EquipmentSlots | 'register'>(
 		'mainWeapon',
 	)
-	
+
 	// モーダル状態管理
 	const [modalState, setModalState] = useState({
 		isOpen: false,
@@ -110,10 +108,7 @@ export default function EquipmentForm({
 			<h2 className="text-xl font-bold text-gray-800 mb-4">装備/プロパティ</h2>
 
 			{/* タブヘッダー */}
-			<EquipmentSlotTabs 
-				activeTab={activeTab} 
-				onTabChange={setActiveTab} 
-			/>
+			<EquipmentSlotTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
 			{/* タブコンテンツ */}
 			{activeTab === 'register' ? (
@@ -196,10 +191,14 @@ export default function EquipmentForm({
 				selectedEquipmentId={
 					effectiveEquipment[activeTab as keyof EquipmentSlots]?.id || null
 				}
-				slotInfo={activeTab !== 'register' ? {
-					type: 'equipment' as const,
-					slot: activeTab,
-				} : undefined}
+				slotInfo={
+					activeTab !== 'register'
+						? {
+								type: 'equipment' as const,
+								slot: activeTab,
+							}
+						: undefined
+				}
 				equipmentModal={modalState}
 				onEquipmentSelect={handlePresetEquipmentSelect}
 				onEquipmentModalClose={closeEquipmentModal}

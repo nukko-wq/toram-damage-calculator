@@ -23,7 +23,8 @@ export class SkillCalculationUtils {
 		// 全データソースのボーナスを取得して物理貫通を計算
 		const allBonuses = getAllDataSourceBonusesWithBuffSkills(store.data)
 		const equipmentBonuses = calculateEquipmentBonuses(allBonuses)
-		const totalPhysicalPenetration = equipmentBonuses.equipmentBonus1.physicalPenetration || 0
+		const totalPhysicalPenetration =
+			equipmentBonuses.equipmentBonus1.physicalPenetration || 0
 
 		return {
 			baseSTR: baseStats.STR,
@@ -44,7 +45,7 @@ export class SkillCalculationUtils {
 			HP: results.basicStats.HP || 0,
 			MP: results.basicStats.MP || 0,
 			level: baseStats.level,
-			
+
 			// 貫通系ステータス
 			physicalPenetration: 0,
 			totalPhysicalPenetration: totalPhysicalPenetration,
@@ -78,7 +79,8 @@ export class SkillCalculationUtils {
 		// 全データソースのボーナスを取得して物理貫通を計算
 		const allBonuses = getAllDataSourceBonusesWithBuffSkills(calculatorData)
 		const equipmentBonuses = calculateEquipmentBonuses(allBonuses)
-		const totalPhysicalPenetration = equipmentBonuses.equipmentBonus1.physicalPenetration || 0
+		const totalPhysicalPenetration =
+			equipmentBonuses.equipmentBonus1.physicalPenetration || 0
 
 		return {
 			baseSTR: baseStats.STR,
@@ -99,7 +101,7 @@ export class SkillCalculationUtils {
 			HP: results.basicStats.HP || 0,
 			MP: results.basicStats.MP || 0,
 			level: baseStats.level,
-			
+
 			// 貫通系ステータス
 			physicalPenetration: 0,
 			totalPhysicalPenetration: totalPhysicalPenetration,

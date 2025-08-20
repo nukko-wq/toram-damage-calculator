@@ -19,7 +19,10 @@ import { getDarkPowerSkillBonuses } from '../categories/darkPowerSkills'
 import { getDualSwordSkillBonuses } from '../categories/dualSwordSkills'
 import { getHalberdSkillBonuses } from '../categories/halberdSkills'
 import { getHunterSkillBonuses } from '../categories/hunterSkills'
-import { getMartialSkillBonuses, getMartialSkillBraveMultiplier } from '../categories/martialSkills'
+import {
+	getMartialSkillBonuses,
+	getMartialSkillBraveMultiplier,
+} from '../categories/martialSkills'
 // カテゴリ別インポート
 import { getMasterySkillBonuses } from '../categories/masterySkills'
 import { getNinjaSkillBonuses } from '../categories/ninjaSkills'
@@ -56,8 +59,14 @@ export function getBuffSkillBonuses(
 	if (!buffSkillData) return bonuses
 
 	// マスタリスキル（subWeaponTypeを渡して盾判定も可能にする）
-	const subWeapon = subWeaponType ? { weaponType: subWeaponType, ATK: 0, stability: 0, refinement: 0 } : null
-	const masteryBonuses = getMasterySkillBonuses(buffSkillData, weaponType, subWeapon)
+	const subWeapon = subWeaponType
+		? { weaponType: subWeaponType, ATK: 0, stability: 0, refinement: 0 }
+		: null
+	const masteryBonuses = getMasterySkillBonuses(
+		buffSkillData,
+		weaponType,
+		subWeapon,
+	)
 	for (const [key, value] of Object.entries(masteryBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -80,7 +89,11 @@ export function getBuffSkillBonuses(
 	}
 
 	// ハルバードスキル
-	const halberdBonuses = getHalberdSkillBonuses(buffSkillData, weaponType, baseStats)
+	const halberdBonuses = getHalberdSkillBonuses(
+		buffSkillData,
+		weaponType,
+		baseStats,
+	)
 	for (const [key, value] of Object.entries(halberdBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -89,7 +102,11 @@ export function getBuffSkillBonuses(
 	}
 
 	// マーシャルスキル
-	const martialBonuses = getMartialSkillBonuses(buffSkillData, weaponType, subWeaponType)
+	const martialBonuses = getMartialSkillBonuses(
+		buffSkillData,
+		weaponType,
+		subWeaponType,
+	)
 	for (const [key, value] of Object.entries(martialBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =
@@ -98,7 +115,11 @@ export function getBuffSkillBonuses(
 	}
 
 	// モノノフスキル（武士道、両手持ち、怪力乱神等）
-	const mononofuBonuses = getMononofuSkillBonuses(buffSkillData, weaponType, subWeaponType || null)
+	const mononofuBonuses = getMononofuSkillBonuses(
+		buffSkillData,
+		weaponType,
+		subWeaponType || null,
+	)
 	for (const [key, value] of Object.entries(mononofuBonuses)) {
 		if (typeof value === 'number' && value !== 0) {
 			bonuses[key as keyof AllBonuses] =

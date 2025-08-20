@@ -71,9 +71,15 @@ export default function FoodForm({ food: _food, onFoodChange }: FoodFormProps) {
 			}
 
 			// すべてのスロットが定義されている場合のみ更新
-			if (value && typeof value === 'object' && 
-				'slot1' in value && 'slot2' in value && 'slot3' in value && 
-				'slot4' in value && 'slot5' in value) {
+			if (
+				value &&
+				typeof value === 'object' &&
+				'slot1' in value &&
+				'slot2' in value &&
+				'slot3' in value &&
+				'slot4' in value &&
+				'slot5' in value
+			) {
 				// Zustandストアを更新
 				updateFood(value as FoodFormData)
 				// 後方互換性のため従来のonChangeも呼び出し

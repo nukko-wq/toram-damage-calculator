@@ -15,18 +15,22 @@ export class OgreSlashCalculator extends SkillHitCalculator {
 		switch (hitNumber) {
 			case 1: {
 				// 1撃目: ステータス依存計算 + 物理貫通加算
-				const baseMultiplier = Math.abs(playerStats.baseSTR + playerStats.baseVIT)
+				const baseMultiplier = Math.abs(
+					playerStats.baseSTR + playerStats.baseVIT,
+				)
 				const fixedDamage = playerStats.adjustedDEX
-				
+
 				// StatusPreviewの装備品補正値1の物理貫通値を使用して1hit目ボーナス計算
 				const totalPenetration = playerStats.totalPhysicalPenetration
-				
+
 				// 物理貫通100%超過分を1撃目威力に加算
-				const penetrationBonus = totalPenetration > 100 ? totalPenetration - 100 : 0
+				const penetrationBonus =
+					totalPenetration > 100 ? totalPenetration - 100 : 0
 				const finalMultiplier = baseMultiplier + penetrationBonus
-				
+
 				// 特殊効果の物理貫通は引き続きバフスキルの消費鬼力から計算
-				const demonPowerCount = input.buffSkillContext?.getBuffSkillLevel('sm1') || 0
+				const demonPowerCount =
+					input.buffSkillContext?.getBuffSkillLevel('sm1') || 0
 				const skillPenetration = Math.abs(demonPowerCount * 10)
 
 				return {
@@ -35,14 +39,15 @@ export class OgreSlashCalculator extends SkillHitCalculator {
 					calculatedFixedDamage: fixedDamage,
 					calculationProcess: `|${playerStats.baseSTR}+${playerStats.baseVIT}| + 貫通加算${penetrationBonus} = ${finalMultiplier}%, ${playerStats.adjustedDEX}`,
 					specialEffects: {
-						physicalPenetration: skillPenetration
-					}
+						physicalPenetration: skillPenetration,
+					},
 				}
 			}
 
 			case 2: {
 				// 2撃目: 消費鬼力依存計算
-				const demonPowerCount = input.buffSkillContext?.getBuffSkillLevel('sm1') || 0
+				const demonPowerCount =
+					input.buffSkillContext?.getBuffSkillLevel('sm1') || 0
 				const multiplier = Math.abs(200 * demonPowerCount)
 				const fixedDamage = 500
 
@@ -52,8 +57,8 @@ export class OgreSlashCalculator extends SkillHitCalculator {
 					calculatedFixedDamage: fixedDamage,
 					calculationProcess: `|200×${demonPowerCount}| = ${multiplier}%, 500固定`,
 					specialEffects: {
-						physicalPenetration: Math.abs(demonPowerCount * 10)
-					}
+						physicalPenetration: Math.abs(demonPowerCount * 10),
+					},
 				}
 			}
 

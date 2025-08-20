@@ -11,36 +11,47 @@ import { calculateStatPoints } from '@/utils/statPointCalculation'
 
 export default function BaseStatsForm() {
 	console.log('BaseStatsForm: Component rendered')
-	
+
 	// Zustandストアから基本ステータスを取得
 	const storeStats = useCalculatorStore((state) => state.data.baseStats)
 	const updateBaseStats = useCalculatorStore((state) => state.updateBaseStats)
-	
+
 	console.log('BaseStatsForm: storeStats:', storeStats)
 	console.log('BaseStatsForm: updateBaseStats:', updateBaseStats)
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveStats = storeStats
 
-	const { register, watch, setValue, getValues, reset } = useForm<BaseStatsFormData>({
-		resolver: zodResolver(baseStatsSchema),
-		defaultValues: effectiveStats,
-		mode: 'onChange',
-	})
-	
-	console.log('BaseStatsForm: useForm initialized with defaultValues:', effectiveStats)
+	const { register, watch, setValue, getValues, reset } =
+		useForm<BaseStatsFormData>({
+			resolver: zodResolver(baseStatsSchema),
+			defaultValues: effectiveStats,
+			mode: 'onChange',
+		})
+
+	console.log(
+		'BaseStatsForm: useForm initialized with defaultValues:',
+		effectiveStats,
+	)
 
 	// useFormSyncカスタムフックで初期化とフォーム監視を統合
-	console.log('BaseStatsForm: Calling useFormSync with watch function:', typeof watch)
-	
+	console.log(
+		'BaseStatsForm: Calling useFormSync with watch function:',
+		typeof watch,
+	)
+
 	// 直接watchをテストしてみる
 	useEffect(() => {
 		const subscription = watch((value, { name, type }) => {
-			console.log('BaseStatsForm: Direct watch callback triggered:', { value, name, type })
+			console.log('BaseStatsForm: Direct watch callback triggered:', {
+				value,
+				name,
+				type,
+			})
 		})
 		return () => subscription.unsubscribe()
 	}, [watch])
-	
+
 	useFormSync<BaseStatsFormData>(
 		watch,
 		(data: BaseStatsFormData) => {
@@ -49,7 +60,12 @@ export default function BaseStatsForm() {
 		},
 		(data) => {
 			const isValid = validateBaseStats(data)
-			console.log('BaseStatsForm: validateBaseStats result:', isValid, 'data:', data)
+			console.log(
+				'BaseStatsForm: validateBaseStats result:',
+				isValid,
+				'data:',
+				data,
+			)
 			return isValid
 		},
 	)
@@ -82,7 +98,13 @@ export default function BaseStatsForm() {
 
 		// 空文字、0、または不正な値の場合は最小値に設定
 		const numValue = Number(value)
-		if (value === undefined || value === null || String(value) === '' || Number.isNaN(numValue) || numValue < min) {
+		if (
+			value === undefined ||
+			value === null ||
+			String(value) === '' ||
+			Number.isNaN(numValue) ||
+			numValue < min
+		) {
 			setValue(fieldName, min, { shouldValidate: true })
 		} else if (numValue > max) {
 			setValue(fieldName, max, { shouldValidate: true })
