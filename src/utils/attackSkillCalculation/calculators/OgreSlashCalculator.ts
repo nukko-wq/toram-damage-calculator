@@ -18,14 +18,16 @@ export class OgreSlashCalculator extends SkillHitCalculator {
 				const baseMultiplier = Math.abs(playerStats.baseSTR + playerStats.baseVIT)
 				const fixedDamage = playerStats.adjustedDEX
 				
-				// 物理貫通総計を計算（キャラクター基本値 + スキル特殊効果）
-				const demonPowerCount = input.buffSkillContext?.getBuffSkillLevel('sm1') || 0
-				const skillPenetration = Math.abs(demonPowerCount * 10)
-				const totalPenetration = playerStats.physicalPenetration + skillPenetration
+				// StatusPreviewの装備品補正値1の物理貫通値を使用して1hit目ボーナス計算
+				const totalPenetration = playerStats.totalPhysicalPenetration
 				
 				// 物理貫通100%超過分を1撃目威力に加算
 				const penetrationBonus = totalPenetration > 100 ? totalPenetration - 100 : 0
 				const finalMultiplier = baseMultiplier + penetrationBonus
+				
+				// 特殊効果の物理貫通は引き続きバフスキルの消費鬼力から計算
+				const demonPowerCount = input.buffSkillContext?.getBuffSkillLevel('sm1') || 0
+				const skillPenetration = Math.abs(demonPowerCount * 10)
 
 				return {
 					hitNumber: 1,

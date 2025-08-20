@@ -1,6 +1,8 @@
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { CalculatorData } from '@/types/calculator'
 import { calculateResults } from '@/utils/calculationEngine'
+import { getAllDataSourceBonusesWithBuffSkills } from '@/utils/dataSourceIntegration'
+import { calculateEquipmentBonuses } from '@/utils/basicStatsCalculation'
 import type { BuffSkillContext, EquipmentContext, PlayerStats } from './types'
 
 /**
@@ -17,6 +19,11 @@ export class SkillCalculationUtils {
 
 		// 基本ステータス計算（既存のcalculationEngine.tsを使用）
 		const results = calculateResults(store.data)
+
+		// 全データソースのボーナスを取得して物理貫通を計算
+		const allBonuses = getAllDataSourceBonusesWithBuffSkills(store.data)
+		const equipmentBonuses = calculateEquipmentBonuses(allBonuses)
+		const totalPhysicalPenetration = equipmentBonuses.equipmentBonus1.physicalPenetration || 0
 
 		return {
 			baseSTR: baseStats.STR,
@@ -38,8 +45,9 @@ export class SkillCalculationUtils {
 			MP: results.basicStats.MP || 0,
 			level: baseStats.level,
 			
-			// 貫通系ステータス（仮の値、将来的に実装時に正しい値を設定）
+			// 貫通系ステータス
 			physicalPenetration: 0,
+			totalPhysicalPenetration: totalPhysicalPenetration,
 		}
 	}
 
@@ -67,6 +75,11 @@ export class SkillCalculationUtils {
 		// 基本ステータス計算（既存のcalculationEngine.tsを使用）
 		const results = calculateResults(calculatorData)
 
+		// 全データソースのボーナスを取得して物理貫通を計算
+		const allBonuses = getAllDataSourceBonusesWithBuffSkills(calculatorData)
+		const equipmentBonuses = calculateEquipmentBonuses(allBonuses)
+		const totalPhysicalPenetration = equipmentBonuses.equipmentBonus1.physicalPenetration || 0
+
 		return {
 			baseSTR: baseStats.STR,
 			baseDEX: baseStats.DEX,
@@ -87,8 +100,9 @@ export class SkillCalculationUtils {
 			MP: results.basicStats.MP || 0,
 			level: baseStats.level,
 			
-			// 貫通系ステータス（仮の値、将来的に実装時に正しい値を設定）
+			// 貫通系ステータス
 			physicalPenetration: 0,
+			totalPhysicalPenetration: totalPhysicalPenetration,
 		}
 	}
 
