@@ -1,7 +1,6 @@
 // 敵情報データベース（プリセット + ユーザーカスタム統合）
 
 import { enemiesData } from '@/data/enemies'
-import { safeJSONParse } from './storage'
 import type {
 	Enemy,
 	EnemyCategory,
@@ -10,6 +9,7 @@ import type {
 	UserEnemy,
 } from '@/types/calculator'
 import { getUserEnemies } from './customEnemyManager'
+import { safeJSONParse } from './storage'
 
 // ストレージキー
 const STORAGE_KEYS = {

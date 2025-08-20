@@ -7,7 +7,7 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "biome check",
-		"lint:fix": "npx @biomejs/biome lint --write",
+		"lint:fix": "biome check --write",
 		"format": "biome format --write",
 		"check": "npx @biomejs/biome check",
 		"check:fix": "npx @biomejs/biome check --write",

@@ -5,8 +5,8 @@ import { useCalculatorStore } from '@/stores'
 import type { BuffSkillDefinition } from '@/types/buffSkill'
 import { CATEGORY_LABELS } from '@/types/buffSkill'
 import {
-	getSkillNameClassName,
 	getCategoryLabelClassName,
+	getSkillNameClassName,
 	shouldShowModal,
 } from '@/utils/buffSkillUtils'
 import MultiParamModal from './MultiParamModal'

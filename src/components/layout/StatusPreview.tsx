@@ -21,7 +21,6 @@ import {
 	calculateMATK,
 	calculateMagicalCriticalDamage,
 	calculateMagicalCriticalRate,
-	getSpellBurstLevel,
 	calculateMagicalResistance,
 	calculateMotionSpeed,
 	calculateMP,
@@ -32,6 +31,7 @@ import {
 	calculateTotalATK,
 	calculateTotalElementAdvantage,
 	getBodyArmorType,
+	getSpellBurstLevel,
 } from '@/utils/basicStatsCalculation'
 import {
 	getAllDataSourceBonusesWithBuffSkills,

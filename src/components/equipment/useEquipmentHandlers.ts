@@ -7,9 +7,9 @@ import type {
 	EquipmentSlots,
 } from '@/types/calculator'
 import { getArmorType, saveArmorType } from '@/utils/armorTypeStorage'
+import { getEquipmentAllCrystals } from '@/utils/equipmentCrystalStorage'
 import { getCombinedEquipmentById } from '@/utils/equipmentDatabase'
 import { getWeaponInfo } from '@/utils/weaponInfoStorage'
-import { getEquipmentAllCrystals } from '@/utils/equipmentCrystalStorage'
 
 interface ModalStates {
 	modalState: {

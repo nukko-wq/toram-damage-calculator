@@ -1062,7 +1062,7 @@ export function getDetailedDataSourceBonuses(
 			buffItems: getBuffBonuses(data.buffItems),
 			buffSkills: (() => {
 				// 全バフスキル効果を統合（getAllDataSourceBonusesWithBuffSkillsと同じロジック）
-				let combinedBonuses: Partial<AllBonuses> = {}
+				const combinedBonuses: Partial<AllBonuses> = {}
 
 				// 敵情報を取得（エンハンス等で使用）
 				let enemyDEF = 1000

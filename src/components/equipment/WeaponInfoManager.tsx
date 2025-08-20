@@ -3,8 +3,8 @@
 import { useCalculatorStore } from '@/stores'
 import {
 	clearWeaponInfo,
-	saveWeaponInfo,
 	saveSubWeaponInfo,
+	saveWeaponInfo,
 } from '@/utils/weaponInfoStorage'
 
 interface WeaponInfoManagerProps {

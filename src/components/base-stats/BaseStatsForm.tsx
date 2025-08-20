@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo, useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useFormSync, validateBaseStats } from '@/hooks/useFormSync'
 import { type BaseStatsFormData, baseStatsSchema } from '@/schemas/baseStats'

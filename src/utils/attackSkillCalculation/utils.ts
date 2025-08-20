@@ -1,8 +1,8 @@
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { CalculatorData } from '@/types/calculator'
+import { calculateEquipmentBonuses } from '@/utils/basicStatsCalculation'
 import { calculateResults } from '@/utils/calculationEngine'
 import { getAllDataSourceBonusesWithBuffSkills } from '@/utils/dataSourceIntegration'
-import { calculateEquipmentBonuses } from '@/utils/basicStatsCalculation'
 import type { BuffSkillContext, EquipmentContext, PlayerStats } from './types'
 
 /**

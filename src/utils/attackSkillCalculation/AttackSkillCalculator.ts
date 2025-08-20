@@ -16,9 +16,9 @@ import {
 	StormBlazer10StackCalculator,
 	StrikeStabAilmentCalculator,
 	StrikeStabCalculator,
-	ThorHammerFollowupCalculator,
 	ThorHammerFollowup5HitCalculator,
 	ThorHammerFollowup8HitCalculator,
+	ThorHammerFollowupCalculator,
 	ThorHammerSingleCalculator,
 } from './calculators'
 import type {

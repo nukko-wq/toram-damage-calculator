@@ -3,13 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
+import { useWeaponFormSync, validateWeaponData } from '@/hooks/useFormSync'
 import {
 	type MainWeaponFormData,
 	mainWeaponSchema,
 	type SubWeaponFormData,
 	subWeaponSchema,
 } from '@/schemas/weapons'
-import { useWeaponFormSync, validateWeaponData } from '@/hooks/useFormSync'
 import { useCalculatorStore } from '@/stores'
 import type { MainWeapon, SubWeapon, WeaponType } from '@/types/calculator'
 import {

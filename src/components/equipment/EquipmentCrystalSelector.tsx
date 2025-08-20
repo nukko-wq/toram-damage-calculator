@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import CrystalSelectionModal from '@/components/crystal/CrystalSelectionModal'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { CrystalType, EquipmentSlots } from '@/types/calculator'
 import type { SlotInfo } from '@/types/damagePreview'
 import { getCrystalById } from '@/utils/crystalDatabase'
 import { getEquipmentCrystal } from '@/utils/equipmentCrystalStorage'
-import { useCalculatorStore } from '@/stores/calculatorStore'
 
 interface EquipmentCrystalSelectorProps {
 	equipmentId: string

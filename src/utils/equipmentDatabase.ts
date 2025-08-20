@@ -1,5 +1,4 @@
 import { equipmentsData } from '@/data/equipments'
-import { safeJSONParse } from './storage'
 import type {
 	ArmorType,
 	ConditionalEffect,
@@ -19,6 +18,7 @@ import {
 	startEditSession,
 	updateEditSessionProperties,
 } from './editSessionManager'
+import { safeJSONParse } from './storage'
 import {
 	getAllTemporaryEquipments,
 	getTemporaryEquipmentById,

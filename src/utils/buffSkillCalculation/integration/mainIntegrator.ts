@@ -25,8 +25,8 @@ import {
 } from '../categories/martialSkills'
 // カテゴリ別インポート
 import { getMasterySkillBonuses } from '../categories/masterySkills'
-import { getNinjaSkillBonuses } from '../categories/ninjaSkills'
 import { getMononofuSkillBonuses } from '../categories/mononofuSkills'
+import { getNinjaSkillBonuses } from '../categories/ninjaSkills'
 import { getPartisanSkillBonuses } from '../categories/partisanSkills'
 import { getPriestSkillBonuses } from '../categories/priestSkills'
 import { getShieldSkillBonuses } from '../categories/shieldSkills'

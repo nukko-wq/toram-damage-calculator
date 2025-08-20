@@ -18,7 +18,6 @@ import type {
 	DamageCalculationResult,
 } from '@/types/stores'
 import { calculateResults } from '@/utils/calculationEngine'
-import { safeJSONParse } from '@/utils/storage'
 import {
 	calculateDamageWithService,
 	type DamageCalculationServiceResult,
@@ -30,6 +29,10 @@ import {
 	getAllEditSessionEquipments,
 } from '@/utils/editSessionManager'
 import {
+	deleteEquipmentCrystal,
+	saveEquipmentCrystal,
+} from '@/utils/equipmentCrystalStorage'
+import {
 	deleteCustomEquipment,
 	hasEditSessions,
 	hasTemporaryEquipments,
@@ -39,10 +42,6 @@ import {
 	updateCustomEquipmentRefinement,
 	updateEquipmentArmorType,
 } from '@/utils/equipmentDatabase'
-import {
-	saveEquipmentCrystal,
-	deleteEquipmentCrystal,
-} from '@/utils/equipmentCrystalStorage'
 import {
 	createInitialCalculatorData,
 	createInitialEquipment,
@@ -56,6 +55,7 @@ import {
 	initializeStorage,
 	saveCurrentData,
 } from '@/utils/saveDataManager'
+import { safeJSONParse } from '@/utils/storage'
 import {
 	cleanupAllTemporaryEquipments,
 	convertTemporaryEquipmentToPersistent,

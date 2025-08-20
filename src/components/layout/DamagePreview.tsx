@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useCalculatorStore } from '@/stores/calculatorStore'
 import { useUIStore } from '@/stores'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 import type {
 	OptionTabType,
 	OtherOptions,

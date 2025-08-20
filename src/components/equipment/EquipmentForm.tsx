@@ -9,8 +9,8 @@ import EquipmentModals from './EquipmentModals'
 import EquipmentSlotTabs from './EquipmentSlotTabs'
 import PropertyEditor from './PropertyEditor'
 import { RegisterForm } from './RegisterForm'
-import WeaponInfoManager from './WeaponInfoManager'
 import { useEquipmentHandlers } from './useEquipmentHandlers'
+import WeaponInfoManager from './WeaponInfoManager'
 
 interface EquipmentFormProps {
 	// Zustand移行後は不要（後方互換性のため残存）
