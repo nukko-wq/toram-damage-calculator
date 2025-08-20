@@ -99,7 +99,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		order: 103,
 		systemGroup: 'sword',
 		category: 'blade',
-		weaponTypeRequirements: ['片手剣'],
+		weaponTypeRequirements: ['片手剣', '双剣', '両手剣'],
 		mpCost: 400,
 		multiplierFormula: '特殊計算',
 		fixedDamageFormula: '特殊計算',
@@ -113,7 +113,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplier: 1000, // 表示用（実際の計算は外部）
 				fixedDamage: 400, // 表示用（実際の計算は外部）
 				adaptation: 'physical',
-				adaptationGrant: 'normal',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,
@@ -130,7 +130,56 @@ const attackSkillsRawData: AttackSkill[] = [
 				multiplierFormula: '威力+補正後STR%',
 				fixedDamageFormula: '固定値+基礎INT/2',
 				adaptation: 'physical',
-				adaptationGrant: 'normal',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
+	// オーガスラッシュ（消費鬼力連携の例）
+	{
+		id: 'ogre_slash',
+		name: 'オーガスラッシュ',
+		order: 104,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['両手剣'],
+		mpCost: 500,
+		multiplierFormula: '特殊計算',
+		fixedDamageFormula: '特殊計算',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 0, // 表示用（|基礎STR+基礎VIT|%+貫通加算は外部計算）
+				fixedDamage: 0, // 表示用（補正後DEXは外部計算）
+				multiplierFormula: '威力+|基礎STR+基礎VIT|%',
+				fixedDamageFormula: '固定値+補正後DEX',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 0, // 表示用（|200×消費鬼力数|%は外部計算）
+				fixedDamage: 500, // 固定500ダメージ
+				multiplierFormula: '威力+|200×消費鬼力数|%',
+				fixedDamageFormula: '固定値500',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
 				canUseLongRange: false,
 				canUseShortRangePower: true,

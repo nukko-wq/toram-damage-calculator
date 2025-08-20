@@ -1533,7 +1533,7 @@ export const calculateSpearMATK = (
 	bonuses: AllBonuses,
 ): SpearMATKCalculationSteps => {
 	// 1. 槍総武器MATK計算: 総武器ATK × 5/8
-	const spearWeaponMATK = Math.floor(totalWeaponATK * 5 / 8)
+	const spearWeaponMATK = Math.floor((totalWeaponATK * 5) / 8)
 
 	// 2. 槍ステータスMATK計算（補正後ステータスを使用）
 	const { INT, AGI } = adjustedStats
@@ -1560,7 +1560,8 @@ export const calculateSpearMATK = (
 	const matkDownTotal = 0 // 必要に応じて実装
 
 	// 4. 槍基礎MATK計算
-	const spearBaseMATK = level + spearWeaponMATK + spearStatusMATK + matkUpTotal - matkDownTotal
+	const spearBaseMATK =
+		level + spearWeaponMATK + spearStatusMATK + matkUpTotal - matkDownTotal
 
 	// 5. MATK%適用
 	const matkPercent = bonuses.MATK_Rate || 0
@@ -1771,7 +1772,7 @@ export function calculateElementAwakeningAdvantage(
 ): ElementAwakeningAdvantageCalculationSteps {
 	// 1. 基本属性覚醒有利計算（25%または0%）
 	let baseElementAwakeningAdvantage = 0
-	
+
 	// 属性覚醒+25%が適用される条件：
 	// - 敵が無属性でない
 	// - 属性攻撃設定が「有利」の場合のみ
@@ -1797,7 +1798,9 @@ export function calculateElementAwakeningAdvantage(
 	if (buffSkills) {
 		const hotKnowsSkill = buffSkills.skills?.IsHotKnows
 		if (hotKnowsSkill?.isEnabled && hotKnowsSkill.stackCount && powerOptions) {
-			const { calculateHotKnowsEffects } = require('@/utils/buffSkillCalculation/categories/minstrelSkills')
+			const {
+				calculateHotKnowsEffects,
+			} = require('@/utils/buffSkillCalculation/categories/minstrelSkills')
 			const hotKnowsResult = calculateHotKnowsEffects(
 				hotKnowsSkill.stackCount,
 				powerOptions,
@@ -1807,7 +1810,8 @@ export function calculateElementAwakeningAdvantage(
 	}
 
 	// 3. 最終属性覚醒有利計算（基本 + 熱情の歌効果）
-	const finalElementAwakeningAdvantage = baseElementAwakeningAdvantage + hotKnowsEffect
+	const finalElementAwakeningAdvantage =
+		baseElementAwakeningAdvantage + hotKnowsEffect
 
 	return {
 		baseElementAwakeningAdvantage,
@@ -1895,7 +1899,7 @@ export function calculateINTElementAdvantage(
 
 	// 2. 属性条件判定
 	let isElementApplicable: boolean
-	
+
 	if (isWeaponApplicable) {
 		// 杖・魔導具装備時: 属性攻撃（有利・その他・不利）すべてで適用、無属性のみ除外
 		isElementApplicable = elementAttack !== 'none'
@@ -2112,7 +2116,9 @@ export function calculateStability(
  * @param buffSkills バフスキルデータ
  * @returns スペルバーストのレベル（0-10）
  */
-export function getSpellBurstLevel(buffSkills: Record<string, import('@/types/buffSkill').BuffSkillState>): number {
+export function getSpellBurstLevel(
+	buffSkills: Record<string, import('@/types/buffSkill').BuffSkillState>,
+): number {
 	const spellBurstSkill = buffSkills.sf1 // sf1がスペルバーストのID
 	if (!spellBurstSkill || !spellBurstSkill.isEnabled) {
 		return 0

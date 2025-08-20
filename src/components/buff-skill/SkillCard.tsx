@@ -4,7 +4,11 @@ import { useCallback, useMemo, useState } from 'react'
 import { useCalculatorStore } from '@/stores'
 import type { BuffSkillDefinition } from '@/types/buffSkill'
 import { CATEGORY_LABELS } from '@/types/buffSkill'
-import { getSkillNameClassName, getCategoryLabelClassName, shouldShowModal } from '@/utils/buffSkillUtils'
+import {
+	getCategoryLabelClassName,
+	getSkillNameClassName,
+	shouldShowModal,
+} from '@/utils/buffSkillUtils'
 import MultiParamModal from './MultiParamModal'
 import SkillParameterModal from './SkillParameterModal'
 import SkillToggleButton from './SkillToggleButton'

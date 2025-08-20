@@ -24,6 +24,10 @@ export interface PlayerStats {
 	HP: number
 	MP: number
 	level: number
+
+	// 貫通系ステータス
+	physicalPenetration: number
+	totalPhysicalPenetration: number // StatusPreviewの装備品補正値1の物理貫通値
 }
 
 /**
@@ -46,6 +50,16 @@ export interface SkillCalculationResult {
 	calculatedMultiplier: number // 計算された実際の倍率%
 	calculatedFixedDamage: number // 計算された実際の固定値
 	calculationProcess?: string // 計算過程の説明（デバッグ用）
+	specialEffects?: {
+		physicalPenetration?: number // 特殊効果による物理貫通
+	}
+}
+
+/**
+ * バフスキルコンテキスト
+ */
+export interface BuffSkillContext {
+	getBuffSkillLevel(skillId: string): number
 }
 
 /**
@@ -56,4 +70,5 @@ export interface SkillCalculationInput {
 	hitNumber: number
 	playerStats: PlayerStats
 	equipmentContext: EquipmentContext
+	buffSkillContext?: BuffSkillContext
 }

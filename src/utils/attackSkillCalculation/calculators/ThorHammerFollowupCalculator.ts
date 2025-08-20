@@ -3,7 +3,7 @@ import { SkillHitCalculator } from './SkillHitCalculator'
 
 /**
  * トールハンマー(追撃3hit)専用計算器
- * 
+ *
  * 1hit目: 固定倍率1500%、固定ダメージ400
  * 2hit目: (200+補正後INT×10%)×6倍率、固定ダメージ200の追撃部分
  */
@@ -24,7 +24,7 @@ export class ThorHammerFollowupCalculator extends SkillHitCalculator {
 			// 2hit目: 追撃部分
 			// (200+補正後INT×10%)×6の計算
 			const adjustedINT = input.playerStats.adjustedINT
-			const baseMultiplier = 200 + (adjustedINT * 0.1)
+			const baseMultiplier = 200 + adjustedINT * 0.1
 			const totalMultiplier = baseMultiplier * 6 // 1倍+2倍+3倍=6倍
 			const fixedDamage = 200
 
@@ -40,6 +40,8 @@ export class ThorHammerFollowupCalculator extends SkillHitCalculator {
 		}
 
 		// 想定外のhitNumber
-		throw new Error(`Invalid hitNumber for ThorHammerFollowup: ${input.hitNumber}`)
+		throw new Error(
+			`Invalid hitNumber for ThorHammerFollowup: ${input.hitNumber}`,
+		)
 	}
 }

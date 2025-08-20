@@ -47,7 +47,6 @@ export function RegisterLevelModal({
 		}
 	}
 
-
 	if (!isOpen) return null
 
 	return (

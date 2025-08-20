@@ -479,8 +479,8 @@ export default function EquipmentSelectionModal({
 												showDamageDifference: isOpen && !!slotInfo,
 												slotInfo,
 												isOpen,
-												hasSlotInfo: !!slotInfo
-											});
+												hasSlotInfo: !!slotInfo,
+											})
 											return (
 												<EquipmentCard
 													key={equipment.id}
@@ -610,8 +610,8 @@ export default function EquipmentSelectionModal({
 												showDamageDifference: isOpen && !!slotInfo,
 												slotInfo,
 												isOpen,
-												hasSlotInfo: !!slotInfo
-											});
+												hasSlotInfo: !!slotInfo,
+											})
 											return (
 												<EquipmentCard
 													key={equipment.id}

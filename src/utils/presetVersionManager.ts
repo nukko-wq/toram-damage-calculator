@@ -1,5 +1,4 @@
 import { crystalsData } from '@/data/crystals'
-import { safeJSONParse } from './storage'
 import { enemiesData } from '@/data/enemies'
 // フォールバック用の静的インポート
 import { equipmentsData } from '@/data/equipments'
@@ -15,6 +14,7 @@ import type {
 	UpdateCheckResult,
 	UpdateNotification,
 } from '@/types/calculator'
+import { safeJSONParse } from './storage'
 
 // ストレージキー
 const STORAGE_KEYS = {

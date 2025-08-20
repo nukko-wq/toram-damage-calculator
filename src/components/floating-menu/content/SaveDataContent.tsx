@@ -13,10 +13,7 @@ interface SaveDataContentProps {
 
 export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 	// Zustandストアからデータを取得
-	const {
-		data: currentData,
-		loadSaveData,
-	} = useCalculatorStore()
+	const { data: currentData, loadSaveData } = useCalculatorStore()
 
 	const {
 		saveDataList,
@@ -85,7 +82,6 @@ export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 			console.error('セーブデータの名前変更に失敗しました:', err)
 		}
 	}
-
 
 	if (isLoading) {
 		return (
@@ -161,7 +157,6 @@ export default function SaveDataContent({ onClose }: SaveDataContentProps) {
 				onClose={() => setIsNewSaveModalOpen(false)}
 				onCreateSave={handleCreateSaveData}
 			/>
-
 		</div>
 	)
 }

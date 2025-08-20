@@ -7,15 +7,9 @@ import type {
 	EquipmentSlots,
 } from '@/types/calculator'
 import { getArmorType, saveArmorType } from '@/utils/armorTypeStorage'
-import {
-	getCombinedEquipmentById,
-} from '@/utils/equipmentDatabase'
-import {
-	getWeaponInfo,
-} from '@/utils/weaponInfoStorage'
-import {
-	getEquipmentAllCrystals,
-} from '@/utils/equipmentCrystalStorage'
+import { getEquipmentAllCrystals } from '@/utils/equipmentCrystalStorage'
+import { getCombinedEquipmentById } from '@/utils/equipmentDatabase'
+import { getWeaponInfo } from '@/utils/weaponInfoStorage'
 
 interface ModalStates {
 	modalState: {
@@ -45,10 +39,18 @@ interface ModalStates {
 
 interface ModalActions {
 	setModalState: React.Dispatch<React.SetStateAction<ModalStates['modalState']>>
-	setCreateModalState: React.Dispatch<React.SetStateAction<ModalStates['createModalState']>>
-	setDeleteModalState: React.Dispatch<React.SetStateAction<ModalStates['deleteModalState']>>
-	setRenameModalState: React.Dispatch<React.SetStateAction<ModalStates['renameModalState']>>
-	setMessageModalState: React.Dispatch<React.SetStateAction<ModalStates['messageModalState']>>
+	setCreateModalState: React.Dispatch<
+		React.SetStateAction<ModalStates['createModalState']>
+	>
+	setDeleteModalState: React.Dispatch<
+		React.SetStateAction<ModalStates['deleteModalState']>
+	>
+	setRenameModalState: React.Dispatch<
+		React.SetStateAction<ModalStates['renameModalState']>
+	>
+	setMessageModalState: React.Dispatch<
+		React.SetStateAction<ModalStates['messageModalState']>
+	>
 }
 
 export function useEquipmentHandlers(
@@ -225,7 +227,7 @@ export function useEquipmentHandlers(
 					const crystalInfo = getEquipmentAllCrystals(equipmentId)
 					if (crystalInfo.slot1 || crystalInfo.slot2) {
 						console.log('クリスタ情報をCrystalFormに復元:', crystalInfo)
-						
+
 						// 装備スロットとクリスタタイプのマッピング
 						const crystalTypeMap: Record<string, string> = {
 							mainWeapon: 'weapon',
@@ -233,24 +235,27 @@ export function useEquipmentHandlers(
 							additional: 'additional',
 							special: 'special',
 						}
-						
+
 						const crystalType = crystalTypeMap[slotKey]
 						if (crystalType) {
-							const currentCrystals = useCalculatorStore.getState().data.crystals
+							const currentCrystals =
+								useCalculatorStore.getState().data.crystals
 							const updatedCrystals = { ...currentCrystals }
-							
+
 							// 1つ目のクリスタスロットを復元
 							if (crystalInfo.slot1) {
-								const crystalSlotKey = `${crystalType}1` as keyof import('@/types/calculator').CrystalSlots
+								const crystalSlotKey =
+									`${crystalType}1` as keyof import('@/types/calculator').CrystalSlots
 								updatedCrystals[crystalSlotKey] = crystalInfo.slot1
 							}
-							
+
 							// 2つ目のクリスタスロットを復元
 							if (crystalInfo.slot2) {
-								const crystalSlotKey = `${crystalType}2` as keyof import('@/types/calculator').CrystalSlots
+								const crystalSlotKey =
+									`${crystalType}2` as keyof import('@/types/calculator').CrystalSlots
 								updatedCrystals[crystalSlotKey] = crystalInfo.slot2
 							}
-							
+
 							updateCrystals(updatedCrystals)
 						}
 					}

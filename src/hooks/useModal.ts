@@ -24,7 +24,7 @@ export function useModal(
 			onOpen()
 			isInitialized.current = true
 		}
-		
+
 		// モーダルが閉じた時に初期化フラグをリセット
 		if (!isOpen) {
 			isInitialized.current = false
@@ -53,7 +53,9 @@ export function useModal(
 /**
  * 標準的なモーダル初期化処理（よく使われるパターン）
  */
-export function createModalInitializer<T extends Record<string, unknown>>(initialValues: T) {
+export function createModalInitializer<T extends Record<string, unknown>>(
+	initialValues: T,
+) {
 	return (setters: { [K in keyof T]: (value: T[K]) => void }) => {
 		Object.entries(initialValues).forEach(([key, value]) => {
 			const setter = setters[key as keyof T]

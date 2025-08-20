@@ -22,7 +22,14 @@ export default function RenameModal({
 	const [error, setError] = useState<string | null>(null)
 
 	// カスタムフックで初期化とESCキー処理を統合
-	useRenameModal(isOpen, onClose, currentName, setNewName, setError, setIsRenaming)
+	useRenameModal(
+		isOpen,
+		onClose,
+		currentName,
+		setNewName,
+		setError,
+		setIsRenaming,
+	)
 
 	// 名前変更処理
 	const handleRename = async () => {

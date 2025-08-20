@@ -7,7 +7,12 @@ import { useCallback, useEffect, useState } from 'react'
  * useEffectを使った複雑な初期化・監視パターンを簡素化する
  */
 export function useFormSync<T extends Record<string, unknown>>(
-	watchFunction: (callback: (value: Partial<T>, info: { name?: string; type?: string }) => void) => { unsubscribe: () => void },
+	watchFunction: (
+		callback: (
+			value: Partial<T>,
+			info: { name?: string; type?: string },
+		) => void,
+	) => { unsubscribe: () => void },
 	updateFunction: (data: T) => void,
 	validationFunction?: (data: Partial<T>) => boolean,
 	debounceMs: number = 30,
@@ -38,12 +43,12 @@ export function useFormSync<T extends Record<string, unknown>>(
 
 			// バリデーション関数が提供されている場合は検証
 			const isValid = validationFunction ? validationFunction(value) : true
-			
+
 			if (isValid) {
 				updateFunction(value as T)
 			}
 		})
-		
+
 		return () => subscription.unsubscribe()
 	}, [watchFunction, isInitialized, updateFunction, validationFunction])
 
@@ -56,28 +61,32 @@ export function useFormSync<T extends Record<string, unknown>>(
 /**
  * 基本ステータス用のバリデーション関数
  */
-export function validateBaseStats(value: Partial<Record<string, unknown>>): boolean {
-	return Object.values(value).every(
-		(v) => {
-			// 空文字は入力中として許可
-			if (v === '' || v === undefined || v === null) return true
-			// 数値の場合は1以上をチェック
-			return typeof v === 'number' && !Number.isNaN(v) && v >= 1
-		},
-	)
+export function validateBaseStats(
+	value: Partial<Record<string, unknown>>,
+): boolean {
+	return Object.values(value).every((v) => {
+		// 空文字は入力中として許可
+		if (v === '' || v === undefined || v === null) return true
+		// 数値の場合は1以上をチェック
+		return typeof v === 'number' && !Number.isNaN(v) && v >= 1
+	})
 }
 
 /**
  * 武器データ用のバリデーション関数
  */
-export function validateWeaponData(value: Partial<Record<string, unknown>>): boolean {
+export function validateWeaponData(
+	value: Partial<Record<string, unknown>>,
+): boolean {
 	return Object.values(value).every((v) => v !== undefined && v !== null)
 }
 
 /**
  * フードデータ用のバリデーション関数
  */
-export function validateFoodData(value: Partial<Record<string, unknown>>): boolean {
+export function validateFoodData(
+	value: Partial<Record<string, unknown>>,
+): boolean {
 	return Object.values(value).every((v) => v !== undefined && v !== null)
 }
 
@@ -86,7 +95,12 @@ export function validateFoodData(value: Partial<Record<string, unknown>>): boole
  * メイン武器とサブ武器の相互依存関係を管理
  */
 export function useWeaponFormSync<T extends Record<string, unknown>>(
-	watchFunction: (callback: (value: Partial<T>, info: { name?: string; type?: string }) => void) => { unsubscribe: () => void },
+	watchFunction: (
+		callback: (
+			value: Partial<T>,
+			info: { name?: string; type?: string },
+		) => void,
+	) => { unsubscribe: () => void },
 	updateFunction: (data: T) => void,
 	validationFunction: (data: Partial<T>) => boolean,
 	options: {
@@ -95,7 +109,11 @@ export function useWeaponFormSync<T extends Record<string, unknown>>(
 		debounceMs?: number
 	} = {},
 ) {
-	const { onWeaponTypeChange, dependentUpdateFunction, debounceMs = 30 } = options
+	const {
+		onWeaponTypeChange,
+		dependentUpdateFunction,
+		debounceMs = 30,
+	} = options
 	const [isInitialized, setIsInitialized] = useState(false)
 
 	// 初期化処理を統合
@@ -133,11 +151,17 @@ export function useWeaponFormSync<T extends Record<string, unknown>>(
 				dependentUpdateFunction(value as T)
 			}
 		})
-		
-		return () => subscription.unsubscribe()
-	}, [watchFunction, isInitialized, updateFunction, validationFunction, onWeaponTypeChange, dependentUpdateFunction])
 
-	
+		return () => subscription.unsubscribe()
+	}, [
+		watchFunction,
+		isInitialized,
+		updateFunction,
+		validationFunction,
+		onWeaponTypeChange,
+		dependentUpdateFunction,
+	])
+
 	return {
 		isInitialized,
 		initialize,

@@ -393,6 +393,110 @@ function calculateBusterBladeEffects(
 }
 ```
 
+### 1.5 オーガスラッシュ (sm1)
+```typescript
+{
+  id: 'sm1',
+  name: 'オーガスラッシュ',
+  category: 'blade',
+  type: 'stack',
+  order: 209,
+  maxStack: 10,
+  description: '消費鬼力を管理します。攻撃スキルのオーガスラッシュの倍率と物理貫通計算に使用されます',
+  effects: [
+    {
+      property: 'DemonPowerConsumption',
+      formula: 'stackCount',
+      conditions: ['攻撃スキル専用パラメータ']
+    },
+    {
+      property: 'PhysicalPenetration_Rate',
+      formula: 'Math.abs(stackCount * 10)',
+      conditions: ['攻撃スキルがオーガスラッシュ選択時のみ', 'StatusPreview物理貫通に反映']
+    }
+  ],
+  calculationFormula: `
+    消費鬼力 = stackCount (0-10の範囲)
+    
+    攻撃スキルでの使用:
+    - 2hit目の倍率: |200×消費鬼力数|%
+    - 特殊効果の物理貫通: |消費鬼力×10|%
+    - 物理貫通100%超過時の1hit目威力ボーナス
+    
+    StatusPreviewでの表示:
+    - 攻撃スキルがオーガスラッシュ選択時のみ物理貫通(%)に加算
+    - 装備品補正値1の物理貫通に |消費鬼力×10|% を追加
+  `,
+  weaponRequirements: [
+    { weaponType: '両手剣', include: true }
+  ],
+  specialFeatures: [
+    {
+      name: '攻撃スキル連携',
+      description: 'BuffSkillFormで設定した消費鬼力がAttackSkillのオーガスラッシュ計算に使用される',
+      integration: 'BuffSkillContext経由でAttackSkillCalculatorに値を提供'
+    },
+    {
+      name: 'StatusPreview連携',
+      description: '攻撃スキルがオーガスラッシュ選択時のみStatusPreviewの装備品補正値物理貫通に効果反映',
+      integration: 'dataSourceIntegration.getAttackSkillSpecialEffects()で物理貫通ボーナス計算'
+    }
+  ],
+  uiSettings: {
+    parameterName: '消費鬼力',
+    parameterUnit: '個',
+    showInModal: true,
+    quickToggle: false,
+    stackOptions: [
+      { value: 0, label: '0個', description: '効果なし' },
+      { value: 1, label: '1個', description: '2hit目倍率200%' },
+      { value: 2, label: '2個', description: '2hit目倍率400%' },
+      { value: 3, label: '3個', description: '2hit目倍率600%' },
+      { value: 4, label: '4個', description: '2hit目倍率800%' },
+      { value: 5, label: '5個', description: '2hit目倍率1000%' },
+      { value: 6, label: '6個', description: '2hit目倍率1200%' },
+      { value: 7, label: '7個', description: '2hit目倍率1400%' },
+      { value: 8, label: '8個', description: '2hit目倍率1600%' },
+      { value: 9, label: '9個', description: '2hit目倍率1800%' },
+      { value: 10, label: '10個', description: '2hit目倍率2000%' }
+    ]
+  }
+}
+
+// 実装用の効果取得関数
+function getOgreSlashDemonPower(
+  stackCount: number
+): number {
+  if (stackCount < 0 || stackCount > 10) return 0
+  return stackCount
+}
+
+// 攻撃スキル連携用の計算関数
+function calculateOgreSlashAttackEffects(
+  demonPowerCount: number
+): {
+  secondHitMultiplier: number;
+  physicalPenetration: number;
+  firstHitBonusMultiplier: number;
+} {
+  // 2hit目倍率計算
+  const secondHitMultiplier = Math.abs(200 * demonPowerCount)
+  
+  // 特殊効果の物理貫通計算
+  const physicalPenetration = Math.abs(demonPowerCount * 10)
+  
+  // 1hit目威力ボーナス計算（物理貫通100%超過分）
+  // この値は攻撃スキル側で総物理貫通率を計算した後に適用される
+  const firstHitBonusMultiplier = 0 // 攻撃スキル側で計算
+  
+  return {
+    secondHitMultiplier,
+    physicalPenetration,
+    firstHitBonusMultiplier
+  }
+}
+```
+
 ## 実装ステータス
 
 - [x] ブレードマスタリ (Ms-blade) - 設計・実装完了
@@ -400,6 +504,7 @@ function calculateBusterBladeEffects(
 - [x] バーサーク (Berserk) - 設計・実装完了
 - [x] オーラブレード (AuraBlade) - 設計完了・実装待ち
 - [x] バスターブレード (BusterBlade) - 設計完了・実装待ち
+- [x] オーガスラッシュ (sm1) - 設計・実装完了（攻撃スキル連携対応）
 
 ## 特徴
 
@@ -423,6 +528,13 @@ function calculateBusterBladeEffects(
     - 基本効果: 武器ATK率+10%
     - 片手剣+盾装備時: 武器ATK率+(10+盾の精錬値)%
     - 盾の精錬値S(15)の場合: 武器ATK率+25%（最大効果）
+- **攻撃スキル連携効果**:
+  - **オーガスラッシュ**: 消費鬼力システムによる攻撃スキル強化
+    - 消費鬼力管理: 0-10個のスタック型パラメータ
+    - 攻撃スキル連携: BuffSkillContext経由で攻撃スキル計算に影響
+    - 2hit目倍率強化: |200×消費鬼力数|%
+    - 物理貫通ボーナス: |消費鬼力×10|%（特殊効果）
+    - 1hit目威力ボーナス: 物理貫通100%超過時に追加効果
 
 ## 関連ファイル
 

@@ -12,8 +12,8 @@ export class Storm1Hit6ExtendCalculator extends SkillHitCalculator {
 		console.log('Storm1Hit6ExtendCalculator DEBUG:', {
 			hitNumber,
 			hasStaffEquipped: equipmentContext.hasStaffEquipped,
-			mainWeaponType: equipmentContext.mainWeaponType
-		});
+			mainWeaponType: equipmentContext.mainWeaponType,
+		})
 
 		switch (hitNumber) {
 			case 1: {

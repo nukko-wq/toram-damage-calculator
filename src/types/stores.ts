@@ -176,7 +176,7 @@ export interface CalculatorStore {
 	updateTempEquipmentCrystal: (
 		equipmentId: string,
 		slotNumber: 1 | 2,
-		crystalId: string | null
+		crystalId: string | null,
 	) => void
 	clearTempEquipmentCrystals: () => void
 	saveTempEquipmentCrystalsToStorage: () => void
@@ -199,7 +199,7 @@ export interface UIStore {
 
 	// StatusPreviewの高さ管理（ピクセル値）
 	statusPreviewHeight: number
-	
+
 	// DamagePreviewの高さ管理（ピクセル値）
 	damagePreviewHeight: number
 
@@ -221,7 +221,7 @@ export interface UIStore {
 
 	// StatusPreviewの高さ管理
 	setStatusPreviewHeight: (height: number) => void
-	
+
 	// DamagePreviewの高さ管理
 	setDamagePreviewHeight: (height: number) => void
 }

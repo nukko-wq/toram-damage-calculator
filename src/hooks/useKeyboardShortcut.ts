@@ -149,7 +149,9 @@ export function useResponsiveStateManager<T extends Record<string, boolean>>(
 ) {
 	const [isMobile, setIsMobile] = useState(false)
 	const [visibleSections, setVisibleSections] = useState(initialVisibleSections)
-	const [activeSection, setActiveSection] = useState<keyof T | null>(initialActiveSection)
+	const [activeSection, setActiveSection] = useState<keyof T | null>(
+		initialActiveSection,
+	)
 
 	// ブレークポイント監視の最適化
 	useEffect(() => {
@@ -178,30 +180,33 @@ export function useResponsiveStateManager<T extends Record<string, boolean>>(
 	}, [])
 
 	// モバイル用セクション切り替え処理
-	const handleMobileSectionChange = useCallback((section: keyof T) => {
-		// 現在選択中のセクションと同じ場合はトグル（非表示）
-		if (activeSection === section && visibleSections[section]) {
-			setActiveSection(null) // アクティブセクションをクリア
-			setVisibleSections((prev) => {
-				const newState = { ...prev }
-				for (const key in newState) {
-					newState[key] = false as T[typeof key]
-				}
-				return newState
-			})
-		} else {
-			// 新しいセクションを選択
-			setActiveSection(section)
-			setVisibleSections((prev) => {
-				const newState = { ...prev }
-				for (const key in newState) {
-					newState[key] = false as T[typeof key]
-				}
-				newState[section] = true as T[typeof section]
-				return newState
-			})
-		}
-	}, [activeSection, visibleSections])
+	const handleMobileSectionChange = useCallback(
+		(section: keyof T) => {
+			// 現在選択中のセクションと同じ場合はトグル（非表示）
+			if (activeSection === section && visibleSections[section]) {
+				setActiveSection(null) // アクティブセクションをクリア
+				setVisibleSections((prev) => {
+					const newState = { ...prev }
+					for (const key in newState) {
+						newState[key] = false as T[typeof key]
+					}
+					return newState
+				})
+			} else {
+				// 新しいセクションを選択
+				setActiveSection(section)
+				setVisibleSections((prev) => {
+					const newState = { ...prev }
+					for (const key in newState) {
+						newState[key] = false as T[typeof key]
+					}
+					newState[section] = true as T[typeof section]
+					return newState
+				})
+			}
+		},
+		[activeSection, visibleSections],
+	)
 
 	return {
 		isMobile,

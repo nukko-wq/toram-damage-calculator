@@ -792,6 +792,16 @@ export function getAllDataSourceBonusesWithBuffSkills(
 		}
 	}
 
+	// 攻撃スキルの特殊効果を追加（オーガスラッシュの物理貫通等）
+	const attackSkillBonuses = getAttackSkillSpecialEffects(data)
+
+	for (const [key, value] of Object.entries(attackSkillBonuses)) {
+		if (typeof value === 'number' && value !== 0) {
+			bonuses[key as keyof AllBonuses] =
+				(bonuses[key as keyof AllBonuses] || 0) + value
+		}
+	}
+
 	return bonuses
 }
 
@@ -907,9 +917,44 @@ export function getEnchantmentBonuses(equipmentData: any): Partial<AllBonuses> {
 }
 
 /**
+ * 攻撃スキルの特殊効果をボーナス値に変換
+ * （例：オーガスラッシュの物理貫通効果）
+ */
+function getAttackSkillSpecialEffects(
+	data: CalculatorData,
+): Partial<AllBonuses> {
+	const bonuses: Partial<AllBonuses> = {}
+
+	// 攻撃スキルが選択されていない場合はボーナスなし
+	if (!data.attackSkill?.selectedSkillId) {
+		return bonuses
+	}
+
+	// オーガスラッシュの特殊効果処理
+	if (data.attackSkill.selectedSkillId === 'ogre_slash') {
+		// バフスキルのオーガスラッシュ（sm1）が有効かチェック
+		const ogreSlashBuffSkill = data.buffSkills?.skills?.sm1
+		if (ogreSlashBuffSkill?.isEnabled && 'stackCount' in ogreSlashBuffSkill) {
+			const demonPowerCount = ogreSlashBuffSkill.stackCount || 0
+			// 物理貫通 = |消費鬼力 × 10|%
+			const physicalPenetration = Math.abs(demonPowerCount * 10)
+
+			if (physicalPenetration > 0) {
+				bonuses.PhysicalPenetration_Rate =
+					(bonuses.PhysicalPenetration_Rate || 0) + physicalPenetration
+			}
+		}
+	}
+
+	return bonuses
+}
+
+/**
  * レジスタ効果をボーナス値に変換
  */
-function getRegisterBonuses(registerData?: RegisterFormData): Partial<AllBonuses> {
+function getRegisterBonuses(
+	registerData?: RegisterFormData,
+): Partial<AllBonuses> {
 	const bonuses: Partial<AllBonuses> = {}
 
 	if (!registerData?.effects) return bonuses
@@ -962,7 +1007,7 @@ function getRegisterBonuses(registerData?: RegisterFormData): Partial<AllBonuses
 			case 'fateCompanionship':
 				// 運命共同体: 特殊計算（レベル1固定 + パーティメンバー数効果）
 				if (effect.level === 1) {
-					const partyMemberBonus = (effect.partyMembers || 0) // パーティメンバー数%の効果
+					const partyMemberBonus = effect.partyMembers || 0 // パーティメンバー数%の効果
 
 					bonuses.ATK_Rate = (bonuses.ATK_Rate || 0) + partyMemberBonus
 					bonuses.MATK_Rate = (bonuses.MATK_Rate || 0) + partyMemberBonus
@@ -1017,7 +1062,7 @@ export function getDetailedDataSourceBonuses(
 			buffItems: getBuffBonuses(data.buffItems),
 			buffSkills: (() => {
 				// 全バフスキル効果を統合（getAllDataSourceBonusesWithBuffSkillsと同じロジック）
-				let combinedBonuses: Partial<AllBonuses> = {}
+				const combinedBonuses: Partial<AllBonuses> = {}
 
 				// 敵情報を取得（エンハンス等で使用）
 				let enemyDEF = 1000
@@ -1097,7 +1142,9 @@ export function getDetailedDataSourceBonuses(
 					data.baseStats?.level || 1,
 				)
 
-				for (const [key, value] of Object.entries(frontlineMaintenance2Bonuses)) {
+				for (const [key, value] of Object.entries(
+					frontlineMaintenance2Bonuses,
+				)) {
 					if (typeof value === 'number' && value !== 0) {
 						combinedBonuses[key as keyof AllBonuses] =
 							(combinedBonuses[key as keyof AllBonuses] || 0) + value
@@ -1105,12 +1152,25 @@ export function getDetailedDataSourceBonuses(
 				}
 
 				// ペット関連スキルの補正値を追加
-				const petCriticalUpBonuses = getPetCriticalUpEffects(data.buffSkills?.skills || null)
-				const petBraveUpBonuses = getPetBraveUpEffects(data.buffSkills?.skills || null)
-				const petMindUpBonuses = getPetMindUpEffects(data.buffSkills?.skills || null)
-				const petCutUpBonuses = getPetCutUpEffects(data.buffSkills?.skills || null)
+				const petCriticalUpBonuses = getPetCriticalUpEffects(
+					data.buffSkills?.skills || null,
+				)
+				const petBraveUpBonuses = getPetBraveUpEffects(
+					data.buffSkills?.skills || null,
+				)
+				const petMindUpBonuses = getPetMindUpEffects(
+					data.buffSkills?.skills || null,
+				)
+				const petCutUpBonuses = getPetCutUpEffects(
+					data.buffSkills?.skills || null,
+				)
 
-				for (const petBonuses of [petCriticalUpBonuses, petBraveUpBonuses, petMindUpBonuses, petCutUpBonuses]) {
+				for (const petBonuses of [
+					petCriticalUpBonuses,
+					petBraveUpBonuses,
+					petMindUpBonuses,
+					petCutUpBonuses,
+				]) {
 					for (const [key, value] of Object.entries(petBonuses)) {
 						if (typeof value === 'number' && value !== 0) {
 							combinedBonuses[key as keyof AllBonuses] =

@@ -1,8 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useCalculatorStore } from '@/stores/calculatorStore'
 import { useUIStore } from '@/stores'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 import type {
 	OptionTabType,
 	OtherOptions,
@@ -34,10 +34,7 @@ interface DamagePreviewProps {
 
 export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	// UIStoreから高さ管理を取得
-	const { 
-		damagePreviewHeight,
-		setDamagePreviewHeight 
-	} = useUIStore()
+	const { damagePreviewHeight, setDamagePreviewHeight } = useUIStore()
 
 	// リサイズ関連の状態管理
 	const containerRef = useRef<HTMLDivElement>(null)
@@ -197,53 +194,68 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		}
 	}, [damageResults.normal])
 
-	const handlePowerOptionChange = useCallback(<K extends keyof PowerOptions>(
-		key: K,
-		value: PowerOptions[K],
-	) => {
-		updatePowerOptions({ ...powerOptions, [key]: value })
-	}, [powerOptions, updatePowerOptions])
+	const handlePowerOptionChange = useCallback(
+		<K extends keyof PowerOptions>(key: K, value: PowerOptions[K]) => {
+			updatePowerOptions({ ...powerOptions, [key]: value })
+		},
+		[powerOptions, updatePowerOptions],
+	)
 
-	const handleOtherOptionChange = useCallback(<K extends keyof OtherOptions>(
-		key: K,
-		value: OtherOptions[K],
-	) => {
-		updateOtherOptions({ ...otherOptions, [key]: value })
-	}, [otherOptions, updateOtherOptions])
+	const handleOtherOptionChange = useCallback(
+		<K extends keyof OtherOptions>(key: K, value: OtherOptions[K]) => {
+			updateOtherOptions({ ...otherOptions, [key]: value })
+		},
+		[otherOptions, updateOtherOptions],
+	)
 
-	const handleTabChange = useCallback((tab: OptionTabType) => {
-		updateOptionTab(tab)
-	}, [updateOptionTab])
+	const handleTabChange = useCallback(
+		(tab: OptionTabType) => {
+			updateOptionTab(tab)
+		},
+		[updateOptionTab],
+	)
 
 	// リサイズ関連のイベントハンドラー
-	const handleMouseDown = useCallback((e: React.MouseEvent) => {
-		setIsResizing(true)
-		setStartY(e.clientY)
-		setStartHeight(damagePreviewHeight)
-		e.preventDefault()
-	}, [damagePreviewHeight])
+	const handleMouseDown = useCallback(
+		(e: React.MouseEvent) => {
+			setIsResizing(true)
+			setStartY(e.clientY)
+			setStartHeight(damagePreviewHeight)
+			e.preventDefault()
+		},
+		[damagePreviewHeight],
+	)
 
-	const handleTouchStart = useCallback((e: React.TouchEvent) => {
-		setIsResizing(true)
-		setStartY(e.touches[0].clientY)
-		setStartHeight(damagePreviewHeight)
-		e.preventDefault()
-	}, [damagePreviewHeight])
+	const handleTouchStart = useCallback(
+		(e: React.TouchEvent) => {
+			setIsResizing(true)
+			setStartY(e.touches[0].clientY)
+			setStartHeight(damagePreviewHeight)
+			e.preventDefault()
+		},
+		[damagePreviewHeight],
+	)
 
-	const handleMouseMove = useCallback((e: MouseEvent) => {
-		if (!isResizing) return
-		const deltaY = e.clientY - startY
-		const newHeight = startHeight + deltaY // 下に動かすと高さを大きく、上に動かすと高さを小さく
-		setDamagePreviewHeight(newHeight)
-	}, [isResizing, startY, startHeight, setDamagePreviewHeight])
+	const handleMouseMove = useCallback(
+		(e: MouseEvent) => {
+			if (!isResizing) return
+			const deltaY = e.clientY - startY
+			const newHeight = startHeight + deltaY // 下に動かすと高さを大きく、上に動かすと高さを小さく
+			setDamagePreviewHeight(newHeight)
+		},
+		[isResizing, startY, startHeight, setDamagePreviewHeight],
+	)
 
-	const handleTouchMove = useCallback((e: TouchEvent) => {
-		if (!isResizing) return
-		const deltaY = e.touches[0].clientY - startY
-		const newHeight = startHeight + deltaY
-		setDamagePreviewHeight(newHeight)
-		e.preventDefault()
-	}, [isResizing, startY, startHeight, setDamagePreviewHeight])
+	const handleTouchMove = useCallback(
+		(e: TouchEvent) => {
+			if (!isResizing) return
+			const deltaY = e.touches[0].clientY - startY
+			const newHeight = startHeight + deltaY
+			setDamagePreviewHeight(newHeight)
+			e.preventDefault()
+		},
+		[isResizing, startY, startHeight, setDamagePreviewHeight],
+	)
 
 	const handleEnd = useCallback(() => {
 		setIsResizing(false)
@@ -254,7 +266,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		if (isResizing) {
 			document.addEventListener('mousemove', handleMouseMove)
 			document.addEventListener('mouseup', handleEnd)
-			document.addEventListener('touchmove', handleTouchMove, { passive: false })
+			document.addEventListener('touchmove', handleTouchMove, {
+				passive: false,
+			})
 			document.addEventListener('touchend', handleEnd)
 
 			return () => {
@@ -282,7 +296,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	}
 
 	return (
-		<div 
+		<div
 			ref={containerRef}
 			className="relative bg-blue-50"
 			style={{ height: `${damagePreviewHeight}px`, overflow: 'hidden' }}
@@ -301,8 +315,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			>
 				<div className="w-8 h-1 bg-gray-400 rounded-full" />
 			</div>
-			
-			<div 
+
+			<div
 				className="container mx-auto px-4 h-full overflow-y-auto py-1 sm:py-2"
 				style={{ paddingBottom: '12px' }} // リサイズハンドル分のスペースを確保
 			>
@@ -540,13 +554,15 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					</p>
 					{/* 無属性敵選択時の注意書き */}
 					{(() => {
-						const selectedEnemy = calculatorData.enemy?.selectedEnemyId 
+						const selectedEnemy = calculatorData.enemy?.selectedEnemyId
 							? getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
 							: null
-						return selectedEnemy?.isNonElemental && (
-							<p className="text-xs text-orange-600 mt-1">
+						return (
+							selectedEnemy?.isNonElemental && (
+								<p className="text-xs text-orange-600 mt-1">
 									※この敵は属性覚醒の有利+25%が適用されません。
-							</p>
+								</p>
+							)
 						)
 					})()}
 				</div>

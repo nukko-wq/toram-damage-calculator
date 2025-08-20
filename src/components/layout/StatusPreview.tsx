@@ -21,7 +21,6 @@ import {
 	calculateMATK,
 	calculateMagicalCriticalDamage,
 	calculateMagicalCriticalRate,
-	getSpellBurstLevel,
 	calculateMagicalResistance,
 	calculateMotionSpeed,
 	calculateMP,
@@ -32,6 +31,7 @@ import {
 	calculateTotalATK,
 	calculateTotalElementAdvantage,
 	getBodyArmorType,
+	getSpellBurstLevel,
 } from '@/utils/basicStatsCalculation'
 import {
 	getAllDataSourceBonusesWithBuffSkills,
@@ -114,11 +114,11 @@ const INITIAL_VISIBLE_SECTIONS = {
 export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	const { data } = useCalculatorStore()
 	const { currentSaveId } = useSaveDataStore()
-	const { 
-		getStatusPreviewCategory, 
+	const {
+		getStatusPreviewCategory,
 		setStatusPreviewCategory,
 		statusPreviewHeight,
-		setStatusPreviewHeight 
+		setStatusPreviewHeight,
 	} = useUIStore()
 
 	// リサイズ関連の状態管理
@@ -134,10 +134,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		activeSection,
 		toggleSection,
 		handleMobileSectionChange,
-	} = useResponsiveStateManager(
-		INITIAL_VISIBLE_SECTIONS,
-		'basicStats',
-	)
+	} = useResponsiveStateManager(INITIAL_VISIBLE_SECTIONS, 'basicStats')
 
 	// 基本ステータスカテゴリ状態管理（UIStoreから取得）
 	const basicStatsCategory = getStatusPreviewCategory(currentSaveId)
@@ -166,34 +163,46 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	}
 
 	// リサイズ関連のイベントハンドラー
-	const handleMouseDown = useCallback((e: React.MouseEvent) => {
-		setIsResizing(true)
-		setStartY(e.clientY)
-		setStartHeight(statusPreviewHeight)
-		e.preventDefault()
-	}, [statusPreviewHeight])
+	const handleMouseDown = useCallback(
+		(e: React.MouseEvent) => {
+			setIsResizing(true)
+			setStartY(e.clientY)
+			setStartHeight(statusPreviewHeight)
+			e.preventDefault()
+		},
+		[statusPreviewHeight],
+	)
 
-	const handleTouchStart = useCallback((e: React.TouchEvent) => {
-		setIsResizing(true)
-		setStartY(e.touches[0].clientY)
-		setStartHeight(statusPreviewHeight)
-		e.preventDefault()
-	}, [statusPreviewHeight])
+	const handleTouchStart = useCallback(
+		(e: React.TouchEvent) => {
+			setIsResizing(true)
+			setStartY(e.touches[0].clientY)
+			setStartHeight(statusPreviewHeight)
+			e.preventDefault()
+		},
+		[statusPreviewHeight],
+	)
 
-	const handleMouseMove = useCallback((e: MouseEvent) => {
-		if (!isResizing) return
-		const deltaY = e.clientY - startY
-		const newHeight = startHeight + deltaY // 下に動かすと高さを大きく、上に動かすと高さを小さく
-		setStatusPreviewHeight(newHeight)
-	}, [isResizing, startY, startHeight, setStatusPreviewHeight])
+	const handleMouseMove = useCallback(
+		(e: MouseEvent) => {
+			if (!isResizing) return
+			const deltaY = e.clientY - startY
+			const newHeight = startHeight + deltaY // 下に動かすと高さを大きく、上に動かすと高さを小さく
+			setStatusPreviewHeight(newHeight)
+		},
+		[isResizing, startY, startHeight, setStatusPreviewHeight],
+	)
 
-	const handleTouchMove = useCallback((e: TouchEvent) => {
-		if (!isResizing) return
-		const deltaY = e.touches[0].clientY - startY
-		const newHeight = startHeight + deltaY
-		setStatusPreviewHeight(newHeight)
-		e.preventDefault()
-	}, [isResizing, startY, startHeight, setStatusPreviewHeight])
+	const handleTouchMove = useCallback(
+		(e: TouchEvent) => {
+			if (!isResizing) return
+			const deltaY = e.touches[0].clientY - startY
+			const newHeight = startHeight + deltaY
+			setStatusPreviewHeight(newHeight)
+			e.preventDefault()
+		},
+		[isResizing, startY, startHeight, setStatusPreviewHeight],
+	)
 
 	const handleEnd = useCallback(() => {
 		setIsResizing(false)
@@ -204,7 +213,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		if (isResizing) {
 			document.addEventListener('mousemove', handleMouseMove)
 			document.addEventListener('mouseup', handleEnd)
-			document.addEventListener('touchmove', handleTouchMove, { passive: false })
+			document.addEventListener('touchmove', handleTouchMove, {
+				passive: false,
+			})
 			document.addEventListener('touchend', handleEnd)
 
 			return () => {
@@ -333,7 +344,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					data.mainWeapon.weaponType,
 					powerOptions?.elementAttack || 'none',
 				)
-				
 
 				// 熱情の歌の効果を計算
 				const hotKnowsSkill = data.buffSkills?.skills?.IsHotKnows
@@ -355,22 +365,28 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 				// スキル種別に応じて総属性有利を計算
 				const baseElementAdvantage = finalBonuses.ElementAdvantage_Rate || 0
-				const isStaffOrMagicDevice = data.mainWeapon.weaponType === '杖' || data.mainWeapon.weaponType === '魔導具'
+				const isStaffOrMagicDevice =
+					data.mainWeapon.weaponType === '杖' ||
+					data.mainWeapon.weaponType === '魔導具'
 
 				// 物理スキル: 属性覚醒+25 + 属性有利プロパティ
-				const physicalTotal = elementAwakeningResult.finalElementAwakeningAdvantage + baseElementAdvantage
+				const physicalTotal =
+					elementAwakeningResult.finalElementAwakeningAdvantage +
+					baseElementAdvantage
 
 				// 魔法スキル: 属性覚醒+25 + INT補正（条件満たす場合） + 属性有利プロパティ
-				const magicalTotal = elementAwakeningResult.finalElementAwakeningAdvantage + 
-					intElementAdvantageResult.intElementAdvantage + baseElementAdvantage
-
+				const magicalTotal =
+					elementAwakeningResult.finalElementAwakeningAdvantage +
+					intElementAdvantageResult.intElementAdvantage +
+					baseElementAdvantage
 
 				// 表示用に両方の値を含むオブジェクトを返す
 				return {
 					...calculateTotalElementAdvantage(finalBonuses, hotKnowsEffect),
 					physicalSkillTotal: physicalTotal,
 					magicalSkillTotal: magicalTotal,
-					elementAwakening: elementAwakeningResult.finalElementAwakeningAdvantage,
+					elementAwakening:
+						elementAwakeningResult.finalElementAwakeningAdvantage,
 					intElementAdvantage: intElementAdvantageResult.intElementAdvantage,
 					baseElementAdvantage: baseElementAdvantage,
 					isStaffOrMagicDevice,
@@ -501,41 +517,44 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
 	)
 	// 槍MATK計算（旋風槍装備時のみ）
-	const spearMatkCalculation = data.mainWeapon.weaponType === '旋風槍' 
-		? calculateSpearMATK(
-			baseStats.level,
-			data.mainWeapon.weaponType,
-			atkCalculation.totalWeaponATK, // 総武器ATK
-			baseStats, // 基礎ステータス（MATKアップ用）
-			adjustedStatsCalculation, // 補正後ステータス（槍ステータスMATK用）
-			finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
-		)
-		: null
+	const spearMatkCalculation =
+		data.mainWeapon.weaponType === '旋風槍'
+			? calculateSpearMATK(
+					baseStats.level,
+					data.mainWeapon.weaponType,
+					atkCalculation.totalWeaponATK, // 総武器ATK
+					baseStats, // 基礎ステータス（MATKアップ用）
+					adjustedStatsCalculation, // 補正後ステータス（槍ステータスMATK用）
+					finalBonuses, // 全ての効果を統合した最終ボーナス値を使用
+				)
+			: null
 
 	// 魔法クリティカル率計算（DamagePreviewの設定を考慮）
 	const magicalCriticalRateCalculation = useMemo(() => {
 		// 物理クリティカル率を取得
 		const physicalCriticalRate = criticalRateCalculation.finalCriticalRate
-		
+
 		// スペルバーストレベル取得
 		const spellBurstLevel = getSpellBurstLevel(data.buffSkills.skills)
-		
+
 		// 武器種判定（杖または魔導具）
-		const isStaffOrMagicDevice = data.mainWeapon.weaponType === '杖' || data.mainWeapon.weaponType === '魔導具'
-		
+		const isStaffOrMagicDevice =
+			data.mainWeapon.weaponType === '杖' ||
+			data.mainWeapon.weaponType === '魔導具'
+
 		// DamagePreviewの設定を取得
 		const powerOptions = data.powerOptions || { elementAttack: 'none' }
 		const otherOptions = data.otherOptions || { enemyStatusWeaken: 'none' }
-		
+
 		// 衰弱状態の判定
 		const isWeakened = otherOptions.enemyStatusWeaken === 'applied'
-		
+
 		// 弱点属性一致の判定
 		const isWeakElementMatch = powerOptions.elementAttack === 'advantageous'
-		
+
 		// 無属性攻撃の判定
 		const isNeutralElement = powerOptions.elementAttack === 'none'
-		
+
 		// 魔法クリティカル率計算（全条件を考慮）
 		return calculateMagicalCriticalRate(
 			physicalCriticalRate,
@@ -546,11 +565,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			isNeutralElement,
 		)
 	}, [
-		criticalRateCalculation, 
-		data.buffSkills.skills, 
+		criticalRateCalculation,
+		data.buffSkills.skills,
 		data.mainWeapon.weaponType,
 		data.powerOptions,
-		data.otherOptions
+		data.otherOptions,
 	])
 
 	// 総ATK計算（ATK・サブATK計算結果が必要なため、useMemoの外で実行）
@@ -601,11 +620,14 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			})(),
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
-			magicCriticalRate: magicalCriticalRateCalculation.finalMagicalCriticalRate,
+			magicCriticalRate:
+				magicalCriticalRateCalculation.finalMagicalCriticalRate,
 			magicCriticalDamage:
 				magicalCriticalDamageCalculation.finalMagicalCriticalDamage,
-			totalElementAdvantage: calculationResults.totalElementAdvantageCalculation.physicalSkillTotal,
-			elementAwakeningAdvantage: elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage,
+			totalElementAdvantage:
+				calculationResults.totalElementAdvantageCalculation.physicalSkillTotal,
+			elementAwakeningAdvantage:
+				elementAwakeningAdvantageCalculation.finalElementAwakeningAdvantage,
 			ASPD: aspdCalculation.finalASPD,
 			CSPD: cspdCalculation.finalCSPD,
 			HIT: hitCalculation.finalHIT,
@@ -621,8 +643,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 		switch (category) {
 			case 'physical': {
 				// 物理スキル用の属性覚醒有利（属性覚醒25のみ）
-				const physicalElementAwakeningAdvantage = calculationResults.totalElementAdvantageCalculation.elementAwakening
-				
+				const physicalElementAwakeningAdvantage =
+					calculationResults.totalElementAdvantageCalculation.elementAwakening
+
 				return {
 					HP: baseStats.HP,
 					MP: baseStats.MP,
@@ -636,7 +659,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					subStabilityRate: baseStats.subStabilityRate,
 					criticalRate: baseStats.criticalRate,
 					criticalDamage: baseStats.criticalDamage,
-					totalElementAdvantage: calculationResults.totalElementAdvantageCalculation.physicalSkillTotal,
+					totalElementAdvantage:
+						calculationResults.totalElementAdvantageCalculation
+							.physicalSkillTotal,
 					elementAwakeningAdvantage: physicalElementAwakeningAdvantage,
 					shortRangeDamage:
 						calculationResults.equipmentBonuses.equipmentBonus1
@@ -672,9 +697,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 			case 'magical': {
 				// 魔法スキル用の属性覚醒有利（属性覚醒25 + INT属性有利補正）
-				const magicalElementAwakeningAdvantage = calculationResults.totalElementAdvantageCalculation.elementAwakening + 
-					calculationResults.totalElementAdvantageCalculation.intElementAdvantage
-				
+				const magicalElementAwakeningAdvantage =
+					calculationResults.totalElementAdvantageCalculation.elementAwakening +
+					calculationResults.totalElementAdvantageCalculation
+						.intElementAdvantage
+
 				return {
 					HP: baseStats.HP,
 					MP: baseStats.MP,
@@ -684,7 +711,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					subStabilityRate: baseStats.subStabilityRate,
 					magicCriticalRate: baseStats.magicCriticalRate,
 					magicCriticalDamage: baseStats.magicCriticalDamage,
-					totalElementAdvantage: calculationResults.totalElementAdvantageCalculation.magicalSkillTotal,
+					totalElementAdvantage:
+						calculationResults.totalElementAdvantageCalculation
+							.magicalSkillTotal,
 					elementAwakeningAdvantage: magicalElementAwakeningAdvantage,
 					shortRangeDamage:
 						calculationResults.equipmentBonuses.equipmentBonus1
@@ -720,9 +749,11 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 
 			case 'hybrid': {
 				// ハイブリッド用の属性覚醒有利（魔法スキルベース：属性覚醒25 + INT属性有利補正）
-				const hybridElementAwakeningAdvantage = calculationResults.totalElementAdvantageCalculation.elementAwakening + 
-					calculationResults.totalElementAdvantageCalculation.intElementAdvantage
-				
+				const hybridElementAwakeningAdvantage =
+					calculationResults.totalElementAdvantageCalculation.elementAwakening +
+					calculationResults.totalElementAdvantageCalculation
+						.intElementAdvantage
+
 				return {
 					HP: baseStats.HP,
 					MP: baseStats.MP,
@@ -742,7 +773,9 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					criticalDamage: baseStats.criticalDamage,
 					magicCriticalRate: baseStats.magicCriticalRate,
 					magicCriticalDamage: baseStats.magicCriticalDamage,
-					totalElementAdvantage: calculationResults.totalElementAdvantageCalculation.magicalSkillTotal,
+					totalElementAdvantage:
+						calculationResults.totalElementAdvantageCalculation
+							.magicalSkillTotal,
 					elementAwakeningAdvantage: hybridElementAwakeningAdvantage,
 					shortRangeDamage:
 						calculationResults.equipmentBonuses.equipmentBonus1
@@ -817,33 +850,43 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 							.darkResistance_Rate || 0,
 				} as Record<string, number | null>
 
-			default: { // 'base'
+			default: {
+				// 'base'
 				// 攻撃スキルの設定に基づいて物理または魔法スキル用の総属性有利を判定
 				let attackSkillType: 'physical' | 'magical' = 'physical' // デフォルトは物理
-				
+
 				if (data.attackSkill?.selectedSkillId) {
 					try {
 						const { getAttackSkillById } = require('@/data/attackSkills')
 						const skill = getAttackSkillById(data.attackSkill.selectedSkillId)
 						if (skill?.hits?.[0]?.attackType) {
-							attackSkillType = skill.hits[0].attackType as 'physical' | 'magical'
+							attackSkillType = skill.hits[0].attackType as
+								| 'physical'
+								| 'magical'
 						}
 					} catch (error) {
 						// エラー時はデフォルトの物理を使用
 						console.warn('攻撃スキル情報の取得に失敗:', error)
 					}
 				}
-				
-				const totalElementAdvantageValue = attackSkillType === 'magical' 
-					? calculationResults.totalElementAdvantageCalculation.magicalSkillTotal
-					: calculationResults.totalElementAdvantageCalculation.physicalSkillTotal
-				
+
+				const totalElementAdvantageValue =
+					attackSkillType === 'magical'
+						? calculationResults.totalElementAdvantageCalculation
+								.magicalSkillTotal
+						: calculationResults.totalElementAdvantageCalculation
+								.physicalSkillTotal
+
 				// ベースカテゴリの属性覚醒有利もスキルタイプに応じて変更
-				const baseElementAwakeningAdvantage = attackSkillType === 'magical'
-					? calculationResults.totalElementAdvantageCalculation.elementAwakening + 
-					  calculationResults.totalElementAdvantageCalculation.intElementAdvantage
-					: calculationResults.totalElementAdvantageCalculation.elementAwakening
-				
+				const baseElementAwakeningAdvantage =
+					attackSkillType === 'magical'
+						? calculationResults.totalElementAdvantageCalculation
+								.elementAwakening +
+							calculationResults.totalElementAdvantageCalculation
+								.intElementAdvantage
+						: calculationResults.totalElementAdvantageCalculation
+								.elementAwakening
+
 				return {
 					...baseStats,
 					totalElementAdvantage: totalElementAdvantageValue,
@@ -950,7 +993,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					darkResistance: '闇耐性(%)',
 				}
 
-			default: { // 'base'
+			default: {
+				// 'base'
 				return {
 					...baseLabels,
 					ATK: 'ATK',
@@ -1098,7 +1142,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 					'aggro',
 					'darkResistance',
 				]
-			default: { // 'base'
+			default: {
+				// 'base'
 				return [
 					'HP',
 					'MP',
@@ -1136,7 +1181,6 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// TODO: 将来的には全98項目の計算を実装
 	// 現在は基本的な項目のみ計算
 
-
 	// 補正後ステータス (8項目) - 正確な計算結果を使用
 	const adjustedStats: Record<string, number> = {
 		STR: adjustedStatsCalculation.STR,
@@ -1153,7 +1197,7 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 	// 現在は仮値だが、将来的には calculateEquipmentBonuses の結果を使用
 
 	return (
-		<div 
+		<div
 			ref={containerRef}
 			className="relative bg-blue-50"
 			style={{ height: `${statusPreviewHeight}px`, overflow: 'hidden' }}
@@ -1172,8 +1216,8 @@ export default function StatusPreview({ isVisible }: StatusPreviewProps) {
 			>
 				<div className="w-8 h-1 bg-gray-400 rounded-full" />
 			</div>
-			
-			<div 
+
+			<div
 				className="flex flex-col items-center px-1 sm:px-4 py-2 h-full overflow-y-auto"
 				style={{ paddingBottom: '12px' }} // リサイズハンドル分のスペースを確保
 			>

@@ -1,7 +1,7 @@
 'use client'
 
-import { useEscapeKey } from '@/hooks/useKeyboardShortcut'
 import { createPortal } from 'react-dom'
+import { useEscapeKey } from '@/hooks/useKeyboardShortcut'
 
 interface SaveConfirmModalProps {
 	isOpen: boolean

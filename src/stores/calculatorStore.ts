@@ -18,7 +18,6 @@ import type {
 	DamageCalculationResult,
 } from '@/types/stores'
 import { calculateResults } from '@/utils/calculationEngine'
-import { safeJSONParse } from '@/utils/storage'
 import {
 	calculateDamageWithService,
 	type DamageCalculationServiceResult,
@@ -30,6 +29,10 @@ import {
 	getAllEditSessionEquipments,
 } from '@/utils/editSessionManager'
 import {
+	deleteEquipmentCrystal,
+	saveEquipmentCrystal,
+} from '@/utils/equipmentCrystalStorage'
+import {
 	deleteCustomEquipment,
 	hasEditSessions,
 	hasTemporaryEquipments,
@@ -39,7 +42,6 @@ import {
 	updateCustomEquipmentRefinement,
 	updateEquipmentArmorType,
 } from '@/utils/equipmentDatabase'
-import { saveEquipmentCrystal, deleteEquipmentCrystal } from '@/utils/equipmentCrystalStorage'
 import {
 	createInitialCalculatorData,
 	createInitialEquipment,
@@ -53,6 +55,7 @@ import {
 	initializeStorage,
 	saveCurrentData,
 } from '@/utils/saveDataManager'
+import { safeJSONParse } from '@/utils/storage'
 import {
 	cleanupAllTemporaryEquipments,
 	convertTemporaryEquipmentToPersistent,
@@ -206,7 +209,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					// 仮データと編集セッションを永続化
 					await get().saveTemporaryCustomEquipments()
 					await get().saveEditSessions()
-					
+
 					// 一時的なクリスタ連携情報をLocalStorageに永続化
 					get().saveTempEquipmentCrystalsToStorage()
 
@@ -832,7 +835,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 					if (saved) {
 						const settings: CalculationResultSettings = safeJSONParse(saved, {
 							isVisible: false,
-							lastToggleTime: new Date().toISOString()
+							lastToggleTime: new Date().toISOString(),
 						})
 						set({ isCalculationResultVisible: settings.isVisible })
 					}
@@ -873,41 +876,49 @@ export const useCalculatorStore = create<CalculatorStore>()(
 
 			// ===== 一時的なクリスタ連携情報管理 =====
 			updateTempEquipmentCrystal: (equipmentId, slotNumber, crystalId) => {
-				set((state) => {
-					const tempEquipmentCrystals = state.data.tempEquipmentCrystals || {}
-					const equipmentCrystals = tempEquipmentCrystals[equipmentId] || {}
-					
-					const updatedEquipmentCrystals = {
-						...equipmentCrystals,
-						[`slot${slotNumber}`]: crystalId
-					}
-					
-					return {
-						data: {
-							...state.data,
-							tempEquipmentCrystals: {
-								...tempEquipmentCrystals,
-								[equipmentId]: updatedEquipmentCrystals
-							}
-						},
-						hasUnsavedChanges: true
-					}
-				}, false, 'updateTempEquipmentCrystal')
+				set(
+					(state) => {
+						const tempEquipmentCrystals = state.data.tempEquipmentCrystals || {}
+						const equipmentCrystals = tempEquipmentCrystals[equipmentId] || {}
+
+						const updatedEquipmentCrystals = {
+							...equipmentCrystals,
+							[`slot${slotNumber}`]: crystalId,
+						}
+
+						return {
+							data: {
+								...state.data,
+								tempEquipmentCrystals: {
+									...tempEquipmentCrystals,
+									[equipmentId]: updatedEquipmentCrystals,
+								},
+							},
+							hasUnsavedChanges: true,
+						}
+					},
+					false,
+					'updateTempEquipmentCrystal',
+				)
 			},
 
 			clearTempEquipmentCrystals: () => {
-				set((state) => ({
-					data: {
-						...state.data,
-						tempEquipmentCrystals: {}
-					}
-				}), false, 'clearTempEquipmentCrystals')
+				set(
+					(state) => ({
+						data: {
+							...state.data,
+							tempEquipmentCrystals: {},
+						},
+					}),
+					false,
+					'clearTempEquipmentCrystals',
+				)
 			},
 
 			saveTempEquipmentCrystalsToStorage: () => {
 				const { data } = get()
 				const tempCrystals = data.tempEquipmentCrystals
-				
+
 				if (tempCrystals) {
 					// LocalStorageに保存または削除
 					Object.entries(tempCrystals).forEach(([equipmentId, crystals]) => {
@@ -919,7 +930,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							// 保存する場合
 							saveEquipmentCrystal(equipmentId, 1, crystals.slot1)
 						}
-						
+
 						// slot2の処理
 						if (crystals.slot2 === null) {
 							// 削除する場合
@@ -929,7 +940,7 @@ export const useCalculatorStore = create<CalculatorStore>()(
 							saveEquipmentCrystal(equipmentId, 2, crystals.slot2)
 						}
 					})
-					
+
 					// 一時データをクリア
 					get().clearTempEquipmentCrystals()
 				}

@@ -3,8 +3,8 @@
 import { useCalculatorStore } from '@/stores'
 import {
 	clearWeaponInfo,
-	saveWeaponInfo,
 	saveSubWeaponInfo,
+	saveWeaponInfo,
 } from '@/utils/weaponInfoStorage'
 
 interface WeaponInfoManagerProps {
@@ -113,18 +113,18 @@ export default function WeaponInfoManager({
 		}
 	}
 
-	const handleRegister = slotKey === 'mainWeapon' 
-		? handleRegisterWeaponInfo 
-		: handleRegisterSubWeaponInfo
+	const handleRegister =
+		slotKey === 'mainWeapon'
+			? handleRegisterWeaponInfo
+			: handleRegisterSubWeaponInfo
 
-	const weaponLabel = slotKey === 'mainWeapon' ? 'メイン武器情報' : 'サブ武器情報'
+	const weaponLabel =
+		slotKey === 'mainWeapon' ? 'メイン武器情報' : 'サブ武器情報'
 
 	return (
 		<>
 			<div className="flex gap-4 items-center mt-2 pl-3">
-				<div className="text-sm font-semibold text-gray-700">
-					{weaponLabel}
-				</div>
+				<div className="text-sm font-semibold text-gray-700">{weaponLabel}</div>
 				<div className="flex gap-2">
 					<button
 						type="button"

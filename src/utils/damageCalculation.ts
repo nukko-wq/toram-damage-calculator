@@ -266,7 +266,10 @@ export function calculateDamage(
 	}
 
 	// ステップ2a: クリティカルダメージ補正（クリティカル・Graze時）
-	if (input.userSettings.damageType === 'critical' || input.userSettings.damageType === 'graze') {
+	if (
+		input.userSettings.damageType === 'critical' ||
+		input.userSettings.damageType === 'graze'
+	) {
 		if (process.env.NODE_ENV === 'development') {
 			console.log('\n--- ステップ2a: クリティカル計算 ---')
 		}
@@ -1082,6 +1085,9 @@ function processEnemyDefense(
 			)
 		}
 	}
+
+	// 貫通率の上限を100%に制限
+	penetrationRate = Math.min(100, penetrationRate)
 
 	if (process.env.NODE_ENV === 'development') {
 		console.log('貫通計算詳細:')

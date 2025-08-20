@@ -16,17 +16,17 @@ import {
 	calculateMATK,
 	calculateMagicalCriticalDamage,
 	calculateMagicalCriticalRate,
-	getSpellBurstLevel,
 	calculateMagicalResistance,
-	calculateSpearMATK,
 	calculateMotionSpeed,
 	calculateMP,
 	calculatePhysicalResistance,
+	calculateSpearMATK,
 	calculateStability,
 	calculateSubATK,
 	calculateTotalATK,
 	calculateTotalElementAdvantage,
 	getBodyArmorType,
+	getSpellBurstLevel,
 } from './basicStatsCalculation'
 import { getAllDataSourceBonusesWithBuffSkills } from './dataSourceIntegration'
 
@@ -119,7 +119,8 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 		spellBurstLevel,
 		false, // 衰弱状態（ダメージ計算時に設定）
 		false, // 弱点属性一致（ダメージ計算時に設定）
-		data.mainWeapon.weaponType === '杖' || data.mainWeapon.weaponType === '魔導具', // 杖または魔導具
+		data.mainWeapon.weaponType === '杖' ||
+			data.mainWeapon.weaponType === '魔導具', // 杖または魔導具
 		false, // 無属性攻撃（ダメージ計算時に設定）
 	)
 
@@ -189,16 +190,17 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 	)
 
 	// 18. 槍MATK計算（旋風槍装備時のみ）
-	const spearMatkCalculation = data.mainWeapon.weaponType === '旋風槍' 
-		? calculateSpearMATK(
-			data.baseStats.level,
-			data.mainWeapon.weaponType,
-			atkCalculation.totalWeaponATK, // 総武器ATK
-			data.baseStats, // 基礎ステータス（MATKアップ用）
-			adjustedStats, // 補正後ステータス（槍ステータスMATK用）
-			allBonuses, // 全ての効果を統合した最終ボーナス値を使用
-		)
-		: null
+	const spearMatkCalculation =
+		data.mainWeapon.weaponType === '旋風槍'
+			? calculateSpearMATK(
+					data.baseStats.level,
+					data.mainWeapon.weaponType,
+					atkCalculation.totalWeaponATK, // 総武器ATK
+					data.baseStats, // 基礎ステータス（MATKアップ用）
+					adjustedStats, // 補正後ステータス（槍ステータスMATK用）
+					allBonuses, // 全ての効果を統合した最終ボーナス値を使用
+				)
+			: null
 
 	return {
 		basicStats: {
@@ -217,7 +219,8 @@ export const calculateResults = (data: CalculatorData): CalculationResults => {
 				subATKCalculation?.subStability || data.subWeapon.stability,
 			criticalRate: criticalRateCalculation.finalCriticalRate,
 			criticalDamage: criticalDamageCalculation.finalCriticalDamage,
-			magicCriticalRate: magicalCriticalRateCalculation.finalMagicalCriticalRate, // 魔法クリティカル率計算結果
+			magicCriticalRate:
+				magicalCriticalRateCalculation.finalMagicalCriticalRate, // 魔法クリティカル率計算結果
 			magicCriticalDamage:
 				magicalCriticalDamageCalculation.finalMagicalCriticalDamage, // 魔法クリティカルダメージ計算結果
 			totalElementAdvantage:

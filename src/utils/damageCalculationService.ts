@@ -132,7 +132,7 @@ export function calculateDamageWithService(
 			: physicalStabilityRate
 
 		// 選択されたスキルを取得（確定クリティカル判定用）
-		const selectedSkill = calculatorData.attackSkill?.selectedSkillId 
+		const selectedSkill = calculatorData.attackSkill?.selectedSkillId
 			? getAttackSkillById(calculatorData.attackSkill.selectedSkillId)
 			: null
 
@@ -198,7 +198,7 @@ export function calculateDamageWithService(
 					)
 					hotKnowsEffect = hotKnowsResult.ElementAdvantage_Rate || 0
 				}
-				
+
 				// 基本属性有利プロパティ + 熱情の歌効果（INT補正と属性覚醒は除外）
 				return baseAdvantage + hotKnowsEffect
 			}
@@ -368,18 +368,19 @@ export function calculateDamageWithService(
 				currentDistance: powerOptions.distance,
 				damageType: (() => {
 					// 確定クリティカルスキルの判定
-					const isGuaranteedCritical = selectedSkill?.hits.some((hit) => hit.isGuaranteedCritical) || false
-					
+					const isGuaranteedCritical =
+						selectedSkill?.hits.some((hit) => hit.isGuaranteedCritical) || false
+
 					// 1. 確定クリティカルスキルの場合、白ダメージ判定でもクリティカル倍率で計算
 					if (isGuaranteedCritical && powerOptions.damageType === 'white') {
 						return 'critical'
 					}
-					
+
 					// 2. 魔法スキルの場合、Graze判定でもクリティカル倍率で計算（Grazeによる安定率半減を受けないため）
 					if (isMagicalSkill && powerOptions.damageType === 'graze') {
 						return 'critical'
 					}
-					
+
 					return powerOptions.damageType
 				})(),
 			},
@@ -466,7 +467,7 @@ export function calculateDamageWithService(
 			const selectedSkill = getAttackSkillById(
 				calculatorData.attackSkill.selectedSkillId,
 			)
-			
+
 			if (selectedSkill) {
 				// 攻撃スキル計算システムを使用してスキル情報を取得
 				const skillCalculationResult = attackSkillCalculation.calculateSkill(
@@ -680,7 +681,8 @@ export function calculateDamageWithService(
 				: Math.floor((minStabilityRate + maxStabilityRate) / 2)
 
 			// 確定クリティカルスキルの判定
-			const isGuaranteedCritical = selectedSkill?.hits.some((hit) => hit.isGuaranteedCritical) || false
+			const isGuaranteedCritical =
+				selectedSkill?.hits.some((hit) => hit.isGuaranteedCritical) || false
 
 			// ダメージタイプの変換処理
 			const effectiveDamageType = (() => {
@@ -688,12 +690,12 @@ export function calculateDamageWithService(
 				if (isGuaranteedCritical && powerOptions.damageType === 'white') {
 					return 'critical'
 				}
-				
+
 				// 2. 魔法スキルの場合、Graze判定でもクリティカル倍率で計算（Grazeによる安定率半減を受けないため）
 				if (isMagicalSkill && powerOptions.damageType === 'graze') {
 					return 'critical'
 				}
-				
+
 				return powerOptions.damageType
 			})()
 
@@ -822,7 +824,9 @@ export function calculateDamageWithService(
 					// グレイズ安定率 = Math.floor(基本安定率 / 2)
 					const grazeMinStabilityRate = Math.floor(minStabilityRate / 2)
 					const grazeMaxStabilityRate = 100 // 最大は100%のまま
-					const grazeAverageStabilityRate = Math.floor((grazeMinStabilityRate + grazeMaxStabilityRate) / 2)
+					const grazeAverageStabilityRate = Math.floor(
+						(grazeMinStabilityRate + grazeMaxStabilityRate) / 2,
+					)
 
 					// 多撃の場合は既に計算済みの値を使用（グレイズ安定率適用）
 					if (isMultiHit) {

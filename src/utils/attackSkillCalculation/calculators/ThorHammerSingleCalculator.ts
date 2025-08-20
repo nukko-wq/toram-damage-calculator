@@ -3,7 +3,7 @@ import { SkillHitCalculator } from './SkillHitCalculator'
 
 /**
  * トールハンマー(単発)専用計算器
- * 
+ *
  * 固定倍率1500%、固定ダメージ400の槍MATK参照魔法攻撃スキル
  */
 export class ThorHammerSingleCalculator extends SkillHitCalculator {

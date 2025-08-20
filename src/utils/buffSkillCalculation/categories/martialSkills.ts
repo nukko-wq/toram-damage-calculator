@@ -3,10 +3,9 @@
  */
 
 import type { BuffSkillState, MainWeaponType } from '@/types/buffSkill'
-import type { EquipmentProperties } from '@/types/calculator'
+import type { EquipmentProperties, WeaponType } from '@/types/calculator'
 import type { AllBonuses } from '../../basicStatsCalculation'
 import { convertWeaponType, integrateEffects } from '../types'
-import type { WeaponType } from '@/types/calculator'
 
 /**
  * 体術鍛錬の効果計算関数

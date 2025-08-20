@@ -2,7 +2,11 @@
 
 import { useState } from 'react'
 import { useCalculatorStore } from '@/stores'
-import type { Equipment, EquipmentProperties, EquipmentSlots } from '@/types/calculator'
+import type {
+	Equipment,
+	EquipmentProperties,
+	EquipmentSlots,
+} from '@/types/calculator'
 import EquipmentCrystalSelector from './EquipmentCrystalSelector'
 
 interface PropertyEditorProps {
@@ -13,12 +17,12 @@ interface PropertyEditorProps {
 	onUpdate?: () => void
 }
 
-export default function PropertyEditor({ 
-	item, 
-	slotKey, 
+export default function PropertyEditor({
+	item,
+	slotKey,
 	onPropertyChange,
 	onMessage,
-	onUpdate
+	onUpdate,
 }: PropertyEditorProps) {
 	// 一時的な入力値を管理するstate（プロパティキー -> 入力値のマップ）
 	const [tempInputValues, setTempInputValues] = useState<
@@ -318,16 +322,12 @@ export default function PropertyEditor({
 	}
 
 	// 一時的な入力値のキーを生成
-	const getTempInputKey = (
-		property: keyof EquipmentProperties,
-	) => {
+	const getTempInputKey = (property: keyof EquipmentProperties) => {
 		return `${slotKey}-${property}`
 	}
 
 	// 表示用の値を取得（一時入力値 > 実際の値 > 空文字）
-	const getDisplayValue = (
-		property: keyof EquipmentProperties,
-	) => {
+	const getDisplayValue = (property: keyof EquipmentProperties) => {
 		const tempKey = getTempInputKey(property)
 		if (tempInputValues[tempKey] !== undefined) {
 			return tempInputValues[tempKey]
@@ -391,11 +391,7 @@ export default function PropertyEditor({
 		const numValue = Number.parseInt(value) || 0
 
 		// カスタム装備の場合、プロパティ連動更新を実行
-		if (
-			item.id &&
-			'isCustom' in item &&
-			item.isCustom
-		) {
+		if (item.id && 'isCustom' in item && item.isCustom) {
 			updateCustomEquipmentProperties(item.id, {
 				[property]: numValue,
 			})
@@ -415,152 +411,152 @@ export default function PropertyEditor({
 					onCrystalChange={onUpdate}
 				/>
 			)}
-			
+
 			{/* プロパティ入力フォーム */}
 			<div className="flex overflow-x-scroll w-full max-w-[82vw] sm:max-w-[95vw] flex-nowrap">
-			{propertyGroups.map((group) => (
-				<div
-					key={group.title}
-					className="w-[240px] border-gray-300 rounded-lg p-3"
-				>
-					<h4 className="font-medium text-gray-700 mb-3 text-sm bg-white">
-						{group.title}
-					</h4>
-					{/* 列見出し */}
-					<div className="grid grid-cols-[100px_60px_60px] gap-1 mb-2">
-						<div className="text-gray-700 text-sm">プロパティ</div>
-						<div className="text-center text-gray-700 text-sm">%</div>
-						<div className="text-center text-gray-700 text-sm">+</div>
-					</div>
-					{/* プロパティ行 */}
-					<div className="space-y-1">
-						{group.propertyPairs.map((pair) => (
-							<div
-								key={pair.properties[0]}
-								className="grid grid-cols-[100px_60px_60px] gap-1 items-center"
-							>
+				{propertyGroups.map((group) => (
+					<div
+						key={group.title}
+						className="w-[240px] border-gray-300 rounded-lg p-3"
+					>
+						<h4 className="font-medium text-gray-700 mb-3 text-sm bg-white">
+							{group.title}
+						</h4>
+						{/* 列見出し */}
+						<div className="grid grid-cols-[100px_60px_60px] gap-1 mb-2">
+							<div className="text-gray-700 text-sm">プロパティ</div>
+							<div className="text-center text-gray-700 text-sm">%</div>
+							<div className="text-center text-gray-700 text-sm">+</div>
+						</div>
+						{/* プロパティ行 */}
+						<div className="space-y-1">
+							{group.propertyPairs.map((pair) => (
 								<div
-									className="text-xs text-gray-700 font-medium truncate"
-									title={getBasePropertyLabel(pair.properties[0])}
+									key={pair.properties[0]}
+									className="grid grid-cols-[100px_60px_60px] gap-1 items-center"
 								>
-									{getBasePropertyLabel(pair.properties[0])}
-								</div>
-								{pair.type === 'pair' ? (
-									// ペア項目: %系と固定値系
-									<>
-										<input
-											id={`${item.name}-${pair.properties[0]}`}
-											type="number"
-											value={getDisplayValue(pair.properties[0])}
-											onChange={(e) =>
-												handlePropertyInputChange(
-													pair.properties[0],
-													e.target.value,
-												)
-											}
-											onBlur={(e) =>
-												handlePropertyBlur(pair.properties[0], e.target.value)
-											}
-											onFocus={(e) => e.target.select()}
-											onMouseDown={(e) => {
-												if (document.activeElement === e.target) {
-													handlePropertyClickToClear(
+									<div
+										className="text-xs text-gray-700 font-medium truncate"
+										title={getBasePropertyLabel(pair.properties[0])}
+									>
+										{getBasePropertyLabel(pair.properties[0])}
+									</div>
+									{pair.type === 'pair' ? (
+										// ペア項目: %系と固定値系
+										<>
+											<input
+												id={`${item.name}-${pair.properties[0]}`}
+												type="number"
+												value={getDisplayValue(pair.properties[0])}
+												onChange={(e) =>
+													handlePropertyInputChange(
 														pair.properties[0],
-														item.name || item.id,
+														e.target.value,
 													)
 												}
-											}}
-											className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-										/>
-										<input
-											id={`${item.name}-${pair.properties[1]}`}
-											type="number"
-											value={getDisplayValue(pair.properties[1])}
-											onChange={(e) =>
-												handlePropertyInputChange(
-													pair.properties[1],
-													e.target.value,
-												)
-											}
-											onBlur={(e) =>
-												handlePropertyBlur(pair.properties[1], e.target.value)
-											}
-											onFocus={(e) => e.target.select()}
-											onMouseDown={(e) => {
-												if (document.activeElement === e.target) {
-													handlePropertyClickToClear(
+												onBlur={(e) =>
+													handlePropertyBlur(pair.properties[0], e.target.value)
+												}
+												onFocus={(e) => e.target.select()}
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(
+															pair.properties[0],
+															item.name || item.id,
+														)
+													}
+												}}
+												className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
+											<input
+												id={`${item.name}-${pair.properties[1]}`}
+												type="number"
+												value={getDisplayValue(pair.properties[1])}
+												onChange={(e) =>
+													handlePropertyInputChange(
 														pair.properties[1],
-														item.name || item.id,
+														e.target.value,
 													)
 												}
-											}}
-											className="px-2 py-1 text-xs border border-gray-300 rounded bg-blue-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-										/>
-									</>
-								) : pair.type === 'percent' ? (
-									// パーセント項目: %系のみ
-									<>
-										<input
-											id={`${item.name}-${pair.properties[0]}`}
-											type="number"
-											value={getDisplayValue(pair.properties[0])}
-											onChange={(e) =>
-												handlePropertyInputChange(
-													pair.properties[0],
-													e.target.value,
-												)
-											}
-											onBlur={(e) =>
-												handlePropertyBlur(pair.properties[0], e.target.value)
-											}
-											onFocus={(e) => e.target.select()}
-											onMouseDown={(e) => {
-												if (document.activeElement === e.target) {
-													handlePropertyClickToClear(
+												onBlur={(e) =>
+													handlePropertyBlur(pair.properties[1], e.target.value)
+												}
+												onFocus={(e) => e.target.select()}
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(
+															pair.properties[1],
+															item.name || item.id,
+														)
+													}
+												}}
+												className="px-2 py-1 text-xs border border-gray-300 rounded bg-blue-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
+										</>
+									) : pair.type === 'percent' ? (
+										// パーセント項目: %系のみ
+										<>
+											<input
+												id={`${item.name}-${pair.properties[0]}`}
+												type="number"
+												value={getDisplayValue(pair.properties[0])}
+												onChange={(e) =>
+													handlePropertyInputChange(
 														pair.properties[0],
-														item.name || item.id,
+														e.target.value,
 													)
 												}
-											}}
-											className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-										/>
-										<div />
-									</>
-								) : (
-									// 固定項目: 固定値のみ
-									<>
-										<div />
-										<input
-											id={`${item.name}-${pair.properties[0]}`}
-											type="number"
-											value={getDisplayValue(pair.properties[0])}
-											onChange={(e) =>
-												handlePropertyInputChange(
-													pair.properties[0],
-													e.target.value,
-												)
-											}
-											onBlur={(e) =>
-												handlePropertyBlur(pair.properties[0], e.target.value)
-											}
-											onFocus={(e) => e.target.select()}
-											onMouseDown={(e) => {
-												if (document.activeElement === e.target) {
-													handlePropertyClickToClear(
+												onBlur={(e) =>
+													handlePropertyBlur(pair.properties[0], e.target.value)
+												}
+												onFocus={(e) => e.target.select()}
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(
+															pair.properties[0],
+															item.name || item.id,
+														)
+													}
+												}}
+												className="px-2 py-1 text-xs border border-gray-300 rounded bg-rose-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
+											<div />
+										</>
+									) : (
+										// 固定項目: 固定値のみ
+										<>
+											<div />
+											<input
+												id={`${item.name}-${pair.properties[0]}`}
+												type="number"
+												value={getDisplayValue(pair.properties[0])}
+												onChange={(e) =>
+													handlePropertyInputChange(
 														pair.properties[0],
-														item.name || item.id,
+														e.target.value,
 													)
 												}
-											}}
-											className="px-2 py-1 text-xs border border-gray-300 rounded bg-blue-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
-										/>
-									</>
-								)}
-							</div>
-						))}
+												onBlur={(e) =>
+													handlePropertyBlur(pair.properties[0], e.target.value)
+												}
+												onFocus={(e) => e.target.select()}
+												onMouseDown={(e) => {
+													if (document.activeElement === e.target) {
+														handlePropertyClickToClear(
+															pair.properties[0],
+															item.name || item.id,
+														)
+													}
+												}}
+												className="px-2 py-1 text-xs border border-gray-300 rounded bg-blue-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent w-full"
+											/>
+										</>
+									)}
+								</div>
+							))}
+						</div>
 					</div>
-				</div>
-			))}
+				))}
 			</div>
 		</div>
 	)

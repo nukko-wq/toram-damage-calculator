@@ -32,7 +32,7 @@ export function saveEquipmentCrystal(
 	try {
 		const storage = getCrystalInfoStorage()
 		const key = generateCrystalKey(equipmentId, slotNumber)
-		
+
 		const crystalInfo: CrystalInfo = {
 			crystalId,
 			updatedAt: new Date().toISOString(),
@@ -75,10 +75,13 @@ export function deleteEquipmentCrystal(
 	try {
 		const storage = getCrystalInfoStorage()
 		const key = generateCrystalKey(equipmentId, slotNumber)
-		
+
 		if (key in storage) {
 			delete storage[key]
-			localStorage.setItem(EQUIPMENT_CRYSTAL_STORAGE_KEY, JSON.stringify(storage))
+			localStorage.setItem(
+				EQUIPMENT_CRYSTAL_STORAGE_KEY,
+				JSON.stringify(storage),
+			)
 			return true
 		}
 		return false

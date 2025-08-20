@@ -13,7 +13,9 @@ const getInitialStatusPreviewCategories = (): Record<
 	try {
 		const stored = localStorage.getItem('ui-store')
 		if (stored) {
-			const parsed = safeJSONParse(stored, { state: { statusPreviewCategories: {} } })
+			const parsed = safeJSONParse(stored, {
+				state: { statusPreviewCategories: {} },
+			})
 			return parsed.state?.statusPreviewCategories || {}
 		}
 	} catch (error) {
@@ -96,7 +98,11 @@ export const useUIStore = create<UIStore>()(
 					const minHeight = 200
 					const maxHeight = 600
 					const clampedHeight = Math.max(minHeight, Math.min(maxHeight, height))
-					set({ statusPreviewHeight: clampedHeight }, false, 'setStatusPreviewHeight')
+					set(
+						{ statusPreviewHeight: clampedHeight },
+						false,
+						'setStatusPreviewHeight',
+					)
 				},
 
 				// ===== DamagePreviewの高さ管理 =====
@@ -105,7 +111,11 @@ export const useUIStore = create<UIStore>()(
 					const minHeight = 200
 					const maxHeight = 600
 					const clampedHeight = Math.max(minHeight, Math.min(maxHeight, height))
-					set({ damagePreviewHeight: clampedHeight }, false, 'setDamagePreviewHeight')
+					set(
+						{ damagePreviewHeight: clampedHeight },
+						false,
+						'setDamagePreviewHeight',
+					)
 				},
 			}),
 			{

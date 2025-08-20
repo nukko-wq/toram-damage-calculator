@@ -38,11 +38,14 @@ export class AttackSkillCalculationService {
 			SkillCalculationUtils.convertToPlayerStats(calculatorData)
 		const equipmentContext =
 			SkillCalculationUtils.convertToEquipmentContext(calculatorData)
+		const buffSkillContext =
+			SkillCalculationUtils.convertToBuffSkillContext(calculatorData)
 
 		const hits = this.calculator.calculateSkill(
 			skillId,
 			playerStats,
 			equipmentContext,
+			buffSkillContext,
 		)
 
 		return { hits }
