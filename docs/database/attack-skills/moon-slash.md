@@ -148,7 +148,7 @@ class MoonSlashCalculator extends SkillHitCalculator {
 ## UI表示仕様
 
 ### スキル選択ドロップダウン
-- **表示位置**: 剣系統グループ内、order順で`buster_blade`(101)の後
+- **表示位置**: 剣系統グループ内、order順で`buster_blade`(101)の後、シャットアウト(通常)(104)の前
 - **表示名**: `ムーンスラッシュ`
 - **武器種フィルタ**: 片手剣、双剣、両手剣装備時のみ表示
 

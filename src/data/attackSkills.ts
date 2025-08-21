@@ -139,11 +139,47 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// シャットアウト(通常)
+	{
+		id: 'shut_out',
+		name: 'シャットアウト(通常)',
+		order: 104,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['片手剣', '双剣', '両手剣'],
+		mpCost: 100,
+		multiplierFormula: '500% + 武器種別補正',
+		fixedDamageFormula: '100 + 武器種別補正',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 500, // 表示用（実際の計算は外部）
+				fixedDamage: 100, // 表示用（実際の計算は外部）
+				multiplierFormula: [
+					'両手剣装備時：威力+1000%',
+					'片手剣装備時：威力+基礎DEX/2%',
+					'双剣装備時：威力+基礎AGI/4%',
+				],
+				fixedDamageFormula: '双剣装備時：固定値+100',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// オーガスラッシュ（消費鬼力連携の例）
 	{
 		id: 'ogre_slash',
 		name: 'オーガスラッシュ',
-		order: 104,
+		order: 105,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['両手剣'],
@@ -658,7 +694,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'l_boomerang_3',
 		name: 'Lブーメラン\u2162',
-		order: 104,
+		order: 106,
 		systemGroup: 'sword',
 		category: 'partizan',
 		weaponTypeRequirements: ['両手剣'],
@@ -707,7 +743,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'storm_blazer_10stack',
 		name: 'ストームブレイザー(10スタック)',
-		order: 105,
+		order: 107,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['両手剣'],
@@ -738,7 +774,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'storm_blazer_1stack',
 		name: 'ストームブレイザー(1スタック)',
-		order: 106,
+		order: 108,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['両手剣'],
