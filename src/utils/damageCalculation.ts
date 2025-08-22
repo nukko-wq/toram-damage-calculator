@@ -28,6 +28,11 @@ export interface DamageCalculationInput {
 		hitNumber?: number // ヒット番号（スキル固有効果用）
 	}
 
+	// 武器情報（スキル特殊効果計算用）
+	weapon?: {
+		mainWeaponType: string | null // メイン武器種
+	}
+
 	// 耐性・防御力
 	resistance: {
 		physical: number // 物理耐性(%)
@@ -1055,6 +1060,19 @@ function processEnemyDefense(
 	if (defenseType === 'DEF') {
 		penetrationRate = input.penetration.physical
 
+		// スキル特殊効果による物理貫通倍率適用
+		const physicalPenetrationMultiplier = getSkillPhysicalPenetrationMultiplier(
+			input.attackSkill.skillId,
+			input.weapon?.mainWeaponType,
+		)
+		penetrationRate = penetrationRate * physicalPenetrationMultiplier
+
+		if (process.env.NODE_ENV === 'development' && physicalPenetrationMultiplier > 1) {
+			console.log(
+				`スキル特殊効果による物理貫通倍率: ${physicalPenetrationMultiplier}倍 (スキルID: ${input.attackSkill.skillId}, 武器: ${input.weapon?.mainWeaponType})`,
+			)
+		}
+
 		// スキル固有の貫通ボーナス適用
 		const skillPenetrationBonus = getSkillPenetrationBonus(
 			input.attackSkill.skillId,
@@ -1129,6 +1147,34 @@ function getSkillPenetrationBonus(
 	// 他のスキル固有効果を追加する場合はここに記述
 
 	return 0
+}
+
+/**
+ * スキル特殊効果による物理貫通倍率を取得
+ */
+function getSkillPhysicalPenetrationMultiplier(
+	skillId?: string,
+	mainWeaponType?: string | null,
+): number {
+	if (!skillId || !mainWeaponType) {
+		return 1
+	}
+
+	// シャットアウト(出血付与時)の物理貫通倍率効果
+	if (skillId === 'shut_out_bleeding') {
+		switch (mainWeaponType) {
+			case '片手剣':
+				return 4 // 物理貫通4倍
+			case '双剣':
+				return 2 // 物理貫通2倍
+			default:
+				return 1 // 他の武器種は倍率なし
+		}
+	}
+
+	// 他のスキルの物理貫通倍率効果を追加する場合はここに記述
+
+	return 1
 }
 
 /**

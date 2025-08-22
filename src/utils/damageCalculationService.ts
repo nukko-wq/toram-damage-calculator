@@ -332,6 +332,10 @@ export function calculateDamageWithService(
 			referenceStat: totalATK, // 計算済みの総ATKを使用
 			passiveMultiplier: passiveMultiplier, // バフスキルから取得したパッシブ倍率を適用
 			braveMultiplier: braveMultiplierWithEnemy, // エンハンス含むブレイブ倍率を適用
+			// 武器種情報を追加（スキル特殊効果計算用）
+			weapon: {
+				mainWeaponType: calculatorData.mainWeapon?.weaponType || null,
+			},
 			// 敵情報を実際のデータに基づいて設定
 			enemyLevel: finalEnemyLevel,
 			stability: {
