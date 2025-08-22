@@ -7,6 +7,7 @@ import {
 	MeteorBreakerCalculator,
 	MoonSlashCalculator,
 	OgreSlashCalculator,
+	ShutOutBleedingCalculator,
 	ShutOutCalculator,
 	type SkillHitCalculator,
 	StandardCalculator,
@@ -82,6 +83,8 @@ export class AttackSkillCalculator {
 				return new OgreSlashCalculator()
 			case 'shut_out':
 				return new ShutOutCalculator()
+			case 'shut_out_bleeding':
+				return new ShutOutBleedingCalculator()
 			case 'storm_blazer_10stack':
 				return new StormBlazer10StackCalculator()
 			case 'storm_blazer_1stack':
