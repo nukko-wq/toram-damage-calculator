@@ -139,6 +139,36 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// オーラブレード（基本計算）
+	{
+		id: 'aura_blade',
+		name: 'オーラブレード',
+		order: 104,
+		systemGroup: 'sword',
+		category: 'blade',
+		weaponTypeRequirements: ['片手剣', '双剣', '両手剣'],
+		mpCost: 300, // 保留のため仮設定
+		multiplierFormula: '1500%',
+		fixedDamageFormula: '200',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1500,
+				fixedDamage: 200,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+			},
+		],
+	},
+
 	// シャットアウト(通常)
 	{
 		id: 'shut_out',

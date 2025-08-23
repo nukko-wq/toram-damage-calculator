@@ -115,6 +115,7 @@ export class AttackSkillCalculator {
 				return new ThorHammerFollowup8HitCalculator()
 			case 'power_shot':
 			case 'dual_strike':
+			case 'aura_blade':
 				return new StandardCalculator()
 			default:
 				throw new Error(`No calculator found for skill: ${skillId}`)
