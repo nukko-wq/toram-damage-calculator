@@ -143,7 +143,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'shut_out',
 		name: 'シャットアウト(通常)',
-		order: 104,
+		order: 105,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['片手剣', '双剣', '両手剣'],
@@ -179,7 +179,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'shut_out_bleeding',
 		name: 'シャットアウト(出血付与時)',
-		order: 105,
+		order: 106,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['片手剣', '双剣', '両手剣'],
@@ -219,7 +219,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'ogre_slash',
 		name: 'オーガスラッシュ',
-		order: 106,
+		order: 107,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['両手剣'],
@@ -734,7 +734,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'l_boomerang_3',
 		name: 'Lブーメラン\u2162',
-		order: 107,
+		order: 108,
 		systemGroup: 'sword',
 		category: 'partizan',
 		weaponTypeRequirements: ['両手剣'],
@@ -783,7 +783,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'storm_blazer_10stack',
 		name: 'ストームブレイザー(10スタック)',
-		order: 108,
+		order: 109,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['両手剣'],
@@ -814,7 +814,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'storm_blazer_1stack',
 		name: 'ストームブレイザー(1スタック)',
-		order: 109,
+		order: 110,
 		systemGroup: 'sword',
 		category: 'blade',
 		weaponTypeRequirements: ['両手剣'],

@@ -23,7 +23,7 @@ AttackSkillFormに新しい攻撃スキル「オーガスラッシュ」を追�
   // 基本情報
   id: 'ogre_slash',
   name: 'オーガスラッシュ',
-  order: 106,                       // シャットアウト(出血付与時)の後
+  order: 107,                       // シャットアウト(出血付与時)の後
   systemGroup: 'sword',             // 剣系統
   category: 'blade',                // ブレードカテゴリ
   weaponTypeRequirements: ['両手剣'],
@@ -182,7 +182,7 @@ class OgreSlashCalculator extends SkillHitCalculator {
 ## UI表示仕様
 
 ### スキル選択ドロップダウン
-- **表示位置**: 剣系統グループ内、order順でシャットアウト(出血付与時)(105)の後
+- **表示位置**: 剣系統グループ内、order順でシャットアウト(出血付与時)(106)の後
 - **表示名**: `オーガスラッシュ`
 - **武器種フィルタ**: 両手剣装備時のみ表示
 

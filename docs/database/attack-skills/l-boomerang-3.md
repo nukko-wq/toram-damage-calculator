@@ -23,7 +23,7 @@ AttackSkillFormに新しい攻撃スキル「Lブーメラン\u2162」を追加�
   // 基本情報
   id: 'l_boomerang_3',
   name: 'Lブーメラン\u2162',
-  order: 107,                    // 剣系統100番台、オーガスラッシュの後
+  order: 108,                    // 剣系統100番台、オーガスラッシュの後
   systemGroup: 'sword',          // 剣系統
   category: 'partisan',          // パルチザンカテゴリ
   weaponTypeRequirements: ['両手剣'],
@@ -126,7 +126,7 @@ class StandardCalculator extends SkillHitCalculator {
 ## UI表示仕様
 
 ### スキル選択ドロップダウン
-- **表示位置**: 剣系統グループ内、order順でオーガスラッシュ(106)の後
+- **表示位置**: 剣系統グループ内、order順でオーガスラッシュ(107)の後
 - **表示名**: `Lブーメラン\u2162`
 - **武器種フィルタ**: 両手剣装備時のみ表示
 
