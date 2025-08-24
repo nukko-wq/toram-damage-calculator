@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
-import PropertyEditor from '@/components/equipment/PropertyEditor'
+import PropertyEditor, { getBasePropertyLabel } from '@/components/equipment/PropertyEditor'
 import { useUIStore } from '@/stores/uiStore'
 import type { Equipment, EquipmentProperties } from '@/types/calculator'
 
@@ -48,31 +48,13 @@ export default function CrystalPropertyInput() {
 		property: keyof EquipmentProperties,
 		value: number,
 	): string => {
-		// PropertyEditorのgetBasePropertyLabel関数の簡易版
-		const labelMap: Record<string, string> = {
-			ATK_Rate: 'ATK',
-			MATK_Rate: 'MATK',
-			HP_Rate: 'HP',
-			MP_Rate: 'MP',
-			STR_Rate: 'STR',
-			INT_Rate: 'INT',
-			VIT_Rate: 'VIT',
-			AGI_Rate: 'AGI',
-			DEX_Rate: 'DEX',
-			Critical_Rate: 'クリティカル',
-			AttackSpeed_Rate: '攻撃速度',
-			PhysicalPenetration_Rate: '物理貫通',
-			MagicalPenetration_Rate: '魔法貫通',
-		}
-
-		const label =
-			labelMap[property] || property.replace(/_Rate$/, '').replace(/_/g, '')
+		const label = getBasePropertyLabel(property)
 		const isPercentage = property.endsWith('_Rate')
 
 		if (isPercentage) {
-			return `${label} +${value}%`
+			return `${label}(%) :${value}`
 		}
-		return `${label} +${value}`
+		return `${label} :${value}`
 	}
 
 	const handlePropertyChange = (

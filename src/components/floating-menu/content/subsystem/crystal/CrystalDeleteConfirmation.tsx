@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useUIStore } from '@/stores/uiStore'
 import { getUserCrystalById } from '@/utils/crystalDatabase'
 import { getBasePropertyLabel } from '@/components/equipment/PropertyEditor'
