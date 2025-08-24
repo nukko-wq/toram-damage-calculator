@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import type { UIStore } from '@/types/stores'
+import type { UIStore, CustomType, NavigationScreen, EditMode } from '@/types/stores'
+import type { CrystalType, EquipmentProperties } from '@/types/calculator'
 import { safeJSONParse } from '@/utils/storage'
 
 // ローカルストレージから初期カテゴリ状態を取得
@@ -39,6 +40,31 @@ export const useUIStore = create<UIStore>()(
 				statusPreviewCategories: getInitialStatusPreviewCategories(),
 				statusPreviewHeight: 400, // デフォルトの高さ（400px）
 				damagePreviewHeight: 600, // デフォルトの高さ（600px）
+
+				// サブシステム関連の初期状態
+				subsystem: {
+					fullScreenModal: {
+						isOpen: false,
+						type: null,
+						title: '',
+					},
+					navigation: {
+						currentScreen: 'main',
+						canGoBack: false,
+						canGoNext: false,
+					},
+					crystalCustom: {
+						selectedItems: [],
+						editMode: 'create',
+						currentEditId: null,
+						newRegistration: {
+							selectedType: null,
+							name: '',
+							properties: {},
+							validationErrors: {},
+						},
+					},
+				},
 
 				// ===== アクション =====
 				setShowSaveManager: (value) => {
@@ -115,6 +141,282 @@ export const useUIStore = create<UIStore>()(
 						{ damagePreviewHeight: clampedHeight },
 						false,
 						'setDamagePreviewHeight',
+					)
+				},
+
+				// ===== サブシステム関連のアクション =====
+				// モーダル制御
+				openFullScreenModal: (type: CustomType, title: string) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								fullScreenModal: {
+									isOpen: true,
+									type,
+									title,
+								},
+							},
+						}),
+						false,
+						'openFullScreenModal',
+					)
+				},
+
+				closeFullScreenModal: () => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								fullScreenModal: {
+									isOpen: false,
+									type: null,
+									title: '',
+								},
+								navigation: {
+									currentScreen: 'main',
+									canGoBack: false,
+									canGoNext: false,
+								},
+							},
+						}),
+						false,
+						'closeFullScreenModal',
+					)
+				},
+
+				// 画面遷移制御
+				navigateToScreen: (screen: NavigationScreen) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								navigation: {
+									...state.subsystem.navigation,
+									currentScreen: screen,
+									canGoBack: screen !== 'main',
+									canGoNext: true, // 具体的なバリデーションは各画面で実装
+								},
+							},
+						}),
+						false,
+						'navigateToScreen',
+					)
+				},
+
+				goBack: () => {
+					const currentScreen = get().subsystem.navigation.currentScreen
+					let previousScreen: NavigationScreen = 'main'
+					
+					switch (currentScreen) {
+						case 'type_selection':
+							previousScreen = 'main'
+							break
+						case 'name_input':
+							previousScreen = 'type_selection'
+							break
+						case 'property_input':
+							previousScreen = 'name_input'
+							break
+						case 'confirmation':
+							previousScreen = 'property_input'
+							break
+						case 'completion':
+							previousScreen = 'main'
+							break
+						default:
+							previousScreen = 'main'
+					}
+					
+					get().navigateToScreen(previousScreen)
+				},
+
+				goNext: () => {
+					const currentScreen = get().subsystem.navigation.currentScreen
+					let nextScreen: NavigationScreen = 'main'
+					
+					switch (currentScreen) {
+						case 'main':
+							nextScreen = 'type_selection'
+							break
+						case 'type_selection':
+							nextScreen = 'name_input'
+							break
+						case 'name_input':
+							nextScreen = 'property_input'
+							break
+						case 'property_input':
+							nextScreen = 'confirmation'
+							break
+						case 'confirmation':
+							nextScreen = 'completion'
+							break
+						case 'completion':
+							nextScreen = 'main'
+							break
+					}
+					
+					get().navigateToScreen(nextScreen)
+				},
+
+				// クリスタルタイプ選択
+				selectCrystalType: (type: CrystalType) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									newRegistration: {
+										...state.subsystem.crystalCustom.newRegistration,
+										selectedType: type,
+									},
+								},
+							},
+						}),
+						false,
+						'selectCrystalType',
+					)
+				},
+
+				clearCrystalTypeSelection: () => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									newRegistration: {
+										...state.subsystem.crystalCustom.newRegistration,
+										selectedType: null,
+									},
+								},
+							},
+						}),
+						false,
+						'clearCrystalTypeSelection',
+					)
+				},
+
+				// クリスタル名称設定
+				setCrystalName: (name: string) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									newRegistration: {
+										...state.subsystem.crystalCustom.newRegistration,
+										name,
+									},
+								},
+							},
+						}),
+						false,
+						'setCrystalName',
+					)
+				},
+
+				// 編集モード制御
+				setCrystalEditMode: (mode: EditMode, id?: string) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									editMode: mode,
+									currentEditId: id || null,
+								},
+							},
+						}),
+						false,
+						'setCrystalEditMode',
+					)
+				},
+
+				selectCrystalItems: (ids: string[]) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									selectedItems: ids,
+								},
+							},
+						}),
+						false,
+						'selectCrystalItems',
+					)
+				},
+
+				// フォームデータ管理
+				updateCrystalFormData: (data: Partial<EquipmentProperties>) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									newRegistration: {
+										...state.subsystem.crystalCustom.newRegistration,
+										properties: {
+											...state.subsystem.crystalCustom.newRegistration.properties,
+											...data,
+										},
+									},
+								},
+							},
+						}),
+						false,
+						'updateCrystalFormData',
+					)
+				},
+
+				setValidationErrors: (errors: Record<string, string>) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									newRegistration: {
+										...state.subsystem.crystalCustom.newRegistration,
+										validationErrors: errors,
+									},
+								},
+							},
+						}),
+						false,
+						'setValidationErrors',
+					)
+				},
+
+				resetCrystalForm: () => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									newRegistration: {
+										selectedType: null,
+										name: '',
+										properties: {},
+										validationErrors: {},
+									},
+								},
+								navigation: {
+									currentScreen: 'main',
+									canGoBack: false,
+									canGoNext: false,
+								},
+							},
+						}),
+						false,
+						'resetCrystalForm',
 					)
 				},
 			}),

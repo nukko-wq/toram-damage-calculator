@@ -1,6 +1,8 @@
 'use client'
 
+import { useUIStore } from '@/stores/uiStore'
 import SaveDataContent from './content/SaveDataContent'
+import SubsystemMenu from './content/subsystem/SubsystemMenu'
 import type { MenuSection } from './hooks/useFloatingMenu'
 
 interface MenuContentProps {
@@ -46,13 +48,26 @@ function SampleDataContent() {
 }
 
 function SubsystemContent() {
+	const openFullScreenModal = useUIStore((state) => state.openFullScreenModal)
+	
+	const handleItemClick = (itemId: string) => {
+		switch (itemId) {
+			case 'crystal_custom':
+				openFullScreenModal('crystal', '装備品のカスタム設定')
+				break
+			case 'enemy_custom':
+				// 将来実装
+				console.log('Enemy custom - coming soon')
+				break
+			default:
+				console.log('Unknown item:', itemId)
+		}
+	}
+
 	return (
 		<div className="p-4">
 			<h3 className="text-lg font-semibold text-gray-900 mb-4">サブシステム</h3>
-			<div className="text-sm text-gray-600">
-				<p>追加ツールや計算機能がここに表示されます。</p>
-				<p className="mt-2 text-xs">※この機能は今後実装予定です</p>
-			</div>
+			<SubsystemMenu onItemClick={handleItemClick} />
 		</div>
 	)
 }
