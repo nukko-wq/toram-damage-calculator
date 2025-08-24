@@ -17,7 +17,7 @@ export default function CrystalTypeSelection() {
 		},
 		selectCrystalType,
 		navigateToScreen,
-		goBack,
+		resetCrystalForm,
 	} = useUIStore()
 
 	const [selectedType, setSelectedType] = useState<CrystalType | null>(
@@ -65,7 +65,9 @@ export default function CrystalTypeSelection() {
 
 	const handleBack = () => {
 		setSelectedType(null)
-		goBack()
+		
+		// 新規作成・編集問わず、初期画面にリセットして戻る
+		resetCrystalForm()
 	}
 
 	return (

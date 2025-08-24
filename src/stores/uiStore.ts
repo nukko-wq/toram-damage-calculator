@@ -406,6 +406,8 @@ export const useUIStore = create<UIStore>()(
 								...state.subsystem,
 								crystalCustom: {
 									...state.subsystem.crystalCustom,
+									editMode: 'create', // createモードにリセット
+									currentEditId: null, // 編集IDをクリア
 									newRegistration: {
 										selectedType: null,
 										name: '',
