@@ -3,12 +3,12 @@
 import { useMemo } from 'react'
 import { useUIStore } from '@/stores/uiStore'
 import type { EquipmentProperties, UserCrystal } from '@/types/calculator'
-import { saveUserCrystal } from '@/utils/crystalDatabase'
+import { saveUserCrystal, updateUserCrystal, getUserCrystalById } from '@/utils/crystalDatabase'
 
 export default function CrystalConfirmation() {
 	const {
 		subsystem: {
-			crystalCustom: { newRegistration },
+			crystalCustom: { newRegistration, editMode, currentEditId },
 		},
 		navigateToScreen,
 		goBack,
@@ -113,21 +113,33 @@ export default function CrystalConfirmation() {
 		}
 
 		try {
-			// UserCrystal形式でデータ作成
-			const newCrystal: UserCrystal = {
-				id: `custom_crystal_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
-				name: newRegistration.name,
-				type: newRegistration.selectedType,
-				properties: newRegistration.properties,
-				description: '',
-				isCustom: true,
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-				isFavorite: false,
-			}
+			if (editMode === 'edit' && currentEditId) {
+				// 編集モード：既存クリスタルを更新
+				const updates = {
+					name: newRegistration.name,
+					type: newRegistration.selectedType,
+					properties: newRegistration.properties,
+				}
 
-			// LocalStorageに保存
-			saveUserCrystal(newCrystal)
+				// LocalStorageで更新（既存のupdateUserCrystal関数を使用）
+				updateUserCrystal(currentEditId, updates)
+			} else {
+				// 新規作成モード
+				const newCrystal: UserCrystal = {
+					id: `custom_crystal_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
+					name: newRegistration.name,
+					type: newRegistration.selectedType,
+					properties: newRegistration.properties,
+					description: '',
+					isCustom: true,
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString(),
+					isFavorite: false,
+				}
+
+				// LocalStorageに保存
+				saveUserCrystal(newCrystal)
+			}
 
 			// 成功時の処理
 			navigateToScreen('completion')
@@ -139,7 +151,8 @@ export default function CrystalConfirmation() {
 			}, 2000)
 		} catch (error) {
 			console.error('Crystal save error:', error)
-			alert('登録に失敗しました。もう一度お試しください。')
+			const actionText = editMode === 'edit' ? '更新' : '登録'
+			alert(`${actionText}に失敗しました。もう一度お試しください。`)
 		}
 	}
 
@@ -149,6 +162,7 @@ export default function CrystalConfirmation() {
 	}
 
 	const currentTime = new Date().toLocaleString('ja-JP')
+	const buttonText = editMode === 'edit' ? '再登録' : '登録'
 
 	return (
 		<div className="p-6">
@@ -171,7 +185,7 @@ export default function CrystalConfirmation() {
 			{/* 確認メッセージ */}
 			<div className="mb-6 text-center">
 				<h3 className="text-lg font-semibold text-gray-900">
-					以下の内容で登録しますか？
+					以下の内容で{editMode === 'edit' ? '更新' : '登録'}しますか？
 				</h3>
 			</div>
 
@@ -232,7 +246,7 @@ export default function CrystalConfirmation() {
 						}
 					`}
 				>
-					はい
+					{buttonText}
 				</button>
 
 				<button

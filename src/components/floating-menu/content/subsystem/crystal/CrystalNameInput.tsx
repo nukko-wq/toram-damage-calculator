@@ -7,7 +7,7 @@ import { getUserCrystalsByType } from '@/utils/crystalDatabase'
 export default function CrystalNameInput() {
 	const {
 		subsystem: {
-			crystalCustom: { newRegistration },
+			crystalCustom: { newRegistration, editMode, currentEditId },
 		},
 		setCrystalName,
 		navigateToScreen,
@@ -39,12 +39,15 @@ export default function CrystalNameInput() {
 			return errors
 		}
 
-		// 重複チェック
+		// 重複チェック（編集時は自分自身を除外）
 		if (newRegistration.selectedType) {
 			const existingCrystals = getUserCrystalsByType(
 				newRegistration.selectedType,
 			)
-			if (existingCrystals.some((crystal) => crystal.name === nameValue)) {
+			const duplicateCrystal = existingCrystals.find((crystal) => crystal.name === nameValue)
+			
+			// 編集モードの場合、自分自身（currentEditId）は重複チェックから除外
+			if (duplicateCrystal && !(editMode === 'edit' && duplicateCrystal.id === currentEditId)) {
 				errors.name = '同じタイプ内に同名のクリスタルが既に存在します'
 				return errors
 			}

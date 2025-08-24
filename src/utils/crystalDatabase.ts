@@ -292,3 +292,4 @@ export const getPresetCrystalsLegacy = (): PresetCrystal[] => {
 export const crystalExists = (id: string): boolean => {
 	return getAllCrystals().some((crystal) => crystal.id === id)
 }
+

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useUIStore } from '@/stores/uiStore'
-import { getUserCrystals } from '@/utils/crystalDatabase'
+import { getUserCrystals, getUserCrystalById } from '@/utils/crystalDatabase'
 
 export default function CrystalCustomMain() {
 	const {
@@ -11,6 +11,9 @@ export default function CrystalCustomMain() {
 		setCrystalEditMode,
 		resetCrystalForm,
 		selectForDeletion,
+		updateCrystalFormData,
+		setCrystalName,
+		selectCrystalType,
 	} = useUIStore()
 
 	const userCrystals = getUserCrystals()
@@ -87,6 +90,22 @@ export default function CrystalCustomMain() {
 		navigateToScreen('delete_confirmation')
 	}
 
+	const handleEditCrystal = (crystalId: string) => {
+		const existingCrystal = getUserCrystalById(crystalId)
+		if (existingCrystal) {
+			// 編集モードに設定
+			setCrystalEditMode('edit', crystalId)
+			
+			// 既存データを各フォームにプリセット
+			selectCrystalType(existingCrystal.type)
+			setCrystalName(existingCrystal.name)
+			updateCrystalFormData(existingCrystal.properties)
+			
+			// タイプ選択画面から開始
+			navigateToScreen('type_selection')
+		}
+	}
+
 	const renderInitialView = () => {
 		if (crystalCustom.editMode === 'edit') {
 			// 編集用の一覧表示
@@ -132,6 +151,7 @@ export default function CrystalCustomMain() {
 															</div>
 															<button
 																type="button"
+																onClick={() => handleEditCrystal(crystal.id)}
 																className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors cursor-pointer flex-shrink-0"
 															>
 																編集
