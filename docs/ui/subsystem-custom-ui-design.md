@@ -498,7 +498,7 @@ export default function CrystalPropertyEditorWrapper({
         登録ボタン → 確認画面 → saveUserCrystal() → LocalStorage
 ```
 
-### 7. 確認画面設計
+### 7. 新規登録 確認画面設計
 
 #### 7.1 画面レイアウト
 ```
@@ -791,6 +791,407 @@ const equipmentCustomMessage = {
   message: "装備品（武器・防具）のカスタム作成は、メインフォームの「装備品」セクションで行えます。",
   linkText: "装備品カスタムを開く",
   action: () => closeSubsystemAndScrollToEquipment()
+}
+```
+
+### 8. クリスタル削除機能設計
+
+#### 8.1 削除フロー
+```
+メイン画面 → [登録削除] → 削除対象選択 → 削除確認ダイアログ → 削除完了
+```
+
+#### 8.2 削除確認ダイアログ画面設計
+
+##### 8.2.1 画面レイアウト
+```
+┌─────────────────────────────────────────────────┐
+│ クリスタル削除 - 削除確認                 [終了] │
+├─────────────────────────────────────────────────┤
+│  削除対象：武器クリスタル  名称：カスタム武器1    │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│    以下のクリスタルを削除してもよろしいですか？  │
+│                                                 │
+│ ┌─────────────────────────────────────────────┐ │
+│ │            クリスタル詳細情報               │ │
+│ │                                             │ │
+│ │  タイプ：武器クリスタル                     │ │
+│ │  名称：カスタム武器1                        │ │
+│ │  作成日：2024/01/15 14:30                   │ │
+│ │                                             │ │
+│ │  ━━━━━━━ 設定プロパティ ━━━━━━━        │ │
+│ │                                             │ │
+│ │  ATK +10%  |  MATK +5   |  クリティカル +3% │ │
+│ │  HP +500   |  STR +8%   |  攻撃速度 +12    │ │
+│ │  物理貫通 +7%  |  短距離威力 +15%           │ │
+│ │                                             │ │
+│ │  プロパティ数：7個                           │ │
+│ │                                             │ │
+│ │  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━        │ │
+│ │                                             │ │
+│ │  ⚠️  この操作は元に戻すことができません      │ │
+│ │                                             │ │
+│ └─────────────────────────────────────────────┘ │
+│                                                 │
+│                                                 │
+├─────────────────────────────────────────────────┤
+│           [削除する]         [キャンセル]        │
+└─────────────────────────────────────────────────┘
+```
+
+##### 8.2.2 表示データ仕様
+```typescript
+interface DeleteConfirmationData {
+  // クリスタル基本情報
+  crystal: {
+    id: string
+    name: string
+    type: CrystalType
+    createdAt: string
+    updatedAt?: string
+  }
+  
+  // プロパティ情報
+  activeProperties: Array<{
+    property: keyof EquipmentProperties
+    value: number
+    displayValue: string // "ATK +10%", "HP +500" など
+  }>
+  
+  // メタ情報
+  propertyCount: number
+  formattedCreatedAt: string // "2024/01/15 14:30" 形式
+}
+
+// 削除対象クリスタルの詳細取得
+const getDeleteConfirmationData = (crystalId: string): DeleteConfirmationData => {
+  const crystal = getUserCrystalById(crystalId)
+  if (!crystal) throw new Error('Crystal not found')
+  
+  const activeProperties = Object.entries(crystal.properties)
+    .filter(([_, value]) => value !== 0 && value !== undefined && value !== null)
+    .map(([key, value]) => ({
+      property: key as keyof EquipmentProperties,
+      value: value as number,
+      displayValue: formatPropertyDisplay(key as keyof EquipmentProperties, value as number)
+    }))
+  
+  return {
+    crystal: {
+      id: crystal.id,
+      name: crystal.name,
+      type: crystal.type,
+      createdAt: crystal.createdAt,
+      updatedAt: crystal.updatedAt
+    },
+    activeProperties,
+    propertyCount: activeProperties.length,
+    formattedCreatedAt: new Date(crystal.createdAt).toLocaleString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+}
+```
+
+##### 8.2.3 クリスタル情報表示仕様
+```typescript
+interface CrystalInfoDisplay {
+  // 基本情報セクション
+  basicInfo: {
+    type: {
+      label: string      // "武器クリスタル"
+      icon?: string     // タイプアイコン
+    }
+    name: string        // "カスタム武器1"
+    createdAt: string   // "2024/01/15 14:30"
+    updatedAt?: string  // 更新日（存在する場合）
+  }
+  
+  // プロパティセクション
+  properties: {
+    title: string                    // "設定プロパティ"
+    items: PropertyDisplayItem[]     // プロパティ一覧
+    count: number                    // "プロパティ数：7個"
+    layout: 'grid-3-col'            // 3列グリッド表示
+  }
+  
+  // 警告セクション
+  warning: {
+    message: string   // "この操作は元に戻すことができません"
+    icon: '⚠️'       // 警告アイコン
+    style: 'danger'  // スタイル種別
+  }
+}
+```
+
+##### 8.2.4 ボタン仕様
+
+**削除するボタン（左下）:**
+```typescript
+const handleDelete = async () => {
+  try {
+    // 削除前の最終確認（オプション）
+    const doubleConfirm = window.confirm(
+      `"${crystal.name}"を完全に削除しますか？\nこの操作は元に戻すことができません。`
+    )
+    
+    if (!doubleConfirm) return
+    
+    // クリスタル削除実行
+    await deleteUserCrystal(crystal.id)
+    
+    // 成功メッセージ表示
+    showSuccessMessage(`"${crystal.name}"を削除しました`)
+    
+    // 削除一覧画面に戻る（自動的に一覧更新）
+    navigateToScreen('delete_list')
+    
+  } catch (error) {
+    // エラーハンドリング
+    showErrorMessage('削除に失敗しました')
+    console.error('Crystal deletion failed:', error)
+  }
+}
+```
+
+**キャンセルボタン（右下）:**
+- 前の画面（削除対象選択画面）に戻る
+- 削除処理は実行されない
+- 選択状態は保持される
+
+##### 8.2.5 削除対象選択からの遷移仕様
+```typescript
+// 削除対象選択画面から削除確認画面への遷移
+interface DeleteFlowState {
+  selectedCrystalId: string      // 選択されたクリスタルID
+  confirmationData: DeleteConfirmationData  // 確認画面表示用データ
+  returnScreen: 'delete_list'    // 戻り先画面
+}
+
+// 削除対象選択画面での削除ボタンクリック処理
+const handleDeleteButtonClick = (crystalId: string) => {
+  try {
+    // 削除確認データを準備
+    const confirmationData = getDeleteConfirmationData(crystalId)
+    
+    // UI状態を更新
+    setDeleteFlowState({
+      selectedCrystalId: crystalId,
+      confirmationData,
+      returnScreen: 'delete_list'
+    })
+    
+    // 削除確認画面に遷移
+    navigateToScreen('delete_confirmation')
+    
+  } catch (error) {
+    showErrorMessage('クリスタル情報の取得に失敗しました')
+  }
+}
+```
+
+#### 8.3 削除機能の技術仕様
+
+##### 8.3.1 データ削除処理
+```typescript
+// src/utils/crystalDatabase.ts に削除関数を追加
+export const deleteUserCrystal = async (crystalId: string): Promise<void> => {
+  try {
+    // 現在のユーザークリスタル一覧を取得
+    const userCrystals = getUserCrystals()
+    
+    // 指定IDのクリスタルが存在するか確認
+    const crystalExists = userCrystals.some(crystal => crystal.id === crystalId)
+    if (!crystalExists) {
+      throw new Error(`Crystal with ID ${crystalId} not found`)
+    }
+    
+    // 削除対象を除外した新しい配列を作成
+    const updatedCrystals = userCrystals.filter(crystal => crystal.id !== crystalId)
+    
+    // LocalStorageを更新
+    localStorage.setItem('userCrystals', JSON.stringify(updatedCrystals))
+    
+    // 削除成功ログ
+    console.log(`Crystal deleted successfully: ${crystalId}`)
+    
+  } catch (error) {
+    console.error('Failed to delete crystal:', error)
+    throw error
+  }
+}
+
+// バルク削除（複数選択削除）用関数
+export const deleteMultipleUserCrystals = async (crystalIds: string[]): Promise<void> => {
+  try {
+    const userCrystals = getUserCrystals()
+    const updatedCrystals = userCrystals.filter(crystal => 
+      !crystalIds.includes(crystal.id)
+    )
+    
+    localStorage.setItem('userCrystals', JSON.stringify(updatedCrystals))
+    console.log(`Multiple crystals deleted: ${crystalIds.join(', ')}`)
+    
+  } catch (error) {
+    console.error('Failed to delete multiple crystals:', error)
+    throw error
+  }
+}
+```
+
+##### 8.3.2 削除後の状態管理
+```typescript
+// UI状態の更新処理
+interface DeleteResultState {
+  success: boolean
+  deletedCrystalName: string
+  message: string
+  timestamp: string
+}
+
+// 削除完了後のUIStore更新
+const updateUIStateAfterDeletion = (deletedCrystal: UserCrystal) => {
+  // 削除成功状態をセット
+  setDeleteResult({
+    success: true,
+    deletedCrystalName: deletedCrystal.name,
+    message: `"${deletedCrystal.name}"を削除しました`,
+    timestamp: new Date().toISOString()
+  })
+  
+  // 編集モードを一覧表示に戻す
+  setCrystalEditMode('list')
+  
+  // 削除確認画面から削除一覧画面に遷移
+  navigateToScreen('delete_list')
+  
+  // 一覧の再読み込みをトリガー
+  triggerCrystalListReload()
+}
+```
+
+##### 8.3.3 エラーハンドリング
+```typescript
+interface DeleteErrorHandling {
+  // 削除処理中のエラー
+  deletionFailed: {
+    message: string
+    action: 'retry' | 'cancel'
+    originalError: Error
+  }
+  
+  // データ整合性エラー
+  crystalNotFound: {
+    message: string
+    action: 'back_to_list'
+  }
+  
+  // LocalStorage関連エラー
+  storageError: {
+    message: string
+    action: 'reload_page'
+  }
+}
+
+const handleDeletionError = (error: Error, crystalId: string) => {
+  if (error.message.includes('not found')) {
+    showErrorMessage('削除対象のクリスタルが見つかりません')
+    navigateToScreen('delete_list')
+  } else if (error.message.includes('storage')) {
+    showErrorMessage('データの保存に失敗しました。ページを再読み込みしてください')
+  } else {
+    showErrorMessage('削除に失敗しました。しばらく待ってから再試行してください')
+  }
+  
+  console.error(`Crystal deletion failed for ID ${crystalId}:`, error)
+}
+```
+
+#### 8.4 削除機能のUI状態管理
+
+##### 8.4.1 UIStore拡張
+```typescript
+// src/types/stores.ts への追加
+interface SubsystemState {
+  // 既存の状態...
+  
+  // 削除機能用状態
+  deleteFlow: {
+    selectedCrystalId: string | null
+    confirmationData: DeleteConfirmationData | null
+    isDeleting: boolean
+    deleteResult: DeleteResultState | null
+  }
+}
+
+interface SubsystemActions {
+  // 既存のアクション...
+  
+  // 削除機能用アクション
+  selectForDeletion: (crystalId: string) => void
+  confirmDeletion: () => Promise<void>
+  cancelDeletion: () => void
+  clearDeleteResult: () => void
+}
+```
+
+##### 8.4.2 削除確認画面コンポーネント
+```typescript
+// src/components/floating-menu/content/subsystem/crystal/CrystalDeleteConfirmation.tsx
+interface CrystalDeleteConfirmationProps {
+  crystalId: string
+  onConfirm: () => Promise<void>
+  onCancel: () => void
+}
+
+export default function CrystalDeleteConfirmation({
+  crystalId,
+  onConfirm,
+  onCancel
+}: CrystalDeleteConfirmationProps) {
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [confirmationData, setConfirmationData] = useState<DeleteConfirmationData | null>(null)
+  
+  useEffect(() => {
+    // コンポーネントマウント時に削除確認データを取得
+    try {
+      const data = getDeleteConfirmationData(crystalId)
+      setConfirmationData(data)
+    } catch (error) {
+      showErrorMessage('クリスタル情報の取得に失敗しました')
+      onCancel() // エラー時は前の画面に戻る
+    }
+  }, [crystalId, onCancel])
+  
+  const handleConfirm = async () => {
+    setIsDeleting(true)
+    try {
+      await onConfirm()
+      // 成功時の処理はonConfirm内で実行済み
+    } catch (error) {
+      handleDeletionError(error as Error, crystalId)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+  
+  // 確認データ読み込み中
+  if (!confirmationData) {
+    return <LoadingSpinner message="クリスタル情報を読み込み中..." />
+  }
+  
+  // メインのUIレンダリング
+  return (
+    <div className="p-6">
+      {/* クリスタル詳細情報表示 */}
+      {/* 削除確認ボタン */}
+    </div>
+  )
 }
 ```
 

@@ -184,7 +184,7 @@ export interface CalculatorStore {
 
 // サブシステム関連の型定義
 export type CustomType = 'crystal' | 'equipment' | 'enemy'
-export type NavigationScreen = 'main' | 'type_selection' | 'name_input' | 'property_input' | 'confirmation' | 'completion'
+export type NavigationScreen = 'main' | 'type_selection' | 'name_input' | 'property_input' | 'confirmation' | 'completion' | 'delete_confirmation'
 export type EditMode = 'list' | 'edit' | 'create'
 
 // ===== UIストア =====
@@ -236,6 +236,16 @@ export interface UIStore {
 				properties: Partial<import('./calculator').EquipmentProperties>
 				validationErrors: Record<string, string>
 			}
+			// 削除機能の状態
+			deleteFlow: {
+				selectedCrystalId: string | null
+				isDeleting: boolean
+				deleteSuccess: {
+					isSuccess: boolean
+					deletedCrystalName: string
+					message: string
+				} | null
+			}
 		}
 	}
 
@@ -286,6 +296,12 @@ export interface UIStore {
 	updateCrystalFormData: (data: Partial<import('./calculator').EquipmentProperties>) => void
 	setValidationErrors: (errors: Record<string, string>) => void
 	resetCrystalForm: () => void
+	
+	// 削除機能用アクション
+	selectForDeletion: (crystalId: string) => void
+	confirmDeletion: (crystalId: string) => Promise<void>
+	cancelDeletion: () => void
+	clearDeleteSuccess: () => void
 }
 
 // ===== セーブデータストア =====

@@ -10,6 +10,7 @@ export default function CrystalCustomMain() {
 		navigateToScreen,
 		setCrystalEditMode,
 		resetCrystalForm,
+		selectForDeletion,
 	} = useUIStore()
 
 	const userCrystals = getUserCrystals()
@@ -79,7 +80,11 @@ export default function CrystalCustomMain() {
 
 	const handleDeleteRegistration = () => {
 		setCrystalEditMode('list')
-		// 削除モード（実際の実装は次のフェーズ）
+	}
+
+	const handleDeleteCrystal = (crystalId: string) => {
+		selectForDeletion(crystalId)
+		navigateToScreen('delete_confirmation')
 	}
 
 	const renderInitialView = () => {
@@ -198,6 +203,7 @@ export default function CrystalCustomMain() {
 															</div>
 															<button
 																type="button"
+																onClick={() => handleDeleteCrystal(crystal.id)}
 																className="px-3 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-700 rounded transition-colors cursor-pointer flex-shrink-0"
 															>
 																削除

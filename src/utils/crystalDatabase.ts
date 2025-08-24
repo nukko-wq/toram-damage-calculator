@@ -206,13 +206,21 @@ export const saveUserCrystal = (
 }
 
 // ユーザーカスタムクリスタを削除
-export const deleteUserCrystal = (id: string): void => {
+export const deleteUserCrystal = async (id: string): Promise<void> => {
 	try {
 		const userCrystals = getUserCrystals()
+		const crystalExists = userCrystals.some((crystal) => crystal.id === id)
+		if (!crystalExists) {
+			throw new Error(`Crystal with ID ${id} not found`)
+		}
+		
 		const filtered = userCrystals.filter((c) => c.id !== id)
 		StorageHelper.set(STORAGE_KEYS.CUSTOM_CRYSTALS, filtered)
+		
+		console.log(`Crystal deleted successfully: ${id}`)
 	} catch (error) {
 		console.error('Error deleting user crystal:', error)
+		throw error
 	}
 }
 

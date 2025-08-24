@@ -4,6 +4,7 @@ import { useUIStore } from '@/stores/uiStore'
 import FullScreenModal from '../FullScreenModal'
 import CrystalConfirmation from './CrystalConfirmation'
 import CrystalCustomMain from './CrystalCustomMain'
+import CrystalDeleteConfirmation from './CrystalDeleteConfirmation'
 import CrystalNameInput from './CrystalNameInput'
 import CrystalPropertyInput from './CrystalPropertyInput'
 import CrystalTypeSelection from './CrystalTypeSelection'
@@ -26,6 +27,8 @@ export default function CrystalCustomSystem() {
 				return <CrystalPropertyInput />
 			case 'confirmation':
 				return <CrystalConfirmation />
+			case 'delete_confirmation':
+				return <CrystalDeleteConfirmation />
 			case 'completion':
 				return <div className="p-6 text-center">登録が完了しました！</div>
 			default:

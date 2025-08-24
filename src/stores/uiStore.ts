@@ -63,6 +63,11 @@ export const useUIStore = create<UIStore>()(
 							properties: {},
 							validationErrors: {},
 						},
+						deleteFlow: {
+							selectedCrystalId: null,
+							isDeleting: false,
+							deleteSuccess: null,
+						},
 					},
 				},
 
@@ -417,6 +422,145 @@ export const useUIStore = create<UIStore>()(
 						}),
 						false,
 						'resetCrystalForm',
+					)
+				},
+
+				// 削除機能用アクション
+				selectForDeletion: (crystalId) => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									deleteFlow: {
+										...state.subsystem.crystalCustom.deleteFlow,
+										selectedCrystalId: crystalId,
+									},
+								},
+							},
+						}),
+						false,
+						'selectForDeletion',
+					)
+				},
+
+				confirmDeletion: async (crystalId) => {
+					// 削除前にクリスタル名を取得
+					const { getUserCrystalById } = await import('../utils/crystalDatabase')
+					const crystal = getUserCrystalById(crystalId)
+					const crystalName = crystal ? crystal.name : 'Unknown Crystal'
+
+					// 削除処理中状態に設定
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									deleteFlow: {
+										...state.subsystem.crystalCustom.deleteFlow,
+										isDeleting: true,
+									},
+								},
+							},
+						}),
+						false,
+						'confirmDeletion:start',
+					)
+
+					try {
+						// crystalDatabase から deleteUserCrystal をインポートして実行
+						const { deleteUserCrystal } = await import('../utils/crystalDatabase')
+						await deleteUserCrystal(crystalId)
+
+						// 削除成功後の状態更新
+						set(
+							(state) => ({
+								subsystem: {
+									...state.subsystem,
+									crystalCustom: {
+										...state.subsystem.crystalCustom,
+										editMode: 'list',
+										deleteFlow: {
+											selectedCrystalId: null,
+											isDeleting: false,
+											deleteSuccess: {
+												isSuccess: true,
+												deletedCrystalName: crystalName,
+												message: `"${crystalName}"を削除しました`,
+											},
+										},
+									},
+								},
+							}),
+							false,
+							'confirmDeletion:success',
+						)
+					} catch (error) {
+						console.error('Crystal deletion failed:', error)
+						// エラー時は削除処理中状態を解除
+						set(
+							(state) => ({
+								subsystem: {
+									...state.subsystem,
+									crystalCustom: {
+										...state.subsystem.crystalCustom,
+										deleteFlow: {
+											...state.subsystem.crystalCustom.deleteFlow,
+											isDeleting: false,
+											deleteSuccess: null,
+										},
+									},
+								},
+							}),
+							false,
+							'confirmDeletion:error',
+						)
+						throw error
+					}
+				},
+
+				cancelDeletion: () => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									deleteFlow: {
+										selectedCrystalId: null,
+										isDeleting: false,
+										deleteSuccess: null,
+									},
+								},
+								navigation: {
+									...state.subsystem.navigation,
+									currentScreen: 'main',
+								},
+							},
+						}),
+						false,
+						'cancelDeletion',
+					)
+				},
+
+				clearDeleteSuccess: () => {
+					set(
+						(state) => ({
+							subsystem: {
+								...state.subsystem,
+								crystalCustom: {
+									...state.subsystem.crystalCustom,
+									deleteFlow: {
+										...state.subsystem.crystalCustom.deleteFlow,
+										deleteSuccess: null,
+									},
+								},
+							},
+						}),
+						false,
+						'clearDeleteSuccess',
 					)
 				},
 			}),
