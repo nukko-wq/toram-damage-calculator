@@ -80,7 +80,7 @@ export default function FullScreenModal({
 							<button
 								type="button"
 								onClick={onClose}
-								className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200"
+								className="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 cursor-pointer"
 								aria-label="モーダルを閉じる"
 							>
 								終了

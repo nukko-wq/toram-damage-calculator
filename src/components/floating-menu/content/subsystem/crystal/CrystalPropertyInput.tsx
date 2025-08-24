@@ -13,7 +13,7 @@ export default function CrystalPropertyInput() {
 		updateCrystalFormData,
 		navigateToScreen,
 		goBack,
-		closeFullScreenModal,
+		resetCrystalForm,
 	} = useUIStore()
 
 	// PropertyEditorに渡すための仮想アイテム作成
@@ -98,7 +98,9 @@ export default function CrystalPropertyInput() {
 	}
 
 	const handleCancel = () => {
-		closeFullScreenModal()
+		// フォームをリセットしてメイン画面に戻る
+		resetCrystalForm()
+		navigateToScreen('main')
 	}
 
 	const getTypeLabel = (type: string) => {
@@ -180,6 +182,7 @@ export default function CrystalPropertyInput() {
 						onPropertyChange={handlePropertyChange}
 						onMessage={() => {}} // 不要だが必須プロパティ
 						onUpdate={() => {}} // 不要だが必須プロパティ
+						disableCrystalSelector={true} // クリスタ連携機能を無効化
 					/>
 				</div>
 			</div>
@@ -189,7 +192,7 @@ export default function CrystalPropertyInput() {
 				<button
 					type="button"
 					onClick={handleNext}
-					className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+					className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors cursor-pointer"
 				>
 					登録
 				</button>
@@ -197,7 +200,7 @@ export default function CrystalPropertyInput() {
 				<button
 					type="button"
 					onClick={handleBack}
-					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors cursor-pointer"
 				>
 					戻る
 				</button>
@@ -205,7 +208,7 @@ export default function CrystalPropertyInput() {
 				<button
 					type="button"
 					onClick={handleCancel}
-					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors cursor-pointer"
 				>
 					キャンセル
 				</button>

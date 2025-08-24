@@ -15,6 +15,7 @@ interface PropertyEditorProps {
 	onPropertyChange: (property: keyof EquipmentProperties, value: string) => void
 	onMessage?: (message: string) => void
 	onUpdate?: () => void
+	disableCrystalSelector?: boolean // クリスタ連携機能を無効にするオプション
 }
 
 export default function PropertyEditor({
@@ -23,6 +24,7 @@ export default function PropertyEditor({
 	onPropertyChange,
 	onMessage,
 	onUpdate,
+	disableCrystalSelector = false,
 }: PropertyEditorProps) {
 	// 一時的な入力値を管理するstate（プロパティキー -> 入力値のマップ）
 	const [tempInputValues, setTempInputValues] = useState<
@@ -404,7 +406,7 @@ export default function PropertyEditor({
 	return (
 		<div className="space-y-4">
 			{/* クリスタ選択UI - 対象装備のみ表示 */}
-			{item.id && (
+			{item.id && !disableCrystalSelector && (
 				<EquipmentCrystalSelector
 					equipmentId={item.id}
 					slotKey={slotKey}

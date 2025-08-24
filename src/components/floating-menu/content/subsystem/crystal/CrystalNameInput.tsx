@@ -12,8 +12,8 @@ export default function CrystalNameInput() {
 		setCrystalName,
 		navigateToScreen,
 		goBack,
-		closeFullScreenModal,
 		setValidationErrors,
+		resetCrystalForm,
 	} = useUIStore()
 
 	const [name, setName] = useState(newRegistration.name)
@@ -80,7 +80,9 @@ export default function CrystalNameInput() {
 	}
 
 	const handleCancel = () => {
-		closeFullScreenModal()
+		// フォームをリセットしてメイン画面に戻る
+		resetCrystalForm()
+		navigateToScreen('main')
 	}
 
 	const getTypeLabel = (type: string) => {
@@ -162,7 +164,7 @@ export default function CrystalNameInput() {
 						px-6 py-2 rounded-lg font-medium transition-colors
 						${
 							Object.keys(localErrors).length === 0 && name.trim()
-								? 'bg-blue-600 hover:bg-blue-700 text-white'
+								? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
 								: 'bg-gray-300 text-gray-500 cursor-not-allowed'
 						}
 					`}
@@ -173,7 +175,7 @@ export default function CrystalNameInput() {
 				<button
 					type="button"
 					onClick={handleBack}
-					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors cursor-pointer"
 				>
 					戻る
 				</button>
@@ -181,7 +183,7 @@ export default function CrystalNameInput() {
 				<button
 					type="button"
 					onClick={handleCancel}
-					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors cursor-pointer"
 				>
 					キャンセル
 				</button>

@@ -18,7 +18,6 @@ export default function CrystalTypeSelection() {
 		selectCrystalType,
 		navigateToScreen,
 		goBack,
-		closeFullScreenModal,
 	} = useUIStore()
 
 	const [selectedType, setSelectedType] = useState<CrystalType | null>(
@@ -67,10 +66,6 @@ export default function CrystalTypeSelection() {
 	const handleBack = () => {
 		setSelectedType(null)
 		goBack()
-	}
-
-	const handleCancel = () => {
-		closeFullScreenModal()
 	}
 
 	return (
@@ -128,7 +123,7 @@ export default function CrystalTypeSelection() {
 						px-6 py-2 rounded-lg font-medium transition-colors
 						${
 							selectedType
-								? 'bg-blue-600 hover:bg-blue-700 text-white'
+								? 'bg-blue-600 hover:bg-blue-700 text-white cursor-pointer'
 								: 'bg-gray-300 text-gray-500 cursor-not-allowed'
 						}
 					`}
@@ -139,15 +134,7 @@ export default function CrystalTypeSelection() {
 				<button
 					type="button"
 					onClick={handleBack}
-					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
-				>
-					戻る
-				</button>
-
-				<button
-					type="button"
-					onClick={handleCancel}
-					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+					className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors cursor-pointer"
 				>
 					キャンセル
 				</button>
