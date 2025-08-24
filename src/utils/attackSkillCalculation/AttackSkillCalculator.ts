@@ -7,6 +7,8 @@ import {
 	MeteorBreakerCalculator,
 	MoonSlashCalculator,
 	OgreSlashCalculator,
+	ShutOutBleedingCalculator,
+	ShutOutCalculator,
 	type SkillHitCalculator,
 	StandardCalculator,
 	Storm1Hit6Calculator,
@@ -79,6 +81,10 @@ export class AttackSkillCalculator {
 				return new MoonSlashCalculator()
 			case 'ogre_slash':
 				return new OgreSlashCalculator()
+			case 'shut_out':
+				return new ShutOutCalculator()
+			case 'shut_out_bleeding':
+				return new ShutOutBleedingCalculator()
 			case 'storm_blazer_10stack':
 				return new StormBlazer10StackCalculator()
 			case 'storm_blazer_1stack':
@@ -109,6 +115,7 @@ export class AttackSkillCalculator {
 				return new ThorHammerFollowup8HitCalculator()
 			case 'power_shot':
 			case 'dual_strike':
+			case 'aura_blade':
 				return new StandardCalculator()
 			default:
 				throw new Error(`No calculator found for skill: ${skillId}`)

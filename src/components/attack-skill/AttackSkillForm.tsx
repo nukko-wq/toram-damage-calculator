@@ -301,24 +301,22 @@ export default function AttackSkillForm({
 					</div>
 
 					{/* タブメニュー */}
-					{selectedSkill.hits.length > 1 && (
-						<div className="flex border-b border-gray-300">
-							{selectedSkill.hits.map((hit, index) => (
-								<button
-									type="button"
-									key={hit.hitNumber}
-									onClick={() => setSelectedHitIndex(index)}
-									className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-										selectedHitIndex === index
-											? 'border-blue-500 text-blue-600'
-											: 'border-transparent text-gray-600 hover:text-gray-800'
-									}`}
-								>
-									{hit.hitNumber}撃目
-								</button>
-							))}
-						</div>
-					)}
+					<div className="flex border-b border-gray-300">
+						{selectedSkill.hits.map((hit, index) => (
+							<button
+								type="button"
+								key={hit.hitNumber}
+								onClick={() => setSelectedHitIndex(index)}
+								className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+									selectedHitIndex === index
+										? 'border-blue-500 text-blue-600'
+										: 'border-transparent text-gray-600 hover:text-gray-800'
+								}`}
+							>
+								{hit.hitNumber}撃目
+							</button>
+						))}
+					</div>
 
 					{/* 選択された撃の詳細情報 */}
 					{(() => {

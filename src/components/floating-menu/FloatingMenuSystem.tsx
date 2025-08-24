@@ -1,5 +1,6 @@
 'use client'
 
+import CrystalCustomSystem from './content/subsystem/crystal/CrystalCustomSystem'
 import FloatingMenuButton from './FloatingMenuButton'
 import { useFloatingMenu } from './hooks/useFloatingMenu'
 import MenuPanel from './MenuPanel'
@@ -20,6 +21,9 @@ export default function FloatingMenuSystem() {
 				onSectionChange={setActiveSection}
 				onClose={closeMenu}
 			/>
+
+			{/* クリスタルカスタムシステム */}
+			<CrystalCustomSystem />
 		</>
 	)
 }

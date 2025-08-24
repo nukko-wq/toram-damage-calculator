@@ -182,6 +182,11 @@ export interface CalculatorStore {
 	saveTempEquipmentCrystalsToStorage: () => void
 }
 
+// サブシステム関連の型定義
+export type CustomType = 'crystal' | 'equipment' | 'enemy'
+export type NavigationScreen = 'main' | 'type_selection' | 'name_input' | 'property_input' | 'confirmation' | 'completion' | 'delete_confirmation'
+export type EditMode = 'list' | 'edit' | 'create'
+
 // ===== UIストア =====
 export interface UIStore {
 	showSaveManager: boolean
@@ -202,6 +207,47 @@ export interface UIStore {
 
 	// DamagePreviewの高さ管理（ピクセル値）
 	damagePreviewHeight: number
+
+	// サブシステム関連の状態
+	subsystem: {
+		// 全画面モーダル状態
+		fullScreenModal: {
+			isOpen: boolean
+			type: CustomType | null
+			title: string
+		}
+		
+		// 画面遷移状態
+		navigation: {
+			currentScreen: NavigationScreen
+			canGoBack: boolean
+			canGoNext: boolean
+		}
+		
+		// クリスタルカスタム状態
+		crystalCustom: {
+			selectedItems: string[]
+			editMode: EditMode
+			currentEditId: string | null
+			// 新規登録時の状態
+			newRegistration: {
+				selectedType: import('./calculator').CrystalType | null
+				name: string
+				properties: Partial<import('./calculator').EquipmentProperties>
+				validationErrors: Record<string, string>
+			}
+			// 削除機能の状態
+			deleteFlow: {
+				selectedCrystalId: string | null
+				isDeleting: boolean
+				deleteSuccess: {
+					isSuccess: boolean
+					deletedCrystalName: string
+					message: string
+				} | null
+			}
+		}
+	}
 
 	setShowSaveManager: (value: boolean) => void
 	setShowUpdateNotifications: (value: boolean) => void
@@ -224,6 +270,38 @@ export interface UIStore {
 
 	// DamagePreviewの高さ管理
 	setDamagePreviewHeight: (height: number) => void
+
+	// サブシステム関連のアクション
+	// モーダル制御
+	openFullScreenModal: (type: CustomType, title: string) => void
+	closeFullScreenModal: () => void
+	
+	// 画面遷移制御
+	navigateToScreen: (screen: NavigationScreen) => void
+	goBack: () => void
+	goNext: () => void
+	
+	// クリスタルタイプ選択
+	selectCrystalType: (type: import('./calculator').CrystalType) => void
+	clearCrystalTypeSelection: () => void
+	
+	// クリスタル名称設定
+	setCrystalName: (name: string) => void
+	
+	// 編集モード制御
+	setCrystalEditMode: (mode: EditMode, id?: string) => void
+	selectCrystalItems: (ids: string[]) => void
+	
+	// フォームデータ管理
+	updateCrystalFormData: (data: Partial<import('./calculator').EquipmentProperties>) => void
+	setValidationErrors: (errors: Record<string, string>) => void
+	resetCrystalForm: () => void
+	
+	// 削除機能用アクション
+	selectForDeletion: (crystalId: string) => void
+	confirmDeletion: (crystalId: string) => Promise<void>
+	cancelDeletion: () => void
+	clearDeleteSuccess: () => void
 }
 
 // ===== セーブデータストア =====
