@@ -16,8 +16,8 @@ export default function SubsystemMenu({ onItemClick }: SubsystemMenuProps) {
 	const subsystemMenuItems: SubsystemMenuItem[] = [
 		{
 			id: 'crystal_custom',
-			title: 'クリスタルカスタム',
-			description: 'ユーザークリスタルの作成・編集・削除',
+			title: 'クリスタカスタム',
+			description: 'ユーザークリスタの作成・編集・削除',
 			status: 'available',
 			onClick: () => onItemClick('crystal_custom'),
 		},
