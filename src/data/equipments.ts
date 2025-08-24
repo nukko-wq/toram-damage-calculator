@@ -384,6 +384,24 @@ export const equipmentsData: EquipmentsData = {
 					FireResistance_Rate: 30,
 				},
 			},
+			{
+				id: 'bad4a545-dfca-4897-ba55-3561a185c0f7',
+				name: 'ミーテカチューシャ',
+				properties: {
+					DEX_Rate: 7,
+					ATK_Rate: 8,
+					Critical: 5,
+					NaturalMPRecovery_Rate: -12,
+				},
+			},
+			{
+				id: 'b58d55a4-33ea-47e9-a024-f271f78aa203',
+				name: 'たい焼き',
+				properties: {
+					NaturalMPRecovery: 50,
+					RevivalTime_Rate: 30,
+				},
+			},
 		],
 		special: [
 			{
