@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useUIStore } from '@/stores/uiStore'
 import { getUserCrystalById } from '@/utils/crystalDatabase'
+import { getBasePropertyLabel } from '@/components/equipment/PropertyEditor'
 import type { EquipmentProperties } from '@/types/calculator'
 
 export default function CrystalDeleteConfirmation() {
@@ -42,31 +43,13 @@ export default function CrystalDeleteConfirmation() {
 		property: keyof EquipmentProperties,
 		value: number,
 	): string => {
-		// PropertyEditorのgetBasePropertyLabel関数の簡易版
-		const labelMap: Record<string, string> = {
-			ATK_Rate: 'ATK',
-			MATK_Rate: 'MATK',
-			HP_Rate: 'HP',
-			MP_Rate: 'MP',
-			STR_Rate: 'STR',
-			INT_Rate: 'INT',
-			VIT_Rate: 'VIT',
-			AGI_Rate: 'AGI',
-			DEX_Rate: 'DEX',
-			Critical_Rate: 'クリティカル',
-			AttackSpeed_Rate: '攻撃速度',
-			PhysicalPenetration_Rate: '物理貫通',
-			MagicalPenetration_Rate: '魔法貫通',
-		}
-
-		const label =
-			labelMap[property] || property.replace(/_Rate$/, '').replace(/_/g, '')
+		const label = getBasePropertyLabel(property)
 		const isPercentage = property.endsWith('_Rate')
 
 		if (isPercentage) {
-			return `${label} +${value}%`
+			return `${label}(%) :${value}`
 		}
-		return `${label} +${value}`
+		return `${label} :${value}`
 	}
 
 	const getTypeLabel = (type: string) => {
