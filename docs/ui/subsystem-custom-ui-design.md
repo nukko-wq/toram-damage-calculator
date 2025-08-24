@@ -3,6 +3,13 @@
 ## 概要
 フローティングメニューのサブシステムに、装備品カスタムとクリスタルカスタム（将来的に敵カスタム）機能を追加するUI設計。全画面表示でのカスタム設定システムを含む。
 
+**実装状況:**
+- ✅ クリスタルカスタム機能完全実装済み（新規登録・削除機能含む）
+- ✅ 全画面モーダルシステム実装済み
+- ✅ UI状態管理（Zustand）実装済み
+- ⏳ 装備品カスタム機能（将来実装予定）
+- ⏳ 敵カスタム機能（将来実装予定）
+
 ## 機能要件
 
 ### 1. サブシステムメニューの構成
@@ -656,25 +663,31 @@ const validateBeforeConfirmation = (data: ConfirmationData): ConfirmationValidat
 
 ### 1. コンポーネント構造
 
-#### 1.1 新規作成コンポーネント
+#### 1.1 実装済みコンポーネント構造
 ```
 src/components/floating-menu/content/subsystem/
-├── SubsystemMenu.tsx                    // サブシステムメニュー
-├── FullScreenModal.tsx                  // 全画面モーダル
-├── equipment/
-│   ├── EquipmentCustomSystem.tsx        // 装備品カスタムメイン
-│   ├── EquipmentCustomActions.tsx       // 操作ボタン群
-│   ├── EquipmentCustomList.tsx          // 装備品一覧
-│   └── EquipmentCustomEditor.tsx        // 編集フォーム
-├── crystal/
-│   ├── CrystalCustomSystem.tsx          // クリスタルカスタムメイン
-│   ├── CrystalCustomActions.tsx         // 操作ボタン群
-│   ├── CrystalCustomList.tsx            // クリスタル一覧
-│   └── CrystalCustomEditor.tsx          // 編集フォーム
-└── hooks/
-    ├── useFullScreenModal.ts            // 全画面モーダル制御
-    ├── useEquipmentCustom.ts            // 装備品カスタム制御
-    └── useCrystalCustom.ts              // クリスタルカスタム制御
+├── SubsystemMenu.tsx                    // サブシステムメニュー（計画中）
+├── FullScreenModal.tsx                  // 全画面モーダル（実装済み）
+├── equipment/                           // 装備品カスタム（将来実装）
+│   └── （未実装）
+└── crystal/                             // クリスタルカスタム（実装済み）
+    ├── CrystalCustomSystem.tsx          // クリスタルカスタムメイン（実装済み）
+    ├── CrystalCustomMain.tsx            // メイン画面・操作ボタン群（実装済み）
+    ├── CrystalTypeSelection.tsx         // タイプ選択画面（実装済み）
+    ├── CrystalNameInput.tsx             // 名称入力画面（実装済み）
+    ├── CrystalPropertyInput.tsx         // プロパティ入力画面（実装済み）
+    ├── CrystalConfirmation.tsx          // 新規登録確認画面（実装済み）
+    └── CrystalDeleteConfirmation.tsx    // 削除確認画面（実装済み）
+
+src/types/
+├── stores.ts                            // UI状態管理型定義（拡張済み）
+└── calculator.ts                        // 既存の型定義
+
+src/stores/
+└── uiStore.ts                           // UIStore実装（拡張済み）
+
+src/utils/
+└── crystalDatabase.ts                   // データベース関数（削除機能追加済み）
 ```
 
 #### 1.2 既存コンポーネントの拡張
@@ -804,6 +817,8 @@ const equipmentCustomMessage = {
 #### 8.2 削除確認ダイアログ画面設計
 
 ##### 8.2.1 画面レイアウト
+
+**削除確認画面:**
 ```
 ┌─────────────────────────────────────────────────┐
 │ クリスタル削除 - 削除確認                 [終了] │
@@ -837,6 +852,31 @@ const equipmentCustomMessage = {
 │                                                 │
 ├─────────────────────────────────────────────────┤
 │           [削除する]         [キャンセル]        │
+└─────────────────────────────────────────────────┘
+```
+
+**削除成功画面:**
+```
+┌─────────────────────────────────────────────────┐
+│ クリスタル削除 - 削除完了                 [終了] │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│                                                 │
+│                    ┌────┐                      │
+│                    │ ✓  │                      │ 
+│                    └────┘                      │
+│                                                 │
+│              削除が完了しました                 │
+│                                                 │
+│          "カスタム武器1"を削除しました          │
+│                                                 │
+│                                                 │
+│                                                 │
+│                                                 │
+│                                                 │
+│                                                 │
+├─────────────────────────────────────────────────┤
+│                    [OK]                         │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -1112,80 +1152,85 @@ const handleDeletionError = (error: Error, crystalId: string) => {
 }
 ```
 
-#### 8.4 削除機能のUI状態管理
+#### 8.4 削除機能のUI状態管理（実装済み）
 
 ##### 8.4.1 UIStore拡張
 ```typescript
-// src/types/stores.ts への追加
+// src/types/stores.ts への追加（実装済み）
+export type NavigationScreen = 'main' | 'type_selection' | 'name_input' | 'property_input' | 'confirmation' | 'completion' | 'delete_confirmation'
+
 interface SubsystemState {
   // 既存の状態...
   
-  // 削除機能用状態
-  deleteFlow: {
-    selectedCrystalId: string | null
-    confirmationData: DeleteConfirmationData | null
-    isDeleting: boolean
-    deleteResult: DeleteResultState | null
+  // 削除機能用状態（実装済み）
+  crystalCustom: {
+    // 既存の状態...
+    deleteFlow: {
+      selectedCrystalId: string | null
+      isDeleting: boolean
+      deleteSuccess: {
+        isSuccess: boolean
+        deletedCrystalName: string
+        message: string
+      } | null
+    }
   }
 }
 
 interface SubsystemActions {
   // 既存のアクション...
   
-  // 削除機能用アクション
+  // 削除機能用アクション（実装済み）
   selectForDeletion: (crystalId: string) => void
-  confirmDeletion: () => Promise<void>
+  confirmDeletion: (crystalId: string) => Promise<void>
   cancelDeletion: () => void
-  clearDeleteResult: () => void
+  clearDeleteSuccess: () => void
 }
 ```
 
-##### 8.4.2 削除確認画面コンポーネント
+##### 8.4.2 削除確認画面コンポーネント（実装済み）
 ```typescript
-// src/components/floating-menu/content/subsystem/crystal/CrystalDeleteConfirmation.tsx
-interface CrystalDeleteConfirmationProps {
-  crystalId: string
-  onConfirm: () => Promise<void>
-  onCancel: () => void
-}
+// src/components/floating-menu/content/subsystem/crystal/CrystalDeleteConfirmation.tsx（実装済み）
+export default function CrystalDeleteConfirmation() {
+  const {
+    subsystem: { crystalCustom },
+    confirmDeletion,
+    cancelDeletion,
+    clearDeleteSuccess,
+    navigateToScreen,
+  } = useUIStore()
 
-export default function CrystalDeleteConfirmation({
-  crystalId,
-  onConfirm,
-  onCancel
-}: CrystalDeleteConfirmationProps) {
   const [isDeleting, setIsDeleting] = useState(false)
-  const [confirmationData, setConfirmationData] = useState<DeleteConfirmationData | null>(null)
-  
-  useEffect(() => {
-    // コンポーネントマウント時に削除確認データを取得
-    try {
-      const data = getDeleteConfirmationData(crystalId)
-      setConfirmationData(data)
-    } catch (error) {
-      showErrorMessage('クリスタル情報の取得に失敗しました')
-      onCancel() // エラー時は前の画面に戻る
-    }
-  }, [crystalId, onCancel])
-  
-  const handleConfirm = async () => {
-    setIsDeleting(true)
-    try {
-      await onConfirm()
-      // 成功時の処理はonConfirm内で実行済み
-    } catch (error) {
-      handleDeletionError(error as Error, crystalId)
-    } finally {
-      setIsDeleting(false)
-    }
+  const crystalId = crystalCustom.deleteFlow.selectedCrystalId
+  const deleteSuccess = crystalCustom.deleteFlow.deleteSuccess
+
+  // 削除対象のクリスタル情報を取得
+  const crystal = useMemo(() => {
+    if (!crystalId) return null
+    return getUserCrystalById(crystalId)
+  }, [crystalId])
+
+  // 削除成功後の案内表示
+  if (deleteSuccess?.isSuccess) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <span className="text-green-600 text-2xl">✓</span>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            削除が完了しました
+          </h3>
+          <p className="text-green-600 font-medium">
+            {deleteSuccess.message}
+          </p>
+          <button onClick={handleBackToMain}>OK</button>
+        </div>
+      </div>
+    )
   }
-  
-  // 確認データ読み込み中
-  if (!confirmationData) {
-    return <LoadingSpinner message="クリスタル情報を読み込み中..." />
-  }
-  
-  // メインのUIレンダリング
+
+  // 削除確認画面の表示（実装済み）
   return (
     <div className="p-6">
       {/* クリスタル詳細情報表示 */}
