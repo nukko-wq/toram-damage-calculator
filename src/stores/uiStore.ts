@@ -528,6 +528,7 @@ export const useUIStore = create<UIStore>()(
 								...state.subsystem,
 								crystalCustom: {
 									...state.subsystem.crystalCustom,
+									editMode: 'create', // 初期画面（新規登録・内容変更・登録削除ボタン画面）に戻る
 									deleteFlow: {
 										selectedCrystalId: null,
 										isDeleting: false,
