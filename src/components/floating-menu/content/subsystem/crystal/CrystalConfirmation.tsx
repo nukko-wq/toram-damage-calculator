@@ -162,7 +162,7 @@ export default function CrystalConfirmation() {
 	}
 
 	const currentTime = new Date().toLocaleString('ja-JP')
-	const buttonText = editMode === 'edit' ? '再登録' : '登録'
+	const buttonText = 'はい'
 
 	return (
 		<div className="p-6">

@@ -8,7 +8,7 @@ import type { Equipment, EquipmentProperties } from '@/types/calculator'
 export default function CrystalPropertyInput() {
 	const {
 		subsystem: {
-			crystalCustom: { newRegistration },
+			crystalCustom: { newRegistration, editMode },
 		},
 		updateCrystalFormData,
 		navigateToScreen,
@@ -102,6 +102,9 @@ export default function CrystalPropertyInput() {
 		}
 	}
 
+	// 編集モードでのボタンテキスト設定
+	const buttonText = editMode === 'edit' ? '再登録' : '登録'
+
 	return (
 		<div className="p-6">
 			{/* ヘッダー情報 */}
@@ -176,7 +179,7 @@ export default function CrystalPropertyInput() {
 					onClick={handleNext}
 					className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors cursor-pointer"
 				>
-					登録
+					{buttonText}
 				</button>
 
 				<button
