@@ -8,6 +8,22 @@ const formatPercentage = (value: number): string => {
 	return value % 1 === 0 ? `${value}%` : `${value.toFixed(2)}%`
 }
 
+// ラベル表示用の関数
+const getTypeLabel = (type: string): string => {
+	switch (type) {
+		case 'critical':
+			return 'Critical'
+		case 'graze':
+			return 'Graze'
+		case 'white':
+			return '白ダメ'
+		case 'miss':
+			return 'ミス'
+		default:
+			return type
+	}
+}
+
 interface ExpectedValueDisplayProps {
 	expectedValue: number
 	averageStability: number
@@ -186,11 +202,11 @@ function RatioDisplayTab({ occurrenceRatio, damageRatio }: { occurrenceRatio: Oc
 				<div className="mb-4">
 					<HorizontalBarChart data={occurrenceRatio} />
 				</div>
-				<div className="flex flex-wrap gap-4 justify-center">
+				<div className="flex flex-wrap gap-4 justify-start">
 					{Object.entries(occurrenceRatio).map(([type, value]) => (
 						<div key={type} className="flex items-center gap-2">
 							<div className={`w-4 h-4 rounded ${getBarColor(type)}`} />
-							<span className="text-sm text-gray-700 capitalize">{type}</span>
+							<span className="text-sm text-gray-700">{getTypeLabel(type)}</span>
 							<span className="text-sm text-gray-900 font-medium">
 								{formatPercentage(value)}
 							</span>
@@ -205,11 +221,11 @@ function RatioDisplayTab({ occurrenceRatio, damageRatio }: { occurrenceRatio: Oc
 				<div className="mb-4">
 					<HorizontalBarChart data={damageRatio} />
 				</div>
-				<div className="flex flex-wrap gap-4 justify-center">
+				<div className="flex flex-wrap gap-4 justify-start">
 					{Object.entries(damageRatio).map(([type, value]) => (
 						<div key={type} className="flex items-center gap-2">
 							<div className={`w-4 h-4 rounded ${getBarColor(type)}`} />
-							<span className="text-sm text-gray-700 capitalize">{type}</span>
+							<span className="text-sm text-gray-700">{getTypeLabel(type)}</span>
 							<span className="text-sm text-gray-900 font-medium">
 								{formatPercentage(value)}
 							</span>
