@@ -63,13 +63,13 @@ export default function FullScreenModal({
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.3, ease: 'easeInOut' }}
-					className="fixed inset-0 z-[10000] bg-black bg-opacity-50"
+					className="fixed inset-0 z-[10000] bg-white bg-opacity-50"
 					onClick={handleBackgroundClick}
 				>
 					<motion.div
-						initial={{ opacity: 0, y: 50 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: 50 }}
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
 						transition={{ duration: 0.3, ease: 'easeInOut' }}
 						className="h-full w-full bg-white shadow-2xl flex flex-col"
 						onClick={handleContentClick}
