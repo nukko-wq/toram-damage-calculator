@@ -3,6 +3,9 @@
  * トーラムオンラインの正確なダメージ計算式を実装
  */
 
+// ログのオン・オフを制御するフラグ
+const DEBUG_LOG_ENABLED = false
+
 // ============================================================================
 // 型定義（設計書から）
 // ============================================================================
@@ -239,7 +242,7 @@ export function calculateDamage(
 ): DamageCalculationResult {
 	const steps = {} as DamageCalculationSteps
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== 計算ステップ詳細 ===')
 		console.log('damageType:', input.userSettings.damageType)
 		console.log('combo.isActive:', input.combo.isActive)
@@ -247,11 +250,11 @@ export function calculateDamage(
 	}
 
 	// ステップ1: 基礎ダメージ計算
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ1: 基礎ダメージ計算 ---')
 	}
 	const step1Result = calculateBaseDamage(input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step1Result % 1 !== 0
 		console.log(
 			`ステップ1結果: ${step1Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -259,11 +262,11 @@ export function calculateDamage(
 	}
 
 	// ステップ2: 固定値加算
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ2: 固定値加算 ---')
 	}
 	let step2Result = applyFixedValues(step1Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step2Result % 1 !== 0
 		console.log(
 			`ステップ2結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -275,11 +278,11 @@ export function calculateDamage(
 		input.userSettings.damageType === 'critical' ||
 		input.userSettings.damageType === 'graze'
 	) {
-		if (process.env.NODE_ENV === 'development') {
+		if (DEBUG_LOG_ENABLED) {
 			console.log('\n--- ステップ2a: クリティカル計算 ---')
 		}
 		step2Result = applyCriticalDamage(step2Result, input, steps)
-		if (process.env.NODE_ENV === 'development') {
+		if (DEBUG_LOG_ENABLED) {
 			const hasDecimal = step2Result % 1 !== 0
 			console.log(
 				`ステップ2a結果: ${step2Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -288,11 +291,11 @@ export function calculateDamage(
 	}
 
 	// ステップ3: 属性有利補正
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ3: 属性有利補正 ---')
 	}
 	const step3Result = applyElementAdvantage(step2Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step3Result % 1 !== 0
 		console.log(
 			`ステップ3結果: ${step3Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -300,11 +303,11 @@ export function calculateDamage(
 	}
 
 	// ステップ4: スキル倍率補正
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ4: スキル倍率補正 ---')
 	}
 	const step4Result = applySkillMultiplier(step3Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step4Result % 1 !== 0
 		console.log(
 			`ステップ4結果: ${step4Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -312,11 +315,11 @@ export function calculateDamage(
 	}
 
 	// ステップ5: 抜刀%補正 (Phase 3で実装)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ5: 抜刀%補正 ---')
 	}
 	const step5Result = applyUnsheatheRate(step4Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step5Result % 1 !== 0
 		console.log(
 			`ステップ5結果: ${step5Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -324,11 +327,11 @@ export function calculateDamage(
 	}
 
 	// ステップ6: 慣れ補正 (Phase 3で実装)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ6: 慣れ補正 ---')
 	}
 	const step6Result = applyAdaptation(step5Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step6Result % 1 !== 0
 		console.log(
 			`ステップ6結果: ${step6Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -336,11 +339,11 @@ export function calculateDamage(
 	}
 
 	// ステップ7: 距離補正 (Phase 3で実装)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ7: 距離補正 ---')
 	}
 	const step7Result = applyDistance(step6Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step7Result % 1 !== 0
 		console.log(
 			`ステップ7結果: ${step7Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -348,12 +351,12 @@ export function calculateDamage(
 	}
 
 	// ステップ8: コンボ補正 (Phase 3で実装)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ8: コンボ補正 ---')
 	}
 	// コンボ補正は小数点を保持したまま計算
 	const step8Result = applyCombo(step7Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step8Result % 1 !== 0
 		console.log(
 			`ステップ8結果: ${step8Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -361,11 +364,11 @@ export function calculateDamage(
 	}
 
 	// ステップ9: パッシブ倍率補正（プレースホルダー）
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ9: パッシブ倍率補正 ---')
 	}
 	const step9Result = applyPassiveMultiplier(step8Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = step9Result % 1 !== 0
 		console.log(
 			`ステップ9結果: ${step9Result}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -373,11 +376,11 @@ export function calculateDamage(
 	}
 
 	// ステップ10: ブレイブ倍率補正
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('\n--- ステップ10: ブレイブ倍率補正 ---')
 	}
 	const baseDamage = applyBraveMultiplier(step9Result, input, steps)
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		const hasDecimal = baseDamage % 1 !== 0
 		console.log(
 			`ステップ10結果: ${baseDamage}${hasDecimal ? ' (小数点あり)' : ' (整数)'}`,
@@ -423,7 +426,7 @@ function calculateBaseDamage(
 			: input.resistance.magical
 	const weaponResistance = input.resistance.weapon
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== ステップ1: 基礎ダメージ計算詳細 ===')
 		console.log(`自レベル: ${input.playerLevel}`)
 		console.log(`参照ステータス: ${input.referenceStat}`)
@@ -441,7 +444,7 @@ function calculateBaseDamage(
 	const weaponMultiplier = (100 - weaponResistance) / 100
 	const combinedMultiplier = mainMultiplier * weaponMultiplier
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(`主耐性倍率: ${mainMultiplier} = (100 - ${mainResistance})/100`)
 		console.log(
 			`武器耐性倍率: ${weaponMultiplier} = (100 - ${weaponResistance})/100`,
@@ -453,7 +456,7 @@ function calculateBaseDamage(
 
 	const afterResistance = beforeResistance * combinedMultiplier
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(
 			`耐性適用後: ${afterResistance} = ${beforeResistance} × ${combinedMultiplier}`,
 		)
@@ -471,7 +474,7 @@ function calculateBaseDamage(
 	// 処理後DEFも小数点を切り捨て
 	const processedDefenseFloored = Math.floor(processedDefense)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(`敵${defenseType}: ${enemyDefense}`)
 		if (processedDefense !== processedDefenseFloored) {
 			console.log(
@@ -492,7 +495,7 @@ function calculateBaseDamage(
 	// 両方とも切り捨て後の値で減算
 	const result = afterResistanceFloored - processedDefenseFloored
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(
 			`最終結果: ${result} = ${afterResistanceFloored} - ${processedDefenseFloored}`,
 		)
@@ -530,7 +533,7 @@ function applyFixedValues(
 		: 0
 	const skillFixed = input.attackSkill.fixedDamage
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== ステップ2: 固定値加算詳細 ===')
 		console.log(`基礎ダメージ: ${baseDamage}`)
 		console.log(`抜刀アクティブ: ${input.unsheathe.isActive}`)
@@ -543,7 +546,7 @@ function applyFixedValues(
 
 	const result = Math.floor(baseDamage + unsheatheFixed + skillFixed)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(`固定値加算後: ${result}`)
 		console.log(`最低保証後: ${Math.max(1, result)}`)
 		console.log('======================================')
@@ -572,7 +575,7 @@ function applyElementAdvantage(
 		? input.elementAdvantage.total + input.elementAdvantage.awakening
 		: 0
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== ステップ3: 属性有利補正詳細 ===')
 		console.log(`属性有利アクティブ: ${input.elementAdvantage.isActive}`)
 		console.log(`総属性有利: ${input.elementAdvantage.total}%`)
@@ -585,7 +588,7 @@ function applyElementAdvantage(
 
 	const result = Math.floor(beforeAdvantage * (1 + advantageRate / 100))
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(`属性有利適用後: ${result}`)
 		console.log(`最低保証後: ${Math.max(1, result)}`)
 		console.log('======================================')
@@ -612,7 +615,7 @@ function applySkillMultiplier(
 	// スキル倍率の小数点を切り捨て（例：334.4% → 334%）
 	const skillRate = Math.floor(input.attackSkill.multiplier)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== ステップ4: スキル倍率補正詳細 ===')
 		console.log(`スキル倍率（元）: ${input.attackSkill.multiplier}%`)
 		console.log(`スキル倍率（切捨後）: ${skillRate}%`)
@@ -621,7 +624,7 @@ function applySkillMultiplier(
 
 	const result = Math.floor((beforeSkill * skillRate) / 100)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(`スキル倍率適用後: ${result}`)
 		console.log(`最低保証後: ${Math.max(1, result)}`)
 		console.log('======================================')
@@ -647,7 +650,7 @@ function applyUnsheatheRate(
 ): number {
 	const unsheatheRate = input.unsheathe.isActive ? input.unsheathe.rateBonus : 0
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== ステップ5: 抜刀%補正詳細 ===')
 		console.log(`抜刀アクティブ: ${input.unsheathe.isActive}`)
 		console.log(`抜刀%ボーナス: ${unsheatheRate}%`)
@@ -658,7 +661,7 @@ function applyUnsheatheRate(
 
 	const result = Math.floor(beforeUnsheathe * (1 + unsheatheRate / 100))
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(`抜刀%適用後: ${result}`)
 		console.log(`最低保証後: ${Math.max(1, result)}`)
 		console.log('======================================')
@@ -684,7 +687,7 @@ function applyAdaptation(
 ): number {
 	const adaptationRate = input.userSettings.adaptation
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== ステップ6: 慣れ補正詳細 ===')
 		console.log(`慣れ値: ${adaptationRate}%`)
 		console.log(
@@ -694,7 +697,7 @@ function applyAdaptation(
 
 	const result = Math.floor(beforeAdaptation * (adaptationRate / 100))
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(`慣れ適用後: ${result}`)
 		console.log(`最低保証後: ${Math.max(1, result)}`)
 		console.log('======================================')
@@ -747,7 +750,7 @@ function applyDistance(
 	if (hasMultiplierAfterDistance) {
 		// 後続に倍率補正がある場合：小数点を保持して次のステップに渡す
 		result = beforeDistance * (1 + distanceRate / 100)
-		if (process.env.NODE_ENV === 'development') {
+		if (DEBUG_LOG_ENABLED) {
 			console.log('=== 距離補正: 小数点保持 (後続倍率補正あり) ===')
 			console.log(
 				`後続倍率: パッシブ(${input.passiveMultiplier}%) ブレイブ(${input.braveMultiplier}%) クリティカル(${isCritical})`,
@@ -757,7 +760,7 @@ function applyDistance(
 	} else {
 		// 後続に倍率補正がない場合：切り捨て
 		result = Math.floor(beforeDistance * (1 + distanceRate / 100))
-		if (process.env.NODE_ENV === 'development') {
+		if (DEBUG_LOG_ENABLED) {
 			console.log('=== 距離補正: 切り捨て (後続倍率補正なし) ===')
 			console.log(
 				`Math.floor(${beforeDistance} × (1 + ${distanceRate}/100)) = ${result}`,
@@ -791,7 +794,7 @@ function applyCombo(
 		const voidStanceMultiplier = 1 + voidStanceLevel * 0.01
 		comboRate = Math.floor(comboRate * voidStanceMultiplier)
 
-		if (process.env.NODE_ENV === 'development') {
+		if (DEBUG_LOG_ENABLED) {
 			console.log('=== 無の構え効果適用 ===')
 			console.log('無の構えレベル:', voidStanceLevel)
 			console.log('無の構え倍率:', voidStanceMultiplier)
@@ -803,7 +806,7 @@ function applyCombo(
 		}
 	}
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== COMBO CALCULATION (Step 8) ===')
 		console.log('beforeCombo (距離適用後):', beforeCombo)
 		console.log('combo.isActive:', input.combo.isActive)
@@ -824,7 +827,7 @@ function applyCombo(
 	if (hasMultiplierAfterCombo) {
 		// 後続に倍率補正がある場合：小数点を保持
 		result = beforeCombo * (comboRate / 100)
-		if (process.env.NODE_ENV === 'development') {
+		if (DEBUG_LOG_ENABLED) {
 			console.log('=== コンボ補正: 小数点保持 (後続倍率補正あり) ===')
 			console.log(
 				`後続倍率: パッシブ(${input.passiveMultiplier}%) ブレイブ(${input.braveMultiplier}%) クリティカル(${isCritical})`,
@@ -836,7 +839,7 @@ function applyCombo(
 	} else {
 		// 後続に倍率補正がない場合：切り捨て
 		result = Math.floor(beforeCombo * (comboRate / 100))
-		if (process.env.NODE_ENV === 'development') {
+		if (DEBUG_LOG_ENABLED) {
 			console.log('=== コンボ補正: 切り捨て (後続倍率補正なし) ===')
 			console.log(
 				`計算式: Math.floor(${beforeCombo} * ${comboRate}/100) = ${result} (切り捨て)`,
@@ -844,7 +847,7 @@ function applyCombo(
 		}
 	}
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('result (コンボ適用後):', result)
 	}
 
@@ -869,7 +872,7 @@ function applyPassiveMultiplier(
 	// バフスキルから取得したパッシブ倍率を適用
 	const passiveRate = input.passiveMultiplier
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== PASSIVE MULTIPLIER DEBUG ===')
 		console.log('beforePassive:', beforePassive)
 		console.log('input.passiveMultiplier:', input.passiveMultiplier)
@@ -883,7 +886,7 @@ function applyPassiveMultiplier(
 		? calculationResult
 		: Math.floor(calculationResult)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		if (hasBreaveMultiplier) {
 			console.log(
 				'計算式: ' +
@@ -952,7 +955,7 @@ function applyCriticalDamage(
 	input: DamageCalculationInput,
 	steps: DamageCalculationSteps,
 ): number {
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== CRITICAL DAMAGE CALCULATION (Step 2a) ===')
 		console.log('step2Result (固定値適用後):', step2Result)
 	}
@@ -960,7 +963,7 @@ function applyCriticalDamage(
 	// クリティカルダメージ倍率を取得
 	const criticalRate = input.critical.damage
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('criticalRate (クリティカルダメージ%):', criticalRate)
 
 		// ステップ2a: 固定値加算の後、属性有利の前にクリティカル倍率を適用
@@ -974,7 +977,7 @@ function applyCriticalDamage(
 
 	const result = Math.floor(step2Result * (criticalRate / 100))
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('result (クリティカル適用後):', result)
 	}
 
@@ -1067,7 +1070,7 @@ function processEnemyDefense(
 		)
 		penetrationRate = penetrationRate * physicalPenetrationMultiplier
 
-		if (process.env.NODE_ENV === 'development' && physicalPenetrationMultiplier > 1) {
+		if (DEBUG_LOG_ENABLED && physicalPenetrationMultiplier > 1) {
 			console.log(
 				`スキル特殊効果による物理貫通倍率: ${physicalPenetrationMultiplier}倍 (スキルID: ${input.attackSkill.skillId}, 武器: ${input.weapon?.mainWeaponType})`,
 			)
@@ -1081,7 +1084,7 @@ function processEnemyDefense(
 		)
 		penetrationRate += skillPenetrationBonus
 
-		if (process.env.NODE_ENV === 'development' && skillPenetrationBonus > 0) {
+		if (DEBUG_LOG_ENABLED && skillPenetrationBonus > 0) {
 			console.log(
 				`スキル固有貫通ボーナス: +${skillPenetrationBonus}% (スキルID: ${input.attackSkill.skillId})`,
 			)
@@ -1097,7 +1100,7 @@ function processEnemyDefense(
 		)
 		penetrationRate += skillPenetrationBonus
 
-		if (process.env.NODE_ENV === 'development' && skillPenetrationBonus > 0) {
+		if (DEBUG_LOG_ENABLED && skillPenetrationBonus > 0) {
 			console.log(
 				`スキル固有貫通ボーナス: +${skillPenetrationBonus}% (スキルID: ${input.attackSkill.skillId})`,
 			)
@@ -1107,7 +1110,7 @@ function processEnemyDefense(
 	// 貫通率の上限を100%に制限
 	penetrationRate = Math.min(100, penetrationRate)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('貫通計算詳細:')
 		console.log(
 			`  基本貫通: ${defenseType === 'DEF' ? input.penetration.physical : input.penetration.magical}%`,
@@ -1119,7 +1122,7 @@ function processEnemyDefense(
 	// 貫通計算（小数点を保持したまま返す）
 	processed = processed * (1 - penetrationRate / 100)
 
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log(`  貫通適用後: ${processed}`)
 	}
 
@@ -1307,7 +1310,7 @@ export function createDefaultDamageInput(): DamageCalculationInput {
  * 計算過程をコンソールに出力（開発・デバッグ用）
  */
 export function logCalculationSteps(result: DamageCalculationResult): void {
-	if (process.env.NODE_ENV === 'development') {
+	if (DEBUG_LOG_ENABLED) {
 		console.log('=== ダメージ計算結果 ===')
 		console.log(`基本ダメージ: ${result.baseDamage}`)
 		console.log('\n=== 安定率適用結果 ===')
