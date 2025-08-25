@@ -160,8 +160,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 
 	// 期待値表示用データ計算
 	const expectedValueData = useMemo(() => {
-		return calculateExpectedValueData(calculatorData, calculationResults, enemyFormData)
-	}, [calculatorData, calculationResults, enemyFormData])
+		return calculateExpectedValueData(calculatorData, calculationResults, enemyFormData, adaptationMultiplier)
+	}, [calculatorData, calculationResults, enemyFormData, adaptationMultiplier])
 
 	// キャプチャボタンクリック処理（useCallbackで最適化）
 	const handleCapture = useCallback(() => {

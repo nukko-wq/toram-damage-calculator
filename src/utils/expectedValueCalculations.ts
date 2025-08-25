@@ -8,6 +8,7 @@ import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
 import { calculateRaidBossStats } from '@/utils/raidBossCalculation'
 import { getAttackSkillById } from '@/data/attackSkills'
+import { calculateDamageWithService } from '@/utils/damageCalculationService'
 
 // 武器種別の最低保証HIT率を取得
 export const getMinimumGuaranteedHitRate = (weaponType: WeaponType): number => {
@@ -256,20 +257,101 @@ export const calculateDamageRatio = (occurrenceRatio: OccurrenceRatioData): Dama
 	}
 }
 
-// 期待値表示用のダミーデータ（実際の計算ロジック実装まで）
+// Critical系の割合を計算（Critical + Graze = 100%として正規化）
+export const calculateCriticalSystemRatio = (
+	criticalRate: number,
+	grazeRate: number,
+): { criticalRatio: number; grazeRatio: number } => {
+	const total = criticalRate + grazeRate
+	
+	// 合計が0の場合は0%とする
+	if (total === 0) {
+		return {
+			criticalRatio: 0,
+			grazeRatio: 0,
+		}
+	}
+	
+	return {
+		criticalRatio: (criticalRate / total) * 100,
+		grazeRatio: (grazeRate / total) * 100,
+	}
+}
+
+// 平均安定率を計算
+export const calculateAverageStability = (
+	calculatorData: CalculatorData,
+	calculationResults: CalculationResults | null,
+	occurrenceRatio: OccurrenceRatioData,
+	adaptationMultiplier: number = 100,
+): number => {
+	if (!calculationResults) return 0
+	
+	// Critical系の割合を計算
+	const { criticalRatio, grazeRatio } = calculateCriticalSystemRatio(
+		occurrenceRatio.critical,
+		occurrenceRatio.graze,
+	)
+	
+	// Critical時の安定率を取得
+	const criticalDamageResult = calculateDamageWithService(
+		calculatorData,
+		calculationResults,
+		{
+			powerOptions: {
+				...calculatorData.powerOptions || {},
+				damageType: 'critical',
+			},
+			adaptationMultiplier,
+		},
+	)
+	const criticalStability = criticalDamageResult.normal.averageStability
+	
+	// Graze時の安定率を取得
+	const grazeDamageResult = calculateDamageWithService(
+		calculatorData,
+		calculationResults,
+		{
+			powerOptions: {
+				...calculatorData.powerOptions || {},
+				damageType: 'graze',
+			},
+			adaptationMultiplier,
+		},
+	)
+	const grazeStability = grazeDamageResult.normal.averageStability
+	
+	// 加重平均による平均安定率算出
+	if (criticalRatio + grazeRatio === 0) return 0
+	
+	return (
+		(criticalStability * criticalRatio + grazeStability * grazeRatio) / 100
+	)
+}
+
+// 期待値表示用のデータ計算
 export const calculateExpectedValueData = (
 	calculatorData: CalculatorData,
 	calculationResults: CalculationResults | null,
 	enemyFormData: EnemyFormData,
+	adaptationMultiplier: number = 100,
 ) => {
 	const params = getExpectedValueParams(calculatorData, calculationResults, enemyFormData)
 	const weaponType = calculatorData.mainWeapon.weaponType
 	const occurrenceRatio = calculateOccurrenceRatio(params.criticalRate, params.hitRate, weaponType)
 	const damageRatio = calculateDamageRatio(occurrenceRatio)
 	
+	// 平均安定率を計算
+	const averageStability = calculateAverageStability(
+		calculatorData,
+		calculationResults,
+		occurrenceRatio,
+		adaptationMultiplier,
+	)
+	
 	return {
 		expectedValue: 1250, // TODO: 実際の期待値計算
-		averageStability: 92.5, // TODO: 実際の平均安定率計算
+		averageStability: Math.round(averageStability * 10) / 10, // 小数点以下1桁で丸める
 		powerEfficiency: 88.3, // TODO: 実際の威力発揮率計算
 		params, // 基本情報タブで使用
 		occurrenceRatio, // 割合表示タブで使用（発生割合）
