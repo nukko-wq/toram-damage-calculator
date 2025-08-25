@@ -315,7 +315,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				className="container mx-auto px-4 h-full overflow-y-auto py-1 sm:py-2"
 				style={{ paddingBottom: '12px' }} // リサイズハンドル分のスペースを確保
 			>
-				{/* 期待値表示 */}
+				{/* ダメージ表示部分 */}
 				{powerOptions.damageType === 'expected' ? (
 					<ExpectedValueDisplay
 						expectedValue={expectedValueData.expectedValue}
@@ -326,13 +326,12 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						damageRatio={expectedValueData.damageRatio}
 					/>
 				) : (
-					<>
-						{/* 従来のダメージ表示テーブル */}
-				<DamageTable
-					damageResults={damageResults.normal}
-					captureData={captureData}
-					onCapture={handleCapture}
-				/>
+					<DamageTable
+						damageResults={damageResults.normal}
+						captureData={captureData}
+						onCapture={handleCapture}
+					/>
+				)}
 
 				{/* 慣れ倍率スライダー */}
 				<AdaptationMultiplierSlider
@@ -860,8 +859,6 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 					)}
 				</div>
-					</>
-				)}
 			</div>
 		</div>
 	)
