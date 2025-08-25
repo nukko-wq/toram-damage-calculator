@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { ExpectedValueParams } from '@/utils/expectedValueCalculations'
+import type { ExpectedValueParams, OccurrenceRatioData } from '@/utils/expectedValueCalculations'
 
 // パーセント表示用のフォーマット関数（小数点以下0の場合は整数表示）
 const formatPercentage = (value: number): string => {
@@ -13,6 +13,7 @@ interface ExpectedValueDisplayProps {
 	averageStability: number
 	powerEfficiency: number
 	params: ExpectedValueParams
+	occurrenceRatio: OccurrenceRatioData
 }
 
 type TabType = 'basic' | 'ratio' | 'capture' | 'compare'
@@ -22,6 +23,7 @@ export default function ExpectedValueDisplay({
 	averageStability,
 	powerEfficiency,
 	params,
+	occurrenceRatio,
 }: ExpectedValueDisplayProps) {
 	const [activeTab, setActiveTab] = useState<TabType | null>(null)
 
@@ -102,7 +104,7 @@ export default function ExpectedValueDisplay({
 			{activeTab && (
 				<div className="bg-white p-4 rounded-lg border">
 					{activeTab === 'basic' && <BasicInfoTab params={params} />}
-					{activeTab === 'ratio' && <RatioDisplayTab />}
+					{activeTab === 'ratio' && <RatioDisplayTab occurrenceRatio={occurrenceRatio} />}
 					{activeTab === 'capture' && (
 						<CaptureTab
 							expectedValue={expectedValue}
@@ -168,18 +170,11 @@ function BasicInfoTab({ params }: { params: ExpectedValueParams }) {
 }
 
 // 割合表示タブ
-function RatioDisplayTab() {
-	// TODO: 実際のデータから計算
-	const occurrenceRatio = {
-		critical: 45.0,
-		glaze: 30.0,
-		white: 20.0,
-		miss: 5.0,
-	}
-
+function RatioDisplayTab({ occurrenceRatio }: { occurrenceRatio: OccurrenceRatioData }) {
+	// 与ダメージ割合（仮データ - TODO: 実際の計算実装）
 	const damageRatio = {
 		critical: 60.0,
-		glaze: 25.0,
+		graze: 25.0,
 		white: 15.0,
 		miss: 0.0,
 	}
@@ -228,7 +223,7 @@ function RatioDisplayTab() {
 }
 
 // 水平バーチャートコンポーネント
-function HorizontalBarChart({ data }: { data: Record<string, number> }) {
+function HorizontalBarChart({ data }: { data: Record<string, number> | OccurrenceRatioData }) {
 	let cumulativeWidth = 0
 
 	return (
@@ -255,7 +250,7 @@ function getBarColor(type: string): string {
 	switch (type) {
 		case 'critical':
 			return 'bg-yellow-400/90'
-		case 'glaze':
+		case 'graze':
 			return 'bg-rose-400/90'
 		case 'white':
 			return 'bg-gray-300/90'
