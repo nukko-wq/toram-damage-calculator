@@ -329,6 +329,69 @@ export const calculateAverageStability = (
 	)
 }
 
+// 期待値を計算
+export const calculateExpectedValue = (
+	calculatorData: CalculatorData,
+	calculationResults: CalculationResults | null,
+	occurrenceRatio: OccurrenceRatioData,
+	adaptationMultiplier: number = 100,
+): number => {
+	if (!calculationResults) return 0
+	
+	// 各ダメージタイプの平均ダメージを取得
+	const criticalDamageResult = calculateDamageWithService(
+		calculatorData,
+		calculationResults,
+		{
+			powerOptions: {
+				...calculatorData.powerOptions || {},
+				damageType: 'critical',
+			},
+			adaptationMultiplier,
+		},
+	)
+	const criticalDamage = criticalDamageResult.normal.average
+	
+	const grazeDamageResult = calculateDamageWithService(
+		calculatorData,
+		calculationResults,
+		{
+			powerOptions: {
+				...calculatorData.powerOptions || {},
+				damageType: 'graze',
+			},
+			adaptationMultiplier,
+		},
+	)
+	const grazeDamage = grazeDamageResult.normal.average
+	
+	const whiteDamageResult = calculateDamageWithService(
+		calculatorData,
+		calculationResults,
+		{
+			powerOptions: {
+				...calculatorData.powerOptions || {},
+				damageType: 'white',
+			},
+			adaptationMultiplier,
+		},
+	)
+	const whiteDamage = whiteDamageResult.normal.average
+	
+	// ミスダメージは0
+	const missDamage = 0
+	
+	// 期待値計算（発生割合による加重平均）
+	const expectedValue = (
+		criticalDamage * occurrenceRatio.critical +
+		grazeDamage * occurrenceRatio.graze +
+		whiteDamage * occurrenceRatio.white +
+		missDamage * occurrenceRatio.miss
+	) / 100
+	
+	return Math.floor(expectedValue)
+}
+
 // 期待値表示用のデータ計算
 export const calculateExpectedValueData = (
 	calculatorData: CalculatorData,
@@ -341,6 +404,14 @@ export const calculateExpectedValueData = (
 	const occurrenceRatio = calculateOccurrenceRatio(params.criticalRate, params.hitRate, weaponType)
 	const damageRatio = calculateDamageRatio(occurrenceRatio)
 	
+	// 期待値を計算
+	const expectedValue = calculateExpectedValue(
+		calculatorData,
+		calculationResults,
+		occurrenceRatio,
+		adaptationMultiplier,
+	)
+	
 	// 平均安定率を計算
 	const averageStability = calculateAverageStability(
 		calculatorData,
@@ -350,7 +421,7 @@ export const calculateExpectedValueData = (
 	)
 	
 	return {
-		expectedValue: 1250, // TODO: 実際の期待値計算
+		expectedValue, // 実際の期待値計算
 		averageStability: Math.round(averageStability * 10) / 10, // 小数点以下1桁で丸める
 		powerEfficiency: 88.3, // TODO: 実際の威力発揮率計算
 		params, // 基本情報タブで使用
