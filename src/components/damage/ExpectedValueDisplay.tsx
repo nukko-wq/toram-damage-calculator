@@ -5,7 +5,7 @@ import type { ExpectedValueParams, OccurrenceRatioData, DamageRatioData } from '
 
 // パーセント表示用のフォーマット関数（小数点以下0の場合は整数表示）
 const formatPercentage = (value: number): string => {
-	return value % 1 === 0 ? `${value}%` : `${value.toFixed(1)}%`
+	return value % 1 === 0 ? `${value}%` : `${value.toFixed(2)}%`
 }
 
 interface ExpectedValueDisplayProps {

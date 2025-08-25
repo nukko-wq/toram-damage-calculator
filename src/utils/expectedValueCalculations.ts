@@ -227,10 +227,10 @@ export const calculateOccurrenceRatio = (
 	const miss = nonCriticalTotal * (100 - actualHitRate) / 100
 	
 	return {
-		critical: Math.floor(critical * 10) / 10, // 小数第1位まで切り捨て
-		graze: Math.floor(graze * 10) / 10, // クリティカル時のGraze
-		white: Math.floor(white * 10) / 10, // 白ダメ（保証HIT含む）
-		miss: Math.floor(miss * 10) / 10, // 切り捨て
+		critical: critical, // 正確な計算値
+		graze: graze, // クリティカル時のGraze
+		white: white, // 白ダメ（保証HIT含む）
+		miss: miss, // 正確な計算値
 	}
 }
 
@@ -250,9 +250,9 @@ export const calculateDamageRatio = (occurrenceRatio: OccurrenceRatioData): Dama
 	
 	// 正規化（ミスを除外して100%とする）
 	return {
-		critical: Math.floor((critical / totalEffectiveDamage * 100) * 10) / 10,
-		graze: Math.floor((graze / totalEffectiveDamage * 100) * 10) / 10,
-		white: Math.floor((white / totalEffectiveDamage * 100) * 10) / 10,
+		critical: (critical / totalEffectiveDamage * 100),
+		graze: (graze / totalEffectiveDamage * 100),
+		white: (white / totalEffectiveDamage * 100),
 	}
 }
 
