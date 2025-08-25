@@ -62,7 +62,7 @@ export default function ExpectedValueDisplay({
 				<div className="text-center border-l border-gray-200 pl-4">
 					<div className="text-sm text-gray-600 mb-1">平均安定率</div>
 					<div className="text-xl font-bold text-gray-900">
-						{averageStability.toFixed(1)}%
+						{Math.floor(averageStability)}%
 					</div>
 				</div>
 				<div className="text-center border-l border-gray-200 pl-4">
@@ -357,7 +357,7 @@ function CaptureTab({
 					<div className="text-center border-l border-gray-200 pl-4">
 						<div className="text-sm text-gray-600 mb-1">平均安定率</div>
 						<div className="text-lg font-bold text-gray-900">
-							{capturedData.averageStability.toFixed(1)}%
+							{Math.floor(capturedData.averageStability)}%
 						</div>
 					</div>
 					<div className="text-center border-l border-gray-200 pl-4">
