@@ -63,8 +63,8 @@ export const calculateHitRate = (
 	// スキル補正
 	const skillBonus = skillMpCost / 10
 	
-	// 最終命中率（100%でキャップ、小数点以下切り捨て）
-	return Math.floor(Math.min(100, baseHitRate + skillBonus))
+	// 最終命中率（0%～100%でキャップ、小数点以下切り捨て）
+	return Math.floor(Math.max(0, Math.min(100, baseHitRate + skillBonus)))
 }
 
 // 期待値計算用のパラメーターを取得
@@ -187,8 +187,8 @@ export const getExpectedValueParams = (
 // 発生割合データの型定義
 export interface OccurrenceRatioData {
 	critical: number
-	graze: number
-	white: number
+	graze: number // クリティカル時のGraze
+	white: number // 白ダメ（非クリティカル時の命中 + 保証HITによるGraze）
 	miss: number
 }
 
@@ -212,18 +212,18 @@ export const calculateOccurrenceRatio = (
 	
 	// クリティカル系の内訳
 	const critical = criticalRate * hitRate / 100
-	const graze = criticalRate * (100 - hitRate) / 100
+	const graze = criticalRate * (100 - hitRate) / 100 // クリティカル時のGraze
 	
 	// 非クリティカル系の内訳
 	const nonCriticalTotal = 100 - criticalRate
-	const white = nonCriticalTotal * hitRate / 100
+	const white = nonCriticalTotal * actualHitRate / 100 // 白ダメ（通常命中 + 保証HITによるGraze）
 	const miss = nonCriticalTotal * (100 - actualHitRate) / 100
 	
 	return {
-		critical: Math.round(critical * 10) / 10, // 小数第1位まで
-		graze: Math.round(graze * 10) / 10,
-		white: Math.round(white * 10) / 10,
-		miss: Math.round(miss * 10) / 10,
+		critical: Math.floor(critical * 10) / 10, // 小数第1位まで切り捨て
+		graze: Math.floor(graze * 10) / 10, // クリティカル時のGraze
+		white: Math.floor(white * 10) / 10, // 白ダメ（保証HIT含む）
+		miss: Math.floor(miss * 10) / 10, // 切り捨て
 	}
 }
 
