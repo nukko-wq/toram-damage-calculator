@@ -22,7 +22,6 @@ import {
 	getCurrentBraveMultiplier,
 	getCurrentPassiveMultiplier,
 } from '@/utils/damagePreviewCalculations'
-import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import {
 	createInitialOtherOptions,
 	createInitialPowerOptions,
@@ -30,6 +29,8 @@ import {
 import ExpectedValueDisplay from '@/components/damage/ExpectedValueDisplay'
 import { calculateExpectedValueData } from '@/utils/expectedValueCalculations'
 import { useEnemyData } from '@/hooks/useEnemyData'
+import AdaptationMultiplierSlider from '@/components/ui/AdaptationMultiplierSlider'
+import EnemyInfoDisplay from '@/components/ui/EnemyInfoDisplay'
 
 interface DamagePreviewProps {
 	isVisible: boolean
@@ -74,10 +75,6 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		(state) => state.updateAdaptationMultiplier,
 	)
 
-	// 入力中の一時的な値を管理するローカル状態
-	const [tempAdaptationValue, setTempAdaptationValue] = useState<string>(
-		adaptationMultiplier.toString(),
-	)
 
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
@@ -111,10 +108,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			setCaptureData(initialCaptureData)
 		}
 
-		// 2. adaptationMultiplierが変更されたときにtempAdaptationValueを同期
-		setTempAdaptationValue(adaptationMultiplier.toString())
-
-		// 3. 計算結果を更新（必要な場合のみ）
+		// 2. 計算結果を更新（必要な場合のみ）
 		if (!calculationResults) {
 			updateCalculationResults()
 		}
@@ -126,22 +120,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	}, [
 		captureData,
 		initialCaptureData,
-		adaptationMultiplier,
 		calculationResults,
 		updateCalculationResults,
 		updateBaselineDamageResult,
 	])
 
-	// 選択されている敵の名前を取得（useCallbackで最適化）
-	const getSelectedEnemyName = useCallback((): string => {
-		if (calculatorData.enemy?.selectedEnemyId) {
-			const enemy = getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
-			if (enemy) {
-				return enemy.name
-			}
-		}
-		return '未選択'
-	}, [calculatorData.enemy?.selectedEnemyId])
 
 	// 実際のダメージ計算
 	const damageResults = useMemo((): DamageCalculationServiceResult => {
@@ -473,122 +456,13 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				</div>
 
 				{/* 慣れ倍率スライダー */}
-				<div className="sm:p-2 border-b-2 border-blue-200">
-					<div className="flex items-center gap-2 sm:gap-4">
-						<div className="flex items-center gap-2">
-							<label className="text-[13px] font-semibold text-gray-700">
-								慣れ倍率
-							</label>
-							<div className="text-[13px] font-semibold text-gray-700 min-w-12 text-center">
-								{adaptationMultiplier}%
-							</div>
-						</div>
-						<div className="flex-1">
-							<input
-								type="range"
-								min="50"
-								max="250"
-								value={adaptationMultiplier}
-								onChange={(e) =>
-									updateAdaptationMultiplier(Number(e.target.value))
-								}
-								className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
-								style={{
-									background: `linear-gradient(to right, oklch(62.3% 0.214 259.815 / .8) 0%, oklch(62.3% 0.214 259.815 / .8) ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
-								}}
-							/>
-						</div>
-						<div className="flex items-center gap-1">
-							<input
-								type="number"
-								min="50"
-								max="250"
-								step="1"
-								value={tempAdaptationValue}
-								onChange={(e) => {
-									const inputValue = e.target.value
-
-									// 入力値をローカル状態に保存（バックスペース削除を可能にするため）
-									setTempAdaptationValue(inputValue)
-
-									// 空文字列の場合は処理終了（入力中の状態を保持）
-									if (inputValue === '') {
-										return
-									}
-
-									// 数値のみを許可（正規表現チェック）
-									if (!/^\d+$/.test(inputValue)) {
-										return
-									}
-
-									const value = Number(inputValue)
-									// 範囲チェック
-									if (value >= 50 && value <= 250) {
-										updateAdaptationMultiplier(value)
-									} else if (value > 250) {
-										updateAdaptationMultiplier(250)
-									}
-								}}
-								onMouseDown={(e) => {
-									// フォーカス状態でのクリックによる値クリア機能
-									if (document.activeElement === e.target) {
-										updateAdaptationMultiplier(50)
-										setTempAdaptationValue('50')
-										// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
-										setTimeout(() => {
-											const element = e.target as HTMLInputElement
-											if (element) {
-												element.select()
-											}
-										}, 0)
-									}
-								}}
-								onBlur={(e) => {
-									// フォーカスを失った時の最終調整
-									const inputValue = e.target.value
-									if (inputValue === '' || Number.isNaN(Number(inputValue))) {
-										updateAdaptationMultiplier(50)
-										setTempAdaptationValue('50')
-									} else {
-										const value = Number(inputValue)
-										if (value < 50) {
-											updateAdaptationMultiplier(50)
-											setTempAdaptationValue('50')
-										} else if (value > 250) {
-											updateAdaptationMultiplier(250)
-											setTempAdaptationValue('250')
-										}
-									}
-								}}
-								className="w-12 pl-1.5 pr-1 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-							/>
-							<span className="text-xs text-gray-600">%</span>
-						</div>
-					</div>
-					<div className="mt-1 text-xs text-gray-500 ml-0">
-						慣れ倍率は最小50％から最大250％の範囲で変更できます。
-					</div>
-				</div>
+				<AdaptationMultiplierSlider
+					value={adaptationMultiplier}
+					onChange={updateAdaptationMultiplier}
+				/>
 
 				{/* 敵情報 */}
-				<div className="pb-1 sm:p-2">
-					<p className="text-sm font-medium text-gray-700">
-						敵：{getSelectedEnemyName()}
-					</p>
-					{/* 無属性敵選択時の注意書き */}
-					{(() => {
-						const selectedEnemy = calculatorData.enemy?.selectedEnemyId
-							? getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
-							: null
-						return (
-							selectedEnemy?.isNonElemental && (
-								<p className="text-xs text-orange-600 mt-1">
-									※この敵は属性覚醒の有利+25%が適用されません。
-								</p>
-							)
-						)
-					})()}
-				</div>
+				<EnemyInfoDisplay selectedEnemyId={calculatorData.enemy?.selectedEnemyId || null} />
 
 				{/* 威力オプション */}
 				<div className=" sm:p-2">
