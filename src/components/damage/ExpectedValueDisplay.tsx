@@ -227,20 +227,32 @@ function HorizontalBarChart({ data }: { data: Record<string, number> | Occurrenc
 	let cumulativeWidth = 0
 
 	return (
-		<div className="w-full h-8 bg-gray-200 overflow-hidden flex">
-			{Object.entries(data).map(([type, value]) => {
-				const width = value
-				const segment = (
-					<div
-						key={type}
-						className={`h-full ${getBarColor(type)}`}
-						style={{ width: `${width}%` }}
-						title={`${type}: ${formatPercentage(value)}`}
-					/>
-				)
-				cumulativeWidth += width
-				return segment
-			})}
+		<div className="w-full">
+			{/* バーグラフ */}
+			<div className="w-full h-8 bg-gray-200 overflow-hidden flex">
+				{Object.entries(data).map(([type, value]) => {
+					const width = value
+					const segment = (
+						<div
+							key={type}
+							className={`h-full ${getBarColor(type)}`}
+							style={{ width: `${width}%` }}
+							title={`${type}: ${formatPercentage(value)}`}
+						/>
+					)
+					cumulativeWidth += width
+					return segment
+				})}
+			</div>
+			
+			{/* 目盛り */}
+			<div className="relative w-full mt-1">
+				<div className="absolute left-0 text-xs text-gray-500 transform -translate-x-1/2">0</div>
+				<div className="absolute left-1/4 text-xs text-gray-500 transform -translate-x-1/2">25</div>
+				<div className="absolute left-1/2 text-xs text-gray-500 transform -translate-x-1/2">50</div>
+				<div className="absolute left-3/4 text-xs text-gray-500 transform -translate-x-1/2">75</div>
+				<div className="absolute right-0 text-xs text-gray-500 transform translate-x-1/2">100</div>
+			</div>
 		</div>
 	)
 }
