@@ -3,6 +3,11 @@
 import { useState } from 'react'
 import type { ExpectedValueParams } from '@/utils/expectedValueCalculations'
 
+// パーセント表示用のフォーマット関数（小数点以下0の場合は整数表示）
+const formatPercentage = (value: number): string => {
+	return value % 1 === 0 ? `${value}%` : `${value.toFixed(1)}%`
+}
+
 interface ExpectedValueDisplayProps {
 	expectedValue: number
 	averageStability: number
@@ -98,11 +103,13 @@ export default function ExpectedValueDisplay({
 				<div className="bg-white p-4 rounded-lg border">
 					{activeTab === 'basic' && <BasicInfoTab params={params} />}
 					{activeTab === 'ratio' && <RatioDisplayTab />}
-					{activeTab === 'capture' && <CaptureTab 
-						expectedValue={expectedValue}
-						averageStability={averageStability}
-						powerEfficiency={powerEfficiency}
-					/>}
+					{activeTab === 'capture' && (
+						<CaptureTab
+							expectedValue={expectedValue}
+							averageStability={averageStability}
+							powerEfficiency={powerEfficiency}
+						/>
+					)}
 				</div>
 			)}
 		</div>
@@ -125,15 +132,18 @@ function BasicInfoTab({ params }: { params: ExpectedValueParams }) {
 			<div className="text-sm text-gray-600 mb-4">
 				※複数HITの場合、表示は全ての平均値になります。
 			</div>
-			
+
 			<div className="space-y-3">
 				<div>
 					<div className="font-medium text-gray-900 mb-2">
-						1.クリティカル発生率... {criticalRate.toFixed(1)}%
+						1.クリティカル発生率... {formatPercentage(criticalRate)}
 					</div>
 					<div className="ml-4 space-y-1 text-sm text-gray-700">
 						<div>◎自身のクリティカル率： {playerCriticalStat}</div>
-						<div>◎クリティカル発生率100%に必要なクリティカル率： {enemyRequiredCritical}</div>
+						<div>
+							◎クリティカル発生率100%に必要なクリティカル率：{' '}
+							{enemyRequiredCritical}
+						</div>
 						<div className="text-xs text-gray-500 mt-1">
 							※確定クリティカル特性の場合は、クリティカル発生率100%になります。
 						</div>
@@ -142,7 +152,7 @@ function BasicInfoTab({ params }: { params: ExpectedValueParams }) {
 
 				<div>
 					<div className="font-medium text-gray-900 mb-2">
-						2.命中率... {hitRate.toFixed(1)}%
+						2.命中率... {formatPercentage(hitRate)}
 					</div>
 					<div className="ml-4 space-y-1 text-sm text-gray-700">
 						<div>◎自身のHIT値： {playerHitStat}</div>
@@ -175,23 +185,21 @@ function RatioDisplayTab() {
 	}
 
 	return (
-		<div className="space-y-6">
+		<div className="space-y-8">
 			{/* 発生割合 */}
 			<div>
-				<h3 className="font-medium text-gray-900 mb-3">発生割合（%）</h3>
-				<div className="space-y-2">
+				<h3 className="font-medium text-gray-900 mb-4">発生割合（%）</h3>
+				<div className="mb-4">
+					<HorizontalBarChart data={occurrenceRatio} />
+				</div>
+				<div className="flex flex-wrap gap-4 justify-center">
 					{Object.entries(occurrenceRatio).map(([type, value]) => (
-						<div key={type} className="flex items-center">
-							<div className="w-16 text-sm text-gray-700 capitalize">{type}</div>
-							<div className="flex-1 mx-3 bg-gray-200 rounded-full h-4 relative">
-								<div
-									className={`h-4 rounded-full ${getBarColor(type)}`}
-									style={{ width: `${value}%` }}
-								/>
-							</div>
-							<div className="w-12 text-sm text-gray-700 text-right">
-								{value.toFixed(1)}%
-							</div>
+						<div key={type} className="flex items-center gap-2">
+							<div className={`w-4 h-4 rounded ${getBarColor(type)}`} />
+							<span className="text-sm text-gray-700 capitalize">{type}</span>
+							<span className="text-sm text-gray-900 font-medium">
+								{formatPercentage(value)}
+							</span>
 						</div>
 					))}
 				</div>
@@ -199,20 +207,18 @@ function RatioDisplayTab() {
 
 			{/* 与ダメージ割合 */}
 			<div>
-				<h3 className="font-medium text-gray-900 mb-3">与ダメージ割合（%）</h3>
-				<div className="space-y-2">
+				<h3 className="font-medium text-gray-900 mb-4">与ダメージ割合（%）</h3>
+				<div className="mb-4">
+					<HorizontalBarChart data={damageRatio} />
+				</div>
+				<div className="flex flex-wrap gap-4 justify-center">
 					{Object.entries(damageRatio).map(([type, value]) => (
-						<div key={type} className="flex items-center">
-							<div className="w-16 text-sm text-gray-700 capitalize">{type}</div>
-							<div className="flex-1 mx-3 bg-gray-200 rounded-full h-4 relative">
-								<div
-									className={`h-4 rounded-full ${getBarColor(type)}`}
-									style={{ width: `${value}%` }}
-								/>
-							</div>
-							<div className="w-12 text-sm text-gray-700 text-right">
-								{value.toFixed(1)}%
-							</div>
+						<div key={type} className="flex items-center gap-2">
+							<div className={`w-4 h-4 rounded ${getBarColor(type)}`} />
+							<span className="text-sm text-gray-700 capitalize">{type}</span>
+							<span className="text-sm text-gray-900 font-medium">
+								{formatPercentage(value)}
+							</span>
 						</div>
 					))}
 				</div>
@@ -221,19 +227,42 @@ function RatioDisplayTab() {
 	)
 }
 
+// 水平バーチャートコンポーネント
+function HorizontalBarChart({ data }: { data: Record<string, number> }) {
+	let cumulativeWidth = 0
+
+	return (
+		<div className="w-full h-8 bg-gray-200 overflow-hidden flex">
+			{Object.entries(data).map(([type, value]) => {
+				const width = value
+				const segment = (
+					<div
+						key={type}
+						className={`h-full ${getBarColor(type)}`}
+						style={{ width: `${width}%` }}
+						title={`${type}: ${formatPercentage(value)}`}
+					/>
+				)
+				cumulativeWidth += width
+				return segment
+			})}
+		</div>
+	)
+}
+
 // バーの色を取得
 function getBarColor(type: string): string {
 	switch (type) {
 		case 'critical':
-			return 'bg-red-500'
+			return 'bg-yellow-400/90'
 		case 'glaze':
-			return 'bg-orange-400'
+			return 'bg-rose-400/90'
 		case 'white':
-			return 'bg-blue-500'
+			return 'bg-gray-300/90'
 		case 'miss':
-			return 'bg-gray-400'
+			return 'bg-gray-400/90'
 		default:
-			return 'bg-gray-400'
+			return 'bg-gray-200/90'
 	}
 }
 

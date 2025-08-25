@@ -35,8 +35,8 @@ export const calculateHitRate = (
 	// スキル補正
 	const skillBonus = skillMpCost / 10
 	
-	// 最終命中率（100%でキャップ）
-	return Math.min(100, baseHitRate + skillBonus)
+	// 最終命中率（100%でキャップ、小数点以下切り捨て）
+	return Math.floor(Math.min(100, baseHitRate + skillBonus))
 }
 
 // 期待値計算用のパラメーターを取得
