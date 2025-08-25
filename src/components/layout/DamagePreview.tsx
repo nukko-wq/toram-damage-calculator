@@ -27,6 +27,9 @@ import {
 	createInitialOtherOptions,
 	createInitialPowerOptions,
 } from '@/utils/initialData'
+import ExpectedValueDisplay from '@/components/damage/ExpectedValueDisplay'
+import { calculateExpectedValueData } from '@/utils/expectedValueCalculations'
+import { useEnemyData } from '@/hooks/useEnemyData'
 
 interface DamagePreviewProps {
 	isVisible: boolean
@@ -84,6 +87,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	const calculationResults = useCalculatorStore(
 		(state) => state.calculationResults,
 	)
+	
+	// 敵データを取得
+	const { enemyFormData } = useEnemyData()
 	const updateCalculationResults = useCalculatorStore(
 		(state) => state.updateCalculationResults,
 	)
@@ -167,6 +173,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 		}
 	}, [calculatorData, calculationResults, powerOptions, adaptationMultiplier])
+
+	// 期待値表示用データ計算
+	const expectedValueData = useMemo(() => {
+		return calculateExpectedValueData(calculatorData, calculationResults, enemyFormData)
+	}, [calculatorData, calculationResults, enemyFormData])
 
 	// キャプチャボタンクリック処理（useCallbackで最適化）
 	const handleCapture = useCallback(() => {
@@ -320,7 +331,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				className="container mx-auto px-4 h-full overflow-y-auto py-1 sm:py-2"
 				style={{ paddingBottom: '12px' }} // リサイズハンドル分のスペースを確保
 			>
-				{/* ダメージ表示テーブル */}
+				{/* 期待値表示 */}
+				{powerOptions.damageType === 'expected' ? (
+					<ExpectedValueDisplay
+						expectedValue={expectedValueData.expectedValue}
+						averageStability={expectedValueData.averageStability}
+						powerEfficiency={expectedValueData.powerEfficiency}
+						params={expectedValueData.params}
+					/>
+				) : (
+					<>
+						{/* 従来のダメージ表示テーブル */}
 				<div className="overflow-x-auto">
 					<table className="w-full text-sm">
 						<thead>
@@ -1084,6 +1105,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						</div>
 					)}
 				</div>
+					</>
+				)}
 			</div>
 		</div>
 	)
