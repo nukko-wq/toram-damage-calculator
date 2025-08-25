@@ -105,7 +105,16 @@ export default function CrystalCard({
 
 			{/* クリスタ名と選択マーク */}
 			<div className="flex justify-between items-center mb-1 sm:mb-2">
-				<h3 className="font-semibold text-gray-900">{crystal.name}</h3>
+				<h3 className="font-semibold text-gray-900">
+					{'isCustom' in crystal && crystal.isCustom ? (
+						<>
+							<span className="text-gray-900 mr-1">★</span>
+							{crystal.name}
+						</>
+					) : (
+						crystal.name
+					)}
+				</h3>
 				{/* 選択状態のチェックマーク */}
 				{isSelected && (
 					<div className="w-6 h-6 bg-blue-500/80 rounded-full flex items-center justify-center ml-2">
