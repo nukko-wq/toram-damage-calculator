@@ -216,6 +216,10 @@ DamagePreview.tsx において威力オプションが「期待値」に設定�
    - 命中100%に必要なHIT値：EnemyFormの必要HIT
    - 攻撃スキルの消費MP：AttackSkillFormでセットされているスキルの消費MP
 
+3. **平均安定率計算用**
+   - Critical時の安定率：DamagePreviewの威力オプション「Critical」選択時の平均安定率
+   - Graze時の安定率：DamagePreviewの威力オプション「Graze」選択時の平均安定率
+
 ### 計算式の状況
 
 #### クリティカル発生率計算式（検証中）
@@ -270,6 +274,35 @@ DamagePreview.tsx において威力オプションが「期待値」に設定�
 
 **注意事項:**
 - クリティカル発生率計算式は現在検証中のため、実装前に最終確認が必要
+
+#### 平均安定率計算式
+期待値計算で使用する平均安定率の算出方法：
+
+**1. クリティカル系の割合計算**
+Critical + Graze を100%として、CriticalとGrazeの割合を算出：
+
+```
+Critical割合 = Critical発生率 ÷ (Critical発生率 + Graze発生率) × 100%
+Graze割合 = Graze発生率 ÷ (Critical発生率 + Graze発生率) × 100%
+```
+
+**2. 各ダメージタイプの安定率取得**
+- Critical安定率：DamagePreviewの威力オプション「Critical」選択時の平均安定率を取得
+- Graze安定率：DamagePreviewの威力オプション「Graze」選択時の平均安定率を取得
+
+**3. 加重平均による平均安定率算出**
+Critical系の発生割合を重みとして加重平均を計算：
+
+```
+平均安定率 = (Critical安定率 × Critical割合 + Graze安定率 × Graze割合) ÷ 100
+```
+
+**計算例:**
+- Critical発生率：58.24%、Graze発生率：32.76%の場合
+- Critical割合 = 58.24% ÷ (58.24% + 32.76%) × 100% = 64.0%
+- Graze割合 = 32.76% ÷ (58.24% + 32.76%) × 100% = 36.0%
+- Critical安定率：92%、Graze安定率：88%の場合
+- 平均安定率 = (92% × 64.0% + 88% × 36.0%) ÷ 100 = (58.88 + 31.68) ÷ 100 = 90.56%
 
 ### 命中とGrazeの仕様
 
