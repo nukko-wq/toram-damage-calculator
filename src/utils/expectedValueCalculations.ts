@@ -404,6 +404,37 @@ export const calculateExpectedValue = (
 	return Math.floor(expectedValue)
 }
 
+// 威力発揮率を計算
+export const calculatePowerEfficiency = (
+	calculatorData: CalculatorData,
+	calculationResults: CalculationResults | null,
+	expectedValue: number,
+	adaptationMultiplier: number = 100,
+): number => {
+	if (!calculationResults || expectedValue === 0) return 0
+	
+	// Criticalダメージの平均値を取得
+	const criticalDamageResult = calculateDamageWithService(
+		calculatorData,
+		calculationResults,
+		{
+			powerOptions: {
+				...calculatorData.powerOptions || {},
+				damageType: 'critical',
+			},
+			adaptationMultiplier,
+		},
+	)
+	const criticalAverageDamage = criticalDamageResult.normal.average
+	
+	if (criticalAverageDamage === 0) return 0
+	
+	// 威力発揮率 = (期待値 ÷ Criticalの平均ダメージ) × 100
+	const powerEfficiency = (expectedValue / criticalAverageDamage) * 100
+	
+	return Math.round(powerEfficiency * 100) / 100 // 小数点第2位まで
+}
+
 // 期待値表示用のデータ計算
 export const calculateExpectedValueData = (
 	calculatorData: CalculatorData,
@@ -432,10 +463,18 @@ export const calculateExpectedValueData = (
 		adaptationMultiplier,
 	)
 	
+	// 威力発揮率を計算
+	const powerEfficiency = calculatePowerEfficiency(
+		calculatorData,
+		calculationResults,
+		expectedValue,
+		adaptationMultiplier,
+	)
+	
 	return {
 		expectedValue, // 実際の期待値計算
 		averageStability: Math.round(averageStability * 10) / 10, // 小数点以下1桁で丸める
-		powerEfficiency: 88.3, // TODO: 実際の威力発揮率計算
+		powerEfficiency, // 実際の威力発揮率計算
 		params, // 基本情報タブで使用
 		occurrenceRatio, // 割合表示タブで使用（発生割合）
 		damageRatio, // 割合表示タブで使用（与ダメージ割合）

@@ -68,7 +68,7 @@ export default function ExpectedValueDisplay({
 				<div className="text-center border-l border-gray-200 pl-4">
 					<div className="text-sm text-gray-600 mb-1">威力発揮率</div>
 					<div className="text-xl font-bold text-gray-900">
-						{powerEfficiency.toFixed(1)}%
+						{powerEfficiency.toFixed(2)}%
 					</div>
 				</div>
 			</div>
@@ -363,7 +363,7 @@ function CaptureTab({
 					<div className="text-center border-l border-gray-200 pl-4">
 						<div className="text-sm text-gray-600 mb-1">威力発揮率</div>
 						<div className="text-lg font-bold text-gray-900">
-							{capturedData.powerEfficiency.toFixed(1)}%
+							{capturedData.powerEfficiency.toFixed(2)}%
 						</div>
 					</div>
 				</div>
