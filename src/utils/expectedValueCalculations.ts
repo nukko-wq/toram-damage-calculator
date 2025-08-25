@@ -192,6 +192,13 @@ export interface OccurrenceRatioData {
 	miss: number
 }
 
+// 与ダメージ割合データの型定義（ミス除外）
+export interface DamageRatioData {
+	critical: number
+	graze: number
+	white: number
+}
+
 // 保証HIT率を考慮した実際の命中率を計算
 export const calculateActualHitRate = (
 	hitRate: number,
@@ -227,6 +234,28 @@ export const calculateOccurrenceRatio = (
 	}
 }
 
+// 与ダメージ割合を計算（ミス除外して正規化）
+export const calculateDamageRatio = (occurrenceRatio: OccurrenceRatioData): DamageRatioData => {
+	const { critical, graze, white } = occurrenceRatio
+	const totalEffectiveDamage = critical + graze + white
+	
+	// 有効ダメージが0の場合は全て0%
+	if (totalEffectiveDamage === 0) {
+		return {
+			critical: 0,
+			graze: 0,
+			white: 0,
+		}
+	}
+	
+	// 正規化（ミスを除外して100%とする）
+	return {
+		critical: Math.floor((critical / totalEffectiveDamage * 100) * 10) / 10,
+		graze: Math.floor((graze / totalEffectiveDamage * 100) * 10) / 10,
+		white: Math.floor((white / totalEffectiveDamage * 100) * 10) / 10,
+	}
+}
+
 // 期待値表示用のダミーデータ（実際の計算ロジック実装まで）
 export const calculateExpectedValueData = (
 	calculatorData: CalculatorData,
@@ -236,12 +265,14 @@ export const calculateExpectedValueData = (
 	const params = getExpectedValueParams(calculatorData, calculationResults, enemyFormData)
 	const weaponType = calculatorData.mainWeapon.weaponType
 	const occurrenceRatio = calculateOccurrenceRatio(params.criticalRate, params.hitRate, weaponType)
+	const damageRatio = calculateDamageRatio(occurrenceRatio)
 	
 	return {
 		expectedValue: 1250, // TODO: 実際の期待値計算
 		averageStability: 92.5, // TODO: 実際の平均安定率計算
 		powerEfficiency: 88.3, // TODO: 実際の威力発揮率計算
 		params, // 基本情報タブで使用
-		occurrenceRatio, // 割合表示タブで使用
+		occurrenceRatio, // 割合表示タブで使用（発生割合）
+		damageRatio, // 割合表示タブで使用（与ダメージ割合）
 	}
 }

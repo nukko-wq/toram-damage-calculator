@@ -339,6 +339,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 						powerEfficiency={expectedValueData.powerEfficiency}
 						params={expectedValueData.params}
 						occurrenceRatio={expectedValueData.occurrenceRatio}
+						damageRatio={expectedValueData.damageRatio}
 					/>
 				) : (
 					<>

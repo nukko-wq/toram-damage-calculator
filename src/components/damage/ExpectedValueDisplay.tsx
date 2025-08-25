@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { ExpectedValueParams, OccurrenceRatioData } from '@/utils/expectedValueCalculations'
+import type { ExpectedValueParams, OccurrenceRatioData, DamageRatioData } from '@/utils/expectedValueCalculations'
 
 // パーセント表示用のフォーマット関数（小数点以下0の場合は整数表示）
 const formatPercentage = (value: number): string => {
@@ -14,6 +14,7 @@ interface ExpectedValueDisplayProps {
 	powerEfficiency: number
 	params: ExpectedValueParams
 	occurrenceRatio: OccurrenceRatioData
+	damageRatio: DamageRatioData
 }
 
 type TabType = 'basic' | 'ratio' | 'capture' | 'compare'
@@ -24,6 +25,7 @@ export default function ExpectedValueDisplay({
 	powerEfficiency,
 	params,
 	occurrenceRatio,
+	damageRatio,
 }: ExpectedValueDisplayProps) {
 	const [activeTab, setActiveTab] = useState<TabType | null>(null)
 
@@ -58,6 +60,7 @@ export default function ExpectedValueDisplay({
 			{/* タブメニュー */}
 			<div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
 				<button
+					type="button"
 					onClick={() => handleTabClick('basic')}
 					className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
 						activeTab === 'basic'
@@ -68,6 +71,7 @@ export default function ExpectedValueDisplay({
 					基本情報
 				</button>
 				<button
+					type="button"
 					onClick={() => handleTabClick('ratio')}
 					className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
 						activeTab === 'ratio'
@@ -78,6 +82,7 @@ export default function ExpectedValueDisplay({
 					割合表示
 				</button>
 				<button
+					type="button"
 					onClick={() => handleTabClick('capture')}
 					className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
 						activeTab === 'capture'
@@ -88,6 +93,7 @@ export default function ExpectedValueDisplay({
 					一時記録
 				</button>
 				<button
+					type="button"
 					onClick={() => handleTabClick('compare')}
 					className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors opacity-50 cursor-not-allowed ${
 						activeTab === 'compare'
@@ -104,7 +110,7 @@ export default function ExpectedValueDisplay({
 			{activeTab && (
 				<div className="bg-white p-4 rounded-lg border">
 					{activeTab === 'basic' && <BasicInfoTab params={params} />}
-					{activeTab === 'ratio' && <RatioDisplayTab occurrenceRatio={occurrenceRatio} />}
+					{activeTab === 'ratio' && <RatioDisplayTab occurrenceRatio={occurrenceRatio} damageRatio={damageRatio} />}
 					{activeTab === 'capture' && (
 						<CaptureTab
 							expectedValue={expectedValue}
@@ -170,14 +176,7 @@ function BasicInfoTab({ params }: { params: ExpectedValueParams }) {
 }
 
 // 割合表示タブ
-function RatioDisplayTab({ occurrenceRatio }: { occurrenceRatio: OccurrenceRatioData }) {
-	// 与ダメージ割合（仮データ - TODO: 実際の計算実装）
-	const damageRatio = {
-		critical: 60.0,
-		graze: 25.0,
-		white: 15.0,
-		miss: 0.0,
-	}
+function RatioDisplayTab({ occurrenceRatio, damageRatio }: { occurrenceRatio: OccurrenceRatioData; damageRatio: DamageRatioData }) {
 
 	return (
 		<div className="space-y-8">
@@ -223,16 +222,14 @@ function RatioDisplayTab({ occurrenceRatio }: { occurrenceRatio: OccurrenceRatio
 }
 
 // 水平バーチャートコンポーネント
-function HorizontalBarChart({ data }: { data: Record<string, number> | OccurrenceRatioData }) {
-	let cumulativeWidth = 0
-
+function HorizontalBarChart({ data }: { data: Record<string, number> | OccurrenceRatioData | DamageRatioData }) {
 	return (
 		<div className="w-full">
 			{/* バーグラフ */}
 			<div className="w-full h-8 bg-gray-200 overflow-hidden flex">
 				{Object.entries(data).map(([type, value]) => {
 					const width = value
-					const segment = (
+					return (
 						<div
 							key={type}
 							className={`h-full ${getBarColor(type)}`}
@@ -240,8 +237,6 @@ function HorizontalBarChart({ data }: { data: Record<string, number> | Occurrenc
 							title={`${type}: ${formatPercentage(value)}`}
 						/>
 					)
-					cumulativeWidth += width
-					return segment
 				})}
 			</div>
 			
@@ -306,6 +301,7 @@ function CaptureTab({
 			{/* キャプチャボタン */}
 			<div className="flex justify-center">
 				<button
+					type="button"
 					onClick={handleCapture}
 					className="px-4 py-2 bg-blue-500/80 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-2"
 				>
@@ -314,6 +310,7 @@ function CaptureTab({
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"
+						aria-hidden="true"
 					>
 						<path
 							strokeLinecap="round"
