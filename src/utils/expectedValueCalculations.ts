@@ -7,6 +7,7 @@ import type { CalculationResults } from '@/types/calculationResult'
 import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
 import { calculateRaidBossStats } from '@/utils/raidBossCalculation'
+import { getAttackSkillById } from '@/data/attackSkills'
 
 // クリティカル発生率を計算
 export const calculateCriticalRate = (
@@ -135,8 +136,10 @@ export const getExpectedValueParams = (
 	const enemyRequiredCritical = getEnemyResistCritical(enemyFormData)
 	const enemyRequiredHit = getEnemyRequiredHit(enemyFormData)
 	
-	// AttackSkillFormから取得（現在は未実装のためデフォルト値）
-	const skillMpCost = 0 // TODO: 攻撃スキルの消費MPを取得
+	// AttackSkillFormから取得
+	const skillMpCost = calculatorData.attackSkill.selectedSkillId 
+		? getAttackSkillById(calculatorData.attackSkill.selectedSkillId)?.mpCost || 0
+		: 0
 	
 	// 計算
 	const criticalRate = calculateCriticalRate(playerCriticalStat, enemyRequiredCritical)
