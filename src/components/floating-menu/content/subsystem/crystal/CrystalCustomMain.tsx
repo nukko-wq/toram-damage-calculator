@@ -95,12 +95,12 @@ export default function CrystalCustomMain() {
 		if (existingCrystal) {
 			// 編集モードに設定
 			setCrystalEditMode('edit', crystalId)
-			
+
 			// 既存データを各フォームにプリセット
 			selectCrystalType(existingCrystal.type)
 			setCrystalName(existingCrystal.name)
 			updateCrystalFormData(existingCrystal.properties)
-			
+
 			// タイプ選択画面から開始
 			navigateToScreen('type_selection')
 		}
@@ -260,21 +260,21 @@ export default function CrystalCustomMain() {
 							<button
 								type="button"
 								onClick={handleNewRegistration}
-								className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium cursor-pointer"
+								className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium cursor-pointer"
 							>
 								新規登録
 							</button>
 							<button
 								type="button"
 								onClick={handleEditContent}
-								className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium cursor-pointer"
+								className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors font-medium cursor-pointer"
 							>
 								内容変更
 							</button>
 							<button
 								type="button"
 								onClick={handleDeleteRegistration}
-								className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium cursor-pointer"
+								className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors font-medium cursor-pointer"
 							>
 								登録削除
 							</button>

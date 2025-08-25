@@ -1,7 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 
 interface FullScreenModalProps {
 	isOpen: boolean
@@ -32,18 +32,42 @@ export default function FullScreenModal({
 		}
 	}, [isOpen, onClose])
 
-	// 背景スクロール防止
+	// スクロール位置保存用ref
+	const scrollPositionRef = useRef<number>(0)
+
+	// 背景スクロール防止（position: fixed方式）
+	const lockScroll = useCallback(() => {
+		// 現在のスクロール位置を保存
+		scrollPositionRef.current = window.pageYOffset || document.documentElement.scrollTop
+		
+		// bodyを固定してスクロールを防止
+		document.body.style.position = 'fixed'
+		document.body.style.top = `-${scrollPositionRef.current}px`
+		document.body.style.width = '100%'
+	}, [])
+
+	const unlockScroll = useCallback(() => {
+		// bodyのスタイルをリセット
+		document.body.style.position = ''
+		document.body.style.top = ''
+		document.body.style.width = ''
+		
+		// 保存したスクロール位置に復元
+		window.scrollTo(0, scrollPositionRef.current)
+	}, [])
+
 	useEffect(() => {
 		if (isOpen) {
-			document.body.style.overflow = 'hidden'
+			lockScroll()
 		} else {
-			document.body.style.overflow = ''
+			unlockScroll()
 		}
 
 		return () => {
-			document.body.style.overflow = ''
+			// クリーンアップ時に確実にスタイルをリセット
+			unlockScroll()
 		}
-	}, [isOpen])
+	}, [isOpen, lockScroll, unlockScroll])
 
 	const handleBackgroundClick = (e: React.MouseEvent) => {
 		// 背景クリックでは閉じない（意図的な操作のみで閉じる）
@@ -63,13 +87,13 @@ export default function FullScreenModal({
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.3, ease: 'easeInOut' }}
-					className="fixed inset-0 z-[10000] bg-black bg-opacity-50"
+					className="fixed inset-0 z-[10000] bg-white bg-opacity-50"
 					onClick={handleBackgroundClick}
 				>
 					<motion.div
-						initial={{ opacity: 0, y: 50 }}
-						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: 50 }}
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
 						transition={{ duration: 0.3, ease: 'easeInOut' }}
 						className="h-full w-full bg-white shadow-2xl flex flex-col"
 						onClick={handleContentClick}

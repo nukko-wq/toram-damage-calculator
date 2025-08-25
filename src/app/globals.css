@@ -26,6 +26,19 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
+/* スクロールバーによるレイアウトシフト対策 */
+html {
+	/* モダンブラウザ: スクロールガター予約でレイアウトシフト防止 */
+	scrollbar-gutter: stable;
+}
+
+/* フォールバック: 古いブラウザ向けの対策 */
+@supports not (scrollbar-gutter: stable) {
+	html {
+		overflow-y: scroll; /* 常にスクロールバーを表示してレイアウト安定 */
+	}
+}
+
 @media (width >= 48rem) {
 	.grid-custom-layout {
 		grid-template-columns: repeat(4, 1fr);

@@ -318,7 +318,7 @@ export default function EquipmentCard({
 				<h3 className="font-semibold text-gray-900">
 					{'isCustom' in equipment && equipment.isCustom ? (
 						<>
-							<span className="text-yellow-500 mr-1">★</span>
+							<span className="text-gray-900 mr-1">★</span>
 							{equipment.name}
 						</>
 					) : (

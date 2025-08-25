@@ -220,7 +220,7 @@ export default function AttackSkillForm({
 	}, [])
 
 	return (
-		<div className="space-y-4 p-4 shadow-md rounded-lg bg-white xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8 max-w-full overflow-hidden">
+		<div className="space-y-4 p-4 shadow-md rounded-lg bg-white md:col-start-4 md:col-end-9 md:row-start-6 md:row-end-8 xl:col-start-3 xl:col-end-4 xl:row-start-6 xl:row-end-8 max-w-full overflow-hidden">
 			<h2 className="text-lg font-bold text-gray-800 mb-3">攻撃スキル</h2>
 
 			{/* スキル選択セクション */}

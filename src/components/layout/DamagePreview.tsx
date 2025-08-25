@@ -22,11 +22,16 @@ import {
 	getCurrentBraveMultiplier,
 	getCurrentPassiveMultiplier,
 } from '@/utils/damagePreviewCalculations'
-import { getPresetEnemyById } from '@/utils/enemyDatabase'
 import {
 	createInitialOtherOptions,
 	createInitialPowerOptions,
 } from '@/utils/initialData'
+import ExpectedValueDisplay from '@/components/damage/ExpectedValueDisplay'
+import { calculateExpectedValueData } from '@/utils/expectedValueCalculations'
+import { useEnemyData } from '@/hooks/useEnemyData'
+import AdaptationMultiplierSlider from '@/components/ui/AdaptationMultiplierSlider'
+import EnemyInfoDisplay from '@/components/ui/EnemyInfoDisplay'
+import DamageTable from '@/components/ui/DamageTable'
 
 interface DamagePreviewProps {
 	isVisible: boolean
@@ -71,10 +76,6 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		(state) => state.updateAdaptationMultiplier,
 	)
 
-	// 入力中の一時的な値を管理するローカル状態
-	const [tempAdaptationValue, setTempAdaptationValue] = useState<string>(
-		adaptationMultiplier.toString(),
-	)
 
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
@@ -84,6 +85,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	const calculationResults = useCalculatorStore(
 		(state) => state.calculationResults,
 	)
+	
+	// 敵データを取得
+	const { enemyFormData } = useEnemyData()
 	const updateCalculationResults = useCalculatorStore(
 		(state) => state.updateCalculationResults,
 	)
@@ -105,10 +109,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			setCaptureData(initialCaptureData)
 		}
 
-		// 2. adaptationMultiplierが変更されたときにtempAdaptationValueを同期
-		setTempAdaptationValue(adaptationMultiplier.toString())
-
-		// 3. 計算結果を更新（必要な場合のみ）
+		// 2. 計算結果を更新（必要な場合のみ）
 		if (!calculationResults) {
 			updateCalculationResults()
 		}
@@ -120,22 +121,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	}, [
 		captureData,
 		initialCaptureData,
-		adaptationMultiplier,
 		calculationResults,
 		updateCalculationResults,
 		updateBaselineDamageResult,
 	])
 
-	// 選択されている敵の名前を取得（useCallbackで最適化）
-	const getSelectedEnemyName = useCallback((): string => {
-		if (calculatorData.enemy?.selectedEnemyId) {
-			const enemy = getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
-			if (enemy) {
-				return enemy.name
-			}
-		}
-		return '未選択'
-	}, [calculatorData.enemy?.selectedEnemyId])
 
 	// 実際のダメージ計算
 	const damageResults = useMemo((): DamageCalculationServiceResult => {
@@ -167,6 +157,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 			}
 		}
 	}, [calculatorData, calculationResults, powerOptions, adaptationMultiplier])
+
+	// 期待値表示用データ計算
+	const expectedValueData = useMemo(() => {
+		return calculateExpectedValueData(calculatorData, calculationResults, enemyFormData, adaptationMultiplier)
+	}, [calculatorData, calculationResults, enemyFormData, adaptationMultiplier])
 
 	// キャプチャボタンクリック処理（useCallbackで最適化）
 	const handleCapture = useCallback(() => {
@@ -320,252 +315,32 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				className="container mx-auto px-4 h-full overflow-y-auto py-1 sm:py-2"
 				style={{ paddingBottom: '12px' }} // リサイズハンドル分のスペースを確保
 			>
-				{/* ダメージ表示テーブル */}
-				<div className="overflow-x-auto">
-					<table className="w-full text-sm">
-						<thead>
-							<tr className="border-b border-gray-200">
-								<th className="sm:px-2 py-3 text-left text-gray-700 font-medium" />
-								<th
-									className="px-1 sm:px-2 py-1 sm:py-3 text-center text-gray-700 font-medium"
-									colSpan={2}
-								>
-									現在の計算結果
-								</th>
-								<th
-									className="px-1 py-1 sm:px-2 sm:py-3 text-center text-gray-700 font-medium"
-									colSpan={2}
-								>
-									<button
-										onClick={handleCapture}
-										className="px-3 py-1 bg-blue-500/80 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center gap-1 cursor-pointer text-sm mx-auto"
-									>
-										<svg
-											className="w-3 h-3"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-											/>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-											/>
-										</svg>
-										キャプチャ
-									</button>
-								</th>
-							</tr>
-							<tr className="border-b border-gray-200">
-								<th className="sm:px-2 py-0.5 text-left text-gray-700 font-medium" />
-								<th className="px-1 sm:px-2 py-0.5 text-center text-gray-700 font-medium">
-									ダメージ
-								</th>
-								<th className="px-1 sm:px-2 py-0.5 text-center text-gray-700 font-medium">
-									安定率
-								</th>
-								<th className="px-1 sm:px-2 py-0.5 text-center text-gray-700 font-medium">
-									ダメージ
-								</th>
-								<th className="px-1 sm:px-2 py-0.5 text-center text-gray-700 font-medium">
-									安定率
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr className="border-b border-gray-100">
-								<td className="px-1 sm:pl-4 sm:pr-2 pb-0.5 pt-1 font-medium text-gray-700">
-									最小
-								</td>
-								<td className="pl-1 pr-2 sm:px-4 pb-0.5 pt-1 text-right font-semibold text-gray-700 font-roboto">
-									{damageResults.normal.min.toLocaleString()}
-								</td>
-								<td className="px-1 sm:px-4 pb-0.5 pt-1 text-center text-gray-700 font-roboto">
-									{damageResults.normal.stability}%
-								</td>
-								<td className="pl-1 pr-2 sm:px-4 pb-0.5 pt-1 text-right font-semibold text-gray-700 font-roboto">
-									{captureData
-										? captureData.damageResult.minimum.damage.toLocaleString()
-										: 'データなし'}
-								</td>
-								<td className="px-1 sm:px-4 pb-0.5 pt-1 text-center text-gray-700 font-roboto">
-									{captureData
-										? `${captureData.damageResult.minimum.stability}%`
-										: '-'}
-								</td>
-							</tr>
-							<tr className="border-b border-gray-100">
-								<td className="px-1 sm:px-4 py-0.5 font-medium text-gray-700">
-									最大
-								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-semibold text-gray-700 font-roboto">
-									{damageResults.normal.max.toLocaleString()}
-								</td>
-								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
-									{damageResults.normal.maxStability
-										? `${damageResults.normal.maxStability}%`
-										: '100%'}
-								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-semibold text-gray-700 font-roboto">
-									{captureData
-										? captureData.damageResult.maximum.damage.toLocaleString()
-										: 'データなし'}
-								</td>
-								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
-									{captureData
-										? `${captureData.damageResult.maximum.stability}%`
-										: '-'}
-								</td>
-							</tr>
-							<tr>
-								<td className="px-1 sm:px-4 py-0.5 font-medium text-gray-700">
-									平均
-								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-bold text-gray-700 font-roboto">
-									{damageResults.normal.average.toLocaleString()}
-								</td>
-								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
-									{damageResults.normal.averageStability}%
-								</td>
-								<td className="pl-1 pr-2 sm:px-4 py-0.5 text-right font-bold text-gray-700 font-roboto">
-									{captureData
-										? captureData.damageResult.average.damage.toLocaleString()
-										: 'データなし'}
-								</td>
-								<td className="px-1 sm:px-4 py-0.5 text-center text-gray-600 font-roboto">
-									{captureData
-										? `${captureData.damageResult.average.stability}%`
-										: '-'}
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				{/* ダメージ表示部分 */}
+				{powerOptions.damageType === 'expected' ? (
+					<ExpectedValueDisplay
+						expectedValue={expectedValueData.expectedValue}
+						averageStability={expectedValueData.averageStability}
+						powerEfficiency={expectedValueData.powerEfficiency}
+						params={expectedValueData.params}
+						occurrenceRatio={expectedValueData.occurrenceRatio}
+						damageRatio={expectedValueData.damageRatio}
+					/>
+				) : (
+					<DamageTable
+						damageResults={damageResults.normal}
+						captureData={captureData}
+						onCapture={handleCapture}
+					/>
+				)}
 
 				{/* 慣れ倍率スライダー */}
-				<div className="sm:p-2 border-b-2 border-blue-200">
-					<div className="flex items-center gap-2 sm:gap-4">
-						<div className="flex items-center gap-2">
-							<label className="text-[13px] font-semibold text-gray-700">
-								慣れ倍率
-							</label>
-							<div className="text-[13px] font-semibold text-gray-700 min-w-12 text-center">
-								{adaptationMultiplier}%
-							</div>
-						</div>
-						<div className="flex-1">
-							<input
-								type="range"
-								min="50"
-								max="250"
-								value={adaptationMultiplier}
-								onChange={(e) =>
-									updateAdaptationMultiplier(Number(e.target.value))
-								}
-								className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-thumb"
-								style={{
-									background: `linear-gradient(to right, oklch(62.3% 0.214 259.815 / .8) 0%, oklch(62.3% 0.214 259.815 / .8) ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb ${((adaptationMultiplier - 50) / (250 - 50)) * 100}%, #e5e7eb 100%)`,
-								}}
-							/>
-						</div>
-						<div className="flex items-center gap-1">
-							<input
-								type="number"
-								min="50"
-								max="250"
-								step="1"
-								value={tempAdaptationValue}
-								onChange={(e) => {
-									const inputValue = e.target.value
-
-									// 入力値をローカル状態に保存（バックスペース削除を可能にするため）
-									setTempAdaptationValue(inputValue)
-
-									// 空文字列の場合は処理終了（入力中の状態を保持）
-									if (inputValue === '') {
-										return
-									}
-
-									// 数値のみを許可（正規表現チェック）
-									if (!/^\d+$/.test(inputValue)) {
-										return
-									}
-
-									const value = Number(inputValue)
-									// 範囲チェック
-									if (value >= 50 && value <= 250) {
-										updateAdaptationMultiplier(value)
-									} else if (value > 250) {
-										updateAdaptationMultiplier(250)
-									}
-								}}
-								onMouseDown={(e) => {
-									// フォーカス状態でのクリックによる値クリア機能
-									if (document.activeElement === e.target) {
-										updateAdaptationMultiplier(50)
-										setTempAdaptationValue('50')
-										// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
-										setTimeout(() => {
-											const element = e.target as HTMLInputElement
-											if (element) {
-												element.select()
-											}
-										}, 0)
-									}
-								}}
-								onBlur={(e) => {
-									// フォーカスを失った時の最終調整
-									const inputValue = e.target.value
-									if (inputValue === '' || Number.isNaN(Number(inputValue))) {
-										updateAdaptationMultiplier(50)
-										setTempAdaptationValue('50')
-									} else {
-										const value = Number(inputValue)
-										if (value < 50) {
-											updateAdaptationMultiplier(50)
-											setTempAdaptationValue('50')
-										} else if (value > 250) {
-											updateAdaptationMultiplier(250)
-											setTempAdaptationValue('250')
-										}
-									}
-								}}
-								className="w-12 pl-1.5 pr-1 py-1 text-[13px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-							/>
-							<span className="text-xs text-gray-600">%</span>
-						</div>
-					</div>
-					<div className="mt-1 text-xs text-gray-500 ml-0">
-						慣れ倍率は最小50％から最大250％の範囲で変更できます。
-					</div>
-				</div>
+				<AdaptationMultiplierSlider
+					value={adaptationMultiplier}
+					onChange={updateAdaptationMultiplier}
+				/>
 
 				{/* 敵情報 */}
-				<div className="pb-1 sm:p-2">
-					<p className="text-sm font-medium text-gray-700">
-						敵：{getSelectedEnemyName()}
-					</p>
-					{/* 無属性敵選択時の注意書き */}
-					{(() => {
-						const selectedEnemy = calculatorData.enemy?.selectedEnemyId
-							? getPresetEnemyById(calculatorData.enemy.selectedEnemyId)
-							: null
-						return (
-							selectedEnemy?.isNonElemental && (
-								<p className="text-xs text-orange-600 mt-1">
-									※この敵は属性覚醒の有利+25%が適用されません。
-								</p>
-							)
-						)
-					})()}
-				</div>
+				<EnemyInfoDisplay selectedEnemyId={calculatorData.enemy?.selectedEnemyId || null} />
 
 				{/* 威力オプション */}
 				<div className=" sm:p-2">
