@@ -4,7 +4,7 @@ import { SkillHitCalculator } from './SkillHitCalculator'
 /**
  * トールハンマー(追撃8hit)用計算機
  * - 1hit目: 固定倍率1500%, 固定値400
- * - 2hit目: (200+補正後INT×10%)×36の動的倍率, 固定値200
+ * - 2hit目: INT((200+補正後INT×10%)×1) + INT((200+補正後INT×10%)×2) + ... + INT((200+補正後INT×10%)×8), 固定値200
  */
 export class ThorHammerFollowup8HitCalculator extends SkillHitCalculator {
 	calculate(input: SkillCalculationInput): SkillCalculationResult {
@@ -21,20 +21,26 @@ export class ThorHammerFollowup8HitCalculator extends SkillHitCalculator {
 			}
 		} else if (input.hitNumber === 2) {
 			// 2hit目: 追撃部分
-			// (200+補正後INT×10%)×36の計算
+			// INT((200+INT(補正後INT×10%))×1) + INT((200+INT(補正後INT×10%))×2) + ... + INT((200+INT(補正後INT×10%))×8)の計算
 			const adjustedINT = input.playerStats.adjustedINT
-			const baseMultiplier = 200 + adjustedINT * 0.1
-			const totalMultiplier = baseMultiplier * 36 // 1倍+2倍+3倍+4倍+5倍+6倍+7倍+8倍=36倍
+			const intBonus = Math.floor(adjustedINT * 0.1) // INT(補正後INT×10%)
+			const baseMultiplier = 200 + intBonus
+			const hit1 = Math.floor(baseMultiplier * 1) // INT((200+INT(補正後INT×10%))×1)
+			const hit2 = Math.floor(baseMultiplier * 2) // INT((200+INT(補正後INT×10%))×2)
+			const hit3 = Math.floor(baseMultiplier * 3) // INT((200+INT(補正後INT×10%))×3)
+			const hit4 = Math.floor(baseMultiplier * 4) // INT((200+INT(補正後INT×10%))×4)
+			const hit5 = Math.floor(baseMultiplier * 5) // INT((200+INT(補正後INT×10%))×5)
+			const hit6 = Math.floor(baseMultiplier * 6) // INT((200+INT(補正後INT×10%))×6)
+			const hit7 = Math.floor(baseMultiplier * 7) // INT((200+INT(補正後INT×10%))×7)
+			const hit8 = Math.floor(baseMultiplier * 8) // INT((200+INT(補正後INT×10%))×8)
+			const totalMultiplier = hit1 + hit2 + hit3 + hit4 + hit5 + hit6 + hit7 + hit8
 			const fixedDamage = 200
-
-			// 小数点第2位までに丸める
-			const roundedMultiplier = Math.round(totalMultiplier * 100) / 100
 
 			return {
 				hitNumber: 2,
-				calculatedMultiplier: roundedMultiplier,
+				calculatedMultiplier: totalMultiplier,
 				calculatedFixedDamage: fixedDamage,
-				calculationProcess: `トールハンマー(追撃): (200+補正後INT(${adjustedINT})×10%)×36 = (200+${adjustedINT * 0.1})×36 = ${roundedMultiplier}% + 固定値${fixedDamage}`,
+				calculationProcess: `トールハンマー(追撃): INT((200+INT(補正後INT(${adjustedINT})×10%))×1~8) = INT((200+${intBonus})×1~8) = ${hit1}+${hit2}+${hit3}+${hit4}+${hit5}+${hit6}+${hit7}+${hit8} = ${totalMultiplier}% + 固定値${fixedDamage}`,
 			}
 		}
 
