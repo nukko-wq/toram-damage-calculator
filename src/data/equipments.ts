@@ -141,6 +141,19 @@ export const equipmentsData: EquipmentsData = {
 					NaturalHPRecovery: -30,
 				},
 			},
+			{
+				id: 'ed3069b9-0cb1-4776-ad89-a9d64253a3d7',
+				name: '弓汎用A10%D10%CD21CD%10C30',
+				properties: {
+					ATK_Rate: 10,
+					DEX_Rate: 10,
+					CriticalDamage: 21,
+					CriticalDamage_Rate: 10,
+					Critical: 30,
+					Dodge: -22,
+					NaturalHPRecovery: -30,
+				},
+			},
 		],
 		body: [
 			{
@@ -605,6 +618,15 @@ export const equipmentsData: EquipmentsData = {
 					CastingSpeed: 300,
 					LightResistance_Rate: 30,
 					Aggro_Rate: 60,
+				},
+			},
+			{
+				id: '22ec7788-9d15-44d6-95e4-0d75fab1c4f4',
+				name: '怪鳥の貫矢',
+				properties: {
+					CastingSpeed_Rate: 10,
+					PhysicalPenetration_Rate: 10,
+					ArmorBreak_Rate: 10,
 				},
 			},
 		],
