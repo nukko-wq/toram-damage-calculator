@@ -1,4 +1,5 @@
 export { BusterBladeCalculator } from './BusterBladeCalculator'
+export { CrossFire3ChargeCalculator } from './CrossFire3ChargeCalculator'
 export { CycloneArrowCalculator } from './CycloneArrowCalculator'
 export { LBoomerang3Calculator } from './LBoomerang3Calculator'
 export { MagicArrowCalculator } from './MagicArrowCalculator'

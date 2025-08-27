@@ -760,6 +760,53 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// クロスファイア(3溜め)（弓スキル）
+	{
+		id: 'cross_fire_3_charge',
+		name: 'クロスファイア(3溜め)',
+		order: 501,
+		systemGroup: 'bow',
+		category: 'shoot',
+		weaponTypeRequirements: ['弓', '自動弓'],
+		mpCost: 400,
+		multiplierFormula: '弓:特殊計算、自動弓:2700%/300%x2',
+		fixedDamageFormula: '400/400',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 2850, // 弓装備時の表示用（実際は特殊計算）
+				fixedDamage: 400, // 固定ダメージ400
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['物理貫通'], // 自動弓装備時のみ適用
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 400, // 弓装備時の表示用（200%x2）
+				fixedDamage: 400, // 固定ダメージ400
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['物理貫通'], // 自動弓装備時のみ適用
+			},
+		],
+	},
+
 	// 両手剣スキル（Lブーメラン\u2162）
 	{
 		id: 'l_boomerang_3',
