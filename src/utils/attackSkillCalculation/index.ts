@@ -33,6 +33,9 @@ export class AttackSkillCalculationService {
 	calculateSkill(
 		skillId: string,
 		calculatorData: CalculatorData,
+		variableOptions?: {
+			chargeLevel?: number
+		},
 	): { hits: SkillCalculationResult[] } {
 		const playerStats =
 			SkillCalculationUtils.convertToPlayerStats(calculatorData)
@@ -46,6 +49,7 @@ export class AttackSkillCalculationService {
 			playerStats,
 			equipmentContext,
 			buffSkillContext,
+			variableOptions,
 		)
 
 		return { hits }
