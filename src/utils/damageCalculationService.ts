@@ -48,6 +48,9 @@ export interface DamageCalculationOptions {
 	debug?: boolean
 	powerOptions?: PowerOptions
 	adaptationMultiplier?: number // 慣れ倍率（50-250の範囲）
+	variableOptions?: {
+		chargeLevel?: number // クロスファイア(溜め可変)の場合のみ使用
+	}
 }
 
 /**
@@ -101,6 +104,7 @@ export function calculateDamageWithService(
 		debug = false,
 		powerOptions = createInitialPowerOptions(),
 		adaptationMultiplier = 100,
+		variableOptions,
 	} = options
 
 	// デバッグログを一時的に無効化
@@ -475,6 +479,7 @@ export function calculateDamageWithService(
 				const skillCalculationResult = attackSkillCalculation.calculateSkill(
 					selectedSkill.id,
 					calculatorData,
+					variableOptions,
 				)
 
 				// スキルダメージオプションに応じて計算対象の撃を決定

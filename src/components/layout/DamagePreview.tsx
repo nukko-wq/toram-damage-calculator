@@ -141,11 +141,17 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	// 実際のダメージ計算
 	const damageResults = useMemo((): DamageCalculationServiceResult => {
 		try {
+			// クロスファイア(溜め可変)の場合のvariableOptionsを生成
+			const variableOptions = selectedSkill?.hasVariableCharging 
+				? { chargeLevel }
+				: undefined
+
 			// サービスを使用してダメージ計算を実行
 			return calculateDamageWithService(calculatorData, calculationResults, {
 				powerOptions,
 				debug: false,
 				adaptationMultiplier,
+				variableOptions,
 			})
 		} catch (error) {
 			console.error('ダメージ計算エラー:', error)
@@ -167,7 +173,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 			}
 		}
-	}, [calculatorData, calculationResults, powerOptions, adaptationMultiplier])
+	}, [calculatorData, calculationResults, powerOptions, adaptationMultiplier, selectedSkill, chargeLevel])
 
 	// 期待値表示用データ計算
 	const expectedValueData = useMemo(() => {
