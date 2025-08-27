@@ -28,6 +28,7 @@ import {
 } from '@/utils/initialData'
 import ExpectedValueDisplay from '@/components/damage/ExpectedValueDisplay'
 import { calculateExpectedValueData } from '@/utils/expectedValueCalculations'
+import { getAttackSkillById } from '@/data/attackSkills'
 import { useEnemyData } from '@/hooks/useEnemyData'
 import AdaptationMultiplierSlider from '@/components/ui/AdaptationMultiplierSlider'
 import EnemyInfoDisplay from '@/components/ui/EnemyInfoDisplay'
@@ -39,7 +40,12 @@ interface DamagePreviewProps {
 
 export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	// UIStoreから高さ管理を取得
-	const { damagePreviewHeight, setDamagePreviewHeight } = useUIStore()
+	const { 
+		damagePreviewHeight, 
+		setDamagePreviewHeight,
+		attackSkill: { variableCharge: { chargeLevel } },
+		setChargeLevel,
+	} = useUIStore()
 
 	// リサイズ関連の状態管理
 	const containerRef = useRef<HTMLDivElement>(null)
@@ -85,6 +91,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	const calculationResults = useCalculatorStore(
 		(state) => state.calculationResults,
 	)
+
+	// 現在選択されているスキルを取得
+	const selectedSkill = calculatorData.attackSkill?.selectedSkillId 
+		? getAttackSkillById(calculatorData.attackSkill.selectedSkillId)
+		: null
 	
 	// 敵データを取得
 	const { enemyFormData } = useEnemyData()
@@ -370,6 +381,34 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 					{/* タブコンテンツ */}
 					{optionTab === 'power' && (
 						<div className="space-y-0.5 sm:space-y-1">
+							{/* 溜め回数設定UI（クロスファイア(溜め可変)の場合のみ表示） */}
+							{selectedSkill?.id === 'cross_fire_variable_charge' && (
+								<div className="flex items-center gap-2 mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+									<label 
+										htmlFor="charge-level" 
+										className="text-sm font-medium text-blue-800"
+									>
+										溜め回数:
+									</label>
+									<input
+										id="charge-level"
+										type="number"
+										min={1}
+										max={5}
+										step={1}
+										value={chargeLevel}
+										onChange={(e) => {
+											const level = parseInt(e.target.value) || 1
+											if (level >= 1 && level <= 5) {
+												setChargeLevel(level)
+											}
+										}}
+										className="w-16 px-2 py-1 text-sm border border-blue-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+									/>
+									<span className="text-xs text-blue-600">回 (1-5)</span>
+								</div>
+							)}
+
 							{/* ボス戦難易度 */}
 							<div className="flex items-center sm:gap-4 border-b-2 border-blue-200">
 								<label className="text-xs md:text-[13px] font-semibold text-gray-700 w-24">

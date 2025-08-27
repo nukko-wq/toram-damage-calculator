@@ -909,6 +909,14 @@ export interface AttackSkill {
 	// 特殊効果
 	specialEffects?: string[] // 特殊効果の説明文配列
 
+	// 溜め可変機能
+	hasVariableCharging?: boolean // 溜め可変機能あり
+	chargingRange?: {
+		min: number
+		max: number
+		default: number
+	} // 溜め回数設定範囲
+
 	// メタ情報
 	notes?: string // 実装・使用上の注意
 }

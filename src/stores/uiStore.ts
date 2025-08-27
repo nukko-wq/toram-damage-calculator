@@ -41,6 +41,13 @@ export const useUIStore = create<UIStore>()(
 				statusPreviewHeight: 400, // デフォルトの高さ（400px）
 				damagePreviewHeight: 600, // デフォルトの高さ（600px）
 
+				// 攻撃スキル関連の初期状態
+				attackSkill: {
+					variableCharge: {
+						chargeLevel: 1, // デフォルト1回
+					},
+				},
+
 				// サブシステム関連の初期状態
 				subsystem: {
 					fullScreenModal: {
@@ -564,6 +571,24 @@ export const useUIStore = create<UIStore>()(
 						}),
 						false,
 						'clearDeleteSuccess',
+					)
+				},
+
+				// 攻撃スキル関連アクション
+				setChargeLevel: (level: number) => {
+					if (level < 1 || level > 5) return
+					set(
+						(state) => ({
+							attackSkill: {
+								...state.attackSkill,
+								variableCharge: {
+									...state.attackSkill.variableCharge,
+									chargeLevel: level,
+								},
+							},
+						}),
+						false,
+						'setChargeLevel',
 					)
 				},
 			}),

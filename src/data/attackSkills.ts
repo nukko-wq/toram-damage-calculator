@@ -807,6 +807,59 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// クロスファイア(溜め可変)（弓スキル）
+	{
+		id: 'cross_fire_variable_charge',
+		name: 'クロスファイア(溜め可変)',
+		order: 502,
+		systemGroup: 'bow',
+		category: 'shoot',
+		weaponTypeRequirements: ['弓', '自動弓'],
+		mpCost: 400,
+		multiplierFormula: '弓:特殊計算(溜め可変)、自動弓:特殊計算(溜め可変)',
+		fixedDamageFormula: '400/400',
+		hasVariableCharging: true,
+		chargingRange: {
+			min: 1,
+			max: 5,
+			default: 1,
+		},
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1950, // 弓装備時の表示用（デフォルト値: 溜め1回）
+				fixedDamage: 400, // 固定ダメージ400
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['物理貫通'], // 自動弓装備時のみ適用
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 0, // 弓装備時の表示用（デフォルト値: 溜め1回 = 0%）
+				fixedDamage: 0, // チャージ1の場合固定ダメージ0
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['物理貫通'], // 自動弓装備時のみ適用
+			},
+		],
+	},
+
 	// 両手剣スキル（Lブーメラン\u2162）
 	{
 		id: 'l_boomerang_3',

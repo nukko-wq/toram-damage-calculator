@@ -208,6 +208,13 @@ export interface UIStore {
 	// DamagePreviewの高さ管理（ピクセル値）
 	damagePreviewHeight: number
 
+	// 攻撃スキル関連UI状態
+	attackSkill: {
+		variableCharge: {
+			chargeLevel: number // 1-5, default: 1
+		}
+	}
+
 	// サブシステム関連の状態
 	subsystem: {
 		// 全画面モーダル状態
@@ -302,6 +309,9 @@ export interface UIStore {
 	confirmDeletion: (crystalId: string) => Promise<void>
 	cancelDeletion: () => void
 	clearDeleteSuccess: () => void
+
+	// 攻撃スキル関連アクション
+	setChargeLevel: (level: number) => void
 }
 
 // ===== セーブデータストア =====
