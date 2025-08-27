@@ -816,27 +816,13 @@ export type AttackSkillSystemGroup =
 	| 'other' // その他
 
 export type AttackSkillCategory =
-	// 旧分類（互換性のため残す）
-	| 'sword' // 片手剣
-	| 'twohandSword' // 両手剣
-	| 'bow' // 弓
-	| 'bowgun' // 自動弓
-	| 'staff' // 杖
-	| 'magicDevice' // 魔導具
-	| 'knuckle' // 拳甲
-	| 'halberd' // 旋棍
-	| 'katana' // 刀
-	| 'hunter' // ハンタースキル
-	| 'dualSword' // 双剣
-	| 'martialArts' // 格闘
-	// 新スキルツリー分類
 	| 'blade' // ブレードスキル
 	| 'shoot' // シュートスキル
 	| 'magic' // マジックスキル
 	| 'martial' // マーシャルスキル
-	| 'halberdSkill' // ハルバードスキル
+	| 'halberd' // ハルバードスキル
 	| 'mononofu' // モノノフスキル
-	| 'dualSwordSkill' // デュアルソードスキル
+	| 'dualSword' // デュアルソードスキル
 	| 'crasher' // クラッシャースキル
 	| 'sprite' // スプライトスキル
 	| 'shield' // シールドスキル
