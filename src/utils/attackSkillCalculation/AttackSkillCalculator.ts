@@ -1,6 +1,7 @@
 import { getAttackSkillById } from '@/data/attackSkills'
 import {
 	BusterBladeCalculator,
+	CrossFire3ChargeCalculator,
 	CycloneArrowCalculator,
 	LBoomerang3Calculator,
 	MagicArrowCalculator,
@@ -73,6 +74,8 @@ export class AttackSkillCalculator {
 	 */
 	private getCalculatorForSkill(skillId: string): SkillHitCalculator {
 		switch (skillId) {
+			case 'cross_fire_3_charge':
+				return new CrossFire3ChargeCalculator()
 			case 'l_boomerang_3':
 				return new LBoomerang3Calculator()
 			case 'meteor_breaker':

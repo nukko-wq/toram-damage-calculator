@@ -80,7 +80,7 @@ AttackSkillFormに新しい攻撃スキル「トールハンマー(追撃3hit)�
       fixedDamage: 200,             // 固定値200（追撃用）
       
       // 計算式説明
-      multiplierFormula: '(200+補正後INT×10%)×6 (追撃3hit)',
+      multiplierFormula: 'INT((200+INT(補正後INT×10%))×1) + INT((200+INT(補正後INT×10%))×2) + INT((200+INT(補正後INT×10%))×3) (追撃3hit)',
       fixedDamageFormula: '200',
       
       // 慣れ設定
@@ -105,7 +105,7 @@ AttackSkillFormに新しい攻撃スキル「トールハンマー(追撃3hit)�
 ### 計算タイプ
 - **計算方式**: (保留)
 - **1hit目倍率**: 1500%
-- **2hit目倍率**: (200+補正後INT×10%)×6 (追撃3hit分: 1倍+2倍+3倍)
+- **2hit目倍率**: INT((200+INT(補正後INT×10%))×1) + INT((200+INT(補正後INT×10%))×2) + INT((200+INT(補正後INT×10%))×3) (追撃3hit分)
 - **武器種別補正**: (保留)
 - **1hit目固定値**: 400
 - **2hit目固定値**: 200
@@ -128,15 +128,19 @@ class ThorHammerFollowupCalculator extends SkillHitCalculator {
         calculationProcess: '1500% (メイン攻撃)'
       }
     } else if (input.hitNumber === 2) {
-      // (200+補正後INT×10%)×6の計算
+      // INT((200+INT(補正後INT×10%))×1) + INT((200+INT(補正後INT×10%))×2) + INT((200+INT(補正後INT×10%))×3)の計算
       const adjustedINT = input.adjustedStats?.INT || 0
-      const baseMultiplier = 200 + (adjustedINT * 0.1)
-      const totalMultiplier = baseMultiplier * 6 // 1倍+2倍+3倍=6倍
+      const intBonus = Math.floor(adjustedINT * 0.1) // INT(補正後INT×10%)
+      const baseMultiplier = 200 + intBonus
+      const hit1 = Math.floor(baseMultiplier * 1) // INT((200+INT(補正後INT×10%))×1)
+      const hit2 = Math.floor(baseMultiplier * 2) // INT((200+INT(補正後INT×10%))×2)  
+      const hit3 = Math.floor(baseMultiplier * 3) // INT((200+INT(補正後INT×10%))×3)
+      const totalMultiplier = hit1 + hit2 + hit3
       return {
         hitNumber: 2,
         calculatedMultiplier: totalMultiplier,
         calculatedFixedDamage: 200,
-        calculationProcess: `(200+補正後INT(${adjustedINT})×10%)×6 = (200+${adjustedINT * 0.1})×6 = ${totalMultiplier}%`
+        calculationProcess: `INT((200+INT(補正後INT(${adjustedINT})×10%))×1) + INT((200+INT(${adjustedINT}×10%))×2) + INT((200+INT(${adjustedINT}×10%))×3) = INT((200+${intBonus})×1) + INT((200+${intBonus})×2) + INT((200+${intBonus})×3) = ${hit1} + ${hit2} + ${hit3} = ${totalMultiplier}%`
       }
     }
   }
@@ -165,7 +169,7 @@ class ThorHammerFollowupCalculator extends SkillHitCalculator {
 
 🎯 スキル威力値
 　　1hit目: 倍率1500% | 固定値400
-　　2hit目: 倍率(200+補正後INT×10%)×6 | 固定値200 (追撃3hit)
+　　2hit目: 倍率INT((200+INT(補正後INT×10%))×1)+INT((200+INT(補正後INT×10%))×2)+INT((200+INT(補正後INT×10%))×3) | 固定値200 (追撃3hit)
 　　特殊効果: 確定クリティカル (全hit)
 ```
 
@@ -295,4 +299,4 @@ describe('トールハンマー(追撃3hit) Skill', () => {
 
 **注意**: powerReferenceで使用している`'spearMATK'`は、実装では新しい値として定義が必要になる可能性があります。
 
-**追撃部分について**: 2hit目は追撃3hit分をまとめており、計算式は(200+補正後INT×10%)×1+(200+補正後INT×10%)×2+(200+補正後INT×10%)×3を統合して、(200+補正後INT×10%)×6として表現されます。例：補正後INT=600の場合、(200+60)×6=1560%となります。固定値は200を使用します。
+**追撃部分について**: 2hit目は追撃3hit分をまとめており、計算式はINT((200+INT(補正後INT×10%))×1)+INT((200+INT(補正後INT×10%))×2)+INT((200+INT(補正後INT×10%))×3)として補正後INT×10%の計算と各hitごとの計算の両方でINT()関数で小数点以下を切り捨てます。例：補正後INT=600の場合、INT(600×10%)=60、INT((200+60)×1)+INT((200+60)×2)+INT((200+60)×3)=260+520+780=1560%となります。固定値は200を使用します。

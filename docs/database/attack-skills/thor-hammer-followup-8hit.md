@@ -80,7 +80,7 @@ AttackSkillFormに新しい攻撃スキル「トールハンマー(追撃8hit)�
       fixedDamage: 200,             // 固定値200（追撃用）
       
       // 計算式説明
-      multiplierFormula: '(200+補正後INT×10%)×36 (追撃8hit)',
+      multiplierFormula: 'INT((200+INT(補正後INT×10%))×1) + INT((200+INT(補正後INT×10%))×2) + INT((200+INT(補正後INT×10%))×3) + INT((200+INT(補正後INT×10%))×4) + INT((200+INT(補正後INT×10%))×5) + INT((200+INT(補正後INT×10%))×6) + INT((200+INT(補正後INT×10%))×7) + INT((200+INT(補正後INT×10%))×8) (追撃8hit)',
       fixedDamageFormula: '200',
       
       // 慣れ設定
@@ -105,7 +105,7 @@ AttackSkillFormに新しい攻撃スキル「トールハンマー(追撃8hit)�
 ### 計算タイプ
 - **計算方式**: (保留)
 - **1hit目倍率**: 1500%
-- **2hit目倍率**: (200+補正後INT×10%)×36 (追撃8hit分: 1倍+2倍+3倍+4倍+5倍+6倍+7倍+8倍)
+- **2hit目倍率**: INT((200+INT(補正後INT×10%))×1) + INT((200+INT(補正後INT×10%))×2) + INT((200+INT(補正後INT×10%))×3) + INT((200+INT(補正後INT×10%))×4) + INT((200+INT(補正後INT×10%))×5) + INT((200+INT(補正後INT×10%))×6) + INT((200+INT(補正後INT×10%))×7) + INT((200+INT(補正後INT×10%))×8) (追撃8hit分)
 - **武器種別補正**: (保留)
 - **1hit目固定値**: 400
 - **2hit目固定値**: 200
@@ -128,15 +128,24 @@ class ThorHammerFollowup8HitCalculator extends SkillHitCalculator {
         calculationProcess: '1500% (メイン攻撃)'
       }
     } else if (input.hitNumber === 2) {
-      // (200+補正後INT×10%)×36の計算
+      // INT((200+INT(補正後INT×10%))×1) + INT((200+INT(補正後INT×10%))×2) + ... + INT((200+INT(補正後INT×10%))×8)の計算
       const adjustedINT = input.adjustedStats?.INT || 0
-      const baseMultiplier = 200 + (adjustedINT * 0.1)
-      const totalMultiplier = baseMultiplier * 36 // 1倍+2倍+3倍+4倍+5倍+6倍+7倍+8倍=36倍
+      const intBonus = Math.floor(adjustedINT * 0.1) // INT(補正後INT×10%)
+      const baseMultiplier = 200 + intBonus
+      const hit1 = Math.floor(baseMultiplier * 1) // INT((200+INT(補正後INT×10%))×1)
+      const hit2 = Math.floor(baseMultiplier * 2) // INT((200+INT(補正後INT×10%))×2)
+      const hit3 = Math.floor(baseMultiplier * 3) // INT((200+INT(補正後INT×10%))×3)
+      const hit4 = Math.floor(baseMultiplier * 4) // INT((200+INT(補正後INT×10%))×4)
+      const hit5 = Math.floor(baseMultiplier * 5) // INT((200+INT(補正後INT×10%))×5)
+      const hit6 = Math.floor(baseMultiplier * 6) // INT((200+INT(補正後INT×10%))×6)
+      const hit7 = Math.floor(baseMultiplier * 7) // INT((200+INT(補正後INT×10%))×7)
+      const hit8 = Math.floor(baseMultiplier * 8) // INT((200+INT(補正後INT×10%))×8)
+      const totalMultiplier = hit1 + hit2 + hit3 + hit4 + hit5 + hit6 + hit7 + hit8
       return {
         hitNumber: 2,
         calculatedMultiplier: totalMultiplier,
         calculatedFixedDamage: 200,
-        calculationProcess: `(200+補正後INT(${adjustedINT})×10%)×36 = (200+${adjustedINT * 0.1})×36 = ${totalMultiplier}%`
+        calculationProcess: `INT((200+INT(補正後INT(${adjustedINT})×10%))×1~8) = INT((200+${intBonus})×1~8) = ${hit1}+${hit2}+${hit3}+${hit4}+${hit5}+${hit6}+${hit7}+${hit8} = ${totalMultiplier}%`
       }
     }
   }
@@ -165,7 +174,7 @@ class ThorHammerFollowup8HitCalculator extends SkillHitCalculator {
 
 🎯 スキル威力値
 　　1hit目: 倍率1500% | 固定値400
-　　2hit目: 倍率(200+補正後INT×10%)×36 | 固定値200 (追撃8hit)
+　　2hit目: 倍率INT((200+INT(補正後INT×10%))×1)+INT((200+INT(補正後INT×10%))×2)+INT((200+INT(補正後INT×10%))×3)+INT((200+INT(補正後INT×10%))×4)+INT((200+INT(補正後INT×10%))×5)+INT((200+INT(補正後INT×10%))×6)+INT((200+INT(補正後INT×10%))×7)+INT((200+INT(補正後INT×10%))×8) | 固定値200 (追撃8hit)
 　　特殊効果: 確定クリティカル (全hit)
 ```
 
@@ -295,4 +304,4 @@ describe('トールハンマー(追撃8hit) Skill', () => {
 
 **注意**: powerReferenceで使用している`'spearMATK'`は、実装では新しい値として定義が必要になる可能性があります。
 
-**追撃部分について**: 2hit目は追撃8hit分をまとめており、計算式は(200+補正後INT×10%)×1+(200+補正後INT×10%)×2+(200+補正後INT×10%)×3+(200+補正後INT×10%)×4+(200+補正後INT×10%)×5+(200+補正後INT×10%)×6+(200+補正後INT×10%)×7+(200+補正後INT×10%)×8を統合して、(200+補正後INT×10%)×36として表現されます。例：補正後INT=600の場合、(200+60)×36=9360%となります。固定値は200を使用します。
+**追撃部分について**: 2hit目は追撃8hit分をまとめており、計算式はINT((200+INT(補正後INT×10%))×1)+INT((200+INT(補正後INT×10%))×2)+INT((200+INT(補正後INT×10%))×3)+INT((200+INT(補正後INT×10%))×4)+INT((200+INT(補正後INT×10%))×5)+INT((200+INT(補正後INT×10%))×6)+INT((200+INT(補正後INT×10%))×7)+INT((200+INT(補正後INT×10%))×8)として補正後INT×10%の計算と各hitごとの計算の両方でINT()関数で小数点以下を切り捨てます。例：補正後INT=600の場合、INT(600×10%)=60、INT((200+60)×1)+INT((200+60)×2)+INT((200+60)×3)+INT((200+60)×4)+INT((200+60)×5)+INT((200+60)×6)+INT((200+60)×7)+INT((200+60)×8)=260+520+780+1040+1300+1560+1820+2080=9360%となります。固定値は200を使用します。

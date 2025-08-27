@@ -432,7 +432,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		name: 'トールハンマー(単発)',
 		order: 203,
 		systemGroup: 'halberd',
-		category: 'halberdSkill',
+		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'], // 仮設定、要確定
 		mpCost: 400,
 		multiplierFormula: '1500%',
@@ -464,7 +464,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		name: 'トールハンマー(追撃3hit)',
 		order: 204,
 		systemGroup: 'halberd',
-		category: 'halberdSkill',
+		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'], // 仮設定、要確定
 		mpCost: 400,
 		multiplierFormula: '1500% + (200+補正後INT×10%)×6',
@@ -513,7 +513,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		name: 'トールハンマー(追撃5hit)',
 		order: 205,
 		systemGroup: 'halberd',
-		category: 'halberdSkill',
+		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'], // 仮設定、要確定
 		mpCost: 400,
 		multiplierFormula: '1500% + (200+補正後INT×10%)×15',
@@ -562,7 +562,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		name: 'トールハンマー(追撃8hit)',
 		order: 206,
 		systemGroup: 'halberd',
-		category: 'halberdSkill',
+		category: 'halberd',
 		weaponTypeRequirements: ['旋風槍'], // 仮設定、要確定
 		mpCost: 400,
 		multiplierFormula: '1500% + (200+補正後INT×10%)×36',
@@ -611,7 +611,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		name: '術式/アロー',
 		order: 601,
 		systemGroup: 'magic',
-		category: 'staff',
+		category: 'magic',
 		weaponTypeRequirements: ['杖'],
 		mpCost: 5,
 		multiplierFormula: '125% (杖装備時+25%)',
@@ -642,7 +642,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		name: '術式/ストーム(1/6hit)-旧仕様',
 		order: 602,
 		systemGroup: 'magic',
-		category: 'staff',
+		category: 'magic',
 		weaponTypeRequirements: ['杖', '魔導具'],
 		mpCost: 400,
 		multiplierFormula: '200% (杖装備時300%)',
@@ -673,7 +673,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		name: '術式/ストーム(1/6hit)',
 		order: 603,
 		systemGroup: 'magic',
-		category: 'staff',
+		category: 'magic',
 		weaponTypeRequirements: ['杖', '魔導具'],
 		mpCost: 400,
 		multiplierFormula: '200% (杖装備時300%)',
@@ -704,7 +704,7 @@ const attackSkillsRawData: AttackSkill[] = [
 		name: '術式/ストーム(1/6hit)-ストーム延長',
 		order: 604,
 		systemGroup: 'magic',
-		category: 'staff',
+		category: 'magic',
 		weaponTypeRequirements: ['杖', '魔導具'],
 		mpCost: 400,
 		multiplierFormula: '150% (杖装備時250%)',
@@ -756,6 +756,53 @@ const attackSkillsRawData: AttackSkill[] = [
 				canUseLongRange: true,
 				canUseShortRangePower: true,
 				canUseLongRangePower: true,
+			},
+		],
+	},
+
+	// クロスファイア(3溜め)（弓スキル）
+	{
+		id: 'cross_fire_3_charge',
+		name: 'クロスファイア(3溜め)',
+		order: 501,
+		systemGroup: 'bow',
+		category: 'shoot',
+		weaponTypeRequirements: ['弓', '自動弓'],
+		mpCost: 400,
+		multiplierFormula: '弓:特殊計算、自動弓:2700%/300%x2',
+		fixedDamageFormula: '400/400',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 2850, // 弓装備時の表示用（実際は特殊計算）
+				fixedDamage: 400, // 固定ダメージ400
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['物理貫通'], // 自動弓装備時のみ適用
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 400, // 弓装備時の表示用（200%x2）
+				fixedDamage: 400, // 固定ダメージ400
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['物理貫通'], // 自動弓装備時のみ適用
 			},
 		],
 	},

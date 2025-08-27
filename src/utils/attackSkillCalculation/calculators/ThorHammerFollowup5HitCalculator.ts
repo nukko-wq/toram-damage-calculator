@@ -4,7 +4,7 @@ import { SkillHitCalculator } from './SkillHitCalculator'
 /**
  * トールハンマー(追撃5hit)用計算機
  * - 1hit目: 固定倍率1500%, 固定値400
- * - 2hit目: (200+補正後INT×10%)×15の動的倍率, 固定値200
+ * - 2hit目: INT((200+補正後INT×10%)×1) + INT((200+補正後INT×10%)×2) + ... + INT((200+補正後INT×10%)×5), 固定値200
  */
 export class ThorHammerFollowup5HitCalculator extends SkillHitCalculator {
 	calculate(input: SkillCalculationInput): SkillCalculationResult {
@@ -21,20 +21,23 @@ export class ThorHammerFollowup5HitCalculator extends SkillHitCalculator {
 			}
 		} else if (input.hitNumber === 2) {
 			// 2hit目: 追撃部分
-			// (200+補正後INT×10%)×15の計算
+			// INT((200+INT(補正後INT×10%))×1) + INT((200+INT(補正後INT×10%))×2) + ... + INT((200+INT(補正後INT×10%))×5)の計算
 			const adjustedINT = input.playerStats.adjustedINT
-			const baseMultiplier = 200 + adjustedINT * 0.1
-			const totalMultiplier = baseMultiplier * 15 // 1倍+2倍+3倍+4倍+5倍=15倍
+			const intBonus = Math.floor(adjustedINT * 0.1) // INT(補正後INT×10%)
+			const baseMultiplier = 200 + intBonus
+			const hit1 = Math.floor(baseMultiplier * 1) // INT((200+INT(補正後INT×10%))×1)
+			const hit2 = Math.floor(baseMultiplier * 2) // INT((200+INT(補正後INT×10%))×2)
+			const hit3 = Math.floor(baseMultiplier * 3) // INT((200+INT(補正後INT×10%))×3)
+			const hit4 = Math.floor(baseMultiplier * 4) // INT((200+INT(補正後INT×10%))×4)
+			const hit5 = Math.floor(baseMultiplier * 5) // INT((200+INT(補正後INT×10%))×5)
+			const totalMultiplier = hit1 + hit2 + hit3 + hit4 + hit5
 			const fixedDamage = 200
-
-			// 小数点第2位までに丸める
-			const roundedMultiplier = Math.round(totalMultiplier * 100) / 100
 
 			return {
 				hitNumber: 2,
-				calculatedMultiplier: roundedMultiplier,
+				calculatedMultiplier: totalMultiplier,
 				calculatedFixedDamage: fixedDamage,
-				calculationProcess: `トールハンマー(追撃): (200+補正後INT(${adjustedINT})×10%)×15 = (200+${adjustedINT * 0.1})×15 = ${roundedMultiplier}% + 固定値${fixedDamage}`,
+				calculationProcess: `トールハンマー(追撃): INT((200+INT(補正後INT(${adjustedINT})×10%))×1~5) = INT((200+${intBonus})×1~5) = ${hit1}+${hit2}+${hit3}+${hit4}+${hit5} = ${totalMultiplier}% + 固定値${fixedDamage}`,
 			}
 		}
 

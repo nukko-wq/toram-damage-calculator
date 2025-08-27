@@ -229,10 +229,8 @@ export function calculateDamageWithService(
 			const finalTotalElementAdvantage =
 				correctedTotalElementAdvantage + hotKnowsEffect
 
-			// ラフィー選択時は属性覚醒分+25%を無効化
-			const isRaphy =
-				calculatorData.enemy?.selectedEnemyId ===
-				'2b981c85-54f5-4c67-bac1-0e9cba4bdeb2'
+			// 無属性の敵が選択された時は属性覚醒分+25%を無効化
+			const isNonElementalEnemy = enemyInfo?.isNonElemental ?? false
 
 			// 属性威力オプションに応じて計算
 			switch (powerOptions.elementPower) {
@@ -240,8 +238,8 @@ export function calculateDamageWithService(
 					return 0 // 属性威力無効時は0
 				case 'awakeningOnly':
 					// 覚醒のみ時: 25%固定 + 杖・魔導具装備時は有利・不利属性でINT補正も追加（2025年仕様変更）
-					// ラフィー選択時は属性覚醒分+25%を無効化
-					if (isRaphy) {
+					// 無属性の敵選択時は属性覚醒分+25%を無効化
+					if (isNonElementalEnemy) {
 						if (
 							powerOptions.elementAttack === 'advantageous' ||
 							powerOptions.elementAttack === 'disadvantageous'
@@ -268,8 +266,8 @@ export function calculateDamageWithService(
 					// 有利のみ：基本属性有利プロパティ + 熱情の歌効果のみ（INT補正は除外）
 					return baseAdvantage + hotKnowsEffect
 				case 'enabled':
-					// ラフィー選択時は属性覚醒分+25%を無効化
-					if (isRaphy) {
+					// 無属性の敵選択時は属性覚醒分+25%を無効化
+					if (isNonElementalEnemy) {
 						return finalTotalElementAdvantage // 属性覚醒25%を除外
 					}
 					// 属性覚醒+25%は有利属性の場合のみ適用
