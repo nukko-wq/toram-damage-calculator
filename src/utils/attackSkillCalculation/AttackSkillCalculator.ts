@@ -3,6 +3,7 @@ import {
 	BusterBladeCalculator,
 	CrossFire3ChargeCalculator,
 	CrossFireVariableChargeCalculator,
+	CustomSkillCalculator,
 	CycloneArrowCalculator,
 	LBoomerang3Calculator,
 	MagicArrowCalculator,
@@ -83,6 +84,8 @@ export class AttackSkillCalculator {
 				return new CrossFire3ChargeCalculator()
 			case 'cross_fire_variable_charge':
 				return new CrossFireVariableChargeCalculator()
+			case 'custom_skill':
+				return new CustomSkillCalculator()
 			case 'l_boomerang_3':
 				return new LBoomerang3Calculator()
 			case 'meteor_breaker':

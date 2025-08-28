@@ -1004,6 +1004,36 @@ const attackSkillsRawData: AttackSkill[] = [
 			},
 		],
 	},
+
+	// カスタムスキル（ユーザー設定可能）
+	{
+		id: 'custom_skill',
+		name: 'カスタムスキル',
+		order: 999,
+		systemGroup: 'custom',
+		category: 'custom',
+		weaponTypeRequirements: [], // 全武器対応
+		mpCost: 100,
+		multiplierFormula: 'ユーザー設定',
+		fixedDamageFormula: 'ユーザー設定',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 100,
+				fixedDamage: 0,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: false,
+				canUseLongRangePower: false,
+			},
+		],
+	},
 ]
 
 /**
@@ -1047,6 +1077,8 @@ export function getSystemGroupLabel(
 			return '抜刀系統------'
 		case 'dualSword':
 			return '双剣系統------'
+		case 'custom':
+			return 'カスタム------'
 		case 'other':
 			return 'その他------'
 	}

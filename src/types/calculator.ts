@@ -813,7 +813,8 @@ export type AttackSkillSystemGroup =
 	| 'magic' // 魔法系統
 	| 'katana' // 抜刀系統
 	| 'dualSword' // 双剣系統
-	| 'other' // その他
+	| 'custom' // カスタム系統
+	| 'other' // その他 // その他
 
 export type AttackSkillCategory =
 	| 'blade' // ブレードスキル
@@ -843,6 +844,7 @@ export type AttackSkillCategory =
 	| 'battle' // バトルスキル
 	| 'dancer' // ダンサースキル
 	| 'minstrel' // ミンストレルスキル
+	| 'custom' // カスタムスキル // ミンストレルスキル
 
 // 威力参照タイプ
 export type PowerReferenceType = 'totalATK' | 'ATK' | 'MATK' | 'spearMATK' // 将来拡張: 'STR', 'INT', etc.

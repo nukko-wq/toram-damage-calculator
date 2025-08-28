@@ -40,62 +40,109 @@ export function calculateSkillParameters(
 	const baseValueDiff = baseValue2 - baseValue1 // = 100
 	
 	// 初期近似: スキル倍率 ≈ ダメージ差
-	let skillMultiplier = damageDiff
+	const initialMultiplier = damageDiff
 	
-	// より正確な解を求めるため、近似値周辺で最適解を探索
+	// 数学的解法で初期推定を求める
+	// 固定値を推定し、その周辺で精密探索
 	let bestResult = {
-		multiplier: skillMultiplier,
+		multiplier: initialMultiplier,
 		fixedDamage: 0,
 		error: Infinity,
+		verifyDamage1: 0,
+		verifyDamage2: 0,
 	}
 	
-	// 近似値±50の範囲で探索
-	for (let testMultiplier = Math.max(1, skillMultiplier - 50); testMultiplier <= skillMultiplier + 50; testMultiplier++) {
-		// この倍率で固定値を逆算
-		// damage1 = INT((baseValue1 + fixed) × mult/100)
-		// fixed = damage1 × 100/mult - baseValue1
-		const calculatedFixed1 = (input.baseDamage * 100 / testMultiplier) - baseValue1
-		const calculatedFixed2 = (input.enhancedDamage * 100 / testMultiplier) - baseValue2
+	// Step 1: 粗い探索で大まかな範囲を特定
+	for (let testMultiplier = Math.max(50, initialMultiplier - 100); testMultiplier <= initialMultiplier + 100; testMultiplier += 1) {
+		// 固定値を逆算
+		const estimatedFixed = (input.baseDamage * 100 / testMultiplier) - baseValue1
 		
-		// 2つの固定値が近い値になることを確認（整数化誤差を考慮）
-		const avgFixed = (calculatedFixed1 + calculatedFixed2) / 2
-		const testFixedDamage = Math.max(0, Math.round(avgFixed))
+		// 固定値の候補を推定値周辺で探索
+		for (let testFixed = Math.max(-50, Math.floor(estimatedFixed) - 20); testFixed <= Math.floor(estimatedFixed) + 20; testFixed++) {
+			// 検証：この倍率と固定値で計算した結果
+			const verifyDamage1 = Math.floor((baseValue1 + testFixed) * testMultiplier / 100)
+			const verifyDamage2 = Math.floor((baseValue2 + testFixed) * testMultiplier / 100)
+			
+			const error1 = Math.abs(verifyDamage1 - input.baseDamage)
+			const error2 = Math.abs(verifyDamage2 - input.enhancedDamage)
+			const totalError = error1 + error2
+			
+			if (totalError < bestResult.error) {
+				bestResult = {
+					multiplier: testMultiplier,
+					fixedDamage: testFixed,
+					error: totalError,
+					verifyDamage1,
+					verifyDamage2,
+				}
+				
+				// 完全一致が見つかった場合は探索を終了
+				if (totalError === 0) {
+					break
+				}
+			}
+		}
 		
-		// 検証：この倍率と固定値で計算した結果
-		const verifyDamage1 = Math.floor((baseValue1 + testFixedDamage) * testMultiplier / 100)
-		const verifyDamage2 = Math.floor((baseValue2 + testFixedDamage) * testMultiplier / 100)
+		if (bestResult.error === 0) {
+			break
+		}
+	}
+	
+	// Step 2: 粗い探索の結果を基に小数点で精密探索
+	if (bestResult.error > 0) {
+		const roughMultiplier = bestResult.multiplier
+		const roughFixed = bestResult.fixedDamage
 		
-		const error1 = Math.abs(verifyDamage1 - input.baseDamage)
-		const error2 = Math.abs(verifyDamage2 - input.enhancedDamage)
-		const totalError = error1 + error2
-		
-		if (totalError < bestResult.error) {
-			bestResult = {
-				multiplier: testMultiplier,
-				fixedDamage: testFixedDamage,
-				error: totalError,
+		for (let testMultiplier = roughMultiplier - 2; testMultiplier <= roughMultiplier + 2; testMultiplier += 0.1) {
+			for (let testFixed = roughFixed - 5; testFixed <= roughFixed + 5; testFixed++) {
+				// 検証：この倍率と固定値で計算した結果
+				const verifyDamage1 = Math.floor((baseValue1 + testFixed) * testMultiplier / 100)
+				const verifyDamage2 = Math.floor((baseValue2 + testFixed) * testMultiplier / 100)
+				
+				const error1 = Math.abs(verifyDamage1 - input.baseDamage)
+				const error2 = Math.abs(verifyDamage2 - input.enhancedDamage)
+				const totalError = error1 + error2
+				
+				if (totalError < bestResult.error) {
+					bestResult = {
+						multiplier: Math.round(testMultiplier * 10) / 10,
+						fixedDamage: testFixed,
+						error: totalError,
+						verifyDamage1,
+						verifyDamage2,
+					}
+					
+					if (totalError === 0) {
+						break
+					}
+				}
+			}
+			
+			if (bestResult.error === 0) {
+				break
 			}
 		}
 	}
 	
 	// 最適解を採用
-	skillMultiplier = bestResult.multiplier
+	const skillMultiplier = bestResult.multiplier
 	const skillFixedDamage = bestResult.fixedDamage
 	
-	// 計算過程の表示用
+	// 計算過程の表示用（正しい計算順序）
 	const step1_baseDamage = baseValue1
-	const step2_afterFixed = Math.floor(step1_baseDamage + skillFixedDamage)
-	const step3_afterSkill = Math.floor((step2_afterFixed * skillMultiplier) / 100)
+	const step2_afterFixed = step1_baseDamage + skillFixedDamage // 固定値は単純加算（INT適用なし）
+	const step3_afterElement = step2_afterFixed // 属性有利0%なので変化なし
+	const step4_afterSkill = Math.floor(step3_afterElement * skillMultiplier / 100) // INT関数はここで適用
 	
 	return {
 		skillMultiplier,
 		skillFixedDamage,
-		baseDamage: step3_afterSkill,
+		baseDamage: step4_afterSkill, // 推定パラメータでの計算結果
 		calculationSteps: {
 			step1_baseDamage,
 			step2_afterFixed,
-			step3_afterElement: step2_afterFixed, // 属性有利0%なので変化なし
-			step4_afterSkill: step3_afterSkill,
+			step3_afterElement,
+			step4_afterSkill,
 		},
 	}
 }
