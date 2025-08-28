@@ -8,11 +8,6 @@ import { calculateSkillParameters } from './utils/skillVerificationCalculation'
 interface FormData {
 	playerLevel: number
 	atk: number
-	matk: number
-	stabilityRate: number
-	physicalPenetration: number
-	criticalDamage: number
-	totalElementAdvantage: number
 	actualDamage: number
 }
 
@@ -42,7 +37,7 @@ export default function NecromancerSkillsPage() {
 						ネクロマンサースキル検証
 					</h1>
 					<p className="text-gray-600">
-						スキルの倍率と固定値を実測ダメージから逆算して求めることができます
+						物理系ネクロマンサースキルの倍率と固定値を実測ダメージから逆算して求めることができます
 					</p>
 				</div>
 
@@ -69,27 +64,23 @@ export default function NecromancerSkillsPage() {
 					<h2 className="text-xl font-semibold text-gray-800 mb-4">使用方法</h2>
 					<div className="prose max-w-none">
 						<ol className="list-decimal list-inside space-y-2 text-gray-700">
-							<li>キャラクターの基本情報（レベル、ATK、MATK等）を入力します</li>
-							<li>検証したいスキルを使用して敵にダメージを与えます</li>
+							<li>キャラクターの基本情報（レベル、ATK）を入力します</li>
+							<li>検証したい物理系ネクロマンサースキルを使用して敵にダメージを与えます</li>
 							<li>「与えたダメージ」欄に実測値を入力します</li>
 							<li>
 								「スキル倍率・固定値を計算」ボタンを押すと、推定されたスキルの倍率と固定値が表示されます
 							</li>
 						</ol>
 
-						<h3 className="text-lg font-semibold mt-6 mb-2">注意事項</h3>
+						<h3 className="text-lg font-semibold mt-6 mb-2">完全理想条件での計算</h3>
 						<ul className="list-disc list-inside space-y-1 text-gray-700">
-							<li>敵のレベルとDEFは143（一般的なMob値）として計算されます</li>
-							<li>物理耐性は5%として仮定されます</li>
-							<li>
-								クリティカルダメージではない通常ダメージを使用してください
-							</li>
-							<li>
-								他のバフ効果（慣れ、距離補正、コンボ等）は無効として計算されます
-							</li>
-							<li>
-								安定率による誤差があるため、複数回測定しての平均値使用を推奨します
-							</li>
+							<li><strong>敵条件</strong>: レベル1、DEF/MDEF=0、物魔耐性=0%</li>
+							<li><strong>バフ条件</strong>: コンボ、パッシブ、ブレイブ、抜刀%、慣れ、距離補正は全て無効</li>
+							<li><strong>安定率</strong>: 100%（ダメージ変動なし）</li>
+							<li><strong>属性有利</strong>: 0%（属性補正なし）</li>
+							<li><strong>クリティカル</strong>: 使用しない（通常ダメージのみ）</li>
+							<li><strong>計算式</strong>: 実測ダメージ = INT((自Lv + ATK - 1 + 固定値) × スキル倍率/100)</li>
+							<li><strong>最適環境</strong>: ダミー人形での検証が最も正確（条件が完全に一致）</li>
 						</ul>
 					</div>
 				</div>

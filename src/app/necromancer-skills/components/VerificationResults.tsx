@@ -104,23 +104,18 @@ export default function VerificationResults({
 			</div>
 
 			{/* 検証情報 */}
-			<div className="bg-yellow-50 p-4 rounded-lg">
-				<h4 className="text-sm font-semibold text-yellow-800 mb-2">
-					検証時の注意
+			<div className="bg-green-50 p-4 rounded-lg">
+				<h4 className="text-sm font-semibold text-green-800 mb-2">
+					完全理想条件での計算結果
 				</h4>
-				<ul className="text-xs text-yellow-700 space-y-1">
-					<li>• 敵の防御力やレベルを正確に入力してください</li>
-					<li>
-						•
-						他のバフ効果（慣れ、距離補正等）が影響していないことを確認してください
-					</li>
-					<li>
-						•
-						安定率による誤差があるため、複数回測定して平均値を使用することを推奨します
-					</li>
-					<li>
-						• クリティカルダメージは含まない通常ダメージを使用してください
-					</li>
+				<ul className="text-xs text-green-700 space-y-1">
+					<li>• <strong>計算式</strong>: 実測ダメージ = INT((自Lv + ATK - 1 + 固定値) × スキル倍率/100)</li>
+					<li>• <strong>敵条件</strong>: Lv1、DEF/MDEF=0、物魔耐性=0%</li>
+					<li>• <strong>バフ条件</strong>: 全てのバフ効果が無効</li>
+					<li>• <strong>安定率</strong>: 100%（ダメージ変動なし）</li>
+					<li>• <strong>属性有利</strong>: 0%（属性補正なし）</li>
+					<li>• <strong>クリティカル</strong>: 使用しない（通常ダメージのみ）</li>
+					<li>• <strong>最適環境</strong>: ダミー人形での検証（完全理想条件と一致）</li>
 				</ul>
 			</div>
 		</div>
