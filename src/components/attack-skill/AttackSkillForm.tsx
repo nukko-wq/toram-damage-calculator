@@ -7,8 +7,8 @@ import {
 	getPowerReferenceDisplayText,
 	getSystemGroupLabel,
 } from '@/data/attackSkills'
-import { useCalculatorStore } from '@/stores/calculatorStore'
 import { useUIStore } from '@/stores'
+import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { AttackSkillDisplayData, CalculatedHit } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import type { BuffSkillContext } from '@/utils/attackSkillCalculation/types'
@@ -34,7 +34,11 @@ export default function AttackSkillForm({
 	)
 
 	// UIStoreから溜め回数設定を取得
-	const { attackSkill: { variableCharge: { chargeLevel } } } = useUIStore()
+	const {
+		attackSkill: {
+			variableCharge: { chargeLevel },
+		},
+	} = useUIStore()
 
 	// 選択中の撃目（タブ）
 	const [selectedHitIndex, setSelectedHitIndex] = useState(0)
@@ -59,10 +63,10 @@ export default function AttackSkillForm({
 		}
 
 		// 計算モジュールを使用して実際の計算を実行
-		const variableOptions = selectedSkill.hasVariableCharging 
+		const variableOptions = selectedSkill.hasVariableCharging
 			? { chargeLevel }
 			: undefined
-		
+
 		const calculationResult = attackSkillCalculation.calculateSkill(
 			selectedSkill.id,
 			calculatorData,
@@ -126,10 +130,10 @@ export default function AttackSkillForm({
 		if (newSkillId) {
 			const skill = getAttackSkillById(newSkillId)
 			if (skill) {
-				const variableOptions = skill.hasVariableCharging 
+				const variableOptions = skill.hasVariableCharging
 					? { chargeLevel }
 					: undefined
-					
+
 				const calculationResult = attackSkillCalculation.calculateSkill(
 					newSkillId,
 					calculatorData,

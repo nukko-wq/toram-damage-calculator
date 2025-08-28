@@ -733,7 +733,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'cyclone_arrow',
 		name: 'サイクロンアロー',
-		order: 502,
+		order: 503,
 		systemGroup: 'bow',
 		category: 'hunter',
 		weaponTypeRequirements: ['弓'],

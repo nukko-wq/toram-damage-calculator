@@ -23,7 +23,9 @@ export default function EnemyInfoDisplay({
 	}
 
 	// 選択されている敵のデータを取得
-	const selectedEnemy = selectedEnemyId ? getPresetEnemyById(selectedEnemyId) : null
+	const selectedEnemy = selectedEnemyId
+		? getPresetEnemyById(selectedEnemyId)
+		: null
 
 	return (
 		<div className={`pb-1 sm:p-2 ${className}`}>

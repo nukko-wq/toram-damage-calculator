@@ -13,7 +13,7 @@ export class CrossFireVariableChargeCalculator extends SkillHitCalculator {
 			case 1: {
 				// 1撃目: 武器種・溜め回数に応じた計算
 				let multiplier: number
-				
+
 				if (equipmentContext.mainWeaponType === '弓') {
 					// 弓: |950xチャージ数+基礎DEXx20%xチャージ数|
 					const baseMultiplier = 950 * chargeLevel
@@ -25,19 +25,21 @@ export class CrossFireVariableChargeCalculator extends SkillHitCalculator {
 				} else {
 					multiplier = 0 // 武器種不適合
 				}
-				
+
 				// 自動弓装備時は物理貫通効果を追加
-				const physicalPenetration = equipmentContext.mainWeaponType === '自動弓'
-					? Math.abs(Math.floor(playerStats.baseDEX * 0.1))
-					: 0
-				
+				const physicalPenetration =
+					equipmentContext.mainWeaponType === '自動弓'
+						? Math.abs(Math.floor(playerStats.baseDEX * 0.1))
+						: 0
+
 				const result: SkillCalculationResult = {
 					hitNumber: 1,
 					calculatedMultiplier: multiplier,
 					calculatedFixedDamage: 400,
-					calculationProcess: equipmentContext.mainWeaponType === '弓'
-						? `|950x${chargeLevel} + floor(${playerStats.baseDEX} * 0.2)x${chargeLevel}| = ${multiplier}%`
-						: `900x${chargeLevel} = ${multiplier}%`,
+					calculationProcess:
+						equipmentContext.mainWeaponType === '弓'
+							? `|950x${chargeLevel} + floor(${playerStats.baseDEX} * 0.2)x${chargeLevel}| = ${multiplier}%`
+							: `900x${chargeLevel} = ${multiplier}%`,
 				}
 
 				// 物理貫通効果がある場合は追加
@@ -52,7 +54,7 @@ export class CrossFireVariableChargeCalculator extends SkillHitCalculator {
 			case 2: {
 				// 2撃目: 武器種・溜め回数に応じた計算
 				let multiplier: number
-				
+
 				if (equipmentContext.mainWeaponType === '弓') {
 					// 弓: 200%x(チャージ数-1)
 					multiplier = chargeLevel > 1 ? 200 * (chargeLevel - 1) : 0
@@ -62,19 +64,23 @@ export class CrossFireVariableChargeCalculator extends SkillHitCalculator {
 				} else {
 					multiplier = 0 // 武器種不適合
 				}
-				
+
 				// 自動弓装備時は物理貫通効果を追加
-				const physicalPenetration = equipmentContext.mainWeaponType === '自動弓'
-					? Math.abs(Math.floor(playerStats.baseDEX * 0.1))
-					: 0
-				
+				const physicalPenetration =
+					equipmentContext.mainWeaponType === '自動弓'
+						? Math.abs(Math.floor(playerStats.baseDEX * 0.1))
+						: 0
+
 				const result: SkillCalculationResult = {
 					hitNumber: 2,
 					calculatedMultiplier: multiplier,
 					calculatedFixedDamage: chargeLevel > 1 ? 400 : 0,
-					calculationProcess: equipmentContext.mainWeaponType === '弓'
-						? `200x(${chargeLevel}-1) = ${multiplier}%` + (chargeLevel > 1 ? ', 固定400' : ', 固定0')
-						: `300x(${chargeLevel}-1) = ${multiplier}%` + (chargeLevel > 1 ? ', 固定400' : ', 固定0'),
+					calculationProcess:
+						equipmentContext.mainWeaponType === '弓'
+							? `200x(${chargeLevel}-1) = ${multiplier}%` +
+								(chargeLevel > 1 ? ', 固定400' : ', 固定0')
+							: `300x(${chargeLevel}-1) = ${multiplier}%` +
+								(chargeLevel > 1 ? ', 固定400' : ', 固定0'),
 				}
 
 				// 物理貫通効果がある場合は追加
@@ -87,7 +93,9 @@ export class CrossFireVariableChargeCalculator extends SkillHitCalculator {
 			}
 
 			default:
-				throw new Error(`Invalid hit number for Cross Fire (Variable Charge): ${hitNumber}`)
+				throw new Error(
+					`Invalid hit number for Cross Fire (Variable Charge): ${hitNumber}`,
+				)
 		}
 	}
 }

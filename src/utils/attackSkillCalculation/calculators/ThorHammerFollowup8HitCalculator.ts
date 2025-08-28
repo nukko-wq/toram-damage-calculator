@@ -33,7 +33,8 @@ export class ThorHammerFollowup8HitCalculator extends SkillHitCalculator {
 			const hit6 = Math.floor(baseMultiplier * 6) // INT((200+INT(補正後INT×10%))×6)
 			const hit7 = Math.floor(baseMultiplier * 7) // INT((200+INT(補正後INT×10%))×7)
 			const hit8 = Math.floor(baseMultiplier * 8) // INT((200+INT(補正後INT×10%))×8)
-			const totalMultiplier = hit1 + hit2 + hit3 + hit4 + hit5 + hit6 + hit7 + hit8
+			const totalMultiplier =
+				hit1 + hit2 + hit3 + hit4 + hit5 + hit6 + hit7 + hit8
 			const fixedDamage = 200
 
 			return {

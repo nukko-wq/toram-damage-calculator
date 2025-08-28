@@ -255,6 +255,18 @@ export const equipmentsData: EquipmentsData = {
 					Accuracy_Rate: -6,
 				},
 			},
+			{
+				id: 'e23dc735-2388-403b-9c25-31ad501bdde1',
+				name: 'オーシャンシーカー',
+				properties: {
+					HP: 4500,
+					MP: 600,
+					Stability_Rate: 15,
+					Accuracy_Rate: 30,
+					AttackSpeed: 600,
+					WindResistance_Rate: 30,
+				},
+			},
 		],
 		additional: [
 			{
@@ -497,6 +509,14 @@ export const equipmentsData: EquipmentsData = {
 						description: '両手剣装備時: クリティカル率+15',
 					},
 				],
+			},
+			{
+				id: '2a9be5e1-2c01-4b11-8e47-f8760e0f0138',
+				name: '輝く海のお守り',
+				properties: {
+					AilmentResistance_Rate: 5,
+					Stability_Rate: 10,
+				},
 			},
 		],
 		subWeapon: [

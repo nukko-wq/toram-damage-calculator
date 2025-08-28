@@ -1,6 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import ExpectedValueDisplay from '@/components/damage/ExpectedValueDisplay'
+import AdaptationMultiplierSlider from '@/components/ui/AdaptationMultiplierSlider'
+import DamageTable from '@/components/ui/DamageTable'
+import EnemyInfoDisplay from '@/components/ui/EnemyInfoDisplay'
+import { getAttackSkillById } from '@/data/attackSkills'
+import { useEnemyData } from '@/hooks/useEnemyData'
 import { useUIStore } from '@/stores'
 import { useCalculatorStore } from '@/stores/calculatorStore'
 import type {
@@ -22,17 +28,11 @@ import {
 	getCurrentBraveMultiplier,
 	getCurrentPassiveMultiplier,
 } from '@/utils/damagePreviewCalculations'
+import { calculateExpectedValueData } from '@/utils/expectedValueCalculations'
 import {
 	createInitialOtherOptions,
 	createInitialPowerOptions,
 } from '@/utils/initialData'
-import ExpectedValueDisplay from '@/components/damage/ExpectedValueDisplay'
-import { calculateExpectedValueData } from '@/utils/expectedValueCalculations'
-import { getAttackSkillById } from '@/data/attackSkills'
-import { useEnemyData } from '@/hooks/useEnemyData'
-import AdaptationMultiplierSlider from '@/components/ui/AdaptationMultiplierSlider'
-import EnemyInfoDisplay from '@/components/ui/EnemyInfoDisplay'
-import DamageTable from '@/components/ui/DamageTable'
 
 interface DamagePreviewProps {
 	isVisible: boolean
@@ -40,10 +40,12 @@ interface DamagePreviewProps {
 
 export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	// UIStoreから高さ管理を取得
-	const { 
-		damagePreviewHeight, 
+	const {
+		damagePreviewHeight,
 		setDamagePreviewHeight,
-		attackSkill: { variableCharge: { chargeLevel } },
+		attackSkill: {
+			variableCharge: { chargeLevel },
+		},
 		setChargeLevel,
 	} = useUIStore()
 
@@ -82,7 +84,6 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		(state) => state.updateAdaptationMultiplier,
 	)
 
-
 	// キャプチャデータの状態管理
 	const [captureData, setCaptureData] = useState<DamageCaptureData | null>(null)
 
@@ -93,10 +94,10 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 	)
 
 	// 現在選択されているスキルを取得
-	const selectedSkill = calculatorData.attackSkill?.selectedSkillId 
+	const selectedSkill = calculatorData.attackSkill?.selectedSkillId
 		? getAttackSkillById(calculatorData.attackSkill.selectedSkillId)
 		: null
-	
+
 	// 敵データを取得
 	const { enemyFormData } = useEnemyData()
 	const updateCalculationResults = useCalculatorStore(
@@ -137,12 +138,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		updateBaselineDamageResult,
 	])
 
-
 	// 実際のダメージ計算
 	const damageResults = useMemo((): DamageCalculationServiceResult => {
 		try {
 			// クロスファイア(溜め可変)の場合のvariableOptionsを生成
-			const variableOptions = selectedSkill?.hasVariableCharging 
+			const variableOptions = selectedSkill?.hasVariableCharging
 				? { chargeLevel }
 				: undefined
 
@@ -173,11 +173,23 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				},
 			}
 		}
-	}, [calculatorData, calculationResults, powerOptions, adaptationMultiplier, selectedSkill, chargeLevel])
+	}, [
+		calculatorData,
+		calculationResults,
+		powerOptions,
+		adaptationMultiplier,
+		selectedSkill,
+		chargeLevel,
+	])
 
 	// 期待値表示用データ計算
 	const expectedValueData = useMemo(() => {
-		return calculateExpectedValueData(calculatorData, calculationResults, enemyFormData, adaptationMultiplier)
+		return calculateExpectedValueData(
+			calculatorData,
+			calculationResults,
+			enemyFormData,
+			adaptationMultiplier,
+		)
 	}, [calculatorData, calculationResults, enemyFormData, adaptationMultiplier])
 
 	// キャプチャボタンクリック処理（useCallbackで最適化）
@@ -357,7 +369,9 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 				/>
 
 				{/* 敵情報 */}
-				<EnemyInfoDisplay selectedEnemyId={calculatorData.enemy?.selectedEnemyId || null} />
+				<EnemyInfoDisplay
+					selectedEnemyId={calculatorData.enemy?.selectedEnemyId || null}
+				/>
 
 				{/* 威力オプション */}
 				<div className=" sm:p-2">
@@ -390,8 +404,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 							{/* 溜め回数設定UI（クロスファイア(溜め可変)の場合のみ表示） */}
 							{selectedSkill?.id === 'cross_fire_variable_charge' && (
 								<div className="flex items-center gap-2 mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-									<label 
-										htmlFor="charge-level" 
+									<label
+										htmlFor="charge-level"
 										className="text-sm font-medium text-blue-800"
 									>
 										溜め回数:

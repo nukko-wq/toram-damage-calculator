@@ -3,7 +3,11 @@
 import { useMemo } from 'react'
 import { useUIStore } from '@/stores/uiStore'
 import type { EquipmentProperties, UserCrystal } from '@/types/calculator'
-import { saveUserCrystal, updateUserCrystal, getUserCrystalById } from '@/utils/crystalDatabase'
+import {
+	getUserCrystalById,
+	saveUserCrystal,
+	updateUserCrystal,
+} from '@/utils/crystalDatabase'
 
 export default function CrystalConfirmation() {
 	const {

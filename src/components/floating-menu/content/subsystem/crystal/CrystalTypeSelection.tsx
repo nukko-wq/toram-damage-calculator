@@ -65,7 +65,7 @@ export default function CrystalTypeSelection() {
 
 	const handleBack = () => {
 		setSelectedType(null)
-		
+
 		// 新規作成・編集問わず、初期画面にリセットして戻る
 		resetCrystalForm()
 	}

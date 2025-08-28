@@ -184,7 +184,14 @@ export interface CalculatorStore {
 
 // サブシステム関連の型定義
 export type CustomType = 'crystal' | 'equipment' | 'enemy'
-export type NavigationScreen = 'main' | 'type_selection' | 'name_input' | 'property_input' | 'confirmation' | 'completion' | 'delete_confirmation'
+export type NavigationScreen =
+	| 'main'
+	| 'type_selection'
+	| 'name_input'
+	| 'property_input'
+	| 'confirmation'
+	| 'completion'
+	| 'delete_confirmation'
 export type EditMode = 'list' | 'edit' | 'create'
 
 // ===== UIストア =====
@@ -223,14 +230,14 @@ export interface UIStore {
 			type: CustomType | null
 			title: string
 		}
-		
+
 		// 画面遷移状態
 		navigation: {
 			currentScreen: NavigationScreen
 			canGoBack: boolean
 			canGoNext: boolean
 		}
-		
+
 		// クリスタルカスタム状態
 		crystalCustom: {
 			selectedItems: string[]
@@ -282,28 +289,30 @@ export interface UIStore {
 	// モーダル制御
 	openFullScreenModal: (type: CustomType, title: string) => void
 	closeFullScreenModal: () => void
-	
+
 	// 画面遷移制御
 	navigateToScreen: (screen: NavigationScreen) => void
 	goBack: () => void
 	goNext: () => void
-	
+
 	// クリスタルタイプ選択
 	selectCrystalType: (type: import('./calculator').CrystalType) => void
 	clearCrystalTypeSelection: () => void
-	
+
 	// クリスタル名称設定
 	setCrystalName: (name: string) => void
-	
+
 	// 編集モード制御
 	setCrystalEditMode: (mode: EditMode, id?: string) => void
 	selectCrystalItems: (ids: string[]) => void
-	
+
 	// フォームデータ管理
-	updateCrystalFormData: (data: Partial<import('./calculator').EquipmentProperties>) => void
+	updateCrystalFormData: (
+		data: Partial<import('./calculator').EquipmentProperties>,
+	) => void
 	setValidationErrors: (errors: Record<string, string>) => void
 	resetCrystalForm: () => void
-	
+
 	// 削除機能用アクション
 	selectForDeletion: (crystalId: string) => void
 	confirmDeletion: (crystalId: string) => Promise<void>

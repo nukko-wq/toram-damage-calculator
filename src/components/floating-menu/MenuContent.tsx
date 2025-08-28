@@ -49,7 +49,7 @@ function SampleDataContent() {
 
 function SubsystemContent() {
 	const openFullScreenModal = useUIStore((state) => state.openFullScreenModal)
-	
+
 	const handleItemClick = (itemId: string) => {
 		switch (itemId) {
 			case 'crystal_custom':
