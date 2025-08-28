@@ -6,8 +6,9 @@ import { z } from 'zod'
 
 const schema = z.object({
 	playerLevel: z.number().min(1).max(400),
-	atk: z.number().min(0),
-	actualDamage: z.number().min(1),
+	baseAtk: z.number().min(0),
+	baseDamage: z.number().min(1),
+	enhancedDamage: z.number().min(1),
 })
 
 type FormData = z.infer<typeof schema>
@@ -27,8 +28,9 @@ export default function NecromancerSkillVerificationForm({
 		resolver: zodResolver(schema),
 		defaultValues: {
 			playerLevel: 305,
-			atk: 10000,
-			actualDamage: 50000,
+			baseAtk: 10000,
+			baseDamage: 50000,
+			enhancedDamage: 55000,
 		},
 	})
 
@@ -60,15 +62,15 @@ export default function NecromancerSkillVerificationForm({
 
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">
-						ATK
+						基準ATK（通常時）
 					</label>
 					<input
 						type="number"
-						{...register('atk', { valueAsNumber: true })}
+						{...register('baseAtk', { valueAsNumber: true })}
 						className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 					/>
-					{errors.atk && (
-						<p className="text-red-600 text-sm mt-1">{errors.atk.message}</p>
+					{errors.baseAtk && (
+						<p className="text-red-600 text-sm mt-1">{errors.baseAtk.message}</p>
 					)}
 				</div>
 
@@ -78,23 +80,50 @@ export default function NecromancerSkillVerificationForm({
 
 			</div>
 
-			{/* 実測値 */}
+			{/* 2点測定データ */}
 			<div className="space-y-4">
-				<h3 className="text-lg font-medium text-gray-700">実測値</h3>
+				<h3 className="text-lg font-medium text-gray-700">2点測定データ</h3>
+				
+				<div className="bg-blue-50 p-3 rounded-md">
+					<p className="text-sm text-blue-700 mb-2">
+						<strong>測定方法:</strong> 同じスキルを2回使用して測定
+					</p>
+					<ul className="text-xs text-blue-600 space-y-1">
+						<li>• 測定1: 通常のATKでダメージ測定</li>
+						<li>• 測定2: ATK+100した状態でダメージ測定</li>
+					</ul>
+				</div>
 
 				<div>
 					<label className="block text-sm font-medium text-gray-700 mb-1">
-						与えたダメージ
+						測定1: 基準ATKでのダメージ
 					</label>
 					<input
 						type="number"
-						{...register('actualDamage', { valueAsNumber: true })}
+						{...register('baseDamage', { valueAsNumber: true })}
 						className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-						placeholder="実際に与えたダメージを入力"
+						placeholder="通常ATKでの実測ダメージ"
 					/>
-					{errors.actualDamage && (
+					{errors.baseDamage && (
 						<p className="text-red-600 text-sm mt-1">
-							{errors.actualDamage.message}
+							{errors.baseDamage.message}
+						</p>
+					)}
+				</div>
+
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-1">
+						測定2: ATK+100でのダメージ
+					</label>
+					<input
+						type="number"
+						{...register('enhancedDamage', { valueAsNumber: true })}
+						className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+						placeholder="ATK+100での実測ダメージ"
+					/>
+					{errors.enhancedDamage && (
+						<p className="text-red-600 text-sm mt-1">
+							{errors.enhancedDamage.message}
 						</p>
 					)}
 				</div>

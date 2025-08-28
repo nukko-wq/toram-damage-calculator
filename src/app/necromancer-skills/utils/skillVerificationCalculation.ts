@@ -1,7 +1,8 @@
 interface VerificationInput {
 	playerLevel: number
-	atk: number
-	actualDamage: number
+	baseAtk: number
+	baseDamage: number
+	enhancedDamage: number
 }
 
 interface VerificationResult {
@@ -19,66 +20,73 @@ interface VerificationResult {
 export function calculateSkillParameters(
 	input: VerificationInput,
 ): VerificationResult {
-	// 仮定値（ネクロマンサースキル検証用の理想条件）
-	const assumedEnemyLevel = 1
-	const referenceStat = input.atk // 物理攻撃として仮定
-
-	// ステップ1: 基礎ダメージ計算
-	// 理想条件: INT((自Lv + 参照ステータス - 1) × 1 × 1 - 0) = INT(自Lv + 参照ステータス - 1)
-	const step1_baseDamage = Math.floor(Math.max(1, input.playerLevel + referenceStat - assumedEnemyLevel))
-
-	// 理想条件: 安定率100%（ダメージ変動なし）、属性有利0%（倍率増加なし）
-	// 大幅に簡略化された計算式: 実測ダメージ = INT((基礎ダメージ + 固定値) × スキル倍率/100)
+	// 2点測定による数学的解法
+	// 測定1: baseDamage = INT((playerLevel + baseAtk - 1 + fixedDamage) × multiplier/100)
+	// 測定2: enhancedDamage = INT((playerLevel + baseAtk + 100 - 1 + fixedDamage) × multiplier/100)
 	
-	// 実測ダメージからスキル倍率と固定値を逆算
-	const estimatedBaseDamage = input.actualDamage
-
-	// 固定値を仮定して倍率を計算
-	// まず固定値0と仮定して計算
-	let skillFixedDamage = 0
-	let step2_afterFixed = step1_baseDamage + skillFixedDamage
-
-	// スキル倍率を逆算（属性有利なしなので直接計算）
-	let skillMultiplier = (estimatedBaseDamage * 100) / step2_afterFixed
-
-	// より正確な固定値を推定するため、複数の倍率候補で計算
-	const commonMultipliers = [
-		100, 120, 150, 180, 200, 250, 300, 350, 400, 450, 500,
-	]
+	const assumedEnemyLevel = 1
+	const baseValue1 = input.playerLevel + input.baseAtk - assumedEnemyLevel // 測定1の基礎値
+	const baseValue2 = input.playerLevel + input.baseAtk + 100 - assumedEnemyLevel // 測定2の基礎値（ATK+100）
+	
+	// 2点測定からスキル倍率と固定値を数学的に求める
+	// damage1 = INT((baseValue1 + fixed) × mult/100)  
+	// damage2 = INT((baseValue2 + fixed) × mult/100)
+	// 
+	// INTを無視した近似解として：
+	// damage2 - damage1 ≈ (baseValue2 - baseValue1) × mult/100 = 100 × mult/100 = mult
+	// よって mult ≈ damage2 - damage1
+	
+	const damageDiff = input.enhancedDamage - input.baseDamage
+	const baseValueDiff = baseValue2 - baseValue1 // = 100
+	
+	// 初期近似: スキル倍率 ≈ ダメージ差
+	let skillMultiplier = damageDiff
+	
+	// より正確な解を求めるため、近似値周辺で最適解を探索
 	let bestResult = {
 		multiplier: skillMultiplier,
-		fixedDamage: skillFixedDamage,
+		fixedDamage: 0,
 		error: Infinity,
 	}
-
-	for (const testMultiplier of commonMultipliers) {
-		// この倍率で固定値を逆算（理想条件での簡略化された計算）
-		// 最終ダメージ = INT((基礎ダメージ + 固定値) × スキル倍率/100)
-		const requiredStep2 = Math.floor(estimatedBaseDamage / (testMultiplier / 100))
-		const testFixedDamage = Math.max(0, requiredStep2 - step1_baseDamage)
-
-		// 検証：この固定値と倍率で計算した結果
-		const verifyStep2 = Math.floor(step1_baseDamage + testFixedDamage)
-		const verifyFinalDamage = Math.floor((verifyStep2 * testMultiplier) / 100)
-
-		const error = Math.abs(verifyFinalDamage - input.actualDamage)
-
-		if (error < bestResult.error) {
+	
+	// 近似値±50の範囲で探索
+	for (let testMultiplier = Math.max(1, skillMultiplier - 50); testMultiplier <= skillMultiplier + 50; testMultiplier++) {
+		// この倍率で固定値を逆算
+		// damage1 = INT((baseValue1 + fixed) × mult/100)
+		// fixed = damage1 × 100/mult - baseValue1
+		const calculatedFixed1 = (input.baseDamage * 100 / testMultiplier) - baseValue1
+		const calculatedFixed2 = (input.enhancedDamage * 100 / testMultiplier) - baseValue2
+		
+		// 2つの固定値が近い値になることを確認（整数化誤差を考慮）
+		const avgFixed = (calculatedFixed1 + calculatedFixed2) / 2
+		const testFixedDamage = Math.max(0, Math.round(avgFixed))
+		
+		// 検証：この倍率と固定値で計算した結果
+		const verifyDamage1 = Math.floor((baseValue1 + testFixedDamage) * testMultiplier / 100)
+		const verifyDamage2 = Math.floor((baseValue2 + testFixedDamage) * testMultiplier / 100)
+		
+		const error1 = Math.abs(verifyDamage1 - input.baseDamage)
+		const error2 = Math.abs(verifyDamage2 - input.enhancedDamage)
+		const totalError = error1 + error2
+		
+		if (totalError < bestResult.error) {
 			bestResult = {
 				multiplier: testMultiplier,
 				fixedDamage: testFixedDamage,
-				error,
+				error: totalError,
 			}
 		}
 	}
-
-	// 最適解で最終計算
+	
+	// 最適解を採用
 	skillMultiplier = bestResult.multiplier
-	skillFixedDamage = bestResult.fixedDamage
-
-	step2_afterFixed = Math.floor(step1_baseDamage + skillFixedDamage)
+	const skillFixedDamage = bestResult.fixedDamage
+	
+	// 計算過程の表示用
+	const step1_baseDamage = baseValue1
+	const step2_afterFixed = Math.floor(step1_baseDamage + skillFixedDamage)
 	const step3_afterSkill = Math.floor((step2_afterFixed * skillMultiplier) / 100)
-
+	
 	return {
 		skillMultiplier,
 		skillFixedDamage,
@@ -92,18 +100,10 @@ export function calculateSkillParameters(
 	}
 }
 
-// 簡易版：固定値0、一般的な倍率で計算
+// 簡易版：2点測定による簡易計算
 export function calculateSimpleSkillMultiplier(
 	input: VerificationInput,
 ): number {
-	const assumedEnemyLevel = 1
-	const referenceStat = input.atk
-
-	// 基礎ダメージ（理想条件）
-	const baseDamage = Math.floor(Math.max(1, input.playerLevel + referenceStat - assumedEnemyLevel))
-
-	// 理想条件: 安定率100%、属性有利0%
-	// 実測ダメージ = INT(基礎ダメージ × スキル倍率/100)
-	// スキル倍率を逆算（固定値0として）
-	return (input.actualDamage * 100) / baseDamage
+	// 2点測定での簡易計算：スキル倍率 ≈ ダメージ差
+	return input.enhancedDamage - input.baseDamage
 }

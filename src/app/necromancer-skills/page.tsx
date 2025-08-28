@@ -7,8 +7,9 @@ import { calculateSkillParameters } from './utils/skillVerificationCalculation'
 
 interface FormData {
 	playerLevel: number
-	atk: number
-	actualDamage: number
+	baseAtk: number
+	baseDamage: number
+	enhancedDamage: number
 }
 
 export default function NecromancerSkillsPage() {
@@ -37,7 +38,7 @@ export default function NecromancerSkillsPage() {
 						ネクロマンサースキル検証
 					</h1>
 					<p className="text-gray-600">
-						物理系ネクロマンサースキルの倍率と固定値を実測ダメージから逆算して求めることができます
+						2点測定法により物理系ネクロマンサースキルの倍率と固定値を数学的に正確に求めることができます
 					</p>
 				</div>
 
@@ -64,23 +65,31 @@ export default function NecromancerSkillsPage() {
 					<h2 className="text-xl font-semibold text-gray-800 mb-4">使用方法</h2>
 					<div className="prose max-w-none">
 						<ol className="list-decimal list-inside space-y-2 text-gray-700">
-							<li>キャラクターの基本情報（レベル、ATK）を入力します</li>
-							<li>検証したい物理系ネクロマンサースキルを使用して敵にダメージを与えます</li>
-							<li>「与えたダメージ」欄に実測値を入力します</li>
+							<li>キャラクターの基本情報（レベル、基準ATK）を入力します</li>
+							<li>通常のATKで物理系ネクロマンサースキルを使用してダメージを測定します</li>
+							<li>ATK+100した状態で同じスキルを使用してダメージを測定します</li>
+							<li>2つのダメージ値を入力して計算ボタンを押します</li>
 							<li>
-								「スキル倍率・固定値を計算」ボタンを押すと、推定されたスキルの倍率と固定値が表示されます
+								数学的解法により、スキルの倍率と固定値が正確に算出されます
 							</li>
 						</ol>
 
-						<h3 className="text-lg font-semibold mt-6 mb-2">完全理想条件での計算</h3>
+						<h3 className="text-lg font-semibold mt-6 mb-2">2点測定法の利点</h3>
+						<ul className="list-disc list-inside space-y-1 text-gray-700">
+							<li><strong>数学的正確性</strong>: 推測ではなく連立方程式による厳密解</li>
+							<li><strong>固定値も正確</strong>: スキル倍率と固定値を同時に算出</li>
+							<li><strong>検証の簡単さ</strong>: ATK+100の装備変更のみで実現可能</li>
+							<li><strong>誤差の最小化</strong>: 理想条件で測定誤差を排除</li>
+						</ul>
+
+						<h3 className="text-lg font-semibold mt-6 mb-2">理想測定条件</h3>
 						<ul className="list-disc list-inside space-y-1 text-gray-700">
 							<li><strong>敵条件</strong>: レベル1、DEF/MDEF=0、物魔耐性=0%</li>
-							<li><strong>バフ条件</strong>: コンボ、パッシブ、ブレイブ、抜刀%、慣れ、距離補正は全て無効</li>
+							<li><strong>バフ条件</strong>: 全てのバフ効果が無効</li>
 							<li><strong>安定率</strong>: 100%（ダメージ変動なし）</li>
-							<li><strong>属性有利</strong>: 0%（属性補正なし）</li>
-							<li><strong>クリティカル</strong>: 使用しない（通常ダメージのみ）</li>
-							<li><strong>計算式</strong>: 実測ダメージ = INT((自Lv + ATK - 1 + 固定値) × スキル倍率/100)</li>
-							<li><strong>最適環境</strong>: ダミー人形での検証が最も正確（条件が完全に一致）</li>
+							<li><strong>属性・クリティカル</strong>: 使用しない（通常ダメージのみ）</li>
+							<li><strong>計算式</strong>: ダメージ = INT((Lv + ATK - 1 + 固定値) × 倍率/100)</li>
+							<li><strong>推奨環境</strong>: ダミー人形での検証が最適</li>
 						</ul>
 					</div>
 				</div>
