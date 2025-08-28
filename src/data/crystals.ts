@@ -547,6 +547,15 @@ export const crystalsData: CrystalsData = {
 					},
 				],
 			},
+			{
+				id: 'f6e6483a-3d3d-4b1d-a9f7-fe5e26eb1f06',
+				name: 'ドン・イエティ',
+				type: 'special',
+				properties: {
+					ATK: 100,
+					AttackSpeed: -1000,
+				},
+			},
 		],
 		normal: [
 			{
