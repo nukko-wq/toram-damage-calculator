@@ -1,10 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type {
-	AttackType,
-	DefenseType,
-	ResistanceType,
-	PowerReference,
+	PowerReferenceType,
 	AdaptationType,
 } from '../types/calculator'
 
@@ -13,10 +10,10 @@ export interface CustomSkillSettings {
 	multiplier: number
 	fixedDamage: number
 	mpCost: number
-	attackType: AttackType
-	powerReference: PowerReference
-	referenceDefense: DefenseType | 'none'
-	referenceResistance: ResistanceType | 'none'
+	attackType: 'physical' | 'magical'
+	powerReference: PowerReferenceType
+	referenceDefense: 'DEF' | 'MDEF' | 'none'
+	referenceResistance: 'physical' | 'magical' | 'none'
 	adaptation: AdaptationType | 'none'
 	adaptationGrant: AdaptationType | 'none'
 	distancePower: 'short' | 'long' | 'none'
@@ -30,7 +27,7 @@ const defaultCustomSkillSettings: CustomSkillSettings = {
 	fixedDamage: 0,
 	mpCost: 100,
 	attackType: 'physical',
-	powerReference: 'ATK',
+	powerReference: 'totalATK',
 	referenceDefense: 'DEF',
 	referenceResistance: 'physical',
 	adaptation: 'physical',

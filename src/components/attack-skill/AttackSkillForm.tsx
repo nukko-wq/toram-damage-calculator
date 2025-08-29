@@ -12,6 +12,7 @@ import { useCalculatorStore } from '@/stores/calculatorStore'
 import type { AttackSkillDisplayData, CalculatedHit } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
 import type { BuffSkillContext } from '@/utils/attackSkillCalculation/types'
+import CustomSkillSettingsPanel from '../forms/CustomSkillSettingsPanel'
 
 interface AttackSkillFormProps {
 	onSkillChange?: (skillData: AttackSkillDisplayData) => void
@@ -492,6 +493,11 @@ export default function AttackSkillForm({
 					})()}
 				</div>
 			)}
+
+			{/* カスタムスキル設定パネル */}
+			<CustomSkillSettingsPanel 
+				isVisible={selectedSkill?.id === 'custom_skill'} 
+			/>
 		</div>
 	)
 }

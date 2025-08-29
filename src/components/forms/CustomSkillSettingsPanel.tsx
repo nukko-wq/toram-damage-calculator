@@ -1,29 +1,8 @@
 'use client'
 
 import React from 'react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { useCustomSkillStore } from '../../stores/customSkillStore'
 import type { CustomSkillSettings } from '../../stores/customSkillStore'
-
-const customSkillSchema = z.object({
-	name: z.string().min(1).max(50),
-	multiplier: z.number().min(0).max(9999),
-	fixedDamage: z.number().min(-9999).max(9999),
-	mpCost: z.number().min(0).max(9999),
-	attackType: z.enum(['physical', 'magical']),
-	powerReference: z.enum(['ATK', 'MATK', 'totalATK', 'spearMATK']),
-	referenceDefense: z.enum(['DEF', 'MDEF', 'none']),
-	referenceResistance: z.enum(['physical', 'magical', 'none']),
-	adaptation: z.enum(['physical', 'magical', 'normal', 'none']),
-	adaptationGrant: z.enum(['physical', 'magical', 'normal', 'none']),
-	distancePower: z.enum(['short', 'long', 'none']),
-	canUseUnsheathePower: z.boolean(),
-	canUseLongRange: z.boolean(),
-})
-
-type FormData = z.infer<typeof customSkillSchema>
 
 interface CustomSkillSettingsPanelProps {
 	isVisible: boolean
@@ -34,26 +13,13 @@ export default function CustomSkillSettingsPanel({
 }: CustomSkillSettingsPanelProps) {
 	const { settings, updateSettings, resetSettings, savedPresets, savePreset, loadPreset, deletePreset } = useCustomSkillStore()
 
-	const {
-		register,
-		handleSubmit,
-		reset,
-		watch,
-		formState: { errors },
-	} = useForm<FormData>({
-		resolver: zodResolver(customSkillSchema),
-		defaultValues: settings,
-	})
-
-	// フォーム変更をリアルタイムでストアに反映
-	const watchedData = watch()
-	React.useEffect(() => {
-		updateSettings(watchedData)
-	}, [watchedData, updateSettings])
+	// フォーム値の直接更新
+	const handleInputChange = (field: keyof CustomSkillSettings, value: string | number | boolean) => {
+		updateSettings({ [field]: value })
+	}
 
 	const handleReset = () => {
 		resetSettings()
-		reset(settings)
 	}
 
 	const handleSavePreset = () => {
@@ -65,7 +31,6 @@ export default function CustomSkillSettingsPanel({
 
 	const handleLoadPreset = (presetName: string) => {
 		loadPreset(presetName)
-		reset(settings)
 	}
 
 	if (!isVisible) {
@@ -107,13 +72,11 @@ export default function CustomSkillSettingsPanel({
 								スキル名
 							</label>
 							<input
-								{...register('name')}
+								value={settings.name}
 								type="text"
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('name', e.target.value)}
 							/>
-							{errors.name && (
-								<p className="text-red-600 text-sm mt-1">{errors.name.message}</p>
-							)}
 						</div>
 
 						<div>
@@ -121,13 +84,11 @@ export default function CustomSkillSettingsPanel({
 								消費MP
 							</label>
 							<input
-								{...register('mpCost', { valueAsNumber: true })}
+								value={settings.mpCost}
 								type="number"
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('mpCost', Number(e.target.value))}
 							/>
-							{errors.mpCost && (
-								<p className="text-red-600 text-sm mt-1">{errors.mpCost.message}</p>
-							)}
 						</div>
 					</div>
 
@@ -137,14 +98,12 @@ export default function CustomSkillSettingsPanel({
 								倍率 (%)
 							</label>
 							<input
-								{...register('multiplier', { valueAsNumber: true })}
+								value={settings.multiplier}
 								type="number"
 								step="0.1"
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('multiplier', Number(e.target.value))}
 							/>
-							{errors.multiplier && (
-								<p className="text-red-600 text-sm mt-1">{errors.multiplier.message}</p>
-							)}
 						</div>
 
 						<div>
@@ -152,13 +111,11 @@ export default function CustomSkillSettingsPanel({
 								固定値
 							</label>
 							<input
-								{...register('fixedDamage', { valueAsNumber: true })}
+								value={settings.fixedDamage}
 								type="number"
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('fixedDamage', Number(e.target.value))}
 							/>
-							{errors.fixedDamage && (
-								<p className="text-red-600 text-sm mt-1">{errors.fixedDamage.message}</p>
-							)}
 						</div>
 					</div>
 				</div>
@@ -175,19 +132,21 @@ export default function CustomSkillSettingsPanel({
 							<div className="space-y-2">
 								<label className="flex items-center">
 									<input
-										{...register('attackType')}
 										type="radio"
 										value="physical"
+										checked={settings.attackType === 'physical'}
 										className="mr-2"
+										onChange={() => handleInputChange('attackType', 'physical')}
 									/>
 									物理
 								</label>
 								<label className="flex items-center">
 									<input
-										{...register('attackType')}
 										type="radio"
 										value="magical"
+										checked={settings.attackType === 'magical'}
 										className="mr-2"
+										onChange={() => handleInputChange('attackType', 'magical')}
 									/>
 									魔法
 								</label>
@@ -199,12 +158,13 @@ export default function CustomSkillSettingsPanel({
 								威力参照
 							</label>
 							<select
-								{...register('powerReference')}
+								value={settings.powerReference}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('powerReference', e.target.value)}
 							>
+								<option value="totalATK">総ATK</option>
 								<option value="ATK">ATK</option>
 								<option value="MATK">MATK</option>
-								<option value="totalATK">総ATK</option>
 								<option value="spearMATK">槍MATK</option>
 							</select>
 						</div>
@@ -216,8 +176,9 @@ export default function CustomSkillSettingsPanel({
 								参照防御力
 							</label>
 							<select
-								{...register('referenceDefense')}
+								value={settings.referenceDefense}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('referenceDefense', e.target.value)}
 							>
 								<option value="DEF">DEF</option>
 								<option value="MDEF">MDEF</option>
@@ -230,8 +191,9 @@ export default function CustomSkillSettingsPanel({
 								参照耐性
 							</label>
 							<select
-								{...register('referenceResistance')}
+								value={settings.referenceResistance}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('referenceResistance', e.target.value)}
 							>
 								<option value="physical">物理</option>
 								<option value="magical">魔法</option>
@@ -251,8 +213,9 @@ export default function CustomSkillSettingsPanel({
 								慣れ参照
 							</label>
 							<select
-								{...register('adaptation')}
+								value={settings.adaptation}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('adaptation', e.target.value)}
 							>
 								<option value="physical">物理</option>
 								<option value="magical">魔法</option>
@@ -266,8 +229,9 @@ export default function CustomSkillSettingsPanel({
 								慣れ付与
 							</label>
 							<select
-								{...register('adaptationGrant')}
+								value={settings.adaptationGrant}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('adaptationGrant', e.target.value)}
 							>
 								<option value="physical">物理</option>
 								<option value="magical">魔法</option>
@@ -288,8 +252,9 @@ export default function CustomSkillSettingsPanel({
 								距離威力
 							</label>
 							<select
-								{...register('distancePower')}
+								value={settings.distancePower}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								onChange={(e) => handleInputChange('distancePower', e.target.value)}
 							>
 								<option value="none">無し</option>
 								<option value="short">近距離</option>
@@ -300,9 +265,10 @@ export default function CustomSkillSettingsPanel({
 						<div className="flex items-center">
 							<label className="flex items-center">
 								<input
-									{...register('canUseUnsheathePower')}
 									type="checkbox"
+									checked={settings.canUseUnsheathePower}
 									className="mr-2"
+									onChange={(e) => handleInputChange('canUseUnsheathePower', e.target.checked)}
 								/>
 								抜刀威力適用
 							</label>
@@ -311,9 +277,10 @@ export default function CustomSkillSettingsPanel({
 						<div className="flex items-center">
 							<label className="flex items-center">
 								<input
-									{...register('canUseLongRange')}
 									type="checkbox"
+									checked={settings.canUseLongRange}
 									className="mr-2"
+									onChange={(e) => handleInputChange('canUseLongRange', e.target.checked)}
 								/>
 								ロングレンジ適用
 							</label>
