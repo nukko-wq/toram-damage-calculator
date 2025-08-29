@@ -9,6 +9,7 @@ import { getAttackSkillById } from '@/data/attackSkills'
 import { useEnemyData } from '@/hooks/useEnemyData'
 import { useUIStore } from '@/stores'
 import { useCalculatorStore } from '@/stores/calculatorStore'
+import { useCustomSkillStore } from '@/stores/customSkillStore'
 import type {
 	OptionTabType,
 	OtherOptions,
@@ -98,6 +99,11 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		? getAttackSkillById(calculatorData.attackSkill.selectedSkillId)
 		: null
 
+	// カスタムスキル設定を取得（カスタムスキル選択時のみ）
+	const customSkillSettings = useCustomSkillStore((state) => 
+		selectedSkill?.id === 'custom_skill' ? state.settings : null
+	)
+
 	// 敵データを取得
 	const { enemyFormData } = useEnemyData()
 	const updateCalculationResults = useCalculatorStore(
@@ -180,6 +186,7 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		adaptationMultiplier,
 		selectedSkill,
 		chargeLevel,
+		customSkillSettings, // カスタムスキル設定の変更を監視
 	])
 
 	// 期待値表示用データ計算

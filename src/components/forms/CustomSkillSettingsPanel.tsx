@@ -61,7 +61,7 @@ export default function CustomSkillSettingsPanel({
 				</div>
 			</div>
 
-			<form className="space-y-6">
+			<div className="space-y-6">
 				{/* 基本威力設定 */}
 				<div className="space-y-4">
 					<h4 className="font-medium text-gray-700">◆ 基本設定</h4>
@@ -315,7 +315,7 @@ export default function CustomSkillSettingsPanel({
 						</div>
 					</div>
 				)}
-			</form>
+			</div>
 		</div>
 	)
 }
