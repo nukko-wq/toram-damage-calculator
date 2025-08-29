@@ -100,7 +100,7 @@ export default function CustomSkillSettingsPanel({
 							<input
 								value={settings.multiplier}
 								type="number"
-								step="0.1"
+								step="1"
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 								onChange={(e) => handleInputChange('multiplier', Number(e.target.value))}
 							/>
