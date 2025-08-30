@@ -132,6 +132,7 @@ export class AttackSkillCalculator {
 			case 'power_shot':
 			case 'dual_strike':
 			case 'aura_blade':
+			case 'tomb':
 				return new StandardCalculator()
 			default:
 				throw new Error(`No calculator found for skill: ${skillId}`)

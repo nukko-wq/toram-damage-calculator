@@ -1052,6 +1052,36 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// トゥーム
+	{
+		id: 'tomb',
+		name: 'トゥーム',
+		order: 302,
+		systemGroup: 'necromancer',
+		category: 'necromancer',
+		weaponTypeRequirements: [], // 全武器対応
+		mpCost: 300,
+		multiplierFormula: '250%',
+		fixedDamageFormula: '300',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 250,
+				fixedDamage: 300,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// カスタムスキル（ユーザー設定可能）
 	{
 		id: 'custom_skill',
