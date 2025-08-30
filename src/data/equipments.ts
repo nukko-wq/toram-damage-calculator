@@ -154,6 +154,17 @@ export const equipmentsData: EquipmentsData = {
 					NaturalHPRecovery: -30,
 				},
 			},
+			{
+				id: 'e8ce6f71-0cfb-4eeb-a121-88c2b1167611',
+				name: 'ネクロ属性有利23%A15%S10%',
+				properties: {
+					ElementAdvantage_Rate: 23,
+					ATK_Rate: 15,
+					STR_Rate: 10,
+					Dodge: -22,
+					NaturalHPRecovery: -12,
+				},
+			},
 		],
 		body: [
 			{
