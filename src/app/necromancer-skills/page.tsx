@@ -66,7 +66,9 @@ export default function NecromancerSkillsPage() {
 					<div className="prose max-w-none">
 						<ol className="list-decimal list-inside space-y-2 text-gray-700">
 							<li>キャラクターの基本情報（レベル、基準ATK）を入力します</li>
-							<li>通常のATKで物理系ネクロマンサースキルを使用してダメージを測定します</li>
+							<li>
+								通常のATKで物理系ネクロマンサースキルを使用してダメージを測定します
+							</li>
 							<li>ATK+100した状態で同じスキルを使用してダメージを測定します</li>
 							<li>2つのダメージ値を入力して計算ボタンを押します</li>
 							<li>
@@ -76,20 +78,43 @@ export default function NecromancerSkillsPage() {
 
 						<h3 className="text-lg font-semibold mt-6 mb-2">2点測定法の利点</h3>
 						<ul className="list-disc list-inside space-y-1 text-gray-700">
-							<li><strong>数学的正確性</strong>: 推測ではなく連立方程式による厳密解</li>
-							<li><strong>固定値も正確</strong>: スキル倍率と固定値を同時に算出</li>
-							<li><strong>検証の簡単さ</strong>: ATK+100の装備変更のみで実現可能</li>
-							<li><strong>誤差の最小化</strong>: 理想条件で測定誤差を排除</li>
+							<li>
+								<strong>数学的正確性</strong>:
+								推測ではなく連立方程式による厳密解
+							</li>
+							<li>
+								<strong>固定値も正確</strong>: スキル倍率と固定値を同時に算出
+							</li>
+							<li>
+								<strong>検証の簡単さ</strong>: ATK+100の装備変更のみで実現可能
+							</li>
+							<li>
+								<strong>誤差の最小化</strong>: 理想条件で測定誤差を排除
+							</li>
 						</ul>
 
 						<h3 className="text-lg font-semibold mt-6 mb-2">理想測定条件</h3>
 						<ul className="list-disc list-inside space-y-1 text-gray-700">
-							<li><strong>敵条件</strong>: レベル1、DEF/MDEF=0、物魔耐性=0%</li>
-							<li><strong>バフ条件</strong>: 全てのバフ効果が無効</li>
-							<li><strong>安定率</strong>: 100%（ダメージ変動なし）</li>
-							<li><strong>属性・クリティカル</strong>: 使用しない（通常ダメージのみ）</li>
-							<li><strong>計算式</strong>: ダメージ = INT((Lv + ATK - 1 + 固定値) × 倍率/100)</li>
-							<li><strong>推奨環境</strong>: ダミー人形での検証が最適</li>
+							<li>
+								<strong>敵条件</strong>: レベル1、DEF/MDEF=0、物魔耐性=0%
+							</li>
+							<li>
+								<strong>バフ条件</strong>: 全てのバフ効果が無効
+							</li>
+							<li>
+								<strong>安定率</strong>: 100%（ダメージ変動なし）
+							</li>
+							<li>
+								<strong>属性・クリティカル</strong>:
+								使用しない（通常ダメージのみ）
+							</li>
+							<li>
+								<strong>計算式</strong>: ダメージ = INT((Lv + ATK - 1 + 固定値)
+								× 倍率/100)
+							</li>
+							<li>
+								<strong>推奨環境</strong>: ダミー人形での検証が最適
+							</li>
 						</ul>
 					</div>
 				</div>

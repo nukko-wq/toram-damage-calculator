@@ -4,6 +4,7 @@
  */
 
 import { getAttackSkillById } from '@/data/attackSkills'
+import { useCustomSkillStore } from '@/stores/customSkillStore'
 import type { BuffSkillState } from '@/types/buffSkill'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
@@ -548,8 +549,20 @@ export function calculateDamageWithService(
 							fixedDamage: hitResult.calculatedFixedDamage,
 							supportedDistances: (() => {
 								const distances: ('short' | 'long')[] = []
-								if (originalHit.canUseShortRangePower) distances.push('short')
-								if (originalHit.canUseLongRangePower) distances.push('long')
+								// カスタムスキルの場合は設定を参照
+								if (selectedSkill.id === 'custom_skill') {
+									// カスタムスキル設定を取得
+									const customSkillSettings =
+										useCustomSkillStore.getState().settings
+									if (customSkillSettings.distancePower === 'short')
+										distances.push('short')
+									if (customSkillSettings.distancePower === 'long')
+										distances.push('long')
+								} else {
+									// 通常のスキルの場合
+									if (originalHit.canUseShortRangePower) distances.push('short')
+									if (originalHit.canUseLongRangePower) distances.push('long')
+								}
 								return distances
 							})(),
 							canUseLongRange: originalHit.canUseLongRange,

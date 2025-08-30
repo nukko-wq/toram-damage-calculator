@@ -9,9 +9,9 @@ import {
 } from '@/data/attackSkills'
 import { useUIStore } from '@/stores'
 import { useCalculatorStore } from '@/stores/calculatorStore'
+import { useCustomSkillStore } from '@/stores/customSkillStore'
 import type { AttackSkillDisplayData, CalculatedHit } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
-import type { BuffSkillContext } from '@/utils/attackSkillCalculation/types'
 import CustomSkillSettingsPanel from '../forms/CustomSkillSettingsPanel'
 
 interface AttackSkillFormProps {
@@ -85,6 +85,16 @@ export default function AttackSkillForm({
 					)
 				}
 
+				// カスタムスキルの場合は設定を反映
+				let canUseShortRangePower = originalHit.canUseShortRangePower
+				let canUseLongRangePower = originalHit.canUseLongRangePower
+
+				if (selectedSkill.id === 'custom_skill') {
+					const customSkillSettings = useCustomSkillStore.getState().settings
+					canUseShortRangePower = customSkillSettings.distancePower === 'short'
+					canUseLongRangePower = customSkillSettings.distancePower === 'long'
+				}
+
 				return {
 					hitNumber: calculatedHit.hitNumber,
 					attackType: originalHit.attackType,
@@ -101,8 +111,8 @@ export default function AttackSkillForm({
 					adaptationGrant: originalHit.adaptationGrant,
 					canUseUnsheathePower: originalHit.canUseUnsheathePower,
 					canUseLongRange: originalHit.canUseLongRange,
-					canUseShortRangePower: originalHit.canUseShortRangePower,
-					canUseLongRangePower: originalHit.canUseLongRangePower,
+					canUseShortRangePower,
+					canUseLongRangePower,
 					specialEffects: originalHit.specialEffects,
 					calculationProcess: calculatedHit.calculationProcess,
 				}
@@ -149,6 +159,17 @@ export default function AttackSkillForm({
 							`Original hit data not found for hit ${calculatedHit.hitNumber}`,
 						)
 					}
+					// カスタムスキルの場合は設定を反映
+					let canUseShortRangePower = originalHit.canUseShortRangePower
+					let canUseLongRangePower = originalHit.canUseLongRangePower
+
+					if (skill.id === 'custom_skill') {
+						const customSkillSettings = useCustomSkillStore.getState().settings
+						canUseShortRangePower =
+							customSkillSettings.distancePower === 'short'
+						canUseLongRangePower = customSkillSettings.distancePower === 'long'
+					}
+
 					return {
 						hitNumber: calculatedHit.hitNumber,
 						attackType: originalHit.attackType,
@@ -165,8 +186,8 @@ export default function AttackSkillForm({
 						adaptationGrant: originalHit.adaptationGrant,
 						canUseUnsheathePower: originalHit.canUseUnsheathePower,
 						canUseLongRange: originalHit.canUseLongRange,
-						canUseShortRangePower: originalHit.canUseShortRangePower,
-						canUseLongRangePower: originalHit.canUseLongRangePower,
+						canUseShortRangePower,
+						canUseLongRangePower,
 						specialEffects: originalHit.specialEffects,
 						calculationProcess: calculatedHit.calculationProcess,
 					}
@@ -208,6 +229,20 @@ export default function AttackSkillForm({
 
 	// 距離威力の表示テキストを決定
 	const getDistancePowerDisplayText = (hit: CalculatedHit) => {
+		// カスタムスキルの場合は設定を参照
+		if (selectedSkill?.id === 'custom_skill') {
+			const customSkillSettings = useCustomSkillStore.getState().settings
+			switch (customSkillSettings.distancePower) {
+				case 'short':
+					return '近距離○'
+				case 'long':
+					return '遠距離○'
+				default:
+					return '×'
+			}
+		}
+
+		// 通常のスキルの場合は既存のロジック
 		const canShort = hit.canUseShortRangePower
 		const canLong = hit.canUseLongRangePower
 
@@ -495,8 +530,8 @@ export default function AttackSkillForm({
 			)}
 
 			{/* カスタムスキル設定パネル */}
-			<CustomSkillSettingsPanel 
-				isVisible={selectedSkill?.id === 'custom_skill'} 
+			<CustomSkillSettingsPanel
+				isVisible={selectedSkill?.id === 'custom_skill'}
 			/>
 		</div>
 	)

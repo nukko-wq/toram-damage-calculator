@@ -100,8 +100,8 @@ export default function DamagePreview({ isVisible }: DamagePreviewProps) {
 		: null
 
 	// カスタムスキル設定を取得（カスタムスキル選択時のみ）
-	const customSkillSettings = useCustomSkillStore((state) => 
-		selectedSkill?.id === 'custom_skill' ? state.settings : null
+	const customSkillSettings = useCustomSkillStore((state) =>
+		selectedSkill?.id === 'custom_skill' ? state.settings : null,
 	)
 
 	// 敵データを取得

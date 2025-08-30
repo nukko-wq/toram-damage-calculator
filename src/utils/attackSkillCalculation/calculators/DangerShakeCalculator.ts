@@ -13,7 +13,7 @@ export class DangerShakeCalculator extends SkillHitCalculator {
 				// 1撃目: 武器種・基礎STR依存計算
 				const baseSTR = playerStats.baseSTR
 				let multiplier: number
-				
+
 				// 武器種による基準値の決定
 				const weaponType = equipmentContext.mainWeaponType
 				if (weaponType === '杖') {
@@ -29,7 +29,7 @@ export class DangerShakeCalculator extends SkillHitCalculator {
 					hitNumber: 1,
 					calculatedMultiplier: multiplier,
 					calculatedFixedDamage: 100,
-					calculationProcess: `${weaponType}:|${weaponType === '旋風槍' ? 750 : 1000}+floor(${baseSTR}/2)| = ${multiplier}%, 固定100`
+					calculationProcess: `${weaponType}:|${weaponType === '旋風槍' ? 750 : 1000}+floor(${baseSTR}/2)| = ${multiplier}%, 固定100`,
 				}
 			}
 
@@ -37,7 +37,7 @@ export class DangerShakeCalculator extends SkillHitCalculator {
 				// 2撃目: 武器種・補正後STR依存計算
 				const adjustedSTR = playerStats.adjustedSTR
 				let multiplier: number
-				
+
 				// 武器種による基準値の決定
 				const weaponType = equipmentContext.mainWeaponType
 				if (weaponType === '杖') {
@@ -53,7 +53,7 @@ export class DangerShakeCalculator extends SkillHitCalculator {
 					hitNumber: 2,
 					calculatedMultiplier: multiplier,
 					calculatedFixedDamage: 100,
-					calculationProcess: `${weaponType}:|${weaponType === '旋風槍' ? 1000 : 1500}+${adjustedSTR}| = ${multiplier}%, 固定100`
+					calculationProcess: `${weaponType}:|${weaponType === '旋風槍' ? 1000 : 1500}+${adjustedSTR}| = ${multiplier}%, 固定100`,
 				}
 			}
 

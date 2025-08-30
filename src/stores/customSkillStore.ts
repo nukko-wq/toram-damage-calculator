@@ -1,9 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type {
-	PowerReferenceType,
-	AdaptationType,
-} from '../types/calculator'
+import type { PowerReferenceType, AdaptationType } from '../types/calculator'
 
 export interface CustomSkillSettings {
 	name: string

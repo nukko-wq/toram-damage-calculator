@@ -109,12 +109,26 @@ export default function VerificationResults({
 					2点測定法による数学的解法結果
 				</h4>
 				<ul className="text-xs text-blue-700 space-y-1">
-					<li>• <strong>解法方式</strong>: 2つの実測値から連立方程式を解いて算出</li>
-					<li>• <strong>精度</strong>: 推測値ではなく数学的に正確な解</li>
-					<li>• <strong>計算式</strong>: ダメージ = INT((Lv + ATK - 1 + 固定値) × 倍率/100)</li>
-					<li>• <strong>測定条件</strong>: 理想条件（敵Lv1、全バフ無効、安定率100%）</li>
-					<li>• <strong>測定方法</strong>: 通常ATK vs ATK+100での2回測定</li>
-					<li>• <strong>推奨環境</strong>: ダミー人形での検証が最適</li>
+					<li>
+						• <strong>解法方式</strong>: 2つの実測値から連立方程式を解いて算出
+					</li>
+					<li>
+						• <strong>精度</strong>: 推測値ではなく数学的に正確な解
+					</li>
+					<li>
+						• <strong>計算式</strong>: ダメージ = INT((Lv + ATK - 1 + 固定値) ×
+						倍率/100)
+					</li>
+					<li>
+						• <strong>測定条件</strong>:
+						理想条件（敵Lv1、全バフ無効、安定率100%）
+					</li>
+					<li>
+						• <strong>測定方法</strong>: 通常ATK vs ATK+100での2回測定
+					</li>
+					<li>
+						• <strong>推奨環境</strong>: ダミー人形での検証が最適
+					</li>
 				</ul>
 			</div>
 		</div>
