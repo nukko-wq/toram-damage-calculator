@@ -53,6 +53,15 @@ export const staffSkills: BuffSkillDefinition[] = [
 		order: 501,
 	},
 
+	// モノノフスキル
+	{
+		id: 'sm1-1',
+		name: '両手持ち',
+		category: 'mononofu',
+		type: 'toggle',
+		order: 603,
+	},
+
 	// マジックブレードスキル
 	{
 		id: 'MagicWarrior',
