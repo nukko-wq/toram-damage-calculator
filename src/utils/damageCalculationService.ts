@@ -4,7 +4,6 @@
  */
 
 import { getAttackSkillById } from '@/data/attackSkills'
-import { useCustomSkillStore } from '@/stores/customSkillStore'
 import type { BuffSkillState } from '@/types/buffSkill'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
@@ -109,7 +108,7 @@ export function calculateDamageWithService(
 	} = options
 
 	// デバッグログを一時的に無効化
-	const debugEnabled = false
+	const debugEnabled = true
 
 	try {
 		// 基本的な計算入力データを作成
@@ -517,7 +516,7 @@ export function calculateDamageWithService(
 
 					const skillInput = {
 						...input,
-						// スキルの場合はMATK、ATK、spearMATK、またはtotalATKを参照
+						// スキルの場合はMATK、ATK、spearMATK、ATK_spearMATK_half、またはtotalATKを参照
 						referenceStat:
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
@@ -525,7 +524,10 @@ export function calculateDamageWithService(
 									? calculationResults?.basicStats.spearMATK || 1500
 									: originalHit.powerReference === 'ATK'
 										? calculationResults?.basicStats.ATK || 0
-										: totalATK,
+										: originalHit.powerReference === 'ATK_spearMATK_half'
+											? (calculationResults?.basicStats.ATK || 0) + 
+											  Math.floor((calculationResults?.basicStats.spearMATK || 0) * 0.5)
+											: totalATK,
 						// スキルカテゴリを考慮したパッシブ倍率を適用
 						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
 							calculatorData.buffSkills?.skills || null,
@@ -549,20 +551,8 @@ export function calculateDamageWithService(
 							fixedDamage: hitResult.calculatedFixedDamage,
 							supportedDistances: (() => {
 								const distances: ('short' | 'long')[] = []
-								// カスタムスキルの場合は設定を参照
-								if (selectedSkill.id === 'custom_skill') {
-									// カスタムスキル設定を取得
-									const customSkillSettings =
-										useCustomSkillStore.getState().settings
-									if (customSkillSettings.distancePower === 'short')
-										distances.push('short')
-									if (customSkillSettings.distancePower === 'long')
-										distances.push('long')
-								} else {
-									// 通常のスキルの場合
-									if (originalHit.canUseShortRangePower) distances.push('short')
-									if (originalHit.canUseLongRangePower) distances.push('long')
-								}
+								if (originalHit.canUseShortRangePower) distances.push('short')
+								if (originalHit.canUseLongRangePower) distances.push('long')
 								return distances
 							})(),
 							canUseLongRange: originalHit.canUseLongRange,

@@ -636,6 +636,52 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// ドラゴニックチャージ(3m+進度2以下)
+	{
+		id: 'dragonic_charge_3m_progress2',
+		name: 'ドラゴニックチャージ(3m+進度2以下)',
+		order: 207,
+		systemGroup: 'halberd',
+		category: 'halberd',
+		weaponTypeRequirements: ['旋風槍'],
+		mpCost: 300,
+		multiplierFormula: '1000%',
+		fixedDamageFormula: '300',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1000,
+				fixedDamage: 300,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+				specialEffects: ['物理貫通ボーナス+20%'],
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'MDEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK_spearMATK_half',
+				multiplier: 1000,
+				fixedDamage: 300,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// 術式/ストーム（1/6hit）- 旧仕様
 	{
 		id: 'storm_1_6hit',

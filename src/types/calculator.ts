@@ -849,7 +849,12 @@ export type AttackSkillCategory =
 	| 'custom' // カスタムスキル // ミンストレルスキル
 
 // 威力参照タイプ
-export type PowerReferenceType = 'totalATK' | 'ATK' | 'MATK' | 'spearMATK' | 'ATK_spearMATK_half' // ATK+(spearMATK*0.5)の特殊参照
+export type PowerReferenceType =
+	| 'totalATK'
+	| 'ATK'
+	| 'MATK'
+	| 'spearMATK'
+	| 'ATK_spearMATK_half' // ATK+(spearMATK*0.5)の特殊参照
 
 // 慣れタイプ
 export type AdaptationType = 'physical' | 'magical' | 'normal'

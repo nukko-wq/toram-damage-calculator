@@ -6,6 +6,7 @@ import {
 	CustomSkillCalculator,
 	CycloneArrowCalculator,
 	DangerShakeCalculator,
+	DragonicCharge3mProgress2Calculator,
 	LBoomerang3Calculator,
 	MagicArrowCalculator,
 	MeteorBreakerCalculator,
@@ -89,6 +90,8 @@ export class AttackSkillCalculator {
 				return new CustomSkillCalculator()
 			case 'danger_shake':
 				return new DangerShakeCalculator()
+			case 'dragonic_charge_3m_progress2':
+				return new DragonicCharge3mProgress2Calculator()
 			case 'l_boomerang_3':
 				return new LBoomerang3Calculator()
 			case 'meteor_breaker':

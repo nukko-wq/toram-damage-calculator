@@ -4,6 +4,7 @@ export { CrossFireVariableChargeCalculator } from './CrossFireVariableChargeCalc
 export { CustomSkillCalculator } from './CustomSkillCalculator'
 export { CycloneArrowCalculator } from './CycloneArrowCalculator'
 export { DangerShakeCalculator } from './DangerShakeCalculator'
+export { DragonicCharge3mProgress2Calculator } from './DragonicCharge3mProgress2Calculator'
 export { LBoomerang3Calculator } from './LBoomerang3Calculator'
 export { MagicArrowCalculator } from './MagicArrowCalculator'
 export { MeteorBreakerCalculator } from './MeteorBreakerCalculator'
