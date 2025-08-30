@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import { useCustomSkillStore } from '../../stores/customSkillStore'
 import type { CustomSkillSettings } from '../../stores/customSkillStore'
+import { useCustomSkillStore } from '../../stores/customSkillStore'
 
 interface CustomSkillSettingsPanelProps {
 	isVisible: boolean
