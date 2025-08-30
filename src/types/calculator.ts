@@ -813,6 +813,7 @@ export type AttackSkillSystemGroup =
 	| 'magic' // 魔法系統
 	| 'katana' // 抜刀系統
 	| 'dualSword' // 双剣系統
+	| 'necromancer' // ネクロマンサー系統
 	| 'custom' // カスタム系統
 	| 'other' // その他 // その他
 
@@ -833,6 +834,7 @@ export type AttackSkillCategory =
 	| 'priest' // プリーストスキル
 	| 'magicBlade' // マジックブレードスキル
 	| 'darkPower' // ダークパワースキル
+	| 'necromancer' // ネクロマンサースキル
 	| 'assassin' // アサシンスキル
 	| 'wizard' // ウィザードスキル
 	| 'guard' // ガードスキル

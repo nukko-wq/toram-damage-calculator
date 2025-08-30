@@ -1005,6 +1005,53 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// デンジャーシェイク(前入力派生)
+	{
+		id: 'danger_shake',
+		name: 'デンジャーシェイク(前入力派生)',
+		order: 301,
+		systemGroup: 'necromancer',
+		category: 'necromancer',
+		weaponTypeRequirements: ['杖', '旋風槍'],
+		mpCost: 100,
+		multiplierFormula: '特殊計算',
+		fixedDamageFormula: '100',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1000, // 表示用（実際の計算は外部）
+				fixedDamage: 100, // 固定100ダメージ
+				multiplierFormula: '杖:|1000+基礎STR/2|%, 旋風槍:|750+基礎STR/2|%',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1500, // 表示用（実際の計算は外部）
+				fixedDamage: 100, // 固定100ダメージ
+				multiplierFormula: '杖:|1500+補正後STR|%, 旋風槍:|1000+補正後STR|%',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// カスタムスキル（ユーザー設定可能）
 	{
 		id: 'custom_skill',
@@ -1077,6 +1124,8 @@ export function getSystemGroupLabel(
 			return '抜刀系統------'
 		case 'dualSword':
 			return '双剣系統------'
+		case 'necromancer':
+			return 'ネクロマンサー系統------'
 		case 'custom':
 			return 'カスタム------'
 		case 'other':
