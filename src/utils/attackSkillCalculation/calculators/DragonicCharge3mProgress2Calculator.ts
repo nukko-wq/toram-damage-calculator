@@ -12,12 +12,15 @@ export class DragonicCharge3mProgress2Calculator extends SkillHitCalculator {
 
 		switch (hitNumber) {
 			case 1:
-				// 1hit目: 標準物理攻撃
+				// 1hit目: 標準物理攻撃 + 物理貫通ボーナス+20%
 				return {
 					hitNumber: 1,
 					calculatedMultiplier: 1000, // 固定1000%
 					calculatedFixedDamage: 300, // 固定300
-					calculationProcess: 'Fixed: 1000%, 300',
+					calculationProcess: 'Fixed: 1000%, 300, 物理貫通: 20%',
+					specialEffects: {
+						physicalPenetration: 20, // 物理貫通ボーナス+20%
+					},
 				}
 
 			case 2:

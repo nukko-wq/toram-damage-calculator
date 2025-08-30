@@ -29,6 +29,9 @@ export interface DamageCalculationInput {
 		canUseLongRange: boolean // ロングレンジバフの適用可否
 		skillId?: string // スキルID（スキル固有効果用）
 		hitNumber?: number // ヒット番号（スキル固有効果用）
+		specialEffects?: {
+			physicalPenetration?: number // 特殊効果による物理貫通
+		}
 	}
 
 	// 武器情報（スキル特殊効果計算用）
@@ -1084,9 +1087,19 @@ function processEnemyDefense(
 		)
 		penetrationRate += skillPenetrationBonus
 
+		// スキル特殊効果による貫通ボーナス追加
+		const specialEffectsPenetration = input.attackSkill.specialEffects?.physicalPenetration || 0
+		penetrationRate += specialEffectsPenetration
+
 		if (DEBUG_LOG_ENABLED && skillPenetrationBonus > 0) {
 			console.log(
 				`スキル固有貫通ボーナス: +${skillPenetrationBonus}% (スキルID: ${input.attackSkill.skillId})`,
+			)
+		}
+
+		if (DEBUG_LOG_ENABLED && specialEffectsPenetration > 0) {
+			console.log(
+				`スキル特殊効果貫通ボーナス: +${specialEffectsPenetration}% (スキルID: ${input.attackSkill.skillId})`,
 			)
 		}
 	} else if (defenseType === 'MDEF') {
