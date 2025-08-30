@@ -80,6 +80,69 @@ interface WeaponRequirement {
 
 全武器種で使用可能なバフスキルです。
 
+### 0. マスタリ系統
+
+#### 0.1 マジックマスタリ (Ms-magic)
+```typescript
+{
+  id: 'Ms-magic',
+  name: 'マジックマスタリ',
+  category: 'mastery',
+  type: 'level',
+  order: 101,
+  maxLevel: 10,
+  description: '杖・魔導具装備時に魔法攻撃力と武器攻撃力を上昇させる',
+  effects: [
+    {
+      property: 'MATK_Rate',
+      formula: 'Math.floor((skillLevel - 3) / 5) + 2',
+      conditions: ['メイン武器が杖または魔導具の場合のみ適用']
+    },
+    {
+      property: 'WeaponAtk_Rate',
+      formula: 'skillLevel * 3',
+      conditions: ['メイン武器が杖または魔導具の場合のみ適用']
+    }
+  ],
+  calculationFormula: `
+    メイン武器が杖または魔導具の場合:
+    - MATK_Rate: Math.floor((skillLevel - 3) / 5) + 2 %の加算
+    - WeaponAtk_Rate: skillLevel × 3 %の加算
+  `,
+  weaponRequirements: [
+    {
+      weaponType: '杖',
+      description: 'メイン武器が杖の場合に効果があります'
+    },
+    {
+      weaponType: '魔導具',
+      description: 'メイン武器が魔導具の場合に効果があります'
+    }
+  ],
+  uiSettings: {
+    parameterName: 'スキルレベル',
+    parameterUnit: 'Lv',
+    showInModal: true,
+    quickToggle: false
+  }
+}
+```
+
+**計算例:**
+- スキルレベル1: MATK率+2%、武器ATK率+3%
+- スキルレベル3: MATK率+2%、武器ATK率+9%
+- スキルレベル8: MATK率+3%、武器ATK率+24%
+- スキルレベル10: MATK率+3%、武器ATK率+30%
+
+**MATK_Rate詳細:**
+- Lv1-2: +2%
+- Lv3-7: +2%  
+- Lv8-10: +3%
+
+**適用条件:**
+- メイン武器が杖または魔導具の場合のみ効果を発揮
+- その他の武器種では無効
+
 ### 1. ブレードスキル系統
 
 詳細は [buff-skills/blade-skills.md](./buff-skills/blade-skills.md) を参照してください。
