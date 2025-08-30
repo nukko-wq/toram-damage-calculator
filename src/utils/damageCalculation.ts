@@ -29,6 +29,7 @@ export interface DamageCalculationInput {
 		canUseLongRange: boolean // ロングレンジバフの適用可否
 		skillId?: string // スキルID（スキル固有効果用）
 		hitNumber?: number // ヒット番号（スキル固有効果用）
+		referenceDefense?: 'DEF' | 'MDEF' // 参照防御力タイプ
 		specialEffects?: {
 			physicalPenetration?: number // 特殊効果による物理貫通
 		}
@@ -465,10 +466,12 @@ function calculateBaseDamage(
 		)
 	}
 
+	// 参照防御力タイプを優先、未指定の場合は従来通り攻撃タイプから決定
+	const defenseType = input.attackSkill.referenceDefense || 
+	                    (input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF')
+	
 	// 敵防御力処理
-	const enemyDefense =
-		input.attackSkill.type === 'physical' ? input.enemy.DEF : input.enemy.MDEF
-	const defenseType = input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF'
+	const enemyDefense = defenseType === 'DEF' ? input.enemy.DEF : input.enemy.MDEF
 	const processedDefense = processEnemyDefense(enemyDefense, input, defenseType)
 
 	// 防御力減算前に小数点を切り捨て

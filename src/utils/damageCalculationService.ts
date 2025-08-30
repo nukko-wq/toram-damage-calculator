@@ -558,6 +558,7 @@ export function calculateDamageWithService(
 							canUseLongRange: originalHit.canUseLongRange,
 							skillId: selectedSkill.id,
 							hitNumber: hitResult.hitNumber,
+							referenceDefense: originalHit.referenceDefense,
 							specialEffects: hitResult.specialEffects,
 						},
 						// スキルでも距離・抜刀・慣れ設定を適用
