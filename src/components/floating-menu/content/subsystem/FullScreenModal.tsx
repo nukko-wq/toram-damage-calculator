@@ -38,8 +38,9 @@ export default function FullScreenModal({
 	// 背景スクロール防止（position: fixed方式）
 	const lockScroll = useCallback(() => {
 		// 現在のスクロール位置を保存
-		scrollPositionRef.current = window.pageYOffset || document.documentElement.scrollTop
-		
+		scrollPositionRef.current =
+			window.pageYOffset || document.documentElement.scrollTop
+
 		// bodyを固定してスクロールを防止
 		document.body.style.position = 'fixed'
 		document.body.style.top = `-${scrollPositionRef.current}px`
@@ -51,7 +52,7 @@ export default function FullScreenModal({
 		document.body.style.position = ''
 		document.body.style.top = ''
 		document.body.style.width = ''
-		
+
 		// 保存したスクロール位置に復元
 		window.scrollTo(0, scrollPositionRef.current)
 	}, [])

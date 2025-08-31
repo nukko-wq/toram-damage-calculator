@@ -636,6 +636,52 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// ドラゴニックチャージ(3m+進度2以下)
+	{
+		id: 'dragonic_charge_3m_progress2',
+		name: 'ドラゴニックチャージ(3m+進度2以下)',
+		order: 207,
+		systemGroup: 'halberd',
+		category: 'halberd',
+		weaponTypeRequirements: ['旋風槍'],
+		mpCost: 300,
+		multiplierFormula: '1000%',
+		fixedDamageFormula: '300',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1000,
+				fixedDamage: 300,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+				specialEffects: ['物理貫通ボーナス+20%'],
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'MDEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK_spearMATK_half',
+				multiplier: 1000,
+				fixedDamage: 0,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
 	// 術式/ストーム（1/6hit）- 旧仕様
 	{
 		id: 'storm_1_6hit',
@@ -733,7 +779,7 @@ const attackSkillsRawData: AttackSkill[] = [
 	{
 		id: 'cyclone_arrow',
 		name: 'サイクロンアロー',
-		order: 502,
+		order: 503,
 		systemGroup: 'bow',
 		category: 'hunter',
 		weaponTypeRequirements: ['弓'],
@@ -796,6 +842,59 @@ const attackSkillsRawData: AttackSkill[] = [
 				powerReference: 'ATK',
 				multiplier: 400, // 弓装備時の表示用（200%x2）
 				fixedDamage: 400, // 固定ダメージ400
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['物理貫通'], // 自動弓装備時のみ適用
+			},
+		],
+	},
+
+	// クロスファイア(溜め可変)（弓スキル）
+	{
+		id: 'cross_fire_variable_charge',
+		name: 'クロスファイア(溜め可変)',
+		order: 502,
+		systemGroup: 'bow',
+		category: 'shoot',
+		weaponTypeRequirements: ['弓', '自動弓'],
+		mpCost: 400,
+		multiplierFormula: '弓:特殊計算(溜め可変)、自動弓:特殊計算(溜め可変)',
+		fixedDamageFormula: '400/400',
+		hasVariableCharging: true,
+		chargingRange: {
+			min: 1,
+			max: 5,
+			default: 1,
+		},
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1950, // 弓装備時の表示用（デフォルト値: 溜め1回）
+				fixedDamage: 400, // 固定ダメージ400
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: true,
+				canUseShortRangePower: true,
+				canUseLongRangePower: true,
+				specialEffects: ['物理貫通'], // 自動弓装備時のみ適用
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 0, // 弓装備時の表示用（デフォルト値: 溜め1回 = 0%）
+				fixedDamage: 0, // チャージ1の場合固定ダメージ0
 				adaptation: 'physical',
 				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
@@ -951,6 +1050,113 @@ const attackSkillsRawData: AttackSkill[] = [
 			},
 		],
 	},
+
+	// デンジャーシェイク(前入力派生)
+	{
+		id: 'danger_shake',
+		name: 'デンジャーシェイク(前入力派生)',
+		order: 301,
+		systemGroup: 'necromancer',
+		category: 'necromancer',
+		weaponTypeRequirements: ['杖', '旋風槍'],
+		mpCost: 100,
+		multiplierFormula: '特殊計算',
+		fixedDamageFormula: '100',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1000, // 表示用（実際の計算は外部）
+				fixedDamage: 100, // 固定100ダメージ
+				multiplierFormula: '杖:|1000+基礎STR/2|%, 旋風槍:|750+基礎STR/2|%',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+			{
+				hitNumber: 2,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 1500, // 表示用（実際の計算は外部）
+				fixedDamage: 100, // 固定100ダメージ
+				multiplierFormula: '杖:|1500+補正後STR|%, 旋風槍:|1000+補正後STR|%',
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
+	// トゥーム
+	{
+		id: 'tomb',
+		name: 'トゥーム',
+		order: 302,
+		systemGroup: 'necromancer',
+		category: 'necromancer',
+		weaponTypeRequirements: [], // 全武器対応
+		mpCost: 300,
+		multiplierFormula: '250%',
+		fixedDamageFormula: '300',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 250,
+				fixedDamage: 300,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: true,
+				canUseLongRangePower: false,
+			},
+		],
+	},
+
+	// カスタムスキル（ユーザー設定可能）
+	{
+		id: 'custom_skill',
+		name: 'カスタムスキル',
+		order: 999,
+		systemGroup: 'custom',
+		category: 'custom',
+		weaponTypeRequirements: [], // 全武器対応
+		mpCost: 100,
+		multiplierFormula: 'ユーザー設定',
+		fixedDamageFormula: 'ユーザー設定',
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical',
+				referenceDefense: 'DEF',
+				referenceResistance: 'physical',
+				powerReference: 'ATK',
+				multiplier: 100,
+				fixedDamage: 0,
+				adaptation: 'physical',
+				adaptationGrant: 'physical',
+				canUseUnsheathePower: false,
+				canUseLongRange: false,
+				canUseShortRangePower: false,
+				canUseLongRangePower: false,
+			},
+		],
+	},
 ]
 
 /**
@@ -994,6 +1200,10 @@ export function getSystemGroupLabel(
 			return '抜刀系統------'
 		case 'dualSword':
 			return '双剣系統------'
+		case 'necromancer':
+			return 'ネクロマンサー系統------'
+		case 'custom':
+			return 'カスタム------'
 		case 'other':
 			return 'その他------'
 	}

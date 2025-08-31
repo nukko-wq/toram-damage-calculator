@@ -813,7 +813,9 @@ export type AttackSkillSystemGroup =
 	| 'magic' // 魔法系統
 	| 'katana' // 抜刀系統
 	| 'dualSword' // 双剣系統
-	| 'other' // その他
+	| 'necromancer' // ネクロマンサー系統
+	| 'custom' // カスタム系統
+	| 'other' // その他 // その他
 
 export type AttackSkillCategory =
 	| 'blade' // ブレードスキル
@@ -832,6 +834,7 @@ export type AttackSkillCategory =
 	| 'priest' // プリーストスキル
 	| 'magicBlade' // マジックブレードスキル
 	| 'darkPower' // ダークパワースキル
+	| 'necromancer' // ネクロマンサースキル
 	| 'assassin' // アサシンスキル
 	| 'wizard' // ウィザードスキル
 	| 'guard' // ガードスキル
@@ -843,9 +846,15 @@ export type AttackSkillCategory =
 	| 'battle' // バトルスキル
 	| 'dancer' // ダンサースキル
 	| 'minstrel' // ミンストレルスキル
+	| 'custom' // カスタムスキル // ミンストレルスキル
 
 // 威力参照タイプ
-export type PowerReferenceType = 'totalATK' | 'ATK' | 'MATK' | 'spearMATK' // 将来拡張: 'STR', 'INT', etc.
+export type PowerReferenceType =
+	| 'totalATK'
+	| 'ATK'
+	| 'MATK'
+	| 'spearMATK'
+	| 'ATK_spearMATK_half' // ATK+(spearMATK*0.5)の特殊参照
 
 // 慣れタイプ
 export type AdaptationType = 'physical' | 'magical' | 'normal'
@@ -908,6 +917,14 @@ export interface AttackSkill {
 
 	// 特殊効果
 	specialEffects?: string[] // 特殊効果の説明文配列
+
+	// 溜め可変機能
+	hasVariableCharging?: boolean // 溜め可変機能あり
+	chargingRange?: {
+		min: number
+		max: number
+		default: number
+	} // 溜め回数設定範囲
 
 	// メタ情報
 	notes?: string // 実装・使用上の注意

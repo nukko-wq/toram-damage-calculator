@@ -1,7 +1,9 @@
 'use client'
 
 import { useMemo } from 'react'
-import PropertyEditor, { getBasePropertyLabel } from '@/components/equipment/PropertyEditor'
+import PropertyEditor, {
+	getBasePropertyLabel,
+} from '@/components/equipment/PropertyEditor'
 import { useUIStore } from '@/stores/uiStore'
 import type { Equipment, EquipmentProperties } from '@/types/calculator'
 

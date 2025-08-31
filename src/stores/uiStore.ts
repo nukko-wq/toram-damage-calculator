@@ -1,7 +1,12 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import type { UIStore, CustomType, NavigationScreen, EditMode } from '@/types/stores'
 import type { CrystalType, EquipmentProperties } from '@/types/calculator'
+import type {
+	CustomType,
+	EditMode,
+	NavigationScreen,
+	UIStore,
+} from '@/types/stores'
 import { safeJSONParse } from '@/utils/storage'
 
 // ローカルストレージから初期カテゴリ状態を取得
@@ -40,6 +45,13 @@ export const useUIStore = create<UIStore>()(
 				statusPreviewCategories: getInitialStatusPreviewCategories(),
 				statusPreviewHeight: 400, // デフォルトの高さ（400px）
 				damagePreviewHeight: 600, // デフォルトの高さ（600px）
+
+				// 攻撃スキル関連の初期状態
+				attackSkill: {
+					variableCharge: {
+						chargeLevel: 1, // デフォルト1回
+					},
+				},
 
 				// サブシステム関連の初期状態
 				subsystem: {
@@ -212,7 +224,7 @@ export const useUIStore = create<UIStore>()(
 				goBack: () => {
 					const currentScreen = get().subsystem.navigation.currentScreen
 					let previousScreen: NavigationScreen = 'main'
-					
+
 					switch (currentScreen) {
 						case 'type_selection':
 							previousScreen = 'main'
@@ -232,14 +244,14 @@ export const useUIStore = create<UIStore>()(
 						default:
 							previousScreen = 'main'
 					}
-					
+
 					get().navigateToScreen(previousScreen)
 				},
 
 				goNext: () => {
 					const currentScreen = get().subsystem.navigation.currentScreen
 					let nextScreen: NavigationScreen = 'main'
-					
+
 					switch (currentScreen) {
 						case 'main':
 							nextScreen = 'type_selection'
@@ -260,7 +272,7 @@ export const useUIStore = create<UIStore>()(
 							nextScreen = 'main'
 							break
 					}
-					
+
 					get().navigateToScreen(nextScreen)
 				},
 
@@ -368,7 +380,8 @@ export const useUIStore = create<UIStore>()(
 									newRegistration: {
 										...state.subsystem.crystalCustom.newRegistration,
 										properties: {
-											...state.subsystem.crystalCustom.newRegistration.properties,
+											...state.subsystem.crystalCustom.newRegistration
+												.properties,
 											...data,
 										},
 									},
@@ -449,7 +462,9 @@ export const useUIStore = create<UIStore>()(
 
 				confirmDeletion: async (crystalId) => {
 					// 削除前にクリスタル名を取得
-					const { getUserCrystalById } = await import('../utils/crystalDatabase')
+					const { getUserCrystalById } = await import(
+						'../utils/crystalDatabase'
+					)
 					const crystal = getUserCrystalById(crystalId)
 					const crystalName = crystal ? crystal.name : 'Unknown Crystal'
 
@@ -473,7 +488,9 @@ export const useUIStore = create<UIStore>()(
 
 					try {
 						// crystalDatabase から deleteUserCrystal をインポートして実行
-						const { deleteUserCrystal } = await import('../utils/crystalDatabase')
+						const { deleteUserCrystal } = await import(
+							'../utils/crystalDatabase'
+						)
 						await deleteUserCrystal(crystalId)
 
 						// 削除成功後の状態更新
@@ -564,6 +581,24 @@ export const useUIStore = create<UIStore>()(
 						}),
 						false,
 						'clearDeleteSuccess',
+					)
+				},
+
+				// 攻撃スキル関連アクション
+				setChargeLevel: (level: number) => {
+					if (level < 1 || level > 5) return
+					set(
+						(state) => ({
+							attackSkill: {
+								...state.attackSkill,
+								variableCharge: {
+									...state.attackSkill.variableCharge,
+									chargeLevel: level,
+								},
+							},
+						}),
+						false,
+						'setChargeLevel',
 					)
 				},
 			}),

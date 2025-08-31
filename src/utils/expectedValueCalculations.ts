@@ -2,13 +2,17 @@
  * 期待値表示での計算ロジック
  */
 
-import type { CalculatorData, EnemyFormData, WeaponType } from '@/types/calculator'
-import type { CalculationResults } from '@/types/calculationResult'
-import { getPresetEnemyById } from '@/utils/enemyDatabase'
-import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
-import { calculateRaidBossStats } from '@/utils/raidBossCalculation'
 import { getAttackSkillById } from '@/data/attackSkills'
+import type { CalculationResults } from '@/types/calculationResult'
+import type {
+	CalculatorData,
+	EnemyFormData,
+	WeaponType,
+} from '@/types/calculator'
+import { calculateBossDifficultyStats } from '@/utils/bossDifficultyCalculation'
 import { calculateDamageWithService } from '@/utils/damageCalculationService'
+import { getPresetEnemyById } from '@/utils/enemyDatabase'
+import { calculateRaidBossStats } from '@/utils/raidBossCalculation'
 
 // 武器種別の最低保証HIT率を取得
 export const getMinimumGuaranteedHitRate = (weaponType: WeaponType): number => {
@@ -60,10 +64,10 @@ export const calculateHitRate = (
 ): number => {
 	// 基本命中率
 	const baseHitRate = 100 - (requiredHit - playerHitValue) / 3
-	
+
 	// スキル補正
 	const skillBonus = skillMpCost / 10
-	
+
 	// 最終命中率（0%～100%でキャップ、小数点以下切り捨て）
 	return Math.floor(Math.max(0, Math.min(100, baseHitRate + skillBonus)))
 }
@@ -98,13 +102,20 @@ const getEnemyResistCritical = (enemyFormData: EnemyFormData): number => {
 
 		// ボス難易度調整
 		if (enemy.category === 'boss' && enemyFormData.difficulty) {
-			const adjustedStats = calculateBossDifficultyStats(enemy.level, enemy.stats, enemyFormData.difficulty)
+			const adjustedStats = calculateBossDifficultyStats(
+				enemy.level,
+				enemy.stats,
+				enemyFormData.difficulty,
+			)
 			return adjustedStats.stats.resistCritical
 		}
 
 		// レイドボス調整
 		if (enemy.category === 'raidBoss' && enemyFormData.raidBossLevel) {
-			const adjustedStats = calculateRaidBossStats(enemy.id, enemyFormData.raidBossLevel)
+			const adjustedStats = calculateRaidBossStats(
+				enemy.id,
+				enemyFormData.raidBossLevel,
+			)
 			return adjustedStats.resistCritical
 		}
 
@@ -134,13 +145,20 @@ const getEnemyRequiredHit = (enemyFormData: EnemyFormData): number => {
 
 		// ボス難易度調整
 		if (enemy.category === 'boss' && enemyFormData.difficulty) {
-			const adjustedStats = calculateBossDifficultyStats(enemy.level, enemy.stats, enemyFormData.difficulty)
+			const adjustedStats = calculateBossDifficultyStats(
+				enemy.level,
+				enemy.stats,
+				enemyFormData.difficulty,
+			)
 			return adjustedStats.stats.requiredHIT
 		}
 
 		// レイドボス調整
 		if (enemy.category === 'raidBoss' && enemyFormData.raidBossLevel) {
-			const adjustedStats = calculateRaidBossStats(enemy.id, enemyFormData.raidBossLevel)
+			const adjustedStats = calculateRaidBossStats(
+				enemy.id,
+				enemyFormData.raidBossLevel,
+			)
 			return adjustedStats.requiredHIT
 		}
 
@@ -160,20 +178,24 @@ export const getExpectedValueParams = (
 	// StatusPreviewの基本ステータスから取得
 	const playerCriticalStat = calculationResults?.basicStats?.criticalRate || 0
 	const playerHitStat = calculationResults?.basicStats?.HIT || 0
-	
+
 	// 敵情報から取得
 	const enemyRequiredCritical = getEnemyResistCritical(enemyFormData)
 	const enemyRequiredHit = getEnemyRequiredHit(enemyFormData)
-	
+
 	// AttackSkillFormから取得
-	const skillMpCost = calculatorData.attackSkill.selectedSkillId 
-		? getAttackSkillById(calculatorData.attackSkill.selectedSkillId)?.mpCost || 0
+	const skillMpCost = calculatorData.attackSkill.selectedSkillId
+		? getAttackSkillById(calculatorData.attackSkill.selectedSkillId)?.mpCost ||
+			0
 		: 0
-	
+
 	// 計算
-	const criticalRate = calculateCriticalRate(playerCriticalStat, enemyRequiredCritical)
+	const criticalRate = calculateCriticalRate(
+		playerCriticalStat,
+		enemyRequiredCritical,
+	)
 	const hitRate = calculateHitRate(playerHitStat, enemyRequiredHit, skillMpCost)
-	
+
 	return {
 		criticalRate,
 		hitRate,
@@ -217,16 +239,16 @@ export const calculateOccurrenceRatio = (
 ): OccurrenceRatioData => {
 	const guaranteedHitRate = getMinimumGuaranteedHitRate(weaponType)
 	const actualHitRate = Math.max(hitRate, guaranteedHitRate)
-	
+
 	// クリティカル系の内訳
-	const critical = criticalRate * hitRate / 100
-	const graze = criticalRate * (100 - hitRate) / 100 // クリティカル時のGraze
-	
+	const critical = (criticalRate * hitRate) / 100
+	const graze = (criticalRate * (100 - hitRate)) / 100 // クリティカル時のGraze
+
 	// 非クリティカル系の内訳
 	const nonCriticalTotal = 100 - criticalRate
-	const white = nonCriticalTotal * actualHitRate / 100 // 白ダメ（通常命中 + 保証HITによるGraze）
-	const miss = nonCriticalTotal * (100 - actualHitRate) / 100
-	
+	const white = (nonCriticalTotal * actualHitRate) / 100 // 白ダメ（通常命中 + 保証HITによるGraze）
+	const miss = (nonCriticalTotal * (100 - actualHitRate)) / 100
+
 	return {
 		critical: critical, // 正確な計算値
 		graze: graze, // クリティカル時のGraze
@@ -236,10 +258,12 @@ export const calculateOccurrenceRatio = (
 }
 
 // 与ダメージ割合を計算（ミス除外して正規化）
-export const calculateDamageRatio = (occurrenceRatio: OccurrenceRatioData): DamageRatioData => {
+export const calculateDamageRatio = (
+	occurrenceRatio: OccurrenceRatioData,
+): DamageRatioData => {
 	const { critical, graze, white } = occurrenceRatio
 	const totalEffectiveDamage = critical + graze + white
-	
+
 	// 有効ダメージが0の場合は全て0%
 	if (totalEffectiveDamage === 0) {
 		return {
@@ -248,12 +272,12 @@ export const calculateDamageRatio = (occurrenceRatio: OccurrenceRatioData): Dama
 			white: 0,
 		}
 	}
-	
+
 	// 正規化（ミスを除外して100%とする）
 	return {
-		critical: (critical / totalEffectiveDamage * 100),
-		graze: (graze / totalEffectiveDamage * 100),
-		white: (white / totalEffectiveDamage * 100),
+		critical: (critical / totalEffectiveDamage) * 100,
+		graze: (graze / totalEffectiveDamage) * 100,
+		white: (white / totalEffectiveDamage) * 100,
 	}
 }
 
@@ -263,7 +287,7 @@ export const calculateCriticalSystemRatio = (
 	grazeRate: number,
 ): { criticalRatio: number; grazeRatio: number } => {
 	const total = criticalRate + grazeRate
-	
+
 	// 合計が0の場合は0%とする
 	if (total === 0) {
 		return {
@@ -271,7 +295,7 @@ export const calculateCriticalSystemRatio = (
 			grazeRatio: 0,
 		}
 	}
-	
+
 	return {
 		criticalRatio: (criticalRate / total) * 100,
 		grazeRatio: (grazeRate / total) * 100,
@@ -286,47 +310,45 @@ export const calculateAverageStability = (
 	adaptationMultiplier: number = 100,
 ): number => {
 	if (!calculationResults) return 0
-	
+
 	// Critical系の割合を計算
 	const { criticalRatio, grazeRatio } = calculateCriticalSystemRatio(
 		occurrenceRatio.critical,
 		occurrenceRatio.graze,
 	)
-	
+
 	// Critical時の安定率を取得
 	const criticalDamageResult = calculateDamageWithService(
 		calculatorData,
 		calculationResults,
 		{
 			powerOptions: {
-				...calculatorData.powerOptions || {},
+				...(calculatorData.powerOptions || {}),
 				damageType: 'critical',
 			},
 			adaptationMultiplier,
 		},
 	)
 	const criticalStability = criticalDamageResult.normal.averageStability
-	
+
 	// Graze時の安定率を取得
 	const grazeDamageResult = calculateDamageWithService(
 		calculatorData,
 		calculationResults,
 		{
 			powerOptions: {
-				...calculatorData.powerOptions || {},
+				...(calculatorData.powerOptions || {}),
 				damageType: 'graze',
 			},
 			adaptationMultiplier,
 		},
 	)
 	const grazeStability = grazeDamageResult.normal.averageStability
-	
+
 	// 加重平均による平均安定率算出
 	if (criticalRatio + grazeRatio === 0) return 0
-	
-	return (
-		(criticalStability * criticalRatio + grazeStability * grazeRatio) / 100
-	)
+
+	return (criticalStability * criticalRatio + grazeStability * grazeRatio) / 100
 }
 
 // 期待値を計算
@@ -337,58 +359,58 @@ export const calculateExpectedValue = (
 	adaptationMultiplier: number = 100,
 ): number => {
 	if (!calculationResults) return 0
-	
+
 	// 各ダメージタイプの平均ダメージを取得
 	const criticalDamageResult = calculateDamageWithService(
 		calculatorData,
 		calculationResults,
 		{
 			powerOptions: {
-				...calculatorData.powerOptions || {},
+				...(calculatorData.powerOptions || {}),
 				damageType: 'critical',
 			},
 			adaptationMultiplier,
 		},
 	)
 	const criticalDamage = criticalDamageResult.normal.average
-	
+
 	const grazeDamageResult = calculateDamageWithService(
 		calculatorData,
 		calculationResults,
 		{
 			powerOptions: {
-				...calculatorData.powerOptions || {},
+				...(calculatorData.powerOptions || {}),
 				damageType: 'graze',
 			},
 			adaptationMultiplier,
 		},
 	)
 	const grazeDamage = grazeDamageResult.normal.average
-	
+
 	const whiteDamageResult = calculateDamageWithService(
 		calculatorData,
 		calculationResults,
 		{
 			powerOptions: {
-				...calculatorData.powerOptions || {},
+				...(calculatorData.powerOptions || {}),
 				damageType: 'white',
 			},
 			adaptationMultiplier,
 		},
 	)
 	const whiteDamage = whiteDamageResult.normal.average
-	
+
 	// ミスダメージは0
 	const missDamage = 0
-	
+
 	// 期待値計算（発生割合による加重平均）
-	const expectedValue = (
-		criticalDamage * occurrenceRatio.critical +
-		grazeDamage * occurrenceRatio.graze +
-		whiteDamage * occurrenceRatio.white +
-		missDamage * occurrenceRatio.miss
-	) / 100
-	
+	const expectedValue =
+		(criticalDamage * occurrenceRatio.critical +
+			grazeDamage * occurrenceRatio.graze +
+			whiteDamage * occurrenceRatio.white +
+			missDamage * occurrenceRatio.miss) /
+		100
+
 	// 計算過程をコンソールログで表示
 	console.group('期待値計算の詳細')
 	console.log('発生割合:', occurrenceRatio)
@@ -396,11 +418,14 @@ export const calculateExpectedValue = (
 	console.log('Grazeダメージ:', grazeDamage)
 	console.log('白ダメダメージ:', whiteDamage)
 	console.log('ミスダメージ:', missDamage)
-	console.log('計算式:', `(${criticalDamage} × ${occurrenceRatio.critical}% + ${grazeDamage} × ${occurrenceRatio.graze}% + ${whiteDamage} × ${occurrenceRatio.white}% + ${missDamage} × ${occurrenceRatio.miss}%) ÷ 100`)
+	console.log(
+		'計算式:',
+		`(${criticalDamage} × ${occurrenceRatio.critical}% + ${grazeDamage} × ${occurrenceRatio.graze}% + ${whiteDamage} × ${occurrenceRatio.white}% + ${missDamage} × ${occurrenceRatio.miss}%) ÷ 100`,
+	)
 	console.log('期待値（小数）:', expectedValue)
 	console.log('期待値（整数）:', Math.floor(expectedValue))
 	console.groupEnd()
-	
+
 	return Math.floor(expectedValue)
 }
 
@@ -412,26 +437,26 @@ export const calculatePowerEfficiency = (
 	adaptationMultiplier: number = 100,
 ): number => {
 	if (!calculationResults || expectedValue === 0) return 0
-	
+
 	// Criticalダメージの平均値を取得
 	const criticalDamageResult = calculateDamageWithService(
 		calculatorData,
 		calculationResults,
 		{
 			powerOptions: {
-				...calculatorData.powerOptions || {},
+				...(calculatorData.powerOptions || {}),
 				damageType: 'critical',
 			},
 			adaptationMultiplier,
 		},
 	)
 	const criticalAverageDamage = criticalDamageResult.normal.average
-	
+
 	if (criticalAverageDamage === 0) return 0
-	
+
 	// 威力発揮率 = (期待値 ÷ Criticalの平均ダメージ) × 100
 	const powerEfficiency = (expectedValue / criticalAverageDamage) * 100
-	
+
 	return Math.round(powerEfficiency * 100) / 100 // 小数点第2位まで
 }
 
@@ -442,11 +467,19 @@ export const calculateExpectedValueData = (
 	enemyFormData: EnemyFormData,
 	adaptationMultiplier: number = 100,
 ) => {
-	const params = getExpectedValueParams(calculatorData, calculationResults, enemyFormData)
+	const params = getExpectedValueParams(
+		calculatorData,
+		calculationResults,
+		enemyFormData,
+	)
 	const weaponType = calculatorData.mainWeapon.weaponType
-	const occurrenceRatio = calculateOccurrenceRatio(params.criticalRate, params.hitRate, weaponType)
+	const occurrenceRatio = calculateOccurrenceRatio(
+		params.criticalRate,
+		params.hitRate,
+		weaponType,
+	)
 	const damageRatio = calculateDamageRatio(occurrenceRatio)
-	
+
 	// 期待値を計算
 	const expectedValue = calculateExpectedValue(
 		calculatorData,
@@ -454,7 +487,7 @@ export const calculateExpectedValueData = (
 		occurrenceRatio,
 		adaptationMultiplier,
 	)
-	
+
 	// 平均安定率を計算
 	const averageStability = calculateAverageStability(
 		calculatorData,
@@ -462,7 +495,7 @@ export const calculateExpectedValueData = (
 		occurrenceRatio,
 		adaptationMultiplier,
 	)
-	
+
 	// 威力発揮率を計算
 	const powerEfficiency = calculatePowerEfficiency(
 		calculatorData,
@@ -470,7 +503,7 @@ export const calculateExpectedValueData = (
 		expectedValue,
 		adaptationMultiplier,
 	)
-	
+
 	return {
 		expectedValue, // 実際の期待値計算
 		averageStability: Math.round(averageStability * 10) / 10, // 小数点以下1桁で丸める

@@ -48,6 +48,9 @@ export interface DamageCalculationOptions {
 	debug?: boolean
 	powerOptions?: PowerOptions
 	adaptationMultiplier?: number // 慣れ倍率（50-250の範囲）
+	variableOptions?: {
+		chargeLevel?: number // クロスファイア(溜め可変)の場合のみ使用
+	}
 }
 
 /**
@@ -101,10 +104,11 @@ export function calculateDamageWithService(
 		debug = false,
 		powerOptions = createInitialPowerOptions(),
 		adaptationMultiplier = 100,
+		variableOptions,
 	} = options
 
 	// デバッグログを一時的に無効化
-	const debugEnabled = false
+	const debugEnabled = true
 
 	try {
 		// 基本的な計算入力データを作成
@@ -475,6 +479,7 @@ export function calculateDamageWithService(
 				const skillCalculationResult = attackSkillCalculation.calculateSkill(
 					selectedSkill.id,
 					calculatorData,
+					variableOptions,
 				)
 
 				// スキルダメージオプションに応じて計算対象の撃を決定
@@ -511,7 +516,7 @@ export function calculateDamageWithService(
 
 					const skillInput = {
 						...input,
-						// スキルの場合はMATK、ATK、spearMATK、またはtotalATKを参照
+						// スキルの場合はMATK、ATK、spearMATK、ATK_spearMATK_half、またはtotalATKを参照
 						referenceStat:
 							originalHit.powerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
@@ -519,7 +524,10 @@ export function calculateDamageWithService(
 									? calculationResults?.basicStats.spearMATK || 1500
 									: originalHit.powerReference === 'ATK'
 										? calculationResults?.basicStats.ATK || 0
-										: totalATK,
+										: originalHit.powerReference === 'ATK_spearMATK_half'
+											? (calculationResults?.basicStats.ATK || 0) + 
+											  Math.floor((calculationResults?.basicStats.spearMATK || 0) * 0.5)
+											: totalATK,
 						// スキルカテゴリを考慮したパッシブ倍率を適用
 						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
 							calculatorData.buffSkills?.skills || null,
@@ -550,6 +558,8 @@ export function calculateDamageWithService(
 							canUseLongRange: originalHit.canUseLongRange,
 							skillId: selectedSkill.id,
 							hitNumber: hitResult.hitNumber,
+							referenceDefense: originalHit.referenceDefense,
+							specialEffects: hitResult.specialEffects,
 						},
 						// スキルでも距離・抜刀・慣れ設定を適用
 						unsheathe: {

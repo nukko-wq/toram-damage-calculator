@@ -1,10 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { useUIStore } from '@/stores/uiStore'
-import { getUserCrystalById } from '@/utils/crystalDatabase'
 import { getBasePropertyLabel } from '@/components/equipment/PropertyEditor'
+import { useUIStore } from '@/stores/uiStore'
 import type { EquipmentProperties } from '@/types/calculator'
+import { getUserCrystalById } from '@/utils/crystalDatabase'
 
 export default function CrystalDeleteConfirmation() {
 	const {
@@ -29,9 +29,11 @@ export default function CrystalDeleteConfirmation() {
 	// 有効なプロパティ（0以外の値）を取得
 	const activeProperties = useMemo(() => {
 		if (!crystal) return []
-		
+
 		return Object.entries(crystal.properties)
-			.filter(([_, value]) => value !== 0 && value !== undefined && value !== null)
+			.filter(
+				([_, value]) => value !== 0 && value !== undefined && value !== null,
+			)
 			.map(([key, value]) => ({
 				property: key as keyof EquipmentProperties,
 				value: value as number,
@@ -122,7 +124,7 @@ export default function CrystalDeleteConfirmation() {
 							{deleteSuccess.message}
 						</p>
 					</div>
-					
+
 					<button
 						type="button"
 						onClick={handleBackToMain}
@@ -140,7 +142,9 @@ export default function CrystalDeleteConfirmation() {
 		return (
 			<div className="p-6">
 				<div className="text-center">
-					<p className="text-red-600 mb-4">削除対象のクリスタルが見つかりません</p>
+					<p className="text-red-600 mb-4">
+						削除対象のクリスタルが見つかりません
+					</p>
 					<button
 						type="button"
 						onClick={handleCancel}
@@ -186,7 +190,9 @@ export default function CrystalDeleteConfirmation() {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
 							<div>
 								<span className="font-medium text-gray-700">タイプ：</span>
-								<span className="text-gray-900">{getTypeLabel(crystal.type)}</span>
+								<span className="text-gray-900">
+									{getTypeLabel(crystal.type)}
+								</span>
 							</div>
 							<div>
 								<span className="font-medium text-gray-700">名称：</span>
@@ -197,8 +203,12 @@ export default function CrystalDeleteConfirmation() {
 								<span className="text-gray-900">{formattedCreatedAt}</span>
 							</div>
 							<div>
-								<span className="font-medium text-gray-700">プロパティ数：</span>
-								<span className="text-gray-900">{activeProperties.length}個</span>
+								<span className="font-medium text-gray-700">
+									プロパティ数：
+								</span>
+								<span className="text-gray-900">
+									{activeProperties.length}個
+								</span>
 							</div>
 						</div>
 					</div>

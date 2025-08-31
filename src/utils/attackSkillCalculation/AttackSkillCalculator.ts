@@ -2,7 +2,11 @@ import { getAttackSkillById } from '@/data/attackSkills'
 import {
 	BusterBladeCalculator,
 	CrossFire3ChargeCalculator,
+	CrossFireVariableChargeCalculator,
+	CustomSkillCalculator,
 	CycloneArrowCalculator,
+	DangerShakeCalculator,
+	DragonicCharge3mProgress2Calculator,
 	LBoomerang3Calculator,
 	MagicArrowCalculator,
 	MeteorBreakerCalculator,
@@ -44,6 +48,9 @@ export class AttackSkillCalculator {
 		playerStats: PlayerStats,
 		equipmentContext: EquipmentContext,
 		buffSkillContext?: BuffSkillContext,
+		variableOptions?: {
+			chargeLevel?: number
+		},
 	): SkillCalculationResult[] {
 		const skill = getAttackSkillById(skillId)
 		if (!skill) {
@@ -57,6 +64,7 @@ export class AttackSkillCalculator {
 				playerStats,
 				equipmentContext,
 				buffSkillContext,
+				variableOptions,
 			}),
 		)
 	}
@@ -76,6 +84,14 @@ export class AttackSkillCalculator {
 		switch (skillId) {
 			case 'cross_fire_3_charge':
 				return new CrossFire3ChargeCalculator()
+			case 'cross_fire_variable_charge':
+				return new CrossFireVariableChargeCalculator()
+			case 'custom_skill':
+				return new CustomSkillCalculator()
+			case 'danger_shake':
+				return new DangerShakeCalculator()
+			case 'dragonic_charge_3m_progress2':
+				return new DragonicCharge3mProgress2Calculator()
 			case 'l_boomerang_3':
 				return new LBoomerang3Calculator()
 			case 'meteor_breaker':
@@ -119,6 +135,7 @@ export class AttackSkillCalculator {
 			case 'power_shot':
 			case 'dual_strike':
 			case 'aura_blade':
+			case 'tomb':
 				return new StandardCalculator()
 			default:
 				throw new Error(`No calculator found for skill: ${skillId}`)

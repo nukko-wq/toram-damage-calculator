@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 
 interface AdaptationMultiplierSliderProps {
 	value: number
@@ -22,7 +22,10 @@ export default function AdaptationMultiplierSlider({
 	}, [value])
 
 	// valueが変更されたらtempValueを同期
-	if (tempValue !== value.toString() && document.activeElement?.tagName !== 'INPUT') {
+	if (
+		tempValue !== value.toString() &&
+		document.activeElement?.tagName !== 'INPUT'
+	) {
 		setTempValue(value.toString())
 	}
 

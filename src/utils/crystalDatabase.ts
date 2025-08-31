@@ -213,10 +213,10 @@ export const deleteUserCrystal = async (id: string): Promise<void> => {
 		if (!crystalExists) {
 			throw new Error(`Crystal with ID ${id} not found`)
 		}
-		
+
 		const filtered = userCrystals.filter((c) => c.id !== id)
 		StorageHelper.set(STORAGE_KEYS.CUSTOM_CRYSTALS, filtered)
-		
+
 		console.log(`Crystal deleted successfully: ${id}`)
 	} catch (error) {
 		console.error('Error deleting user crystal:', error)
@@ -292,4 +292,3 @@ export const getPresetCrystalsLegacy = (): PresetCrystal[] => {
 export const crystalExists = (id: string): boolean => {
 	return getAllCrystals().some((crystal) => crystal.id === id)
 }
-

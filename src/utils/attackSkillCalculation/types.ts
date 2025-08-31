@@ -71,4 +71,7 @@ export interface SkillCalculationInput {
 	playerStats: PlayerStats
 	equipmentContext: EquipmentContext
 	buffSkillContext?: BuffSkillContext
+	variableOptions?: {
+		chargeLevel?: number // クロスファイア(溜め可変)の場合のみ使用
+	}
 }

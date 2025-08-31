@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useUIStore } from '@/stores/uiStore'
-import { getUserCrystals, getUserCrystalById } from '@/utils/crystalDatabase'
+import { getUserCrystalById, getUserCrystals } from '@/utils/crystalDatabase'
 
 export default function CrystalCustomMain() {
 	const {

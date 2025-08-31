@@ -141,6 +141,30 @@ export const equipmentsData: EquipmentsData = {
 					NaturalHPRecovery: -30,
 				},
 			},
+			{
+				id: 'ed3069b9-0cb1-4776-ad89-a9d64253a3d7',
+				name: '弓汎用A10%D10%CD21CD%10C30',
+				properties: {
+					ATK_Rate: 10,
+					DEX_Rate: 10,
+					CriticalDamage: 21,
+					CriticalDamage_Rate: 10,
+					Critical: 30,
+					Dodge: -22,
+					NaturalHPRecovery: -30,
+				},
+			},
+			{
+				id: 'e8ce6f71-0cfb-4eeb-a121-88c2b1167611',
+				name: 'ネクロ属性有利23%A15%S10%',
+				properties: {
+					ElementAdvantage_Rate: 23,
+					ATK_Rate: 15,
+					STR_Rate: 10,
+					Dodge: -22,
+					NaturalHPRecovery: -12,
+				},
+			},
 		],
 		body: [
 			{
@@ -240,6 +264,18 @@ export const equipmentsData: EquipmentsData = {
 					PhysicalPenetration_Rate: -8,
 					Accuracy: -22,
 					Accuracy_Rate: -6,
+				},
+			},
+			{
+				id: 'e23dc735-2388-403b-9c25-31ad501bdde1',
+				name: 'オーシャンシーカー',
+				properties: {
+					HP: 4500,
+					MP: 600,
+					Stability_Rate: 15,
+					Accuracy_Rate: 30,
+					AttackSpeed: 600,
+					WindResistance_Rate: 30,
 				},
 			},
 		],
@@ -485,6 +521,14 @@ export const equipmentsData: EquipmentsData = {
 					},
 				],
 			},
+			{
+				id: '2a9be5e1-2c01-4b11-8e47-f8760e0f0138',
+				name: '輝く海のお守り',
+				properties: {
+					AilmentResistance_Rate: 5,
+					Stability_Rate: 10,
+				},
+			},
 		],
 		subWeapon: [
 			{
@@ -605,6 +649,15 @@ export const equipmentsData: EquipmentsData = {
 					CastingSpeed: 300,
 					LightResistance_Rate: 30,
 					Aggro_Rate: 60,
+				},
+			},
+			{
+				id: '22ec7788-9d15-44d6-95e4-0d75fab1c4f4',
+				name: '怪鳥の貫矢',
+				properties: {
+					CastingSpeed_Rate: 10,
+					PhysicalPenetration_Rate: 10,
+					ArmorBreak_Rate: 10,
 				},
 			},
 		],

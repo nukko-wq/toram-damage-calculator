@@ -10,11 +10,9 @@ import type { BaseStats } from '@/types/calculator'
 import { calculateStatPoints } from '@/utils/statPointCalculation'
 
 export default function BaseStatsForm() {
-
 	// Zustandストアから基本ステータスを取得
 	const storeStats = useCalculatorStore((state) => state.data.baseStats)
 	const updateBaseStats = useCalculatorStore((state) => state.updateBaseStats)
-
 
 	// Zustandストアの値を使用（完全移行）
 	const effectiveStats = storeStats
@@ -26,13 +24,11 @@ export default function BaseStatsForm() {
 			mode: 'onChange',
 		})
 
-
 	// useFormSyncカスタムフックで初期化とフォーム監視を統合
 
 	// 直接watchをテストしてみる
 	useEffect(() => {
-		const subscription = watch((value, { name, type }) => {
-		})
+		const subscription = watch((value, { name, type }) => {})
 		return () => subscription.unsubscribe()
 	}, [watch])
 

@@ -173,11 +173,10 @@ export function calculateMagicMasteryEffects(
 	// WeaponATK%計算
 	const weaponATKRate = skillLevel * 3
 
-	// MATK%計算（スキルレベル別）
+	// MATK%計算（設計書の期待値に従う）
+	// Lv1-2: +2%, Lv3-7: +2%, Lv8-10: +3%
 	let matkRate = 0
-	if (skillLevel >= 1 && skillLevel <= 2) {
-		matkRate = 1
-	} else if (skillLevel >= 3 && skillLevel <= 7) {
+	if (skillLevel >= 1 && skillLevel <= 7) {
 		matkRate = 2
 	} else if (skillLevel >= 8 && skillLevel <= 10) {
 		matkRate = 3

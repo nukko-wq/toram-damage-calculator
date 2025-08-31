@@ -7,10 +7,12 @@ import {
 	getPowerReferenceDisplayText,
 	getSystemGroupLabel,
 } from '@/data/attackSkills'
+import { useUIStore } from '@/stores'
 import { useCalculatorStore } from '@/stores/calculatorStore'
+import { useCustomSkillStore } from '@/stores/customSkillStore'
 import type { AttackSkillDisplayData, CalculatedHit } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
-import type { BuffSkillContext } from '@/utils/attackSkillCalculation/types'
+import CustomSkillSettingsPanel from '../forms/CustomSkillSettingsPanel'
 
 interface AttackSkillFormProps {
 	onSkillChange?: (skillData: AttackSkillDisplayData) => void
@@ -31,6 +33,13 @@ export default function AttackSkillForm({
 	const updateAttackSkill = useCalculatorStore(
 		(state) => state.updateAttackSkill,
 	)
+
+	// UIStoreから溜め回数設定を取得
+	const {
+		attackSkill: {
+			variableCharge: { chargeLevel },
+		},
+	} = useUIStore()
 
 	// 選択中の撃目（タブ）
 	const [selectedHitIndex, setSelectedHitIndex] = useState(0)
@@ -55,9 +64,14 @@ export default function AttackSkillForm({
 		}
 
 		// 計算モジュールを使用して実際の計算を実行
+		const variableOptions = selectedSkill.hasVariableCharging
+			? { chargeLevel }
+			: undefined
+
 		const calculationResult = attackSkillCalculation.calculateSkill(
 			selectedSkill.id,
 			calculatorData,
+			variableOptions,
 		)
 
 		const calculatedHits: CalculatedHit[] = calculationResult.hits.map(
@@ -69,6 +83,16 @@ export default function AttackSkillForm({
 					throw new Error(
 						`Original hit data not found for hit ${calculatedHit.hitNumber}`,
 					)
+				}
+
+				// カスタムスキルの場合は設定を反映
+				let canUseShortRangePower = originalHit.canUseShortRangePower
+				let canUseLongRangePower = originalHit.canUseLongRangePower
+
+				if (selectedSkill.id === 'custom_skill') {
+					const customSkillSettings = useCustomSkillStore.getState().settings
+					canUseShortRangePower = customSkillSettings.distancePower === 'short'
+					canUseLongRangePower = customSkillSettings.distancePower === 'long'
 				}
 
 				return {
@@ -87,8 +111,8 @@ export default function AttackSkillForm({
 					adaptationGrant: originalHit.adaptationGrant,
 					canUseUnsheathePower: originalHit.canUseUnsheathePower,
 					canUseLongRange: originalHit.canUseLongRange,
-					canUseShortRangePower: originalHit.canUseShortRangePower,
-					canUseLongRangePower: originalHit.canUseLongRangePower,
+					canUseShortRangePower,
+					canUseLongRangePower,
 					specialEffects: originalHit.specialEffects,
 					calculationProcess: calculatedHit.calculationProcess,
 				}
@@ -100,7 +124,7 @@ export default function AttackSkillForm({
 			calculatedHits,
 			showDetailedInfo: false,
 		}
-	}, [selectedSkill, calculatorData])
+	}, [selectedSkill, calculatorData, chargeLevel])
 
 	// スキル選択処理
 	const handleSkillSelect = (skillId: string) => {
@@ -117,9 +141,14 @@ export default function AttackSkillForm({
 		if (newSkillId) {
 			const skill = getAttackSkillById(newSkillId)
 			if (skill) {
+				const variableOptions = skill.hasVariableCharging
+					? { chargeLevel }
+					: undefined
+
 				const calculationResult = attackSkillCalculation.calculateSkill(
 					newSkillId,
 					calculatorData,
+					variableOptions,
 				)
 				calculatedData = calculationResult.hits.map((calculatedHit) => {
 					const originalHit = skill.hits.find(
@@ -130,6 +159,17 @@ export default function AttackSkillForm({
 							`Original hit data not found for hit ${calculatedHit.hitNumber}`,
 						)
 					}
+					// カスタムスキルの場合は設定を反映
+					let canUseShortRangePower = originalHit.canUseShortRangePower
+					let canUseLongRangePower = originalHit.canUseLongRangePower
+
+					if (skill.id === 'custom_skill') {
+						const customSkillSettings = useCustomSkillStore.getState().settings
+						canUseShortRangePower =
+							customSkillSettings.distancePower === 'short'
+						canUseLongRangePower = customSkillSettings.distancePower === 'long'
+					}
+
 					return {
 						hitNumber: calculatedHit.hitNumber,
 						attackType: originalHit.attackType,
@@ -146,8 +186,8 @@ export default function AttackSkillForm({
 						adaptationGrant: originalHit.adaptationGrant,
 						canUseUnsheathePower: originalHit.canUseUnsheathePower,
 						canUseLongRange: originalHit.canUseLongRange,
-						canUseShortRangePower: originalHit.canUseShortRangePower,
-						canUseLongRangePower: originalHit.canUseLongRangePower,
+						canUseShortRangePower,
+						canUseLongRangePower,
 						specialEffects: originalHit.specialEffects,
 						calculationProcess: calculatedHit.calculationProcess,
 					}
@@ -189,6 +229,20 @@ export default function AttackSkillForm({
 
 	// 距離威力の表示テキストを決定
 	const getDistancePowerDisplayText = (hit: CalculatedHit) => {
+		// カスタムスキルの場合は設定を参照
+		if (selectedSkill?.id === 'custom_skill') {
+			const customSkillSettings = useCustomSkillStore.getState().settings
+			switch (customSkillSettings.distancePower) {
+				case 'short':
+					return '近距離○'
+				case 'long':
+					return '遠距離○'
+				default:
+					return '×'
+			}
+		}
+
+		// 通常のスキルの場合は既存のロジック
 		const canShort = hit.canUseShortRangePower
 		const canLong = hit.canUseLongRangePower
 
@@ -474,6 +528,11 @@ export default function AttackSkillForm({
 					})()}
 				</div>
 			)}
+
+			{/* カスタムスキル設定パネル */}
+			<CustomSkillSettingsPanel
+				isVisible={selectedSkill?.id === 'custom_skill'}
+			/>
 		</div>
 	)
 }

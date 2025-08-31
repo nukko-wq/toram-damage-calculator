@@ -44,10 +44,15 @@ export default function CrystalNameInput() {
 			const existingCrystals = getUserCrystalsByType(
 				newRegistration.selectedType,
 			)
-			const duplicateCrystal = existingCrystals.find((crystal) => crystal.name === nameValue)
-			
+			const duplicateCrystal = existingCrystals.find(
+				(crystal) => crystal.name === nameValue,
+			)
+
 			// 編集モードの場合、自分自身（currentEditId）は重複チェックから除外
-			if (duplicateCrystal && !(editMode === 'edit' && duplicateCrystal.id === currentEditId)) {
+			if (
+				duplicateCrystal &&
+				!(editMode === 'edit' && duplicateCrystal.id === currentEditId)
+			) {
 				errors.name = '同じタイプ内に同名のクリスタルが既に存在します'
 				return errors
 			}

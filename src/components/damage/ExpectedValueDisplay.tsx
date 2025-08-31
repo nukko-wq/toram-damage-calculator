@@ -1,7 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import type { ExpectedValueParams, OccurrenceRatioData, DamageRatioData } from '@/utils/expectedValueCalculations'
+import type {
+	DamageRatioData,
+	ExpectedValueParams,
+	OccurrenceRatioData,
+} from '@/utils/expectedValueCalculations'
 
 // パーセント表示用のフォーマット関数（小数点以下0の場合は整数表示）
 const formatPercentage = (value: number): string => {
@@ -126,7 +130,12 @@ export default function ExpectedValueDisplay({
 			{activeTab && (
 				<div className="bg-white p-4 rounded-lg border">
 					{activeTab === 'basic' && <BasicInfoTab params={params} />}
-					{activeTab === 'ratio' && <RatioDisplayTab occurrenceRatio={occurrenceRatio} damageRatio={damageRatio} />}
+					{activeTab === 'ratio' && (
+						<RatioDisplayTab
+							occurrenceRatio={occurrenceRatio}
+							damageRatio={damageRatio}
+						/>
+					)}
 					{activeTab === 'capture' && (
 						<CaptureTab
 							expectedValue={expectedValue}
@@ -192,8 +201,13 @@ function BasicInfoTab({ params }: { params: ExpectedValueParams }) {
 }
 
 // 割合表示タブ
-function RatioDisplayTab({ occurrenceRatio, damageRatio }: { occurrenceRatio: OccurrenceRatioData; damageRatio: DamageRatioData }) {
-
+function RatioDisplayTab({
+	occurrenceRatio,
+	damageRatio,
+}: {
+	occurrenceRatio: OccurrenceRatioData
+	damageRatio: DamageRatioData
+}) {
 	return (
 		<div className="space-y-8">
 			{/* 発生割合 */}
@@ -206,7 +220,9 @@ function RatioDisplayTab({ occurrenceRatio, damageRatio }: { occurrenceRatio: Oc
 					{Object.entries(occurrenceRatio).map(([type, value]) => (
 						<div key={type} className="flex items-center gap-2">
 							<div className={`w-4 h-4 rounded ${getBarColor(type)}`} />
-							<span className="text-sm text-gray-700">{getTypeLabel(type)}</span>
+							<span className="text-sm text-gray-700">
+								{getTypeLabel(type)}
+							</span>
 							<span className="text-sm text-gray-900 font-medium">
 								{formatPercentage(value)}
 							</span>
@@ -225,7 +241,9 @@ function RatioDisplayTab({ occurrenceRatio, damageRatio }: { occurrenceRatio: Oc
 					{Object.entries(damageRatio).map(([type, value]) => (
 						<div key={type} className="flex items-center gap-2">
 							<div className={`w-4 h-4 rounded ${getBarColor(type)}`} />
-							<span className="text-sm text-gray-700">{getTypeLabel(type)}</span>
+							<span className="text-sm text-gray-700">
+								{getTypeLabel(type)}
+							</span>
 							<span className="text-sm text-gray-900 font-medium">
 								{formatPercentage(value)}
 							</span>
@@ -238,7 +256,11 @@ function RatioDisplayTab({ occurrenceRatio, damageRatio }: { occurrenceRatio: Oc
 }
 
 // 水平バーチャートコンポーネント
-function HorizontalBarChart({ data }: { data: Record<string, number> | OccurrenceRatioData | DamageRatioData }) {
+function HorizontalBarChart({
+	data,
+}: {
+	data: Record<string, number> | OccurrenceRatioData | DamageRatioData
+}) {
 	return (
 		<div className="w-full">
 			{/* バーグラフ */}
@@ -255,14 +277,24 @@ function HorizontalBarChart({ data }: { data: Record<string, number> | Occurrenc
 					)
 				})}
 			</div>
-			
+
 			{/* 目盛り */}
 			<div className="relative w-full mt-1">
-				<div className="absolute left-0 text-xs text-gray-500 transform -translate-x-1/2">0</div>
-				<div className="absolute left-1/4 text-xs text-gray-500 transform -translate-x-1/2">25</div>
-				<div className="absolute left-1/2 text-xs text-gray-500 transform -translate-x-1/2">50</div>
-				<div className="absolute left-3/4 text-xs text-gray-500 transform -translate-x-1/2">75</div>
-				<div className="absolute right-0 text-xs text-gray-500 transform translate-x-1/2">100</div>
+				<div className="absolute left-0 text-xs text-gray-500 transform -translate-x-1/2">
+					0
+				</div>
+				<div className="absolute left-1/4 text-xs text-gray-500 transform -translate-x-1/2">
+					25
+				</div>
+				<div className="absolute left-1/2 text-xs text-gray-500 transform -translate-x-1/2">
+					50
+				</div>
+				<div className="absolute left-3/4 text-xs text-gray-500 transform -translate-x-1/2">
+					75
+				</div>
+				<div className="absolute right-0 text-xs text-gray-500 transform translate-x-1/2">
+					100
+				</div>
 			</div>
 		</div>
 	)

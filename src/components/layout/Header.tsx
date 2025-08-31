@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import React from 'react'
 import HeaderTitle from './HeaderTitle'
 
@@ -18,6 +19,22 @@ export default React.memo<HeaderProps>(function Header({ className = '' }) {
 				<div className="flex flex-col sm:gap-4 md:flex-row md:justify-between md:items-center">
 					{/* サイトタイトル */}
 					<HeaderTitle />
+
+					{/* ナビゲーション */}
+					<nav className="flex flex-wrap gap-4">
+						<Link
+							href="/"
+							className="text-blue-600 hover:text-blue-800 transition-colors"
+						>
+							メイン計算機
+						</Link>
+						<Link
+							href="/necromancer-skills"
+							className="text-blue-600 hover:text-blue-800 transition-colors"
+						>
+							ネクロマンサー検証
+						</Link>
+					</nav>
 				</div>
 			</div>
 		</header>
