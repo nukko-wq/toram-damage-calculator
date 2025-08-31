@@ -203,7 +203,6 @@ export default function CustomSkillSettingsPanel({
 							>
 								<option value="DEF">DEF</option>
 								<option value="MDEF">MDEF</option>
-								<option value="none">無し</option>
 							</select>
 						</div>
 

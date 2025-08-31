@@ -9,7 +9,7 @@ export interface CustomSkillSettings {
 	mpCost: number
 	attackType: 'physical' | 'magical'
 	powerReference: PowerReferenceType
-	referenceDefense: 'DEF' | 'MDEF' | 'none'
+	referenceDefense: 'DEF' | 'MDEF'
 	referenceResistance: 'physical' | 'magical' | 'none'
 	adaptation: AdaptationType | 'none'
 	adaptationGrant: AdaptationType | 'none'
