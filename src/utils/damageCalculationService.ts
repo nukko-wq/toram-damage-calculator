@@ -562,8 +562,16 @@ export function calculateDamageWithService(
 							fixedDamage: hitResult.calculatedFixedDamage,
 							supportedDistances: (() => {
 								const distances: ('short' | 'long')[] = []
-								if (originalHit.canUseShortRangePower) distances.push('short')
-								if (originalHit.canUseLongRangePower) distances.push('long')
+								if (isCustomSkill) {
+									const customSettings = useCustomSkillStore.getState().settings
+									const canUseShort = customSettings.distancePower === 'short' || customSettings.distancePower === 'both'
+									const canUseLong = customSettings.distancePower === 'both'
+									if (canUseShort) distances.push('short')
+									if (canUseLong) distances.push('long')
+								} else {
+									if (originalHit.canUseShortRangePower) distances.push('short')
+									if (originalHit.canUseLongRangePower) distances.push('long')
+								}
 								return distances
 							})(),
 							canUseLongRange: originalHit.canUseLongRange,

@@ -13,7 +13,7 @@ export interface CustomSkillSettings {
 	referenceResistance: 'physical' | 'magical'
 	adaptation: AdaptationType | 'none'
 	adaptationGrant: AdaptationType | 'none'
-	distancePower: 'short' | 'long' | 'none'
+	distancePower: 'short' | 'both' | 'none'
 	canUseUnsheathePower: boolean
 	canUseLongRange: boolean
 }

@@ -285,7 +285,7 @@ export default function CustomSkillSettingsPanel({
 							>
 								<option value="none">無し</option>
 								<option value="short">近距離</option>
-								<option value="long">遠距離</option>
+								<option value="both">有効</option>
 							</select>
 						</div>
 
