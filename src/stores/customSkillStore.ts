@@ -10,7 +10,7 @@ export interface CustomSkillSettings {
 	attackType: 'physical' | 'magical'
 	powerReference: PowerReferenceType
 	referenceDefense: 'DEF' | 'MDEF'
-	referenceResistance: 'physical' | 'magical' | 'none'
+	referenceResistance: 'physical' | 'magical'
 	adaptation: AdaptationType | 'none'
 	adaptationGrant: AdaptationType | 'none'
 	distancePower: 'short' | 'long' | 'none'

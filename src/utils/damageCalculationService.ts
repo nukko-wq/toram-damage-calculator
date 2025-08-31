@@ -572,6 +572,10 @@ export function calculateDamageWithService(
 							referenceDefense: isCustomSkill 
 								? useCustomSkillStore.getState().settings.referenceDefense 
 								: originalHit.referenceDefense,
+							// 注: referenceResistanceも将来的に使用される場合は同様にカスタム設定を適用
+							// referenceResistance: isCustomSkill 
+							//   ? useCustomSkillStore.getState().settings.referenceResistance 
+							//   : originalHit.referenceResistance,
 							specialEffects: hitResult.specialEffects,
 						},
 						// スキルでも距離・抜刀・慣れ設定を適用

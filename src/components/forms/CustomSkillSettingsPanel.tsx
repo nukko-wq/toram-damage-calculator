@@ -219,7 +219,6 @@ export default function CustomSkillSettingsPanel({
 							>
 								<option value="physical">物理</option>
 								<option value="magical">魔法</option>
-								<option value="none">無し</option>
 							</select>
 						</div>
 					</div>
