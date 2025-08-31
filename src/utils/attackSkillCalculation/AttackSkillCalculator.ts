@@ -12,6 +12,7 @@ import {
 	MeteorBreakerCalculator,
 	MoonSlashCalculator,
 	OgreSlashCalculator,
+	PhantomMissileCalculator,
 	ShutOutBleedingCalculator,
 	ShutOutCalculator,
 	type SkillHitCalculator,
@@ -132,6 +133,8 @@ export class AttackSkillCalculator {
 				return new ThorHammerFollowup5HitCalculator()
 			case 'thor_hammer_followup_8hit':
 				return new ThorHammerFollowup8HitCalculator()
+			case 'phantom_missile':
+				return new PhantomMissileCalculator()
 			case 'power_shot':
 			case 'dual_strike':
 			case 'aura_blade':
