@@ -1,5 +1,5 @@
-import { SkillHitCalculator } from './SkillHitCalculator'
 import type { SkillCalculationInput, SkillCalculationResult } from '../types'
+import { SkillHitCalculator } from './SkillHitCalculator'
 
 /**
  * ドラゴニックチャージ(3m+進度2以下)専用計算器
@@ -30,8 +30,7 @@ export class DragonicCharge3mProgress2Calculator extends SkillHitCalculator {
 					hitNumber: 2,
 					calculatedMultiplier: 1000, // 固定1000%
 					calculatedFixedDamage: 0, // 固定0
-					calculationProcess:
-						'Fixed: 1000%, 0 (PowerRef: ATK_spearMATK_half)',
+					calculationProcess: 'Fixed: 1000%, 0 (PowerRef: ATK_spearMATK_half)',
 				}
 
 			default:

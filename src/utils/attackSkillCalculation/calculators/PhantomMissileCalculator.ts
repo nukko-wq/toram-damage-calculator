@@ -1,5 +1,5 @@
-import { SkillHitCalculator } from './SkillHitCalculator'
 import type { SkillCalculationInput, SkillCalculationResult } from '../types'
+import { SkillHitCalculator } from './SkillHitCalculator'
 
 /**
  * ファントムミサイル専用計算器
