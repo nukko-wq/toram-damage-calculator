@@ -4,7 +4,7 @@ import type { SkillCalculationInput, SkillCalculationResult } from '../types'
 /**
  * ドラゴニックチャージ(3m+進度2以下)専用計算器
  * 1hit目: 標準物理攻撃 (ATK参照、威力1000%、固定300)
- * 2hit目: 特殊物理攻撃 (ATK + 槍MATK×0.5参照、威力1000%、固定300、MDEF参照)
+ * 2hit目: 特殊物理攻撃 (ATK + 槍MATK×0.5参照、威力1000%、固定0、MDEF参照)
  */
 export class DragonicCharge3mProgress2Calculator extends SkillHitCalculator {
 	calculate(input: SkillCalculationInput): SkillCalculationResult {
@@ -29,9 +29,9 @@ export class DragonicCharge3mProgress2Calculator extends SkillHitCalculator {
 				return {
 					hitNumber: 2,
 					calculatedMultiplier: 1000, // 固定1000%
-					calculatedFixedDamage: 300, // 固定300
+					calculatedFixedDamage: 0, // 固定0
 					calculationProcess:
-						'Fixed: 1000%, 300 (PowerRef: ATK_spearMATK_half)',
+						'Fixed: 1000%, 0 (PowerRef: ATK_spearMATK_half)',
 				}
 
 			default:

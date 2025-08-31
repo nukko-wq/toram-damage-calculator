@@ -671,7 +671,7 @@ const attackSkillsRawData: AttackSkill[] = [
 				referenceResistance: 'physical',
 				powerReference: 'ATK_spearMATK_half',
 				multiplier: 1000,
-				fixedDamage: 300,
+				fixedDamage: 0,
 				adaptation: 'physical',
 				adaptationGrant: 'physical',
 				canUseUnsheathePower: false,
