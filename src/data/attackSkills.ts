@@ -1098,6 +1098,36 @@ const attackSkillsRawData: AttackSkill[] = [
 		],
 	},
 
+	// サモンデモニック(MP2000消費・強攻撃)
+	{
+		id: 'summon_demonic',
+		name: 'サモンデモニック(MP2000消費・強攻撃)',
+		order: 304,
+		systemGroup: 'necromancer',
+		category: 'necromancer',
+		weaponTypeRequirements: [], // 武器種制限なし（全武器対応）
+		mpCost: 2000,
+		multiplierFormula: '200+90x2000/100', // 威力計算式
+		fixedDamageFormula: '2000', // 固定ダメージ
+		hits: [
+			{
+				hitNumber: 1,
+				attackType: 'physical', // 物理攻撃
+				referenceDefense: 'DEF', // DEF参照
+				referenceResistance: 'physical', // 物理耐性参照
+				powerReference: 'ATK_MATK', // ATK+MATK参照
+				multiplier: 2000, // 威力倍率 200+90x2000/100=2000%
+				fixedDamage: 2000, // 固定2000ダメージ
+				adaptation: 'normal', // 慣れ参照（通常攻撃慣れ）
+				adaptationGrant: 'normal', // 慣れ付与（通常攻撃慣れ）
+				canUseUnsheathePower: false, // 抜刀威力適用不可
+				canUseLongRange: false, // ロングレンジ適用不可
+				canUseShortRangePower: false, // 近距離威力適用不可
+				canUseLongRangePower: false, // 遠距離威力適用不可
+			},
+		],
+	},
+
 	// トゥーム
 	{
 		id: 'tomb',
