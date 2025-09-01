@@ -91,6 +91,8 @@ export class AttackSkillCalculator {
 				return new CustomSkillCalculator()
 			case 'danger_shake':
 				return new DangerShakeCalculator()
+			case 'summon_demonic':
+				return new StandardCalculator()
 			case 'dragonic_charge_3m_progress2':
 				return new DragonicCharge3mProgress2Calculator()
 			case 'l_boomerang_3':

@@ -4,7 +4,7 @@
  */
 
 // ログのオン・オフを制御するフラグ
-const DEBUG_LOG_ENABLED = true
+const DEBUG_LOG_ENABLED = process.env.NODE_ENV === 'development'
 
 // ============================================================================
 // 型定義（設計書から）

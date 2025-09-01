@@ -108,8 +108,8 @@ export function calculateDamageWithService(
 		variableOptions,
 	} = options
 
-	// デバッグログを一時的に無効化
-	const debugEnabled = true
+	// デバッグログを開発環境でのみ有効化
+	const debugEnabled = process.env.NODE_ENV === 'development'
 
 	try {
 		// 基本的な計算入力データを作成
@@ -536,9 +536,12 @@ export function calculateDamageWithService(
 												Math.floor(
 													(calculationResults?.basicStats.spearMATK || 0) * 0.5,
 												)
-											: effectivePowerReference === 'totalATK'
-												? totalATK
-												: totalATK,
+											: effectivePowerReference === 'ATK_MATK'
+												? (calculationResults?.basicStats.ATK || 0) +
+													(calculationResults?.basicStats.MATK || 0)
+												: effectivePowerReference === 'totalATK'
+													? totalATK
+													: totalATK,
 						// スキルカテゴリを考慮したパッシブ倍率を適用
 						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
 							calculatorData.buffSkills?.skills || null,

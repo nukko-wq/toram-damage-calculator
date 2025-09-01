@@ -855,6 +855,7 @@ export type PowerReferenceType =
 	| 'MATK'
 	| 'spearMATK'
 	| 'ATK_spearMATK_half' // ATK+(spearMATK*0.5)の特殊参照
+	| 'ATK_MATK' // ATK+MATKの特殊参照
 
 // 慣れタイプ
 export type AdaptationType = 'physical' | 'magical' | 'normal'
