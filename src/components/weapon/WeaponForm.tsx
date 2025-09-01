@@ -94,6 +94,7 @@ export default function WeaponForm() {
 
 	// フォーカス状態でのクリックによる値クリア機能（メイン武器）
 	const handleMainClickToClear = (fieldName: 'ATK' | 'stability') => {
+		// 最小値の0を設定してから、テキストを選択状態にする
 		setValueMain(fieldName, 0, { shouldValidate: true })
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
@@ -108,6 +109,7 @@ export default function WeaponForm() {
 
 	// フォーカス状態でのクリックによる値クリア機能（サブ武器）
 	const handleSubClickToClear = (fieldName: 'ATK' | 'stability') => {
+		// 最小値の0を設定してから、テキストを選択状態にする
 		setValueSub(fieldName, 0, { shouldValidate: true })
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
@@ -149,8 +151,6 @@ export default function WeaponForm() {
 	// 入力値を範囲内に制限する関数（メイン武器）
 	const handleMainBlur = (fieldName: keyof MainWeaponFormData) => {
 		const value = getValuesMain(fieldName)
-		if (typeof value !== 'number') return
-
 		const min = 0
 		let max = 1500
 
@@ -160,9 +160,17 @@ export default function WeaponForm() {
 			max = 15
 		}
 
-		if (value < min) {
+		// 空文字、0、または不正な値の場合は最小値に設定
+		const numValue = Number(value)
+		if (
+			value === undefined ||
+			value === null ||
+			String(value) === '' ||
+			Number.isNaN(numValue) ||
+			numValue < min
+		) {
 			setValueMain(fieldName, min, { shouldValidate: true })
-		} else if (value > max) {
+		} else if (numValue > max) {
 			setValueMain(fieldName, max, { shouldValidate: true })
 		}
 	}
@@ -170,8 +178,6 @@ export default function WeaponForm() {
 	// 入力値を範囲内に制限する関数（サブ武器）
 	const handleSubBlur = (fieldName: keyof SubWeaponFormData) => {
 		const value = getValuesSub(fieldName)
-		if (typeof value !== 'number') return
-
 		const min = 0
 		let max = 1500
 
@@ -181,18 +187,23 @@ export default function WeaponForm() {
 			max = 15
 		}
 
-		if (value < min) {
+		// 空文字、0、または不正な値の場合は最小値に設定
+		const numValue = Number(value)
+		if (
+			value === undefined ||
+			value === null ||
+			String(value) === '' ||
+			Number.isNaN(numValue) ||
+			numValue < min
+		) {
 			setValueSub(fieldName, min, { shouldValidate: true })
-		} else if (value > max) {
+		} else if (numValue > max) {
 			setValueSub(fieldName, max, { shouldValidate: true })
 		}
 	}
 
 	// メイン武器の武器タイプ変更時の処理
-	const handleMainWeaponTypeChange = (
-		newWeaponType: string,
-		currentData: Partial<MainWeaponFormData>,
-	) => {
+	const handleMainWeaponTypeChange = (newWeaponType: string) => {
 		const newMainWeaponType = newWeaponType as WeaponType
 		const currentSubWeaponType = effectiveSubWeapon.weaponType
 
@@ -281,7 +292,7 @@ export default function WeaponForm() {
 									updateMainWeapon(updatedMainWeapon)
 
 									// サブ武器の自動修正処理を実行
-									handleMainWeaponTypeChange(newWeaponType, updatedMainWeapon)
+									handleMainWeaponTypeChange(newWeaponType)
 								}}
 							>
 								{weaponTypes.map((type) => (
@@ -312,7 +323,11 @@ export default function WeaponForm() {
 								}}
 								{...registerMain('ATK', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 0
 										}
 										const numValue = Number(value)
@@ -343,7 +358,11 @@ export default function WeaponForm() {
 								}}
 								{...registerMain('stability', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 0
 										}
 										const numValue = Number(value)
@@ -427,7 +446,11 @@ export default function WeaponForm() {
 								}}
 								{...registerSub('ATK', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 0
 										}
 										const numValue = Number(value)
@@ -458,7 +481,11 @@ export default function WeaponForm() {
 								}}
 								{...registerSub('stability', {
 									setValueAs: (value: string | number) => {
-										if (value === '' || value === null || value === undefined) {
+										// 空文字の場合はそのまま返す（入力中は許可）
+										if (value === '') {
+											return ''
+										}
+										if (value === null || value === undefined) {
 											return 0
 										}
 										const numValue = Number(value)
