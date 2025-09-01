@@ -38,6 +38,11 @@ export default function EnemyForm() {
 		title: '',
 	})
 
+	// 一時的な入力値を管理するstate（PropertyEditorと同様）
+	const [tempInputValues, setTempInputValues] = useState<
+		Record<string, string>
+	>({})
+
 	// 現在選択されている敵情報を取得
 	const selectedEnemy =
 		effectiveEnemyData.selectedId && effectiveEnemyData.type
@@ -73,6 +78,83 @@ export default function EnemyForm() {
 
 		// Zustandストアを更新
 		updateEnemy(newData)
+	}
+
+	// 一時的な入力値のキーを生成
+	const getTempInputKey = (field: 'resistCritical' | 'requiredHIT') => {
+		return `enemy-${field}`
+	}
+
+	// 表示用の値を取得（一時入力値 > 実際の値 > 空文字）
+	const getDisplayValue = (field: 'resistCritical' | 'requiredHIT') => {
+		const tempKey = getTempInputKey(field)
+		if (tempInputValues[tempKey] !== undefined) {
+			return tempInputValues[tempKey]
+		}
+		const actualValue = effectiveEnemyData.manualOverrides?.[field]
+		return actualValue === 0 ? '' : actualValue || ''
+	}
+
+	// 入力値変更時の処理
+	const handleManualOverrideInputChange = (
+		field: 'resistCritical' | 'requiredHIT',
+		value: string,
+	) => {
+		const tempKey = getTempInputKey(field)
+		// 一時的な入力値を保存（空文字も許可）
+		setTempInputValues((prev) => ({
+			...prev,
+			[tempKey]: value,
+		}))
+		// 空文字でなければ実際の値も更新（内部データ用）
+		if (value !== '') {
+			handleManualOverrideChange(field, value)
+		}
+	}
+
+	// フォーカスが外れたときの処理
+	const handleManualOverrideBlur = (
+		field: 'resistCritical' | 'requiredHIT',
+		value: string,
+	) => {
+		const tempKey = getTempInputKey(field)
+		// 一時的な入力値をクリア
+		setTempInputValues((prev) => {
+			const newValues = { ...prev }
+			delete newValues[tempKey]
+			return newValues
+		})
+
+		// 空文字、または不正な値の場合は0に設定
+		const numValue = Number(value)
+		if (
+			value === undefined ||
+			value === null ||
+			String(value) === '' ||
+			Number.isNaN(numValue)
+		) {
+			handleManualOverrideChange(field, '0')
+		} else {
+			// 実際の値を更新
+			handleManualOverrideChange(field, value)
+		}
+	}
+
+	// フォーカス状態でのクリックによる値クリア機能
+	const handleManualOverrideClickToClear = (
+		field: 'resistCritical' | 'requiredHIT',
+	) => {
+		// 最小値の0を設定してから、テキストを選択状態にする
+		handleManualOverrideChange(field, '0')
+		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
+		setTimeout(() => {
+			const element = document.getElementById(
+				`enemy-${field}`,
+			) as HTMLInputElement
+			if (element) {
+				element.select()
+			}
+		}, 0)
 	}
 
 	// 手動調整値の変更処理
@@ -427,16 +509,23 @@ export default function EnemyForm() {
 								</label>
 								<div className="flex items-center gap-2">
 									<input
+										id="enemy-resistCritical"
 										type="number"
-										value={
-											effectiveEnemyData.manualOverrides?.resistCritical || 0
-										}
+										value={getDisplayValue('resistCritical')}
 										onChange={(e) =>
-											handleManualOverrideChange(
+											handleManualOverrideInputChange(
 												'resistCritical',
 												e.target.value,
 											)
 										}
+										onBlur={(e) =>
+											handleManualOverrideBlur('resistCritical', e.target.value)
+										}
+										onMouseDown={(e) => {
+											if (document.activeElement === e.target) {
+												handleManualOverrideClickToClear('resistCritical')
+											}
+										}}
 										className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
 										min="0"
 										max="999"
@@ -457,11 +546,23 @@ export default function EnemyForm() {
 								</label>
 								<div className="flex items-center gap-2">
 									<input
+										id="enemy-requiredHIT"
 										type="number"
-										value={effectiveEnemyData.manualOverrides?.requiredHIT || 0}
+										value={getDisplayValue('requiredHIT')}
 										onChange={(e) =>
-											handleManualOverrideChange('requiredHIT', e.target.value)
+											handleManualOverrideInputChange(
+												'requiredHIT',
+												e.target.value,
+											)
 										}
+										onBlur={(e) =>
+											handleManualOverrideBlur('requiredHIT', e.target.value)
+										}
+										onMouseDown={(e) => {
+											if (document.activeElement === e.target) {
+												handleManualOverrideClickToClear('requiredHIT')
+											}
+										}}
 										className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
 										min="0"
 										max="9999"
