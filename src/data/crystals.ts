@@ -287,6 +287,19 @@ export const crystalsData: CrystalsData = {
 					},
 				],
 			},
+			{
+				id: 'fab03fd4-ffb3-404e-b374-199baf31108b',
+				name: 'メルゼハール',
+				type: 'armor',
+				properties: {
+					HP_Rate: 25,
+					PhysicalResistance_Rate: 15,
+					MATK_Rate: 13,
+					MagicalPenetration_Rate: 10,
+					CastingSpeed_Rate: 25,
+					MP: -200,
+				},
+			},
 		],
 		additional: [
 			{
