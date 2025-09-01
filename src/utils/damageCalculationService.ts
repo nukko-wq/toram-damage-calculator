@@ -4,6 +4,7 @@
  */
 
 import { getAttackSkillById } from '@/data/attackSkills'
+import { useCustomSkillStore } from '@/stores/customSkillStore'
 import type { BuffSkillState } from '@/types/buffSkill'
 import type { CalculatorData, PowerOptions } from '@/types/calculator'
 import { attackSkillCalculation } from '@/utils/attackSkillCalculation'
@@ -514,20 +515,30 @@ export function calculateDamageWithService(
 					)
 					if (!originalHit) continue
 
+					// カスタムスキルの場合は設定から威力参照を取得
+					const isCustomSkill = selectedSkill.id === 'custom_skill'
+					const effectivePowerReference = isCustomSkill
+						? useCustomSkillStore.getState().settings.powerReference
+						: originalHit.powerReference
+
 					const skillInput = {
 						...input,
 						// スキルの場合はMATK、ATK、spearMATK、ATK_spearMATK_half、またはtotalATKを参照
 						referenceStat:
-							originalHit.powerReference === 'MATK'
+							effectivePowerReference === 'MATK'
 								? calculationResults?.basicStats.MATK || 1500
-								: originalHit.powerReference === 'spearMATK'
+								: effectivePowerReference === 'spearMATK'
 									? calculationResults?.basicStats.spearMATK || 1500
-									: originalHit.powerReference === 'ATK'
+									: effectivePowerReference === 'ATK'
 										? calculationResults?.basicStats.ATK || 0
-										: originalHit.powerReference === 'ATK_spearMATK_half'
-											? (calculationResults?.basicStats.ATK || 0) + 
-											  Math.floor((calculationResults?.basicStats.spearMATK || 0) * 0.5)
-											: totalATK,
+										: effectivePowerReference === 'ATK_spearMATK_half'
+											? (calculationResults?.basicStats.ATK || 0) +
+												Math.floor(
+													(calculationResults?.basicStats.spearMATK || 0) * 0.5,
+												)
+											: effectivePowerReference === 'totalATK'
+												? totalATK
+												: totalATK,
 						// スキルカテゴリを考慮したパッシブ倍率を適用
 						passiveMultiplier: getBuffSkillPassiveMultiplierWithSkillCategory(
 							calculatorData.buffSkills?.skills || null,
@@ -551,14 +562,28 @@ export function calculateDamageWithService(
 							fixedDamage: hitResult.calculatedFixedDamage,
 							supportedDistances: (() => {
 								const distances: ('short' | 'long')[] = []
-								if (originalHit.canUseShortRangePower) distances.push('short')
-								if (originalHit.canUseLongRangePower) distances.push('long')
+								if (isCustomSkill) {
+									const customSettings = useCustomSkillStore.getState().settings
+									const canUseShort = customSettings.distancePower === 'short' || customSettings.distancePower === 'both'
+									const canUseLong = customSettings.distancePower === 'both'
+									if (canUseShort) distances.push('short')
+									if (canUseLong) distances.push('long')
+								} else {
+									if (originalHit.canUseShortRangePower) distances.push('short')
+									if (originalHit.canUseLongRangePower) distances.push('long')
+								}
 								return distances
 							})(),
 							canUseLongRange: originalHit.canUseLongRange,
 							skillId: selectedSkill.id,
 							hitNumber: hitResult.hitNumber,
-							referenceDefense: originalHit.referenceDefense,
+							referenceDefense: isCustomSkill 
+								? useCustomSkillStore.getState().settings.referenceDefense 
+								: originalHit.referenceDefense,
+							// 注: referenceResistanceも将来的に使用される場合は同様にカスタム設定を適用
+							// referenceResistance: isCustomSkill 
+							//   ? useCustomSkillStore.getState().settings.referenceResistance 
+							//   : originalHit.referenceResistance,
 							specialEffects: hitResult.specialEffects,
 						},
 						// スキルでも距離・抜刀・慣れ設定を適用

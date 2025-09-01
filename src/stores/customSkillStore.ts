@@ -9,11 +9,11 @@ export interface CustomSkillSettings {
 	mpCost: number
 	attackType: 'physical' | 'magical'
 	powerReference: PowerReferenceType
-	referenceDefense: 'DEF' | 'MDEF' | 'none'
-	referenceResistance: 'physical' | 'magical' | 'none'
+	referenceDefense: 'DEF' | 'MDEF'
+	referenceResistance: 'physical' | 'magical'
 	adaptation: AdaptationType | 'none'
 	adaptationGrant: AdaptationType | 'none'
-	distancePower: 'short' | 'long' | 'none'
+	distancePower: 'short' | 'both' | 'none'
 	canUseUnsheathePower: boolean
 	canUseLongRange: boolean
 }

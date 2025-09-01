@@ -467,11 +467,13 @@ function calculateBaseDamage(
 	}
 
 	// 参照防御力タイプを優先、未指定の場合は従来通り攻撃タイプから決定
-	const defenseType = input.attackSkill.referenceDefense || 
-	                    (input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF')
-	
+	const defenseType =
+		input.attackSkill.referenceDefense ||
+		(input.attackSkill.type === 'physical' ? 'DEF' : 'MDEF')
+
 	// 敵防御力処理
-	const enemyDefense = defenseType === 'DEF' ? input.enemy.DEF : input.enemy.MDEF
+	const enemyDefense =
+		defenseType === 'DEF' ? input.enemy.DEF : input.enemy.MDEF
 	const processedDefense = processEnemyDefense(enemyDefense, input, defenseType)
 
 	// 防御力減算前に小数点を切り捨て
@@ -1091,7 +1093,8 @@ function processEnemyDefense(
 		penetrationRate += skillPenetrationBonus
 
 		// スキル特殊効果による貫通ボーナス追加
-		const specialEffectsPenetration = input.attackSkill.specialEffects?.physicalPenetration || 0
+		const specialEffectsPenetration =
+			input.attackSkill.specialEffects?.physicalPenetration || 0
 		penetrationRate += specialEffectsPenetration
 
 		if (DEBUG_LOG_ENABLED && skillPenetrationBonus > 0) {

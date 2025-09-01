@@ -203,7 +203,6 @@ export default function CustomSkillSettingsPanel({
 							>
 								<option value="DEF">DEF</option>
 								<option value="MDEF">MDEF</option>
-								<option value="none">無し</option>
 							</select>
 						</div>
 
@@ -220,7 +219,6 @@ export default function CustomSkillSettingsPanel({
 							>
 								<option value="physical">物理</option>
 								<option value="magical">魔法</option>
-								<option value="none">無し</option>
 							</select>
 						</div>
 					</div>
@@ -287,7 +285,7 @@ export default function CustomSkillSettingsPanel({
 							>
 								<option value="none">無し</option>
 								<option value="short">近距離</option>
-								<option value="long">遠距離</option>
+								<option value="both">有効</option>
 							</select>
 						</div>
 

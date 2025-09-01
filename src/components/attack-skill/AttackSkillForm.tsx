@@ -88,11 +88,15 @@ export default function AttackSkillForm({
 				// カスタムスキルの場合は設定を反映
 				let canUseShortRangePower = originalHit.canUseShortRangePower
 				let canUseLongRangePower = originalHit.canUseLongRangePower
+				let effectiveReferenceDefense = originalHit.referenceDefense
+				let effectiveReferenceResistance = originalHit.referenceResistance
 
 				if (selectedSkill.id === 'custom_skill') {
 					const customSkillSettings = useCustomSkillStore.getState().settings
-					canUseShortRangePower = customSkillSettings.distancePower === 'short'
-					canUseLongRangePower = customSkillSettings.distancePower === 'long'
+					canUseShortRangePower = customSkillSettings.distancePower === 'short' || customSkillSettings.distancePower === 'both'
+					canUseLongRangePower = customSkillSettings.distancePower === 'both'
+					effectiveReferenceDefense = customSkillSettings.referenceDefense
+					effectiveReferenceResistance = customSkillSettings.referenceResistance
 				}
 
 				return {
@@ -101,8 +105,8 @@ export default function AttackSkillForm({
 					powerReference: getPowerReferenceDisplayText(
 						originalHit.powerReference,
 					),
-					referenceDefense: originalHit.referenceDefense,
-					referenceResistance: originalHit.referenceResistance,
+					referenceDefense: effectiveReferenceDefense,
+					referenceResistance: effectiveReferenceResistance,
 					multiplier: calculatedHit.calculatedMultiplier,
 					fixedDamage: calculatedHit.calculatedFixedDamage,
 					multiplierFormula: originalHit.multiplierFormula,
@@ -162,12 +166,16 @@ export default function AttackSkillForm({
 					// カスタムスキルの場合は設定を反映
 					let canUseShortRangePower = originalHit.canUseShortRangePower
 					let canUseLongRangePower = originalHit.canUseLongRangePower
+					let effectiveReferenceDefense = originalHit.referenceDefense
+					let effectiveReferenceResistance = originalHit.referenceResistance
 
 					if (skill.id === 'custom_skill') {
 						const customSkillSettings = useCustomSkillStore.getState().settings
 						canUseShortRangePower =
-							customSkillSettings.distancePower === 'short'
-						canUseLongRangePower = customSkillSettings.distancePower === 'long'
+							customSkillSettings.distancePower === 'short' || customSkillSettings.distancePower === 'both'
+						canUseLongRangePower = customSkillSettings.distancePower === 'both'
+						effectiveReferenceDefense = customSkillSettings.referenceDefense
+						effectiveReferenceResistance = customSkillSettings.referenceResistance
 					}
 
 					return {
@@ -176,8 +184,8 @@ export default function AttackSkillForm({
 						powerReference: getPowerReferenceDisplayText(
 							originalHit.powerReference,
 						),
-						referenceDefense: originalHit.referenceDefense,
-						referenceResistance: originalHit.referenceResistance,
+						referenceDefense: effectiveReferenceDefense,
+						referenceResistance: effectiveReferenceResistance,
 						multiplier: calculatedHit.calculatedMultiplier,
 						fixedDamage: calculatedHit.calculatedFixedDamage,
 						multiplierFormula: originalHit.multiplierFormula,
@@ -235,8 +243,8 @@ export default function AttackSkillForm({
 			switch (customSkillSettings.distancePower) {
 				case 'short':
 					return '近距離○'
-				case 'long':
-					return '遠距離○'
+				case 'both':
+					return '近距離○/遠距離○'
 				default:
 					return '×'
 			}
