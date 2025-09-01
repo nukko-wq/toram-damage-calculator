@@ -411,20 +411,22 @@ export const calculateExpectedValue = (
 			missDamage * occurrenceRatio.miss) /
 		100
 
-	// 計算過程をコンソールログで表示
-	console.group('期待値計算の詳細')
-	console.log('発生割合:', occurrenceRatio)
-	console.log('Criticalダメージ:', criticalDamage)
-	console.log('Grazeダメージ:', grazeDamage)
-	console.log('白ダメダメージ:', whiteDamage)
-	console.log('ミスダメージ:', missDamage)
-	console.log(
-		'計算式:',
-		`(${criticalDamage} × ${occurrenceRatio.critical}% + ${grazeDamage} × ${occurrenceRatio.graze}% + ${whiteDamage} × ${occurrenceRatio.white}% + ${missDamage} × ${occurrenceRatio.miss}%) ÷ 100`,
-	)
-	console.log('期待値（小数）:', expectedValue)
-	console.log('期待値（整数）:', Math.floor(expectedValue))
-	console.groupEnd()
+	// 計算過程をコンソールログで表示（開発環境のみ）
+	if (process.env.NODE_ENV === 'development') {
+		console.group('期待値計算の詳細')
+		console.log('発生割合:', occurrenceRatio)
+		console.log('Criticalダメージ:', criticalDamage)
+		console.log('Grazeダメージ:', grazeDamage)
+		console.log('白ダメダメージ:', whiteDamage)
+		console.log('ミスダメージ:', missDamage)
+		console.log(
+			'計算式:',
+			`(${criticalDamage} × ${occurrenceRatio.critical}% + ${grazeDamage} × ${occurrenceRatio.graze}% + ${whiteDamage} × ${occurrenceRatio.white}% + ${missDamage} × ${occurrenceRatio.miss}%) ÷ 100`,
+		)
+		console.log('期待値（小数）:', expectedValue)
+		console.log('期待値（整数）:', Math.floor(expectedValue))
+		console.groupEnd()
+	}
 
 	return Math.floor(expectedValue)
 }
