@@ -93,7 +93,9 @@ export default function AttackSkillForm({
 
 				if (selectedSkill.id === 'custom_skill') {
 					const customSkillSettings = useCustomSkillStore.getState().settings
-					canUseShortRangePower = customSkillSettings.distancePower === 'short' || customSkillSettings.distancePower === 'both'
+					canUseShortRangePower =
+						customSkillSettings.distancePower === 'short' ||
+						customSkillSettings.distancePower === 'both'
 					canUseLongRangePower = customSkillSettings.distancePower === 'both'
 					effectiveReferenceDefense = customSkillSettings.referenceDefense
 					effectiveReferenceResistance = customSkillSettings.referenceResistance
@@ -172,10 +174,12 @@ export default function AttackSkillForm({
 					if (skill.id === 'custom_skill') {
 						const customSkillSettings = useCustomSkillStore.getState().settings
 						canUseShortRangePower =
-							customSkillSettings.distancePower === 'short' || customSkillSettings.distancePower === 'both'
+							customSkillSettings.distancePower === 'short' ||
+							customSkillSettings.distancePower === 'both'
 						canUseLongRangePower = customSkillSettings.distancePower === 'both'
 						effectiveReferenceDefense = customSkillSettings.referenceDefense
-						effectiveReferenceResistance = customSkillSettings.referenceResistance
+						effectiveReferenceResistance =
+							customSkillSettings.referenceResistance
 					}
 
 					return {

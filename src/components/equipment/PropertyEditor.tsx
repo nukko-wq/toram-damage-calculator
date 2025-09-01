@@ -344,16 +344,18 @@ export default function PropertyEditor({
 		value: string,
 	) => {
 		const tempKey = getTempInputKey(property)
-		// 一時的な入力値を保存
+		// 一時的な入力値を保存（空文字も許可）
 		setTempInputValues((prev) => ({
 			...prev,
 			[tempKey]: value,
 		}))
-		// 実際の値も更新（内部データ用）
-		handleEquipmentPropertyChange(property, value)
+		// 空文字でなければ実際の値も更新（内部データ用）
+		if (value !== '') {
+			handleEquipmentPropertyChange(property, value)
+		}
 	}
 
-	// フォーカスが外れたときに0を空文字に変換する機能
+	// フォーカスが外れたときの処理（BaseStatsFormと同様の動作）
 	const handlePropertyBlur = (
 		property: keyof EquipmentProperties,
 		value: string,
@@ -365,8 +367,20 @@ export default function PropertyEditor({
 			delete newValues[tempKey]
 			return newValues
 		})
-		// 実際の値を更新
-		handleEquipmentPropertyChange(property, value)
+
+		// 空文字、または不正な値の場合は0に設定
+		const numValue = Number(value)
+		if (
+			value === undefined ||
+			value === null ||
+			String(value) === '' ||
+			Number.isNaN(numValue)
+		) {
+			handleEquipmentPropertyChange(property, '0')
+		} else {
+			// 実際の値を更新
+			handleEquipmentPropertyChange(property, value)
+		}
 	}
 
 	// フォーカス状態でのクリックによる値クリア機能（装備プロパティ）
@@ -374,6 +388,7 @@ export default function PropertyEditor({
 		property: keyof EquipmentProperties,
 		equipmentId: string,
 	) => {
+		// 最小値の0を設定してから、テキストを選択状態にする
 		handleEquipmentPropertyChange(property, '0')
 		// 次のティックでテキストを選択状態にしてユーザーが入力しやすくする
 		setTimeout(() => {
@@ -459,7 +474,6 @@ export default function PropertyEditor({
 												onBlur={(e) =>
 													handlePropertyBlur(pair.properties[0], e.target.value)
 												}
-												onFocus={(e) => e.target.select()}
 												onMouseDown={(e) => {
 													if (document.activeElement === e.target) {
 														handlePropertyClickToClear(
@@ -483,7 +497,6 @@ export default function PropertyEditor({
 												onBlur={(e) =>
 													handlePropertyBlur(pair.properties[1], e.target.value)
 												}
-												onFocus={(e) => e.target.select()}
 												onMouseDown={(e) => {
 													if (document.activeElement === e.target) {
 														handlePropertyClickToClear(
@@ -511,7 +524,6 @@ export default function PropertyEditor({
 												onBlur={(e) =>
 													handlePropertyBlur(pair.properties[0], e.target.value)
 												}
-												onFocus={(e) => e.target.select()}
 												onMouseDown={(e) => {
 													if (document.activeElement === e.target) {
 														handlePropertyClickToClear(
@@ -541,7 +553,6 @@ export default function PropertyEditor({
 												onBlur={(e) =>
 													handlePropertyBlur(pair.properties[0], e.target.value)
 												}
-												onFocus={(e) => e.target.select()}
 												onMouseDown={(e) => {
 													if (document.activeElement === e.target) {
 														handlePropertyClickToClear(

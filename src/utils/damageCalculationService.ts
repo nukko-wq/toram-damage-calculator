@@ -567,7 +567,9 @@ export function calculateDamageWithService(
 								const distances: ('short' | 'long')[] = []
 								if (isCustomSkill) {
 									const customSettings = useCustomSkillStore.getState().settings
-									const canUseShort = customSettings.distancePower === 'short' || customSettings.distancePower === 'both'
+									const canUseShort =
+										customSettings.distancePower === 'short' ||
+										customSettings.distancePower === 'both'
 									const canUseLong = customSettings.distancePower === 'both'
 									if (canUseShort) distances.push('short')
 									if (canUseLong) distances.push('long')
@@ -580,12 +582,12 @@ export function calculateDamageWithService(
 							canUseLongRange: originalHit.canUseLongRange,
 							skillId: selectedSkill.id,
 							hitNumber: hitResult.hitNumber,
-							referenceDefense: isCustomSkill 
-								? useCustomSkillStore.getState().settings.referenceDefense 
+							referenceDefense: isCustomSkill
+								? useCustomSkillStore.getState().settings.referenceDefense
 								: originalHit.referenceDefense,
 							// 注: referenceResistanceも将来的に使用される場合は同様にカスタム設定を適用
-							// referenceResistance: isCustomSkill 
-							//   ? useCustomSkillStore.getState().settings.referenceResistance 
+							// referenceResistance: isCustomSkill
+							//   ? useCustomSkillStore.getState().settings.referenceResistance
 							//   : originalHit.referenceResistance,
 							specialEffects: hitResult.specialEffects,
 						},
