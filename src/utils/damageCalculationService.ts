@@ -108,8 +108,8 @@ export function calculateDamageWithService(
 		variableOptions,
 	} = options
 
-	// デバッグログを一時的に無効化
-	const debugEnabled = true
+	// デバッグログを開発環境でのみ有効化
+	const debugEnabled = process.env.NODE_ENV === 'development'
 
 	try {
 		// 基本的な計算入力データを作成
